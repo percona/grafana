@@ -10,7 +10,6 @@ jobs:
   build:
     name: Build a Docker image
     timeout-minutes: 30
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +23,7 @@ jobs:
         run: docker login -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }} docker.pkg.github.com
 
       - name: Build a Docker image
-        run: docker build --tag percona-platorm/grafana/grafana:dev .
+        run: docker build --squash --tag percona-platorm/grafana/grafana:dev .
 
       - name: Push the Docker image to the registry
         run: docker push percona-platform/grafana/grafana:dev
