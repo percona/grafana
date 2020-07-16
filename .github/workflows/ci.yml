@@ -26,7 +26,7 @@ jobs:
         run: docker build --squash --tag percona-platform/grafana/grafana:dev .
 
       - name: Push the Docker image to the registry
-        run: docker push percona-platform/grafana/grafana:dev
+        run: docker push docker.pkg.github.com/percona-platform/grafana/grafana:dev
 
       - name: Print usefull info on failure
         if: ${{ failure() }}
