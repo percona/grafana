@@ -23,7 +23,7 @@ jobs:
         run: docker login -u $GITHUB_ACTOR -p ${{ secrets.GITHUB_TOKEN }} docker.pkg.github.com
 
       - name: Build a Docker image
-        run: docker build --squash --tag percona-platform/grafana/grafana:dev .
+        run: docker build --squash --tag docker.pkg.github.com/percona-platform/grafana/grafana:dev .
 
       - name: Push the Docker image to the registry
         run: docker push docker.pkg.github.com/percona-platform/grafana/grafana:dev
