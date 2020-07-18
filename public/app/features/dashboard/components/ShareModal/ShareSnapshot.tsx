@@ -236,7 +236,6 @@ export class ShareSnapshot extends PureComponent<Props, State> {
               </li>
             </ul>
           </p>
-          +{' '}
           <p className="share-modal-info-text">
             <strong>What to do next: </strong> Once you click <i>Share with Percona</i>, wait for the dashboard to be
             generated, and you will be provided with a unique URL that then needs to be communicated to Percona via your
