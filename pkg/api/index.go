@@ -358,6 +358,22 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 			SortWeight:   dtos.WeightAdmin,
 			Children:     adminNavLinks,
 		})
+
+		saasNavLinks := []*dtos.NavLink{
+			{Text: "Cluster", Id: "dbaas-cluster", Url: "/graph/d/pmm-dbaas/cluster", Icon: "database"},
+			{Text: "Inventory", Id: "dbaas-iventory", Url: "/graph/d/pmm-dbaas/inventory", Icon: "building"},
+		}
+
+		data.NavTree = append(data.NavTree, &dtos.NavLink{
+			Text:         "SaaS",
+			SubTitle:     "Manage the SaaS cluster",
+			HideFromTabs: true,
+			Id:           "saas",
+			Icon:         "database",
+			Url:          "/graph/d/pmm-dbaas/cluster",
+			SortWeight:   dtos.WeightAdmin,
+			Children:     saasNavLinks,
+		})
 	}
 
 	helpVersion := fmt.Sprintf(`%s v%s (%s)`, setting.ApplicationName, setting.BuildVersion, setting.BuildCommit)

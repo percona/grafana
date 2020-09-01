@@ -537,6 +537,24 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
       controllerAs: 'ctrl',
       reloadOnSearch: false,
     })
+    .when('/graph/d/pmm-dbaas/cluster', {
+      template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () =>
+          SafeDynamicImport(import(/* webpackChunkName: "DbaasClusterPage" */ 'app/features/dbaas/DbaasClusterPage')),
+      },
+    })
+    .when('/graph/d/pmm-dbaas/inventory', {
+      template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () =>
+          SafeDynamicImport(
+            import(/* webpackChunkName: "DbaasInventoryPage" */ 'app/features/dbaas/DbaasInventoryPage')
+          ),
+      },
+    })
     .otherwise({
       templateUrl: 'public/app/partials/error.html',
       controller: 'ErrorCtrl',
