@@ -358,7 +358,6 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 			SortWeight:   dtos.WeightAdmin,
 			Children:     adminNavLinks,
 		})
-
 	}
 
 	helpVersion := fmt.Sprintf(`%s v%s (%s)`, setting.ApplicationName, setting.BuildVersion, setting.BuildCommit)
