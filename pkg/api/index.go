@@ -359,16 +359,6 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 			Children:     adminNavLinks,
 		})
 
-		data.NavTree = append(data.NavTree, &dtos.NavLink{
-			Text:         "SaaS",
-			SubTitle:     "Manage the SaaS cluster",
-			HideFromTabs: true,
-			Id:           "saas",
-			Icon:         "database",
-			Url:          "/graph/d/pmm-dbaas/pmm-dbaas",
-			SortWeight:   dtos.WeightAdmin,
-			Children:     []*dtos.NavLink{},
-		})
 	}
 
 	helpVersion := fmt.Sprintf(`%s v%s (%s)`, setting.ApplicationName, setting.BuildVersion, setting.BuildCommit)

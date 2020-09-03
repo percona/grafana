@@ -15,7 +15,7 @@ const TopSection: FC<any> = () => {
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
-
+  ///graph/d/pmm-dbaas/pmm-dbaas
   return (
     <div className="sidemenu__top">
       <TopSectionItem link={searchLink} onClick={onOpenSearch} />
