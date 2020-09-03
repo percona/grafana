@@ -12,10 +12,17 @@ const TopSection: FC<any> = () => {
     icon: 'search',
   };
 
+  mainLinks.push({
+    id: 'dbaas',
+    icon: 'database',
+    text: 'DBaaS',
+    url: '/graph/d/pmm-dbaas/pmm-dbaas',
+  });
+
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
-  ///graph/d/pmm-dbaas/pmm-dbaas
+
   return (
     <div className="sidemenu__top">
       <TopSectionItem link={searchLink} onClick={onOpenSearch} />
