@@ -22,6 +22,17 @@ exports[`Render should render component 1`] = `
       }
     }
   />
+  <TopSectionItem
+    key="dbaas-1"
+    link={
+      Object {
+        "icon": "database",
+        "id": "dbaas",
+        "text": "DBaaS",
+        "url": "/graph/d/pmm-dbaas/pmm-dbaas",
+      }
+    }
+  />
 </div>
 `;
 
@@ -44,6 +55,17 @@ exports[`Render should render items 1`] = `
       Object {
         "hideFromMenu": false,
         "id": "3",
+      }
+    }
+  />
+  <TopSectionItem
+    key="dbaas-1"
+    link={
+      Object {
+        "icon": "database",
+        "id": "dbaas",
+        "text": "DBaaS",
+        "url": "/graph/d/pmm-dbaas/pmm-dbaas",
       }
     }
   />
