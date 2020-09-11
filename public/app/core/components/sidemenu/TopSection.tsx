@@ -5,6 +5,7 @@ import config from '../../config';
 import { getLocationSrv, getBackendSrv } from '@grafana/runtime';
 
 const TopSection: FC<any> = () => {
+  const [showDBaaS, setShowDBaaS] = useState(false);
   const navTree = _.cloneDeep(config.bootData.navTree);
   const mainLinks = _.filter(navTree, item => !item.hideFromMenu);
   const searchLink = {
@@ -20,14 +21,15 @@ const TopSection: FC<any> = () => {
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
-  const [showDBaaS, setShowDBaaS] = useState(false);
+  const updateDBaaS = async () => {
+    const { settings } = await getBackendSrv().post('http://localhost/v1/Settings/Get');
+    setShowDBaaS(settings.dbaas_enabled);
+  };
 
   // TODO: once DBaaS is enabled by default move it to config file (api/index.go)
   useEffect(() => {
     if (config.bootData.user.isSignedIn) {
-      getBackendSrv()
-        .post('http://localhost/v1/Settings/Get')
-        .then(({ settings }) => setShowDBaaS(settings.dbaas_enabled));
+      updateDBaaS();
     }
   }, []);
 
