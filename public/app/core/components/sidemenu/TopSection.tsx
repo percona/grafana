@@ -22,7 +22,7 @@ const TopSection: FC<any> = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
   const updateDBaaS = async () => {
-    const { settings } = await getBackendSrv().post('http://localhost/v1/Settings/Get');
+    const { settings } = await getBackendSrv().post(`${window.location.origin}/v1/Settings/Get`);
     setShowDBaaS(settings.dbaas_enabled);
   };
 
