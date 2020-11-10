@@ -518,7 +518,6 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
     })
     .when('/integrated-alerting', {
       template: '<react-container />',
-      reloadOnSearch: false,
       resolve: {
         component: () =>
           SafeDynamicImport(
