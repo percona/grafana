@@ -20,9 +20,9 @@ const IntegratedAlertingPage: FC = () => {
         component: <div key={TabKeys.alertRules}>{Messages.tabs.alertRules}</div>,
       },
       {
-        label: Messages.tabs.routingRules,
-        key: TabKeys.routingRules,
-        component: <div key={TabKeys.routingRules}>{Messages.tabs.routingRules}</div>,
+        label: Messages.tabs.alertRuleTemplates,
+        key: TabKeys.alertRuleTemplates,
+        component: <div key={TabKeys.alertRuleTemplates}>{Messages.tabs.alertRuleTemplates}</div>,
       },
       {
         label: Messages.tabs.notificationChannels,
