@@ -7,4 +7,7 @@ export const AlertRuleTemplateService = {
   async upload(payload: UploadAlertRuleTemplatePayload) {
     return getBackendSrv().post(`${BASE_URL}/Create`, payload);
   },
+  async list() {
+    return getBackendSrv().post(`${BASE_URL}/List`);
+  },
 };
