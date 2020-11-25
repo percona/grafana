@@ -5,6 +5,7 @@ import { getStyles } from './IntegratedAlerting.styles';
 import { TabKeys } from './IntegratedAlerting.types';
 import { AlertRuleTemplate } from './components/AlertRuleTemplate/AlertRuleTemplate';
 
+
 const IntegratedAlertingPage: FC = () => {
   const styles = useStyles(getStyles);
   const [activeTab, setActiveTab] = useState(TabKeys.alerts);
