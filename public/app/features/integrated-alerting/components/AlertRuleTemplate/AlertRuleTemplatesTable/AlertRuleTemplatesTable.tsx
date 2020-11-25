@@ -63,7 +63,7 @@ export const AlertRuleTemplatesTable = () => {
           </div>
         ) : null}
         {!rows.length && !pendingRequest ? (
-          <div data-qa="table-no-data" className={style.empty}>
+          <div data-qa="alert-rule-templates-table-no-data" className={style.empty}>
             {<h1>{Messages.noData}</h1>}
           </div>
         ) : null}
