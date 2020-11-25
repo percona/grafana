@@ -54,16 +54,16 @@ export const AlertRuleTemplatesTable = () => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
   return (
-    <div className={style.tableWrap}>
-      <div className={style.table}>
+    <div className={style.tableWrap} data-qa="alert-rule-templates-table-outer-wrapper">
+      <div className={style.table} data-qa="alert-rule-templates-inner-wrapper">
         {pendingRequest ? (
-          <div data-qa="table-loading" className={style.empty}>
+          <div data-qa="alert-rule-templates-table-loading" className={style.empty}>
             <Spinner />
           </div>
         ) : null}
         {rows.length && !pendingRequest ? (
-          <table {...getTableProps()}>
-            <thead>
+          <table {...getTableProps()} data-qa="alert-rule-templates-table">
+            <thead data-qa="alert-rule-templates-table-thead">
               {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map(column => (
@@ -80,7 +80,7 @@ export const AlertRuleTemplatesTable = () => {
                 </tr>
               ))}
             </thead>
-            <tbody {...getTableBodyProps()}>
+            <tbody {...getTableBodyProps()} data-qa="alert-rule-templates-table-tbody">
               {rows.map(row => {
                 prepareRow(row);
                 return (
