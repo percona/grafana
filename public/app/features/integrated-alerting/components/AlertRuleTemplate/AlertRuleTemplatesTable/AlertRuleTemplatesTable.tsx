@@ -7,6 +7,7 @@ import { logger } from '@percona/platform-core';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { formatTemplates } from './AlertRuleTemplatesTable.utils';
 import { FormattedTemplate } from './AlertRuleTemplatesTable.types';
+import { Messages } from './AlertRuleTemplatesTable.messages';
 
 export const AlertRuleTemplatesTable = () => {
   const style = useStyles(getStyles);
@@ -59,6 +60,11 @@ export const AlertRuleTemplatesTable = () => {
         {pendingRequest ? (
           <div data-qa="alert-rule-templates-table-loading" className={style.empty}>
             <Spinner />
+          </div>
+        ) : null}
+        {!rows.length && !pendingRequest ? (
+          <div data-qa="table-no-data" className={style.empty}>
+            {<h1>{Messages.noData}</h1>}
           </div>
         ) : null}
         {rows.length && !pendingRequest ? (
