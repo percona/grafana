@@ -1,6 +1,9 @@
 import { formatTemplate, formatTemplates } from './AlertRuleTemplatesTable.utils';
 import { Template } from './AlertRuleTemplatesTable.types';
 
+const moment = jest.requireActual('moment-timezone');
+moment.tz.setDefault('UTC');
+
 const testTemplate = {
   source: 'BUILT_IN',
   summary: 'MySQL database down',
