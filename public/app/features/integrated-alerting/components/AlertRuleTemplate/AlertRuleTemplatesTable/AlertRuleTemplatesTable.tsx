@@ -5,46 +5,31 @@ import { getStyles } from './AlertRuleTemplatesTable.styles';
 import { css } from 'emotion';
 import { logger } from '@percona/platform-core';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
+import { formatTemplates } from './AlertRuleTemplatesTable.utils';
+import { FormattedTemplate } from './AlertRuleTemplatesTable.types';
 
 export const AlertRuleTemplatesTable = () => {
   const style = useStyles(getStyles);
   const [pendingRequest, setPendingRequest] = useState(false);
+  const [data, setData] = useState<FormattedTemplate[]>([]);
 
   const getAlertRuleTemplates = async () => {
     setPendingRequest(true);
     try {
       const { templates } = await AlertRuleTemplateService.list();
+      setData(formatTemplates(templates));
     } catch (e) {
       logger.error(e);
+    } finally {
+      setPendingRequest(false);
     }
   };
-
-  const data = React.useMemo(
-    () => [
-      {
-        name: 'MySQL database down',
-        source: 'Percona Enterprise Platform',
-        created: '2020-10-01 21:17:00',
-      },
-      {
-        name: 'MongoDB database down',
-        source: 'Percona Enterprise Platform',
-        created: '2020-10-01 21:17:00',
-      },
-      {
-        name: 'High memory consumption',
-        source: 'Built-in',
-        created: '2020-10-01 21:17:00',
-      },
-    ],
-    []
-  );
 
   const columns = React.useMemo(
     () => [
       {
         Header: 'Name',
-        accessor: 'name',
+        accessor: 'summary',
         width: '70%',
       },
       {
@@ -54,7 +39,7 @@ export const AlertRuleTemplatesTable = () => {
       },
       {
         Header: 'Created',
-        accessor: 'created',
+        accessor: 'created_at',
         width: '10%',
       },
     ],
