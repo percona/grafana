@@ -24,22 +24,28 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({ 
     },
     []
   );
+  const onSubmit = async (values: AlertRuleTemplateRenderProps) => {
+    try {
+      await AlertRuleTemplateService.upload(values);
+      setVisible(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <Modal title={Messages.alertRuleTemplate.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>
       <Form
-        onSubmit={async (values: AlertRuleTemplateRenderProps) => {
-          await AlertRuleTemplateService.upload(values);
-          setVisible(false);
-        }}
+        onSubmit={onSubmit}
         render={({ handleSubmit, valid, pristine, submitting, form: { change } }) => (
-          <form onSubmit={handleSubmit} className={styles.formWrapper}>
+          <form onSubmit={handleSubmit}>
             <>
               <input type="file" accept=".yml, .yaml" ref={inputRef} onChange={onUploadFile(change)} hidden />
               <TextareaInputField
                 name="yaml"
                 label={Messages.alertRuleTemplate.addModal.fields.alertRuleTemplate}
                 validators={[required]}
+                className={styles.alertRuleTemplate}
               />
               <Button
                 type="button"
