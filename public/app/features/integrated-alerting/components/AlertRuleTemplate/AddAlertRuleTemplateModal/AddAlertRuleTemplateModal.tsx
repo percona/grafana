@@ -2,7 +2,7 @@ import React, { FC, ChangeEvent, useCallback, useRef } from 'react';
 import { FormApi } from 'final-form';
 import { Form } from 'react-final-form';
 import { Button, HorizontalGroup, Icon, useStyles } from '@grafana/ui';
-import { Modal, LoaderButton, TextareaInputField, validators } from '@percona/platform-core';
+import { Modal, LoaderButton, TextareaInputField, validators, logger } from '@percona/platform-core';
 import { Messages } from 'app/features/integrated-alerting/IntegratedAlerting.messages';
 import { AddAlertRuleTemplateModalProps, AlertRuleTemplateRenderProps } from './AddAlertRuleTemplateModal.types';
 import { getStyles } from './AddAlertRuleTemplateModal.styles';
@@ -29,7 +29,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({ 
       await AlertRuleTemplateService.upload(values);
       setVisible(false);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   };
 
