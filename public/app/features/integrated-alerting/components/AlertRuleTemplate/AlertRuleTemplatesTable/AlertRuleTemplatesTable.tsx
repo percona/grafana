@@ -1,14 +1,23 @@
-import React, { useEffect } from 'react';
-import { useTable, Column } from 'react-table';
-import { useStyles } from '@grafana/ui';
+import React, { useEffect, useState } from 'react';
+import { useSortBy, useTable } from 'react-table';
+import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './AlertRuleTemplatesTable.styles';
+import { css } from 'emotion';
+import { logger } from '@percona/platform-core';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 
 export const AlertRuleTemplatesTable = () => {
-  // const getAlertRuleTemplates = async () => {
-  //   const { templates } = await AlertRuleTemplateService.list(values);
-  // };
   const style = useStyles(getStyles);
+  const [pendingRequest, setPendingRequest] = useState(false);
+
+  const getAlertRuleTemplates = async () => {
+    setPendingRequest(true);
+    try {
+      const { templates } = await AlertRuleTemplateService.list();
+    } catch (e) {
+      logger.error(e);
+    }
+  };
 
   const data = React.useMemo(
     () => [
@@ -35,69 +44,72 @@ export const AlertRuleTemplatesTable = () => {
     () => [
       {
         Header: 'Name',
-        accessor: 'name', // accessor is the "key" in the data
-      } as Column,
+        accessor: 'name',
+        width: '70%',
+      },
       {
         Header: 'Source',
         accessor: 'source',
-      } as Column,
+        width: '20%',
+      },
       {
         Header: 'Created',
         accessor: 'created',
-      } as Column,
+        width: '10%',
+      },
     ],
     []
   );
 
   useEffect(() => {
-    // getAlertRuleTemplates();
+    getAlertRuleTemplates();
   }, []);
 
-  const tableInstance = useTable({ columns, data });
+  const tableInstance = useTable({ columns, data }, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
   return (
-    // apply the table props
-    <table {...getTableProps()}>
-      <thead>
-        {// Loop over the header rows
-        headerGroups.map(headerGroup => (
-          // Apply the header row props
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {// Loop over the headers in each row
-            headerGroup.headers.map(column => (
-              // Apply the header cell props
-              <th {...column.getHeaderProps()}>
-                {// Render the header
-                column.render('Header')}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      {/* Apply the table body props */}
-      <tbody {...getTableBodyProps()}>
-        {// Loop over the table rows
-        rows.map(row => {
-          // Prepare the row for display
-          prepareRow(row);
-          return (
-            // Apply the row props
-            <tr {...row.getRowProps()}>
-              {// Loop over the rows cells
-              row.cells.map(cell => {
-                // Apply the cell props
+    <div className={style.tableWrap}>
+      <div className={style.table}>
+        {pendingRequest ? (
+          <div data-qa="table-loading" className={style.empty}>
+            <Spinner />
+          </div>
+        ) : null}
+        {rows.length && !pendingRequest ? (
+          <table {...getTableProps()}>
+            <thead>
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(column => (
+                    <th
+                      className={css`
+                        cursor: pointer;
+                        width: ${column.width};
+                      `}
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
+                      {column.render('Header')}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {rows.map(row => {
+                prepareRow(row);
                 return (
-                  <td {...cell.getCellProps()}>
-                    {// Render the cell contents
-                    cell.render('Cell')}
-                  </td>
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+                    })}
+                  </tr>
                 );
               })}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+            </tbody>
+          </table>
+        ) : null}
+      </div>
+    </div>
   );
 };
