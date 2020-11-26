@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSortBy, useTable } from 'react-table';
+import { useSortBy, useTable, TableOptions } from 'react-table';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './AlertRuleTemplatesTable.styles';
 import { css } from 'emotion';
@@ -7,7 +7,11 @@ import { logger } from '@percona/platform-core';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { formatTemplates } from './AlertRuleTemplatesTable.utils';
 import { FormattedTemplate } from './AlertRuleTemplatesTable.types';
-import { Messages } from './AlertRuleTemplatesTable.messages';
+import { Messages } from '../../../IntegratedAlerting.messages';
+
+const { noData, columns } = Messages.alertRuleTemplate.table;
+
+const { name: nameColumn, source: sourceColumn, createdAt: createdAtColumn } = columns;
 
 export const AlertRuleTemplatesTable = () => {
   const style = useStyles(getStyles);
@@ -29,17 +33,17 @@ export const AlertRuleTemplatesTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Name',
+        Header: nameColumn,
         accessor: 'summary',
         width: '70%',
       },
       {
-        Header: 'Source',
+        Header: sourceColumn,
         accessor: 'source',
         width: '20%',
       },
       {
-        Header: 'Created',
+        Header: createdAtColumn,
         accessor: 'created_at',
         width: '10%',
       },
@@ -51,7 +55,7 @@ export const AlertRuleTemplatesTable = () => {
     getAlertRuleTemplates();
   }, []);
 
-  const tableInstance = useTable({ columns, data }, useSortBy);
+  const tableInstance = useTable({ columns, data } as TableOptions<any>, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
   return (
@@ -64,7 +68,7 @@ export const AlertRuleTemplatesTable = () => {
         ) : null}
         {!rows.length && !pendingRequest ? (
           <div data-qa="alert-rule-templates-table-no-data" className={style.empty}>
-            {<h1>{Messages.noData}</h1>}
+            {<h1>{noData}</h1>}
           </div>
         ) : null}
         {rows.length && !pendingRequest ? (
