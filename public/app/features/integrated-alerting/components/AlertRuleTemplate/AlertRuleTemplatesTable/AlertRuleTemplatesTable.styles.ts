@@ -16,8 +16,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       display: block;
       max-width: 100%;
       max-height: 500px;
-      overflow-x: auto;
-      overflow-y: auto;
+      overflow: auto;
     `,
     table: css`
       /* This is required to make the table full-width */
