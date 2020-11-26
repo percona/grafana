@@ -4,7 +4,6 @@ import { dataQa } from '@percona/platform-core';
 import { AlertRuleTemplatesTable } from './AlertRuleTemplatesTable';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { act } from 'react-dom/test-utils';
-import * as core from '@percona/platform-core';
 
 jest.spyOn(AlertRuleTemplateService, 'list').mockImplementation(() =>
   Promise.resolve({
