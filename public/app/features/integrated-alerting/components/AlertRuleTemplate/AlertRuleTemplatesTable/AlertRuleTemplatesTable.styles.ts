@@ -1,11 +1,13 @@
 import { css } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
-import { selectThemeVariant, stylesFactory } from '@grafana/ui';
+import { stylesFactory } from '@grafana/ui';
 
 export const getStyles = stylesFactory((theme: GrafanaTheme) => {
-  const backgroundColor = selectThemeVariant({ light: 'rgb(247, 247, 249)', dark: '#161719' }, theme.type);
-  const borderColor = selectThemeVariant({ light: theme.palette.gray85, dark: '#292929' }, theme.type);
-  const headerBackground = selectThemeVariant({ light: 'rgb(247, 247, 249)', dark: '#3D3D3D' }, theme.type);
+  const { colors } = theme;
+
+  const borderColor = colors.border2;
+  const backgroundColorBody = colors.bg1;
+  const backgroundColorHeader = colors.bg2;
 
   return {
     /* This will make the table scrollable when it gets too small */
@@ -53,7 +55,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
         }
         th,
         td {
-          background-color: ${backgroundColor};
+          background-color: ${backgroundColorBody};
           margin: 0;
           padding: 0 16px;
           border-bottom: 1px solid ${borderColor};
@@ -65,7 +67,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
         }
 
         th {
-          background-color: ${headerBackground};
+          background-color: ${backgroundColorHeader};
         }
       }
 
@@ -79,7 +81,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       height: 160px;
       justify-content: center;
       align-items: center;
-      border: 1px solid ${borderColor};
+      border: 1px solid ${backgroundColorBody};
     `,
   };
 });
