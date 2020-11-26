@@ -18,7 +18,6 @@
     "public/e2e-test/**/*.ts",
     "public/test/**/*.ts",
     "public/vendor/**/*.ts",
-    "components/AlertRuleTemplate/AlertRuleTemplatesTable/react-table-config.d.ts",
     "packages/jaeger-ui-components/typings"
   ]
 }

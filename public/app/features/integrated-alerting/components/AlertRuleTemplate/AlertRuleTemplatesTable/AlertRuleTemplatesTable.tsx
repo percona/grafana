@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSortBy, useTable, TableOptions } from 'react-table';
+import { useSortBy, useTable } from 'react-table';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './AlertRuleTemplatesTable.styles';
 import { css } from 'emotion';
@@ -55,7 +55,7 @@ export const AlertRuleTemplatesTable = () => {
     getAlertRuleTemplates();
   }, []);
 
-  const tableInstance = useTable({ columns, data }, useSortBy);
+  const tableInstance = useTable({ columns, data });
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
   return (
@@ -82,7 +82,7 @@ export const AlertRuleTemplatesTable = () => {
                         cursor: pointer;
                         width: ${column.width};
                       `}
-                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                      {...column.getHeaderProps()}
                     >
                       {column.render('Header')}
                     </th>
