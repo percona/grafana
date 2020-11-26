@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSortBy, useTable } from 'react-table';
+import { useTable } from 'react-table';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './AlertRuleTemplatesTable.styles';
 import { css } from 'emotion';
