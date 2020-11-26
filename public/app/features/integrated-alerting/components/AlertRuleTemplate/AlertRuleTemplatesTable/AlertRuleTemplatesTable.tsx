@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useTable } from 'react-table';
+import { useTable, Column } from 'react-table';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './AlertRuleTemplatesTable.styles';
 import { css } from 'emotion';
@@ -36,17 +36,17 @@ export const AlertRuleTemplatesTable = () => {
         Header: nameColumn,
         accessor: 'summary',
         width: '70%',
-      },
+      } as Column,
       {
         Header: sourceColumn,
         accessor: 'source',
         width: '20%',
-      },
+      } as Column,
       {
         Header: createdAtColumn,
         accessor: 'created_at',
         width: '10%',
-      },
+      } as Column,
     ],
     []
   );
