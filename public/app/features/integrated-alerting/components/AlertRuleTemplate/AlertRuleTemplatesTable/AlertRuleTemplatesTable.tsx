@@ -55,7 +55,7 @@ export const AlertRuleTemplatesTable = () => {
     getAlertRuleTemplates();
   }, []);
 
-  const tableInstance = useTable({ columns, data } as TableOptions<any>, useSortBy);
+  const tableInstance = useTable({ columns, data }, useSortBy);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
   return (
