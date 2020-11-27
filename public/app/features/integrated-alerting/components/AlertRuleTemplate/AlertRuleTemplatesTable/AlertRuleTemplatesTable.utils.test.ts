@@ -8,12 +8,14 @@ const testTemplate = {
   source: 'BUILT_IN',
   summary: 'MySQL database down',
   created_at: '2020-11-25T16:53:39.366Z',
+  yaml: 'yaml file content',
 } as Template;
 
 const expectedTemplate = {
   source: 'Built-in',
   summary: 'MySQL database down',
   created_at: '2020-11-25 16:53:39',
+  yaml: 'yaml file content',
 };
 
 describe('AlertRuleTemplatesTable utils', () => {

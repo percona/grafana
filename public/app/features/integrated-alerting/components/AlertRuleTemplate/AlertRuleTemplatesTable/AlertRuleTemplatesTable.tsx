@@ -8,10 +8,11 @@ import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { formatTemplates } from './AlertRuleTemplatesTable.utils';
 import { FormattedTemplate } from './AlertRuleTemplatesTable.types';
 import { Messages } from '../../../IntegratedAlerting.messages';
+import { AlertRuleTemplateActions } from '../AlertRuleTemplateActions/AlertRuleTemplateActions';
 
 const { noData, columns } = Messages.alertRuleTemplate.table;
 
-const { name: nameColumn, source: sourceColumn, createdAt: createdAtColumn } = columns;
+const { name: nameColumn, source: sourceColumn, createdAt: createdAtColumn, actions: actionsColumn } = columns;
 
 export const AlertRuleTemplatesTable = () => {
   const style = useStyles(getStyles);
@@ -35,7 +36,7 @@ export const AlertRuleTemplatesTable = () => {
       {
         Header: nameColumn,
         accessor: 'summary',
-        width: '70%',
+        width: '60%',
       } as Column,
       {
         Header: sourceColumn,
@@ -45,6 +46,11 @@ export const AlertRuleTemplatesTable = () => {
       {
         Header: createdAtColumn,
         accessor: 'created_at',
+        width: '10%',
+      } as Column,
+      {
+        Header: actionsColumn,
+        accessor: (template: FormattedTemplate) => <AlertRuleTemplateActions template={template} />,
         width: '10%',
       } as Column,
     ],

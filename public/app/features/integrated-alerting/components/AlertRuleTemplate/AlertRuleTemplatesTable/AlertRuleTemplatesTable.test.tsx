@@ -4,26 +4,11 @@ import { dataQa } from '@percona/platform-core';
 import { AlertRuleTemplatesTable } from './AlertRuleTemplatesTable';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { act } from 'react-dom/test-utils';
+import { templateStubs } from '../__mocks__/alertRuleTemplateStubs';
 
 jest.spyOn(AlertRuleTemplateService, 'list').mockImplementation(() =>
   Promise.resolve({
-    templates: [
-      {
-        created_at: '2020-11-25T16:53:39.366Z',
-        source: 'BUILT_IN',
-        summary: 'MySQL database down',
-      },
-      {
-        created_at: '2020-11-25T16:53:39.366Z',
-        source: 'SAAS',
-        summary: 'MongoDB database down',
-      },
-      {
-        created_at: '2020-11-25T16:53:39.366Z',
-        source: 'USER_FILE',
-        summary: 'High memory consumption',
-      },
-    ],
+    templates: templateStubs,
   })
 );
 

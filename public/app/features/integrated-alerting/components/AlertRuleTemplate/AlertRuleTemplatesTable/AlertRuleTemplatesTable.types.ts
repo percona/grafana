@@ -9,10 +9,12 @@ export interface Template {
   summary: string;
   source: keyof typeof SourceDescription;
   created_at: string;
+  yaml: string;
 }
 
 export interface FormattedTemplate {
   summary: string;
   source: SourceDescription[keyof SourceDescription];
   created_at: string;
+  yaml: string;
 }
