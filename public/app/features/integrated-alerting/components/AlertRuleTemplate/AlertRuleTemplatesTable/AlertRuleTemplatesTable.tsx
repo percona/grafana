@@ -36,7 +36,7 @@ export const AlertRuleTemplatesTable = () => {
       {
         Header: nameColumn,
         accessor: 'summary',
-        width: '60%',
+        width: '70%',
       } as Column,
       {
         Header: sourceColumn,
@@ -51,7 +51,6 @@ export const AlertRuleTemplatesTable = () => {
       {
         Header: actionsColumn,
         accessor: (template: FormattedTemplate) => <AlertRuleTemplateActions template={template} />,
-        width: '10%',
       } as Column,
     ],
     []
