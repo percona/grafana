@@ -71,10 +71,6 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
           background-color: ${backgroundColorHeader};
         }
       }
-
-      .pagination {
-        padding: 0.5rem;
-      }
     `,
     empty: css`
       display: flex;
@@ -112,6 +108,12 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       margin-left: 10px;
       height: 16px;
       width: 16px;
+    `,
+    disabledRow: css`
+      & td {
+        color: ${colors.textWeak};
+        background-color: ${colors.dashboardBg} !important;
+      }
     `,
   };
 });
