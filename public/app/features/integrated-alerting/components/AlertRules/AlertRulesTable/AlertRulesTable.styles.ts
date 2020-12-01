@@ -100,8 +100,11 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
     `,
     lastNotifiedWrapper: css`
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
+    `,
+    lastNotifiedDate: css`
+      flex: 1;
     `,
     lastNotifiedCircle: css`
       border-radius: 50%;
