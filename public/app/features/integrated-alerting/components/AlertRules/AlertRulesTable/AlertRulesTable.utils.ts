@@ -39,14 +39,14 @@ export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
   const { created_at, disabled, filters, for: duration, last_notified, template, severity, summary } = rule;
 
   return {
-    createdAt: moment(created_at).format('YYYY-MM-DD HH:mm:ss'),
+    createdAt: moment(created_at).format('YYYY-MM-DD HH:mm:ss.SSS'),
     disabled,
     duration: formatDuration(duration),
     filters: filters.map(formatFilter),
     severity: AlertRuleSeverity[severity],
     summary,
     threshold: formatThreshold(template),
-    lastNotified: last_notified ? moment(last_notified).format('YYYY-MM-DD HH:mm:ss') : '',
+    lastNotified: last_notified ? moment(last_notified).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
   };
 };
 
