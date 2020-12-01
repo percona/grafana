@@ -3,7 +3,7 @@ import { GrafanaTheme } from '@grafana/data';
 import { stylesFactory } from '@grafana/ui';
 
 export const getStyles = stylesFactory((theme: GrafanaTheme) => {
-  const { border, colors } = theme;
+  const { colors } = theme;
 
   const borderColor = colors.border2;
   const backgroundColorBody = colors.bg1;
@@ -93,11 +93,22 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
     `,
     filter: css`
       background-color: ${colors.bg3};
-      /* border-radius: ${border.radius.lg}; */
       border-radius: 8px;
       padding: 6px;
       line-height: 1;
       margin: 5px;
+    `,
+    lastNotifiedWrapper: css`
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    `,
+    lastNotifiedCircle: css`
+      border-radius: 50%;
+      background-color: #e82b2b;
+      margin-left: 10px;
+      height: 16px;
+      width: 16px;
     `,
   };
 });
