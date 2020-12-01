@@ -43,17 +43,17 @@ export const AlertRulesTable = () => {
       {
         Header: summaryColumn,
         accessor: 'summary',
-        width: '30%',
+        width: '25%',
       } as Column,
       {
         Header: thresholdColumn,
         accessor: 'threshold',
-        width: '5%',
+        width: '10%',
       } as Column,
       {
         Header: durationColumn,
         accessor: 'duration',
-        width: '5%',
+        width: '10%',
       } as Column,
       {
         Header: severityColumn,
@@ -71,7 +71,7 @@ export const AlertRulesTable = () => {
             ))}
           </div>
         ),
-        width: '35%',
+        width: '30%',
       } as Column,
       {
         Header: createdAtColumn,
@@ -80,7 +80,18 @@ export const AlertRulesTable = () => {
       } as Column,
       {
         Header: lastNotifiedColumn,
-        accessor: 'lastNotified',
+        accessor: ({ lastNotified }: AlertRule) => (
+          <>
+            <div className={style.lastNotifiedWrapper}>
+              {lastNotified ? (
+                <>
+                  <span className={style.lastNotifiedDate}>{lastNotified}</span>
+                  <span className={style.lastNotifiedCircle} />
+                </>
+              ) : null}
+            </div>
+          </>
+        ),
         width: '10%',
       } as Column,
     ],
