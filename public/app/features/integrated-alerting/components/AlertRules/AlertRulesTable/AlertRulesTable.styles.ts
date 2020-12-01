@@ -3,11 +3,13 @@ import { GrafanaTheme } from '@grafana/data';
 import { stylesFactory } from '@grafana/ui';
 
 export const getStyles = stylesFactory((theme: GrafanaTheme) => {
-  const { colors } = theme;
+  const { border, colors } = theme;
 
   const borderColor = colors.border2;
   const backgroundColorBody = colors.bg1;
   const backgroundColorHeader = colors.bg2;
+
+  const cellPadding = 16;
 
   return {
     /* This will make the table scrollable when it gets too small */
@@ -56,7 +58,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
         td {
           background-color: ${backgroundColorBody};
           margin: 0;
-          padding: 0 16px;
+          padding: 0 ${cellPadding}px;
           border-bottom: 1px solid ${borderColor};
           border-right: 1px solid ${borderColor};
 
@@ -81,6 +83,21 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       justify-content: center;
       align-items: center;
       border: 1px solid ${backgroundColorBody};
+    `,
+    filtersWrapper: css`
+      padding: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0 -${cellPadding}px;
+    `,
+    filter: css`
+      background-color: ${colors.bg3};
+      /* border-radius: ${border.radius.lg}; */
+      border-radius: 8px;
+      padding: 6px;
+      line-height: 1;
+      margin: 5px;
     `,
   };
 });
