@@ -3,7 +3,7 @@ import { GrafanaTheme } from '@grafana/data';
 import { stylesFactory } from '@grafana/ui';
 
 export const getStyles = stylesFactory((theme: GrafanaTheme) => {
-  const { colors } = theme;
+  const { colors, palette } = theme;
 
   const borderColor = colors.border2;
   const backgroundColorBody = colors.bg1;
@@ -108,7 +108,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
     `,
     lastNotifiedCircle: css`
       border-radius: 50%;
-      background-color: #e82b2b;
+      background-color: ${palette.red};
       margin-left: 10px;
       height: 16px;
       width: 16px;
