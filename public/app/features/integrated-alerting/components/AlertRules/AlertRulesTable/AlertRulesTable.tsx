@@ -43,27 +43,35 @@ export const AlertRulesTable = () => {
       {
         Header: summaryColumn,
         accessor: 'summary',
-        width: '70%',
+        width: '30%',
       } as Column,
       {
         Header: thresholdColumn,
         accessor: 'threshold',
-        width: '20%',
+        width: '5%',
       } as Column,
       {
         Header: durationColumn,
         accessor: 'duration',
-        width: '10%',
+        width: '5%',
       } as Column,
       {
         Header: severityColumn,
         accessor: 'severity',
-        width: '10%',
+        width: '5%',
       } as Column,
       {
         Header: filtersColumn,
-        accessor: 'filters',
-        width: '10%',
+        accessor: ({ filters }: AlertRule) => (
+          <div className={style.filtersWrapper}>
+            {filters.map(filter => (
+              <span key={filter} className={style.filter}>
+                {filter}
+              </span>
+            ))}
+          </div>
+        ),
+        width: '35%',
       } as Column,
       {
         Header: createdAtColumn,
@@ -123,9 +131,9 @@ export const AlertRulesTable = () => {
                 prepareRow(row);
                 return (
                   <tr {...row.getRowProps()}>
-                    {row.cells.map(cell => {
-                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                    })}
+                    {row.cells.map(cell => (
+                      <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    ))}
                   </tr>
                 );
               })}
