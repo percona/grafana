@@ -63,8 +63,8 @@ export interface AlertRulesListResponseRule {
   disabled: boolean;
   filters: AlertRulesListResponseFilter[];
   for: string; // duration, e.g.: '999s'
-  last_notified: string;
-  params: AlertRulesListResponseParam[];
+  last_notified?: string;
+  params?: AlertRulesListResponseParam[];
   severity: keyof typeof AlertRuleSeverity;
   summary: string;
   template: AlertRulesListResponseTemplate;
