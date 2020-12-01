@@ -45,24 +45,24 @@ describe('AlertRulesTable utils', () => {
 
   test('formatRule', () => {
     expect(formatRule(rulesStubs[0])).toEqual({
-      createdAt: '2020-11-25 17:53:39.366',
+      createdAt: '2020-11-25 16:53:39.366',
       disabled: false,
       duration: '2 minutes',
       filters: ['environment=prod', 'app=wordpress', 'cluster=PXCCluster1'],
       severity: 'Critical',
       summary: 'Database down - HR - Prod',
       threshold: 'true',
-      lastNotified: '2020-11-25 17:53:39.366',
+      lastNotified: '2020-11-25 16:53:39.366',
     });
 
     expect(formatRule(rulesStubs[3])).toEqual({
-      createdAt: '2020-11-25 17:53:39.366',
-      disabled: false,
-      duration: '2 minutes',
+      createdAt: '2020-11-25 16:53:39.366',
+      disabled: true,
+      duration: '5 minutes',
       filters: ['environment=prod', 'app=wordpress', 'cluster=PXCCluster1'],
-      severity: 'Critical',
-      summary: 'Database down - HR - Prod',
-      threshold: 'true',
+      severity: 'Warning',
+      summary: 'High network throughput in - Mnfcg - Dev',
+      threshold: '100 GB/min',
       lastNotified: '',
     });
   });
@@ -72,23 +72,23 @@ describe('AlertRulesTable utils', () => {
 
     expect(formatRules([rulesStubs[0], rulesStubs[3]])).toEqual([
       {
-        createdAt: '2020-11-25 17:53:39.366',
+        createdAt: '2020-11-25 16:53:39.366',
         disabled: false,
         duration: '2 minutes',
         filters: ['environment=prod', 'app=wordpress', 'cluster=PXCCluster1'],
         severity: 'Critical',
         summary: 'Database down - HR - Prod',
         threshold: 'true',
-        lastNotified: '2020-11-25 17:53:39.366',
+        lastNotified: '2020-11-25 16:53:39.366',
       },
       {
-        createdAt: '2020-11-25 17:53:39.366',
-        disabled: false,
-        duration: '2 minutes',
+        createdAt: '2020-11-25 16:53:39.366',
+        disabled: true,
+        duration: '5 minutes',
         filters: ['environment=prod', 'app=wordpress', 'cluster=PXCCluster1'],
-        severity: 'Critical',
-        summary: 'Database down - HR - Prod',
-        threshold: 'true',
+        severity: 'Warning',
+        summary: 'High network throughput in - Mnfcg - Dev',
+        threshold: '100 GB/min',
         lastNotified: '',
       },
     ]);
