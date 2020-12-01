@@ -15,15 +15,10 @@ export interface AlertRulesListResponseTemplate {
 }
 
 export enum AlertRuleSeverity {
-  SEVERITY_INVALID = 'Invalid',
-  SEVERITY_EMERGENCY = 'Emergency',
-  SEVERITY_ALERT = 'High',
   SEVERITY_CRITICAL = 'Critical',
-  SEVERITY_ERROR = 'Error',
+  SEVERITY_ERROR = 'High',
   SEVERITY_WARNING = 'Warning',
   SEVERITY_NOTICE = 'Notice',
-  SEVERITY_INFO = 'Info',
-  SEVERITY_DEBUG = 'Debug',
 }
 
 export interface AlertRule {

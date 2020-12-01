@@ -62,7 +62,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: true,
+          value: 75,
+          unit: '%',
         },
       ],
     },
@@ -89,13 +90,14 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     ],
     for: '300s',
     last_notified: '2020-11-25T16:53:39.366Z',
-    severity: 'SEVERITY_ALERT',
+    severity: 'SEVERITY_ERROR',
     summary: 'High memory consumption - Mnfcg - Dev',
     template: {
       params: [
         {
           name: 'threshold',
-          value: true,
+          value: 80,
+          unit: '%',
         },
       ],
     },
@@ -128,7 +130,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: true,
+          value: 100,
+          unit: 'GB/min',
         },
       ],
     },
@@ -155,13 +158,48 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     ],
     for: '1500s',
     last_notified: '2020-11-25T16:53:39.366Z',
-    severity: 'SEVERITY_INFO',
+    severity: 'SEVERITY_NOTICE',
     summary: 'Low memory consumption - Sales - Dev',
     template: {
       params: [
         {
           name: 'threshold',
-          value: true,
+          value: 30,
+          unit: '%',
+        },
+      ],
+    },
+  },
+  {
+    created_at: '2020-11-25T16:53:39.366Z',
+    disabled: false,
+    filters: [
+      {
+        key: 'environment',
+        type: 'EQUAL',
+        value: 'prod',
+      },
+      {
+        key: 'app',
+        type: 'EQUAL',
+        value: 'wordpress',
+      },
+      {
+        key: 'cluster',
+        type: 'EQUAL',
+        value: 'PXCCluster1',
+      },
+    ],
+    for: '10s',
+    last_notified: '2020-11-25T16:53:39.366Z',
+    severity: 'SEVERITY_NOTICE',
+    summary: 'Low memory consumption - Sales - Dev',
+    template: {
+      params: [
+        {
+          name: 'threshold',
+          value: 30,
+          unit: '%',
         },
       ],
     },
