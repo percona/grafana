@@ -22,7 +22,7 @@ export const formatThreshold = (template: AlertRulesListResponseTemplate): strin
   return `${value}${unit ? ` ${unit}` : ''}`;
 };
 
-const formatDuration = (duration: string): string => {
+export const formatDuration = (duration: string): string => {
   const seconds = parseInt(duration, 10);
 
   // NOTE: this is needed because the `humanize` function by moment.js returns 'a few seconds' for < ~50 secs
