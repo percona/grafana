@@ -4,8 +4,9 @@ import {
   AlertRuleFilterType,
   AlertRuleSeverity,
   AlertRulesListResponseFilter,
-  AlertRulesListResponseRule,
   AlertRulesListResponseParam,
+  AlertRulesListResponseRule,
+  AlertRulesListResponseTemplate,
 } from '../AlertRules.types';
 
 export const formatFilter = (filter: AlertRulesListResponseFilter): string => {
@@ -14,8 +15,8 @@ export const formatFilter = (filter: AlertRulesListResponseFilter): string => {
   return `${key}${AlertRuleFilterType[type]}${value}`;
 };
 
-export const formatThreshold = (params: AlertRulesListResponseParam[]): string => {
-  const thresholdParam = params.find(param => param.name === 'threshold');
+export const formatThreshold = (template: AlertRulesListResponseTemplate): string => {
+  const thresholdParam = template.params.find(param => param.name === 'threshold');
 
   const { value, unit } = thresholdParam;
 
@@ -23,7 +24,7 @@ export const formatThreshold = (params: AlertRulesListResponseParam[]): string =
 };
 
 export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
-  const { created_at, disabled, filters, for: duration, params, severity, summary } = rule;
+  const { created_at, disabled, filters, for: duration, last_notified, template, severity, summary } = rule;
 
   return {
     createdAt: moment(created_at).format('YYYY-MM-DD HH:mm:ss'),
@@ -32,7 +33,8 @@ export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
     filters: filters.map(formatFilter),
     severity: AlertRuleSeverity[severity],
     summary,
-    threshold: formatThreshold(params),
+    threshold: formatThreshold(template),
+    lastNotified: moment(last_notified).format('YYYY-MM-DD HH:mm:ss'),
   };
 };
 
