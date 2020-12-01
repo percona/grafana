@@ -22,13 +22,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     for: '120s',
-    params: [
-      {
-        name: 'lastNotified',
-        string: '2020-11-25T16:53:39.366Z',
-        type: 'STRING',
-      },
-    ],
+    last_notified: '2020-11-25T16:53:39.366Z',
     severity: 'SEVERITY_CRITICAL',
     summary: 'Database down - HR - Prod',
     template: {
@@ -61,13 +55,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     for: '300s',
-    params: [
-      {
-        name: 'lastNotified',
-        string: '2020-11-25T16:53:39.366Z',
-        type: 'STRING',
-      },
-    ],
+    last_notified: '2020-11-25T16:53:39.366Z',
     severity: 'SEVERITY_WARNING',
     summary: 'High CPU load - Sales - Prod',
     template: {
@@ -100,13 +88,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     for: '300s',
-    params: [
-      {
-        name: 'lastNotified',
-        string: '2020-11-25T16:53:39.366Z',
-        type: 'STRING',
-      },
-    ],
+    last_notified: '2020-11-25T16:53:39.366Z',
     severity: 'SEVERITY_ALERT',
     summary: 'High memory consumption - Mnfcg - Dev',
     template: {
@@ -139,7 +121,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     for: '300s',
-    params: [],
+    last_notified: '',
     severity: 'SEVERITY_WARNING',
     summary: 'High network throughput in - Mnfcg - Dev',
     template: {
@@ -172,13 +154,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     for: '1500s',
-    params: [
-      {
-        name: 'lastNotified',
-        string: '2020-11-25T16:53:39.366Z',
-        type: 'STRING',
-      },
-    ],
+    last_notified: '2020-11-25T16:53:39.366Z',
     severity: 'SEVERITY_INFO',
     summary: 'Low memory consumption - Sales - Dev',
     template: {
