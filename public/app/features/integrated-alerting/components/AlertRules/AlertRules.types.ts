@@ -6,16 +6,16 @@ export enum AlertRuleFilterType {
 
 export interface AlertRulesListResponseTemplateParam {
   name: string;
-  unit: string;
+  unit?: string;
   value: any;
 }
 
 export interface AlertRulesListResponseTemplate {
-  params: AlertRulesListResponseTemplateParam;
+  params: AlertRulesListResponseTemplateParam[];
 }
 
 export enum AlertRuleSeverity {
-  SEVERITY_INVALID,
+  SEVERITY_INVALID = 'Invalid',
   SEVERITY_EMERGENCY = 'Emergency',
   SEVERITY_ALERT = 'High',
   SEVERITY_CRITICAL = 'Critical',
@@ -27,7 +27,7 @@ export enum AlertRuleSeverity {
 }
 
 export interface AlertRule {
-  created_at: string;
+  createdAt: string;
   disabled: boolean;
   duration: string;
   filters: string[];
@@ -51,11 +51,11 @@ export enum AlertRuleParamType {
 }
 
 export interface AlertRulesListResponseParam {
-  bool: boolean;
-  float: number;
+  bool?: boolean;
+  float?: number;
   name: string;
-  string: string;
-  type: AlertRuleParamType;
+  string?: string;
+  type: keyof typeof AlertRuleParamType;
 }
 
 export interface AlertRulesListResponseRule {
@@ -63,8 +63,9 @@ export interface AlertRulesListResponseRule {
   disabled: boolean;
   filters: AlertRulesListResponseFilter[];
   for: string; // duration, e.g.: '999s'
+  last_notified: string;
   params: AlertRulesListResponseParam[];
-  severity: AlertRuleSeverity;
+  severity: keyof typeof AlertRuleSeverity;
   summary: string;
   template: AlertRulesListResponseTemplate;
 }
