@@ -141,7 +141,7 @@ export const AlertRulesTable = () => {
               {rows.map(row => {
                 prepareRow(row);
                 return (
-                  <tr {...row.getRowProps()}>
+                  <tr {...row.getRowProps()} className={(row.original as AlertRule).disabled ? style.disabledRow : ''}>
                     {row.cells.map(cell => (
                       <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     ))}
