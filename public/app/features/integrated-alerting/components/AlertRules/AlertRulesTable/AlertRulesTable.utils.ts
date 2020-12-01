@@ -4,7 +4,6 @@ import {
   AlertRuleFilterType,
   AlertRuleSeverity,
   AlertRulesListResponseFilter,
-  AlertRulesListResponseParam,
   AlertRulesListResponseRule,
   AlertRulesListResponseTemplate,
 } from '../AlertRules.types';
@@ -23,18 +22,30 @@ export const formatThreshold = (template: AlertRulesListResponseTemplate): strin
   return `${value}${unit ? ` ${unit}` : ''}`;
 };
 
+const formatDuration = (duration: string): string => {
+  const seconds = parseInt(duration, 10);
+
+  if (seconds < 60) {
+    return `${seconds} seconds`;
+  }
+  // TODO: when switching to moment.js v2.25, add thresholds to the `humanize` function,
+  //       making it more precise. Right now it's just approximating:
+  //       3000 (seconds, which is 50 minutes) will result in 'a minute';
+  return moment.duration(seconds, 'seconds').humanize();
+};
+
 export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
   const { created_at, disabled, filters, for: duration, last_notified, template, severity, summary } = rule;
 
   return {
     createdAt: moment(created_at).format('YYYY-MM-DD HH:mm:ss'),
     disabled,
-    duration,
+    duration: formatDuration(duration),
     filters: filters.map(formatFilter),
     severity: AlertRuleSeverity[severity],
     summary,
     threshold: formatThreshold(template),
-    lastNotified: moment(last_notified).format('YYYY-MM-DD HH:mm:ss'),
+    lastNotified: last_notified ? moment(last_notified).format('YYYY-MM-DD HH:mm:ss') : '',
   };
 };
 
