@@ -4,7 +4,7 @@ import { EditAlertRuleTemplateModal } from '../EditAlertRuleTemplateModal/EditAl
 import { getStyles } from './AlertRuleTemplateActions.styles';
 import { AlertRuleTemplateActionsProps } from './AlertRuleTemplateActions.types';
 
-export const AlertRuleTemplateActions: FC<AlertRuleTemplateActionsProps> = ({ template }) => {
+export const AlertRuleTemplateActions: FC<AlertRuleTemplateActionsProps> = ({ template, getAlertRuleTemplates }) => {
   const styles = useStyles(getStyles);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const { yaml } = template;
@@ -12,7 +12,12 @@ export const AlertRuleTemplateActions: FC<AlertRuleTemplateActionsProps> = ({ te
   return (
     <div className={styles.actionsWrapper}>
       <IconButton data-qa="edit-template-button" name="pen" onClick={() => setEditModalVisible(true)} />
-      <EditAlertRuleTemplateModal yaml={yaml} isVisible={editModalVisible} setVisible={setEditModalVisible} />
+      <EditAlertRuleTemplateModal
+        yaml={yaml}
+        isVisible={editModalVisible}
+        setVisible={setEditModalVisible}
+        getAlertRuleTemplates={getAlertRuleTemplates}
+      />
     </div>
   );
 };

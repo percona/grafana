@@ -7,13 +7,19 @@ import { getStyles } from './EditAlertRuleTemplateModal.styles';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { Messages } from './EditAlertRuleTemplateModal.messages';
 
-export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = ({ yaml, isVisible, setVisible }) => {
+export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = ({
+  yaml,
+  isVisible,
+  setVisible,
+  getAlertRuleTemplates,
+}) => {
   const styles = useStyles(getStyles);
   const { required } = validators;
   const onSubmit = async (values: EditAlertRuleTemplateRenderProps) => {
     try {
       await AlertRuleTemplateService.update(values);
       setVisible(false);
+      getAlertRuleTemplates();
     } catch (e) {
       logger.error(e);
     }

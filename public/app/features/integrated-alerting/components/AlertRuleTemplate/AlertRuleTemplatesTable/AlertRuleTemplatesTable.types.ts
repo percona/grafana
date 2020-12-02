@@ -18,3 +18,9 @@ export interface FormattedTemplate {
   created_at: string;
   yaml: string;
 }
+
+export interface AlertRuleTemplatesTableProps {
+  pendingRequest: boolean;
+  data: FormattedTemplate[];
+  getAlertRuleTemplates: () => void;
+}

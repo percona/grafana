@@ -8,7 +8,9 @@ jest.mock('../AlertRuleTemplate.service');
 
 describe('EditAlertRuleTemplateModal', () => {
   it('should render component correctly', () => {
-    const wrapper = mount(<EditAlertRuleTemplateModal setVisible={jest.fn()} isVisible yaml="" />);
+    const wrapper = mount(
+      <EditAlertRuleTemplateModal setVisible={jest.fn()} isVisible yaml="" getAlertRuleTemplates={jest.fn()} />
+    );
     const addButton = wrapper.find(dataQa('alert-rule-template-edit-button')).find('button');
 
     expect(wrapper.find('textarea')).toBeTruthy();
@@ -17,14 +19,18 @@ describe('EditAlertRuleTemplateModal', () => {
   });
 
   it('should not render modal when visible is set to false', () => {
-    const wrapper = mount(<EditAlertRuleTemplateModal setVisible={jest.fn()} isVisible={false} yaml="" />);
+    const wrapper = mount(
+      <EditAlertRuleTemplateModal setVisible={jest.fn()} isVisible={false} yaml="" getAlertRuleTemplates={jest.fn()} />
+    );
 
     expect(wrapper.contains('textarea')).toBeFalsy();
   });
 
   it('should call setVisible on close', () => {
     const setVisible = jest.fn();
-    const wrapper = mount(<EditAlertRuleTemplateModal setVisible={setVisible} isVisible yaml="" />);
+    const wrapper = mount(
+      <EditAlertRuleTemplateModal setVisible={setVisible} isVisible yaml="" getAlertRuleTemplates={jest.fn()} />
+    );
 
     wrapper.find(dataQa('modal-background')).simulate('click');
 
@@ -32,16 +38,31 @@ describe('EditAlertRuleTemplateModal', () => {
   });
 
   it('should render yaml content passed', () => {
-    const wrapper = mount(<EditAlertRuleTemplateModal setVisible={jest.fn()} isVisible yaml="test content" />);
+    const wrapper = mount(
+      <EditAlertRuleTemplateModal
+        setVisible={jest.fn()}
+        isVisible
+        yaml="test content"
+        getAlertRuleTemplates={jest.fn()}
+      />
+    );
     const addButton = wrapper.find(dataQa('alert-rule-template-edit-button')).find('button');
 
     expect(wrapper.find('textarea').text()).toEqual('test content');
     expect(addButton.prop('disabled')).toBeTruthy();
   });
 
-  it('should call setVisible on submit', async () => {
+  it('should call setVisible and getAlertRuleTemplates on submit', async () => {
     const setVisible = jest.fn();
-    const wrapper = mount(<EditAlertRuleTemplateModal setVisible={setVisible} isVisible yaml="" />);
+    const getAlertRuleTemplates = jest.fn();
+    const wrapper = mount(
+      <EditAlertRuleTemplateModal
+        setVisible={setVisible}
+        isVisible
+        yaml=""
+        getAlertRuleTemplates={getAlertRuleTemplates}
+      />
+    );
 
     wrapper.find('textarea').simulate('change', { target: { value: 'test content' } });
 
@@ -50,5 +71,6 @@ describe('EditAlertRuleTemplateModal', () => {
     });
 
     expect(setVisible).toHaveBeenCalledWith(false);
+    expect(getAlertRuleTemplates).toHaveBeenCalled();
   });
 });

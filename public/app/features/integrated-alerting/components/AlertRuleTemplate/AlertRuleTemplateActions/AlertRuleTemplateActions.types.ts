@@ -2,4 +2,5 @@ import { FormattedTemplate } from '../AlertRuleTemplatesTable/AlertRuleTemplates
 
 export interface AlertRuleTemplateActionsProps {
   template: FormattedTemplate;
+  getAlertRuleTemplates: () => void;
 }
