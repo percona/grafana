@@ -12,7 +12,7 @@ export const AlertRuleTemplateService = {
     return getBackendSrv().post(`${BASE_URL}/Create`, payload);
   },
   async list(): Promise<TemplatesList> {
-    return getBackendSrv().post(`${BASE_URL}/List`);
+    return getBackendSrv().post(`${BASE_URL}/List`, { reload: true });
   },
   async update(payload: UpdateAlertRuleTemplatePayload): Promise<void> {
     return getBackendSrv().post(`${BASE_URL}/Update`, payload);
