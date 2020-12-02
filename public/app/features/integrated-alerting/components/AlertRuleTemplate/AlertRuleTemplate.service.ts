@@ -8,6 +8,6 @@ export const AlertRuleTemplateService = {
     return getBackendSrv().post(`${BASE_URL}/Create`, payload);
   },
   async list(): Promise<TemplatesList> {
-    return getBackendSrv().post(`${BASE_URL}/List`);
+    return getBackendSrv().post(`${BASE_URL}/List`, { reload: true });
   },
 };
