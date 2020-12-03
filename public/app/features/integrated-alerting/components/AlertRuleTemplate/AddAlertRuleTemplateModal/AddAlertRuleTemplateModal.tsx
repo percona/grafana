@@ -8,7 +8,11 @@ import { AddAlertRuleTemplateModalProps, AlertRuleTemplateRenderProps } from './
 import { getStyles } from './AddAlertRuleTemplateModal.styles';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 
-export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({ isVisible, setVisible }) => {
+export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
+  isVisible,
+  setVisible,
+  getAlertRuleTemplates,
+}) => {
   const styles = useStyles(getStyles);
   const { required } = validators;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,6 +32,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({ 
     try {
       await AlertRuleTemplateService.upload(values);
       setVisible(false);
+      getAlertRuleTemplates();
     } catch (e) {
       logger.error(e);
     }

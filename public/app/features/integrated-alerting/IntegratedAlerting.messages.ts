@@ -35,6 +35,7 @@ export const Messages = {
         name: 'Name',
         source: 'Source',
         createdAt: 'Created',
+        actions: 'Actions',
       },
     },
   },
