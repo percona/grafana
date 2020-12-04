@@ -1,2 +1,3 @@
-export * from './AlertRuleTemplate';
+export * from './Alerts';
 export * from './AlertRules';
+export * from './AlertRuleTemplate';
