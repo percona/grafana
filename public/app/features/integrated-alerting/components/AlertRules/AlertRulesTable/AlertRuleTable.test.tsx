@@ -4,8 +4,6 @@ import { dataQa } from '@percona/platform-core';
 import { AlertRulesTable } from './AlertRulesTable';
 import { act } from 'react-dom/test-utils';
 
-// const consoleLog = jest.spyOn(console, 'error').mockImplementation(() => {});
-
 describe('AddAlertRuleTemplatesTable', () => {
   afterEach(() => {
     jest.clearAllMocks();
