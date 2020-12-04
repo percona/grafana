@@ -1,0 +1,78 @@
+import { AlertsListResponseAlert } from '../Alerts.types';
+
+export const alertsStubs: AlertsListResponseAlert[] = [
+  {
+    alert_id: '1',
+    labels: {
+      environment: 'prod',
+      app: 'wordpress',
+      node_name: 'pxc_instance1',
+      cluster: 'PXCCluster1',
+      service_name: 'my_db1',
+    },
+    active_since: '2020-11-25T16:53:39.366Z',
+    last_notified: '2020-11-25T16:53:39.366Z',
+    severity: 'SEVERITY_CRITICAL',
+    summary: 'PXC cluster on [HR prod] is down',
+    status: 'TRIGGERING',
+  },
+  {
+    alert_id: '2',
+    labels: {
+      environment: 'prod',
+      service_type: 'mongodb',
+      node_name: 'mdb_prod_1',
+      cluster: 'MDBReplicaSet1',
+      service_name: 'mdb_prod',
+    },
+    active_since: '2020-11-25T16:53:39.366Z',
+    last_notified: '2020-11-25T16:53:39.366Z',
+    severity: 'SEVERITY_WARNING',
+    summary: 'CPU load on [Sales Prod] exceeded 75%',
+    status: 'TRIGGERING',
+  },
+  {
+    alert_id: '3',
+    labels: {
+      environment: 'dev',
+      service_type: 'mysql',
+      node_name: 'cluster_node_2',
+      cluster: 'PXCCluster2',
+      service_name: 'pxc_cluster1',
+    },
+    active_since: '2020-11-25T16:53:39.366Z',
+    last_notified: '2020-11-25T16:53:39.366Z',
+    severity: 'SEVERITY_ERROR',
+    summary: 'Memory consumption on [Mncfg Dev] instance 1 reached 80%',
+    status: 'TRIGGERING',
+  },
+  {
+    alert_id: '4',
+    labels: {
+      environment: 'dev',
+      service_type: 'mongodb',
+      node_name: 'mdb_prod_7',
+      cluster: 'MDBReplicaSet2',
+      service_name: 'mdb_replset1',
+    },
+    active_since: '2020-11-25T16:53:39.366Z',
+    severity: 'SEVERITY_WARNING',
+    summary: 'Memory consumption on [Mncfg Dev] instance 1 reached 80%',
+    status: 'SILENCED',
+  },
+  {
+    alert_id: '5',
+    labels: {
+      environment: 'dev',
+      service_type: 'mysql',
+      node_name: 'cluster_node_2',
+      cluster: 'PXCCluster2',
+      service_name: 'pxc_cluster1',
+    },
+    active_since: '2020-11-25T16:53:39.366Z',
+    last_notified: '2020-11-25T16:53:39.366Z',
+    severity: 'SEVERITY_NOTICE',
+    summary: 'Memory consumption on [Sales Dev] is lower than 30%',
+    status: 'TRIGGERING',
+  },
+];
