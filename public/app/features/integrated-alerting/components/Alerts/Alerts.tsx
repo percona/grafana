@@ -1,4 +1,4 @@
 import React, { FC } from 'react';
 import { AlertsTable } from './AlertsTable';
 
-export const AlertsTable: FC = () => <AlertsTable />;
+export const Alerts: FC = () => <AlertsTable />;
