@@ -7,30 +7,29 @@ import { logger } from '@percona/platform-core';
 import { AlertsService } from '../Alerts.service';
 import { Messages } from '../../../IntegratedAlerting.messages';
 import { Alert } from '../Alerts.types';
-import { formatRules } from './AlertsTable.utils';
+import { formatAlerts } from './AlertsTable.utils';
 
-const { noData, columns } = Messages.alertRules.table;
+const { noData, columns } = Messages.alerts.table;
 
 const {
-  createdAt: createdAtColumn,
-  duration: durationColumn,
-  filters: filtersColumn,
+  activeSince: activeSinceColumn,
+  labels: labelsColumn,
   lastNotified: lastNotifiedColumn,
   severity: severityColumn,
+  state: stateColumn,
   summary: summaryColumn,
-  threshold: thresholdColumn,
 } = columns;
 
 export const AlertsTable = () => {
   const style = useStyles(getStyles);
   const [pendingRequest, setPendingRequest] = useState(false);
-  const [data, setData] = useState<AlertRule[]>([]);
+  const [data, setData] = useState<Alert[]>([]);
 
   const getAlertRules = async () => {
     setPendingRequest(true);
     try {
-      const { rules } = await AlertRulesService.list();
-      setData(formatRules(rules));
+      const { alerts } = await AlertsService.list();
+      setData(formatAlerts(alerts));
     } catch (e) {
       logger.error(e);
     } finally {
@@ -43,17 +42,7 @@ export const AlertsTable = () => {
       {
         Header: summaryColumn,
         accessor: 'summary',
-        width: '25%',
-      } as Column,
-      {
-        Header: thresholdColumn,
-        accessor: 'threshold',
-        width: '10%',
-      } as Column,
-      {
-        Header: durationColumn,
-        accessor: 'duration',
-        width: '10%',
+        width: '30%',
       } as Column,
       {
         Header: severityColumn,
@@ -61,37 +50,31 @@ export const AlertsTable = () => {
         width: '5%',
       } as Column,
       {
-        Header: filtersColumn,
-        accessor: ({ filters }: AlertRule) => (
-          <div className={style.filtersWrapper}>
-            {filters.map(filter => (
-              <span key={filter} className={style.filter}>
-                {filter}
+        Header: stateColumn,
+        accessor: 'status',
+        width: '5%',
+      } as Column,
+      {
+        Header: labelsColumn,
+        accessor: ({ labels }: Alert) => (
+          <div className={style.labelsWrapper}>
+            {labels.map(label => (
+              <span key={label} className={style.label}>
+                {label}
               </span>
             ))}
           </div>
         ),
-        width: '30%',
+        width: '40%',
       } as Column,
       {
-        Header: createdAtColumn,
-        accessor: 'createdAt',
+        Header: activeSinceColumn,
+        accessor: ({ activeSince }: Alert) => <>{activeSince ? activeSince : null}</>,
         width: '10%',
       } as Column,
       {
         Header: lastNotifiedColumn,
-        accessor: ({ lastNotified }: AlertRule) => (
-          <>
-            <div className={style.lastNotifiedWrapper}>
-              {lastNotified ? (
-                <>
-                  <span className={style.lastNotifiedDate}>{lastNotified}</span>
-                  <span className={style.lastNotifiedCircle} />
-                </>
-              ) : null}
-            </div>
-          </>
-        ),
+        accessor: ({ lastNotified }: Alert) => <>{lastNotified ? lastNotified : null}</>,
         width: '10%',
       } as Column,
     ],
@@ -141,7 +124,10 @@ export const AlertsTable = () => {
               {rows.map(row => {
                 prepareRow(row);
                 return (
-                  <tr {...row.getRowProps()} className={(row.original as Alert).disabled ? style.disabledRow : ''}>
+                  <tr
+                    {...row.getRowProps()}
+                    className={(row.original as Alert).status === 'Silenced' ? style.disabledRow : ''}
+                  >
                     {row.cells.map(cell => (
                       <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     ))}
