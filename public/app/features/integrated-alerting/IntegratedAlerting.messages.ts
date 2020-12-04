@@ -5,6 +5,19 @@ export const Messages = {
     alertRuleTemplates: 'Alert Rule Templates',
     notificationChannels: 'Notification Channels',
   },
+  alerts: {
+    table: {
+      noData: 'No alerts',
+      columns: {
+        activeSince: 'Active Since',
+        labels: 'Labels',
+        lastNotified: 'Last Notified',
+        severity: 'Severity',
+        summary: 'Name',
+        state: 'State',
+      },
+    },
+  },
   alertRules: {
     table: {
       noData: 'No alert rules found',
@@ -14,7 +27,7 @@ export const Messages = {
         filters: 'Filters',
         lastNotified: 'Last Notified',
         severity: 'Severity',
-        summary: 'Summary',
+        summary: 'Name',
         threshold: 'Threshold',
       },
     },
