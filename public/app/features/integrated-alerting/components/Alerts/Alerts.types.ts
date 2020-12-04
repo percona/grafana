@@ -22,16 +22,16 @@ export interface Alert {
 }
 
 export interface AlertsListResponseAlert {
+  active_since?: string;
   alert_id: string;
-  disabled: boolean;
-  labels: AlertsListResponseLabel[];
+  labels: AlertsListResponseLabel;
   last_notified?: string;
-  rule: AlertRulesListResponseRule;
+  rule?: AlertRulesListResponseRule;
   severity: keyof typeof AlertRuleSeverity;
   status: keyof typeof AlertStatus;
   summary: string;
 }
 
 export interface AlertsListResponse {
-  rules: AlertsListResponseAlert[];
+  alerts: AlertsListResponseAlert[];
 }
