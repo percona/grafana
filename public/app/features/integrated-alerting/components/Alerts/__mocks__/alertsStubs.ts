@@ -75,4 +75,17 @@ export const alertsStubs: AlertsListResponseAlert[] = [
     summary: 'Memory consumption on [Sales Dev] is lower than 30%',
     status: 'TRIGGERING',
   },
+  {
+    alert_id: '6',
+    labels: {
+      environment: 'dev',
+      service_type: 'mongodb',
+      node_name: 'mdb_prod_7',
+      cluster: 'MDBReplicaSet2',
+      service_name: 'mdb_replset1',
+    },
+    severity: 'SEVERITY_WARNING',
+    summary: 'Memory consumption on [Mncfg Dev] instance 1 reached 80%',
+    status: 'SILENCED',
+  },
 ];
