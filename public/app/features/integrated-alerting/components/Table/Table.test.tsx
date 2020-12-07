@@ -36,7 +36,7 @@ describe('Table', () => {
     expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(0);
   });
 
-  it('should render correctly without data', async () => {
+  it('should display the noData section when no data is passed', async () => {
     const wrapper = mount(<Table data={[]} columns={columns} emptyMessage="empty" />);
     const noData = wrapper.find(dataQa('table-no-data'));
 
