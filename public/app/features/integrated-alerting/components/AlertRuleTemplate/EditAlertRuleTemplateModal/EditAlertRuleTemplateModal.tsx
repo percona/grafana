@@ -3,7 +3,7 @@ import { Form } from 'react-final-form';
 import { HorizontalGroup, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextareaInputField, validators, logger } from '@percona/platform-core';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import { EditAlertRuleTemplateModalProps, EditAlertRuleTemplateRenderProps } from './EditAlertRuleTemplateModal.types';
 import { getStyles } from './EditAlertRuleTemplateModal.styles';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';

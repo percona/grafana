@@ -5,6 +5,13 @@ import { dataQa } from '@percona/platform-core';
 import { EditAlertRuleTemplateModal } from './EditAlertRuleTemplateModal';
 
 jest.mock('../AlertRuleTemplate.service');
+jest.mock('app/core/app_events', () => {
+  return {
+    appEvents: {
+      emit: jest.fn(),
+    },
+  };
+});
 
 describe('EditAlertRuleTemplateModal', () => {
   it('should render component correctly', () => {

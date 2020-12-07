@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button, HorizontalGroup, Icon, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextareaInputField, validators, logger } from '@percona/platform-core';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import { Messages } from 'app/features/integrated-alerting/IntegratedAlerting.messages';
 import { AddAlertRuleTemplateModalProps, AlertRuleTemplateRenderProps } from './AddAlertRuleTemplateModal.types';
 import { getStyles } from './AddAlertRuleTemplateModal.styles';
