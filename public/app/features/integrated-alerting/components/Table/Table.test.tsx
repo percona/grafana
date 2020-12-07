@@ -28,7 +28,7 @@ describe('Table', () => {
     expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(0);
   });
 
-  it('should render correctly when pending', async () => {
+  it('should render the loader when data fetch is pending', async () => {
     const wrapper = mount(<Table data={data} columns={columns} pendingRequest />);
 
     expect(wrapper.find(dataQa('table-loading'))).toHaveLength(1);
