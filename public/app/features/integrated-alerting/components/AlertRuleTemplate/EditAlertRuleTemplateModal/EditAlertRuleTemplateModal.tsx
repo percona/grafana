@@ -1,7 +1,9 @@
 import React, { FC } from 'react';
 import { Form } from 'react-final-form';
 import { HorizontalGroup, useStyles } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextareaInputField, validators, logger } from '@percona/platform-core';
+import { appEvents } from 'app/core/core';
 import { EditAlertRuleTemplateModalProps, EditAlertRuleTemplateRenderProps } from './EditAlertRuleTemplateModal.types';
 import { getStyles } from './EditAlertRuleTemplateModal.styles';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
@@ -19,6 +21,7 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
     try {
       await AlertRuleTemplateService.update(values);
       setVisible(false);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.editSuccess]);
       getAlertRuleTemplates();
     } catch (e) {
       logger.error(e);
