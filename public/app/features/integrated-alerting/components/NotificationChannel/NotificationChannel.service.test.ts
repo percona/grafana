@@ -10,7 +10,7 @@ jest.mock('@grafana/runtime', () => ({
 }));
 
 describe('NotificationChannelService', () => {
-  it('should return correct list of notification channels', async () => {
+  it('should return a list of notification channels', async () => {
     postMock.mockImplementation(() => {
       return Promise.resolve({ channels: notificationChannelResponseStubs });
     });
