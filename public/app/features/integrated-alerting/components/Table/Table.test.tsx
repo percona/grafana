@@ -20,7 +20,7 @@ const data = [
 ];
 
 describe('Table', () => {
-  it('should render the table correctly', async () => {
+  it('should render the table', async () => {
     const wrapper = mount(<Table data={data} columns={columns} />);
 
     expect(wrapper.find(dataQa('table-thead')).find('tr')).toHaveLength(1);
