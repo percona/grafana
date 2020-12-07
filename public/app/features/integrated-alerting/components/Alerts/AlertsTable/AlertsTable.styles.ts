@@ -1,8 +1,7 @@
 import { css } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => {
+export const getStyles = (theme: GrafanaTheme) => {
   const { colors } = theme;
 
   const borderColor = colors.border2;
@@ -101,4 +100,4 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       }
     `,
   };
-});
+};
