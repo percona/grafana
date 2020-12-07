@@ -9,4 +9,5 @@ export const Messages = {
     [NotificationChannelType.pagerDuty]: 'Pager Duty',
     [NotificationChannelType.slack]: 'Slack',
   },
+  missingTypeError: "Notification channel type doesn't exist",
 };

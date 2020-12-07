@@ -8,6 +8,7 @@ import {
   PagerDutylNotificationChannel,
   SlackNotificationChannel,
 } from './NotificationChannel.types';
+import { Messages } from './NotificationChannel.messages';
 
 const BASE_URL = `${window.location.origin}/v1/management/ia/Channels`;
 const TO_MODEL = {
@@ -39,6 +40,10 @@ const TO_MODEL = {
 };
 
 const getType = (channel: NotificationChannelResponse): NotificationChannelType => {
+  if ('email_config' in channel) {
+    return NotificationChannelType.email;
+  }
+
   if ('pagerduty_config' in channel) {
     return NotificationChannelType.pagerDuty;
   }
@@ -47,7 +52,7 @@ const getType = (channel: NotificationChannelResponse): NotificationChannelType 
     return NotificationChannelType.slack;
   }
 
-  return NotificationChannelType.email;
+  throw new Error(Messages.missingTypeError);
 };
 
 export const NotificationChannelService = {
