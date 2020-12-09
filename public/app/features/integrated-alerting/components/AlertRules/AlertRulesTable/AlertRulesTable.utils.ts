@@ -5,7 +5,7 @@ import {
   AlertRuleSeverity,
   AlertRulesListResponseFilter,
   AlertRulesListResponseRule,
-  AlertRulesListResponseTemplate,
+  AlertRulesListPayloadTemplate,
 } from '../AlertRules.types';
 
 export const formatFilter = (filter: AlertRulesListResponseFilter): string => {
@@ -14,7 +14,7 @@ export const formatFilter = (filter: AlertRulesListResponseFilter): string => {
   return `${key}${AlertRuleFilterType[type]}${value}`;
 };
 
-export const formatThreshold = (template: AlertRulesListResponseTemplate): string => {
+export const formatThreshold = (template: AlertRulesListPayloadTemplate): string => {
   const thresholdParam = template.params.find(param => param.name === 'threshold');
 
   const { value, unit } = thresholdParam;
