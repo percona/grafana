@@ -4,14 +4,14 @@ export enum AlertRuleFilterType {
   EQUAL = '=',
 }
 
-export interface AlertRulesListResponseTemplateParam {
+export interface AlertRulesListPayloadTemplateParam {
   name: string;
   unit?: string;
   value: any;
 }
 
-export interface AlertRulesListResponseTemplate {
-  params: AlertRulesListResponseTemplateParam[];
+export interface AlertRulesListPayloadTemplate {
+  params: AlertRulesListPayloadTemplateParam[];
 }
 
 export enum AlertRuleSeverity {
@@ -62,9 +62,29 @@ export interface AlertRulesListResponseRule {
   params?: AlertRulesListResponseParam[];
   severity: keyof typeof AlertRuleSeverity;
   summary: string;
-  template: AlertRulesListResponseTemplate;
+  template: AlertRulesListPayloadTemplate;
 }
 
 export interface AlertRulesListResponse {
   rules: AlertRulesListResponseRule[];
+}
+
+export interface AlertRulePayloadCustomLabels {
+  [K: string]: string;
+}
+
+type ApertRulesListPayloadFilter = AlertRulesListResponseFilter;
+
+type AlertRulesListPayloadParam = AlertRulesListResponseParam;
+
+export interface AlertRuleCreatePayload {
+  channel_ids: string[];
+  custom_labels: AlertRulePayloadCustomLabels;
+  disabled: boolean;
+  filters: ApertRulesListPayloadFilter[];
+  for: string;
+  params: AlertRulesListPayloadParam[];
+  severity: keyof typeof AlertRuleSeverity;
+  summary: string;
+  template_name: string;
 }
