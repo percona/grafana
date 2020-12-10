@@ -4,7 +4,7 @@ import { dataQa } from '@percona/platform-core';
 import { AlertRulesTable } from './AlertRulesTable';
 import { act } from 'react-dom/test-utils';
 
-describe('AddAlertRuleTemplatesTable', () => {
+describe('AlertRulesTable', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
