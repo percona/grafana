@@ -1,3 +1,5 @@
+import { SelectableValue } from '@grafana/data';
+
 export interface NotificationChannelContext {
   getNotificationChannels: () => void;
 }
@@ -32,30 +34,39 @@ export interface SlackNotificationChannel extends NotificationChannel {
 }
 
 export interface NotificationChannelListResponse {
-  channels: NotificationChannelResponse[];
+  channels: NotificationChannelAPI[];
 }
 
-export interface NotificationChannelResponse {
-  channel_id: string;
-  disabled: boolean;
+export interface NotificationChannelAPI {
+  channel_id?: string;
+  disabled?: boolean;
   summary: string;
-  email_config?: EmailNotificationChannelResponse;
-  pagerduty_config?: PagerDutyNotificationChannelResponse;
-  slack_config?: SlackNotificationChannelResponse;
+  email_config?: EmailNotificationChannelAPI;
+  pagerduty_config?: PagerDutyNotificationChannelAPI;
+  slack_config?: SlackNotificationChannelAPI;
 }
 
-export interface EmailNotificationChannelResponse {
-  send_resolved: boolean;
+export interface EmailNotificationChannelAPI {
+  send_resolved?: boolean;
   to: string[];
 }
 
-export interface PagerDutyNotificationChannelResponse {
-  send_resolved: boolean;
+export interface PagerDutyNotificationChannelAPI {
+  send_resolved?: boolean;
   routing_key: string;
   service_key: string;
 }
 
-export interface SlackNotificationChannelResponse {
-  send_resolved: boolean;
+export interface SlackNotificationChannelAPI {
+  send_resolved?: boolean;
   channel: string;
+}
+
+export interface NotificationChannelRenderProps {
+  name: string;
+  type: SelectableValue<NotificationChannelType>;
+  emails?: string;
+  routing?: string;
+  service?: string;
+  channel?: string;
 }

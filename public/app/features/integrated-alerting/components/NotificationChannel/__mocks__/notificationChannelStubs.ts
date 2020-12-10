@@ -1,12 +1,12 @@
 import {
-  NotificationChannelResponse,
+  NotificationChannelAPI,
   NotificationChannelType,
   EmailNotificationChannel,
   PagerDutylNotificationChannel,
   SlackNotificationChannel,
 } from '../NotificationChannel.types';
 
-export const notificationChannelResponseStubs: NotificationChannelResponse[] = [
+export const notificationChannelResponseStubs: NotificationChannelAPI[] = [
   {
     channel_id: '1',
     summary: 'email channel',
