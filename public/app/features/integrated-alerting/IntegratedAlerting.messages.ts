@@ -19,18 +19,6 @@ export const Messages = {
     },
   },
   alertRules: {
-    addModal: {
-      title: 'Add Alert Rule',
-      confirm: 'Add',
-      templateField: 'Template',
-      nameField: 'Name',
-      thresholdField: 'Threshold',
-      durationField: 'Duration (s)',
-      filtersField: 'Filters',
-      severityField: 'Severity',
-      channelField: 'Channel',
-      activateSwitch: 'Activate',
-    },
     table: {
       noData: 'No alert rules found',
       columns: {
