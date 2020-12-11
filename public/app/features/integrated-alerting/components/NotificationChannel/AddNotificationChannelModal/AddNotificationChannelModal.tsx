@@ -10,10 +10,11 @@ import { Messages } from './AddNotificationChannelModal.messages';
 import { TYPE_OPTIONS, TYPE_FIELDS_COMPONENT } from './AddNotificationChannel.constants';
 import { NotificationChannelService } from '../NotificationChannel.service';
 
+const { required } = validators;
+const initialValues = { type: TYPE_OPTIONS[0] };
+
 export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> = ({ isVisible, setVisible }) => {
   const styles = useStyles(getStyles);
-  const { required } = validators;
-  const initialValues = { type: TYPE_OPTIONS[0] };
   const { getNotificationChannels } = useContext(NotificationChannelProvider);
   const onSubmit = async (values: NotificationChannelRenderProps) => {
     try {
