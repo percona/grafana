@@ -3,9 +3,9 @@ import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   select: css`
-    margin-bottom: 16px;
+    margin-bottom: ${spacing.xl};
 
-    & > {
+    & > * {
       height: 37px !important;
     }
   `,
@@ -26,19 +26,6 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    /* div {
-      display: flex;
-      width: 60%;
-
-      label {
-        width: 150px;
-      }
-
-      & :nth-child(2n) {
-        flex: 1;
-      }
-    } */
   `,
   formFieldsWrapper: css`
     display: flex;
@@ -46,6 +33,8 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     flex-wrap: wrap;
     width: 60%;
     overflow: visible;
+    margin-bottom: 60px;
+
     dt {
       flex-basis: 50%;
       text-overflow: ellipsis;
