@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Form, Field } from 'react-final-form';
 import { Button, HorizontalGroup, Switch, Select, MultiSelect, useStyles } from '@grafana/ui';
 import {
@@ -14,13 +14,29 @@ import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
 import { SEVERITY_OPTIONS, NOTIFICATION_CHANNEL_OPTIONS } from './AddAlertRulesModal.constants';
-import { formatCreateAPIPayload } from './AddAlertRuleModal.utils';
+import { formatTemplateOptions, formatCreateAPIPayload } from './AddAlertRuleModal.utils';
 import { AlertRulesService } from '../AlertRules.service';
+import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
+import { SelectableValue } from '@grafana/data';
 
 const { required } = validators;
 
 export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible }) => {
   const styles = useStyles(getStyles);
+  const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<string>>>();
+
+  const getTemplates = async () => {
+    try {
+      const response = await AlertRuleTemplateService.list();
+      setTemplateOptions(formatTemplateOptions(response.templates));
+    } catch (e) {
+      logger.error(e);
+    }
+  };
+
+  useEffect(() => {
+    getTemplates;
+  }, []);
 
   const onSubmit = async (values: AddAlertRuleFormValues) => {
     try {
@@ -40,7 +56,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <dl className={styles.formFieldsWrapper}>
               <dt>{Messages.templateField}</dt>
               <dd>
-                <TextInputField name="template" validators={[required]} />
+                <Field name="severity" validate={required}>
+                  {({ input }) => <Select className={styles.select} options={templateOptions} {...input} />}
+                </Field>
               </dd>
 
               <dt>{Messages.nameField}</dt>

@@ -1,5 +1,13 @@
 import { AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { AlertRuleCreatePayload, AlertRulesListPayloadFilter } from '../AlertRules.types';
+import { Template } from '../../AlertRuleTemplate/AlertRuleTemplatesTable/AlertRuleTemplatesTable.types';
+import { SelectableValue } from '@grafana/data';
+
+export const formatTemplateOptions = (templates: Template[]): Array<SelectableValue<string>> =>
+  templates.map(template => ({
+    value: template.summary,
+    label: template.summary,
+  }));
 
 // TODO: handle new types as they gets added to AlertRuleFilterType
 export const formatFilter = (filter: string): AlertRulesListPayloadFilter => {
