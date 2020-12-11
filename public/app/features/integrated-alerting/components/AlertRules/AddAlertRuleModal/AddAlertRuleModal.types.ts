@@ -19,7 +19,7 @@ export enum Severity {
 }
 
 export interface AddAlertRuleFormValues {
-  template: string;
+  template: SelectableValue<string>;
   name: string;
   threshold: string;
   duration: number;
