@@ -32,7 +32,7 @@ export interface AlertRule {
   threshold: string;
 }
 
-export interface AlertRulesListResponseFilter {
+export interface AlertRulesListPayloadFilter {
   key: string;
   type: keyof typeof AlertRuleFilterType;
   value: string;
@@ -56,7 +56,7 @@ export interface AlertRulesListResponseParam {
 export interface AlertRulesListResponseRule {
   created_at: string;
   disabled: boolean;
-  filters: AlertRulesListResponseFilter[];
+  filters: AlertRulesListPayloadFilter[];
   for: string; // duration, e.g.: '999s'
   last_notified?: string;
   params?: AlertRulesListResponseParam[];
@@ -73,18 +73,17 @@ export interface AlertRulePayloadCustomLabels {
   [K: string]: string;
 }
 
-type ApertRulesListPayloadFilter = AlertRulesListResponseFilter;
-
 type AlertRulesListPayloadParam = AlertRulesListResponseParam;
 
 export interface AlertRuleCreatePayload {
   channel_ids: string[];
   custom_labels: AlertRulePayloadCustomLabels;
   disabled: boolean;
-  filters: ApertRulesListPayloadFilter[];
+  filters: AlertRulesListPayloadFilter[];
   for: string;
   params: AlertRulesListPayloadParam[];
   severity: keyof typeof AlertRuleSeverity;
   summary: string;
   template_name: string;
+  threshold: string;
 }
