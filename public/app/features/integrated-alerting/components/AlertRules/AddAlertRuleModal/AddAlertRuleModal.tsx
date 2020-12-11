@@ -10,6 +10,8 @@ import {
   logger,
   validators,
 } from '@percona/platform-core';
+import { SelectableValue } from '@grafana/data';
+import { AppEvents } from '@grafana/data';
 import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
@@ -17,7 +19,7 @@ import { SEVERITY_OPTIONS, NOTIFICATION_CHANNEL_OPTIONS } from './AddAlertRulesM
 import { formatTemplateOptions, formatCreateAPIPayload } from './AddAlertRuleModal.utils';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
-import { SelectableValue } from '@grafana/data';
+import { appEvents } from 'app/core/core';
 
 const { required } = validators;
 
@@ -42,6 +44,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
     try {
       await AlertRulesService.create(formatCreateAPIPayload(values));
       setVisible(false);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
     } catch (e) {
       logger.error(e);
     }

@@ -13,6 +13,7 @@ export const Messages = {
   title: 'Add Alert Rule',
   confirm: 'Add',
   cancel: 'Cancel',
+  addSuccess: 'The alert rule has been created correctly',
   templateField: 'Template',
   nameField: 'Name',
   thresholdField: 'Threshold',
