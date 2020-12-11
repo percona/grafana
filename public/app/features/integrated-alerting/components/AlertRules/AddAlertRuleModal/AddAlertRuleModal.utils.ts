@@ -29,7 +29,13 @@ export const formatFilter = (filter: string): AlertRulesListPayloadFilter => {
 };
 
 export const formatFilters = (filters: string): AlertRulesListPayloadFilter[] => {
-  const filterList = filters.split(/,\s*/);
+  const trimmedFilters = filters.trim();
+
+  if (trimmedFilters === '') {
+    return [];
+  }
+
+  const filterList = trimmedFilters.split(/,\s*/);
 
   return filterList.map(formatFilter);
 };
