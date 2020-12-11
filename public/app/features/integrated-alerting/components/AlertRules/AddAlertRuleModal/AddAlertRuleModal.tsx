@@ -1,6 +1,6 @@
-import React, { FC, useMemo, useState } from 'react';
-import { Form } from 'react-final-form';
-import { HorizontalGroup, Select, useStyles } from '@grafana/ui';
+import React, { FC } from 'react';
+import { Form, Field } from 'react-final-form';
+import { Button, HorizontalGroup, Switch, Select, MultiSelect, useStyles } from '@grafana/ui';
 import {
   Modal,
   LoaderButton,
@@ -8,101 +8,80 @@ import {
   NumberInputField,
   TextareaInputField,
   logger,
+  validators,
 } from '@percona/platform-core';
-import { Messages } from 'app/features/integrated-alerting/IntegratedAlerting.messages';
-import { AddAlertRuleModalProps, NotificationChannel } from './AddAlertRuleModal.types';
-import { AlertRuleSeverity } from '../AlertRules.types';
+import { Messages } from './AddAlertRuleModal.messages';
+import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
-// import { AlertRulesService } from '../AlertRules.service';
+import { SEVERITY_OPTIONS, NOTIFICATION_CHANNEL_OPTIONS } from './AddAlertRulesModal.constants';
+import { formatCreateAPIPayload } from './AddAlertRuleModal.utils';
+import { AlertRulesService } from '../AlertRules.service';
+
+const { required } = validators;
 
 export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible }) => {
   const styles = useStyles(getStyles);
-  const [selectedSeverity, setSelectedSeverity] = useState();
-  const [selectedChannel, setSelectedChannel] = useState();
 
-  const onSubmit = async values => {
+  const onSubmit = async (values: AddAlertRuleFormValues) => {
     try {
-      // await AlertRulesService.create();
+      await AlertRulesService.create(formatCreateAPIPayload(values));
       setVisible(false);
     } catch (e) {
       logger.error(e);
     }
   };
 
-  const severityOptions = useMemo(
-    () =>
-      Object.keys(AlertRuleSeverity).map(key => ({
-        value: key,
-        label: AlertRuleSeverity[key],
-      })),
-    []
-  );
-
-  const channelOptions = useMemo(
-    () =>
-      Object.keys(NotificationChannel).map(key => ({
-        value: key,
-        label: NotificationChannel[key],
-      })),
-    []
-  );
-
   return (
-    <Modal title={Messages.alertRules.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>
+    <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
       <Form
         onSubmit={onSubmit}
         render={({ handleSubmit, valid, pristine, submitting }) => (
           <form className={styles.form} onSubmit={handleSubmit}>
             <dl className={styles.formFieldsWrapper}>
-              <dt>{Messages.alertRules.addModal.templateField}</dt>
+              <dt>{Messages.templateField}</dt>
               <dd>
-                <TextInputField name="template" />
+                <TextInputField name="template" validators={[required]} />
               </dd>
 
-              <dt>{Messages.alertRules.addModal.nameField}</dt>
+              <dt>{Messages.nameField}</dt>
               <dd>
-                <TextInputField name="name" />
+                <TextInputField name="name" validators={[required]} />
               </dd>
 
-              <dt>{Messages.alertRules.addModal.thresholdField}</dt>
+              <dt>{Messages.thresholdField}</dt>
               <dd>
-                <TextInputField name="threshold" />
+                <TextInputField name="threshold" validators={[required]} />
               </dd>
 
-              <dt>{Messages.alertRules.addModal.durationField}</dt>
+              <dt>{Messages.durationField}</dt>
               <dd>
-                <NumberInputField name="duration" />
+                <NumberInputField name="duration" validators={[required]} />
               </dd>
 
-              <dt>{Messages.alertRules.addModal.filtersField}</dt>
+              <dt>{Messages.filtersField}</dt>
               <dd>
-                <Select
-                  className={styles.select}
-                  name="severity"
-                  value={selectedSeverity}
-                  options={severityOptions}
-                  onChange={severity => {
-                    setSelectedSeverity(severity);
-                  }}
-                />
+                <Field name="severity" validate={required}>
+                  {({ input }) => <Select className={styles.select} options={SEVERITY_OPTIONS} {...input} />}
+                </Field>
               </dd>
 
-              <dt>{Messages.alertRules.addModal.filtersField}</dt>
+              <dt>{Messages.filtersField}</dt>
               <dd>
-                <TextareaInputField name="filters" />
+                <TextareaInputField name="filters" validators={[required]} />
               </dd>
 
-              <dt>{Messages.alertRules.addModal.channelField}</dt>
+              <dt>{Messages.channelField}</dt>
               <dd>
-                <Select
-                  className={styles.select}
-                  name="channel"
-                  value={selectedChannel}
-                  options={channelOptions}
-                  onChange={channel => {
-                    setSelectedChannel(channel);
-                  }}
-                />
+                <Field name="notificationChannels" validate={required}>
+                  {({ input }) => (
+                    <MultiSelect className={styles.select} options={NOTIFICATION_CHANNEL_OPTIONS} {...input} />
+                  )}
+                </Field>
+              </dd>
+
+              <dt>{Messages.activateSwitch}</dt>
+              <dd>
+                <Field name="enabled">{({ input }) => <Switch {...input} />}</Field>
               </dd>
             </dl>
             <HorizontalGroup justify="center" spacing="md">
@@ -113,8 +92,15 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 disabled={!valid || pristine}
                 loading={submitting}
               >
-                {Messages.alertRules.addModal.confirm}
+                {Messages.confirm}
               </LoaderButton>
+              <Button
+                data-qa="notification-channel-cancel-button"
+                variant="secondary"
+                onClick={() => setVisible(false)}
+              >
+                {Messages.cancel}
+              </Button>
             </HorizontalGroup>
           </form>
         )}
