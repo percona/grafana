@@ -48,11 +48,16 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   };
 
   return (
-    <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
+    <Modal
+      title={Messages.title}
+      isVisible={isVisible}
+      onClose={() => setVisible(false)}
+      data-qa="add-alert-rule-modal"
+    >
       <Form
         onSubmit={onSubmit}
         render={({ handleSubmit, valid, pristine, submitting }) => (
-          <form className={styles.form} onSubmit={handleSubmit}>
+          <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
             <dl className={styles.formFieldsWrapper}>
               <dt>{Messages.templateField}</dt>
               <dd>
@@ -104,7 +109,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             </dl>
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
-                data-qa="alert-rule-template-add-button"
+                data-qa="add-alert-rule-modal-form-add-button"
                 size="md"
                 variant="primary"
                 disabled={!valid || pristine}
@@ -113,7 +118,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 {Messages.confirm}
               </LoaderButton>
               <Button
-                data-qa="notification-channel-cancel-button"
+                data-qa="add-alert-rule-modal-form-cancel-button"
                 variant="secondary"
                 onClick={() => setVisible(false)}
               >
