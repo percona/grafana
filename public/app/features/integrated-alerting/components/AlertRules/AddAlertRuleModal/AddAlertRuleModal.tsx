@@ -56,7 +56,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <dl className={styles.formFieldsWrapper}>
               <dt>{Messages.templateField}</dt>
               <dd>
-                <Field name="severity" validate={required}>
+                <Field name="template" validate={required}>
                   {({ input }) => <Select className={styles.select} options={templateOptions} {...input} />}
                 </Field>
               </dd>
@@ -76,7 +76,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 <NumberInputField name="duration" validators={[required]} />
               </dd>
 
-              <dt>{Messages.filtersField}</dt>
+              <dt>{Messages.severityField}</dt>
               <dd>
                 <Field name="severity" validate={required}>
                   {({ input }) => <Select className={styles.select} options={SEVERITY_OPTIONS} {...input} />}
