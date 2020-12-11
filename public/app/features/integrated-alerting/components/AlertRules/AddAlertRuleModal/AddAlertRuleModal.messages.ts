@@ -1,7 +1,7 @@
 export const Messages = {
   channels: {
     email: 'email',
-    pagerDuty: 'Pager Duty',
+    pagerDuty: 'PagerDuty',
     slack: 'Slack',
   },
   severities: {
