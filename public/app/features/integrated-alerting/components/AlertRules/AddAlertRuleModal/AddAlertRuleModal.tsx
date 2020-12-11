@@ -37,7 +37,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   };
 
   useEffect(() => {
-    getTemplates;
+    getTemplates();
   }, []);
 
   const onSubmit = async (values: AddAlertRuleFormValues) => {
