@@ -2,6 +2,13 @@ import { css } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
+  select: css`
+    margin-bottom: 16px;
+
+    & > * {
+      height: 37px !important;
+    }
+  `,
   form: css`
     width: 100%;
     display: flex;
