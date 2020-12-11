@@ -24,7 +24,7 @@ export interface AddAlertRuleFormValues {
   threshold: string;
   duration: number;
   filters: string;
-  notificationChannels: Array<SelectableValue<string>>;
+  notificationChannels: Array<SelectableValue<NotificationChannel>>;
   severity: SelectableValue<Severity>;
   enabled: boolean;
 }
