@@ -3,22 +3,10 @@ import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   select: css`
-    margin-bottom: ${spacing.xl};
+    margin-bottom: 16px;
 
     & > * {
       height: 37px !important;
-    }
-  `,
-  field: css`
-    display: flex;
-    width: 60%;
-
-    label {
-      width: 150px;
-    }
-
-    & :nth-child(2n) {
-      flex: 1;
     }
   `,
   form: css`
@@ -26,24 +14,34 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    /* div {
+      display: flex;
+      width: 60%;
+
+      label {
+        width: 150px;
+      }
+
+      & :nth-child(2n) {
+        flex: 1;
+      }
+    } */
   `,
   formFieldsWrapper: css`
     display: flex;
-    flex-flow: row;
     flex-wrap: wrap;
     width: 60%;
-    overflow: visible;
     margin-bottom: 60px;
 
     dt {
-      flex-basis: 50%;
-      text-overflow: ellipsis;
+      flex: 0 1 25%;
+      max-width: 150px;
     }
     dd {
       margin-left: auto;
       text-align: left;
-      text-overflow: ellipsis;
-      flex-basis: 50%;
+      flex: 1 1 75%;
     }
   `,
 });
