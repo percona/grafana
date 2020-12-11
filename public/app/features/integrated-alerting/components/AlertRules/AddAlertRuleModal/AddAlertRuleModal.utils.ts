@@ -39,7 +39,7 @@ export const formatCreateAPIPayload = (data: AddAlertRuleFormValues): AlertRuleC
     for: `${duration}s`,
     params: [],
     severity: severity.value,
-    template_name: template,
+    template_name: template.value,
     threshold,
     summary: name,
   };
