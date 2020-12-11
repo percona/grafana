@@ -61,6 +61,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
         onSubmit={onSubmit}
         render={({ handleSubmit, valid, pristine, submitting }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
+            {/* TODO: polish this up */}
             <dl className={styles.formFieldsWrapper}>
               <dt>{Messages.templateField}</dt>
               <dd>
