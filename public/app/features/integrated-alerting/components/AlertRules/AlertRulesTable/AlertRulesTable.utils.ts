@@ -3,12 +3,12 @@ import {
   AlertRule,
   AlertRuleFilterType,
   AlertRuleSeverity,
-  AlertRulesListResponseFilter,
+  AlertRulesListPayloadFilter,
   AlertRulesListResponseRule,
   AlertRulesListPayloadTemplate,
 } from '../AlertRules.types';
 
-export const formatFilter = (filter: AlertRulesListResponseFilter): string => {
+export const formatFilter = (filter: AlertRulesListPayloadFilter): string => {
   const { key, type, value } = filter;
 
   return `${key}${AlertRuleFilterType[type]}${value}`;
