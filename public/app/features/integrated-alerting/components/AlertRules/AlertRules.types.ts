@@ -75,6 +75,10 @@ export interface AlertRulePayloadCustomLabels {
 
 type AlertRulesListPayloadParam = AlertRulesListResponseParam;
 
+export interface AlertRuleCreateResponse {
+  rule_id: string;
+}
+
 export interface AlertRuleCreatePayload {
   channel_ids: string[];
   custom_labels: AlertRulePayloadCustomLabels;
