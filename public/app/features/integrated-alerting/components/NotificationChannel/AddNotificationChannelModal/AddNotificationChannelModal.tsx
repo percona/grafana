@@ -1,7 +1,9 @@
 import React, { FC, useContext } from 'react';
 import { Form, Field } from 'react-final-form';
 import { HorizontalGroup, Select, Button, useStyles } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextInputField, validators, logger } from '@percona/platform-core';
+import { appEvents } from 'app/core/core';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
 import { NotificationChannelRenderProps } from '../NotificationChannel.types';
 import { AddNotificationChannelModalProps } from './AddNotificationChannelModal.types';
@@ -20,6 +22,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
     try {
       await NotificationChannelService.add(values);
       setVisible(false);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       getNotificationChannels();
     } catch (e) {
       logger.error(e);

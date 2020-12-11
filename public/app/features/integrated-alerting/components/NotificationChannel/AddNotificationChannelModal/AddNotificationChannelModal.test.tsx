@@ -6,6 +6,13 @@ import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
 
 jest.mock('../NotificationChannel.service');
+jest.mock('app/core/app_events', () => {
+  return {
+    appEvents: {
+      emit: jest.fn(),
+    },
+  };
+});
 
 describe('AddNotificationChannelModal', () => {
   it('should render modal with correct fields', () => {

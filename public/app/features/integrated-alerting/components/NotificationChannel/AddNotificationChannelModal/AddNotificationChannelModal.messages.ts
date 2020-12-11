@@ -14,4 +14,5 @@ export const Messages = {
   emailOption: 'Email',
   pagerDutyOption: 'Pager Duty',
   slackOption: 'Slack',
+  addSuccess: 'Notification channel was successfully added',
 };
