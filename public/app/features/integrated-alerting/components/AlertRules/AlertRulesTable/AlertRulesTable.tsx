@@ -15,7 +15,6 @@ const {
   createdAt: createdAtColumn,
   duration: durationColumn,
   filters: filtersColumn,
-  lastNotified: lastNotifiedColumn,
   severity: severityColumn,
   summary: summaryColumn,
   threshold: thresholdColumn,
@@ -71,27 +70,11 @@ export const AlertRulesTable = () => {
             ))}
           </div>
         ),
-        width: '30%',
+        width: '40%',
       } as Column,
       {
         Header: createdAtColumn,
         accessor: 'createdAt',
-        width: '10%',
-      } as Column,
-      {
-        Header: lastNotifiedColumn,
-        accessor: ({ lastNotified }: AlertRule) => (
-          <>
-            <div className={style.lastNotifiedWrapper}>
-              {lastNotified ? (
-                <>
-                  <span className={style.lastNotifiedDate}>{lastNotified}</span>
-                  <span className={style.lastNotifiedCircle} />
-                </>
-              ) : null}
-            </div>
-          </>
-        ),
         width: '10%',
       } as Column,
     ],

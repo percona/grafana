@@ -3,8 +3,17 @@ import { mount, ReactWrapper } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { AlertRulesTable } from './AlertRulesTable';
 import { act } from 'react-dom/test-utils';
+import { rulesStubs } from '../__mocks__/alertRulesStubs';
 
-describe('AddAlertRuleTemplatesTable', () => {
+jest.mock('../AlertRules.service', () => ({
+  AlertRulesService: {
+    list: () => ({
+      rules: rulesStubs,
+    }),
+  },
+}));
+
+describe('AlertRulesTable', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
