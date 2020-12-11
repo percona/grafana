@@ -1,4 +1,4 @@
-import { formatFilter, formatFilters } from './AddAlertRuleModal.utils';
+import { formatFilter, formatFilters, formatTemplateOptions } from './AddAlertRuleModal.utils';
 
 describe('AddAlertRuleModal utils', () => {
   test('formatFilter', () => {
@@ -74,6 +74,30 @@ describe('AddAlertRuleModal utils', () => {
         key: 'aaa',
         value: '   zzz',
         type: 'EQUAL',
+      },
+    ]);
+  });
+
+  test('formatTemplateOptions', () => {
+    expect(formatTemplateOptions([])).toEqual([]);
+    expect(
+      formatTemplateOptions([
+        { summary: 'test summary 1', source: 'SAAS', created_at: 'test', yaml: 'test' },
+        { summary: '', source: 'SAAS', created_at: 'test', yaml: 'test' },
+        { summary: '   ', source: 'SAAS', created_at: 'test', yaml: 'test' },
+      ])
+    ).toEqual([
+      {
+        value: 'test summary 1',
+        label: 'test summary 1',
+      },
+      {
+        value: '',
+        label: '',
+      },
+      {
+        value: '   ',
+        label: '   ',
       },
     ]);
   });
