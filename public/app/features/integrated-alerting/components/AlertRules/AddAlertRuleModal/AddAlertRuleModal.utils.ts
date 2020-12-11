@@ -11,9 +11,7 @@ export const formatTemplateOptions = (templates: Template[]): Array<SelectableVa
 
 // TODO: handle new types as they gets added to AlertRuleFilterType
 export const formatFilter = (filter: string): AlertRulesListPayloadFilter => {
-  console.log(filter);
   const [key, value] = filter.split('=');
-  console.log(key, value);
 
   return {
     key,
