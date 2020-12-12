@@ -66,7 +66,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               <dt>{Messages.templateField}</dt>
               <dd>
                 <Field name="template" validate={required}>
-                  {({ input }) => <Select className={styles.select} options={templateOptions} {...input} />}
+                  {({ input }) => (
+                    <Select className={styles.select} options={templateOptions} {...input} data-qa="template-select" />
+                  )}
                 </Field>
               </dd>
 
@@ -88,7 +90,14 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               <dt>{Messages.severityField}</dt>
               <dd>
                 <Field name="severity" validate={required}>
-                  {({ input }) => <Select className={styles.select} options={SEVERITY_OPTIONS} {...input} />}
+                  {({ input }) => (
+                    <Select
+                      className={styles.select}
+                      options={SEVERITY_OPTIONS}
+                      {...input}
+                      data-qa="severity-multiselect"
+                    />
+                  )}
                 </Field>
               </dd>
 
@@ -101,7 +110,12 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               <dd>
                 <Field name="notificationChannels" validate={required}>
                   {({ input }) => (
-                    <MultiSelect className={styles.select} options={NOTIFICATION_CHANNEL_OPTIONS} {...input} />
+                    <MultiSelect
+                      className={styles.select}
+                      options={NOTIFICATION_CHANNEL_OPTIONS}
+                      {...input}
+                      data-qa="notification-channels-multiselect"
+                    />
                   )}
                 </Field>
               </dd>
@@ -113,7 +127,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             </dl>
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
-                data-qa="add-alert-rule-modal-form-add-button"
+                data-qa="add-alert-rule-modal-add-button"
                 size="md"
                 variant="primary"
                 disabled={!valid || pristine}
@@ -122,7 +136,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 {Messages.confirm}
               </LoaderButton>
               <Button
-                data-qa="add-alert-rule-modal-form-cancel-button"
+                data-qa="add-alert-rule-modal-cancel-button"
                 variant="secondary"
                 onClick={() => setVisible(false)}
               >
