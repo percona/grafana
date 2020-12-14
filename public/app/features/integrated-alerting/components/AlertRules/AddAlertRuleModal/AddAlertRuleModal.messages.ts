@@ -1,6 +1,6 @@
 export const Messages = {
   channels: {
-    email: 'email',
+    email: 'Email',
     pagerDuty: 'PagerDuty',
     slack: 'Slack',
   },
