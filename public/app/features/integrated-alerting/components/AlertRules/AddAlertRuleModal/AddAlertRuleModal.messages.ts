@@ -20,6 +20,6 @@ export const Messages = {
   durationField: 'Duration (s)',
   filtersField: 'Filters',
   severityField: 'Severity',
-  channelField: 'Channel',
+  channelField: 'Channels',
   activateSwitch: 'Activate',
 };
