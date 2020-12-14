@@ -4,7 +4,7 @@ import { act } from 'react-dom/test-utils';
 import { dataQa } from '@percona/platform-core';
 import { AddAlertRuleModal } from './AddAlertRuleModal';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
-import { templateStubs } from '../__mocks__/alertRulesStubs';
+import { templateStubs } from '../../AlertRuleTemplate/__mocks__/alertRuleTemplateStubs';
 
 // TODO: improve coverage
 
