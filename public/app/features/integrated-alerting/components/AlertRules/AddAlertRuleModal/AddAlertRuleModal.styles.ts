@@ -3,7 +3,7 @@ import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   select: css`
-    margin-bottom: 16px;
+    margin-bottom: ${spacing.d};
 
     & > * {
       height: 37px !important;
