@@ -62,87 +62,88 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
         render={({ handleSubmit, valid, pristine, submitting }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
             {/* TODO: polish this up */}
-            <dl className={styles.formFieldsWrapper}>
-              <dt>{Messages.templateField}</dt>
-              <dd>
-                <Field name="template" validate={required}>
-                  {({ input }) => (
-                    <Select className={styles.select} options={templateOptions} {...input} data-qa="template-select" />
-                  )}
-                </Field>
-              </dd>
+            <Field name="template" validate={required}>
+              {({ input }) => (
+                <>
+                  <label className={styles.label} data-qa="type-field-label">
+                    {Messages.templateField}
+                  </label>
+                  <Select className={styles.select} options={templateOptions} {...input} data-qa="template-select" />
+                </>
+              )}
+            </Field>
 
-              <dt>{Messages.nameField}</dt>
-              <dd>
-                <TextInputField name="name" validators={[required]} />
-              </dd>
+            <TextInputField label={Messages.nameField} name="name" validators={[required]} />
 
-              <dt>{Messages.thresholdField}</dt>
-              <dd>
-                <TextInputField name="threshold" validators={[required]} />
-              </dd>
+            <TextInputField label={Messages.thresholdField} name="threshold" validators={[required]} />
 
-              <dt>{Messages.durationField}</dt>
-              <dd>
-                <NumberInputField name="duration" validators={[required]} />
-              </dd>
+            <NumberInputField label={Messages.durationField} name="duration" validators={[required]} />
 
-              <dt>{Messages.severityField}</dt>
-              <dd>
-                <Field name="severity" validate={required}>
-                  {({ input }) => (
-                    <Select
-                      className={styles.select}
-                      options={SEVERITY_OPTIONS}
-                      {...input}
-                      data-qa="severity-multiselect"
-                    />
-                  )}
-                </Field>
-              </dd>
+            <Field name="severity" validate={required}>
+              {({ input }) => (
+                <>
+                  <label className={styles.label} data-qa="type-field-label">
+                    {Messages.severityField}
+                  </label>
+                  <Select
+                    className={styles.select}
+                    options={SEVERITY_OPTIONS}
+                    {...input}
+                    data-qa="severity-multiselect"
+                  />
+                </>
+              )}
+            </Field>
 
-              <dt>{Messages.filtersField}</dt>
-              <dd>
-                <TextareaInputField name="filters" validators={[required]} />
-              </dd>
+            <TextareaInputField label={Messages.filtersField} name="filters" validators={[required]} />
 
-              <dt>{Messages.channelField}</dt>
-              <dd>
-                <Field name="notificationChannels" validate={required}>
-                  {({ input }) => (
-                    <MultiSelect
-                      className={styles.select}
-                      options={NOTIFICATION_CHANNEL_OPTIONS}
-                      {...input}
-                      data-qa="notification-channels-multiselect"
-                    />
-                  )}
-                </Field>
-              </dd>
+            <Field name="notificationChannels" validate={required}>
+              {({ input }) => (
+                <>
+                  <label className={styles.label} data-qa="type-field-label">
+                    {Messages.channelField}
+                  </label>
+                  <MultiSelect
+                    className={styles.select}
+                    options={NOTIFICATION_CHANNEL_OPTIONS}
+                    {...input}
+                    data-qa="notification-channels-multiselect"
+                  />
+                </>
+              )}
+            </Field>
 
-              <dt>{Messages.activateSwitch}</dt>
-              <dd>
-                <Field name="enabled">{({ input }) => <Switch {...input} />}</Field>
-              </dd>
-            </dl>
-            <HorizontalGroup justify="center" spacing="md">
-              <LoaderButton
-                data-qa="add-alert-rule-modal-add-button"
-                size="md"
-                variant="primary"
-                disabled={!valid || pristine}
-                loading={submitting}
-              >
-                {Messages.confirm}
-              </LoaderButton>
-              <Button
-                data-qa="add-alert-rule-modal-cancel-button"
-                variant="secondary"
-                onClick={() => setVisible(false)}
-              >
-                {Messages.cancel}
-              </Button>
-            </HorizontalGroup>
+            <Field name="enabled">
+              {({ input }) => (
+                <>
+                  <label className={styles.label} data-qa="type-field-label">
+                    {Messages.activateSwitch}
+                  </label>
+                  <Switch {...input} />
+                </>
+              )}
+            </Field>
+
+            <div className={styles.actionsWrapper}>
+              <HorizontalGroup justify="center" spacing="md">
+                <LoaderButton
+                  data-qa="add-alert-rule-modal-add-button"
+                  size="md"
+                  variant="primary"
+                  disabled={!valid || pristine}
+                  loading={submitting}
+                >
+                  {Messages.confirm}
+                </LoaderButton>
+                <Button
+                  data-qa="add-alert-rule-modal-cancel-button"
+                  variant="secondary"
+                  onClick={() => setVisible(false)}
+                >
+                  {Messages.cancel}
+                </Button>
+              </HorizontalGroup>
+            </div>
           </form>
         )}
       />
