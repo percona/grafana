@@ -1,4 +1,4 @@
-import React, { FC, useContext } from 'react';
+import React, { FC, useContext, useCallback } from 'react';
 import { Form, Field } from 'react-final-form';
 import { HorizontalGroup, Select, Button, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
@@ -28,6 +28,11 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
       logger.error(e);
     }
   };
+  const renderTypeFields = useCallback((values: NotificationChannelRenderProps) => {
+    const TypeFields = TYPE_FIELDS_COMPONENT[values.type.value];
+
+    return <TypeFields values={values} />;
+  }, []);
 
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
@@ -48,7 +53,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
                   </>
                 )}
               </Field>
-              {TYPE_FIELDS_COMPONENT[values.type.value]}
+              {renderTypeFields(values)}
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="notification-channel-add-button"
