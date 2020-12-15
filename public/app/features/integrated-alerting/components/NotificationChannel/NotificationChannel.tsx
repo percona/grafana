@@ -8,14 +8,16 @@ import { Messages } from './NotificationChannel.messages';
 import { NotificationChannelProvider } from './NotificationChannel.provider';
 import { getStyles } from './NotificationChannel.styles';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
+import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
 
-const { emptyTable, nameColumn, typeColumn, typeLabel } = Messages;
+const { emptyTable, nameColumn, typeColumn, actionsColumn, typeLabel } = Messages;
 
 export const NotificationChannel: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Channel[]>([]);
+  const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel>();
 
   const columns = useMemo(
     () => [
@@ -26,6 +28,13 @@ export const NotificationChannel: FC = () => {
       {
         Header: typeColumn,
         accessor: ({ type }: Channel) => typeLabel[type],
+      },
+      {
+        Header: actionsColumn,
+        width: '80px',
+        accessor: (notificationChannel: Channel) => (
+          <NotificationChannelActions notificationChannel={notificationChannel} />
+        ),
       },
     ],
     []
@@ -47,20 +56,29 @@ export const NotificationChannel: FC = () => {
   }, []);
 
   return (
-    <NotificationChannelProvider.Provider value={{ getNotificationChannels }}>
+    <NotificationChannelProvider.Provider
+      value={{ getNotificationChannels, setSelectedNotificationChannel, setAddModalVisible }}
+    >
       <div className={styles.actionsWrapper}>
         <Button
           size="md"
           icon="plus-square"
           variant="link"
-          onClick={() => setAddModalVisible(!addModalVisible)}
+          onClick={() => {
+            setSelectedNotificationChannel(null);
+            setAddModalVisible(!addModalVisible);
+          }}
           data-qa="notification-channel-add-modal-button"
         >
           {Messages.addAction}
         </Button>
       </div>
       <Table data={data} columns={columns} pendingRequest={pendingRequest} emptyMessage={emptyTable} />
-      <AddNotificationChannelModal isVisible={addModalVisible} setVisible={setAddModalVisible} />
+      <AddNotificationChannelModal
+        isVisible={addModalVisible}
+        setVisible={setAddModalVisible}
+        notificationChannel={selectedNotificationChannel}
+      />
     </NotificationChannelProvider.Provider>
   );
 };
