@@ -1,4 +1,3 @@
-import React from 'react';
 import { NotificationChannelType } from '../NotificationChannel.types';
 import { Messages } from './AddNotificationChannelModal.messages';
 import { EmailFields } from './EmailFields/EmailFields';
@@ -21,7 +20,7 @@ export const TYPE_OPTIONS = [
 ];
 
 export const TYPE_FIELDS_COMPONENT = {
-  [NotificationChannelType.email]: <EmailFields />,
-  [NotificationChannelType.pagerDuty]: <PagerDutyFields />,
-  [NotificationChannelType.slack]: <SlackFields />,
+  [NotificationChannelType.email]: EmailFields,
+  [NotificationChannelType.pagerDuty]: PagerDutyFields,
+  [NotificationChannelType.slack]: SlackFields,
 };
