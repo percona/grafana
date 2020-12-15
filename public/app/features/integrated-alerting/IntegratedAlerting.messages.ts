@@ -7,6 +7,7 @@ export const Messages = {
   },
   alertRuleTemplate: {
     addAction: 'Add',
+    addSuccess: 'Alert rule template successfully added',
     addModal: {
       confirm: 'Add',
       cancel: 'Cancel',
