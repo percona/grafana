@@ -5,4 +5,7 @@ export const NotificationChannelService = {
   async list(): Promise<NotificationChannel[]> {
     return notificationChannelStubs;
   },
+  async add(): Promise<void> {
+    return Promise.resolve();
+  },
 };

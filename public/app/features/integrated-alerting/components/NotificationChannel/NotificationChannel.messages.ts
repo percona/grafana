@@ -10,4 +10,5 @@ export const Messages = {
     [NotificationChannelType.slack]: 'Slack',
   },
   missingTypeError: "Notification channel type doesn't exist",
+  addAction: 'Add',
 };
