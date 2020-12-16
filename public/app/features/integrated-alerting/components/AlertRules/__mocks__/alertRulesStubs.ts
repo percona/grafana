@@ -29,7 +29,10 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: true,
+          type: 'BOOL',
+          bool: {
+            default: true,
+          },
         },
       ],
     },
@@ -62,8 +65,11 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: 75,
-          unit: '%',
+          type: 'FLOAT',
+          float: {
+            default: 75,
+          },
+          unit: 'PERCENTAGE',
         },
       ],
     },
@@ -96,8 +102,11 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: 80,
-          unit: '%',
+          type: 'FLOAT',
+          float: {
+            default: 80,
+          },
+          unit: 'PERCENTAGE',
         },
       ],
     },
@@ -130,8 +139,11 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: 100,
-          unit: 'GB/min',
+          type: 'FLOAT',
+          float: {
+            default: 75,
+          },
+          unit: 'PERCENTAGE',
         },
       ],
     },
@@ -164,8 +176,11 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: 30,
-          unit: '%',
+          type: 'FLOAT',
+          float: {
+            default: 75,
+          },
+          unit: 'PERCENTAGE',
         },
       ],
     },
@@ -198,8 +213,11 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       params: [
         {
           name: 'threshold',
-          value: 30,
-          unit: '%',
+          type: 'FLOAT',
+          float: {
+            default: 75,
+          },
+          unit: 'PERCENTAGE',
         },
       ],
     },
