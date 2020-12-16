@@ -1,5 +1,5 @@
-import { formatDuration, formatFilter, formatRule, formatRules, formatThreshold } from './AlertRulesTable.utils';
-import { rulesStubs } from '../__mocks__/alertRulesStubs';
+import { formatDuration, formatFilter, formatRule, formatRules, formatThreshold } from './AlertRules.utils';
+import { rulesStubs } from './__mocks__/alertRulesStubs';
 
 const moment = jest.requireActual('moment-timezone');
 moment.tz.setDefault('UTC');
@@ -15,8 +15,11 @@ describe('AlertRulesTable utils', () => {
         params: [
           {
             name: 'threshold',
-            value: 70,
-            unit: '%',
+            float: {
+              default: 70,
+            },
+            unit: 'PERCENTAGE',
+            type: 'FLOAT',
           },
         ],
       })
@@ -27,7 +30,10 @@ describe('AlertRulesTable utils', () => {
         params: [
           {
             name: 'threshold',
-            value: true,
+            type: 'BOOL',
+            bool: {
+              default: true,
+            },
           },
         ],
       })
@@ -62,7 +68,7 @@ describe('AlertRulesTable utils', () => {
       filters: ['environment=prod', 'app=wordpress', 'cluster=PXCCluster1'],
       severity: 'Warning',
       summary: 'High network throughput in - Mnfcg - Dev',
-      threshold: '100 GB/min',
+      threshold: '75 %',
       lastNotified: '',
     });
   });
@@ -88,7 +94,7 @@ describe('AlertRulesTable utils', () => {
         filters: ['environment=prod', 'app=wordpress', 'cluster=PXCCluster1'],
         severity: 'Warning',
         summary: 'High network throughput in - Mnfcg - Dev',
-        threshold: '100 GB/min',
+        threshold: '75 %',
         lastNotified: '',
       },
     ]);
