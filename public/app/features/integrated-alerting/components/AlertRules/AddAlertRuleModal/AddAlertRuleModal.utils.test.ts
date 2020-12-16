@@ -83,9 +83,9 @@ describe('AddAlertRuleModal utils', () => {
     expect(formatTemplateOptions([])).toEqual([]);
     expect(
       formatTemplateOptions([
-        { summary: 'test summary 1', source: 'SAAS', created_at: 'test', yaml: 'test' },
-        { summary: '', source: 'SAAS', created_at: 'test', yaml: 'test' },
-        { summary: '   ', source: 'SAAS', created_at: 'test', yaml: 'test' },
+        { summary: 'test summary 1', name: 'testsum1', source: 'SAAS', created_at: 'test', yaml: 'test' },
+        { summary: '', name: '', source: 'SAAS', created_at: 'test', yaml: 'test' },
+        { summary: '   ', name: 'test2', source: 'SAAS', created_at: 'test', yaml: 'test' },
       ])
     ).toEqual([
       {
