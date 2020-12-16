@@ -26,4 +26,20 @@ describe('AlertRuleTemplatesTable utils', () => {
   test('formatTemplate', () => {
     expect(formatTemplates([testTemplate, testTemplate])).toEqual([expectedTemplate, expectedTemplate]);
   });
+
+  test('formatTemplate with undefined creation date', () => {
+    const testTemplate = {
+      source: 'BUILT_IN',
+      summary: 'MySQL database down',
+      yaml: 'yaml file content',
+    } as Template;
+
+    const expectedTemplate = {
+      source: 'Built-in',
+      summary: 'MySQL database down',
+      yaml: 'yaml file content',
+    };
+
+    expect(formatTemplates([testTemplate, testTemplate])).toEqual([expectedTemplate, expectedTemplate]);
+  });
 });
