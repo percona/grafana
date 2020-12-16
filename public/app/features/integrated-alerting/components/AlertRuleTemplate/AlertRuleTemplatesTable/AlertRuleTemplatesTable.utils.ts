@@ -7,7 +7,7 @@ export const formatTemplate = (template: Template): FormattedTemplate => {
   return {
     summary,
     source: SourceDescription[source],
-    created_at: moment(created_at).format('YYYY-MM-DD HH:mm:ss'),
+    created_at: created_at ? moment(created_at).format('YYYY-MM-DD HH:mm:ss') : undefined,
     ...restProps,
   };
 };

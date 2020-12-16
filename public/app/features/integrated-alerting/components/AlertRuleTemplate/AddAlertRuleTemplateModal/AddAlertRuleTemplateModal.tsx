@@ -2,7 +2,9 @@ import React, { FC, ChangeEvent, useCallback, useRef } from 'react';
 import { FormApi } from 'final-form';
 import { Form } from 'react-final-form';
 import { Button, HorizontalGroup, Icon, useStyles } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextareaInputField, validators, logger } from '@percona/platform-core';
+import { appEvents } from 'app/core/app_events';
 import { Messages } from 'app/features/integrated-alerting/IntegratedAlerting.messages';
 import { AddAlertRuleTemplateModalProps, AlertRuleTemplateRenderProps } from './AddAlertRuleTemplateModal.types';
 import { getStyles } from './AddAlertRuleTemplateModal.styles';
@@ -32,6 +34,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
     try {
       await AlertRuleTemplateService.upload(values);
       setVisible(false);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.alertRuleTemplate.addSuccess]);
       getAlertRuleTemplates();
     } catch (e) {
       logger.error(e);
@@ -73,6 +76,13 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
                 >
                   {Messages.alertRuleTemplate.addModal.confirm}
                 </LoaderButton>
+                <Button
+                  data-qa="alert-rule-template-cancel-button"
+                  variant="secondary"
+                  onClick={() => setVisible(false)}
+                >
+                  {Messages.alertRuleTemplate.addModal.cancel}
+                </Button>
               </HorizontalGroup>
             </>
           </form>

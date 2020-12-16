@@ -5,6 +5,13 @@ import { dataQa } from '@percona/platform-core';
 import { EditAlertRuleTemplateModal } from './EditAlertRuleTemplateModal';
 
 jest.mock('../AlertRuleTemplate.service');
+jest.mock('app/core/app_events', () => {
+  return {
+    appEvents: {
+      emit: jest.fn(),
+    },
+  };
+});
 
 describe('EditAlertRuleTemplateModal', () => {
   it('should render component correctly', () => {
@@ -16,6 +23,7 @@ describe('EditAlertRuleTemplateModal', () => {
     expect(wrapper.find('textarea')).toBeTruthy();
     expect(addButton).toBeTruthy();
     expect(addButton.prop('disabled')).toBeTruthy();
+    expect(wrapper.find(dataQa('alert-rule-template-cancel-button'))).toBeTruthy();
   });
 
   it('should not render modal when visible is set to false', () => {
