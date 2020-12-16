@@ -26,7 +26,6 @@ describe('AlertRulesTable', () => {
 
     await act(async () => {
       wrapper = mount(<AlertRulesTable data={data} columns={columns} />);
-      // wrapper = mount(<AlertRulesTable columns={[]} data={{}} emptyMessage="" pendingRequest={true} />);
     });
 
     wrapper.update();
