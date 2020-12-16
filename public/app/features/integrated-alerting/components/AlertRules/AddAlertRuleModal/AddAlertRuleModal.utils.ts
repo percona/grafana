@@ -1,13 +1,24 @@
 import { AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { AlertRuleCreatePayload, AlertRulesListPayloadFilter } from '../AlertRules.types';
+import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
 import { Template } from '../../AlertRuleTemplate/AlertRuleTemplatesTable/AlertRuleTemplatesTable.types';
 import { SelectableValue } from '@grafana/data';
 
+export const formatChannelsOptions = (channels: NotificationChannel[]): Array<SelectableValue<string>> =>
+  channels
+    ? channels.map(channel => ({
+        value: channel.channelId,
+        label: channel.summary,
+      }))
+    : [];
+
 export const formatTemplateOptions = (templates: Template[]): Array<SelectableValue<string>> =>
-  templates.map(template => ({
-    value: template.summary,
-    label: template.summary,
-  }));
+  templates
+    ? templates.map(template => ({
+        value: template.name,
+        label: template.summary,
+      }))
+    : [];
 
 // TODO: handle new types as they gets added to AlertRuleFilterType
 export const formatFilter = (filter: string): AlertRulesListPayloadFilter => {
@@ -46,7 +57,7 @@ export const formatCreateAPIPayload = (data: AddAlertRuleFormValues): AlertRuleC
   return {
     custom_labels: {},
     disabled: !enabled,
-    channel_ids: notificationChannels.map(channel => channel.value),
+    channel_ids: notificationChannels ? notificationChannels.map(channel => channel.value) : [],
     filters: formatFilters(filters),
     for: `${duration}s`,
     params: [],

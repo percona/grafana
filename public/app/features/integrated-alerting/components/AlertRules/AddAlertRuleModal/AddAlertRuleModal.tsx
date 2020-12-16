@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { Form, Field } from 'react-final-form';
 import { Button, HorizontalGroup, Switch, Select, MultiSelect, useStyles } from '@grafana/ui';
 import {
@@ -15,10 +15,12 @@ import { AppEvents } from '@grafana/data';
 import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
-import { SEVERITY_OPTIONS, NOTIFICATION_CHANNEL_OPTIONS } from './AddAlertRulesModal.constants';
-import { formatTemplateOptions, formatCreateAPIPayload } from './AddAlertRuleModal.utils';
+import { SEVERITY_OPTIONS } from './AddAlertRulesModal.constants';
+import { formatTemplateOptions, formatChannelsOptions, formatCreateAPIPayload } from './AddAlertRuleModal.utils';
+import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
+import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { appEvents } from 'app/core/core';
 
 const { required } = validators;
@@ -26,18 +28,22 @@ const { required } = validators;
 export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible }) => {
   const styles = useStyles(getStyles);
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<string>>>();
+  const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
+  const { getAlertRules } = useContext(AlertRulesProvider);
 
-  const getTemplates = async () => {
+  const getData = async () => {
     try {
-      const response = await AlertRuleTemplateService.list();
-      setTemplateOptions(formatTemplateOptions(response.templates));
+      const channelsListResponse = await NotificationChannelService.list();
+      setChannelsOptions(formatChannelsOptions(channelsListResponse));
+      const templatesListResponse = await AlertRuleTemplateService.list();
+      setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
     } catch (e) {
       logger.error(e);
     }
   };
 
   useEffect(() => {
-    getTemplates();
+    getData();
   }, []);
 
   const onSubmit = async (values: AddAlertRuleFormValues) => {
@@ -45,6 +51,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       await AlertRulesService.create(formatCreateAPIPayload(values));
       setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
+      getAlertRules();
     } catch (e) {
       logger.error(e);
     }
@@ -97,7 +104,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
             <TextareaInputField label={Messages.filtersField} name="filters" validators={[required]} />
 
-            <Field name="notificationChannels" validate={required}>
+            <Field name="notificationChannels">
               {({ input }) => (
                 <>
                   <label className={styles.label} data-qa="type-field-label">
@@ -105,7 +112,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                   </label>
                   <MultiSelect
                     className={styles.select}
-                    options={NOTIFICATION_CHANNEL_OPTIONS}
+                    options={channelsOptions}
                     {...input}
                     data-qa="notification-channels-multiselect"
                   />

@@ -1,13 +1,31 @@
-import {} from '../AlertRuleTemplate/AlertRuleTemplate.types';
+import { NotificationChannel } from '../NotificationChannel/NotificationChannel.types';
+
+export interface AlertRulesContext {
+  getAlertRules: () => void;
+}
 
 export enum AlertRuleFilterType {
   EQUAL = '=',
 }
 
+export enum AlertRulesListPayloadTemplateParamUnits {
+  PARAM_UNIT_INVALID = 'Invalid unit',
+  PERCENTAGE = '%',
+}
+
 export interface AlertRulesListPayloadTemplateParam {
+  [AlertRuleParamType.BOOL]?: {
+    default: boolean;
+  };
+  [AlertRuleParamType.FLOAT]?: {
+    default: number;
+  };
+  [AlertRuleParamType.STRING]?: {
+    default: string;
+  };
   name: string;
-  unit?: string;
-  value: any;
+  unit?: keyof typeof AlertRulesListPayloadTemplateParamUnits;
+  type: keyof typeof AlertRuleParamType;
 }
 
 export interface AlertRulesListPayloadTemplate {
@@ -39,17 +57,17 @@ export interface AlertRulesListPayloadFilter {
 }
 
 export enum AlertRuleParamType {
-  PARAM_TYPE_INVALID,
+  PARAM_TYPE_INVALID = 'Invalid type',
   BOOL = 'bool',
   FLOAT = 'float',
   STRING = 'string',
 }
 
 export interface AlertRulesListResponseParam {
-  bool?: boolean;
-  float?: number;
+  [AlertRuleParamType.BOOL]?: boolean;
+  [AlertRuleParamType.FLOAT]?: number;
   name: string;
-  string?: string;
+  [AlertRuleParamType.STRING]?: string;
   type: keyof typeof AlertRuleParamType;
 }
 
@@ -80,7 +98,7 @@ export interface AlertRuleCreateResponse {
 }
 
 export interface AlertRuleCreatePayload {
-  channel_ids: string[];
+  channel_ids: NotificationChannel[];
   custom_labels: AlertRulePayloadCustomLabels;
   disabled: boolean;
   filters: AlertRulesListPayloadFilter[];

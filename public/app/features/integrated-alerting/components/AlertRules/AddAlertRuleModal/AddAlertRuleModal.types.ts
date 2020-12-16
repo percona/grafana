@@ -1,14 +1,9 @@
 import { SelectableValue } from '@grafana/data';
+import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
 
 export interface AddAlertRuleModalProps {
   isVisible: boolean;
   setVisible: (value: boolean) => void;
-}
-
-export enum NotificationChannel {
-  email = 'email',
-  pagerDuty = 'pagerDuty',
-  slack = 'slack',
 }
 
 export enum Severity {
