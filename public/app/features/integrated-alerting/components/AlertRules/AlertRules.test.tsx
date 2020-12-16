@@ -7,8 +7,6 @@ import { NotificationChannelService } from '../NotificationChannel/NotificationC
 import { NotificationChannelType } from '../NotificationChannel/NotificationChannel.types';
 import { templateStubs } from '../AlertRuleTemplate/__mocks__/alertRuleTemplateStubs';
 
-console.error = jest.fn();
-
 const notificationChannelsServiceList = jest.spyOn(NotificationChannelService, 'list').mockImplementation(() =>
   Promise.resolve([
     {

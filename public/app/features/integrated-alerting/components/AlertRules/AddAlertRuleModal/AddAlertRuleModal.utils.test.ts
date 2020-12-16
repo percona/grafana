@@ -1,4 +1,4 @@
-import { AddAlertRuleFormValues, NotificationChannel, Severity } from './AddAlertRuleModal.types';
+import { AddAlertRuleFormValues, Severity } from './AddAlertRuleModal.types';
 import { formatCreateAPIPayload, formatFilter, formatFilters, formatTemplateOptions } from './AddAlertRuleModal.utils';
 
 describe('AddAlertRuleModal utils', () => {
@@ -89,7 +89,7 @@ describe('AddAlertRuleModal utils', () => {
       ])
     ).toEqual([
       {
-        value: 'test summary 1',
+        value: 'testsum1',
         label: 'test summary 1',
       },
       {
@@ -97,7 +97,7 @@ describe('AddAlertRuleModal utils', () => {
         label: '',
       },
       {
-        value: '   ',
+        value: 'test2',
         label: '   ',
       },
     ]);
@@ -110,9 +110,9 @@ describe('AddAlertRuleModal utils', () => {
       filters: 'test=filter,',
       name: 'test name',
       notificationChannels: [
-        { value: NotificationChannel.pagerDuty, label: 'Pager Duty' },
-        { value: NotificationChannel.email, label: 'email' },
-        { value: NotificationChannel.slack, label: 'Slack' },
+        { value: 'pagerDuty', label: 'Pager Duty' },
+        { value: 'email', label: 'email' },
+        { value: 'slack', label: 'Slack' },
       ],
       severity: { value: Severity.SEVERITY_CRITICAL, label: 'Critical' },
       template: { value: 'Test Template', label: 'Test Template' },
@@ -121,7 +121,7 @@ describe('AddAlertRuleModal utils', () => {
     expect(formatCreateAPIPayload(inputData)).toEqual({
       custom_labels: {},
       disabled: true,
-      channel_ids: [NotificationChannel.pagerDuty, NotificationChannel.email, NotificationChannel.slack],
+      channel_ids: ['pagerDuty', 'email', 'slack'],
       filters: [
         {
           key: 'test',
