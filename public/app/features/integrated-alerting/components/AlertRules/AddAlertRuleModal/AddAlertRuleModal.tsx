@@ -96,7 +96,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                     className={styles.select}
                     options={SEVERITY_OPTIONS}
                     {...input}
-                    data-qa="severity-multiselect"
+                    data-qa="severity-multiselect-input"
                   />
                 </>
               )}
