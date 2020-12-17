@@ -75,7 +75,12 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                   <label className={styles.label} data-qa="type-field-label">
                     {Messages.templateField}
                   </label>
-                  <Select className={styles.select} options={templateOptions} {...input} data-qa="template-select" />
+                  <Select
+                    className={styles.select}
+                    options={templateOptions}
+                    {...input}
+                    data-qa="template-select-input"
+                  />
                 </>
               )}
             </Field>
@@ -114,7 +119,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                     className={styles.select}
                     options={channelsOptions}
                     {...input}
-                    data-qa="notificationChannels-multiselect"
+                    data-qa="notificationChannels-multiselect-input"
                   />
                 </>
               )}
@@ -126,7 +131,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                   <label className={styles.label} data-qa="type-field-label">
                     {Messages.activateSwitch}
                   </label>
-                  <Switch {...input} />
+                  <Switch {...input} data-qa="enabled-toggle-input" />
                 </>
               )}
             </Field>
