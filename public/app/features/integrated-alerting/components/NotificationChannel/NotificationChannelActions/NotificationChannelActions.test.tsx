@@ -27,4 +27,20 @@ describe('NotificationChannelActions', () => {
     expect(notificationChannelContextStub.setSelectedNotificationChannel).toHaveBeenCalled();
     expect(notificationChannelContextStub.setAddModalVisible).toHaveBeenCalled();
   });
+
+  it('should open delete modal when clicking edit button', () => {
+    const wrapper = mount(
+      <NotificationChannelProvider.Provider value={notificationChannelContextStub}>
+        <NotificationChannelActions notificationChannel={notificationChannelStubs[0]} />
+      </NotificationChannelProvider.Provider>
+    );
+
+    wrapper
+      .find(dataQa('delete-notification-channel-button'))
+      .find('button')
+      .simulate('click');
+
+    expect(notificationChannelContextStub.setSelectedNotificationChannel).toHaveBeenCalled();
+    expect(notificationChannelContextStub.setDeleteModalVisible).toHaveBeenCalled();
+  });
 });

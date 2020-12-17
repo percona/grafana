@@ -6,7 +6,9 @@ import { NotificationChannelProvider } from '../NotificationChannel.provider';
 
 export const NotificationChannelActions: FC<NotificationChannelActionsProps> = ({ notificationChannel }) => {
   const styles = useStyles(getStyles);
-  const { setSelectedNotificationChannel, setAddModalVisible } = useContext(NotificationChannelProvider);
+  const { setSelectedNotificationChannel, setAddModalVisible, setDeleteModalVisible } = useContext(
+    NotificationChannelProvider
+  );
 
   return (
     <div className={styles.actionsWrapper}>
@@ -16,6 +18,14 @@ export const NotificationChannelActions: FC<NotificationChannelActionsProps> = (
         onClick={() => {
           setSelectedNotificationChannel(notificationChannel);
           setAddModalVisible(true);
+        }}
+      />
+      <IconButton
+        data-qa="delete-notification-channel-button"
+        name="times"
+        onClick={() => {
+          setSelectedNotificationChannel(notificationChannel);
+          setDeleteModalVisible(true);
         }}
       />
     </div>

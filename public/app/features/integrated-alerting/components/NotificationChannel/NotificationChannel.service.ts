@@ -13,7 +13,7 @@ export const NotificationChannelService = {
     return getBackendSrv()
       .post(`${BASE_URL}/List`)
       .then(({ channels }: NotificationChannelListResponse) =>
-        channels.map(channel => TO_MODEL[getType(channel)](channel))
+        channels ? channels.map(channel => TO_MODEL[getType(channel)](channel)) : []
       );
   },
   async add(values: NotificationChannelRenderProps): Promise<void> {
@@ -21,5 +21,8 @@ export const NotificationChannelService = {
   },
   async change(values: NotificationChannelRenderProps): Promise<void> {
     return getBackendSrv().post(`${BASE_URL}/Change`, TO_API[values.type.value](values));
+  },
+  async remove({ channelId }: NotificationChannel): Promise<void> {
+    return getBackendSrv().post(`${BASE_URL}/Remove`, { channel_id: channelId });
   },
 };
