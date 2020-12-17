@@ -114,7 +114,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                     className={styles.select}
                     options={channelsOptions}
                     {...input}
-                    data-qa="notification-channels-multiselect"
+                    data-qa="notificationChannels-multiselect"
                   />
                 </>
               )}
