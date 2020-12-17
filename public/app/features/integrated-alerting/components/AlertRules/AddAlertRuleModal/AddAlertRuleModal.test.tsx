@@ -8,6 +8,7 @@ import { AddAlertRuleModal } from './AddAlertRuleModal';
 
 jest.mock('../AlertRules.service');
 jest.mock('../../AlertRuleTemplate/AlertRuleTemplate.service');
+jest.mock('../../NotificationChannel/NotificationChannel.service');
 jest.mock('app/core/app_events', () => {
   return {
     appEvents: {
