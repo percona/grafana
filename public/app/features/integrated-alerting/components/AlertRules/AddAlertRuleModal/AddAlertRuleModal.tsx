@@ -89,7 +89,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
             <TextInputField label={Messages.nameField} name="name" validators={[required]} />
 
-            <TextInputField label={Messages.thresholdField} name="threshold" validators={[required]} />
+            <TextInputField label={Messages.thresholdField} name="threshold" />
 
             <NumberInputField label={Messages.durationField} name="duration" validators={[required]} />
 
