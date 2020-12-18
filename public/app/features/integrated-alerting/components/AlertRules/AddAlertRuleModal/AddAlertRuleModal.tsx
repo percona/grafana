@@ -33,9 +33,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
   const getData = async () => {
     try {
-      const channelsListResponse = await NotificationChannelService.list();
+      const [channelsListResponse, templatesListResponse] = await Promise.all([
+        NotificationChannelService.list(),
+        AlertRuleTemplateService.list(),
+      ]);
       setChannelsOptions(formatChannelsOptions(channelsListResponse));
-      const templatesListResponse = await AlertRuleTemplateService.list();
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
     } catch (e) {
       logger.error(e);
@@ -125,7 +127,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
 
-            <Field name="enabled">
+            <Field name="enabled" type="checkbox">
               {({ input }) => (
                 <>
                   <label className={styles.label} data-qa="type-field-label">

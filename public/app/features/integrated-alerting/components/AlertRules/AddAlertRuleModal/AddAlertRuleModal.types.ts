@@ -1,5 +1,4 @@
 import { SelectableValue } from '@grafana/data';
-import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
 
 export interface AddAlertRuleModalProps {
   isVisible: boolean;
@@ -19,7 +18,7 @@ export interface AddAlertRuleFormValues {
   threshold: string;
   duration: number;
   filters: string;
-  notificationChannels: Array<SelectableValue<NotificationChannel>>;
+  notificationChannels: Array<SelectableValue<string>>;
   severity: SelectableValue<Severity>;
   enabled: boolean;
 }

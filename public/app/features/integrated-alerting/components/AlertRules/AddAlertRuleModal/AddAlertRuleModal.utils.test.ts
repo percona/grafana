@@ -1,7 +1,51 @@
 import { AddAlertRuleFormValues, Severity } from './AddAlertRuleModal.types';
-import { formatCreateAPIPayload, formatFilter, formatFilters, formatTemplateOptions } from './AddAlertRuleModal.utils';
+import {
+  formatCreateAPIPayload,
+  formatFilter,
+  formatFilters,
+  formatTemplateOptions,
+  formatThreshold,
+} from './AddAlertRuleModal.utils';
 
 describe('AddAlertRuleModal utils', () => {
+  test('formatThreshold', () => {
+    expect(formatThreshold('2.')).toEqual({
+      name: 'threshold',
+      float: 2,
+      type: 'FLOAT',
+    });
+
+    expect(formatThreshold('.2')).toEqual({
+      name: 'threshold',
+      float: 0.2,
+      type: 'FLOAT',
+    });
+
+    expect(formatThreshold('2.2')).toEqual({
+      name: 'threshold',
+      float: 2.2,
+      type: 'FLOAT',
+    });
+
+    expect(formatThreshold('2')).toEqual({
+      name: 'threshold',
+      float: 2,
+      type: 'FLOAT',
+    });
+
+    expect(formatThreshold('')).toEqual({
+      name: 'threshold',
+      string: '',
+      type: 'STRING',
+    });
+
+    expect(formatThreshold('true')).toEqual({
+      name: 'threshold',
+      bool: true,
+      type: 'BOOL',
+    });
+  });
+
   test('formatFilter', () => {
     expect(formatFilter('key=value')).toEqual({
       key: 'key',
@@ -135,10 +179,15 @@ describe('AddAlertRuleModal utils', () => {
         },
       ],
       for: '123s',
-      params: [],
+      params: [
+        {
+          name: 'threshold',
+          bool: true,
+          type: 'BOOL',
+        },
+      ],
       severity: Severity.SEVERITY_CRITICAL,
       template_name: 'Test Template',
-      threshold: 'true',
       summary: 'test name',
     });
   });

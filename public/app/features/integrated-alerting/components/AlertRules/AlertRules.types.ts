@@ -1,5 +1,3 @@
-import { NotificationChannel } from '../NotificationChannel/NotificationChannel.types';
-
 export interface AlertRulesContext {
   getAlertRules: () => void;
 }
@@ -98,7 +96,7 @@ export interface AlertRuleCreateResponse {
 }
 
 export interface AlertRuleCreatePayload {
-  channel_ids: NotificationChannel[];
+  channel_ids: string[];
   custom_labels: AlertRulePayloadCustomLabels;
   disabled: boolean;
   filters: AlertRulesListPayloadFilter[];
@@ -107,5 +105,4 @@ export interface AlertRuleCreatePayload {
   severity: keyof typeof AlertRuleSeverity;
   summary: string;
   template_name: string;
-  threshold: string;
 }

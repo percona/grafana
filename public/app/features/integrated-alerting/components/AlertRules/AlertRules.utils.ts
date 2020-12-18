@@ -17,7 +17,11 @@ export const formatFilter = (filter: AlertRulesListPayloadFilter): string => {
 };
 
 export const formatThreshold = (template: AlertRulesListPayloadTemplate): string => {
-  const thresholdParam = template.params.find(param => param.name === 'threshold');
+  const thresholdParam = template.params?.find(param => param.name === 'threshold');
+
+  if (!thresholdParam) {
+    return '';
+  }
 
   const { unit: paramUnit, type: paramType } = thresholdParam;
 
