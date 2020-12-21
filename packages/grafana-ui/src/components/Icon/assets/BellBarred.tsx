@@ -7,6 +7,7 @@ export const BellBarred: FunctionComponent<SvgProps> = ({ size, ...rest }) => {
       viewBox="0 0 20 20"
       xmlns="http://www.w3.org/2000/svg"
       opacity="1"
+      stroke="currentColor"
       fill="none"
       width={size}
       height={size}
