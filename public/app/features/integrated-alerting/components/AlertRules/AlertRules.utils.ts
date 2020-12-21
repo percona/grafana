@@ -6,6 +6,7 @@ import {
   AlertRuleSeverity,
   AlertRulesListPayloadFilter,
   AlertRulesListResponseRule,
+  AlertRulesListResponseParam,
   AlertRulesListPayloadTemplate,
   AlertRulesListPayloadTemplateParamUnits,
 } from './AlertRules.types';
@@ -16,22 +17,32 @@ export const formatFilter = (filter: AlertRulesListPayloadFilter): string => {
   return `${key}${AlertRuleFilterType[type]}${value}`;
 };
 
-export const formatThreshold = (template: AlertRulesListPayloadTemplate): string => {
-  const thresholdParam = template.params?.find(param => param.name === 'threshold');
+export const formatThreshold = (
+  template: AlertRulesListPayloadTemplate,
+  params: AlertRulesListResponseParam[] | undefined
+): string => {
+  const templateThresholdParam = template?.params?.find(param => param.name === 'threshold');
+  const thresholdParam = params?.find(param => param.name === 'threshold');
 
-  if (!thresholdParam) {
+  if (!templateThresholdParam) {
     return '';
   }
 
-  const { unit: paramUnit, type: paramType } = thresholdParam;
-
+  const { unit: paramUnit } = templateThresholdParam;
+  const { type: paramType } = thresholdParam ?? templateThresholdParam;
   const type = AlertRuleParamType[paramType];
 
   if (type === AlertRuleParamType.PARAM_TYPE_INVALID) {
     return 'Invalid type';
   }
 
-  const value = thresholdParam[type].default;
+  let value: boolean | number | string;
+
+  if (!thresholdParam) {
+    value = templateThresholdParam[type].default;
+  } else {
+    value = thresholdParam[type];
+  }
 
   const unit = AlertRulesListPayloadTemplateParamUnits[paramUnit];
 
@@ -52,7 +63,7 @@ export const formatDuration = (duration: string): string => {
 };
 
 export const formatRule = (alert: AlertRulesListResponseRule): AlertRule => {
-  const { created_at, disabled, filters, for: duration, last_notified, template, severity, summary } = alert;
+  const { created_at, disabled, filters, for: duration, last_notified, template, severity, summary, params } = alert;
 
   return {
     createdAt: moment(created_at).format('YYYY-MM-DD HH:mm:ss.SSS'),
@@ -61,7 +72,7 @@ export const formatRule = (alert: AlertRulesListResponseRule): AlertRule => {
     filters: filters.map(formatFilter),
     severity: AlertRuleSeverity[severity],
     summary,
-    threshold: formatThreshold(template),
+    threshold: formatThreshold(template, params),
     lastNotified: last_notified ? moment(last_notified).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
   };
 };

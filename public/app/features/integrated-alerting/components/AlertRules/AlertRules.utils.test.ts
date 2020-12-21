@@ -1,8 +1,38 @@
 import { formatDuration, formatFilter, formatRule, formatRules, formatThreshold } from './AlertRules.utils';
 import { rulesStubs } from './__mocks__/alertRulesStubs';
+import { AlertRulesListPayloadTemplate } from './AlertRules.types';
 
 const moment = jest.requireActual('moment-timezone');
 moment.tz.setDefault('UTC');
+
+const testTemplate1: AlertRulesListPayloadTemplate = {
+  params: [
+    {
+      name: 'threshold',
+      float: {
+        default: 70,
+      },
+      unit: 'PERCENTAGE',
+      type: 'FLOAT',
+    },
+  ],
+};
+
+const testTemplate2: AlertRulesListPayloadTemplate = {
+  params: [],
+};
+
+const testTemplate3: AlertRulesListPayloadTemplate = {
+  params: [
+    {
+      name: 'threshold',
+      bool: {
+        default: true,
+      },
+      type: 'BOOL',
+    },
+  ],
+};
 
 describe('AlertRulesTable utils', () => {
   test('formatFilter', () => {
@@ -10,33 +40,42 @@ describe('AlertRulesTable utils', () => {
   });
 
   test('formatThreshold', () => {
+    expect(formatThreshold(testTemplate1, undefined)).toEqual('70 %');
+
+    expect(formatThreshold(testTemplate1, [])).toEqual('70 %');
+
+    expect(formatThreshold(testTemplate2, undefined)).toEqual('');
+
+    expect(formatThreshold(testTemplate2, [])).toEqual('');
+
     expect(
-      formatThreshold({
-        params: [
-          {
-            name: 'threshold',
-            float: {
-              default: 70,
-            },
-            unit: 'PERCENTAGE',
-            type: 'FLOAT',
-          },
-        ],
-      })
+      formatThreshold(testTemplate2, [
+        {
+          name: 'threshold',
+          float: 70,
+          type: 'FLOAT',
+        },
+      ])
+    ).toEqual('');
+
+    expect(
+      formatThreshold(testTemplate1, [
+        {
+          name: 'threshold',
+          float: 70,
+          type: 'FLOAT',
+        },
+      ])
     ).toEqual('70 %');
 
     expect(
-      formatThreshold({
-        params: [
-          {
-            name: 'threshold',
-            type: 'BOOL',
-            bool: {
-              default: true,
-            },
-          },
-        ],
-      })
+      formatThreshold(testTemplate3, [
+        {
+          name: 'threshold',
+          type: 'BOOL',
+          bool: true,
+        },
+      ])
     ).toEqual('true');
   });
 

@@ -25,6 +25,13 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     last_notified: '2020-11-25T16:53:39.366Z',
     severity: 'SEVERITY_CRITICAL',
     summary: 'Database down - HR - Prod',
+    params: [
+      {
+        name: 'threshold',
+        type: 'BOOL',
+        bool: true,
+      },
+    ],
     template: {
       params: [
         {
@@ -61,6 +68,13 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     last_notified: '2020-11-25T16:53:39.366Z',
     severity: 'SEVERITY_WARNING',
     summary: 'High CPU load - Sales - Prod',
+    params: [
+      {
+        name: 'threshold',
+        type: 'FLOAT',
+        float: 75,
+      },
+    ],
     template: {
       params: [
         {
@@ -135,6 +149,13 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     last_notified: '',
     severity: 'SEVERITY_WARNING',
     summary: 'High network throughput in - Mnfcg - Dev',
+    params: [
+      {
+        name: 'threshold',
+        type: 'FLOAT',
+        float: 75,
+      },
+    ],
     template: {
       params: [
         {
