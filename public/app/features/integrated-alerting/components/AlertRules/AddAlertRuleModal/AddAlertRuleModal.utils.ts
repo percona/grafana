@@ -76,29 +76,34 @@ export const formatStringThreshold = (value: string): AlertRulesListResponsePara
 };
 
 export const formatThreshold = (value: string): AlertRulesListResponseParam => {
-  const trimmedValue = value.trim();
-
-  if (/^true|false$/i.test(trimmedValue)) {
-    return formatBooleanThreshold(trimmedValue);
-  } else if (/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(trimmedValue)) {
-    return formatFloatThreshold(trimmedValue);
+  if (/^true|false$/i.test(value)) {
+    return formatBooleanThreshold(value);
+  } else if (/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(value)) {
+    return formatFloatThreshold(value);
   } else {
-    return formatStringThreshold(trimmedValue);
+    return formatStringThreshold(value);
   }
 };
 
 export const formatCreateAPIPayload = (data: AddAlertRuleFormValues): AlertRuleCreatePayload => {
   const { enabled, duration, filters, name, notificationChannels, severity, template, threshold } = data;
 
-  return {
+  const payload: AlertRuleCreatePayload = {
     custom_labels: {},
     disabled: !enabled,
     channel_ids: notificationChannels ? notificationChannels.map(channel => channel.value) : [],
     filters: formatFilters(filters),
     for: `${duration}s`,
-    params: [formatThreshold(threshold)],
     severity: severity.value,
     template_name: template.value,
     summary: name,
   };
+
+  const trimmedThreshold = threshold?.trim();
+
+  if (trimmedThreshold) {
+    payload.params = [formatThreshold(trimmedThreshold)];
+  }
+
+  return payload;
 };

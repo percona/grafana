@@ -101,7 +101,7 @@ export interface AlertRuleCreatePayload {
   disabled: boolean;
   filters: AlertRulesListPayloadFilter[];
   for: string;
-  params: AlertRulesListPayloadParam[];
+  params?: AlertRulesListPayloadParam[];
   severity: keyof typeof AlertRuleSeverity;
   summary: string;
   template_name: string;
