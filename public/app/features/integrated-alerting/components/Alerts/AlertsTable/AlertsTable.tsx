@@ -8,6 +8,7 @@ import { AlertsService } from '../Alerts.service';
 import { Messages } from '../../../IntegratedAlerting.messages';
 import { Alert } from '../Alerts.types';
 import { formatAlerts } from './AlertsTable.utils';
+import { AlertRulesActions } from '../AlertRulesActions';
 
 const { noData, columns } = Messages.alerts.table;
 
@@ -18,6 +19,7 @@ const {
   severity: severityColumn,
   state: stateColumn,
   summary: summaryColumn,
+  actions: actionsColumn,
 } = columns;
 
 export const AlertsTable = () => {
@@ -76,6 +78,10 @@ export const AlertsTable = () => {
         Header: lastNotifiedColumn,
         accessor: ({ lastNotified }: Alert) => <>{lastNotified ? lastNotified : null}</>,
         width: '10%',
+      } as Column,
+      {
+        Header: actionsColumn,
+        accessor: (alert: Alert) => <AlertRulesActions alert={alert} />,
       } as Column,
     ],
     []
