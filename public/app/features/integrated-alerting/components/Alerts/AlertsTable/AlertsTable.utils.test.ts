@@ -5,6 +5,7 @@ const moment = jest.requireActual('moment-timezone');
 moment.tz.setDefault('UTC');
 
 const expectedAlertResult1 = {
+  alertId: '1',
   activeSince: '2020-11-25 16:53:39.366',
   labels: [
     'environment=prod',
@@ -20,6 +21,7 @@ const expectedAlertResult1 = {
 };
 
 const expectedAlertResult2 = {
+  alertId: '6',
   activeSince: '',
   labels: [
     'environment=dev',
