@@ -127,13 +127,13 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
 
-            <Field name="enabled" type="checkbox">
+            <Field name="enabled" type="checkbox" defaultValue={true}>
               {({ input }) => (
                 <>
                   <label className={styles.label} data-qa="type-field-label">
                     {Messages.activateSwitch}
                   </label>
-                  <Switch {...input} data-qa="enabled-toggle-input" />
+                  <Switch {...input} value={input.checked} data-qa="enabled-toggle-input" />
                 </>
               )}
             </Field>
