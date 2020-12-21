@@ -13,6 +13,7 @@ export interface AlertsListResponseLabel {
 }
 
 export interface Alert {
+  alertId: string;
   activeSince: string;
   labels: string[];
   lastNotified: string;
