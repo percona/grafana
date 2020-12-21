@@ -35,3 +35,8 @@ export interface AlertsListResponseAlert {
 export interface AlertsListResponse {
   alerts: AlertsListResponseAlert[];
 }
+
+export interface AlertTogglePayload {
+  alert_id: string;
+  silenced: 'DO_NOT_CHANGE' | 'TRUE' | 'FALSE';
+}
