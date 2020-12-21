@@ -8,7 +8,7 @@ import { IconName, IconType, IconSize } from '../../types/icon';
 import * as DefaultIcon from '@iconscout/react-unicons';
 import * as MonoIcon from './assets';
 
-const alwaysMonoIcons = ['grafana', 'favorite', 'heart-break', 'heart'];
+const alwaysMonoIcons = ['grafana', 'favorite', 'heart-break', 'heart', 'bell-alt', 'bell-barred'];
 
 export interface IconProps extends React.HTMLAttributes<HTMLDivElement> {
   name: IconName;
@@ -51,11 +51,16 @@ export const Icon = React.forwardRef<HTMLDivElement, IconProps>(
 
     const iconName = type === 'default' ? `Uil${toPascalCase(name)}` : toPascalCase(name);
 
+    console.log(iconName, type);
+
     /* Unicons don't have type definitions */
     //@ts-ignore
     const Component = type === 'default' ? DefaultIcon[iconName] : MonoIcon[iconName];
 
+    console.log(Component);
+
     if (!Component) {
+      console.log('no compo');
       return <div />;
     }
 
