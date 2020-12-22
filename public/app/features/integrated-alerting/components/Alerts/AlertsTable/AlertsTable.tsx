@@ -27,7 +27,7 @@ export const AlertsTable = () => {
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Alert[]>([]);
 
-  const getAlertRules = async () => {
+  const getAlerts = async () => {
     setPendingRequest(true);
     try {
       const { alerts } = await AlertsService.list();
@@ -81,14 +81,14 @@ export const AlertsTable = () => {
       } as Column,
       {
         Header: actionsColumn,
-        accessor: (alert: Alert) => <AlertsActions alert={alert} />,
+        accessor: (alert: Alert) => <AlertsActions alert={alert} getAlerts={getAlerts} />,
       } as Column,
     ],
     []
   );
 
   useEffect(() => {
-    getAlertRules();
+    getAlerts();
   }, []);
 
   const tableInstance = useTable({ columns, data });
