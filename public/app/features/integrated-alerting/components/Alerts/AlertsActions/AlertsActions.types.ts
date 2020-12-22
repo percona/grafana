@@ -1,5 +1,5 @@
 import { Alert } from '../Alerts.types';
 
-export interface AlertRulesActionsProps {
+export interface AlertsActionsProps {
   alert: Alert;
 }

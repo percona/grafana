@@ -8,7 +8,7 @@ import { AlertsService } from '../Alerts.service';
 import { Messages } from '../../../IntegratedAlerting.messages';
 import { Alert } from '../Alerts.types';
 import { formatAlerts } from './AlertsTable.utils';
-import { AlertRulesActions } from '../AlertRulesActions';
+import { AlertsActions } from '../AlertsActions/AlertsActions';
 
 const { noData, columns } = Messages.alerts.table;
 
@@ -81,7 +81,7 @@ export const AlertsTable = () => {
       } as Column,
       {
         Header: actionsColumn,
-        accessor: (alert: Alert) => <AlertRulesActions alert={alert} />,
+        accessor: (alert: Alert) => <AlertsActions alert={alert} />,
       } as Column,
     ],
     []

@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import { IconButton, useStyles } from '@grafana/ui';
-import { getStyles } from './AlertRulesActions.styles';
-import { AlertRulesActionsProps } from './AlertRulesActions.types';
+import { getStyles } from './AlertsActions.styles';
+import { AlertsActionsProps } from './AlertsActions.types';
 import { AlertStatus } from '../Alerts.types';
 import { AlertsService } from '../Alerts.service';
 
-export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alert }) => {
+export const AlertsActions: FC<AlertsActionsProps> = ({ alert }) => {
   const styles = useStyles(getStyles);
 
   const toggleAlert = () => {
