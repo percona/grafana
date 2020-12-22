@@ -4,8 +4,6 @@ export * from './Shield';
 export * from './Favorite';
 export * from './Grafana';
 export * from './Bell';
-export * from './BellAlt';
-export * from './BellBarred';
 export * from './PlusSquare';
 export * from './FolderPlus';
 export * from './Folder';
