@@ -3,31 +3,61 @@ import { mount } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { AlertsActions } from './AlertsActions';
 import { alertsStubs } from '../__mocks__/alertsStubs';
+import { formatAlert } from '../AlertsTable/AlertsTable.utils';
+import { AlertsService } from '../Alerts.service';
 
-describe('AlertRulesActions', () => {
-  it('should render component correctly', () => {
-    const wrapper = mount(<AlertsActions template={alertsStubs[0]} getAlertRuleTemplates={jest.fn()} />);
+jest.mock('../Alerts.service');
 
-    expect(wrapper.contains(dataQa('alert-rule-template-edit-button'))).toBeFalsy();
-    expect(wrapper.find(dataQa('edit-template-button'))).toBeTruthy();
+const alertsServiceToggle = jest.spyOn(AlertsService, 'toggle');
+
+describe('AlertActions', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('should open edit modal when clicking edit button', () => {
-    const wrapper = mount(<AlertsActions template={formattedTemplateStubs[1]} getAlertRuleTemplates={jest.fn()} />);
+  it('renders a barred bell for an active alert', () => {
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[0])} />);
+
+    expect(
+      wrapper
+        .find(dataQa('silence-alert-button'))
+        .at(0)
+        .props()
+    ).toHaveProperty('name', 'bell-barred');
+  });
+
+  it('renders a bell for an silenced alert', () => {
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[3])} />);
+
+    expect(
+      wrapper
+        .find(dataQa('silence-alert-button'))
+        .at(0)
+        .props()
+    ).toHaveProperty('name', 'bell-alt');
+  });
+
+  it('calls the API to activate a silenced alert', () => {
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[3])} />);
 
     wrapper
-      .find(dataQa('edit-template-button'))
-      .find('button')
+      .find(dataQa('silence-alert-button'))
+      .at(0)
       .simulate('click');
 
-    expect(wrapper.find(dataQa('alert-rule-template-edit-button'))).toBeTruthy();
+    expect(alertsServiceToggle).toBeCalledTimes(1);
+    expect(alertsServiceToggle).toBeCalledWith({ alert_id: '4', silenced: 'FALSE' });
   });
 
-  it('should disable edit button when template is built-in', () => {
-    const wrapper = mount(<AlertsActions template={formattedTemplateStubs[0]} getAlertRuleTemplates={jest.fn()} />);
+  it('calls the API to silence an active alert', () => {
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[1])} />);
 
-    const editButton = wrapper.find(dataQa('edit-template-button')).find('button');
+    wrapper
+      .find(dataQa('silence-alert-button'))
+      .at(0)
+      .simulate('click');
 
-    expect(editButton.prop('disabled')).toBeTruthy();
+    expect(alertsServiceToggle).toBeCalledTimes(1);
+    expect(alertsServiceToggle).toBeCalledWith({ alert_id: '2', silenced: 'TRUE' });
   });
 });
