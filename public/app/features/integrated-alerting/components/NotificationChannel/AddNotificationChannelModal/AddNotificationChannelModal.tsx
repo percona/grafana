@@ -26,7 +26,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
   const onSubmit = async (values: NotificationChannelRenderProps) => {
     try {
       if (notificationChannel) {
-        await NotificationChannelService.change(values);
+        await NotificationChannelService.change(notificationChannel.channelId, values);
       } else {
         await NotificationChannelService.add(values);
       }
