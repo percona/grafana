@@ -23,10 +23,10 @@ export interface Alert {
 }
 
 export interface AlertsListResponseAlert {
-  active_since?: string;
+  created_at?: string;
   alert_id: string;
   labels: AlertsListResponseLabel;
-  last_notified?: string;
+  updated_at?: string;
   rule?: AlertRulesListResponseRule;
   severity: keyof typeof AlertRuleSeverity;
   status: keyof typeof AlertStatus;

@@ -13,16 +13,16 @@ export const formatLabels = (labels: AlertsListResponseLabel): string[] => {
 };
 
 export const formatAlert = (rule: AlertsListResponseAlert): Alert => {
-  const { alert_id, active_since, labels, last_notified, severity, status, summary } = rule;
+  const { alert_id, created_at, labels, updated_at, severity, status, summary } = rule;
 
   return {
     alertId: alert_id,
-    activeSince: active_since ? moment(active_since).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
+    activeSince: created_at ? moment(created_at).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
     labels: formatLabels(labels),
     severity: AlertRuleSeverity[severity],
     status: AlertStatus[status],
     summary,
-    lastNotified: last_notified ? moment(last_notified).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
+    lastNotified: updated_at ? moment(updated_at).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
   };
 };
 
