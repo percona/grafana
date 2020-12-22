@@ -14,6 +14,8 @@ export const AlertsActions: FC<AlertsActionsProps> = ({ alert, getAlerts }) => {
   const [pendingRequest, setPendingRequest] = useState(false);
 
   const isSilenced = alert.status === AlertStatus.SILENCED;
+  const silenceIcon = isSilenced ? 'bell-alt' : 'bell-barred';
+  const title = isSilenced ? Messages.activateTitle : Messages.silenceTitle;
 
   const toggleAlert = async () => {
     setPendingRequest(true);
@@ -31,14 +33,12 @@ export const AlertsActions: FC<AlertsActionsProps> = ({ alert, getAlerts }) => {
     }
   };
 
-  const silenceIcon = isSilenced ? 'bell-alt' : 'bell-barred';
-
   return (
     <div className={styles.actionsWrapper}>
       {pendingRequest ? (
         <Spinner />
       ) : (
-        <IconButton data-qa="silence-alert-button" name={silenceIcon} onClick={toggleAlert} />
+        <IconButton data-qa="silence-alert-button" name={silenceIcon} title={title} onClick={toggleAlert} />
       )}
     </div>
   );
