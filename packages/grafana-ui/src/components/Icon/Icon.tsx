@@ -51,16 +51,11 @@ export const Icon = React.forwardRef<HTMLDivElement, IconProps>(
 
     const iconName = type === 'default' ? `Uil${toPascalCase(name)}` : toPascalCase(name);
 
-    console.log(iconName, type);
-
     /* Unicons don't have type definitions */
     //@ts-ignore
     const Component = type === 'default' ? DefaultIcon[iconName] : MonoIcon[iconName];
 
-    console.log(Component);
-
     if (!Component) {
-      console.log('no compo');
       return <div />;
     }
 
