@@ -72,4 +72,5 @@ export const notificationChannelContextStub: NotificationChannelContext = {
   setSelectedNotificationChannel: jest.fn(),
   setAddModalVisible: jest.fn(),
   getNotificationChannels: jest.fn(),
+  setDeleteModalVisible: jest.fn(),
 };

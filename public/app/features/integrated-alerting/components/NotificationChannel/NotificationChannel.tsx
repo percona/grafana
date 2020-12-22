@@ -9,12 +9,14 @@ import { NotificationChannelProvider } from './NotificationChannel.provider';
 import { getStyles } from './NotificationChannel.styles';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
+import { DeleteNotificationChannelModal } from './DeleteNotificationChannelModal/DeleteNotificationChannelModal';
 
 const { emptyTable, nameColumn, typeColumn, actionsColumn, typeLabel } = Messages;
 
 export const NotificationChannel: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Channel[]>([]);
   const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel>();
@@ -57,7 +59,7 @@ export const NotificationChannel: FC = () => {
 
   return (
     <NotificationChannelProvider.Provider
-      value={{ getNotificationChannels, setSelectedNotificationChannel, setAddModalVisible }}
+      value={{ getNotificationChannels, setSelectedNotificationChannel, setAddModalVisible, setDeleteModalVisible }}
     >
       <div className={styles.actionsWrapper}>
         <Button
@@ -77,6 +79,11 @@ export const NotificationChannel: FC = () => {
       <AddNotificationChannelModal
         isVisible={addModalVisible}
         setVisible={setAddModalVisible}
+        notificationChannel={selectedNotificationChannel}
+      />
+      <DeleteNotificationChannelModal
+        isVisible={deleteModalVisible}
+        setVisible={setDeleteModalVisible}
         notificationChannel={selectedNotificationChannel}
       />
     </NotificationChannelProvider.Provider>
