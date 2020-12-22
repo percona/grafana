@@ -5,13 +5,7 @@ import { DeleteNotificationChannelModal } from './DeleteNotificationChannelModal
 import { notificationChannelStubs } from '../__mocks__/notificationChannelStubs';
 
 jest.mock('../NotificationChannel.service');
-jest.mock('app/core/app_events', () => {
-  return {
-    appEvents: {
-      emit: jest.fn(),
-    },
-  };
-});
+jest.mock('app/core/app_events');
 
 describe('DeleteNotificationChannelModal', () => {
   it('should render delete modal', () => {
