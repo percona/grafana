@@ -39,7 +39,7 @@ export const AlertsActions: FC<AlertsActionsProps> = ({ alert, getAlerts }) => {
       {pendingRequest ? (
         <Spinner />
       ) : (
-        <button onClick={toggleAlert} className={styles.button} title={title}>
+        <button data-qa="silence-alert-button" onClick={toggleAlert} className={styles.button} title={title}>
           <ToggleIcon />
         </button>
       )}

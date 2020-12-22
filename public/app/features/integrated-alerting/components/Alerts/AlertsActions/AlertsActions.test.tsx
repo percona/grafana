@@ -4,9 +4,12 @@ import { dataQa } from '@percona/platform-core';
 import { AlertsActions } from './AlertsActions';
 import { alertsStubs } from '../__mocks__/alertsStubs';
 import { formatAlert } from '../AlertsTable/AlertsTable.utils';
+import { Bell, BellBarred } from './icons';
 import { AlertsService } from '../Alerts.service';
 
 jest.mock('../Alerts.service');
+
+const fakeGetAlerts = jest.fn();
 
 const alertsServiceToggle = jest.spyOn(AlertsService, 'toggle');
 
@@ -16,29 +19,19 @@ describe('AlertActions', () => {
   });
 
   it('renders a barred bell for an active alert', () => {
-    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[0])} />);
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[0])} getAlerts={fakeGetAlerts} />);
 
-    expect(
-      wrapper
-        .find(dataQa('silence-alert-button'))
-        .at(0)
-        .props()
-    ).toHaveProperty('name', 'bell-barred');
+    expect(wrapper.find(BellBarred)).toHaveLength(1);
   });
 
   it('renders a bell for an silenced alert', () => {
-    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[3])} />);
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[3])} getAlerts={fakeGetAlerts} />);
 
-    expect(
-      wrapper
-        .find(dataQa('silence-alert-button'))
-        .at(0)
-        .props()
-    ).toHaveProperty('name', 'bell-alt');
+    expect(wrapper.find(Bell)).toHaveLength(1);
   });
 
   it('calls the API to activate a silenced alert', () => {
-    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[3])} />);
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[3])} getAlerts={fakeGetAlerts} />);
 
     wrapper
       .find(dataQa('silence-alert-button'))
@@ -50,7 +43,7 @@ describe('AlertActions', () => {
   });
 
   it('calls the API to silence an active alert', () => {
-    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[1])} />);
+    const wrapper = mount(<AlertsActions alert={formatAlert(alertsStubs[1])} getAlerts={fakeGetAlerts} />);
 
     wrapper
       .find(dataQa('silence-alert-button'))
