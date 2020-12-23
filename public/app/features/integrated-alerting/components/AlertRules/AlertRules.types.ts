@@ -118,3 +118,7 @@ export interface AlertRuleCreatePayload {
   summary: string;
   template_name: string;
 }
+
+export interface AlertRuleUpdatePayload extends AlertRuleCreatePayload {
+  rule_id: string;
+}
