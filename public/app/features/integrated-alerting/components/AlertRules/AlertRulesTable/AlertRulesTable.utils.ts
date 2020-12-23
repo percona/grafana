@@ -35,8 +35,8 @@ export const formatDuration = (duration: string): string => {
   return moment.duration(seconds, 'seconds').humanize();
 };
 
-export const formatRule = (alert: AlertRulesListResponseRule): AlertRule => {
-  const { created_at, disabled, filters, for: duration, last_notified, template, severity, summary } = alert;
+export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
+  const { created_at, disabled, filters, for: duration, last_notified, template, severity, summary } = rule;
 
   return {
     createdAt: moment(created_at).format('YYYY-MM-DD HH:mm:ss.SSS'),
