@@ -119,6 +119,10 @@ describe('AlertRulesTable utils', () => {
   });
 
   test('formatRules', () => {
+    expect(formatRules(undefined)).toEqual([]);
+
+    expect(formatRules(null)).toEqual([]);
+
     expect(formatRules([])).toEqual([]);
 
     expect(formatRules([rulesStubs[0], rulesStubs[3]])).toEqual([
