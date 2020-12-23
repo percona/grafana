@@ -84,24 +84,26 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
         render={({ handleSubmit, valid, pristine, submitting }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
             {alertRule ? null : (
-              <Field name="template" validate={required}>
-                {({ input }) => (
-                  <>
-                    <label className={styles.label} data-qa="type-field-label">
-                      {Messages.templateField}
-                    </label>
-                    <Select
-                      className={styles.select}
-                      options={templateOptions}
-                      {...input}
-                      data-qa="template-select-input"
-                    />
-                  </>
-                )}
-              </Field>
-            )}
+              <>
+                <Field name="template" validate={required}>
+                  {({ input }) => (
+                    <>
+                      <label className={styles.label} data-qa="type-field-label">
+                        {Messages.templateField}
+                      </label>
+                      <Select
+                        className={styles.select}
+                        options={templateOptions}
+                        {...input}
+                        data-qa="template-select-input"
+                      />
+                    </>
+                  )}
+                </Field>
 
-            <TextInputField label={Messages.nameField} name="name" validators={[required]} />
+                <TextInputField label={Messages.nameField} name="name" validators={[required]} />
+              </>
+            )}
 
             <TextInputField label={Messages.thresholdField} name="threshold" />
 
