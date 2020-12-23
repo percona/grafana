@@ -16,7 +16,12 @@ import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
 import { SEVERITY_OPTIONS } from './AddAlertRulesModal.constants';
-import { formatTemplateOptions, formatChannelsOptions, formatCreateAPIPayload } from './AddAlertRuleModal.utils';
+import {
+  formatTemplateOptions,
+  formatChannelsOptions,
+  formatCreateAPIPayload,
+  getInitialValues,
+} from './AddAlertRuleModal.utils';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
@@ -25,7 +30,7 @@ import { appEvents } from 'app/core/core';
 
 const { required } = validators;
 
-export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible }) => {
+export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible, alertRule }) => {
   const styles = useStyles(getStyles);
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<string>>>();
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
@@ -48,6 +53,8 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
     getData();
   }, []);
 
+  const initialValues = getInitialValues(alertRule);
+
   const onSubmit = async (values: AddAlertRuleFormValues) => {
     try {
       await AlertRulesService.create(formatCreateAPIPayload(values));
@@ -67,10 +74,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       data-qa="add-alert-rule-modal"
     >
       <Form
+        initialValues={initialValues}
         onSubmit={onSubmit}
         render={({ handleSubmit, valid, pristine, submitting }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
-            {/* TODO: polish this up */}
             <Field name="template" validate={required}>
               {({ input }) => (
                 <>
