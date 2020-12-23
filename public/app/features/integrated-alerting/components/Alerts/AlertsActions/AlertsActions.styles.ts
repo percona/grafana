@@ -5,7 +5,8 @@ export const getStyles = (theme: GrafanaTheme) => {
   const size = 16;
 
   const hoverColor = theme.isLight ? theme.palette.gray95 : theme.palette.gray15;
-
+  
+  //TODO: remove the button styles and use an IconButton once implemented as part of the @percona/platform-core library
   return {
     button: css`
       width: ${size}px;
