@@ -15,6 +15,7 @@ export const Messages = {
         severity: 'Severity',
         summary: 'Name',
         state: 'State',
+        actions: 'Actions',
       },
     },
   },
