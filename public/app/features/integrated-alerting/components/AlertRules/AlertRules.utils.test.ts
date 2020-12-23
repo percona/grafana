@@ -6,6 +6,8 @@ const moment = jest.requireActual('moment-timezone');
 moment.tz.setDefault('UTC');
 
 const testTemplate1: AlertRulesListPayloadTemplate = {
+  name: 'test1',
+  summary: 'Test1',
   params: [
     {
       name: 'threshold',
@@ -19,10 +21,14 @@ const testTemplate1: AlertRulesListPayloadTemplate = {
 };
 
 const testTemplate2: AlertRulesListPayloadTemplate = {
+  name: 'test2',
+  summary: 'Test2',
   params: [],
 };
 
 const testTemplate3: AlertRulesListPayloadTemplate = {
+  name: 'test3',
+  summary: 'Test3',
   params: [
     {
       name: 'threshold',
