@@ -20,6 +20,7 @@ import {
   formatTemplateOptions,
   formatChannelsOptions,
   formatCreateAPIPayload,
+  formatUpdateAPIPayload,
   getInitialValues,
 } from './AddAlertRuleModal.utils';
 import { AlertRulesProvider } from '../AlertRules.provider';
@@ -57,7 +58,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
   const onSubmit = async (values: AddAlertRuleFormValues) => {
     try {
-      await AlertRulesService.create(formatCreateAPIPayload(values));
+      if (alertRule) {
+        await AlertRulesService.update(formatUpdateAPIPayload(alertRule.rawValues.rule_id, values));
+      } else {
+        await AlertRulesService.create(formatCreateAPIPayload(values));
+      }
       setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       getAlertRules();
@@ -78,21 +83,23 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
         onSubmit={onSubmit}
         render={({ handleSubmit, valid, pristine, submitting }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
-            <Field name="template" validate={required}>
-              {({ input }) => (
-                <>
-                  <label className={styles.label} data-qa="type-field-label">
-                    {Messages.templateField}
-                  </label>
-                  <Select
-                    className={styles.select}
-                    options={templateOptions}
-                    {...input}
-                    data-qa="template-select-input"
-                  />
-                </>
-              )}
-            </Field>
+            {alertRule ? null : (
+              <Field name="template" validate={required}>
+                {({ input }) => (
+                  <>
+                    <label className={styles.label} data-qa="type-field-label">
+                      {Messages.templateField}
+                    </label>
+                    <Select
+                      className={styles.select}
+                      options={templateOptions}
+                      {...input}
+                      data-qa="template-select-input"
+                    />
+                  </>
+                )}
+              </Field>
+            )}
 
             <TextInputField label={Messages.nameField} name="name" validators={[required]} />
 
@@ -154,7 +161,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                   disabled={!valid || pristine}
                   loading={submitting}
                 >
-                  {Messages.confirm}
+                  {alertRule ? Messages.update : Messages.create}
                 </LoaderButton>
                 <Button
                   data-qa="add-alert-rule-modal-cancel-button"

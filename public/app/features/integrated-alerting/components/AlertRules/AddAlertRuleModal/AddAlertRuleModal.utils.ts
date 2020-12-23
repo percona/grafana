@@ -3,6 +3,7 @@ import {
   AlertRule,
   AlertRuleParamType,
   AlertRuleCreatePayload,
+  AlertRuleUpdatePayload,
   AlertRulesListPayloadFilter,
   AlertRuleFilterType,
   AlertRulesListResponseParam,
@@ -116,6 +117,15 @@ export const formatCreateAPIPayload = (data: AddAlertRuleFormValues): AlertRuleC
   }
 
   return payload;
+};
+
+export const formatUpdateAPIPayload = (ruleId: string, data: AddAlertRuleFormValues): AlertRuleUpdatePayload => {
+  const payload = formatCreateAPIPayload(data);
+
+  return {
+    ...payload,
+    rule_id: ruleId,
+  };
 };
 
 export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string => {
