@@ -194,9 +194,6 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 
 	if setting.AlertingEnabled && (c.OrgRole == models.ROLE_ADMIN || c.OrgRole == models.ROLE_EDITOR) {
 		alertChildNavs := []*dtos.NavLink{
-			// NOTE: this will be enabled after the Integrated Alerting page will be populated
-			// {Text: "Integrated Alerting", Id: "integrated-alerting", Url: setting.AppSubUrl + "/integrated-alerting", Icon: "list-ul"},
-			// {Text: "Divider", Divider: true, Id: "divider", HideFromTabs: true},
 			{Text: "Alert Rules", Id: "alert-list", Url: setting.AppSubUrl + "/alerting/list", Icon: "list-ul"},
 			{Text: "Notification channels", Id: "channels", Url: setting.AppSubUrl + "/alerting/notifications", Icon: "comment-alt-share"},
 		}
