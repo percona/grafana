@@ -88,7 +88,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 <Field name="template" validate={required}>
                   {({ input }) => (
                     <>
-                      <label className={styles.label} data-qa="type-field-label">
+                      <label className={styles.label} data-qa="template-select-label">
                         {Messages.templateField}
                       </label>
                       <Select
@@ -112,7 +112,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="severity" validate={required}>
               {({ input }) => (
                 <>
-                  <label className={styles.label} data-qa="type-field-label">
+                  <label className={styles.label} data-qa="severity-select-label">
                     {Messages.severityField}
                   </label>
                   <Select
@@ -130,7 +130,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="notificationChannels">
               {({ input }) => (
                 <>
-                  <label className={styles.label} data-qa="type-field-label">
+                  <label className={styles.label} data-qa="notification-channel-select-label">
                     {Messages.channelField}
                   </label>
                   <MultiSelect
@@ -146,7 +146,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="enabled" type="checkbox" defaultValue={true}>
               {({ input }) => (
                 <>
-                  <label className={styles.label} data-qa="type-field-label">
+                  <label className={styles.label} data-qa="enabled-toggle-label">
                     {Messages.activateSwitch}
                   </label>
                   <Switch {...input} value={input.checked} data-qa="enabled-toggle-input" />
