@@ -135,7 +135,7 @@ export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string =>
 };
 
 export const formatEditFilters = (filters: AlertRulesListPayloadFilter[]): string => {
-  return filters.map(formatEditFilter).join(', ');
+  return filters ? filters.map(formatEditFilter).join(', ') : '';
 };
 
 export const formatEditTemplate = (template: AlertRulesListPayloadTemplate): SelectableValue<string> => ({
