@@ -96,6 +96,49 @@ describe('AlertRulesTable utils', () => {
 
   test('formatRule', () => {
     expect(formatRule(rulesStubs[0])).toEqual({
+      rawValues: {
+        created_at: '2020-11-25T16:53:39.366Z',
+        disabled: false,
+        filters: [
+          {
+            key: 'environment',
+            type: 'EQUAL',
+            value: 'prod',
+          },
+          {
+            key: 'app',
+            type: 'EQUAL',
+            value: 'wordpress',
+          },
+          {
+            key: 'cluster',
+            type: 'EQUAL',
+            value: 'PXCCluster1',
+          },
+        ],
+        for: '120s',
+        last_notified: '2020-11-25T16:53:39.366Z',
+        params: [
+          {
+            bool: true,
+            name: 'threshold',
+            type: 'BOOL',
+          },
+        ],
+        severity: 'SEVERITY_CRITICAL',
+        summary: 'Database down - HR - Prod',
+        template: {
+          params: [
+            {
+              bool: {
+                default: true,
+              },
+              name: 'threshold',
+              type: 'BOOL',
+            },
+          ],
+        },
+      },
       createdAt: '2020-11-25 16:53:39.366',
       disabled: false,
       duration: '2 minutes',
@@ -107,6 +150,50 @@ describe('AlertRulesTable utils', () => {
     });
 
     expect(formatRule(rulesStubs[3])).toEqual({
+      rawValues: {
+        created_at: '2020-11-25T16:53:39.366Z',
+        disabled: true,
+        filters: [
+          {
+            key: 'environment',
+            type: 'EQUAL',
+            value: 'prod',
+          },
+          {
+            key: 'app',
+            type: 'EQUAL',
+            value: 'wordpress',
+          },
+          {
+            key: 'cluster',
+            type: 'EQUAL',
+            value: 'PXCCluster1',
+          },
+        ],
+        for: '300s',
+        last_notified: '',
+        params: [
+          {
+            float: 75,
+            name: 'threshold',
+            type: 'FLOAT',
+          },
+        ],
+        severity: 'SEVERITY_WARNING',
+        summary: 'High network throughput in - Mnfcg - Dev',
+        template: {
+          params: [
+            {
+              float: {
+                default: 75,
+              },
+              name: 'threshold',
+              type: 'FLOAT',
+              unit: 'PERCENTAGE',
+            },
+          ],
+        },
+      },
       createdAt: '2020-11-25 16:53:39.366',
       disabled: true,
       duration: '5 minutes',
@@ -127,6 +214,49 @@ describe('AlertRulesTable utils', () => {
 
     expect(formatRules([rulesStubs[0], rulesStubs[3]])).toEqual([
       {
+        rawValues: {
+          created_at: '2020-11-25T16:53:39.366Z',
+          disabled: false,
+          filters: [
+            {
+              key: 'environment',
+              type: 'EQUAL',
+              value: 'prod',
+            },
+            {
+              key: 'app',
+              type: 'EQUAL',
+              value: 'wordpress',
+            },
+            {
+              key: 'cluster',
+              type: 'EQUAL',
+              value: 'PXCCluster1',
+            },
+          ],
+          for: '120s',
+          last_notified: '2020-11-25T16:53:39.366Z',
+          params: [
+            {
+              bool: true,
+              name: 'threshold',
+              type: 'BOOL',
+            },
+          ],
+          severity: 'SEVERITY_CRITICAL',
+          summary: 'Database down - HR - Prod',
+          template: {
+            params: [
+              {
+                bool: {
+                  default: true,
+                },
+                name: 'threshold',
+                type: 'BOOL',
+              },
+            ],
+          },
+        },
         createdAt: '2020-11-25 16:53:39.366',
         disabled: false,
         duration: '2 minutes',
@@ -137,6 +267,50 @@ describe('AlertRulesTable utils', () => {
         lastNotified: '2020-11-25 16:53:39.366',
       },
       {
+        rawValues: {
+          created_at: '2020-11-25T16:53:39.366Z',
+          disabled: true,
+          filters: [
+            {
+              key: 'environment',
+              type: 'EQUAL',
+              value: 'prod',
+            },
+            {
+              key: 'app',
+              type: 'EQUAL',
+              value: 'wordpress',
+            },
+            {
+              key: 'cluster',
+              type: 'EQUAL',
+              value: 'PXCCluster1',
+            },
+          ],
+          for: '300s',
+          last_notified: '',
+          params: [
+            {
+              float: 75,
+              name: 'threshold',
+              type: 'FLOAT',
+            },
+          ],
+          severity: 'SEVERITY_WARNING',
+          summary: 'High network throughput in - Mnfcg - Dev',
+          template: {
+            params: [
+              {
+                float: {
+                  default: 75,
+                },
+                name: 'threshold',
+                type: 'FLOAT',
+                unit: 'PERCENTAGE',
+              },
+            ],
+          },
+        },
         createdAt: '2020-11-25 16:53:39.366',
         disabled: true,
         duration: '5 minutes',
