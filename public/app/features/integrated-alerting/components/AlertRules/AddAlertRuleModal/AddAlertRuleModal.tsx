@@ -64,7 +64,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
         await AlertRulesService.create(formatCreateAPIPayload(values));
       }
       setVisible(false);
-      appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
+      appEvents.emit(AppEvents.alertSuccess, [alertRule ? Messages.updateSuccess : Messages.createSuccess]);
       getAlertRules();
     } catch (e) {
       logger.error(e);
