@@ -96,6 +96,11 @@ export const AlertRules: FC = () => {
     getAlertRules();
   }, []);
 
+  const handleAddButton = () => {
+    setSelectedAlertRule(null);
+    setAddModalVisible(currentValue => !currentValue);
+  };
+
   return (
     <AlertRulesProvider.Provider value={{ getAlertRules, setAddModalVisible, setSelectedAlertRule }}>
       <div className={styles.actionsWrapper}>
@@ -103,7 +108,7 @@ export const AlertRules: FC = () => {
           size="md"
           icon="plus-square"
           variant="link"
-          onClick={() => setAddModalVisible(!addModalVisible)}
+          onClick={handleAddButton}
           data-qa="alert-rule-template-add-modal-button"
         >
           {Messages.alertRuleTemplate.addAction}
