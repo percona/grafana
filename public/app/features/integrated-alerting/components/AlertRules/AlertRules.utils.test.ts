@@ -97,6 +97,7 @@ describe('AlertRulesTable utils', () => {
   test('formatRule', () => {
     expect(formatRule(rulesStubs[0])).toEqual({
       rawValues: {
+        rule_id: 'test 1',
         created_at: '2020-11-25T16:53:39.366Z',
         disabled: false,
         filters: [
@@ -152,6 +153,7 @@ describe('AlertRulesTable utils', () => {
 
     expect(formatRule(rulesStubs[3])).toEqual({
       rawValues: {
+        rule_id: 'test 4',
         created_at: '2020-11-25T16:53:39.366Z',
         disabled: true,
         filters: [
@@ -217,6 +219,7 @@ describe('AlertRulesTable utils', () => {
     expect(formatRules([rulesStubs[0], rulesStubs[3]])).toEqual([
       {
         rawValues: {
+          rule_id: 'test 1',
           created_at: '2020-11-25T16:53:39.366Z',
           disabled: false,
           filters: [
@@ -271,6 +274,7 @@ describe('AlertRulesTable utils', () => {
       },
       {
         rawValues: {
+          rule_id: 'test 4',
           created_at: '2020-11-25T16:53:39.366Z',
           disabled: true,
           filters: [
