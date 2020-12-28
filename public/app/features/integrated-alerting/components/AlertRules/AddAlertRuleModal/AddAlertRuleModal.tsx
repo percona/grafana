@@ -71,11 +71,15 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
     }
   };
 
+  const handleClose = () => {
+    setVisible(false);
+  };
+
   return (
     <Modal
-      title={Messages.title}
+      title={alertRule ? Messages.editRuleTitle : Messages.addRuleTitle}
       isVisible={isVisible}
-      onClose={() => setVisible(false)}
+      onClose={handleClose}
       data-qa="add-alert-rule-modal"
     >
       <Form
