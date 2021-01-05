@@ -14,7 +14,6 @@ const SideMenuDropDown: FC<Props> = props => {
   if (link.children) {
     childrenLinks = _.filter(link.children, item => !item.hideFromMenu);
   }
-
   return (
     <ul className="dropdown-menu dropdown-menu--sidemenu" role="menu">
       <li className="side-menu-header">
