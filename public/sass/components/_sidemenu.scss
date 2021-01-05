@@ -84,6 +84,71 @@ $mobile-menu-breakpoint: md;
   top: auto !important;
 }
 
+.psina {
+  // ...
+  > ul {
+    // ...
+    li {
+      // the holder
+      position: relative;
+      margin: 0 8px;
+      ul {
+        // the dropdown
+        visibility: hidden;
+        opacity: 0;
+        padding: 0;
+        min-width: 160px;
+        background-color: #333;
+        position: absolute;
+        top: calc(var(--menu-height) + 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        transition: 200ms;
+        transition-delay: 200ms;
+        // the dropdown items style
+        li {
+          margin: 0;
+          padding: 8px 16px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          height: 30px;
+          padding-right: 40px;
+          // lets put an arrow right
+          // to the inner li\`s with
+          // dropdowns
+          &::before {
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 5px solid #ffa500;
+          }
+          // every dropdown after the
+          // first must open to the right
+          ul {
+            top: -2%;
+            left: 100%;
+            transform: translate(0);
+          }
+          &:hover {
+            background-color: #000000;
+          }
+        }
+      }
+      // on hover an li (not an <a>)
+      // must show its ul (dropdown)
+      &:hover {
+        > ul {
+          opacity: 1;
+          visibility: visible;
+          transition-delay: 0ms;
+        }
+      }
+    }
+  }
+}
+
 .sidemenu-link {
   color: $side-menu-icon-color !important;
   line-height: 42px;

@@ -14,11 +14,25 @@ const DropDownChild: FC<Props> = props => {
     margin-right: ${theme.spacing.sm};
   `;
 
+  const data = child.children ? (
+    child.children.map((child, index) => {
+      return (
+        <>
+          <DropDownChild child={child} key={`${child.url}-${index}`} />
+        </>
+      );
+    })
+  ) : (
+    <div>123</div>
+  );
+
+  const renderChildren = !!child.children;
   return (
     <li className={listItemClassName}>
       <a href={child.url}>
         {child.icon && <Icon name={child.icon as IconName} className={iconClassName} />}
         {child.text}
+        {renderChildren ? <ul className={'submenu'}>{data}</ul> : 'net'}
       </a>
     </li>
   );
