@@ -92,6 +92,7 @@ export interface AlertRulesListResponseRule {
   summary: string;
   template: AlertRulesListPayloadTemplate;
   rule_id: string;
+  custom_labels?: AlertRulePayloadCustomLabels;
 }
 
 export interface AlertRulesListResponse {
