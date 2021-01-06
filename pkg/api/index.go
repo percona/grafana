@@ -129,8 +129,8 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 	}
 
 	inventoryChildNavs := []*dtos.NavLink{
-		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/", Icon: "home-alt", HideFromTabs: true},
-		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/", Icon: "plus", HideFromTabs: true},
+		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/graph/d/pmm-inventory/pmm-inventory", Icon: "home-alt", HideFromTabs: true},
+		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/graph/d/pmm-add-instance/pmm-add-instance", Icon: "plus", HideFromTabs: true},
 	}
 
 	nodeChildNavs := []*dtos.NavLink{
