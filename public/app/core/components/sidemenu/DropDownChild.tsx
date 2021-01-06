@@ -11,7 +11,7 @@ const DropDownChild: FC<Props> = props => {
   const listItemClassName = child.divider ? 'divider' : '';
   const theme = useTheme();
   const iconClassName = css`
-    margin-right: ${theme.spacing.sm}d;
+    margin-right: ${theme.spacing.sm};
   `;
 
   const childrenMenu = child.children
