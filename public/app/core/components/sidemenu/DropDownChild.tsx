@@ -15,7 +15,7 @@ const DropDownChild: FC<Props> = props => {
   `;
 
   const childrenMenu = child.children
-    ? child.children.map((child, index) => {
+    ? child.children.map((child: any, index: number) => {
         return (
           <>
             <DropDownChild child={child} key={`${child.url}-${index}`} />
