@@ -25,9 +25,10 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
 
     const createAlertRulePayload = {
       template_name: alertRule.rawValues.template.name,
-      channel_ids: alertRule.rawValues.channels.map(channel => channel.channel_id),
+      channel_ids: alertRule.rawValues.channels?.map(channel => channel.channel_id),
       custom_labels: alertRule.rawValues.custom_labels,
       ...alertRule.rawValues,
+      disabled: true,
       summary: `${Messages.copyOf} ${alertRule.summary}`,
     };
 
