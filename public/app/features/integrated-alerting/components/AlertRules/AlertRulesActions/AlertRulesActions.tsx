@@ -13,21 +13,34 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
   const styles = useStyles(getStyles);
   const [pendingRequest, setPendingRequest] = useState(false);
   const { setAddModalVisible, setSelectedAlertRule, getAlertRules } = useContext(AlertRulesProvider);
-  const { ruleId, summary, disabled } = alertRule;
+  const { rawValues, ruleId, summary, disabled } = alertRule;
 
   const handleEditClick = () => {
     setSelectedAlertRule(alertRule);
     setAddModalVisible(true);
   };
 
+  const handleDeleteClick = async () => {
+    setPendingRequest(true);
+    try {
+      await AlertRulesService.delete({ rule_id: ruleId });
+      appEvents.emit(AppEvents.alertSuccess, [Messages.deleteSuccess]);
+      getAlertRules();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setPendingRequest(false);
+    }
+  };
+
   const handleCopyClick = async () => {
     setPendingRequest(true);
 
     const createAlertRulePayload = {
-      template_name: alertRule.rawValues.template.name,
-      channel_ids: alertRule.rawValues.channels?.map(channel => channel.channel_id),
-      custom_labels: alertRule.rawValues.custom_labels,
-      ...alertRule.rawValues,
+      template_name: rawValues.template.name,
+      channel_ids: rawValues.channels?.map(channel => channel.channel_id),
+      custom_labels: rawValues.custom_labels,
+      ...rawValues,
       disabled: true,
       summary: `${Messages.copyOf} ${alertRule.summary}`,
     };
@@ -69,6 +82,7 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
         <>
           <Switch value={!disabled} onClick={toggleAlertRule} data-qa="toggle-alert-rule" />
           <IconButton data-qa="edit-alert-rule-button" name="pen" onClick={handleEditClick} />
+          <IconButton data-qa="delete-alert-rule-button" name="times" onClick={handleDeleteClick} />
           <IconButton data-qa="copy-alert-rule-button" name="copy" onClick={handleCopyClick} />
         </>
       )}

@@ -12,6 +12,7 @@ jest.mock('../AlertRules.service');
 jest.mock('app/core/app_events');
 
 const alertRulesServiceCreate = jest.spyOn(AlertRulesService, 'create');
+const alertRulesServiceDelete = jest.spyOn(AlertRulesService, 'delete');
 
 describe('AlertRulesActions', () => {
   afterEach(() => {
@@ -58,6 +59,19 @@ describe('AlertRulesActions', () => {
     });
 
     expect(alertRulesContextStub.setSelectedAlertRule).toBeCalledTimes(1);
+  });
+
+  it('calls the API to delete an alert rule', async () => {
+    const wrapper = mount(<AlertRulesActions alertRule={formattedRulesStubs[1]} />);
+
+    await act(async () => {
+      wrapper
+        .find(dataQa('delete-alert-rule-button'))
+        .at(0)
+        .simulate('click');
+    });
+
+    expect(alertRulesServiceDelete).toBeCalledTimes(1);
   });
 
   it('renders an enabled switch for an enabled alert rule', () => {

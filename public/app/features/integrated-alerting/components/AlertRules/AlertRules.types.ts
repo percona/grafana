@@ -129,3 +129,7 @@ export interface AlertRuleTogglePayload {
   disabled: 'DO_NOT_CHANGE' | 'TRUE' | 'FALSE';
   rule_id: string;
 }
+
+export interface AlertRuleDeletePayload {
+  rule_id: string;
+}
