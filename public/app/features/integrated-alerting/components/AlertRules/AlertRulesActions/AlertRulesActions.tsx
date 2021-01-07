@@ -20,6 +20,29 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
     setAddModalVisible(true);
   };
 
+  const handleCopyClick = async () => {
+    setPendingRequest(true);
+
+    const createAlertRulePayload = {
+      template_name: alertRule.rawValues.template.name,
+      channel_ids: alertRule.rawValues.channels?.map(channel => channel.channel_id),
+      custom_labels: alertRule.rawValues.custom_labels,
+      ...alertRule.rawValues,
+      disabled: true,
+      summary: `${Messages.copyOf} ${alertRule.summary}`,
+    };
+
+    try {
+      await AlertRulesService.create(createAlertRulePayload);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.createSuccess]);
+      getAlertRules();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setPendingRequest(false);
+    }
+  };
+
   const toggleAlertRule = async () => {
     setPendingRequest(true);
     try {
@@ -46,6 +69,7 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
         <>
           <Switch value={!disabled} onClick={toggleAlertRule} data-qa="toggle-alert-rule" />
           <IconButton data-qa="edit-alert-rule-button" name="pen" onClick={handleEditClick} />
+          <IconButton data-qa="copy-alert-rule-button" name="copy" onClick={handleCopyClick} />
         </>
       )}
     </div>
