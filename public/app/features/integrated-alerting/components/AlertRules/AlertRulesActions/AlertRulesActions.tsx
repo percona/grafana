@@ -24,7 +24,7 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
     setPendingRequest(true);
     try {
       await AlertRulesService.delete({ rule_id: ruleId });
-      appEvents.emit(AppEvents.alertSuccess, [Messages.deleteSuccess]);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.getDeletedMessage(summary)]);
       getAlertRules();
     } catch (e) {
       logger.error(e);
@@ -47,7 +47,7 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
 
     try {
       await AlertRulesService.create(createAlertRulePayload);
-      appEvents.emit(AppEvents.alertSuccess, [Messages.createSuccess]);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.getCreatedMessage(summary)]);
       getAlertRules();
     } catch (e) {
       logger.error(e);
