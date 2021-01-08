@@ -8,19 +8,21 @@ import { AlertRulesActionsProps } from './AlertRulesActions.types';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { Messages } from './AlertRulesActions.messages';
+import { DeleteModal } from '../../DeleteModal';
 
 export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => {
   const styles = useStyles(getStyles);
   const [pendingRequest, setPendingRequest] = useState(false);
   const { setAddModalVisible, setSelectedAlertRule, getAlertRules } = useContext(AlertRulesProvider);
   const { rawValues, ruleId, summary, disabled } = alertRule;
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const handleEditClick = () => {
     setSelectedAlertRule(alertRule);
     setAddModalVisible(true);
   };
 
-  const handleDeleteClick = async () => {
+  const deleteAlertRule = async () => {
     setPendingRequest(true);
     try {
       await AlertRulesService.delete({ rule_id: ruleId });
@@ -31,6 +33,10 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
     } finally {
       setPendingRequest(false);
     }
+  };
+
+  const handleDeleteClick = () => {
+    setDeleteModalVisible(true);
   };
 
   const handleCopyClick = async () => {
@@ -86,6 +92,15 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
           <IconButton data-qa="copy-alert-rule-button" name="copy" onClick={handleCopyClick} />
         </>
       )}
+      <DeleteModal
+        data-qa="alert-rule-delete-modal"
+        title={Messages.deleteModalTitle}
+        message={Messages.getDeleteModalMessage(summary)}
+        loading={pendingRequest}
+        isVisible={deleteModalVisible}
+        setVisible={setDeleteModalVisible}
+        onDelete={deleteAlertRule}
+      />
     </div>
   );
 };
