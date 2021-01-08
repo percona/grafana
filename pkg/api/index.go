@@ -192,16 +192,6 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 		{Text: "Proxy SQL", Id: "home", Url: setting.AppSubUrl + "/graph/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true, Children: proxysqlChildNavs},
 	}
 
-	data.NavTree = append(data.NavTree, &dtos.NavLink{
-		Text:       "PMM dashboards",
-		Id:         "pmm",
-		SubTitle:   "Manage dashboards & folders",
-		Icon:       "apps",
-		Url:        setting.AppSubUrl + "/",
-		SortWeight: dtos.WeightDashboard,
-		Children:   pmmChildNavs,
-	})
-
 	dashboardChildNavs := []*dtos.NavLink{
 		{Text: "Home", Id: "home", Url: setting.AppSubUrl + "/", Icon: "home-alt", HideFromTabs: true},
 		{Text: "Divider", Divider: true, Id: "divider", HideFromTabs: true},
@@ -218,6 +208,16 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 		Url:        setting.AppSubUrl + "/",
 		SortWeight: dtos.WeightDashboard,
 		Children:   dashboardChildNavs,
+	})
+
+	data.NavTree = append(data.NavTree, &dtos.NavLink{
+		Text:       "PMM dashboards",
+		Id:         "pmm",
+		SubTitle:   "Manage dashboards & folders",
+		Icon:       "apps",
+		Url:        setting.AppSubUrl + "/",
+		SortWeight: dtos.WeightDashboard,
+		Children:   pmmChildNavs,
 	})
 
 	if setting.ExploreEnabled && (c.OrgRole == models.ROLE_ADMIN || c.OrgRole == models.ROLE_EDITOR || setting.ViewersCanEdit) {
