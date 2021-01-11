@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import _ from 'lodash';
 import DropDownChild from './DropDownChild';
 import { NavModelItem } from '@grafana/data';
-import { css } from 'emotion';
 
 interface Props {
   link: NavModelItem;
