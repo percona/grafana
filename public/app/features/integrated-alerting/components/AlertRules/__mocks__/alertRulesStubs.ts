@@ -1,4 +1,4 @@
-import { AlertRulesListResponseRule, AlertRulesContext } from '../AlertRules.types';
+import { AlertRulesListResponseRule } from '../AlertRules.types';
 import { formatRules } from '../AlertRules.utils';
 
 export const rulesStubs: AlertRulesListResponseRule[] = [
@@ -48,6 +48,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
+    channels: [],
   },
   {
     rule_id: 'test 2',
@@ -96,6 +97,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
+    channels: [],
   },
   {
     rule_id: 'test 3',
@@ -137,6 +139,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
+    channels: [],
   },
   {
     rule_id: 'test 4',
@@ -188,6 +191,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
+    channels: [],
   },
   {
     rule_id: 'test 5',
@@ -229,6 +233,7 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
+    channels: [],
   },
   {
     rule_id: 'test 6',
@@ -270,13 +275,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
+    channels: [],
   },
 ];
 
 export const formattedRulesStubs = formatRules(rulesStubs);
-
-export const alertRulesContextStub: AlertRulesContext = {
-  getAlertRules: jest.fn(),
-  setAddModalVisible: jest.fn(),
-  setSelectedAlertRule: jest.fn(),
-};

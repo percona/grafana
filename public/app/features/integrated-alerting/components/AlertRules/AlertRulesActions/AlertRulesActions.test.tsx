@@ -76,8 +76,15 @@ describe('AlertRulesActions', () => {
   });
 
   it('calls getAlertRules on toggle', async () => {
+    const alertRulesContext = {
+      getAlertRules: jest.fn(),
+      setAddModalVisible: jest.fn(),
+      setSelectedAlertRule: jest.fn(),
+      setSelectedRuleDetails: jest.fn(),
+      selectedRuleDetails: formattedRulesStubs[0],
+    };
     const wrapper = mount(
-      <AlertRulesProvider.Provider value={alertRulesContextStub}>
+      <AlertRulesProvider.Provider value={alertRulesContext}>
         <AlertRulesActions alertRule={formattedRulesStubs[0]} />
       </AlertRulesProvider.Provider>
     );
@@ -89,6 +96,6 @@ describe('AlertRulesActions', () => {
         .simulate('click');
     });
 
-    expect(alertRulesContextStub.getAlertRules).toHaveBeenCalled();
+    expect(alertRulesContext.getAlertRules).toHaveBeenCalled();
   });
 });
