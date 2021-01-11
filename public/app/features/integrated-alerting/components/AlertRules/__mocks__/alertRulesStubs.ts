@@ -1,4 +1,4 @@
-import { AlertRulesListResponseRule, AlertRulesContext } from '../AlertRules.types';
+import { AlertRulesListResponseRule } from '../AlertRules.types';
 import { formatRules } from '../AlertRules.utils';
 
 export const rulesStubs: AlertRulesListResponseRule[] = [
@@ -36,8 +36,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 1',
+      summary: 'Test 1',
       params: [
         {
           name: 'threshold',
@@ -83,8 +83,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 2',
+      summary: 'Test 2',
       params: [
         {
           name: 'threshold',
@@ -124,8 +124,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     severity: 'SEVERITY_ERROR',
     summary: 'High memory consumption - Mnfcg - Dev',
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 3',
+      summary: 'Test 3',
       params: [
         {
           name: 'threshold',
@@ -175,8 +175,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 4',
+      summary: 'Test 4',
       params: [
         {
           name: 'threshold',
@@ -216,8 +216,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     severity: 'SEVERITY_NOTICE',
     summary: 'Low memory consumption - Sales - Dev',
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 5',
+      summary: 'Test 5',
       params: [
         {
           name: 'threshold',
@@ -274,9 +274,3 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
 ];
 
 export const formattedRulesStubs = formatRules(rulesStubs);
-
-export const alertRulesContextStub: AlertRulesContext = {
-  getAlertRules: jest.fn(),
-  setAddModalVisible: jest.fn(),
-  setSelectedAlertRule: jest.fn(),
-};

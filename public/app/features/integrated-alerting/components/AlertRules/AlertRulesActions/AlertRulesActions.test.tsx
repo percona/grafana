@@ -4,7 +4,7 @@ import { act } from 'react-dom/test-utils';
 import { dataQa } from '@percona/platform-core';
 import { AlertRulesActions } from './AlertRulesActions';
 import { AlertRulesProvider } from '../AlertRules.provider';
-import { rulesStubs, formattedRulesStubs, alertRulesContextStub } from '../__mocks__/alertRulesStubs';
+import { rulesStubs, formattedRulesStubs } from '../__mocks__/alertRulesStubs';
 import { AlertRulesService } from '../AlertRules.service';
 import { Messages } from './AlertRulesActions.messages';
 
@@ -29,7 +29,7 @@ describe('AlertRulesActions', () => {
       summary: `${Messages.copyOf} ${testRule.summary}`,
       custom_labels: undefined as any,
       channel_ids: ['test_ch'],
-      template_name: 'test_template',
+      template_name: 'test 2',
     };
 
     await act(async () => {
@@ -44,8 +44,15 @@ describe('AlertRulesActions', () => {
   });
 
   it('calls the API to update an alert rule on edit', async () => {
+    const alertRulesContext = {
+      getAlertRules: jest.fn(),
+      setAddModalVisible: jest.fn(),
+      setSelectedAlertRule: jest.fn(),
+      setSelectedRuleDetails: jest.fn(),
+      selectedRuleDetails: formattedRulesStubs[0],
+    };
     const wrapper = mount(
-      <AlertRulesProvider.Provider value={alertRulesContextStub}>
+      <AlertRulesProvider.Provider value={alertRulesContext}>
         <AlertRulesActions alertRule={formattedRulesStubs[0]} />
       </AlertRulesProvider.Provider>
     );
@@ -57,7 +64,7 @@ describe('AlertRulesActions', () => {
         .simulate('click');
     });
 
-    expect(alertRulesContextStub.setSelectedAlertRule).toBeCalledTimes(1);
+    expect(alertRulesContext.setSelectedAlertRule).toBeCalledTimes(1);
   });
 
   it('calls the API to delete an alert rule', async () => {
@@ -93,8 +100,15 @@ describe('AlertRulesActions', () => {
   });
 
   it('calls getAlertRules on toggle', async () => {
+    const alertRulesContext = {
+      getAlertRules: jest.fn(),
+      setAddModalVisible: jest.fn(),
+      setSelectedAlertRule: jest.fn(),
+      setSelectedRuleDetails: jest.fn(),
+      selectedRuleDetails: formattedRulesStubs[0],
+    };
     const wrapper = mount(
-      <AlertRulesProvider.Provider value={alertRulesContextStub}>
+      <AlertRulesProvider.Provider value={alertRulesContext}>
         <AlertRulesActions alertRule={formattedRulesStubs[0]} />
       </AlertRulesProvider.Provider>
     );
@@ -106,6 +120,6 @@ describe('AlertRulesActions', () => {
         .simulate('click');
     });
 
-    expect(alertRulesContextStub.getAlertRules).toHaveBeenCalled();
+    expect(alertRulesContext.getAlertRules).toHaveBeenCalled();
   });
 });

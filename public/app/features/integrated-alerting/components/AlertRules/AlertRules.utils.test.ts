@@ -130,8 +130,7 @@ describe('AlertRulesTable utils', () => {
         severity: 'SEVERITY_CRITICAL',
         summary: 'Database down - HR - Prod',
         template: {
-          name: 'test_template',
-          summary: 'Test Template',
+          name: 'test 1',
           params: [
             {
               bool: {
@@ -141,6 +140,7 @@ describe('AlertRulesTable utils', () => {
               type: 'BOOL',
             },
           ],
+          summary: 'Test 1',
         },
       },
       ruleId: 'test 1',
@@ -198,8 +198,7 @@ describe('AlertRulesTable utils', () => {
         severity: 'SEVERITY_WARNING',
         summary: 'High network throughput in - Mnfcg - Dev',
         template: {
-          name: 'test_template',
-          summary: 'Test Template',
+          name: 'test 4',
           params: [
             {
               float: {
@@ -210,6 +209,7 @@ describe('AlertRulesTable utils', () => {
               unit: 'PERCENTAGE',
             },
           ],
+          summary: 'Test 4',
         },
       },
       ruleId: 'test 4',
@@ -267,8 +267,7 @@ describe('AlertRulesTable utils', () => {
           severity: 'SEVERITY_CRITICAL',
           summary: 'Database down - HR - Prod',
           template: {
-            name: 'test_template',
-            summary: 'Test Template',
+            name: 'test 1',
             params: [
               {
                 bool: {
@@ -278,6 +277,7 @@ describe('AlertRulesTable utils', () => {
                 type: 'BOOL',
               },
             ],
+            summary: 'Test 1',
           },
         },
         ruleId: 'test 1',
@@ -334,8 +334,7 @@ describe('AlertRulesTable utils', () => {
           severity: 'SEVERITY_WARNING',
           summary: 'High network throughput in - Mnfcg - Dev',
           template: {
-            name: 'test_template',
-            summary: 'Test Template',
+            name: 'test 4',
             params: [
               {
                 float: {
@@ -346,6 +345,7 @@ describe('AlertRulesTable utils', () => {
                 unit: 'PERCENTAGE',
               },
             ],
+            summary: 'Test 4',
           },
         },
         ruleId: 'test 4',
