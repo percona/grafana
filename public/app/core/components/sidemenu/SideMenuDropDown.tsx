@@ -15,16 +15,13 @@ const SideMenuDropDown: FC<Props> = props => {
     childrenLinks = _.filter(link.children, item => !item.hideFromMenu);
   }
   return (
-    <ul className="dropdown-menu dropdown-menu--sidemenu psina" role="menu">
+    <ul className="dropdown-menu dropdown-menu--sidemenu" role="menu">
       <li className="side-menu-header">
         <a className="side-menu-header-link" href={link.url} onClick={onHeaderClick}>
           <span className="sidemenu-item-text">{link.text}</span>
         </a>
       </li>
       {childrenLinks.map((child, index) => {
-        if (child.children) {
-          console.log(child);
-        }
         return (
           <>
             <DropDownChild child={child} key={`${child.url}-${index}`} />
