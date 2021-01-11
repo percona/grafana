@@ -29,7 +29,7 @@ describe('AlertRulesActions', () => {
       summary: `${Messages.copyOf} ${testRule.summary}`,
       custom_labels: undefined as any,
       channel_ids: ['test_ch'],
-      template_name: 'test_template',
+      template_name: 'test 2',
     };
 
     await act(async () => {

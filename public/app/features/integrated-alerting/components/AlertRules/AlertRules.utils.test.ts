@@ -157,7 +157,16 @@ describe('AlertRulesTable utils', () => {
     expect(formatRule(rulesStubs[3])).toEqual({
       rawValues: {
         rule_id: 'test 4',
-        channels: [],
+        channels: [
+          {
+            channel_id: 'test_ch',
+            summary: 'Test Channel',
+          },
+          {
+            channel_id: 'test_ch_2',
+            summary: 'Test Channel 2',
+          },
+        ],
         created_at: '2020-11-25T16:53:39.366Z',
         disabled: true,
         filters: [
@@ -284,7 +293,16 @@ describe('AlertRulesTable utils', () => {
       {
         rawValues: {
           rule_id: 'test 4',
-          channels: [],
+          channels: [
+            {
+              channel_id: 'test_ch',
+              summary: 'Test Channel',
+            },
+            {
+              channel_id: 'test_ch_2',
+              summary: 'Test Channel 2',
+            },
+          ],
           created_at: '2020-11-25T16:53:39.366Z',
           disabled: true,
           filters: [

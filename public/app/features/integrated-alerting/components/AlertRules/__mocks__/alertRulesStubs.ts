@@ -36,8 +36,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 1',
+      summary: 'Test 1',
       params: [
         {
           name: 'threshold',
@@ -48,7 +48,6 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
-    channels: [],
   },
   {
     rule_id: 'test 2',
@@ -84,8 +83,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 2',
+      summary: 'Test 2',
       params: [
         {
           name: 'threshold',
@@ -97,7 +96,6 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
-    channels: [],
   },
   {
     rule_id: 'test 3',
@@ -126,8 +124,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     severity: 'SEVERITY_ERROR',
     summary: 'High memory consumption - Mnfcg - Dev',
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 3',
+      summary: 'Test 3',
       params: [
         {
           name: 'threshold',
@@ -139,7 +137,6 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
-    channels: [],
   },
   {
     rule_id: 'test 4',
@@ -178,8 +175,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
       },
     ],
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 4',
+      summary: 'Test 4',
       params: [
         {
           name: 'threshold',
@@ -191,7 +188,6 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
-    channels: [],
   },
   {
     rule_id: 'test 5',
@@ -220,8 +216,8 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
     severity: 'SEVERITY_NOTICE',
     summary: 'Low memory consumption - Sales - Dev',
     template: {
-      name: 'test_template',
-      summary: 'Test Template',
+      name: 'test 5',
+      summary: 'Test 5',
       params: [
         {
           name: 'threshold',
@@ -233,7 +229,6 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
-    channels: [],
   },
   {
     rule_id: 'test 6',
@@ -275,7 +270,6 @@ export const rulesStubs: AlertRulesListResponseRule[] = [
         },
       ],
     },
-    channels: [],
   },
 ];
 
