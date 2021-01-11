@@ -27,7 +27,7 @@ const DropDownChild: FC<Props> = props => {
         {child.icon && <Icon name={child.icon as IconName} className={iconClassName} />}
         {child.text}
       </a>
-      {renderChildren ? <ul className="sidemenu dropdown-menu--sidemenu submenu">{childrenMenu}</ul> : null}
+      {renderChildren && <ul className="sidemenu dropdown-menu--sidemenu submenu">{childrenMenu}</ul>}
     </li>
   );
 };
