@@ -129,67 +129,67 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 	}
 
 	inventoryChildNavs := []*dtos.NavLink{
-		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/graph/d/pmm-inventory/pmm-inventory", Icon: "home-alt", HideFromTabs: true},
-		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/graph/d/pmm-add-instance/pmm-add-instance", Icon: "plus", HideFromTabs: true},
+		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/d/pmm-inventory/pmm-inventory", Icon: "home-alt", HideFromTabs: true},
+		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/d/pmm-add-instance/pmm-add-instance", Icon: "plus", HideFromTabs: true},
 	}
 
 	nodeChildNavs := []*dtos.NavLink{
-		{Text: "Node Overview", Id: "home", Url: setting.AppSubUrl + "/graph/d/node-instance-overview/nodes-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "Node Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/node-instance-summary/node-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "Node Overview", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-overview/nodes-overview", Icon: "home-alt", HideFromTabs: true},
+		{Text: "Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	mysqlHAChildNavs := []*dtos.NavLink{
-		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "ProxySQL Instance Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/pxc-node-summary/pxc-galera-node-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/graph/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "ProxySQL Instance Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	mysqlChildNavs := []*dtos.NavLink{
 		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true, Children: mysqlHAChildNavs},
-		{Text: "MySQL Overview", Id: "home", Url: setting.AppSubUrl + "/graph/d/mysql-instance-overview/mysql-instances-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MySQL Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mysql-instance-summary/mysql-instances-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Overview", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-summary/mysql-instances-summary", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	mongodbHAChildNavs := []*dtos.NavLink{
-		{Text: "MongoDB Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mongodb-cluster-summary/mongodb-cluster-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MongoDB ReplSet Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mongodb-replicaset-summary/mongodb-replset-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MongoDB Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-cluster-summary/mongodb-cluster-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MongoDB ReplSet Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-replicaset-summary/mongodb-replset-summary", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	mongodbChildNavs := []*dtos.NavLink{
 		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true, Children: mongodbHAChildNavs},
-		{Text: "MongoDB Overview", Id: "home", Url: setting.AppSubUrl + "/graph/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MongoDB Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mongodb-instance-summary/mongodb-instance-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MongoDB Overview", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MongoDB Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-summary/mongodb-instance-summary", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	postgresqlChildNavs := []*dtos.NavLink{
 		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PostgreSQL Overview", Id: "home", Url: setting.AppSubUrl + "/graph/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PostgreSQL Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/postgresql-instance-summary/postgresql-instances-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PostgreSQL Overview", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PostgreSQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-summary/postgresql-instances-summary", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	proxysqlHAChildNavs := []*dtos.NavLink{
-		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/pxc-node-summary/pxc-galera-node-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/graph/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	proxysqlChildNavs := []*dtos.NavLink{
 		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true, Children: proxysqlHAChildNavs},
-		{Text: "Proxy SQL Summary", Id: "home", Url: setting.AppSubUrl + "/graph/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "Proxy SQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true},
 	}
 
 	pmmChildNavs := []*dtos.NavLink{
-		{Text: "Query Analyics", Id: "home", Url: setting.AppSubUrl + "/graph/d/pmm-qan/pmm-query-analytics", Icon: "home-alt", HideFromTabs: true},
-		{Text: "System (Node)", Id: "home", Url: setting.AppSubUrl + "/graph/d/node-instance-overview/nodes-overview", Icon: "home-alt", HideFromTabs: true, Children: nodeChildNavs},
-		{Text: "MySQL", Id: "home", Url: setting.AppSubUrl + "/graph/d/mysql-instance-overview/mysql-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: mysqlChildNavs},
-		{Text: "MongoDB", Id: "home", Url: setting.AppSubUrl + "/graph/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: mongodbChildNavs},
-		{Text: "PostgreSQL", Id: "home", Url: setting.AppSubUrl + "/graph/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: postgresqlChildNavs},
-		{Text: "Proxy SQL", Id: "home", Url: setting.AppSubUrl + "/graph/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true, Children: proxysqlChildNavs},
+		{Text: "Query Analyics", Id: "home", Url: setting.AppSubUrl + "/d/pmm-qan/pmm-query-analytics", Icon: "home-alt", HideFromTabs: true},
+		{Text: "System (Node)", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-overview/nodes-overview", Icon: "home-alt", HideFromTabs: true, Children: nodeChildNavs},
+		{Text: "MySQL", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: mysqlChildNavs},
+		{Text: "MongoDB", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: mongodbChildNavs},
+		{Text: "PostgreSQL", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: postgresqlChildNavs},
+		{Text: "Proxy SQL", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true, Children: proxysqlChildNavs},
 	}
 
 	dashboardChildNavs := []*dtos.NavLink{
