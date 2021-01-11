@@ -201,7 +201,7 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 	}
 
 	data.NavTree = append(data.NavTree, &dtos.NavLink{
-		Text:       "Psina",
+		Text:       "Dashboards",
 		Id:         "dashboards",
 		SubTitle:   "Manage dashboards & folders",
 		Icon:       "apps",
@@ -264,36 +264,6 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 		}
 
 		data.NavTree = append(data.NavTree, profileNode)
-	}
-
-	if setting.AlertingEnabled && (c.OrgRole == models.ROLE_ADMIN || c.OrgRole == models.ROLE_EDITOR) {
-		alertChildNavs2 := []*dtos.NavLink{
-			// NOTE: this will be enabled after the Integrated Alerting page will be populated
-			// {Text: "Integrated Alerting", Id: "integrated-alerting", Url: setting.AppSubUrl + "/integrated-alerting", Icon: "list-ul"},
-			// {Text: "Divider", Divider: true, Id: "divider", HideFromTabs: true},
-			{Text: "Inner 1", Id: "alert-list2", Url: setting.AppSubUrl + "/alerting/list", Icon: "list-ul"},
-			{Text: "Inner 3", Id: "channels2", Url: setting.AppSubUrl + "/alerting/notifications", Icon: "comment-alt-share"},
-		}
-
-		alertChildNavs := []*dtos.NavLink{
-			// NOTE: this will be enabled after the Integrated Alerting page will be populated
-			// {Text: "Integrated Alerting", Id: "integrated-alerting", Url: setting.AppSubUrl + "/integrated-alerting", Icon: "list-ul"},
-			// {Text: "Divider", Divider: true, Id: "divider", HideFromTabs: true},
-			{Text: "Alert Rules", Id: "alert-list", Icon: "list-ul", Children: alertChildNavs2},
-			{Text: "Divider2", Divider: true, Id: "divider2", HideFromTabs: true},
-
-			{Text: "Notification channels", Id: "channels", Icon: "comment-alt-share"},
-		}
-
-		data.NavTree = append(data.NavTree, &dtos.NavLink{
-			Text:       "Psina",
-			SubTitle:   "Alert rules & notifications",
-			Id:         "alerting",
-			Icon:       "bell",
-			Url:        setting.AppSubUrl + "/alerting/list",
-			Children:   alertChildNavs,
-			SortWeight: dtos.WeightAlerting,
-		})
 	}
 
 	enabledPlugins, err := plugins.GetEnabledPlugins(c.OrgId)

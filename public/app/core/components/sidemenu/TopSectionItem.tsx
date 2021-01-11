@@ -12,7 +12,7 @@ const TopSectionItem: FC<Props> = props => {
   const { link, onClick } = props;
 
   return (
-    <div className="sidemenu-item dropdown psina">
+    <div className="sidemenu-item dropdown">
       <a className="sidemenu-link" href={link.url} target={link.target} onClick={onClick}>
         <span className="icon-circle sidemenu-icon">
           <Icon name={link.icon as any} size="xl" />
