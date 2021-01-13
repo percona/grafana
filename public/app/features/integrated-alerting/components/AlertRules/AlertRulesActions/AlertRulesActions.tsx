@@ -45,18 +45,20 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
   const handleCopyClick = async () => {
     setPendingRequest(true);
 
+    const newSummary = `${Messages.copyOf} ${alertRule.summary}`;
+
     const createAlertRulePayload = {
       template_name: rawValues.template.name,
       channel_ids: rawValues.channels?.map(channel => channel.channel_id),
       custom_labels: rawValues.custom_labels,
       ...rawValues,
       disabled: true,
-      summary: `${Messages.copyOf} ${alertRule.summary}`,
+      summary: newSummary,
     };
 
     try {
       await AlertRulesService.create(createAlertRulePayload);
-      appEvents.emit(AppEvents.alertSuccess, [Messages.getCreatedMessage(summary)]);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.getCreatedMessage(newSummary)]);
       getAlertRules();
     } catch (e) {
       logger.error(e);
