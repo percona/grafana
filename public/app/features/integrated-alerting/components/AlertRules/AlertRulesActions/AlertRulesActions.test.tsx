@@ -40,7 +40,7 @@ describe('AlertRulesActions', () => {
     });
 
     expect(alertRulesServiceCreate).toBeCalledTimes(1);
-    expect(alertRulesServiceCreate).toHaveBeenCalledWith(expectedResult);
+    expect(alertRulesServiceCreate).toBeCalledWith(expectedResult);
   });
 
   it('calls the API to update an alert rule on edit', async () => {
