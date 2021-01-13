@@ -40,7 +40,7 @@ describe('AlertRulesActions', () => {
     });
 
     expect(alertRulesServiceCreate).toBeCalledTimes(1);
-    expect(alertRulesServiceCreate.mock.calls[0][0]).toEqual(expectedResult);
+    expect(alertRulesServiceCreate).toHaveBeenCalledWith(expectedResult);
   });
 
   it('calls the API to update an alert rule on edit', async () => {
