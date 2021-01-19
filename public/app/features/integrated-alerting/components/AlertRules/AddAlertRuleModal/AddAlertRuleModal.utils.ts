@@ -192,3 +192,6 @@ export const getInitialValues = (alertRule: AlertRule): AddAlertRuleFormValues =
     threshold: formatEditThreshold(params),
   };
 };
+
+export const minValidator = (min: number) => (value: any) =>
+  value >= min ? undefined : `Must be greather than or equal to ${min}`;
