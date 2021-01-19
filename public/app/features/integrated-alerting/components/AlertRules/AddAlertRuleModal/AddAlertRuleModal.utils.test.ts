@@ -13,6 +13,7 @@ import {
   formatEditThreshold,
   formatEditNotificationChannel,
   formatEditNotificationChannels,
+  minValidator,
 } from './AddAlertRuleModal.utils';
 
 describe('AddAlertRuleModal utils', () => {
@@ -372,5 +373,12 @@ describe('AddAlertRuleModal utils', () => {
         },
       ])
     ).toBeNull();
+  });
+
+  test('minimum validator', () => {
+    expect(minValidator(1)(-1)).not.toBeUndefined();
+    expect(minValidator(1)(0)).not.toBeUndefined();
+    expect(minValidator(1)(1)).toBeUndefined();
+    expect(minValidator(1)(100)).toBeUndefined();
   });
 });
