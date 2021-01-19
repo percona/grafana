@@ -20,3 +20,6 @@ export const SEVERITY_OPTIONS = [
     label: Messages.severities.SEVERITY_WARNING,
   },
 ];
+
+// Seconds
+export const MINIMUM_DURATION_VALUE = 1;
