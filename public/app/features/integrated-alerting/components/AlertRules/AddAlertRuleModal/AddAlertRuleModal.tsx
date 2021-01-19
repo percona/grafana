@@ -15,13 +15,14 @@ import { AppEvents } from '@grafana/data';
 import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
-import { SEVERITY_OPTIONS } from './AddAlertRulesModal.constants';
+import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './AddAlertRulesModal.constants';
 import {
   formatTemplateOptions,
   formatChannelsOptions,
   formatCreateAPIPayload,
   formatUpdateAPIPayload,
   getInitialValues,
+  minValidator,
 } from './AddAlertRuleModal.utils';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
@@ -111,7 +112,12 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
             <TextInputField label={Messages.thresholdField} name="threshold" />
 
-            <NumberInputField label={Messages.durationField} name="duration" validators={[required]} />
+            <NumberInputField
+              inputProps={{ min: MINIMUM_DURATION_VALUE }}
+              label={Messages.durationField}
+              name="duration"
+              validators={[required, minValidator(MINIMUM_DURATION_VALUE)]}
+            />
 
             <Field name="severity" validate={required}>
               {({ input }) => (
