@@ -1,15 +1,59 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount, ReactWrapper } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import { dataQa } from '@percona/platform-core';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
+import { NotificationChannelType } from '../NotificationChannel.types';
 import { notificationChannelStubs } from '../__mocks__/notificationChannelStubs';
 
 jest.mock('../NotificationChannel.service');
 jest.mock('app/core/app_events');
 
-describe('AddNotificationChannelModal', () => {
+/**
+ * Return this form's "Add" button
+ */
+const findFormButton = (wrapper: ReactWrapper): ReactWrapper =>
+  wrapper
+    .find(dataQa('notification-channel-add-button'))
+    .find('button')
+    .at(0);
+
+/**
+ * Given a type, return the matching element.
+ * The element returned is the one that's actually clickable and that triggers the change
+ */
+const findTypeOption = (wrapper: ReactWrapper, type: NotificationChannelType): ReactWrapper => {
+  const menuOptions = wrapper.find({ 'aria-label': 'Select option' });
+  const matchingOption = TYPE_OPTIONS.find(option => option.value === type);
+
+  return menuOptions.filterWhere(node => node.text() === matchingOption.label);
+};
+
+/**
+ * Fill the form with a name and a notification channel type
+ */
+const fillNameAndType = (wrapper: ReactWrapper, type: NotificationChannelType, name = 'John Doe') => {
+  const inputs = wrapper.find('input');
+  const nameInput = inputs.at(0);
+  const typeInput = inputs.at(1);
+
+  nameInput.simulate('change', {
+    target: {
+      value: name,
+    },
+  });
+
+  typeInput.simulate('keydown', {
+    key: 'ArrowDown',
+  });
+
+  const option = findTypeOption(wrapper, type);
+
+  option.simulate('click');
+};
+
+fdescribe('AddNotificationChannelModal', () => {
   it('should render modal with correct fields', () => {
     const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
 
@@ -60,5 +104,46 @@ describe('AddNotificationChannelModal', () => {
     );
 
     expect(wrapper.find(dataQa('name-text-input')).prop('value')).toEqual(notificationChannelStubs[0].summary);
+  });
+
+  it('should have the submit button initially disabled', () => {
+    const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
+    const button = findFormButton(wrapper);
+
+    expect(button.getDOMNode().hasAttribute('disabled')).toBe(true);
+  });
+
+  describe('Pager Duty option', () => {
+    it('should have the submit button disabled if both routing and service keys are empty', () => {
+      const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
+      const button = findFormButton(wrapper);
+
+      fillNameAndType(wrapper, NotificationChannelType.pagerDuty);
+      expect(button.getDOMNode().hasAttribute('disabled')).toBe(true);
+    });
+
+    it('should enable submit button if only routing key is provided', () => {
+      const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
+      const button = findFormButton(wrapper);
+
+      fillNameAndType(wrapper, NotificationChannelType.pagerDuty);
+
+      const routingKeyInput = wrapper.find(dataQa('routing-text-input')).at(0);
+
+      routingKeyInput.simulate('change', { target: { value: 'Sample routing key' } });
+      expect(button.getDOMNode().hasAttribute('disabled')).toBe(false);
+    });
+
+    it('should enable submit button if only service key is provided', () => {
+      const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
+      const button = findFormButton(wrapper);
+
+      fillNameAndType(wrapper, NotificationChannelType.pagerDuty);
+
+      const serviceKeyInput = wrapper.find(dataQa('service-text-input')).at(0);
+
+      serviceKeyInput.simulate('change', { target: { value: 'Sample service key' } });
+      expect(button.getDOMNode().hasAttribute('disabled')).toBe(false);
+    });
   });
 });
