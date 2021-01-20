@@ -193,5 +193,5 @@ export const getInitialValues = (alertRule: AlertRule): AddAlertRuleFormValues =
   };
 };
 
-export const minValidator = (min: number) => (value: any) =>
+export const minValidator = (min: number) => (value: any): undefined | string =>
   value >= min ? undefined : `Must be greather than or equal to ${min}`;
