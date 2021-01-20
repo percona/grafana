@@ -9,7 +9,7 @@ import { Messages } from './IntegratedAlerting.messages';
 import { getStyles } from './IntegratedAlerting.styles';
 import { TabKeys } from './IntegratedAlerting.types';
 import { Alerts, AlertRuleTemplate, AlertRules, NotificationChannel } from './components';
-import { DEFAULT_TAB } from './integratedAlerting.constants';
+import { DEFAULT_TAB } from './IntegratedAlerting.constants';
 
 const tabs = [
   {
