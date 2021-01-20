@@ -111,17 +111,7 @@ $mobile-menu-breakpoint: md;
             white-space: nowrap;
             width: 100%;
           }
-          // lets put an arrow right
-          // to the inner li\`s with dropdowns
-          &::before {
-            width: 0;
-            height: 0;
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            border-left: 5px solid #ffa500;
-          }
-          // every dropdown after the
-          // first must open to the right
+          // every dropdown after the first must open to the right
           ul {
             top: -2%;
             left: 100%;
@@ -129,8 +119,7 @@ $mobile-menu-breakpoint: md;
           }
         }
       }
-      // on hover an li (not an <a>)
-      // must show its ul (dropdown)
+      // on hover an li (not an <a>) must show its ul (dropdown)
       &:hover {
         > ul {
           opacity: 1;
