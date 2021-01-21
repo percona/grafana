@@ -21,5 +21,4 @@ export const SEVERITY_OPTIONS = [
   },
 ];
 
-// Seconds
 export const MINIMUM_DURATION_VALUE = 1;
