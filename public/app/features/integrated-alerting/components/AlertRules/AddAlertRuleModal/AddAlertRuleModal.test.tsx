@@ -79,7 +79,7 @@ describe('AddAlertRuleModal', () => {
   it('should enable the submit button if all fields are valid', () => {
     const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
 
-    const thresholdInput = wrapper.find('#input-threshold-id');
+    const thresholdInput = wrapper.find(dataQa('threshold-text-input'));
     thresholdInput.simulate('change', {
       target: {
         value: '2',
@@ -92,8 +92,8 @@ describe('AddAlertRuleModal', () => {
 
   it('should disable the submit button if a negative duration is inserted', () => {
     const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
-    const thresholdInput = wrapper.find('#input-threshold-id');
-    const durationInput = wrapper.find('#input-duration-id');
+    const thresholdInput = wrapper.find(dataQa('threshold-text-input'));
+    const durationInput = wrapper.find(dataQa('duration-number-input'));
 
     thresholdInput.simulate('change', {
       target: {
