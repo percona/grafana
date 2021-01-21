@@ -31,6 +31,7 @@ import { NotificationChannelService } from '../../NotificationChannel/Notificati
 import { appEvents } from 'app/core/core';
 
 const { required } = validators;
+const durationValidators = [required, minValidator(MINIMUM_DURATION_VALUE)];
 
 export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible, alertRule }) => {
   const styles = useStyles(getStyles);
@@ -116,7 +117,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               inputProps={{ min: MINIMUM_DURATION_VALUE }}
               label={Messages.durationField}
               name="duration"
-              validators={[required, minValidator(MINIMUM_DURATION_VALUE)]}
+              validators={durationValidators}
             />
 
             <Field name="severity" validate={required}>
