@@ -4,8 +4,17 @@ import { dataQa } from '@percona/platform-core';
 import { AddAlertRuleModal } from './AddAlertRuleModal';
 import { AlertRule } from '../AlertRules.types';
 
+jest.mock('../AlertRules.service');
 jest.mock('../../AlertRuleTemplate/AlertRuleTemplate.service');
 jest.mock('../../NotificationChannel/NotificationChannel.service');
+
+jest.mock('app/core/app_events', () => {
+  return {
+    appEvents: {
+      emit: jest.fn(),
+    },
+  };
+});
 
 describe('AddAlertRuleModal', () => {
   const initialValues: AlertRule = {
@@ -36,12 +45,28 @@ describe('AddAlertRuleModal', () => {
     },
   };
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should correctly render modal', () => {
     const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
 
     expect(wrapper.find(dataQa('add-alert-rule-modal')).exists()).toBeTruthy();
     expect(wrapper.find(dataQa('add-alert-rule-modal-form')).exists()).toBeTruthy();
     expect(wrapper.find(dataQa('add-alert-rule-modal-add-button')).exists()).toBeTruthy();
+  });
+
+  it('doesn not render the modal when visible is set to false', async () => {
+    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible={false} />);
+
+    expect(wrapper.find(dataQa('add-alert-rule-modal-form')).length).toBe(0);
+  });
+
+  it('renders the modal when visible is set to true', async () => {
+    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+
+    expect(wrapper.find(dataQa('add-alert-rule-modal-form')).length).toBe(1);
   });
 
   it('should have the submit button disabled by default when adding a new rule', () => {
