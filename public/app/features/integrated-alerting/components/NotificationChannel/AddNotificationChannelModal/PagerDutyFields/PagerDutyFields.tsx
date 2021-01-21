@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { TextInputField } from '@percona/platform-core';
+import { TextInputField, validators } from '@percona/platform-core';
 import { Messages } from '../AddNotificationChannelModal.messages';
 import { PagerDutyFieldsProps } from './PagerDutyFields.types';
 
@@ -7,7 +7,10 @@ import { PagerDutyFieldsProps } from './PagerDutyFields.types';
  * This is a validator factory.
  * Given a key, return a validator that will check if there's anything there.
  */
-const anotherKeyRequired = (complementaryKey: string) => (value: any, allValues: any): undefined | string => {
+const anotherKeyRequired = (complementaryKey: string): validators.Validator => (
+  value: any,
+  allValues: Record<string, any>
+): undefined | string => {
   if (allValues[complementaryKey]) {
     // The complementary field is there, we're good to go without errors
     return undefined;
