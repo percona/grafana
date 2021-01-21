@@ -9,15 +9,11 @@ import { PagerDutyFieldsProps } from './PagerDutyFields.types';
  */
 const anotherKeyRequired = (complementaryKey: string) => (value: any, allValues: any): undefined | string => {
   if (allValues[complementaryKey]) {
-    /**
-     * The complementary field is there, we're good to go without errors
-     */
+    // The complementary field is there, we're good to go without errors
     return undefined;
   }
 
-  /**
-   * The complementary field is missing, we must check if this field is empty before signalling an error
-   */
+  // The complementary field is missing, we must check if this field is empty before signalling an error
   return value ? undefined : Messages.routingOrServiceKeyRequired;
 };
 
