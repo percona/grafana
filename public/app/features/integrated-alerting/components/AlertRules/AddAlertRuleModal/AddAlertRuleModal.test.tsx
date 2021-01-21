@@ -57,7 +57,7 @@ describe('AddAlertRuleModal', () => {
     expect(wrapper.find(dataQa('add-alert-rule-modal-add-button')).exists()).toBeTruthy();
   });
 
-  it('doesn not render the modal when visible is set to false', async () => {
+  it('does not render the modal when visible is set to false', async () => {
     const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible={false} />);
 
     expect(wrapper.find(dataQa('add-alert-rule-modal-form')).length).toBe(0);
