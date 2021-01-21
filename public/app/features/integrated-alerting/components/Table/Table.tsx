@@ -1,14 +1,19 @@
 import React, { FC } from 'react';
-import { useTable } from 'react-table';
+import { useTable, usePagination, TableState } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
-import { TableProps } from './Table.types';
+import { TableProps, ExtendedTableInstance } from './Table.types';
+import { PAGE_SIZES } from './Table.constants';
 
 export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage }) => {
   const style = useStyles(getStyles);
-  const tableInstance = useTable({ columns, data });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+  const initialState: Partial<TableState> = {
+    pageIndex: 0,
+    pageSize: PAGE_SIZES[0],
+  } as Partial<TableState>;
+  const tableInstance = useTable({ columns, data, initialState }, usePagination) as ExtendedTableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow, pageCount } = tableInstance;
 
   return (
     <div className={style.tableWrap} data-qa="table-outer-wrapper">
@@ -18,12 +23,12 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
             <Spinner />
           </div>
         ) : null}
-        {!rows.length && !pendingRequest ? (
+        {!pageCount && !pendingRequest ? (
           <div data-qa="table-no-data" className={style.empty}>
             {<h1>{emptyMessage}</h1>}
           </div>
         ) : null}
-        {rows.length && !pendingRequest ? (
+        {pageCount && !pendingRequest ? (
           <table {...getTableProps()} data-qa="table">
             <thead data-qa="table-thead">
               {headerGroups.map(headerGroup => (
@@ -43,7 +48,7 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
               ))}
             </thead>
             <tbody {...getTableBodyProps()} data-qa="table-tbody">
-              {rows.map(row => {
+              {page.map(row => {
                 prepareRow(row);
                 return (
                   <tr {...row.getRowProps()}>
