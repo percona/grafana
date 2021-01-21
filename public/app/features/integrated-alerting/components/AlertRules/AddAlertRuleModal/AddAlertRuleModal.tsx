@@ -32,6 +32,7 @@ import { appEvents } from 'app/core/core';
 
 const { required } = validators;
 const durationValidators = [required, minValidator(MINIMUM_DURATION_VALUE)];
+const nameValidators = [required];
 
 export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible, alertRule }) => {
   const styles = useStyles(getStyles);
@@ -107,7 +108,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                   )}
                 </Field>
 
-                <TextInputField label={Messages.nameField} name="name" validators={[required]} />
+                <TextInputField label={Messages.nameField} name="name" validators={nameValidators} />
               </>
             )}
 
