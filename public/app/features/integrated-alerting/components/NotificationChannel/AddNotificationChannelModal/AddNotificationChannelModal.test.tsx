@@ -13,11 +13,8 @@ jest.mock('app/core/app_events');
 /**
  * Return this form's "Add" button
  */
-const findFormButton = (wrapper: ReactWrapper): ReactWrapper =>
-  wrapper
-    .find(dataQa('notification-channel-add-button'))
-    .find('button')
-    .at(0);
+const findFormButton = (wrapper: ReactWrapper) =>
+  wrapper.find(dataQa('notification-channel-add-button')).find('button');
 
 /**
  * Given a type, return the matching element.
@@ -110,40 +107,39 @@ fdescribe('AddNotificationChannelModal', () => {
     const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
     const button = findFormButton(wrapper);
 
-    expect(button.getDOMNode().hasAttribute('disabled')).toBe(true);
+    expect(button.props().disabled).toBeTruthy();
   });
 
   describe('Pager Duty option', () => {
     it('should have the submit button disabled if both routing and service keys are empty', () => {
       const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
-      const button = findFormButton(wrapper);
 
       fillNameAndType(wrapper, NotificationChannelType.pagerDuty);
-      expect(button.getDOMNode().hasAttribute('disabled')).toBe(true);
+
+      const button = findFormButton(wrapper);
+      expect(button.props().disabled).toBeTruthy();
     });
 
     it('should enable submit button if only routing key is provided', () => {
       const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
-      const button = findFormButton(wrapper);
-
       fillNameAndType(wrapper, NotificationChannelType.pagerDuty);
 
       const routingKeyInput = wrapper.find(dataQa('routing-text-input')).at(0);
-
       routingKeyInput.simulate('change', { target: { value: 'Sample routing key' } });
-      expect(button.getDOMNode().hasAttribute('disabled')).toBe(false);
+
+      const button = findFormButton(wrapper);
+      expect(button.props().disabled).toBeFalsy();
     });
 
     it('should enable submit button if only service key is provided', () => {
       const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
-      const button = findFormButton(wrapper);
-
       fillNameAndType(wrapper, NotificationChannelType.pagerDuty);
 
       const serviceKeyInput = wrapper.find(dataQa('service-text-input')).at(0);
-
       serviceKeyInput.simulate('change', { target: { value: 'Sample service key' } });
-      expect(button.getDOMNode().hasAttribute('disabled')).toBe(false);
+
+      const button = findFormButton(wrapper);
+      expect(button.props().disabled).toBeFalsy();
     });
   });
 });
