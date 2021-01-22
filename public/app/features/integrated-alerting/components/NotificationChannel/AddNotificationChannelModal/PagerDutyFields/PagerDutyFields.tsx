@@ -10,7 +10,7 @@ import { PagerDutyFieldsProps } from './PagerDutyFields.types';
 const anotherKeyRequired = (complementaryKey: string): validators.Validator => (
   value: any,
   allValues: Record<string, any>
-): undefined | string => {
+) => {
   if (allValues[complementaryKey]) {
     // The complementary field is there, we're good to go without errors
     return undefined;
