@@ -21,6 +21,9 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
     prepareRow,
     pageCount,
     setPageSize,
+    gotoPage,
+    previousPage,
+    nextPage,
     state: { pageSize, pageIndex },
   } = tableInstance;
   const leftItemNumber = pageIndex * pageSize + 1;
@@ -77,7 +80,7 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
       </div>
       <div className={style.pagination} data-qa="pagination">
         <span>
-          Rows per page:
+          {'Rows per page:'}
           <select value={pageSize} onChange={e => setPageSize(+e.target.value)}>
             {PAGE_SIZES.map(size => (
               <option key={size} value={size}>
@@ -86,7 +89,15 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
             ))}
           </select>
         </span>
-        <span>{`Showing ${leftItemNumber}-${rightItemNumber} of ${data.length}`}</span>
+        <span>
+          {`Showing ${leftItemNumber}-${rightItemNumber} of ${data.length}`}
+          <span>
+            <button onClick={() => gotoPage(0)}>{'<<'}</button>
+            <button onClick={() => previousPage()}>{'<'}</button>
+            <button onClick={() => nextPage()}>{'>'}</button>
+            <button onClick={() => gotoPage(pageCount - 1)}>{'>>'}</button>
+          </span>
+        </span>
       </div>
     </>
   );
