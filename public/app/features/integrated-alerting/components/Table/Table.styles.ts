@@ -81,5 +81,9 @@ export const getStyles = (theme: GrafanaTheme) => {
       align-items: center;
       border: 1px solid ${backgroundColorBody};
     `,
+    pagination: css`
+      display: flex;
+      justify-content: space-between;
+    `,
   };
 };
