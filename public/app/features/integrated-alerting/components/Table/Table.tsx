@@ -24,6 +24,8 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
     gotoPage,
     previousPage,
     nextPage,
+    canPreviousPage,
+    canNextPage,
     state: { pageSize, pageIndex },
   } = tableInstance;
   const leftItemNumber = pageIndex * pageSize + 1;
@@ -92,10 +94,18 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
         <span>
           {`Showing ${leftItemNumber}-${rightItemNumber} of ${data.length}`}
           <span>
-            <button onClick={() => gotoPage(0)}>{'<<'}</button>
-            <button onClick={() => previousPage()}>{'<'}</button>
-            <button onClick={() => nextPage()}>{'>'}</button>
-            <button onClick={() => gotoPage(pageCount - 1)}>{'>>'}</button>
+            <button disabled={!canPreviousPage} onClick={() => gotoPage(0)}>
+              {'<<'}
+            </button>
+            <button disabled={!canPreviousPage} onClick={() => previousPage()}>
+              {'<'}
+            </button>
+            <button disabled={!canNextPage} onClick={() => nextPage()}>
+              {'>'}
+            </button>
+            <button disabled={!canNextPage} onClick={() => gotoPage(pageCount - 1)}>
+              {'>>'}
+            </button>
           </span>
         </span>
       </div>
