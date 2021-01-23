@@ -2,6 +2,7 @@ import React, { FC, useState, useMemo } from 'react';
 import { useStyles } from '@grafana/ui';
 import { PaginationProps } from './Pagination.types';
 import { getStyles } from './Pagination.styles';
+import { Messages } from './Pagination.messages';
 
 export const Pagination: FC<PaginationProps> = ({
   pageCount,
@@ -47,7 +48,7 @@ export const Pagination: FC<PaginationProps> = ({
   return (
     <div className={style.pagination} data-qa="pagination">
       <span>
-        {'Rows per page:'}
+        {Messages.ROWS_PER_PAGE}
         <select value={pageSize} onChange={e => onPageSizeChange(+e.target.value)}>
           {pageSizeOptions.map(size => (
             <option key={size} value={size}>
