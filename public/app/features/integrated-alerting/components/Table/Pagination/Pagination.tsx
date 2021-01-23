@@ -1,7 +1,19 @@
 import React, { FC, useState, useMemo } from 'react';
+import { useStyles } from '@grafana/ui';
 import { PaginationProps } from './Pagination.types';
+import { getStyles } from './Pagination.styles';
 
-export const Pagination: FC<PaginationProps> = ({ pageCount, initialPageIndex, pagesPerView, onPageChange }) => {
+export const Pagination: FC<PaginationProps> = ({
+  pageCount,
+  initialPageIndex,
+  pageSize,
+  pagesPerView,
+  nrRowsOnCurrentPage,
+  totalItems,
+  pageSizeOptions,
+  onPageChange,
+  onPageSizeChange,
+}) => {
   // Zero pages probably won't make the pagination show up, but here we should be agnostic to that
   pageCount = Math.max(pageCount, 1);
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
@@ -18,6 +30,9 @@ export const Pagination: FC<PaginationProps> = ({ pageCount, initialPageIndex, p
     firstPageIndex = lastPageIndex - maxVisiblePages;
   }
   const shownPages = pageArray.slice(firstPageIndex, lastPageIndex);
+  const leftItemNumber = activePageIndex * pageSize + 1;
+  const rightItemNumber = activePageIndex * pageSize + nrRowsOnCurrentPage;
+  const style = useStyles(getStyles);
 
   const gotoPage = (pageIndex: number) => {
     if (pageIndex < 0) {
@@ -30,28 +45,43 @@ export const Pagination: FC<PaginationProps> = ({ pageCount, initialPageIndex, p
   };
 
   return (
-    <div data-qa="pagination">
-      <button disabled={activePageIndex === 0} onClick={() => gotoPage(0)}>
-        {'<<'}
-      </button>
-      <button disabled={activePageIndex === 0} onClick={() => gotoPage(activePageIndex - 1)} className="prev-page">
-        {'<'}
-      </button>
-      {shownPages.map(page => (
-        <button onClick={() => gotoPage(page)} key={page} className={activePageIndex === page ? 'active' : ''}>
-          {page + 1}
-        </button>
-      ))}
-      <button
-        disabled={activePageIndex === pageCount - 1}
-        onClick={() => gotoPage(activePageIndex + 1)}
-        className="next-page"
-      >
-        {'>'}
-      </button>
-      <button disabled={activePageIndex === pageCount - 1} onClick={() => gotoPage(pageCount - 1)}>
-        {'>>'}
-      </button>
+    <div className={style.pagination} data-qa="pagination">
+      <span>
+        {'Rows per page:'}
+        <select value={pageSize} onChange={e => onPageSizeChange(+e.target.value)}>
+          {pageSizeOptions.map(size => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
+      </span>
+      <span>
+        {`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems}`}
+        <span>
+          <button disabled={activePageIndex === 0} onClick={() => gotoPage(0)}>
+            {'<<'}
+          </button>
+          <button disabled={activePageIndex === 0} onClick={() => gotoPage(activePageIndex - 1)} className="prev-page">
+            {'<'}
+          </button>
+          {shownPages.map(page => (
+            <button onClick={() => gotoPage(page)} key={page} className={activePageIndex === page ? 'active' : ''}>
+              {page + 1}
+            </button>
+          ))}
+          <button
+            disabled={activePageIndex === pageCount - 1}
+            onClick={() => gotoPage(activePageIndex + 1)}
+            className="next-page"
+          >
+            {'>'}
+          </button>
+          <button disabled={activePageIndex === pageCount - 1} onClick={() => gotoPage(pageCount - 1)}>
+            {'>>'}
+          </button>
+        </span>
+      </span>
     </div>
   );
 };

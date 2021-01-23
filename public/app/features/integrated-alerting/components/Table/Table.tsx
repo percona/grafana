@@ -23,10 +23,8 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
     pageCount,
     setPageSize,
     gotoPage,
-    state: { pageSize, pageIndex },
+    state: { pageSize },
   } = tableInstance;
-  const leftItemNumber = pageIndex * pageSize + 1;
-  const rightItemNumber = pageIndex * pageSize + page.length;
 
   return (
     <>
@@ -77,27 +75,16 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
           ) : null}
         </div>
       </div>
-      <div className={style.pagination} data-qa="pagination">
-        <span>
-          {'Rows per page:'}
-          <select value={pageSize} onChange={e => setPageSize(+e.target.value)}>
-            {PAGE_SIZES.map(size => (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            ))}
-          </select>
-        </span>
-        <span>
-          {`Showing ${leftItemNumber}-${rightItemNumber} of ${data.length}`}
-          <Pagination
-            pagesPerView={3}
-            pageCount={pageCount}
-            initialPageIndex={0}
-            onPageChange={pageIndex => gotoPage(pageIndex)}
-          />
-        </span>
-      </div>
+      <Pagination
+        pageCount={pageCount}
+        initialPageIndex={0}
+        totalItems={data.length}
+        pageSizeOptions={PAGE_SIZES}
+        pageSize={pageSize}
+        nrRowsOnCurrentPage={page.length}
+        onPageChange={pageIndex => gotoPage(pageIndex)}
+        onPageSizeChange={pageSize => setPageSize(pageSize)}
+      />
     </>
   );
 };
