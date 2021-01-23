@@ -5,6 +5,7 @@ import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps, ExtendedTableInstance } from './Table.types';
 import { PAGE_SIZES } from './Table.constants';
+import { Pagination } from './Pagination';
 
 export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage }) => {
   const style = useStyles(getStyles);
@@ -22,10 +23,6 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
     pageCount,
     setPageSize,
     gotoPage,
-    previousPage,
-    nextPage,
-    canPreviousPage,
-    canNextPage,
     state: { pageSize, pageIndex },
   } = tableInstance;
   const leftItemNumber = pageIndex * pageSize + 1;
@@ -93,20 +90,12 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
         </span>
         <span>
           {`Showing ${leftItemNumber}-${rightItemNumber} of ${data.length}`}
-          <span>
-            <button disabled={!canPreviousPage} onClick={() => gotoPage(0)}>
-              {'<<'}
-            </button>
-            <button disabled={!canPreviousPage} onClick={() => previousPage()}>
-              {'<'}
-            </button>
-            <button disabled={!canNextPage} onClick={() => nextPage()}>
-              {'>'}
-            </button>
-            <button disabled={!canNextPage} onClick={() => gotoPage(pageCount - 1)}>
-              {'>>'}
-            </button>
-          </span>
+          <Pagination
+            pagesPerView={3}
+            pageCount={pageCount}
+            initialPageIndex={0}
+            onPageChange={pageIndex => gotoPage(pageIndex)}
+          />
         </span>
       </div>
     </>
