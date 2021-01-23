@@ -90,6 +90,6 @@ export const Pagination: FC<PaginationProps> = ({
 Pagination.defaultProps = {
   pageCount: 1,
   initialPageIndex: 0,
-  pagesPerView: 1,
+  pagesPerView: 3,
   onPageChange: () => 0,
 };

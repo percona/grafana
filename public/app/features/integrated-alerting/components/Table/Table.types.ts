@@ -5,6 +5,7 @@ export interface TableProps {
   columns: Column[];
   pendingRequest?: boolean;
   emptyMessage?: string;
+  totalItems: number;
 }
 
 interface ExtendedTableState extends TableState {

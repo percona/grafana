@@ -75,7 +75,13 @@ export const NotificationChannel: FC = () => {
           {Messages.addAction}
         </Button>
       </div>
-      <Table data={data} columns={columns} pendingRequest={pendingRequest} emptyMessage={emptyTable} />
+      <Table
+        data={data}
+        columns={columns}
+        pendingRequest={pendingRequest}
+        emptyMessage={emptyTable}
+        totalItems={data.length}
+      />
       <AddNotificationChannelModal
         isVisible={addModalVisible}
         setVisible={setAddModalVisible}

@@ -7,7 +7,7 @@ import { TableProps, ExtendedTableInstance } from './Table.types';
 import { PAGE_SIZES } from './Table.constants';
 import { Pagination } from './Pagination';
 
-export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage }) => {
+export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage, totalItems }) => {
   const style = useStyles(getStyles);
   const initialState: Partial<TableState> = {
     pageIndex: 0,
@@ -78,7 +78,7 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
       <Pagination
         pageCount={pageCount}
         initialPageIndex={0}
-        totalItems={data.length}
+        totalItems={totalItems}
         pageSizeOptions={PAGE_SIZES}
         pageSize={pageSize}
         nrRowsOnCurrentPage={page.length}
