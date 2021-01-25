@@ -38,4 +38,24 @@ describe('PagerDutyFields', () => {
     expect(serviceKeyTypeButton.props().checked).toBeTruthy();
     expect(wrapper.find(dataQa('service-text-input')).exists()).toBeTruthy();
   });
+
+  it('should call the mutator with a cross-field reference', () => {
+    const mutatorSpy = jest.fn();
+    const values = {
+      name: 'test name',
+      type: { value: NotificationChannelType.pagerDuty, label: 'test label' },
+      keyType: PagerDutyKeyType.service,
+    };
+    const wrapper = mount(
+      <Form
+        onSubmit={jest.fn()}
+        render={() => <PagerDutyFields values={values} mutators={{ resetKey: mutatorSpy }} />}
+      />
+    );
+
+    const keyTypeRadioButtons = wrapper.find(dataQa('keyType-radio-button'));
+    const routingKeyTypeButton = keyTypeRadioButtons.first();
+    routingKeyTypeButton.simulate('input');
+    expect(mutatorSpy).toHaveBeenCalled();
+  });
 });
