@@ -55,7 +55,7 @@ describe('BreadcrumbSections', () => {
     (useSelector as jest.Mock).mockClear();
   });
 
-  it('renders breadcrumb sections', async () => {
+  it('renders breadcrumb sections with correct URLs', async () => {
     let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
     await act(async () => {
@@ -69,10 +69,14 @@ describe('BreadcrumbSections', () => {
         .at(0)
         .text()
     ).toEqual('Root / Child 1');
+  });
 
+  it('renders breadcrumb sections with noncorrect URLs', async () => {
     (useSelector as jest.Mock).mockImplementation(callback => {
       return callback({ location: { path: '/root/child-two/leaf-one' } });
     });
+
+    let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
     await act(async () => {
       wrapper = mount(<BreadcrumbSections pageModel={pageModel} />);
