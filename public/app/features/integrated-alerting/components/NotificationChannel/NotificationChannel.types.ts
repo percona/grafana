@@ -78,3 +78,5 @@ export interface NotificationChannelRenderProps {
   service?: string;
   channel?: string;
 }
+
+export type MutatorKeys = 'resetKey';

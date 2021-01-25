@@ -1,6 +1,6 @@
-import { NotificationChannelRenderProps } from '../../NotificationChannel.types';
+import { NotificationChannelRenderProps, MutatorKeys } from '../../NotificationChannel.types';
 
 export interface PagerDutyFieldsProps {
   values: NotificationChannelRenderProps;
-  mutators: Record<string, (...args: any[]) => any>;
+  mutators: Record<MutatorKeys, (...args: any[]) => any>;
 }

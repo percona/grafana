@@ -5,7 +5,7 @@ import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextInputField, validators, logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/core';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
-import { NotificationChannelRenderProps, PagerDutyKeyType } from '../NotificationChannel.types';
+import { MutatorKeys, NotificationChannelRenderProps, PagerDutyKeyType } from '../NotificationChannel.types';
 import { AddNotificationChannelModalProps } from './AddNotificationChannelModal.types';
 import { getStyles } from './AddNotificationChannelModal.styles';
 import { Messages } from './AddNotificationChannelModal.messages';
@@ -50,7 +50,10 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
     []
   );
 
-  const mutators: Record<string, Mutator<NotificationChannelRenderProps, Partial<NotificationChannelRenderProps>>> = {
+  const mutators: Record<
+    MutatorKeys,
+    Mutator<NotificationChannelRenderProps, Partial<NotificationChannelRenderProps>>
+  > = {
     /**
      * Insead of just resetting the value to '', we'll use the initial value
      * This way, it keeps working on edition mode
