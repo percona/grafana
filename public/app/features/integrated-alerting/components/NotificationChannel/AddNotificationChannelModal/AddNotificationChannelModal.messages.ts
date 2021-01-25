@@ -18,5 +18,4 @@ export const Messages = {
   addSuccess: 'Notification channel was successfully added',
   editSuccess: 'Notification channel was successfully edited',
   invalidChannelName: "Channel shouldn't have # character.",
-  routingOrServiceKeyRequired: 'Either Routing key or Service key is required',
 };
