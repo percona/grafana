@@ -1,30 +1,19 @@
 import React, { FC } from 'react';
-import { TextInputField, validators } from '@percona/platform-core';
+import { RadioButtonGroupField, TextInputField } from '@percona/platform-core';
 import { Messages } from '../AddNotificationChannelModal.messages';
 import { PagerDutyFieldsProps } from './PagerDutyFields.types';
+import { PagerDutyKeyType } from '../../NotificationChannel.types';
+import { PAGER_DUTY_TYPE_OPTIONS } from '../AddNotificationChannel.constants';
 
-/**
- * This is a validator factory.
- * Given a key, return a validator that will check if there's anything there.
- */
-const anotherKeyRequired = (complementaryKey: string): validators.Validator => (
-  value: any,
-  allValues: Record<string, any>
-) => {
-  if (allValues[complementaryKey]) {
-    // The complementary field is there, we're good to go without errors
-    return undefined;
-  }
-
-  // The complementary field is missing, we must check if this field is empty before signalling an error
-  return value ? undefined : Messages.routingOrServiceKeyRequired;
-};
-
-export const PagerDutyFields: FC<PagerDutyFieldsProps> = () => {
+export const PagerDutyFields: FC<PagerDutyFieldsProps> = ({ values }) => {
   return (
     <>
-      <TextInputField name="routing" label={Messages.fields.routingKey} validators={[anotherKeyRequired('service')]} />
-      <TextInputField name="service" label={Messages.fields.serviceKey} validators={[anotherKeyRequired('routing')]} />
+      <RadioButtonGroupField name="keyType" options={PAGER_DUTY_TYPE_OPTIONS} fullWidth />
+      {values.keyType === PagerDutyKeyType.routing ? (
+        <TextInputField name="routing-key" label={Messages.fields.routingKey} />
+      ) : (
+        <TextInputField name="service-key" label={Messages.fields.serviceKey} />
+      )}
     </>
   );
 };
