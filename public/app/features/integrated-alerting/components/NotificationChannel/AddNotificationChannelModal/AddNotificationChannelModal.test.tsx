@@ -5,6 +5,7 @@ import { dataQa } from '@percona/platform-core';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
 import { notificationChannelStubs } from '../__mocks__/notificationChannelStubs';
+import { NotificationChannelType, PagerDutylNotificationChannel } from '../NotificationChannel.types';
 
 jest.mock('../NotificationChannel.service');
 jest.mock('app/core/app_events');
@@ -14,6 +15,40 @@ jest.mock('app/core/app_events');
  */
 const findFormButton = (wrapper: ReactWrapper) =>
   wrapper.find(dataQa('notification-channel-add-button')).find('button');
+
+/**
+ * Given a type, return the matching element.
+ * The element returned is the one that's actually clickable and that triggers the change
+ */
+const findTypeOption = (wrapper: ReactWrapper, type: NotificationChannelType): ReactWrapper => {
+  const menuOptions = wrapper.find({ 'aria-label': 'Select option' });
+  const matchingOption = TYPE_OPTIONS.find(option => option.value === type);
+
+  return menuOptions.filterWhere(node => node.text() === matchingOption.label);
+};
+
+/**
+ * Fill the form with a name and a notification channel type
+ */
+const fillNameAndType = (wrapper: ReactWrapper, type: NotificationChannelType, name = 'John Doe') => {
+  const inputs = wrapper.find('input');
+  const nameInput = inputs.at(0);
+  const typeInput = inputs.at(1);
+
+  nameInput.simulate('change', {
+    target: {
+      value: name,
+    },
+  });
+
+  typeInput.simulate('keydown', {
+    key: 'ArrowDown',
+  });
+
+  const option = findTypeOption(wrapper, type);
+
+  option.simulate('click');
+};
 
 describe('AddNotificationChannelModal', () => {
   it('should render modal with correct fields', () => {
@@ -73,5 +108,38 @@ describe('AddNotificationChannelModal', () => {
     const button = findFormButton(wrapper);
 
     expect(button.props().disabled).toBeTruthy();
+  });
+
+  describe('Pager Duty option', () => {
+    const ORIGINAL_ROUTING_KEY = 'example_key';
+    const CHANGED_ROUTING_KEY = 'changed_key';
+    const channel: PagerDutylNotificationChannel = {
+      type: NotificationChannelType.pagerDuty,
+      channelId: '',
+      summary: '',
+      disabled: false,
+      sendResolved: false,
+      routingKey: ORIGINAL_ROUTING_KEY,
+      serviceKey: '',
+    };
+
+    it('should reset service/routing keys when radios are clicked', () => {
+      const wrapper = mount(
+        <AddNotificationChannelModal setVisible={jest.fn()} isVisible notificationChannel={channel} />
+      );
+
+      const keyTypeRadioButtons = wrapper.find(dataQa('keyType-radio-button'));
+      const routingKeyTypeButton = keyTypeRadioButtons.first();
+      const serviceKeyTypeButton = keyTypeRadioButtons.at(1);
+      let routingKeyInput = wrapper.find(dataQa('routing-text-input'));
+
+      expect(routingKeyInput.props().value).toBe(ORIGINAL_ROUTING_KEY);
+      routingKeyInput.props().value = CHANGED_ROUTING_KEY;
+      expect(routingKeyInput.props().value).toBe(CHANGED_ROUTING_KEY);
+      serviceKeyTypeButton.simulate('input');
+      routingKeyTypeButton.simulate('input');
+      routingKeyInput = wrapper.find(dataQa('routing-text-input'));
+      expect(routingKeyInput.props().value).toBe(ORIGINAL_ROUTING_KEY);
+    });
   });
 });
