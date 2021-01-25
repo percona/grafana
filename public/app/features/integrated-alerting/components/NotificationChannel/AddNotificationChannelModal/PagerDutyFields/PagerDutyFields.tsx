@@ -14,7 +14,7 @@ export const PagerDutyFields: FC<PagerDutyFieldsProps> = ({ values, mutators }) 
       <RadioButtonGroupField
         inputProps={{
           /**
-           * TODO We are relying on "onInput" being called after the form's state values are update.
+           * TODO We are relying on "onInput" being called after the form's state values are updated.
            * It works this way, but we should change platform-core to allow to pass values to the options.
            * That way, we can take the value from the event itself here and call the mutator.
            * Also, it then becomes easier to test this interaction.
