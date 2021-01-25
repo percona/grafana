@@ -8,14 +8,25 @@ import { PAGER_DUTY_TYPE_OPTIONS } from '../AddNotificationChannel.constants';
 const { required } = validators;
 const keyValidator = [required];
 
-export const PagerDutyFields: FC<PagerDutyFieldsProps> = ({ values }) => {
+export const PagerDutyFields: FC<PagerDutyFieldsProps> = ({ values, mutators }) => {
   return (
     <>
-      <RadioButtonGroupField name="keyType" options={PAGER_DUTY_TYPE_OPTIONS} fullWidth />
+      <RadioButtonGroupField
+        inputProps={{
+          onInput: () => {
+            values.keyType === PagerDutyKeyType.routing
+              ? mutators.resetKey(PagerDutyKeyType.service)
+              : mutators.resetKey(PagerDutyKeyType.routing);
+          },
+        }}
+        name="keyType"
+        options={PAGER_DUTY_TYPE_OPTIONS}
+        fullWidth
+      />
       {values.keyType === PagerDutyKeyType.routing ? (
-        <TextInputField name="routingKey" value="" label={Messages.fields.routingKey} validators={keyValidator} />
+        <TextInputField name={PagerDutyKeyType.routing} label={Messages.fields.routingKey} validators={keyValidator} />
       ) : (
-        <TextInputField name="serviceKey" value="" label={Messages.fields.serviceKey} validators={keyValidator} />
+        <TextInputField name={PagerDutyKeyType.service} label={Messages.fields.serviceKey} validators={keyValidator} />
       )}
     </>
   );

@@ -1,19 +1,22 @@
 import React, { FC, useContext, useCallback } from 'react';
-import { Form, Field } from 'react-final-form';
+import { withTypes, Field } from 'react-final-form';
 import { HorizontalGroup, Select, Button, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextInputField, validators, logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/core';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
-import { NotificationChannelRenderProps } from '../NotificationChannel.types';
+import { NotificationChannelRenderProps, PagerDutyKeyType } from '../NotificationChannel.types';
 import { AddNotificationChannelModalProps } from './AddNotificationChannelModal.types';
 import { getStyles } from './AddNotificationChannelModal.styles';
 import { Messages } from './AddNotificationChannelModal.messages';
 import { TYPE_OPTIONS, TYPE_FIELDS_COMPONENT } from './AddNotificationChannel.constants';
 import { NotificationChannelService } from '../NotificationChannel.service';
 import { getInitialValues } from './AddNotificationChannelModal.utils';
+import { Mutator } from 'final-form';
 
 const { required } = validators;
+// Our "values" typings won't be right without using this
+const { Form } = withTypes<NotificationChannelRenderProps>();
 
 export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> = ({
   isVisible,
@@ -37,18 +40,33 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
       logger.error(e);
     }
   };
-  const renderTypeFields = useCallback((values: NotificationChannelRenderProps) => {
-    const TypeFields = TYPE_FIELDS_COMPONENT[values.type.value];
+  const renderTypeFields = useCallback(
+    (values: NotificationChannelRenderProps, mutators: Record<string, (...args: any[]) => any>) => {
+      const TypeFields = TYPE_FIELDS_COMPONENT[values.type.value];
 
-    return <TypeFields values={values} />;
-  }, []);
+      // By passing down the mutators, these fields will be able to call them
+      return <TypeFields values={values} mutators={mutators} />;
+    },
+    []
+  );
+
+  const mutators: Record<string, Mutator<NotificationChannelRenderProps, Partial<NotificationChannelRenderProps>>> = {
+    /**
+     * Insead of just resetting the value to '', we'll use the initial value
+     * This way, it keeps working on edition mode
+     */
+    resetKey: ([key]: PagerDutyKeyType[], state, utils) => {
+      utils.changeValue(state, key, () => initialValues[key]);
+    },
+  };
 
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
       <Form
+        mutators={mutators}
         initialValues={initialValues}
         onSubmit={onSubmit}
-        render={({ handleSubmit, valid, pristine, submitting, values }) => (
+        render={({ form, handleSubmit, valid, pristine, submitting, values }) => (
           <form onSubmit={handleSubmit}>
             <>
               <TextInputField name="name" label={Messages.fields.name} validators={[required]} />
@@ -62,7 +80,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
                   </>
                 )}
               </Field>
-              {renderTypeFields(values)}
+              {renderTypeFields(values, form.mutators)}
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="notification-channel-add-button"
