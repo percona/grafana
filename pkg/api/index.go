@@ -129,67 +129,77 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 	}
 
 	inventoryChildNavs := []*dtos.NavLink{
-		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/d/pmm-inventory/pmm-inventory", Icon: "home-alt", HideFromTabs: true},
-		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/d/pmm-add-instance/pmm-add-instance", Icon: "plus", HideFromTabs: true},
+		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/d/pmm-inventory/pmm-inventory", Icon: "percona-inventory", HideFromTabs: true},
+		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/d/pmm-add-instance/pmm-add-instance", Icon: "percona-add", HideFromTabs: true},
+	}
+
+	nodeSummaryChildNavs := []*dtos.NavLink{
+		{Text: "CPU Utilisation", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-cpu", HideFromTabs: true},
+		{Text: "Disk", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-disk", HideFromTabs: true},
+		{Text: "Memory", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-memory", HideFromTabs: true},
+		{Text: "Network", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-network", HideFromTabs: true},
+		{Text: "Temperature", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-temperature", HideFromTabs: true},
+		{Text: "NUMA", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-cluster-network", HideFromTabs: true},
+		{Text: "Processes", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-process", HideFromTabs: true},
 	}
 
 	nodeChildNavs := []*dtos.NavLink{
-		{Text: "Node Overview", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-overview/nodes-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "Node Overview", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-overview/nodes-overview", Icon: "percona-cluster-network", HideFromTabs: true},
+		{Text: "Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-summary", HideFromTabs: true, Children: nodeSummaryChildNavs},
 	}
 
 	mysqlHAChildNavs := []*dtos.NavLink{
-		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "ProxySQL Instance Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "ProxySQL Instance Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "percona-cluster", HideFromTabs: true},
 	}
 
 	mysqlChildNavs := []*dtos.NavLink{
-		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true, Children: mysqlHAChildNavs},
-		{Text: "MySQL Overview", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MySQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-summary/mysql-instances-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "HA (High availability)", Id: "home", Icon: "percona-cluster", HideFromTabs: true, Children: mysqlHAChildNavs},
+		{Text: "MySQL Overview", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "percona-cluster-network", HideFromTabs: true},
+		{Text: "MySQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-summary/mysql-instances-summary", Icon: "percona-summary", HideFromTabs: true},
 	}
 
 	mongodbHAChildNavs := []*dtos.NavLink{
-		{Text: "MongoDB Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-cluster-summary/mongodb-cluster-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MongoDB ReplSet Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-replicaset-summary/mongodb-replset-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MongoDB Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-cluster-summary/mongodb-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "MongoDB ReplSet Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-replicaset-summary/mongodb-replset-summary", Icon: "percona-cluster", HideFromTabs: true},
 	}
 
 	mongodbChildNavs := []*dtos.NavLink{
-		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true, Children: mongodbHAChildNavs},
-		{Text: "MongoDB Overview", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MongoDB Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-summary/mongodb-instance-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "HA (High availability)", Id: "home", Icon: "percona-cluster", HideFromTabs: true, Children: mongodbHAChildNavs},
+		{Text: "MongoDB Overview", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "percona-cluster-network", HideFromTabs: true},
+		{Text: "MongoDB Summary", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-summary/mongodb-instance-summary", Icon: "percona-summary", HideFromTabs: true},
 	}
 
 	postgresqlChildNavs := []*dtos.NavLink{
-		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PostgreSQL Overview", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PostgreSQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-summary/postgresql-instances-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "HA (High availability)", Id: "home", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "PostgreSQL Overview", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "percona-cluster-network", HideFromTabs: true},
+		{Text: "PostgreSQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-summary/postgresql-instances-summary", Icon: "percona-summary", HideFromTabs: true},
 	}
 
 	proxysqlHAChildNavs := []*dtos.NavLink{
-		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "home-alt", HideFromTabs: true},
-		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "home-alt", HideFromTabs: true},
+		{Text: "MySQL Group Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "MySQL Replication Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "PXC/Galera Cluster Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "PXC/Galera Node Summary", Id: "home", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "percona-cluster", HideFromTabs: true},
 	}
 
 	proxysqlChildNavs := []*dtos.NavLink{
-		{Text: "HA (High availability)", Id: "home", Icon: "home-alt", HideFromTabs: true, Children: proxysqlHAChildNavs},
-		{Text: "Proxy SQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true},
+		{Text: "HA (High availability)", Id: "home", Icon: "percona-cluster", HideFromTabs: true, Children: proxysqlHAChildNavs},
+		{Text: "Proxy SQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "percona-summary", HideFromTabs: true},
 	}
 
 	pmmChildNavs := []*dtos.NavLink{
-		{Text: "Query Analyics", Id: "home", Url: setting.AppSubUrl + "/d/pmm-qan/pmm-query-analytics", Icon: "home-alt", HideFromTabs: true},
-		{Text: "System (Node)", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-overview/nodes-overview", Icon: "home-alt", HideFromTabs: true, Children: nodeChildNavs},
-		{Text: "MySQL", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: mysqlChildNavs},
-		{Text: "MongoDB", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: mongodbChildNavs},
-		{Text: "PostgreSQL", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "home-alt", HideFromTabs: true, Children: postgresqlChildNavs},
-		{Text: "Proxy SQL", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "home-alt", HideFromTabs: true, Children: proxysqlChildNavs},
+		{Text: "Query Analyics", Id: "home", Url: setting.AppSubUrl + "/d/pmm-qan/pmm-query-analytics", Icon: "percona-analytics", HideFromTabs: true},
+		{Text: "System (Node)", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-overview/nodes-overview", Icon: "percona-cluster-network", HideFromTabs: true, Children: nodeChildNavs},
+		{Text: "MySQL", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: mysqlChildNavs},
+		{Text: "MongoDB", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: mongodbChildNavs},
+		{Text: "PostgreSQL", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: postgresqlChildNavs},
+		{Text: "Proxy SQL", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "percona-database", HideFromTabs: true, Children: proxysqlChildNavs},
 	}
 
 	dashboardChildNavs := []*dtos.NavLink{
@@ -214,7 +224,7 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 		Text:       "PMM dashboards",
 		Id:         "pmm",
 		SubTitle:   "Manage dashboards & folders",
-		Icon:       "apps",
+		Icon:       "percona-dashboard",
 		Url:        setting.AppSubUrl + "/",
 		SortWeight: dtos.WeightDashboard,
 		Children:   pmmChildNavs,
@@ -326,7 +336,7 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 	}
 
 	configNodes := []*dtos.NavLink{
-		{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/", Icon: "home-alt", HideFromTabs: true, Children: inventoryChildNavs},
+		{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/", Icon: "percona-inventory", HideFromTabs: true, Children: inventoryChildNavs},
 		{Text: "Settings", Id: "home", Url: setting.AppSubUrl + "/", Icon: "home-alt", HideFromTabs: true},
 		{Divider: true},
 	}

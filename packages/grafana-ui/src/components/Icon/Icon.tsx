@@ -8,7 +8,30 @@ import { IconName, IconType, IconSize } from '../../types/icon';
 import * as DefaultIcon from '@iconscout/react-unicons';
 import * as MonoIcon from './assets';
 
-const alwaysMonoIcons = ['grafana', 'favorite', 'heart-break', 'heart'];
+const alwaysMonoIcons = [
+  'grafana',
+  'favorite',
+  'heart-break',
+  'heart',
+  'percona-database',
+  'percona-analytics',
+  'percona-cluster',
+  'percona-cluster-network',
+  'percona-cluster-computing',
+  'percona-dashboard',
+  'percona-kubernetes',
+  'percona-summary',
+  'percona-inventory',
+  'percona-add',
+  'percona-alert',
+  'percona-disk',
+  'percona-memory',
+  'percona-temperature',
+  'percona-cpu',
+  'percona-surface',
+  'percona-network',
+  'percona-process',
+];
 
 export interface IconProps extends React.HTMLAttributes<HTMLDivElement> {
   name: IconName;
