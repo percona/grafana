@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { useTable, usePagination, TableState } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
@@ -15,6 +15,7 @@ export const Table: FC<TableProps> = ({
   totalItems,
   totalPages,
   manualPagination,
+  fetchData,
 }) => {
   const style = useStyles(getStyles);
   const initialState: Partial<TableState> = {
@@ -42,8 +43,14 @@ export const Table: FC<TableProps> = ({
     pageCount,
     setPageSize,
     gotoPage,
-    state: { pageSize },
+    state: { pageSize, pageIndex },
   } = tableInstance;
+
+  useEffect(() => {
+    if (manualPagination) {
+      fetchData(pageSize, pageIndex);
+    }
+  }, [fetchData, pageIndex, pageSize]);
 
   return (
     <>
