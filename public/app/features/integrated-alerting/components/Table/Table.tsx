@@ -15,7 +15,7 @@ export const Table: FC<TableProps> = ({
   totalItems,
   totalPages,
   manualPagination,
-  fetchData,
+  onPageChange,
 }) => {
   const style = useStyles(getStyles);
   const initialState: Partial<TableState> = {
@@ -48,9 +48,9 @@ export const Table: FC<TableProps> = ({
 
   useEffect(() => {
     if (manualPagination) {
-      fetchData(pageSize, pageIndex);
+      onPageChange(pageSize, pageIndex);
     }
-  }, [fetchData, pageIndex, pageSize]);
+  }, [onPageChange, pageIndex, pageSize]);
 
   return (
     <>

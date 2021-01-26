@@ -42,6 +42,7 @@ export const NotificationChannel: FC = () => {
     []
   );
 
+  // TODO set totalPages, totalItems as pass them to the table
   const getNotificationChannels = async () => {
     setPendingRequest(true);
     try {
@@ -52,6 +53,9 @@ export const NotificationChannel: FC = () => {
       setPendingRequest(false);
     }
   };
+
+  // TODO Refetch data with new params when API's ready
+  const onPageChange = (pageSize: number, pageIndex: number) => {};
 
   useEffect(() => {
     getNotificationChannels();
@@ -81,6 +85,7 @@ export const NotificationChannel: FC = () => {
         pendingRequest={pendingRequest}
         emptyMessage={emptyTable}
         totalItems={data.length}
+        onPageChange={onPageChange}
       />
       <AddNotificationChannelModal
         isVisible={addModalVisible}
