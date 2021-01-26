@@ -1,4 +1,4 @@
-import { Column, TableInstance, TableState, Row } from 'react-table';
+import { Column, TableInstance, TableState, Row, TableOptions } from 'react-table';
 
 export interface TableProps {
   data: object[];
@@ -6,6 +6,8 @@ export interface TableProps {
   pendingRequest?: boolean;
   emptyMessage?: string;
   totalItems: number;
+  totalPages?: number;
+  manualPagination?: boolean;
 }
 
 interface ExtendedTableState extends TableState {
@@ -23,4 +25,9 @@ export interface ExtendedTableInstance extends TableInstance {
   pageCount: number;
   setPageSize: (size: number) => void;
   state: ExtendedTableState;
+}
+
+export interface ExtendedTableOptions extends TableOptions<object> {
+  manualPagination?: boolean;
+  pageCount?: number;
 }

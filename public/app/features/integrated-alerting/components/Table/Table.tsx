@@ -3,17 +3,36 @@ import { useTable, usePagination, TableState } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
-import { TableProps, ExtendedTableInstance } from './Table.types';
+import { TableProps, ExtendedTableInstance, ExtendedTableOptions } from './Table.types';
 import { PAGE_SIZES } from './Table.constants';
 import { Pagination } from './Pagination';
 
-export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage, totalItems }) => {
+export const Table: FC<TableProps> = ({
+  pendingRequest,
+  data,
+  columns,
+  emptyMessage,
+  totalItems,
+  totalPages,
+  manualPagination,
+}) => {
   const style = useStyles(getStyles);
   const initialState: Partial<TableState> = {
     pageIndex: 0,
     pageSize: PAGE_SIZES[0],
   } as Partial<TableState>;
-  const tableInstance = useTable({ columns, data, initialState }, usePagination) as ExtendedTableInstance;
+  const tableOptions: ExtendedTableOptions = {
+    columns,
+    data,
+    initialState,
+    manualPagination,
+  };
+
+  if (manualPagination) {
+    tableOptions.pageCount = totalPages;
+  }
+
+  const tableInstance = useTable(tableOptions, usePagination) as ExtendedTableInstance;
   const {
     getTableProps,
     getTableBodyProps,
