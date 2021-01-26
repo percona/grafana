@@ -134,13 +134,13 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 	}
 
 	nodeSummaryChildNavs := []*dtos.NavLink{
-		{Text: "CPU Utilisation", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-cpu", HideFromTabs: true},
-		{Text: "Disk", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-disk", HideFromTabs: true},
-		{Text: "Memory", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-memory", HideFromTabs: true},
-		{Text: "Network", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-network", HideFromTabs: true},
-		{Text: "Temperature", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-temperature", HideFromTabs: true},
-		{Text: "NUMA", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-cluster-network", HideFromTabs: true},
-		{Text: "Processes", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-summary/node-summary", Icon: "percona-process", HideFromTabs: true},
+		{Text: "CPU Utilisation", Id: "home", Url: setting.AppSubUrl + "/d/node-cpu/cpu-utilization-details", Icon: "percona-cpu", HideFromTabs: true},
+		{Text: "Disk", Id: "home", Url: setting.AppSubUrl + "/d/node-disk/disk-details", Icon: "percona-disk", HideFromTabs: true},
+		{Text: "Memory", Id: "home", Url: setting.AppSubUrl + "/d/node-memory/memory-details", Icon: "percona-memory", HideFromTabs: true},
+		{Text: "Network", Id: "home", Url: setting.AppSubUrl + "/d/node-network/network-details", Icon: "percona-network", HideFromTabs: true},
+		{Text: "Temperature", Id: "home", Url: setting.AppSubUrl + "/d/node-temp/node-temperature-details", Icon: "percona-temperature", HideFromTabs: true},
+		{Text: "NUMA", Id: "home", Url: setting.AppSubUrl + "/d/node-memory-numa/numa-details", Icon: "percona-cluster-network", HideFromTabs: true},
+		{Text: "Processes", Id: "home", Url: setting.AppSubUrl + "/d/node-cpu-process/processes-details", Icon: "percona-process", HideFromTabs: true},
 	}
 
 	nodeChildNavs := []*dtos.NavLink{
@@ -337,7 +337,7 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 
 	configNodes := []*dtos.NavLink{
 		{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/", Icon: "percona-inventory", HideFromTabs: true, Children: inventoryChildNavs},
-		{Text: "Settings", Id: "home", Url: setting.AppSubUrl + "/", Icon: "home-alt", HideFromTabs: true},
+		{Text: "Settings", Id: "home", Url: setting.AppSubUrl + "/", Icon: "percona-setting", HideFromTabs: true},
 		{Divider: true},
 	}
 

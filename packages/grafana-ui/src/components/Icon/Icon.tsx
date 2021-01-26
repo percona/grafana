@@ -31,6 +31,7 @@ const alwaysMonoIcons = [
   'percona-surface',
   'percona-network',
   'percona-process',
+  'percona-setting',
 ];
 
 export interface IconProps extends React.HTMLAttributes<HTMLDivElement> {

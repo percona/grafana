@@ -17,9 +17,24 @@ const TopSection: FC<any> = () => {
   const dbaasLink = {
     id: 'dbaas',
     icon: 'database',
-    text: 'DBaaS',
+    text: 'Database as a Service',
     url: '/graph/d/pmm-dbaas/pmm-dbaas',
+    children: [
+      {
+        id: 'dbaas1',
+        icon: 'percona-cluster-computing',
+        text: 'DB Cluster',
+        url: '/graph/d/pmm-dbaas/pmm-dbaas',
+      },
+      {
+        id: 'dbaas2',
+        icon: 'percona-kubernetes',
+        text: 'Kubernetes Cluster',
+        url: '/graph/d/pmm-dbaas/pmm-dbaas',
+      },
+    ],
   };
+
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
