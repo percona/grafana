@@ -5,10 +5,10 @@ import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';
 
-export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage }) => {
+export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage, children }) => {
   const style = useStyles(getStyles);
   const tableInstance = useTable({ columns, data });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+  const { getTableProps, getTableBodyProps, headerGroups, rows } = tableInstance;
 
   return (
     <div className={style.tableWrap} data-qa="table-outer-wrapper">
@@ -43,16 +43,7 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
               ))}
             </thead>
             <tbody {...getTableBodyProps()} data-qa="table-tbody">
-              {rows.map(row => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()}>
-                    {row.cells.map(cell => {
-                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                    })}
-                  </tr>
-                );
-              })}
+              {children(rows, tableInstance)}
             </tbody>
           </table>
         ) : null}
