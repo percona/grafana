@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { NotificationChannelService } from './NotificationChannel.service';
@@ -58,10 +58,10 @@ export const NotificationChannel: FC = () => {
   };
 
   // TODO Refetch data with new params when API's ready
-  const onPageChange = (pageSize: number, pageIndex: number) => {
+  const onPageChange = useCallback((pageSize: number, pageIndex: number) => {
     setPageSize(pageSize);
     getNotificationChannels(pageSize, pageIndex);
-  };
+  }, []);
 
   return (
     <NotificationChannelProvider.Provider

@@ -32,7 +32,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
       }
       setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [notificationChannel ? Messages.editSuccess : Messages.addSuccess]);
-      getNotificationChannels();
+      getNotificationChannels(null, null);
     } catch (e) {
       logger.error(e);
     }
