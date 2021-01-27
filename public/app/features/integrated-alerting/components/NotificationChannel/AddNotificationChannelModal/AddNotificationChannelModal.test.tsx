@@ -90,17 +90,22 @@ describe('AddNotificationChannelModal', () => {
       const wrapper = mount(
         <AddNotificationChannelModal setVisible={jest.fn()} isVisible notificationChannel={channel} />
       );
-
-      const keyTypeRadioButtons = wrapper.find(dataQa('keyType-radio-button'));
-      const routingKeyTypeButton = keyTypeRadioButtons.first();
-      const serviceKeyTypeButton = keyTypeRadioButtons.at(1);
       let routingKeyInput = wrapper.find(dataQa('routing-text-input'));
 
       expect(routingKeyInput.props().value).toBe(ORIGINAL_ROUTING_KEY);
+
       routingKeyInput.props().value = CHANGED_ROUTING_KEY;
       expect(routingKeyInput.props().value).toBe(CHANGED_ROUTING_KEY);
-      serviceKeyTypeButton.simulate('input');
-      routingKeyTypeButton.simulate('input');
+
+      wrapper
+        .find(dataQa('keyType-radio-button'))
+        .at(1)
+        .simulate('input');
+      wrapper
+        .find(dataQa('keyType-radio-button'))
+        .first()
+        .simulate('input');
+
       routingKeyInput = wrapper.find(dataQa('routing-text-input'));
       expect(routingKeyInput.props().value).toBe(ORIGINAL_ROUTING_KEY);
     });
