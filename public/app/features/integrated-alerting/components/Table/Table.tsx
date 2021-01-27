@@ -5,6 +5,7 @@ import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps, ExtendedTableInstance, ExtendedTableOptions } from './Table.types';
 import { PAGE_SIZES } from './Table.constants';
+import { getProperPageSize } from './Table.utils';
 import { Pagination } from './Pagination';
 
 export const Table: FC<TableProps> = ({
@@ -14,13 +15,14 @@ export const Table: FC<TableProps> = ({
   emptyMessage,
   totalItems,
   totalPages,
+  pageSize: inputPageSize,
   manualPagination,
   onPageChange,
 }) => {
   const style = useStyles(getStyles);
   const initialState: Partial<TableState> = {
     pageIndex: 0,
-    pageSize: PAGE_SIZES[0],
+    pageSize: getProperPageSize(inputPageSize),
   } as Partial<TableState>;
   const tableOptions: ExtendedTableOptions = {
     columns,

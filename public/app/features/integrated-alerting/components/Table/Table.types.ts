@@ -7,6 +7,7 @@ export interface TableProps {
   emptyMessage?: string;
   totalItems: number;
   totalPages?: number;
+  pageSize?: number;
   manualPagination?: boolean;
   onPageChange?: (pageSize: number, pageIndex: number) => void;
 }
