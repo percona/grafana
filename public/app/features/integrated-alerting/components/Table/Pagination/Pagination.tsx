@@ -1,5 +1,5 @@
 import React, { FC, useState, useMemo } from 'react';
-import { useStyles, IconName, Button } from '@grafana/ui';
+import { useStyles, IconName, Button, Select } from '@grafana/ui';
 import { PaginationProps } from './Pagination.types';
 import { getStyles } from './Pagination.styles';
 import { Messages } from './Pagination.messages';
@@ -49,13 +49,14 @@ export const Pagination: FC<PaginationProps> = ({
     <div className={style.pagination} data-qa="pagination">
       <span>
         {Messages.ROWS_PER_PAGE}
-        <select value={pageSize} onChange={e => onPageSizeChange(+e.target.value)}>
-          {pageSizeOptions.map(size => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
+        <span className={style.pageSizeContainer}>
+          <Select
+            isSearchable={false}
+            value={pageSize}
+            options={pageSizeOptions}
+            onChange={e => onPageSizeChange(e.value)}
+          />
+        </span>
       </span>
       <span>
         {`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems} items`}

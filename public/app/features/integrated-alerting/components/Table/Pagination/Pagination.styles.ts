@@ -6,6 +6,10 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     display: flex;
     justify-content: space-between;
     padding-top: ${spacing.md};
+
+    & > span:first-child {
+      padding-left: ${spacing.md};
+    }
   `,
   pageButtonsContainer: css`
     margin-left: ${spacing.xl};
@@ -17,5 +21,10 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
         margin-right: ${spacing.sm};
       }
     },
+  `,
+  pageSizeContainer: css`
+    margin-left: ${spacing.md};
+    display: inline-block;
+    width: 70px;
   `,
 });
