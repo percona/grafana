@@ -1,5 +1,5 @@
 import React, { FC, useState, useMemo } from 'react';
-import { useStyles } from '@grafana/ui';
+import { useStyles, IconName, Button } from '@grafana/ui';
 import { PaginationProps } from './Pagination.types';
 import { getStyles } from './Pagination.styles';
 import { Messages } from './Pagination.messages';
@@ -58,29 +58,42 @@ export const Pagination: FC<PaginationProps> = ({
         </select>
       </span>
       <span>
-        {`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems}`}
-        <span>
-          <button disabled={activePageIndex === 0} onClick={() => gotoPage(0)}>
-            {'<<'}
-          </button>
-          <button disabled={activePageIndex === 0} onClick={() => gotoPage(activePageIndex - 1)} className="prev-page">
-            {'<'}
-          </button>
+        {`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems} items`}
+        <span className={style.pageButtonsContainer}>
+          <Button
+            icon={'angle-double-left' as IconName}
+            variant="secondary"
+            disabled={activePageIndex === 0}
+            onClick={() => gotoPage(0)}
+          />
+          <Button
+            icon="angle-left"
+            variant="secondary"
+            disabled={activePageIndex === 0}
+            onClick={() => gotoPage(activePageIndex - 1)}
+          />
           {shownPages.map(page => (
-            <button onClick={() => gotoPage(page)} key={page} className={activePageIndex === page ? 'active' : ''}>
+            <Button
+              variant={activePageIndex === page ? 'primary' : 'secondary'}
+              onClick={() => gotoPage(page)}
+              key={page}
+            >
               {page + 1}
-            </button>
+            </Button>
           ))}
-          <button
+          <Button
+            icon="angle-right"
+            variant="secondary"
             disabled={activePageIndex === pageCount - 1}
             onClick={() => gotoPage(activePageIndex + 1)}
             className="next-page"
-          >
-            {'>'}
-          </button>
-          <button disabled={activePageIndex === pageCount - 1} onClick={() => gotoPage(pageCount - 1)}>
-            {'>>'}
-          </button>
+          />
+          <Button
+            icon={'angle-double-right' as IconName}
+            variant="secondary"
+            disabled={activePageIndex === pageCount - 1}
+            onClick={() => gotoPage(pageCount - 1)}
+          />
         </span>
       </span>
     </div>
