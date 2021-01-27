@@ -54,10 +54,8 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
     MutatorKeys,
     Mutator<NotificationChannelRenderProps, Partial<NotificationChannelRenderProps>>
   > = {
-    /**
-     * Insead of just resetting the value to '', we'll use the initial value
-     * This way, it keeps working on edition mode
-     */
+    // Insead of just resetting the value to '', we'll use the initial value
+    // This way, it keeps working on edition mode
     resetKey: ([key]: PagerDutyKeyType[], state, utils) => {
       utils.changeValue(state, key, () => initialValues[key]);
     },
