@@ -49,9 +49,7 @@ export const Table: FC<TableProps> = ({
   } = tableInstance;
 
   useEffect(() => {
-    if (manualPagination) {
-      onPageChange(pageSize, pageIndex);
-    }
+    onPageChange(pageSize, pageIndex);
   }, [onPageChange, pageIndex, pageSize]);
 
   return (
