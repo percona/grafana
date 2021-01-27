@@ -10,45 +10,8 @@ import { NotificationChannelType, PagerDutylNotificationChannel } from '../Notif
 jest.mock('../NotificationChannel.service');
 jest.mock('app/core/app_events');
 
-/**
- * Return this form's "Add" button
- */
 const findFormButton = (wrapper: ReactWrapper) =>
   wrapper.find(dataQa('notification-channel-add-button')).find('button');
-
-/**
- * Given a type, return the matching element.
- * The element returned is the one that's actually clickable and that triggers the change
- */
-const findTypeOption = (wrapper: ReactWrapper, type: NotificationChannelType): ReactWrapper => {
-  const menuOptions = wrapper.find({ 'aria-label': 'Select option' });
-  const matchingOption = TYPE_OPTIONS.find(option => option.value === type);
-
-  return menuOptions.filterWhere(node => node.text() === matchingOption.label);
-};
-
-/**
- * Fill the form with a name and a notification channel type
- */
-const fillNameAndType = (wrapper: ReactWrapper, type: NotificationChannelType, name = 'John Doe') => {
-  const inputs = wrapper.find('input');
-  const nameInput = inputs.at(0);
-  const typeInput = inputs.at(1);
-
-  nameInput.simulate('change', {
-    target: {
-      value: name,
-    },
-  });
-
-  typeInput.simulate('keydown', {
-    key: 'ArrowDown',
-  });
-
-  const option = findTypeOption(wrapper, type);
-
-  option.simulate('click');
-};
 
 describe('AddNotificationChannelModal', () => {
   it('should render modal with correct fields', () => {
