@@ -1,22 +1,48 @@
-import React, { FC, useContext, useCallback } from 'react';
+import React, { FC, useContext } from 'react';
 import { withTypes, Field } from 'react-final-form';
 import { HorizontalGroup, Select, Button, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextInputField, validators, logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/core';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
-import { MutatorKeys, NotificationChannelRenderProps, PagerDutyKeyType } from '../NotificationChannel.types';
+import {
+  MutatorKeys,
+  NotificationChannelRenderProps,
+  NotificationChannelType,
+  PagerDutyKeyType,
+} from '../NotificationChannel.types';
 import { AddNotificationChannelModalProps } from './AddNotificationChannelModal.types';
 import { getStyles } from './AddNotificationChannelModal.styles';
 import { Messages } from './AddNotificationChannelModal.messages';
-import { TYPE_OPTIONS, TYPE_FIELDS_COMPONENT } from './AddNotificationChannel.constants';
+import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
 import { NotificationChannelService } from '../NotificationChannel.service';
 import { getInitialValues } from './AddNotificationChannelModal.utils';
 import { Mutator } from 'final-form';
+import { EmailFields } from './EmailFields/EmailFields';
+import { SlackFields } from './SlackFields/SlackFields';
+import { PagerDutyFields } from './PagerDutyFields/PagerDutyFields';
 
 const { required } = validators;
 // Our "values" typings won't be right without using this
 const { Form } = withTypes<NotificationChannelRenderProps>();
+
+const TypeField: FC<{ values: NotificationChannelRenderProps; mutators: Record<string, (...args: any[]) => any> }> = ({
+  values,
+  mutators,
+}) => {
+  const { type } = values;
+
+  switch (type.value) {
+    case NotificationChannelType.email:
+      return <EmailFields />;
+    case NotificationChannelType.pagerDuty:
+      return <PagerDutyFields values={values} mutators={mutators} />;
+    case NotificationChannelType.slack:
+      return <SlackFields />;
+    default:
+      return null;
+  }
+};
 
 export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> = ({
   isVisible,
@@ -40,15 +66,6 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
       logger.error(e);
     }
   };
-  const renderTypeFields = useCallback(
-    (values: NotificationChannelRenderProps, mutators: Record<string, (...args: any[]) => any>) => {
-      const TypeFields = TYPE_FIELDS_COMPONENT[values.type.value];
-
-      // By passing down the mutators, these fields will be able to call them
-      return <TypeFields values={values} mutators={mutators} />;
-    },
-    []
-  );
 
   const mutators: Record<
     MutatorKeys,
@@ -81,7 +98,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
                   </>
                 )}
               </Field>
-              {renderTypeFields(values, form.mutators)}
+              <TypeField values={values} mutators={form.mutators} />
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="notification-channel-add-button"
