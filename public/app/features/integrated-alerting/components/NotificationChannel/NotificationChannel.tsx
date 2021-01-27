@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState, useEffect } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { NotificationChannelService } from './NotificationChannel.service';
@@ -46,7 +46,7 @@ export const NotificationChannel: FC = () => {
   );
 
   // TODO set totalPages, totalItems as pass them to the table
-  const getNotificationChannels = async () => {
+  const getNotificationChannels = async (pageSize: number, pageIndex: number) => {
     setPendingRequest(true);
     try {
       setData(await NotificationChannelService.list());
@@ -60,11 +60,8 @@ export const NotificationChannel: FC = () => {
   // TODO Refetch data with new params when API's ready
   const onPageChange = (pageSize: number, pageIndex: number) => {
     setPageSize(pageSize);
+    getNotificationChannels(pageSize, pageIndex);
   };
-
-  useEffect(() => {
-    getNotificationChannels();
-  }, []);
 
   return (
     <NotificationChannelProvider.Provider
