@@ -194,13 +194,13 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 
 	if setting.AlertingEnabled && (c.OrgRole == models.ROLE_ADMIN || c.OrgRole == models.ROLE_EDITOR) {
 		alertChildNavs := []*dtos.NavLink{
-			{Text: "Alert Rules", Id: "alert-list", Url: setting.AppSubUrl + "/alerting/list", Icon: "list-ul"},
-			{Text: "Notification channels", Id: "channels", Url: setting.AppSubUrl + "/alerting/notifications", Icon: "comment-alt-share"},
+			{Text: "Alert Rules grafana-build-test", Id: "alert-list", Url: setting.AppSubUrl + "/alerting/list", Icon: "list-ul"},
+			{Text: "Notification channels grafana-build-test", Id: "channels", Url: setting.AppSubUrl + "/alerting/notifications", Icon: "comment-alt-share"},
 		}
 
 		data.NavTree = append(data.NavTree, &dtos.NavLink{
-			Text:       "Alerting",
-			SubTitle:   "Alert rules & notifications",
+			Text:       "Alerting grafana-build-test 1",
+			SubTitle:   "Alert rules & notifications grafana-build-test",
 			Id:         "alerting",
 			Icon:       "bell",
 			Url:        setting.AppSubUrl + "/alerting/list",
