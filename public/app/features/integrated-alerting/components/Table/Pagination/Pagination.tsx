@@ -47,9 +47,9 @@ export const Pagination: FC<PaginationProps> = ({
 
   return (
     <div className={style.pagination} data-qa="pagination">
-      <span>
-        {Messages.ROWS_PER_PAGE}
-        <span className={style.pageSizeContainer}>
+      <span className={style.pageSizeContainer}>
+        <span>{Messages.ROWS_PER_PAGE}</span>
+        <span>
           <Select
             isSearchable={false}
             value={pageSize}
@@ -58,9 +58,9 @@ export const Pagination: FC<PaginationProps> = ({
           />
         </span>
       </span>
-      <span>
-        {`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems} items`}
-        <span className={style.pageButtonsContainer}>
+      <span className={style.pageButtonsContainer}>
+        <span>{`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems} items`}</span>
+        <span>
           <Button
             icon={'angle-double-left' as IconName}
             variant="secondary"

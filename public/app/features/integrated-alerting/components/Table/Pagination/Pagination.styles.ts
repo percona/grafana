@@ -12,9 +12,15 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     }
   `,
   pageButtonsContainer: css`
-    margin-left: ${spacing.xl};
+    & > span:first-child {
+      margin-right: ${spacing.xl};
+    }
 
-    & > button {
+    & > span:last-child {
+      white-space: nowrap;
+    }
+
+    button {
       width: 35px;
       justify-content: center;
       &:not(:last-child) {
@@ -23,8 +29,13 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     },
   `,
   pageSizeContainer: css`
-    margin-left: ${spacing.md};
-    display: inline-block;
-    width: 70px;
+    & > span:first-child {
+      margin-right: ${spacing.md};
+    }
+
+    & > span:last-child {
+      display: inline-block;
+      width: 70px;
+    }
   `,
 });
