@@ -19,15 +19,16 @@ const TopSection: FC<any> = () => {
     icon: 'database',
     text: 'Database as a Service',
     url: '/graph/d/pmm-dbaas/pmm-dbaas',
+    // need to add url after dbaas navigation will be fixed
     children: [
       {
-        id: 'dbaas1',
+        id: 'dbaas-db-cluster',
         icon: 'percona-cluster-computing',
         text: 'DB Cluster',
         url: '/graph/d/pmm-dbaas/pmm-dbaas',
       },
       {
-        id: 'dbaas2',
+        id: 'dbaas-kubernetes-cluster',
         icon: 'percona-kubernetes',
         text: 'Kubernetes Cluster',
         url: '/graph/d/pmm-dbaas/pmm-dbaas',
