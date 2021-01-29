@@ -62,12 +62,14 @@ export const Pagination: FC<PaginationProps> = ({
         <span>{`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems} items`}</span>
         <span>
           <Button
+            data-qa="first-page-button"
             icon={'angle-double-left' as IconName}
             variant="secondary"
             disabled={activePageIndex === 0}
             onClick={() => gotoPage(0)}
           />
           <Button
+            data-qa="previous-page-button"
             icon="angle-left"
             variant="secondary"
             disabled={activePageIndex === 0}
@@ -75,6 +77,7 @@ export const Pagination: FC<PaginationProps> = ({
           />
           {shownPages.map(page => (
             <Button
+              data-qa="page-button"
               variant={activePageIndex === page ? 'primary' : 'secondary'}
               onClick={() => gotoPage(page)}
               key={page}
@@ -83,6 +86,7 @@ export const Pagination: FC<PaginationProps> = ({
             </Button>
           ))}
           <Button
+            data-qa="next-page-button"
             icon="angle-right"
             variant="secondary"
             disabled={activePageIndex === pageCount - 1}
@@ -90,6 +94,7 @@ export const Pagination: FC<PaginationProps> = ({
             className="next-page"
           />
           <Button
+            data-qa="last-page-button"
             icon={'angle-double-right' as IconName}
             variant="secondary"
             disabled={activePageIndex === pageCount - 1}
