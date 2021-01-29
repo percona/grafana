@@ -1,11 +1,11 @@
 import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
-import { AlertsTable } from './AlertsTable';
+import { Alerts } from './Alerts';
 import { act } from 'react-dom/test-utils';
-import { alertsStubs } from '../__mocks__/alertsStubs';
+import { alertsStubs } from './__mocks__/alertsStubs';
 
-jest.mock('../Alerts.service', () => ({
+jest.mock('./Alerts.service', () => ({
   AlertsService: {
     list: () => ({
       alerts: alertsStubs,
@@ -22,13 +22,13 @@ describe('AlertsTable', () => {
     let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
     await act(async () => {
-      wrapper = mount(<AlertsTable />);
+      wrapper = mount(<Alerts />);
     });
 
     wrapper.update();
 
-    expect(wrapper.find(dataQa('alerts-table-thead')).find('tr')).toHaveLength(1);
-    expect(wrapper.find(dataQa('alerts-table-tbody')).find('tr')).toHaveLength(6);
-    expect(wrapper.find(dataQa('alerts-table-no-data'))).toHaveLength(0);
+    expect(wrapper.find(dataQa('table-thead')).find('tr')).toHaveLength(1);
+    expect(wrapper.find(dataQa('table-tbody')).find('tr')).toHaveLength(6);
+    expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(0);
   });
 });
