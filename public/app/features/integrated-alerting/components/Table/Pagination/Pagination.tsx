@@ -5,7 +5,7 @@ import { getStyles } from './Pagination.styles';
 import { Messages } from './Pagination.messages';
 
 export const Pagination: FC<PaginationProps> = ({
-  pageCount,
+  pageCount: controlledPageCount,
   initialPageIndex,
   pageSize,
   pagesPerView,
@@ -16,7 +16,7 @@ export const Pagination: FC<PaginationProps> = ({
   onPageSizeChange,
 }) => {
   // Zero pages probably won't make the pagination show up, but here we should be agnostic to that
-  pageCount = Math.max(pageCount, 1);
+  const [pageCount] = useState(Math.max(controlledPageCount, 1));
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
   const maxVisiblePages = Math.min(pagesPerView, pageCount);
