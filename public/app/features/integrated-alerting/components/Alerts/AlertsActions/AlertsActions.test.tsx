@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { AlertsActions } from './AlertsActions';
 import { alertsStubs } from '../__mocks__/alertsStubs';
-import { formatAlert } from '../AlertsTable/AlertsTable.utils';
+import { formatAlert } from '../Alerts.utils';
 import { Bell, BellBarred } from './icons';
 import { AlertsService } from '../Alerts.service';
 
