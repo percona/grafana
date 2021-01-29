@@ -41,8 +41,11 @@ export const Pagination: FC<PaginationProps> = ({
     } else if (pageIndex > pageCount - 1) {
       pageIndex = pageCount - 1;
     }
-    setActivePageIndex(pageIndex);
-    onPageChange(pageIndex);
+
+    if (pageIndex !== activePageIndex) {
+      setActivePageIndex(pageIndex);
+      onPageChange(pageIndex);
+    }
   };
 
   return (
@@ -51,6 +54,7 @@ export const Pagination: FC<PaginationProps> = ({
         <span>{Messages.ROWS_PER_PAGE}</span>
         <span>
           <Select
+            data-qa="pagination-size-select"
             isSearchable={false}
             value={pageSize}
             options={pageSizeOptions}
@@ -59,7 +63,9 @@ export const Pagination: FC<PaginationProps> = ({
         </span>
       </span>
       <span className={style.pageButtonsContainer}>
-        <span>{`Showing ${leftItemNumber}-${rightItemNumber} of ${totalItems} items`}</span>
+        <span data-qa="pagination-items-inverval">
+          {Messages.ITEMS_INTERVAL(leftItemNumber, rightItemNumber, totalItems)}
+        </span>
         <span>
           <Button
             data-qa="first-page-button"
