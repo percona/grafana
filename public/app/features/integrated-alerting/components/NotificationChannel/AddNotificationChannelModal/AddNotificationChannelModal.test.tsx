@@ -5,7 +5,8 @@ import { dataQa } from '@percona/platform-core';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
 import { notificationChannelStubs } from '../__mocks__/notificationChannelStubs';
-import { NotificationChannelType, PagerDutylNotificationChannel } from '../NotificationChannel.types';
+import { NotificationChannelType, PagerDutyKeyType, PagerDutylNotificationChannel } from '../NotificationChannel.types';
+import { NotificationChannelService } from '../NotificationChannel.service';
 
 jest.mock('../NotificationChannel.service');
 jest.mock('app/core/app_events');
@@ -75,39 +76,35 @@ describe('AddNotificationChannelModal', () => {
 
   describe('Pager Duty option', () => {
     const ORIGINAL_ROUTING_KEY = 'example_key';
-    const CHANGED_ROUTING_KEY = 'changed_key';
     const channel: PagerDutylNotificationChannel = {
       type: NotificationChannelType.pagerDuty,
-      channelId: '',
-      summary: '',
+      channelId: 'id1',
+      summary: 'name',
       disabled: false,
       sendResolved: false,
       routingKey: ORIGINAL_ROUTING_KEY,
       serviceKey: '',
     };
 
-    it('should reset service/routing keys when radios are clicked', () => {
+    it('should only send one of the keys', () => {
+      const serviceAddMock = jest.fn();
+      spyOn(NotificationChannelService, 'change').and.callFake(serviceAddMock);
       const wrapper = mount(
         <AddNotificationChannelModal setVisible={jest.fn()} isVisible notificationChannel={channel} />
       );
-      let routingKeyInput = wrapper.find(dataQa('routing-text-input'));
-
-      expect(routingKeyInput.props().value).toBe(ORIGINAL_ROUTING_KEY);
-
-      routingKeyInput.props().value = CHANGED_ROUTING_KEY;
-      expect(routingKeyInput.props().value).toBe(CHANGED_ROUTING_KEY);
-
       wrapper
         .find(dataQa('keyType-radio-button'))
         .at(1)
-        .simulate('input');
-      wrapper
-        .find(dataQa('keyType-radio-button'))
-        .first()
-        .simulate('input');
-
-      routingKeyInput = wrapper.find(dataQa('routing-text-input'));
-      expect(routingKeyInput.props().value).toBe(ORIGINAL_ROUTING_KEY);
+        .simulate('change');
+      wrapper.find(dataQa('service-text-input')).simulate('change', { target: { value: 'new_service_key' } });
+      wrapper.find('form').simulate('submit');
+      expect(serviceAddMock).toHaveBeenCalledWith('id1', {
+        name: 'name',
+        type: TYPE_OPTIONS[1],
+        routing: '',
+        service: 'new_service_key',
+        keyType: PagerDutyKeyType.service,
+      });
     });
   });
 });

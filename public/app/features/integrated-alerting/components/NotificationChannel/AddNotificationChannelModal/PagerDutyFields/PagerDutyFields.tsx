@@ -8,31 +8,24 @@ import { PAGER_DUTY_TYPE_OPTIONS } from '../AddNotificationChannel.constants';
 const { required } = validators;
 const keyValidator = [required];
 
-export const PagerDutyFields: FC<PagerDutyFieldsProps> = ({ values, mutators }) => {
+export const PagerDutyFields: FC<PagerDutyFieldsProps> = ({ values }) => {
+  let label = Messages.fields.routingKey;
+  let name = PagerDutyKeyType.routing;
+
+  if (values.keyType === PagerDutyKeyType.service) {
+    label = Messages.fields.serviceKey;
+    name = PagerDutyKeyType.service;
+  }
+
   return (
     <>
       <RadioButtonGroupField
-        inputProps={{
-          /**
-           * TODO We probably should change platform-core to allow to pass values to the options.
-           * That way, we can take the value from the event itself here and call the mutator, rather than checking the form values.
-           */
-          onInput: () => {
-            values?.keyType === PagerDutyKeyType.service
-              ? mutators?.resetKey(PagerDutyKeyType.routing)
-              : mutators?.resetKey(PagerDutyKeyType.service);
-          },
-        }}
         name="keyType"
         options={PAGER_DUTY_TYPE_OPTIONS}
         initialValue={values?.keyType || PAGER_DUTY_TYPE_OPTIONS[0].value}
         fullWidth
       />
-      {values.keyType === PagerDutyKeyType.service ? (
-        <TextInputField name={PagerDutyKeyType.service} label={Messages.fields.serviceKey} validators={keyValidator} />
-      ) : (
-        <TextInputField name={PagerDutyKeyType.routing} label={Messages.fields.routingKey} validators={keyValidator} />
-      )}
+      <TextInputField name={name} label={label} validators={keyValidator} />
     </>
   );
 };

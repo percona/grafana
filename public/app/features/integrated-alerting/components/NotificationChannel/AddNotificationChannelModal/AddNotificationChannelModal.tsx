@@ -6,7 +6,6 @@ import { Modal, LoaderButton, TextInputField, validators, logger } from '@percon
 import { appEvents } from 'app/core/core';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
 import {
-  MutatorKeys,
   NotificationChannelRenderProps,
   NotificationChannelType,
   PagerDutyKeyType,
@@ -17,7 +16,6 @@ import { Messages } from './AddNotificationChannelModal.messages';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
 import { NotificationChannelService } from '../NotificationChannel.service';
 import { getInitialValues } from './AddNotificationChannelModal.utils';
-import { Mutator } from 'final-form';
 import { EmailFields } from './EmailFields/EmailFields';
 import { SlackFields } from './SlackFields/SlackFields';
 import { PagerDutyFields } from './PagerDutyFields/PagerDutyFields';
@@ -26,17 +24,14 @@ const { required } = validators;
 // Our "values" typings won't be right without using this
 const { Form } = withTypes<NotificationChannelRenderProps>();
 
-const TypeField: FC<{ values: NotificationChannelRenderProps; mutators: Record<string, (...args: any[]) => any> }> = ({
-  values,
-  mutators,
-}) => {
+const TypeField: FC<{ values: NotificationChannelRenderProps }> = ({ values }) => {
   const { type } = values;
 
   switch (type.value) {
     case NotificationChannelType.email:
       return <EmailFields />;
     case NotificationChannelType.pagerDuty:
-      return <PagerDutyFields values={values} mutators={mutators} />;
+      return <PagerDutyFields values={values} />;
     case NotificationChannelType.slack:
       return <SlackFields />;
     default:
@@ -75,24 +70,12 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
     }
   };
 
-  const mutators: Record<
-    MutatorKeys,
-    Mutator<NotificationChannelRenderProps, Partial<NotificationChannelRenderProps>>
-  > = {
-    // Insead of just resetting the value to '', we'll use the initial value
-    // This way, it keeps working on edition mode
-    resetKey: ([key]: PagerDutyKeyType[], state, utils) => {
-      utils.changeValue(state, key, () => initialValues[key]);
-    },
-  };
-
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
       <Form
-        mutators={mutators}
         initialValues={initialValues}
         onSubmit={onSubmit}
-        render={({ form, handleSubmit, valid, pristine, submitting, values }) => (
+        render={({ handleSubmit, valid, pristine, submitting, values }) => (
           <form onSubmit={handleSubmit}>
             <>
               <TextInputField name="name" label={Messages.fields.name} validators={[required]} />
@@ -106,7 +89,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
                   </>
                 )}
               </Field>
-              <TypeField values={values} mutators={form.mutators} />
+              <TypeField values={values} />
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="notification-channel-add-button"

@@ -8,12 +8,7 @@ import { NotificationChannelType, PagerDutyKeyType } from '../../NotificationCha
 describe('PagerDutyFields', () => {
   it('should render with routing as the default key option', () => {
     const values = { name: 'test name', type: { value: NotificationChannelType.pagerDuty, label: 'test label' } };
-    const wrapper = mount(
-      <Form
-        onSubmit={jest.fn()}
-        render={() => <PagerDutyFields values={values} mutators={{ resetKey: jest.fn() }} />}
-      />
-    );
+    const wrapper = mount(<Form onSubmit={jest.fn()} render={() => <PagerDutyFields values={values} />} />);
 
     expect(wrapper.find(dataQa('keyType-radio-button')).length).toBe(2);
     expect(wrapper.find(dataQa('routing-text-input')).exists()).toBeTruthy();
@@ -26,36 +21,11 @@ describe('PagerDutyFields', () => {
       type: { value: NotificationChannelType.pagerDuty, label: 'test label' },
       keyType: PagerDutyKeyType.service,
     };
-    const wrapper = mount(
-      <Form
-        onSubmit={jest.fn()}
-        render={() => <PagerDutyFields values={values} mutators={{ resetKey: jest.fn() }} />}
-      />
-    );
+    const wrapper = mount(<Form onSubmit={jest.fn()} render={() => <PagerDutyFields values={values} />} />);
     const keyTypeRadioButtons = wrapper.find(dataQa('keyType-radio-button'));
     const serviceKeyTypeButton = keyTypeRadioButtons.at(1);
 
     expect(serviceKeyTypeButton.props().checked).toBeTruthy();
     expect(wrapper.find(dataQa('service-text-input')).exists()).toBeTruthy();
-  });
-
-  it('should call the mutator with a cross-field reference', () => {
-    const mutatorSpy = jest.fn();
-    const values = {
-      name: 'test name',
-      type: { value: NotificationChannelType.pagerDuty, label: 'test label' },
-      keyType: PagerDutyKeyType.service,
-    };
-    const wrapper = mount(
-      <Form
-        onSubmit={jest.fn()}
-        render={() => <PagerDutyFields values={values} mutators={{ resetKey: mutatorSpy }} />}
-      />
-    );
-
-    const keyTypeRadioButtons = wrapper.find(dataQa('keyType-radio-button'));
-    const routingKeyTypeButton = keyTypeRadioButtons.first();
-    routingKeyTypeButton.simulate('input');
-    expect(mutatorSpy).toHaveBeenCalled();
   });
 });
