@@ -9,7 +9,7 @@ export interface TableProps {
   totalPages?: number;
   manualPagination?: boolean;
   tableHash?: string;
-  fetchData?: (pageSize: number, pageIndex: number) => void;
+  fetchData: (pageSize: number, pageIndex: number) => void;
 }
 
 interface ExtendedTableState extends TableState {
