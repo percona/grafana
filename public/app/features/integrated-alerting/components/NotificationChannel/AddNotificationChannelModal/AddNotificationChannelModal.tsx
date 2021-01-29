@@ -53,11 +53,19 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
   const initialValues = getInitialValues(notificationChannel);
   const { getNotificationChannels } = useContext(NotificationChannelProvider);
   const onSubmit = async (values: NotificationChannelRenderProps) => {
+    const submittedValues = { ...values };
+
+    if (submittedValues.keyType === PagerDutyKeyType.routing) {
+      submittedValues.service = '';
+    } else {
+      submittedValues.routing = '';
+    }
+
     try {
       if (notificationChannel) {
-        await NotificationChannelService.change(notificationChannel.channelId, values);
+        await NotificationChannelService.change(notificationChannel.channelId, submittedValues);
       } else {
-        await NotificationChannelService.add(values);
+        await NotificationChannelService.add(submittedValues);
       }
       setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [notificationChannel ? Messages.editSuccess : Messages.addSuccess]);
