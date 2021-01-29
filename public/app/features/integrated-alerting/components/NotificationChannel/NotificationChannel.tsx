@@ -5,13 +5,12 @@ import { NotificationChannelService } from './NotificationChannel.service';
 import { Table } from '../Table/Table';
 import { NotificationChannel as Channel } from './NotificationChannel.types';
 import { Messages } from './NotificationChannel.messages';
-import { NOTIFICATION_CHANNEL_TABLE_HASH } from './NotificationChannel.constants';
 import { NotificationChannelProvider } from './NotificationChannel.provider';
 import { getStyles } from './NotificationChannel.styles';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
 import { DeleteNotificationChannelModal } from './DeleteNotificationChannelModal/DeleteNotificationChannelModal';
-import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
+import { NOTIFICATION_CHANNEL_TABLE_HASH } from './NotificationChannel.constants';
 
 const { emptyTable, nameColumn, typeColumn, actionsColumn, typeLabel } = Messages;
 
@@ -22,7 +21,6 @@ export const NotificationChannel: FC = () => {
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Channel[]>([]);
   const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel>();
-  const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_HASH);
 
   const columns = useMemo(
     () => [
@@ -57,9 +55,7 @@ export const NotificationChannel: FC = () => {
     }
   };
 
-  // TODO Refetch data with new params when API's ready
-  const onPageChange = useCallback((pageSize: number, pageIndex: number) => {
-    setPageSize(pageSize);
+  const fetchData = useCallback((pageSize: number, pageIndex: number) => {
     getNotificationChannels(pageSize, pageIndex);
   }, []);
 
@@ -86,9 +82,9 @@ export const NotificationChannel: FC = () => {
         columns={columns}
         pendingRequest={pendingRequest}
         emptyMessage={emptyTable}
+        fetchData={fetchData}
         totalItems={data.length}
-        onPageChange={onPageChange}
-        pageSize={pageSize}
+        tableHash={NOTIFICATION_CHANNEL_TABLE_HASH}
       />
       <AddNotificationChannelModal
         isVisible={addModalVisible}

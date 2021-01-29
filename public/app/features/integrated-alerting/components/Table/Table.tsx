@@ -7,22 +7,24 @@ import { TableProps, ExtendedTableInstance, ExtendedTableOptions } from './Table
 import { PAGE_SIZES } from './Table.constants';
 import { getProperPageSize } from './Table.utils';
 import { Pagination } from './Pagination';
+import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
 
 export const Table: FC<TableProps> = ({
   pendingRequest,
   data,
   columns,
-  emptyMessage,
-  totalItems,
   totalPages,
-  pageSize: inputPageSize,
+  fetchData,
+  emptyMessage,
   manualPagination,
-  onPageChange,
+  totalItems,
+  tableHash,
 }) => {
   const style = useStyles(getStyles);
+  const [storedPageSize, setStoredPageSize] = useStoredTablePageSize(tableHash);
   const initialState: Partial<TableState> = {
     pageIndex: 0,
-    pageSize: getProperPageSize(inputPageSize),
+    pageSize: getProperPageSize(storedPageSize),
   } as Partial<TableState>;
   const tableOptions: ExtendedTableOptions = {
     columns,
@@ -49,8 +51,25 @@ export const Table: FC<TableProps> = ({
   } = tableInstance;
 
   useEffect(() => {
-    onPageChange(pageSize, pageIndex);
-  }, [onPageChange, pageIndex, pageSize]);
+    fetchData(pageSize, pageIndex);
+  }, []);
+
+  const onPageChanged = (newPageIndex: number) => {
+    gotoPage(newPageIndex);
+
+    if (manualPagination) {
+      fetchData(pageSize, newPageIndex);
+    }
+  };
+
+  const onPageSizeChanged = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setStoredPageSize(newPageSize);
+    // No need to refetch data if the table isn't API controlled
+    if (manualPagination) {
+      fetchData(newPageSize, pageIndex);
+    }
+  };
 
   return (
     <>
@@ -108,8 +127,8 @@ export const Table: FC<TableProps> = ({
         pageSizeOptions={PAGE_SIZES}
         pageSize={pageSize}
         nrRowsOnCurrentPage={page.length}
-        onPageChange={pageIndex => gotoPage(pageIndex)}
-        onPageSizeChange={pageSize => setPageSize(pageSize)}
+        onPageChange={pageIndex => onPageChanged(pageIndex)}
+        onPageSizeChange={pageSize => onPageSizeChanged(pageSize)}
       />
     </>
   );

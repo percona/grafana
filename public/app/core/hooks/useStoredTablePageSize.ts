@@ -17,7 +17,9 @@ export const useStoredTablePageSize = (tableHash: string) => {
   const [value, setValue] = useState(pageSize);
 
   useEffect(() => {
-    localStorage.setItem(fullHash, `${value}`);
+    if (tableHash) {
+      localStorage.setItem(fullHash, `${value}`);
+    }
   }, [value]);
 
   return [value, setValue] as const;
