@@ -1,6 +1,9 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/grafana/grafana/pkg/api/dtos"
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/models"
@@ -120,6 +123,8 @@ func handleUpdateUser(cmd models.UpdateUserCommand) Response {
 
 // GET /api/user/orgs
 func GetSignedInUserOrgList(c *models.ReqContext) Response {
+	bytes, _ := json.Marshal(c)
+	fmt.Printf("%v\n", string(bytes))
 	return getUserOrgList(c.UserId)
 }
 
