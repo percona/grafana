@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/grafana/grafana/pkg/bus"
+	"github.com/grafana/grafana/pkg/components/securedata"
+	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/setting"
 )
@@ -39,29 +41,38 @@ func DeleteExpiredSnapshots(cmd *models.DeleteExpiredSnapshotsCommand) error {
 
 func CreateDashboardSnapshot(cmd *models.CreateDashboardSnapshotCommand) error {
 	return inTransaction(func(sess *DBSession) error {
-
 		// never
 		var expires = time.Now().Add(time.Hour * 24 * 365 * 50)
 		if cmd.Expires > 0 {
 			expires = time.Now().Add(time.Second * time.Duration(cmd.Expires))
 		}
 
-		snapshot := &models.DashboardSnapshot{
-			Name:              cmd.Name,
-			Key:               cmd.Key,
-			DeleteKey:         cmd.DeleteKey,
-			OrgId:             cmd.OrgId,
-			UserId:            cmd.UserId,
-			External:          cmd.External,
-			ExternalUrl:       cmd.ExternalUrl,
-			ExternalDeleteUrl: cmd.ExternalDeleteUrl,
-			Dashboard:         cmd.Dashboard,
-			Expires:           expires,
-			Created:           time.Now(),
-			Updated:           time.Now(),
+		marshalledData, err := cmd.Dashboard.Encode()
+		if err != nil {
+			return err
 		}
 
-		_, err := sess.Insert(snapshot)
+		encryptedDashboard, err := securedata.Encrypt(marshalledData)
+		if err != nil {
+			return err
+		}
+
+		snapshot := &models.DashboardSnapshot{
+			Name:               cmd.Name,
+			Key:                cmd.Key,
+			DeleteKey:          cmd.DeleteKey,
+			OrgId:              cmd.OrgId,
+			UserId:             cmd.UserId,
+			External:           cmd.External,
+			ExternalUrl:        cmd.ExternalUrl,
+			ExternalDeleteUrl:  cmd.ExternalDeleteUrl,
+			Dashboard:          simplejson.New(),
+			DashboardEncrypted: encryptedDashboard,
+			Expires:            expires,
+			Created:            time.Now(),
+			Updated:            time.Now(),
+		}
+		_, err = sess.Insert(snapshot)
 		cmd.Result = snapshot
 
 		return err
@@ -103,11 +114,12 @@ func SearchDashboardSnapshots(query *models.GetDashboardSnapshotsQuery) error {
 	}
 
 	// admins can see all snapshots, everyone else can only see their own snapshots
-	if query.SignedInUser.OrgRole == models.ROLE_ADMIN {
+	switch {
+	case query.SignedInUser.OrgRole == models.ROLE_ADMIN:
 		sess.Where("org_id = ?", query.OrgId)
-	} else if !query.SignedInUser.IsAnonymous {
+	case !query.SignedInUser.IsAnonymous:
 		sess.Where("org_id = ? AND user_id = ?", query.OrgId, query.SignedInUser.UserId)
-	} else {
+	default:
 		query.Result = snapshots
 		return nil
 	}
