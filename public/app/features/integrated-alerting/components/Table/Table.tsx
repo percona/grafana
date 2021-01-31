@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useTable, usePagination, TableState } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
@@ -16,11 +16,11 @@ export const Table: FC<TableProps> = ({
   totalPages,
   fetchData,
   emptyMessage,
-  manualPagination,
   totalItems,
   tableHash,
 }) => {
   const style = useStyles(getStyles);
+  const [manualPagination] = useState(totalPages >= 0);
   const [storedPageSize, setStoredPageSize] = useStoredTablePageSize(tableHash);
   const initialState: Partial<TableState> = {
     pageIndex: 0,
