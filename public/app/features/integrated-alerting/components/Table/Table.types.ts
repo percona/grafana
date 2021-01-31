@@ -5,6 +5,7 @@ export interface TableProps {
   columns: Column[];
   pendingRequest?: boolean;
   emptyMessage?: string;
+  showPagination?: boolean;
   totalItems: number;
   totalPages?: number;
   tableHash?: string;

@@ -13,6 +13,7 @@ export const Table: FC<TableProps> = ({
   pendingRequest,
   data,
   columns,
+  showPagination,
   totalPages,
   fetchData,
   emptyMessage,
@@ -120,16 +121,18 @@ export const Table: FC<TableProps> = ({
           ) : null}
         </div>
       </div>
-      <Pagination
-        pageCount={pageCount}
-        initialPageIndex={0}
-        totalItems={totalItems}
-        pageSizeOptions={PAGE_SIZES}
-        pageSize={pageSize}
-        nrRowsOnCurrentPage={page.length}
-        onPageChange={pageIndex => onPageChanged(pageIndex)}
-        onPageSizeChange={pageSize => onPageSizeChanged(pageSize)}
-      />
+      {showPagination && (
+        <Pagination
+          pageCount={pageCount}
+          initialPageIndex={0}
+          totalItems={totalItems}
+          pageSizeOptions={PAGE_SIZES}
+          pageSize={pageSize}
+          nrRowsOnCurrentPage={page.length}
+          onPageChange={pageIndex => onPageChanged(pageIndex)}
+          onPageSizeChange={pageSize => onPageSizeChanged(pageSize)}
+        />
+      )}
     </>
   );
 };
