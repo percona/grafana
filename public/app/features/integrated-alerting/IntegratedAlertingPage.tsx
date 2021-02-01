@@ -6,6 +6,7 @@ import { TabKeys } from './IntegratedAlerting.types';
 import { Alerts, AlertRuleTemplate, AlertRules, NotificationChannel } from './components';
 import { IntegratedAlertingService } from './IntegratedAlerting.service';
 import { logger } from '@percona/platform-core';
+import { EmptyBlock } from './components/EmptyBlock/EmptyBlock';
 
 const IntegratedAlertingTabs: FC = () => {
   const [activeTab, setActiveTab] = useState(TabKeys.alerts);
@@ -56,11 +57,11 @@ const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingEnabled:
   loadingSettings,
   alertingEnabled,
 }) => {
-  if (loadingSettings) {
-    return <Spinner />;
+  if (alertingEnabled) {
+    return <IntegratedAlertingTabs />;
   }
 
-  return alertingEnabled ? <IntegratedAlertingTabs /> : <span></span>;
+  return <EmptyBlock>{loadingSettings ? <Spinner /> : <span>FOO</span>}</EmptyBlock>;
 };
 
 const IntegratedAlertingPage: FC = () => {
