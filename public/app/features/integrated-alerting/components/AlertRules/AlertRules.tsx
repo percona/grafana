@@ -11,6 +11,7 @@ import { Messages } from '../../IntegratedAlerting.messages';
 import { formatRules } from './AlertRules.utils';
 import { AlertRule } from './AlertRules.types';
 import { AlertRulesActions } from './AlertRulesActions';
+import { ALERT_RULES_TABLE_HASH } from './AlertRules.constants';
 
 const { noData, columns } = Messages.alertRules.table;
 
@@ -144,6 +145,7 @@ export const AlertRules: FC = () => {
         pendingRequest={pendingRequest}
         totalItems={data.length}
         fetchData={fetchData}
+        tableHash={ALERT_RULES_TABLE_HASH}
       />
     </AlertRulesProvider.Provider>
   );
