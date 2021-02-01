@@ -4,6 +4,7 @@ import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';
+import { EmptyBlock } from '../EmptyBlock/EmptyBlock';
 
 export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage }) => {
   const style = useStyles(getStyles);
@@ -19,9 +20,7 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
           </div>
         ) : null}
         {!rows.length && !pendingRequest ? (
-          <div data-qa="table-no-data" className={style.empty}>
-            {<h1>{emptyMessage}</h1>}
-          </div>
+          <EmptyBlock data-qa="table-no-data">{<h1>{emptyMessage}</h1>}</EmptyBlock>
         ) : null}
         {rows.length && !pendingRequest ? (
           <table {...getTableProps()} data-qa="table">
