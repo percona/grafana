@@ -15,12 +15,12 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
     <div className={style.tableWrap} data-qa="table-outer-wrapper">
       <div className={style.table} data-qa="table-inner-wrapper">
         {pendingRequest ? (
-          <div data-qa="table-loading" className={style.empty}>
+          <EmptyBlock dataQa="table-loading">
             <Spinner />
-          </div>
+          </EmptyBlock>
         ) : null}
         {!rows.length && !pendingRequest ? (
-          <EmptyBlock data-qa="table-no-data">{<h1>{emptyMessage}</h1>}</EmptyBlock>
+          <EmptyBlock dataQa="table-no-data">{<h1>{emptyMessage}</h1>}</EmptyBlock>
         ) : null}
         {rows.length && !pendingRequest ? (
           <table {...getTableProps()} data-qa="table">
