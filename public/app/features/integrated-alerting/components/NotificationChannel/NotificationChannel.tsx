@@ -85,6 +85,7 @@ export const NotificationChannel: FC = () => {
         fetchData={fetchData}
         totalItems={data.length}
         tableHash={NOTIFICATION_CHANNEL_TABLE_HASH}
+        showPagination
       />
       <AddNotificationChannelModal
         isVisible={addModalVisible}
