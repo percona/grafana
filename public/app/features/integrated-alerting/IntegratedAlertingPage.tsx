@@ -7,6 +7,7 @@ import { Alerts, AlertRuleTemplate, AlertRules, NotificationChannel } from './co
 import { IntegratedAlertingService } from './IntegratedAlerting.service';
 import { logger } from '@percona/platform-core';
 import { EmptyBlock } from './components/EmptyBlock/EmptyBlock';
+import { PMM_SETTINGS_URL } from './IntegratedAlerting.constants';
 
 const IntegratedAlertingTabs: FC = () => {
   const [activeTab, setActiveTab] = useState(TabKeys.alerts);
@@ -57,11 +58,25 @@ const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingEnabled:
   loadingSettings,
   alertingEnabled,
 }) => {
+  const styles = useStyles(getStyles);
   if (alertingEnabled) {
     return <IntegratedAlertingTabs />;
   }
 
-  return <EmptyBlock>{loadingSettings ? <Spinner /> : <span>FOO</span>}</EmptyBlock>;
+  return (
+    <EmptyBlock>
+      {loadingSettings ? (
+        <Spinner />
+      ) : (
+        <>
+          {Messages.general.alertingDisabled}&nbsp;
+          <a className={styles.link} href={PMM_SETTINGS_URL}>
+            {Messages.general.pmmSettings}
+          </a>
+        </>
+      )}
+    </EmptyBlock>
+  );
 };
 
 const IntegratedAlertingPage: FC = () => {
@@ -74,7 +89,7 @@ const IntegratedAlertingPage: FC = () => {
     const {
       settings: { alerting_enabled },
     } = await IntegratedAlertingService.getSettings();
-    console.log(alerting_enabled);
+
     setalertingEnabled(!!alerting_enabled);
     try {
     } catch (e) {
