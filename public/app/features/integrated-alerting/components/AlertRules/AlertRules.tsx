@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { Column } from 'react-table';
 import { Button, useStyles, IconButton } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
@@ -111,7 +111,7 @@ export const AlertRules: FC = () => {
     [selectedRuleDetails]
   );
 
-  useEffect(() => {
+  const fetchData = useCallback((pageSize: number, pageIndex: number) => {
     getAlertRules();
   }, []);
 
@@ -136,7 +136,15 @@ export const AlertRules: FC = () => {
         </Button>
       </div>
       <AddAlertRuleModal isVisible={addModalVisible} setVisible={setAddModalVisible} alertRule={selectedAlertRule} />
-      <AlertRulesTable emptyMessage={noData} data={data} columns={columns} pendingRequest={pendingRequest} />
+      <AlertRulesTable
+        showPagination
+        emptyMessage={noData}
+        data={data}
+        columns={columns}
+        pendingRequest={pendingRequest}
+        totalItems={data.length}
+        fetchData={fetchData}
+      />
     </AlertRulesProvider.Provider>
   );
 };

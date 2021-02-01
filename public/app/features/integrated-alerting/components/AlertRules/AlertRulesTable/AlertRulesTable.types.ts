@@ -5,4 +5,9 @@ export interface AlertRulesTableProps {
   columns: Column[];
   pendingRequest?: boolean;
   emptyMessage?: string;
+  showPagination?: boolean;
+  totalPages?: number;
+  totalItems: number;
+  tableHash?: string;
+  fetchData: (pageSize: number, pageIndex: number) => void;
 }

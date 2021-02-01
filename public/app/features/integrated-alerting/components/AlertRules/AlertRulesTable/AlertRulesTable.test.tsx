@@ -22,12 +22,14 @@ const data = [
   },
 ];
 
+const fetchData = jest.fn();
+
 describe('AlertRulesTable', () => {
   it('should render the table correctly', async () => {
     let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
     await act(async () => {
-      wrapper = mount(<AlertRulesTable data={data} columns={columns} />);
+      wrapper = mount(<AlertRulesTable totalItems={data.length} fetchData={fetchData} data={data} columns={columns} />);
     });
 
     wrapper.update();
@@ -39,7 +41,9 @@ describe('AlertRulesTable', () => {
   });
 
   it('should render the loader when data fetch is pending', async () => {
-    const wrapper = mount(<AlertRulesTable data={data} columns={columns} pendingRequest />);
+    const wrapper = mount(
+      <AlertRulesTable totalItems={data.length} fetchData={fetchData} data={data} columns={columns} pendingRequest />
+    );
 
     expect(wrapper.find(dataQa('alert-rules-table-loading'))).toHaveLength(1);
     expect(wrapper.find(dataQa('alert-rules-table'))).toHaveLength(0);
@@ -47,7 +51,15 @@ describe('AlertRulesTable', () => {
   });
 
   it('should display the noData section when no data is passed', async () => {
-    const wrapper = mount(<AlertRulesTable data={[]} columns={columns} emptyMessage="empty" />);
+    const wrapper = mount(
+      <AlertRulesTable
+        totalItems={data.length}
+        fetchData={fetchData}
+        data={[]}
+        columns={columns}
+        emptyMessage="empty"
+      />
+    );
     const noData = wrapper.find(dataQa('alert-rules-table-no-data'));
 
     expect(wrapper.find(dataQa('alert-rules-table-loading'))).toHaveLength(0);
@@ -65,7 +77,13 @@ describe('AlertRulesTable', () => {
     };
     const wrapper = mount(
       <AlertRulesProvider.Provider value={alertRulesContext}>
-        <AlertRulesTable data={formattedRulesStubs} columns={columns} emptyMessage="empty" />
+        <AlertRulesTable
+          totalItems={data.length}
+          fetchData={fetchData}
+          data={formattedRulesStubs}
+          columns={columns}
+          emptyMessage="empty"
+        />
       </AlertRulesProvider.Provider>
     );
 
