@@ -1,12 +1,13 @@
-import React, { FC, useMemo, useState } from 'react';
-import { TabsBar, TabContent, Tab, useStyles } from '@grafana/ui';
+import React, { FC, useMemo, useState, useEffect } from 'react';
+import { TabsBar, TabContent, Tab, useStyles, Spinner } from '@grafana/ui';
 import { Messages } from './IntegratedAlerting.messages';
 import { getStyles } from './IntegratedAlerting.styles';
 import { TabKeys } from './IntegratedAlerting.types';
 import { Alerts, AlertRuleTemplate, AlertRules, NotificationChannel } from './components';
+import { IntegratedAlertingService } from './IntegratedAlerting.service';
+import { logger } from '@percona/platform-core';
 
-const IntegratedAlertingPage: FC = () => {
-  const styles = useStyles(getStyles);
+const IntegratedAlertingTabs: FC = () => {
   const [activeTab, setActiveTab] = useState(TabKeys.alerts);
   const tabs = useMemo(
     () => [
@@ -35,7 +36,7 @@ const IntegratedAlertingPage: FC = () => {
   );
 
   return (
-    <div className={styles.integratedAlertingWrapper}>
+    <>
       <TabsBar>
         {tabs.map(tab => (
           <Tab
@@ -47,6 +48,48 @@ const IntegratedAlertingPage: FC = () => {
         ))}
       </TabsBar>
       <TabContent>{tabs.find(tab => tab.key === activeTab).component}</TabContent>
+    </>
+  );
+};
+
+const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingEnabled: boolean }> = ({
+  loadingSettings,
+  alertingEnabled,
+}) => {
+  if (loadingSettings) {
+    return <Spinner />;
+  }
+
+  return alertingEnabled ? <IntegratedAlertingTabs /> : <span></span>;
+};
+
+const IntegratedAlertingPage: FC = () => {
+  const styles = useStyles(getStyles);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+  const [alertingEnabled, setalertingEnabled] = useState(false);
+
+  const getSettings = async () => {
+    setLoadingSettings(true);
+    const {
+      settings: { alerting_enabled },
+    } = await IntegratedAlertingService.getSettings();
+    console.log(alerting_enabled);
+    setalertingEnabled(!!alerting_enabled);
+    try {
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setLoadingSettings(false);
+    }
+  };
+
+  useEffect(() => {
+    getSettings();
+  }, []);
+
+  return (
+    <div className={styles.integratedAlertingWrapper}>
+      <IntegratedAlertingContent loadingSettings={loadingSettings} alertingEnabled={alertingEnabled} />
     </div>
   );
 };
