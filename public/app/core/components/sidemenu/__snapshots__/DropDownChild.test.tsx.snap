@@ -4,7 +4,15 @@ exports[`Render should render component 1`] = `
 <li
   className="divider"
 >
-  <a />
+  <a>
+    <span
+      style={
+        Object {
+          "marginLeft": "auto",
+        }
+      }
+    />
+  </a>
 </li>
 `;
 
@@ -16,6 +24,13 @@ exports[`Render should render icon if exists 1`] = `
     <Icon
       className="css-290ig"
       name="icon-test"
+    />
+    <span
+      style={
+        Object {
+          "marginLeft": "auto",
+        }
+      }
     />
   </a>
 </li>
@@ -30,6 +45,17 @@ exports[`Render should render nested submenu items 1`] = `
       className="css-290ig"
       name="icon-test"
     />
+    <span
+      style={
+        Object {
+          "marginLeft": "auto",
+        }
+      }
+    >
+      <Icon
+        name="angle-right"
+      />
+    </span>
   </a>
   <ul
     className="sidemenu dropdown-menu--sidemenu submenu"
