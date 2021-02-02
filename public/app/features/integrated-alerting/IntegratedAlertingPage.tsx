@@ -82,7 +82,7 @@ export const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingE
 const IntegratedAlertingPage: FC = () => {
   const styles = useStyles(getStyles);
   const [loadingSettings, setLoadingSettings] = useState(true);
-  const [alertingEnabled, setalertingEnabled] = useState(false);
+  const [alertingEnabled, setAlertingEnabled] = useState(false);
 
   const getSettings = async () => {
     setLoadingSettings(true);
@@ -91,7 +91,7 @@ const IntegratedAlertingPage: FC = () => {
       const {
         settings: { alerting_enabled },
       } = await IntegratedAlertingService.getSettings();
-      setalertingEnabled(!!alerting_enabled);
+      setAlertingEnabled(!!alerting_enabled);
     } catch (e) {
       logger.error(e);
     } finally {
