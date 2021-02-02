@@ -54,7 +54,7 @@ const IntegratedAlertingTabs: FC = () => {
   );
 };
 
-const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingEnabled: boolean }> = ({
+export const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingEnabled: boolean }> = ({
   loadingSettings,
   alertingEnabled,
 }) => {
@@ -64,7 +64,7 @@ const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingEnabled:
   }
 
   return (
-    <EmptyBlock>
+    <EmptyBlock dataQa="ia-empty-block">
       {loadingSettings ? (
         <Spinner />
       ) : (
@@ -86,12 +86,12 @@ const IntegratedAlertingPage: FC = () => {
 
   const getSettings = async () => {
     setLoadingSettings(true);
-    const {
-      settings: { alerting_enabled },
-    } = await IntegratedAlertingService.getSettings();
 
-    setalertingEnabled(!!alerting_enabled);
     try {
+      const {
+        settings: { alerting_enabled },
+      } = await IntegratedAlertingService.getSettings();
+      setalertingEnabled(!!alerting_enabled);
     } catch (e) {
       logger.error(e);
     } finally {
