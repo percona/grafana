@@ -98,8 +98,14 @@ export interface AlertRulesListResponseRule {
   custom_labels?: AlertRulePayloadCustomLabels;
 }
 
+export interface AlertRulesTotals {
+  total_items: number;
+  total_pages: number;
+}
+
 export interface AlertRulesListResponse {
   rules: AlertRulesListResponseRule[];
+  totals: AlertRulesTotals;
 }
 
 export interface AlertRulePayloadCustomLabels {

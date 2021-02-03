@@ -35,12 +35,16 @@ export const AlertRules: FC = () => {
   const [data, setData] = useState<AlertRule[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_HASH);
   const [pageIndex, setPageindex] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const getAlertRules = async () => {
     setPendingRequest(true);
     try {
-      const { rules } = await AlertRulesService.list({ index: pageIndex, size: pageSize });
+      const { rules, totals } = await AlertRulesService.list({ index: pageIndex, size: pageSize });
       setData(formatRules(rules));
+      setTotalItems(totals.total_items);
+      setTotalPages(totals.total_pages);
     } catch (e) {
       logger.error(e);
     } finally {
@@ -151,7 +155,8 @@ export const AlertRules: FC = () => {
         data={data}
         columns={columns}
         pendingRequest={pendingRequest}
-        totalItems={data.length}
+        totalItems={totalItems}
+        totalPages={totalPages}
         onPaginationChanged={onPaginationChanged}
         pageSize={pageSize}
         pageIndex={pageIndex}
