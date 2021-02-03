@@ -1,9 +1,11 @@
 import { mount } from 'enzyme';
 import React, { FC } from 'react';
 import { useStoredTablePageSize } from './useStoredTablePageSize';
+import { PAGE_SIZES } from '../constants';
 
 const TABLE_HASH = 'test-hash';
 const TABLE_HASH_STORAGE_ID = `${TABLE_HASH}-table-page-size`;
+const DEFAULT_VALUE = PAGE_SIZES[0].value;
 
 const TestComponent: FC = () => {
   const [pageSize, setPageSize] = useStoredTablePageSize(TABLE_HASH);
@@ -20,6 +22,8 @@ const getDataFromLocalStorage = (): number => {
   return +localStorage.getItem(TABLE_HASH_STORAGE_ID);
 };
 
+const setDataOnLocalStorage = (pageSize: number) => localStorage.setItem(TABLE_HASH_STORAGE_ID, `${pageSize}`);
+
 describe('useStoredTablePageSize', () => {
   beforeAll(() => {
     localStorage.removeItem(TABLE_HASH_STORAGE_ID);
@@ -31,22 +35,25 @@ describe('useStoredTablePageSize', () => {
   it('should initially store the default pageSize', () => {
     mount(<TestComponent />);
     const storedSize = getDataFromLocalStorage();
-    expect(storedSize).toBe(1);
+    expect(storedSize).toBe(DEFAULT_VALUE);
     localStorage.removeItem(TABLE_HASH_STORAGE_ID);
   });
 
   it('should store the size on local storage after input changes', () => {
     const wrapper = mount(<TestComponent />);
     const input = wrapper.find('input').first();
-    input.simulate('change', { target: { value: 20 } });
+    const value = PAGE_SIZES[1].value;
+    input.simulate('change', { target: { value } });
     const storedSize = getDataFromLocalStorage();
-    expect(storedSize).toBe(20);
+    expect(storedSize).toBe(value);
   });
 
   it('should set the size from previous saves', () => {
+    const value = PAGE_SIZES[1].value;
+    setDataOnLocalStorage(value);
     const wrapper = mount(<TestComponent />);
     const span = wrapper.find('span').first();
-    expect(+span.text()).toBe(20);
+    expect(+span.text()).toBe(value);
   });
 
   it('should set the default if a wrong value is saved', () => {
@@ -54,7 +61,7 @@ describe('useStoredTablePageSize', () => {
     const wrapper = mount(<TestComponent />);
     const span = wrapper.find('span').first();
     const storedSize = getDataFromLocalStorage();
-    expect(+span.text()).toBe(1);
-    expect(storedSize).toBe(1);
+    expect(+span.text()).toBe(DEFAULT_VALUE);
+    expect(storedSize).toBe(DEFAULT_VALUE);
   });
 });
