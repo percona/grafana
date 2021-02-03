@@ -5,7 +5,7 @@ import { getStyles } from './Pagination.styles';
 import { Messages } from './Pagination.messages';
 
 export const Pagination: FC<PaginationProps> = ({
-  pageCount: controlledPageCount,
+  pageCount: propPageCount,
   initialPageIndex,
   pageSize,
   pagesPerView,
@@ -16,7 +16,7 @@ export const Pagination: FC<PaginationProps> = ({
   onPageSizeChange,
 }) => {
   // Zero pages probably won't make the pagination show up, but here we should be agnostic to that
-  const [pageCount, setPageCount] = useState(Math.max(controlledPageCount, 1));
+  const [pageCount, setPageCount] = useState(Math.max(propPageCount, 1));
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
   const maxVisiblePages = Math.min(pagesPerView, pageCount);
@@ -31,7 +31,7 @@ export const Pagination: FC<PaginationProps> = ({
     firstPageIndex = lastPageIndex - maxVisiblePages;
   }
   const shownPages = pageArray.slice(firstPageIndex, lastPageIndex);
-  const leftItemNumber = activePageIndex * pageSize + 1;
+  const leftItemNumber = propPageCount > 0 ? activePageIndex * pageSize + 1 : 0;
   const rightItemNumber = activePageIndex * pageSize + nrRowsOnCurrentPage;
   const style = useStyles(getStyles);
 
@@ -49,8 +49,8 @@ export const Pagination: FC<PaginationProps> = ({
   };
 
   useEffect(() => {
-    setPageCount(Math.max(controlledPageCount, 1));
-  }, [controlledPageCount]);
+    setPageCount(Math.max(propPageCount, 1));
+  }, [propPageCount]);
 
   return (
     <div className={style.pagination} data-qa="pagination">
@@ -120,5 +120,6 @@ Pagination.defaultProps = {
   pageCount: 1,
   initialPageIndex: 0,
   pagesPerView: 3,
+  totalItems: 0,
   onPageChange: () => 0,
 };

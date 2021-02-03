@@ -207,6 +207,20 @@ describe('Pagination', () => {
     expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.ITEMS_INTERVAL(7, 9, 15));
   });
 
+  it('should show "showing 0 - 0 of 0 items" when empty', () => {
+    const wrapper = shallow(
+      <Pagination
+        pagesPerView={3}
+        totalItems={0}
+        pageCount={0}
+        pageSizeOptions={[]}
+        pageSize={3}
+        nrRowsOnCurrentPage={0}
+      />
+    );
+    expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.ITEMS_INTERVAL(0, 0, 0));
+  });
+
   it('should trigger a page change', () => {
     const cb = jest.fn();
     const wrapper = shallow(
