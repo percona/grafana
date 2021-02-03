@@ -35,7 +35,7 @@ export const AlertRuleTemplate: FC = () => {
       } as Column,
       {
         Header: createdAtColumn,
-        accessor: ({ created_at }: FormattedTemplate) => (created_at ? created_at : '-'),
+        accessor: 'created_at',
         width: '10%',
       } as Column,
       {
