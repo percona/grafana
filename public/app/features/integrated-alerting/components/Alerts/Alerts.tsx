@@ -26,7 +26,7 @@ const {
 export const Alerts: FC = () => {
   const style = useStyles(getStyles);
   const theme = useTheme();
-  const [pendingRequest, setPendingRequest] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState(true);
   const [data, setData] = useState<Alert[]>([]);
   const severityColors = useMemo(() => getSeverityColors(theme), [theme]);
   const columns = React.useMemo(

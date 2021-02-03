@@ -18,7 +18,7 @@ const { name: nameColumn, source: sourceColumn, createdAt: createdAtColumn, acti
 export const AlertRuleTemplate: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [pendingRequest, setPendingRequest] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState(true);
   const [data, setData] = useState<FormattedTemplate[]>([]);
 
   const columns = React.useMemo(
