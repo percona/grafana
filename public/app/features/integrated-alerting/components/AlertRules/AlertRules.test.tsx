@@ -41,7 +41,7 @@ describe('AlertRules', () => {
     expect(notificationChannelsServiceList).toBeCalledTimes(0);
 
     await act(async () => {
-      wrapper = mount(<AlertRules />);
+      wrapper = await mount(<AlertRules />);
     });
 
     expect(alertRuleTemplateServiceList).toBeCalledTimes(1);
@@ -53,7 +53,7 @@ describe('AlertRules', () => {
     let wrapper: ReactWrapper<{}, {}, any>;
 
     await act(async () => {
-      wrapper = mount(<AlertRules />);
+      wrapper = await mount(<AlertRules />);
     });
 
     wrapper.update();
@@ -72,5 +72,15 @@ describe('AlertRules', () => {
       .simulate('click');
 
     expect(wrapper.find(dataQa('alert-rules-details'))).toHaveLength(0);
+  });
+
+  it('should have table initially loading', async () => {
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = await mount(<AlertRules />);
+    });
+
+    expect(wrapper.find(dataQa('table-loading')).exists()).toBeTruthy();
   });
 });

@@ -22,7 +22,7 @@ describe('AlertsTable', () => {
     let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
     await act(async () => {
-      wrapper = mount(<Alerts />);
+      wrapper = await mount(<Alerts />);
     });
 
     wrapper.update();
@@ -30,5 +30,15 @@ describe('AlertsTable', () => {
     expect(wrapper.find(dataQa('table-thead')).find('tr')).toHaveLength(1);
     expect(wrapper.find(dataQa('table-tbody')).find('tr')).toHaveLength(6);
     expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(0);
+  });
+
+  it('should have table initially loading', async () => {
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = await mount(<Alerts />);
+    });
+
+    expect(wrapper.find(dataQa('table-loading')).exists()).toBeTruthy();
   });
 });

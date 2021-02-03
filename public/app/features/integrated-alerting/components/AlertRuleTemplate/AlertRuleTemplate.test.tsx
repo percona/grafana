@@ -23,7 +23,7 @@ describe('AlertRuleTemplate', () => {
     let wrapper: ReactWrapper;
 
     await act(async () => {
-      wrapper = mount(<AlertRuleTemplate />);
+      wrapper = await mount(<AlertRuleTemplate />);
     });
 
     expect(wrapper.find('textarea')).toBeTruthy();
@@ -41,7 +41,7 @@ describe('AlertRuleTemplate', () => {
     let wrapper: ReactWrapper;
 
     await act(async () => {
-      wrapper = mount(<AlertRuleTemplate />);
+      wrapper = await mount(<AlertRuleTemplate />);
     });
 
     wrapper.update();
@@ -59,11 +59,21 @@ describe('AlertRuleTemplate', () => {
     let wrapper: ReactWrapper;
 
     await act(async () => {
-      wrapper = mount(<AlertRuleTemplate />);
+      wrapper = await mount(<AlertRuleTemplate />);
     });
 
     wrapper.update();
 
     expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(1);
+  });
+
+  it('should have table initially loading', async () => {
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = await mount(<AlertRuleTemplate />);
+    });
+
+    expect(wrapper.find(dataQa('table-loading')).exists()).toBeTruthy();
   });
 });
