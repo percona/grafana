@@ -124,6 +124,11 @@ export interface AlertRuleCreatePayload {
   template_name: string;
 }
 
+export interface AlertRuleGetPayload {
+  size: number;
+  index: number;
+}
+
 export interface AlertRuleUpdatePayload extends AlertRuleCreatePayload {
   rule_id: string;
 }

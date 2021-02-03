@@ -39,7 +39,7 @@ export const AlertRules: FC = () => {
   const getAlertRules = async () => {
     setPendingRequest(true);
     try {
-      const { rules } = await AlertRulesService.list();
+      const { rules } = await AlertRulesService.list({ index: pageIndex, size: pageSize });
       setData(formatRules(rules));
     } catch (e) {
       logger.error(e);
@@ -118,7 +118,6 @@ export const AlertRules: FC = () => {
   const onPaginationChanged = useCallback((pageSize: number, pageIndex: number) => {
     setPageSize(pageSize);
     setPageindex(pageIndex);
-    getAlertRules();
   }, []);
 
   const handleAddButton = () => {
@@ -128,7 +127,7 @@ export const AlertRules: FC = () => {
 
   useEffect(() => {
     getAlertRules();
-  }, []);
+  }, [pageSize, pageIndex]);
 
   return (
     <AlertRulesProvider.Provider
