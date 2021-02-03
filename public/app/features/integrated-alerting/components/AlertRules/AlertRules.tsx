@@ -144,14 +144,16 @@ export const AlertRules: FC = () => {
             const alertRule = row.original as AlertRule;
 
             return (
-              <>
+              <React.Fragment key={alertRule.ruleId}>
                 <tr {...row.getRowProps()} className={alertRule.disabled ? styles.disabledRow : ''}>
                   {row.cells.map(cell => (
-                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    <td key={cell.column.id} {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </td>
                   ))}
                 </tr>
                 {selectedRuleDetails && alertRule.ruleId === selectedRuleDetails.ruleId && (
-                  <tr>
+                  <tr key={selectedRuleDetails.ruleId}>
                     <td colSpan={columns.length}>
                       <pre data-qa="alert-rules-details" className={styles.details}>
                         {alertRule.rawValues.template.yaml}
@@ -159,7 +161,7 @@ export const AlertRules: FC = () => {
                     </td>
                   </tr>
                 )}
-              </>
+              </React.Fragment>
             );
           })
         }

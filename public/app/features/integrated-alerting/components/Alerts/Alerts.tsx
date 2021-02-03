@@ -107,13 +107,17 @@ export const Alerts: FC = () => {
         rows.map(row => {
           const { prepareRow } = table;
           prepareRow(row);
+          const alert = row.original as Alert;
           return (
             <tr
+              key={alert.alertId}
               {...row.getRowProps()}
-              className={(row.original as Alert).status === AlertStatus.SILENCED ? style.disabledRow : ''}
+              className={alert.status === AlertStatus.SILENCED ? style.disabledRow : ''}
             >
               {row.cells.map(cell => (
-                <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                <td key={cell.column.id} {...cell.getCellProps()}>
+                  {cell.render('Cell')}
+                </td>
               ))}
             </tr>
           );
