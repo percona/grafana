@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { NotificationChannelService } from './NotificationChannel.service';
@@ -11,6 +11,7 @@ import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
 import { DeleteNotificationChannelModal } from './DeleteNotificationChannelModal/DeleteNotificationChannelModal';
 import { NOTIFICATION_CHANNEL_TABLE_HASH } from './NotificationChannel.constants';
+import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
 
 const { emptyTable, nameColumn, typeColumn, actionsColumn, typeLabel } = Messages;
 
@@ -21,6 +22,8 @@ export const NotificationChannel: FC = () => {
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Channel[]>([]);
   const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel>();
+  const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_HASH);
+  const [pageIndex, setPageindex] = useState(0);
 
   const columns = useMemo(
     () => [
@@ -44,7 +47,7 @@ export const NotificationChannel: FC = () => {
   );
 
   // TODO set totalPages, totalItems as pass them to the table
-  const getNotificationChannels = async (pageSize: number, pageIndex: number) => {
+  const getNotificationChannels = async () => {
     setPendingRequest(true);
     try {
       setData(await NotificationChannelService.list());
@@ -56,7 +59,12 @@ export const NotificationChannel: FC = () => {
   };
 
   const fetchData = useCallback((pageSize: number, pageIndex: number) => {
-    getNotificationChannels(pageSize, pageIndex);
+    setPageSize(pageSize);
+    setPageindex(pageIndex);
+  }, []);
+
+  useEffect(() => {
+    getNotificationChannels();
   }, []);
 
   return (
@@ -84,8 +92,9 @@ export const NotificationChannel: FC = () => {
         emptyMessage={emptyTable}
         fetchData={fetchData}
         totalItems={data.length}
-        tableHash={NOTIFICATION_CHANNEL_TABLE_HASH}
         showPagination
+        pageSize={pageSize}
+        pageIndex={pageIndex}
       />
       <AddNotificationChannelModal
         isVisible={addModalVisible}

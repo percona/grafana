@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Column } from 'react-table';
 import { Button, useStyles, IconButton } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
@@ -12,6 +12,7 @@ import { formatRules } from './AlertRules.utils';
 import { AlertRule } from './AlertRules.types';
 import { AlertRulesActions } from './AlertRulesActions';
 import { ALERT_RULES_TABLE_HASH } from './AlertRules.constants';
+import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
 
 const { noData, columns } = Messages.alertRules.table;
 
@@ -32,6 +33,8 @@ export const AlertRules: FC = () => {
   const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule>();
   const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule>();
   const [data, setData] = useState<AlertRule[]>([]);
+  const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_HASH);
+  const [pageIndex, setPageindex] = useState(0);
 
   const getAlertRules = async () => {
     setPendingRequest(true);
@@ -113,6 +116,8 @@ export const AlertRules: FC = () => {
   );
 
   const fetchData = useCallback((pageSize: number, pageIndex: number) => {
+    setPageSize(pageSize);
+    setPageindex(pageIndex);
     getAlertRules();
   }, []);
 
@@ -120,6 +125,10 @@ export const AlertRules: FC = () => {
     setSelectedAlertRule(null);
     setAddModalVisible(currentValue => !currentValue);
   };
+
+  useEffect(() => {
+    getAlertRules();
+  }, []);
 
   return (
     <AlertRulesProvider.Provider
@@ -145,7 +154,8 @@ export const AlertRules: FC = () => {
         pendingRequest={pendingRequest}
         totalItems={data.length}
         fetchData={fetchData}
-        tableHash={ALERT_RULES_TABLE_HASH}
+        pageSize={pageSize}
+        pageIndex={pageIndex}
       />
     </AlertRulesProvider.Provider>
   );

@@ -1,13 +1,11 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import { useTable, usePagination, TableState } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps, ExtendedTableInstance, ExtendedTableOptions } from './Table.types';
 import { PAGE_SIZES } from './Table.constants';
-import { getProperPageSize } from './Table.utils';
 import { Pagination } from './Pagination';
-import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
 
 export const Table: FC<TableProps> = ({
   pendingRequest,
@@ -18,14 +16,14 @@ export const Table: FC<TableProps> = ({
   fetchData,
   emptyMessage,
   totalItems,
-  tableHash,
+  pageSize: propPageSize,
+  pageIndex: propPageIndex,
 }) => {
   const style = useStyles(getStyles);
-  const [manualPagination] = useState(totalPages >= 0);
-  const [storedPageSize, setStoredPageSize] = useStoredTablePageSize(tableHash);
+  const manualPagination = totalPages >= 0;
   const initialState: Partial<TableState> = {
-    pageIndex: 0,
-    pageSize: getProperPageSize(storedPageSize),
+    pageIndex: propPageIndex,
+    pageSize: propPageSize,
   } as Partial<TableState>;
   const tableOptions: ExtendedTableOptions = {
     columns,
@@ -51,25 +49,14 @@ export const Table: FC<TableProps> = ({
     state: { pageSize, pageIndex },
   } = tableInstance;
 
-  useEffect(() => {
-    fetchData(pageSize, pageIndex);
-  }, []);
-
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
-
-    if (manualPagination) {
-      fetchData(pageSize, newPageIndex);
-    }
+    fetchData(pageSize, newPageIndex);
   };
 
   const onPageSizeChanged = (newPageSize: number) => {
     setPageSize(newPageSize);
-    setStoredPageSize(newPageSize);
-    // No need to refetch data if the table isn't API controlled
-    if (manualPagination) {
-      fetchData(newPageSize, pageIndex);
-    }
+    fetchData(newPageSize, pageIndex);
   };
 
   return (

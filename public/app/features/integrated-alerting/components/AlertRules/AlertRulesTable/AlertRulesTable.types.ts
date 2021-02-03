@@ -8,6 +8,7 @@ export interface AlertRulesTableProps {
   showPagination?: boolean;
   totalPages?: number;
   totalItems: number;
-  tableHash?: string;
+  pageSize: number;
+  pageIndex: number;
   fetchData: (pageSize: number, pageIndex: number) => void;
 }

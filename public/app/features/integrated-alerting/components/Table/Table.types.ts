@@ -9,6 +9,8 @@ export interface TableProps {
   totalItems: number;
   totalPages?: number;
   tableHash?: string;
+  pageSize: number;
+  pageIndex: number;
   fetchData: (pageSize: number, pageIndex: number) => void;
 }
 

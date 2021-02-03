@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from 'react';
+import React, { FC, useContext } from 'react';
 import { TableState, useTable, usePagination } from 'react-table';
 import { Spinner, useStyles } from '@grafana/ui';
 import { css } from 'emotion';
@@ -7,8 +7,7 @@ import { AlertRule } from '../AlertRules.types';
 import { AlertRulesTableProps } from './AlertRulesTable.types';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { Pagination } from '../../Table/Pagination';
-import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
-import { PAGE_SIZES, ExtendedTableInstance, ExtendedTableOptions, getProperPageSize } from '../../Table';
+import { PAGE_SIZES, ExtendedTableInstance, ExtendedTableOptions } from '../../Table';
 
 export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   pendingRequest,
@@ -18,16 +17,16 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   showPagination,
   totalPages,
   totalItems,
-  tableHash,
+  pageSize: propPageSize,
+  pageIndex: propPageIndex,
   fetchData,
 }) => {
   const style = useStyles(getStyles);
   const { selectedRuleDetails } = useContext(AlertRulesProvider);
-  const [manualPagination] = useState(totalPages >= 0);
-  const [storedPageSize, setStoredPageSize] = useStoredTablePageSize(tableHash);
+  const manualPagination = totalPages >= 0;
   const initialState: Partial<TableState> = {
-    pageIndex: 0,
-    pageSize: getProperPageSize(storedPageSize),
+    pageIndex: propPageIndex,
+    pageSize: propPageSize,
   } as Partial<TableState>;
   const tableOptions: ExtendedTableOptions = {
     columns,
@@ -54,24 +53,13 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
 
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
-
-    if (manualPagination) {
-      fetchData(pageSize, newPageIndex);
-    }
+    fetchData(pageSize, newPageIndex);
   };
 
   const onPageSizeChanged = (newPageSize: number) => {
     setPageSize(newPageSize);
-    setStoredPageSize(newPageSize);
-    // No need to refetch data if the table isn't API controlled
-    if (manualPagination) {
-      fetchData(newPageSize, pageIndex);
-    }
+    fetchData(newPageSize, pageIndex);
   };
-
-  useEffect(() => {
-    fetchData(pageSize, pageIndex);
-  }, []);
 
   return (
     <>
