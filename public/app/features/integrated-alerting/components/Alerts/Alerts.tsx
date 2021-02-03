@@ -110,7 +110,7 @@ export const Alerts: FC = () => {
           return (
             <tr
               {...row.getRowProps()}
-              className={(row.original as Alert).status === 'Silenced' ? style.disabledRow : ''}
+              className={(row.original as Alert).status === AlertStatus.SILENCED ? style.disabledRow : ''}
             >
               {row.cells.map(cell => (
                 <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
