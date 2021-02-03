@@ -115,7 +115,7 @@ export const AlertRules: FC = () => {
     [selectedRuleDetails]
   );
 
-  const fetchData = useCallback((pageSize: number, pageIndex: number) => {
+  const onPaginationChanged = useCallback((pageSize: number, pageIndex: number) => {
     setPageSize(pageSize);
     setPageindex(pageIndex);
     getAlertRules();
@@ -153,7 +153,7 @@ export const AlertRules: FC = () => {
         columns={columns}
         pendingRequest={pendingRequest}
         totalItems={data.length}
-        fetchData={fetchData}
+        onPaginationChanged={onPaginationChanged}
         pageSize={pageSize}
         pageIndex={pageIndex}
       />

@@ -19,7 +19,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   totalItems,
   pageSize: propPageSize,
   pageIndex: propPageIndex,
-  fetchData,
+  onPaginationChanged,
 }) => {
   const style = useStyles(getStyles);
   const { selectedRuleDetails } = useContext(AlertRulesProvider);
@@ -53,12 +53,12 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
 
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
-    fetchData(pageSize, newPageIndex);
+    onPaginationChanged(pageSize, newPageIndex);
   };
 
   const onPageSizeChanged = (newPageSize: number) => {
     setPageSize(newPageSize);
-    fetchData(newPageSize, pageIndex);
+    onPaginationChanged(newPageSize, pageIndex);
   };
 
   return (

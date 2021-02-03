@@ -58,7 +58,7 @@ export const NotificationChannel: FC = () => {
     }
   };
 
-  const fetchData = useCallback((pageSize: number, pageIndex: number) => {
+  const onPaginationChanged = useCallback((pageSize: number, pageIndex: number) => {
     setPageSize(pageSize);
     setPageindex(pageIndex);
   }, []);
@@ -90,7 +90,7 @@ export const NotificationChannel: FC = () => {
         columns={columns}
         pendingRequest={pendingRequest}
         emptyMessage={emptyTable}
-        fetchData={fetchData}
+        onPaginationChanged={onPaginationChanged}
         totalItems={data.length}
         showPagination
         pageSize={pageSize}

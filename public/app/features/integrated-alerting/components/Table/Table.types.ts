@@ -11,7 +11,7 @@ export interface TableProps {
   tableHash?: string;
   pageSize: number;
   pageIndex: number;
-  fetchData: (pageSize: number, pageIndex: number) => void;
+  onPaginationChanged: (pageSize: number, pageIndex: number) => void;
 }
 
 interface ExtendedTableState extends TableState {

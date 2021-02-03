@@ -13,7 +13,7 @@ export const Table: FC<TableProps> = ({
   columns,
   showPagination,
   totalPages,
-  fetchData,
+  onPaginationChanged,
   emptyMessage,
   totalItems,
   pageSize: propPageSize,
@@ -51,12 +51,12 @@ export const Table: FC<TableProps> = ({
 
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
-    fetchData(pageSize, newPageIndex);
+    onPaginationChanged(pageSize, newPageIndex);
   };
 
   const onPageSizeChanged = (newPageSize: number) => {
     setPageSize(newPageSize);
-    fetchData(newPageSize, pageIndex);
+    onPaginationChanged(newPageSize, pageIndex);
   };
 
   return (
