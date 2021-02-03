@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from 'react';
+import React, { FC, useState, useMemo, useEffect } from 'react';
 import { useStyles, IconName, Button, Select } from '@grafana/ui';
 import { PaginationProps } from './Pagination.types';
 import { getStyles } from './Pagination.styles';
@@ -16,7 +16,7 @@ export const Pagination: FC<PaginationProps> = ({
   onPageSizeChange,
 }) => {
   // Zero pages probably won't make the pagination show up, but here we should be agnostic to that
-  const [pageCount] = useState(Math.max(controlledPageCount, 1));
+  const [pageCount, setPageCount] = useState(Math.max(controlledPageCount, 1));
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
   const maxVisiblePages = Math.min(pagesPerView, pageCount);
@@ -47,6 +47,10 @@ export const Pagination: FC<PaginationProps> = ({
       onPageChange(pageIndex);
     }
   };
+
+  useEffect(() => {
+    setPageCount(Math.max(controlledPageCount, 1));
+  }, [controlledPageCount]);
 
   return (
     <div className={style.pagination} data-qa="pagination">
