@@ -5,13 +5,30 @@ import { dataQa } from '@percona/platform-core';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
 import { notificationChannelStubs } from '../__mocks__/notificationChannelStubs';
+import { NotificationChannelProvider } from '../NotificationChannel.provider';
 
 jest.mock('../NotificationChannel.service');
-jest.mock('app/core/app_events');
+jest.mock('app/core/core', () => ({
+  appEvents: {
+    emit: jest.fn(),
+  },
+}));
+const withContext = (wrapper: JSX.Element) => (
+  <NotificationChannelProvider.Provider
+    value={{
+      getNotificationChannels: jest.fn(),
+      setSelectedNotificationChannel: jest.fn(),
+      setAddModalVisible: jest.fn(),
+      setDeleteModalVisible: jest.fn(),
+    }}
+  >
+    {wrapper}
+  </NotificationChannelProvider.Provider>
+);
 
 describe('AddNotificationChannelModal', () => {
   it('should render modal with correct fields', () => {
-    const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />);
+    const wrapper = mount(withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />));
 
     expect(wrapper.find('[className$="-singleValue"]').text()).toEqual(TYPE_OPTIONS[0].label);
     expect(wrapper.find('input').length).toBe(2);
@@ -21,14 +38,14 @@ describe('AddNotificationChannelModal', () => {
   });
 
   it('should not render modal when visible is set to false', () => {
-    const wrapper = mount(<AddNotificationChannelModal setVisible={jest.fn()} isVisible={false} />);
+    const wrapper = mount(withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible={false} />));
 
     expect(wrapper.find(dataQa('emails-textarea-input')).length).toBe(0);
   });
 
   it('should call setVisible on close', () => {
     const setVisible = jest.fn();
-    const wrapper = mount(<AddNotificationChannelModal setVisible={setVisible} isVisible />);
+    const wrapper = mount(withContext(<AddNotificationChannelModal setVisible={setVisible} isVisible />));
 
     wrapper.find(dataQa('modal-background')).simulate('click');
 
@@ -37,7 +54,7 @@ describe('AddNotificationChannelModal', () => {
 
   it('should call setVisible on submit', async () => {
     const setVisible = jest.fn();
-    const wrapper = mount(<AddNotificationChannelModal setVisible={setVisible} isVisible />);
+    const wrapper = mount(withContext(<AddNotificationChannelModal setVisible={setVisible} isVisible />));
 
     wrapper.find(dataQa('name-text-input')).simulate('change', { target: { value: 'Email test' } });
     wrapper.find('textarea').simulate('change', { target: { value: 'test1@percona.com' } });
@@ -52,11 +69,13 @@ describe('AddNotificationChannelModal', () => {
   it('should render with notification channel', async () => {
     const setVisible = jest.fn();
     const wrapper = mount(
-      <AddNotificationChannelModal
-        notificationChannel={notificationChannelStubs[0]}
-        setVisible={setVisible}
-        isVisible
-      />
+      withContext(
+        <AddNotificationChannelModal
+          notificationChannel={notificationChannelStubs[0]}
+          setVisible={setVisible}
+          isVisible
+        />
+      )
     );
 
     expect(wrapper.find(dataQa('name-text-input')).prop('value')).toEqual(notificationChannelStubs[0].summary);
