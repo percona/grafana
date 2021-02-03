@@ -41,7 +41,12 @@ export const AlertRules: FC = () => {
   const getAlertRules = async () => {
     setPendingRequest(true);
     try {
-      const { rules, totals } = await AlertRulesService.list({ index: pageIndex, size: pageSize });
+      const { rules, totals } = await AlertRulesService.list({
+        page: {
+          index: pageIndex,
+          size: pageSize,
+        },
+      });
       setData(formatRules(rules));
       setTotalItems(totals.total_items);
       setTotalPages(totals.total_pages);

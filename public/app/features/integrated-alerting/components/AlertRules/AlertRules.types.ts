@@ -131,8 +131,10 @@ export interface AlertRuleCreatePayload {
 }
 
 export interface AlertRuleGetPayload {
-  size: number;
-  index: number;
+  page: {
+    size: number;
+    index: number;
+  };
 }
 
 export interface AlertRuleUpdatePayload extends AlertRuleCreatePayload {
