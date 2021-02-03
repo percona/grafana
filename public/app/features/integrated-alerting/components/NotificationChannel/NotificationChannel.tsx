@@ -75,21 +75,7 @@ export const NotificationChannel: FC = () => {
           {Messages.addAction}
         </Button>
       </div>
-      <Table data={data} columns={columns} pendingRequest={pendingRequest} emptyMessage={emptyTable}>
-        {(rows, table) =>
-          rows.map(row => {
-            const { prepareRow } = table;
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                })}
-              </tr>
-            );
-          })
-        }
-      </Table>
+      <Table data={data} columns={columns} pendingRequest={pendingRequest} emptyMessage={emptyTable} />
       <AddNotificationChannelModal
         isVisible={addModalVisible}
         setVisible={setAddModalVisible}

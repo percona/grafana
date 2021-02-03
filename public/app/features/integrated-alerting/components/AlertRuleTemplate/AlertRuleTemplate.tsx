@@ -82,21 +82,7 @@ export const AlertRuleTemplate: FC = () => {
         setVisible={setAddModalVisible}
         getAlertRuleTemplates={getAlertRuleTemplates}
       />
-      <Table data={data} columns={columns} pendingRequest={pendingRequest} emptyMessage={noData}>
-        {(rows, table) =>
-          rows.map(row => {
-            const { prepareRow } = table;
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                })}
-              </tr>
-            );
-          })
-        }
-      </Table>
+      <Table data={data} columns={columns} pendingRequest={pendingRequest} emptyMessage={noData} />
     </>
   );
 };
