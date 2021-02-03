@@ -4,8 +4,8 @@ import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps, ExtendedTableInstance, ExtendedTableOptions } from './Table.types';
-import { PAGE_SIZES } from './Table.constants';
 import { Pagination } from './Pagination';
+import { PAGE_SIZES } from 'app/core/constants';
 
 export const Table: FC<TableProps> = ({
   pendingRequest,

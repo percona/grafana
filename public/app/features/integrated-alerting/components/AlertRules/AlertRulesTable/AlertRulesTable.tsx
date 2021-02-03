@@ -7,7 +7,8 @@ import { AlertRule } from '../AlertRules.types';
 import { AlertRulesTableProps } from './AlertRulesTable.types';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { Pagination } from '../../Table/Pagination';
-import { PAGE_SIZES, ExtendedTableInstance, ExtendedTableOptions } from '../../Table';
+import { ExtendedTableInstance, ExtendedTableOptions } from '../../Table';
+import { PAGE_SIZES } from 'app/core/constants';
 
 export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   pendingRequest,
