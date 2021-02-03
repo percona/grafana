@@ -22,14 +22,23 @@ const data = [
   },
 ];
 
-const fetchData = jest.fn();
+const onPaginationChanged = jest.fn();
 
 describe('AlertRulesTable', () => {
   it('should render the table correctly', async () => {
     let wrapper: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
 
     await act(async () => {
-      wrapper = mount(<AlertRulesTable totalItems={data.length} fetchData={fetchData} data={data} columns={columns} />);
+      wrapper = mount(
+        <AlertRulesTable
+          totalItems={data.length}
+          onPaginationChanged={onPaginationChanged}
+          data={data}
+          columns={columns}
+          pageSize={10}
+          pageIndex={0}
+        />
+      );
     });
 
     wrapper.update();
@@ -42,7 +51,15 @@ describe('AlertRulesTable', () => {
 
   it('should render the loader when data fetch is pending', async () => {
     const wrapper = mount(
-      <AlertRulesTable totalItems={data.length} fetchData={fetchData} data={data} columns={columns} pendingRequest />
+      <AlertRulesTable
+        totalItems={data.length}
+        onPaginationChanged={onPaginationChanged}
+        data={data}
+        columns={columns}
+        pendingRequest
+        pageSize={10}
+        pageIndex={0}
+      />
     );
 
     expect(wrapper.find(dataQa('alert-rules-table-loading'))).toHaveLength(1);
@@ -54,10 +71,12 @@ describe('AlertRulesTable', () => {
     const wrapper = mount(
       <AlertRulesTable
         totalItems={data.length}
-        fetchData={fetchData}
+        onPaginationChanged={onPaginationChanged}
         data={[]}
         columns={columns}
         emptyMessage="empty"
+        pageSize={10}
+        pageIndex={0}
       />
     );
     const noData = wrapper.find(dataQa('alert-rules-table-no-data'));
@@ -79,10 +98,12 @@ describe('AlertRulesTable', () => {
       <AlertRulesProvider.Provider value={alertRulesContext}>
         <AlertRulesTable
           totalItems={data.length}
-          fetchData={fetchData}
+          onPaginationChanged={onPaginationChanged}
           data={formattedRulesStubs}
           columns={columns}
           emptyMessage="empty"
+          pageSize={10}
+          pageIndex={0}
         />
       </AlertRulesProvider.Provider>
     );

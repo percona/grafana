@@ -19,11 +19,20 @@ const data = [
   },
 ];
 
-const fetchData = jest.fn();
+const onPaginationChanged = jest.fn();
 
 describe('Table', () => {
   it('should render the table', async () => {
-    const wrapper = mount(<Table totalItems={data.length} data={data} columns={columns} fetchData={fetchData} />);
+    const wrapper = mount(
+      <Table
+        totalItems={data.length}
+        data={data}
+        columns={columns}
+        onPaginationChanged={onPaginationChanged}
+        pageSize={10}
+        pageIndex={0}
+      />
+    );
 
     expect(wrapper.find(dataQa('table-thead')).find('tr')).toHaveLength(1);
     expect(wrapper.find(dataQa('table-tbody')).find('tr')).toHaveLength(2);
@@ -32,7 +41,15 @@ describe('Table', () => {
 
   it('should render the loader when data fetch is pending', async () => {
     const wrapper = mount(
-      <Table totalItems={data.length} data={data} columns={columns} fetchData={fetchData} pendingRequest />
+      <Table
+        totalItems={data.length}
+        data={data}
+        columns={columns}
+        onPaginationChanged={onPaginationChanged}
+        pendingRequest
+        pageSize={10}
+        pageIndex={0}
+      />
     );
 
     expect(wrapper.find(dataQa('table-loading'))).toHaveLength(1);
@@ -42,7 +59,15 @@ describe('Table', () => {
 
   it('should display the noData section when no data is passed', async () => {
     const wrapper = mount(
-      <Table totalItems={data.length} data={[]} columns={columns} fetchData={fetchData} emptyMessage="empty" />
+      <Table
+        totalItems={data.length}
+        data={[]}
+        columns={columns}
+        onPaginationChanged={onPaginationChanged}
+        emptyMessage="empty"
+        pageSize={10}
+        pageIndex={0}
+      />
     );
     const noData = wrapper.find(dataQa('table-no-data'));
 
