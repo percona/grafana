@@ -69,12 +69,12 @@ export const Alerts: FC = () => {
       } as Column,
       {
         Header: activeSinceColumn,
-        accessor: ({ activeSince }: Alert) => <>{activeSince ? activeSince : null}</>,
+        accessor: 'activeSince',
         width: '10%',
       } as Column,
       {
         Header: lastNotifiedColumn,
-        accessor: ({ lastNotified }: Alert) => <>{lastNotified ? lastNotified : null}</>,
+        accessor: 'lastNotified',
         width: '10%',
       } as Column,
       {
