@@ -131,8 +131,8 @@ export interface AlertRuleCreatePayload {
 }
 
 export interface AlertRuleGetPayload {
-  page: {
-    size: number;
+  page_params: {
+    page_size: number;
     index: number;
   };
 }
