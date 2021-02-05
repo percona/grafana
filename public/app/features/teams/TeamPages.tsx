@@ -23,9 +23,9 @@ export interface Props {
   teamId: number;
   pageName: string;
   navModel: NavModel;
-  members?: TeamMember[];
-  editorsCanAdmin?: boolean;
-  signedInUser?: User;
+  members: TeamMember[];
+  editorsCanAdmin: boolean;
+  signedInUser: User;
 }
 
 interface State {
@@ -83,8 +83,8 @@ export class TeamPages extends PureComponent<Props, State> {
   hideTabsFromNonTeamAdmin = (navModel: NavModel, isSignedInUserTeamAdmin: boolean) => {
     if (!isSignedInUserTeamAdmin && navModel.main && navModel.main.children) {
       navModel.main.children
-        .filter(navItem => !this.textsAreEqual(navItem.text, PageTypes.Members))
-        .map(navItem => {
+        .filter((navItem) => !this.textsAreEqual(navItem.text, PageTypes.Members))
+        .map((navItem) => {
           navItem.hideFromTabs = true;
         });
     }
@@ -92,7 +92,7 @@ export class TeamPages extends PureComponent<Props, State> {
     return navModel;
   };
 
-  renderPage(isSignedInUserTeamAdmin: boolean) {
+  renderPage(isSignedInUserTeamAdmin: boolean): React.ReactNode {
     const { isSyncEnabled } = this.state;
     const { members } = this.props;
     const currentPage = this.getCurrentPage();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import { TimeZonePicker } from './TimeZonePicker';
+import { TimeZonePicker } from '@grafana/ui';
 import { UseState } from '../../utils/storybook/UseState';
 import { withCenteredStory } from '../../utils/storybook/withCenteredStory';
 
@@ -23,7 +23,7 @@ export const basic = () => {
           <TimeZonePicker
             includeInternal={true}
             value={value.value}
-            onChange={newValue => {
+            onChange={(newValue) => {
               if (!newValue) {
                 return;
               }

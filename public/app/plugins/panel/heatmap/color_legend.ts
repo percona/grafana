@@ -5,7 +5,8 @@ import { contextSrv } from 'app/core/core';
 import { tickStep } from 'app/core/utils/ticks';
 import { getColorScale, getOpacityScale } from './color_scale';
 import coreModule from 'app/core/core_module';
-import { PanelEvents, GrafanaThemeType, getColorFromHexRgbOrName } from '@grafana/data';
+import { PanelEvents, getColorForTheme } from '@grafana/data';
+import { config } from 'app/core/config';
 
 const LEGEND_HEIGHT_PX = 6;
 const LEGEND_WIDTH_PX = 100;
@@ -33,7 +34,7 @@ coreModule.directive('colorLegend', () => {
 
       function render() {
         const legendElem = $(elem).find('svg');
-        const legendWidth = Math.floor(legendElem.outerWidth());
+        const legendWidth = Math.floor(legendElem.outerWidth() ?? 10);
 
         if (panel.color.mode === 'spectrum') {
           const colorScheme: any = _.find(ctrl.colorSchemes, {
@@ -102,7 +103,7 @@ function drawColorLegend(
   const legend = d3.select(legendElem.get(0));
   clearLegend(elem);
 
-  const legendWidth = Math.floor(legendElem.outerWidth()) - 30;
+  const legendWidth = Math.floor(legendElem.outerWidth() ?? 10) - 30;
   const legendHeight = legendElem.attr('height');
 
   const rangeStep = ((rangeTo - rangeFrom) / legendWidth) * LEGEND_SEGMENT_WIDTH;
@@ -118,12 +119,12 @@ function drawColorLegend(
     .data(valuesRange)
     .enter()
     .append('rect')
-    .attr('x', d => Math.round((d - rangeFrom) * widthFactor))
+    .attr('x', (d) => Math.round((d - rangeFrom) * widthFactor))
     .attr('y', 0)
     .attr('width', Math.round(rangeStep * widthFactor + 1)) // Overlap rectangles to prevent gaps
     .attr('height', legendHeight)
     .attr('stroke-width', 0)
-    .attr('fill', d => colorScale(d));
+    .attr('fill', (d) => colorScale(d));
 
   drawLegendValues(elem, rangeFrom, rangeTo, maxValue, minValue, legendWidth, valuesRange);
 }
@@ -140,7 +141,7 @@ function drawOpacityLegend(
   const legend = d3.select(legendElem.get(0));
   clearLegend(elem);
 
-  const legendWidth = Math.floor(legendElem.outerWidth()) - 30;
+  const legendWidth = Math.floor(legendElem.outerWidth() ?? 30) - 30;
   const legendHeight = legendElem.attr('height');
 
   const rangeStep = ((rangeTo - rangeFrom) / legendWidth) * LEGEND_SEGMENT_WIDTH;
@@ -156,13 +157,13 @@ function drawOpacityLegend(
     .data(valuesRange)
     .enter()
     .append('rect')
-    .attr('x', d => Math.round((d - rangeFrom) * widthFactor))
+    .attr('x', (d) => Math.round((d - rangeFrom) * widthFactor))
     .attr('y', 0)
     .attr('width', Math.round(rangeStep * widthFactor))
     .attr('height', legendHeight)
     .attr('stroke-width', 0)
     .attr('fill', options.cardColor)
-    .style('opacity', d => opacityScale(d));
+    .style('opacity', (d) => opacityScale(d));
 
   drawLegendValues(elem, rangeFrom, rangeTo, maxValue, minValue, legendWidth, valuesRange);
 }
@@ -183,16 +184,10 @@ function drawLegendValues(
     return;
   }
 
-  const legendValueScale = d3
-    .scaleLinear()
-    .domain([rangeFrom, rangeTo])
-    .range([0, legendWidth]);
+  const legendValueScale = d3.scaleLinear().domain([rangeFrom, rangeTo]).range([0, legendWidth]);
 
   const ticks = buildLegendTicks(rangeFrom, rangeTo, maxValue, minValue);
-  const xAxis = d3
-    .axisBottom(legendValueScale)
-    .tickValues(ticks)
-    .tickSize(LEGEND_TICK_SIZE);
+  const xAxis = d3.axisBottom(legendValueScale).tickValues(ticks).tickSize(LEGEND_TICK_SIZE);
 
   const colorRect = legendElem.find(':first-child');
   const posY = getSvgElemHeight(legendElem) + LEGEND_VALUE_MARGIN;
@@ -204,17 +199,14 @@ function drawLegendValues(
     .attr('transform', 'translate(' + posX + ',' + posY + ')')
     .call(xAxis);
 
-  legend
-    .select('.axis')
-    .select('.domain')
-    .remove();
+  legend.select('.axis').select('.domain').remove();
 }
 
 function drawSimpleColorLegend(elem: JQuery, colorScale: any) {
   const legendElem = $(elem).find('svg');
   clearLegend(elem);
 
-  const legendWidth = Math.floor(legendElem.outerWidth());
+  const legendWidth = Math.floor(legendElem.outerWidth() ?? 30);
   const legendHeight = legendElem.attr('height');
 
   if (legendWidth) {
@@ -228,12 +220,12 @@ function drawSimpleColorLegend(elem: JQuery, colorScale: any) {
     legendRects
       .enter()
       .append('rect')
-      .attr('x', d => d)
+      .attr('x', (d) => d)
       .attr('y', 0)
       .attr('width', rangeStep + 1) // Overlap rectangles to prevent gaps
       .attr('height', legendHeight)
       .attr('stroke-width', 0)
-      .attr('fill', d => colorScale(d));
+      .attr('fill', (d) => colorScale(d));
   }
 }
 
@@ -242,22 +234,15 @@ function drawSimpleOpacityLegend(elem: JQuery, options: { colorScale: string; ex
   clearLegend(elem);
 
   const legend = d3.select(legendElem.get(0));
-  const legendWidth = Math.floor(legendElem.outerWidth());
+  const legendWidth = Math.floor(legendElem.outerWidth() ?? 30);
   const legendHeight = legendElem.attr('height');
 
   if (legendWidth) {
     let legendOpacityScale: any;
     if (options.colorScale === 'linear') {
-      legendOpacityScale = d3
-        .scaleLinear()
-        .domain([0, legendWidth])
-        .range([0, 1]);
+      legendOpacityScale = d3.scaleLinear().domain([0, legendWidth]).range([0, 1]);
     } else if (options.colorScale === 'sqrt') {
-      legendOpacityScale = d3
-        .scalePow()
-        .exponent(options.exponent)
-        .domain([0, legendWidth])
-        .range([0, 1]);
+      legendOpacityScale = d3.scalePow().exponent(options.exponent).domain([0, legendWidth]).range([0, 1]);
     }
 
     const rangeStep = 10;
@@ -267,19 +252,13 @@ function drawSimpleOpacityLegend(elem: JQuery, options: { colorScale: string; ex
     legendRects
       .enter()
       .append('rect')
-      .attr('x', d => d)
+      .attr('x', (d) => d)
       .attr('y', 0)
       .attr('width', rangeStep)
       .attr('height', legendHeight)
       .attr('stroke-width', 0)
-      .attr(
-        'fill',
-        getColorFromHexRgbOrName(
-          options.cardColor,
-          contextSrv.user.lightTheme ? GrafanaThemeType.Light : GrafanaThemeType.Dark
-        )
-      )
-      .style('opacity', d => legendOpacityScale(d));
+      .attr('fill', getColorForTheme(options.cardColor, config.theme))
+      .style('opacity', (d) => legendOpacityScale(d));
   }
 }
 

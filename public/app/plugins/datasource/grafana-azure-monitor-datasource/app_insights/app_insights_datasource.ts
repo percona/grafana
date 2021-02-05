@@ -1,4 +1,4 @@
-import { ScopedVars } from '@grafana/data';
+import { ScopedVars, MetricFindValue } from '@grafana/data';
 import { DataQueryRequest, DataSourceInstanceSettings } from '@grafana/data';
 import { getBackendSrv, getTemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import _, { isString } from 'lodash';
@@ -72,7 +72,7 @@ export default class AppInsightsDatasource extends DataSourceWithBackend<AzureMo
   }
 
   applyTemplateVariables(target: AzureMonitorQuery, scopedVars: ScopedVars): Record<string, any> {
-    const item = target.appInsights;
+    const item = target.appInsights!;
 
     const old: any = item;
     // fix for timeGrainUnit which is a deprecated/removed field name
@@ -114,7 +114,7 @@ export default class AppInsightsDatasource extends DataSourceWithBackend<AzureMo
         allowedTimeGrainsMs: item.allowedTimeGrainsMs,
         metricName: templateSrv.replace(item.metricName, scopedVars),
         aggregation: templateSrv.replace(item.aggregation, scopedVars),
-        dimension: item.dimension.map(d => templateSrv.replace(d, scopedVars)),
+        dimension: item.dimension.map((d) => templateSrv.replace(d, scopedVars)),
         dimensionFilter: templateSrv.replace(item.dimensionFilter, scopedVars),
         alias: item.alias,
         format: target.format,
@@ -122,7 +122,13 @@ export default class AppInsightsDatasource extends DataSourceWithBackend<AzureMo
     };
   }
 
-  metricFindQuery(query: string) {
+  /**
+   * This is named differently than DataSourceApi.metricFindQuery
+   * because it's not exposed to Grafana like the main AzureMonitorDataSource.
+   * And some of the azure internal data sources return null in this function, which the
+   * external interface does not support
+   */
+  metricFindQueryInternal(query: string): Promise<MetricFindValue[]> | null {
     const appInsightsMetricNameQuery = query.match(/^AppInsightsMetricNames\(\)/i);
     if (appInsightsMetricNameQuery) {
       return this.getMetricNames();
@@ -134,7 +140,7 @@ export default class AppInsightsDatasource extends DataSourceWithBackend<AzureMo
       return this.getGroupBys(getTemplateSrv().replace(metricName));
     }
 
-    return undefined;
+    return null;
   }
 
   testDatasource() {

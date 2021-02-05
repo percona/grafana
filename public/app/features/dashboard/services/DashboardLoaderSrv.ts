@@ -90,7 +90,7 @@ export class DashboardLoaderSrv {
           };
         },
         (err: any) => {
-          console.log('Script dashboard error ' + err);
+          console.error('Script dashboard error ' + err);
           this.$rootScope.appEvent(AppEvents.alertError, [
             'Script Error',
             'Please make sure it exists and returns a valid dashboard',
@@ -123,7 +123,7 @@ export class DashboardLoaderSrv {
 
     // Handle async dashboard scripts
     if (_.isFunction(scriptResult)) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         scriptResult((dashboard: any) => {
           this.$timeout(() => {
             resolve({ data: dashboard });

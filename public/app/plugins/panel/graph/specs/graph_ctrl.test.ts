@@ -39,6 +39,7 @@ describe('GraphCtrl', () => {
     ctx.ctrl.events = {
       emit: () => {},
     };
+    ctx.ctrl.panelData = {};
     ctx.ctrl.annotationsSrv = {
       getAnnotations: () => Promise.resolve({}),
     };
@@ -70,9 +71,7 @@ describe('GraphCtrl', () => {
   describe('when time series are inside range', () => {
     beforeEach(() => {
       const range = {
-        from: dateTime()
-          .subtract(1, 'days')
-          .valueOf(),
+        from: dateTime().subtract(1, 'days').valueOf(),
         to: dateTime().valueOf(),
       };
 

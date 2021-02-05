@@ -1,24 +1,23 @@
 // Libraries
 import _ from 'lodash';
 // Utils
-import kbn from 'app/core/utils/kbn';
 import coreModule from 'app/core/core_module';
 // Types
 import {
   dateMath,
-  DefaultTimeRange,
-  TimeRange,
-  RawTimeRange,
-  TimeZone,
-  toUtc,
   dateTime,
+  getDefaultTimeRange,
   isDateTime,
+  rangeUtil,
+  RawTimeRange,
+  TimeRange,
+  toUtc,
 } from '@grafana/data';
-import { ITimeoutService, ILocationService } from 'angular';
+import { ILocationService, ITimeoutService } from 'angular';
 import { ContextSrv } from 'app/core/services/context_srv';
 import { DashboardModel } from '../state/DashboardModel';
 import { GrafanaRootScope } from 'app/routes/GrafanaCtrl';
-import { getZoomedTimeRange, getShiftedTimeRange } from 'app/core/utils/timePicker';
+import { getShiftedTimeRange, getZoomedTimeRange } from 'app/core/utils/timePicker';
 import { appEvents } from '../../../core/core';
 import { CoreEvents } from '../../../types';
 
@@ -28,8 +27,8 @@ export class TimeSrv {
   time: any;
   refreshTimer: any;
   refresh: any;
-  oldRefresh: boolean;
-  dashboard: Partial<DashboardModel>;
+  oldRefresh: string | null | undefined;
+  dashboard: DashboardModel;
   timeAtLoad: any;
   private autoRefreshBlocked: boolean;
 
@@ -42,7 +41,7 @@ export class TimeSrv {
     private contextSrv: ContextSrv
   ) {
     // default time
-    this.time = DefaultTimeRange.raw;
+    this.time = getDefaultTimeRange().raw;
 
     appEvents.on(CoreEvents.zoomOut, this.zoomOut.bind(this));
     appEvents.on(CoreEvents.shiftTime, this.shiftTime.bind(this));
@@ -56,7 +55,7 @@ export class TimeSrv {
     });
   }
 
-  init(dashboard: Partial<DashboardModel>) {
+  init(dashboard: DashboardModel) {
     this.timer.cancelAll();
 
     this.dashboard = dashboard;
@@ -79,7 +78,7 @@ export class TimeSrv {
       return intervals;
     }
 
-    return intervals.filter(str => str !== '').filter(this.contextSrv.isAllowedInterval);
+    return intervals.filter((str) => str !== '').filter(this.contextSrv.isAllowedInterval);
   }
 
   private parseTime() {
@@ -124,7 +123,7 @@ export class TimeSrv {
       // when time window specified in ms
       timeWindowMs = parseInt(timeWindow, 10);
     } else {
-      timeWindowMs = kbn.interval_to_ms(timeWindow);
+      timeWindowMs = rangeUtil.intervalToMs(timeWindow);
     }
 
     return {
@@ -190,7 +189,7 @@ export class TimeSrv {
 
     if (interval) {
       const validInterval = this.contextSrv.getValidInterval(interval);
-      const intervalMs = kbn.interval_to_ms(validInterval);
+      const intervalMs = rangeUtil.intervalToMs(validInterval);
 
       this.refreshTimer = this.timer.register(
         this.$timeout(() => {
@@ -279,11 +278,11 @@ export class TimeSrv {
       to: isDateTime(this.time.to) ? dateTime(this.time.to) : this.time.to,
     };
 
-    const timezone: TimeZone = this.dashboard ? this.dashboard.getTimezone() : undefined;
+    const timezone = this.dashboard ? this.dashboard.getTimezone() : undefined;
 
     return {
-      from: dateMath.parse(raw.from, false, timezone),
-      to: dateMath.parse(raw.to, true, timezone),
+      from: dateMath.parse(raw.from, false, timezone)!,
+      to: dateMath.parse(raw.to, true, timezone)!,
       raw: raw,
     };
   }

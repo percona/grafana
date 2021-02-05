@@ -117,13 +117,13 @@ export class ChangeTracker {
     // ignore iteration property
     delete dash.iteration;
 
-    dash.panels = _.filter(dash.panels, panel => {
+    dash.panels = _.filter(dash.panels, (panel) => {
       if (panel.repeatPanelId) {
         return false;
       }
 
       // remove scopedVars
-      panel.scopedVars = null;
+      panel.scopedVars = undefined;
 
       // ignore panel legend sort
       if (panel.legend) {

@@ -10,7 +10,8 @@
     },
     "rootDirs": ["public/"],
     "typeRoots": ["node_modules/@types", "public/app/types"],
-    "allowJs": true
+    "allowJs": true,
+    "strictNullChecks": true
   },
   "extends": "@grafana/tsconfig/base.json",
   "include": [
@@ -18,6 +19,7 @@
     "public/e2e-test/**/*.ts",
     "public/test/**/*.ts",
     "public/vendor/**/*.ts",
-    "packages/jaeger-ui-components/typings"
+    "packages/jaeger-ui-components/typings",
+    "packages/grafana-data/typings"
   ]
 }

@@ -11,12 +11,8 @@ import { ResponsiveButton } from './ResponsiveButton';
 
 const getStyles = stylesFactory((theme: GrafanaTheme) => {
   const bgColor = selectThemeVariant({ light: theme.palette.gray5, dark: theme.palette.dark1 }, theme.type);
-  const orangeLighter = tinycolor(theme.palette.orangeDark)
-    .lighten(10)
-    .toString();
-  const pulseTextColor = tinycolor(theme.palette.orangeDark)
-    .desaturate(90)
-    .toString();
+  const orangeLighter = tinycolor(theme.palette.orangeDark).lighten(10).toString();
+  const pulseTextColor = tinycolor(theme.palette.orangeDark).desaturate(90).toString();
   return {
     noRightBorderStyle: css`
       label: noRightBorderStyle;
@@ -98,10 +94,6 @@ const getStyles = stylesFactory((theme: GrafanaTheme) => {
   };
 });
 
-const defaultLiveTooltip = () => {
-  return <>Live</>;
-};
-
 type LiveTailButtonProps = {
   splitted: boolean;
   start: () => void;
@@ -120,7 +112,7 @@ export function LiveTailButton(props: LiveTailButtonProps) {
 
   return (
     <>
-      <Tooltip content={defaultLiveTooltip} placement="bottom">
+      <Tooltip content={isLive ? <>Pause the live stream</> : <>Live stream your logs</>} placement="bottom">
         <ResponsiveButton
           splitted={splitted}
           buttonClassName={classNames('btn navbar-button', styles.liveButton, {
@@ -129,7 +121,7 @@ export function LiveTailButton(props: LiveTailButtonProps) {
             [styles.isPaused]: isLive && isPaused,
           })}
           icon={!isLive ? 'play' : 'pause'}
-          iconClassName={isLive && 'icon-brand-gradient'}
+          iconClassName={isLive ? 'icon-brand-gradient' : undefined}
           onClick={onClickMain}
           title={'\xa0Live'}
         />
@@ -147,12 +139,14 @@ export function LiveTailButton(props: LiveTailButtonProps) {
         }}
       >
         <div>
-          <button
-            className={`btn navbar-button navbar-button--attached explore-active-button ${styles.isLive}`}
-            onClick={stop}
-          >
-            <Icon className="icon-brand-gradient" name="square-shape" size="lg" type="mono" />
-          </button>
+          <Tooltip content={<>Stop and exit the live stream</>} placement="bottom">
+            <button
+              className={`btn navbar-button navbar-button--attached explore-active-button ${styles.isLive}`}
+              onClick={stop}
+            >
+              <Icon className="icon-brand-gradient" name="square-shape" size="lg" type="mono" />
+            </button>
+          </Tooltip>
         </div>
       </CSSTransition>
     </>

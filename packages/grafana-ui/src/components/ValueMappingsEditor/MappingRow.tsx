@@ -7,8 +7,8 @@ import { MappingType, RangeMap, SelectableValue, ValueMap, ValueMapping } from '
 
 export interface Props {
   valueMapping: ValueMapping;
-  updateValueMapping: (valueMapping: ValueMapping) => void;
-  removeValueMapping: () => void;
+  onUpdate: (value: ValueMapping) => void;
+  onRemove: () => void;
 }
 
 const MAPPING_OPTIONS: Array<SelectableValue<MappingType>> = [
@@ -16,27 +16,27 @@ const MAPPING_OPTIONS: Array<SelectableValue<MappingType>> = [
   { value: MappingType.RangeToText, label: 'Range' },
 ];
 
-export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, removeValueMapping }) => {
+export const MappingRow: React.FC<Props> = ({ valueMapping, onUpdate, onRemove }) => {
   const { type } = valueMapping;
 
   const onMappingValueChange = (value: string) => {
-    updateValueMapping({ ...valueMapping, value: value });
+    onUpdate({ ...valueMapping, value: value });
   };
 
   const onMappingFromChange = (value: string) => {
-    updateValueMapping({ ...valueMapping, from: value });
+    onUpdate({ ...valueMapping, from: value });
   };
 
   const onMappingToChange = (value: string) => {
-    updateValueMapping({ ...valueMapping, to: value });
+    onUpdate({ ...valueMapping, to: value });
   };
 
   const onMappingTextChange = (value: string) => {
-    updateValueMapping({ ...valueMapping, text: value });
+    onUpdate({ ...valueMapping, text: value });
   };
 
   const onMappingTypeChange = (mappingType: MappingType) => {
-    updateValueMapping({ ...valueMapping, type: mappingType });
+    onUpdate({ ...valueMapping, type: mappingType });
   };
 
   const onKeyDown = (handler: (value: string) => void) => (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -54,7 +54,7 @@ export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, 
               <Input
                 type="number"
                 defaultValue={(valueMapping as RangeMap).from!}
-                onBlur={e => onMappingFromChange(e.currentTarget.value)}
+                onBlur={(e) => onMappingFromChange(e.currentTarget.value)}
                 onKeyDown={onKeyDown(onMappingFromChange)}
               />
             </Field>
@@ -62,7 +62,7 @@ export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, 
               <Input
                 type="number"
                 defaultValue={(valueMapping as RangeMap).to}
-                onBlur={e => onMappingToChange(e.currentTarget.value)}
+                onBlur={(e) => onMappingToChange(e.currentTarget.value)}
                 onKeyDown={onKeyDown(onMappingToChange)}
               />
             </Field>
@@ -71,7 +71,7 @@ export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, 
           <Field label="Text">
             <Input
               defaultValue={valueMapping.text}
-              onBlur={e => onMappingTextChange(e.currentTarget.value)}
+              onBlur={(e) => onMappingTextChange(e.currentTarget.value)}
               onKeyDown={onKeyDown(onMappingTextChange)}
             />
           </Field>
@@ -84,7 +84,7 @@ export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, 
         <Field label="Value">
           <Input
             defaultValue={(valueMapping as ValueMap).value}
-            onBlur={e => onMappingValueChange(e.currentTarget.value)}
+            onBlur={(e) => onMappingValueChange(e.currentTarget.value)}
             onKeyDown={onKeyDown(onMappingValueChange)}
           />
         </Field>
@@ -92,7 +92,7 @@ export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, 
         <Field label="Text">
           <Input
             defaultValue={valueMapping.text}
-            onBlur={e => onMappingTextChange(e.currentTarget.value)}
+            onBlur={(e) => onMappingTextChange(e.currentTarget.value)}
             onKeyDown={onKeyDown(onMappingTextChange)}
           />
         </Field>
@@ -103,7 +103,7 @@ export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, 
   const label = (
     <HorizontalGroup justify="space-between" align="center">
       <Label>Mapping type</Label>
-      <IconButton name="times" onClick={removeValueMapping} aria-label="ValueMappingsEditor remove button" />
+      <IconButton name="times" onClick={onRemove} aria-label="ValueMappingsEditor remove button" />
     </HorizontalGroup>
   );
   return (
@@ -112,7 +112,7 @@ export const MappingRow: React.FC<Props> = ({ valueMapping, updateValueMapping, 
         <RadioButtonGroup
           options={MAPPING_OPTIONS}
           value={type}
-          onChange={type => {
+          onChange={(type) => {
             onMappingTypeChange(type!);
           }}
         />

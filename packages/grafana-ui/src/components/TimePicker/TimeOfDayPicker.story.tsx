@@ -1,7 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import { TimeOfDayPicker } from './TimeOfDayPicker';
+import { TimeOfDayPicker } from '@grafana/ui';
 import { UseState } from '../../utils/storybook/UseState';
 import { withCenteredStory } from '../../utils/storybook/withCenteredStory';
 import { dateTime } from '@grafana/data';
@@ -22,7 +22,7 @@ export const basic = () => {
       {(value, updateValue) => {
         return (
           <TimeOfDayPicker
-            onChange={newValue => {
+            onChange={(newValue) => {
               action('on selected')(newValue);
               updateValue({ value: newValue });
             }}
@@ -40,7 +40,7 @@ export const onlyMinutes = () => {
       {(value, updateValue) => {
         return (
           <TimeOfDayPicker
-            onChange={newValue => {
+            onChange={(newValue) => {
               action('on selected')(newValue);
               updateValue({ value: newValue });
             }}

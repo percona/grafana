@@ -8,6 +8,7 @@ import { TimeZoneOffset } from '../TimeZonePicker/TimeZoneOffset';
 import { Button } from '../../Button';
 import { TimeZonePicker } from '../TimeZonePicker';
 import isString from 'lodash/isString';
+import { selectors } from '@grafana/e2e-selectors';
 
 interface Props {
   timeZone?: TimeZone;
@@ -15,7 +16,7 @@ interface Props {
   onChangeTimeZone: (timeZone: TimeZone) => void;
 }
 
-export const TimePickerFooter: FC<Props> = props => {
+export const TimePickerFooter: FC<Props> = (props) => {
   const { timeZone, timestamp = Date.now(), onChangeTimeZone } = props;
   const [isEditing, setEditing] = useState(false);
 
@@ -45,10 +46,10 @@ export const TimePickerFooter: FC<Props> = props => {
   if (isEditing) {
     return (
       <div className={cx(style.container, style.editContainer)}>
-        <div className={style.timeZoneContainer}>
+        <div aria-label={selectors.components.TimeZonePicker.container} className={style.timeZoneContainer}>
           <TimeZonePicker
             includeInternal={true}
-            onChange={timeZone => {
+            onChange={(timeZone) => {
               onToggleChangeTz();
 
               if (isString(timeZone)) {

@@ -20,13 +20,13 @@ export interface Props {
   addTeamMember: typeof addTeamMember;
   setSearchMemberQuery: typeof setSearchMemberQuery;
   syncEnabled: boolean;
-  editorsCanAdmin?: boolean;
-  signedInUser?: SignedInUser;
+  editorsCanAdmin: boolean;
+  signedInUser: SignedInUser;
 }
 
 export interface State {
   isAdding: boolean;
-  newTeamMember?: User;
+  newTeamMember?: User | null;
 }
 
 export class TeamMembers extends PureComponent<Props, State> {
@@ -48,7 +48,7 @@ export class TeamMembers extends PureComponent<Props, State> {
   };
 
   onAddUserToTeam = async () => {
-    this.props.addTeamMember(this.state.newTeamMember.id);
+    this.props.addTeamMember(this.state.newTeamMember!.id);
     this.setState({ newTeamMember: null });
   };
 
@@ -59,7 +59,7 @@ export class TeamMembers extends PureComponent<Props, State> {
 
     return (
       <td>
-        {labels.map(label => (
+        {labels.map((label) => (
           <TagBadge key={label} label={label} removeIcon={false} count={0} onClick={() => {}} />
         ))}
       </td>
@@ -129,7 +129,7 @@ export class TeamMembers extends PureComponent<Props, State> {
             </thead>
             <tbody>
               {members &&
-                members.map(member => (
+                members.map((member) => (
                   <TeamMemberRow
                     key={member.userId}
                     member={member}

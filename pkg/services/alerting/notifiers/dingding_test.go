@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/grafana/grafana/pkg/services/validations"
+
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/services/alerting"
@@ -24,7 +26,6 @@ func TestDingDingNotifier(t *testing.T) {
 
 			_, err := newDingDingNotifier(model)
 			So(err, ShouldNotBeNil)
-
 		})
 		Convey("settings should trigger incident", func() {
 			json := `{ "url": "https://www.google.com" }`
@@ -49,7 +50,7 @@ func TestDingDingNotifier(t *testing.T) {
 					&alerting.Rule{
 						State:   models.AlertStateAlerting,
 						Message: `{host="localhost"}`,
-					})
+					}, &validations.OSSPluginRequestValidator{})
 				_, err = notifier.genBody(evalContext, "")
 				So(err, ShouldBeNil)
 			})

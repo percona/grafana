@@ -16,7 +16,7 @@ export interface OptionsPickerState {
   id: string;
   selectedValues: VariableOption[];
   selectedTags: VariableTag[];
-  queryValue: string | null;
+  queryValue: string;
   highlightIndex: number;
   tags: VariableTag[];
   options: VariableOption[];
@@ -26,7 +26,7 @@ export interface OptionsPickerState {
 export const initialState: OptionsPickerState = {
   id: '',
   highlightIndex: -1,
-  queryValue: null,
+  queryValue: '',
   selectedTags: [],
   selectedValues: [],
   tags: [],
@@ -65,7 +65,7 @@ const updateOptions = (state: OptionsPickerState): OptionsPickerState => {
   const selectedOptions = optionsToRecord(state.selectedValues);
   state.selectedValues = Object.values(selectedOptions);
 
-  state.options = state.options.map(option => {
+  state.options = state.options.map((option) => {
     if (!isString(option.value)) {
       return option;
     }
@@ -78,6 +78,7 @@ const updateOptions = (state: OptionsPickerState): OptionsPickerState => {
 
     return { ...option, selected };
   });
+  state.options = applyLimit(state.options);
   return state;
 };
 
@@ -109,7 +110,7 @@ const updateDefaultSelection = (state: OptionsPickerState): OptionsPickerState =
 const updateAllSelection = (state: OptionsPickerState): OptionsPickerState => {
   const { selectedValues } = state;
   if (selectedValues.length > 1) {
-    state.selectedValues = selectedValues.filter(option => option.value !== ALL_VARIABLE_VALUE);
+    state.selectedValues = selectedValues.filter((option) => option.value !== ALL_VARIABLE_VALUE);
   }
   return state;
 };
@@ -134,7 +135,7 @@ const optionsPickerSlice = createSlice({
         state.queryValue = queryHasSearchFilter && queryValue ? queryValue : '';
       }
 
-      state.selectedValues = state.options.filter(option => option.selected);
+      state.selectedValues = state.options.filter((option) => option.selected);
       return applyStateChanges(state, updateDefaultSelection, updateOptions);
     },
     hideOptions: (state, action: PayloadAction): OptionsPickerState => {
@@ -143,7 +144,7 @@ const optionsPickerSlice = createSlice({
     toggleOption: (state, action: PayloadAction<ToggleOption>): OptionsPickerState => {
       const { option, clearOthers, forceSelect } = action.payload;
       const { multi, selectedValues } = state;
-      const selected = !selectedValues.find(o => o.value === option.value);
+      const selected = !selectedValues.find((o) => o.value === option.value);
 
       if (option.value === ALL_VARIABLE_VALUE || !multi || clearOthers) {
         if (selected || forceSelect) {
@@ -159,7 +160,7 @@ const optionsPickerSlice = createSlice({
         return applyStateChanges(state, updateDefaultSelection, updateAllSelection, updateOptions);
       }
 
-      state.selectedValues = selectedValues.filter(o => o.value !== option.value);
+      state.selectedValues = selectedValues.filter((o) => o.value !== option.value);
       return applyStateChanges(state, updateDefaultSelection, updateAllSelection, updateOptions);
     },
     toggleTag: (state, action: PayloadAction<VariableTag>): OptionsPickerState => {
@@ -167,7 +168,7 @@ const optionsPickerSlice = createSlice({
       const values = tag.values || [];
       const selected = !tag.selected;
 
-      state.tags = state.tags.map(t => {
+      state.tags = state.tags.map((t) => {
         if (t.text !== tag.text) {
           return t;
         }
@@ -188,14 +189,14 @@ const optionsPickerSlice = createSlice({
 
       if (!selected) {
         state.selectedValues = state.selectedValues.filter(
-          option => !isString(option.value) || !availableOptions[option.value]
+          (option) => !isString(option.value) || !availableOptions[option.value]
         );
         return applyStateChanges(state, updateDefaultSelection, updateOptions);
       }
 
       const optionsFromTag = values
-        .filter(value => value !== ALL_VARIABLE_VALUE && !!availableOptions[value])
-        .map(value => ({ selected, value, text: value }));
+        .filter((value) => value !== ALL_VARIABLE_VALUE && !!availableOptions[value])
+        .map((value) => ({ selected, value, text: value }));
 
       state.selectedValues.push.apply(state.selectedValues, optionsFromTag);
       return applyStateChanges(state, updateDefaultSelection, updateOptions);
@@ -220,10 +221,12 @@ const optionsPickerSlice = createSlice({
         return applyStateChanges(state, updateOptions);
       }
 
-      state.selectedValues = state.options.map(option => ({
-        ...option,
-        selected: true,
-      }));
+      state.selectedValues = state.options
+        .filter((option) => option.value !== ALL_VARIABLE_VALUE)
+        .map((option) => ({
+          ...option,
+          selected: true,
+        }));
 
       return applyStateChanges(state, updateOptions);
     },
@@ -234,22 +237,22 @@ const optionsPickerSlice = createSlice({
     updateOptionsAndFilter: (state, action: PayloadAction<VariableOption[]>): OptionsPickerState => {
       const searchQuery = trim((state.queryValue ?? '').toLowerCase());
 
-      const filteredOptions = action.payload.filter(option => {
+      state.options = action.payload.filter((option) => {
         const text = Array.isArray(option.text) ? option.text.toString() : option.text;
         return text.toLowerCase().indexOf(searchQuery) !== -1;
       });
 
-      state.options = applyLimit(filteredOptions);
       state.highlightIndex = 0;
 
       return applyStateChanges(state, updateDefaultSelection, updateOptions);
     },
     updateOptionsFromSearch: (state, action: PayloadAction<VariableOption[]>): OptionsPickerState => {
-      state.options = applyLimit(action.payload);
+      state.options = action.payload;
       state.highlightIndex = 0;
 
       return applyStateChanges(state, updateDefaultSelection, updateOptions);
     },
+    cleanPickerState: () => initialState,
   },
 });
 
@@ -263,6 +266,7 @@ export const {
   updateSearchQuery,
   updateOptionsAndFilter,
   updateOptionsFromSearch,
+  cleanPickerState,
 } = optionsPickerSlice.actions;
 
 export const optionsPickerReducer = optionsPickerSlice.reducer;

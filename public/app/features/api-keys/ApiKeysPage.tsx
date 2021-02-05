@@ -13,31 +13,23 @@ import ApiKeysAddedModal from './ApiKeysAddedModal';
 import config from 'app/core/config';
 import appEvents from 'app/core/app_events';
 import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
-import {
-  DeleteButton,
-  EventsWithValidation,
-  InlineFormLabel,
-  LegacyForms,
-  ValidationEvents,
-  IconButton,
-} from '@grafana/ui';
+import { DeleteButton, EventsWithValidation, InlineFormLabel, LegacyForms, ValidationEvents, Icon } from '@grafana/ui';
 const { Input, Switch } = LegacyForms;
-import { NavModel, dateTimeFormat } from '@grafana/data';
+import { NavModel, dateTimeFormat, rangeUtil } from '@grafana/data';
 import { FilterInput } from 'app/core/components/FilterInput/FilterInput';
 import { store } from 'app/store/store';
-import kbn from 'app/core/utils/kbn';
 import { getTimeZone } from 'app/features/profile/state/selectors';
 import { setSearchQuery } from './state/reducers';
 
 const timeRangeValidationEvents: ValidationEvents = {
   [EventsWithValidation.onBlur]: [
     {
-      rule: value => {
+      rule: (value) => {
         if (!value) {
           return true;
         }
         try {
-          kbn.interval_to_seconds(value);
+          rangeUtil.intervalToSeconds(value);
           return true;
         } catch {
           return false;
@@ -125,7 +117,7 @@ export class ApiKeysPage extends PureComponent<Props, any> {
 
     // make sure that secondsToLive is number or null
     const secondsToLive = this.state.newApiKey['secondsToLive'];
-    this.state.newApiKey['secondsToLive'] = secondsToLive ? kbn.interval_to_seconds(secondsToLive) : null;
+    this.state.newApiKey['secondsToLive'] = secondsToLive ? rangeUtil.intervalToSeconds(secondsToLive) : null;
     this.props.addApiKey(this.state.newApiKey, openModal, this.props.includeExpired);
     this.setState((prevState: State) => {
       return {
@@ -183,10 +175,12 @@ export class ApiKeysPage extends PureComponent<Props, any> {
 
     return (
       <SlideDown in={isAdding}>
-        <div className="cta-form">
-          <IconButton name="times" className="cta-form__close btn btn-transparent" onClick={this.onToggleAdding} />
-          <h5>Add API Key</h5>
+        <div className="gf-form-inline cta-form">
+          <button className="cta-form__close btn btn-transparent" onClick={this.onToggleAdding}>
+            <Icon name="times" />
+          </button>
           <form className="gf-form-group" onSubmit={this.onAddApiKey}>
+            <h5>Add API Key</h5>
             <div className="gf-form-inline">
               <div className="gf-form max-width-21">
                 <span className="gf-form-label">Key name</span>
@@ -195,7 +189,7 @@ export class ApiKeysPage extends PureComponent<Props, any> {
                   className="gf-form-input"
                   value={newApiKey.name}
                   placeholder="Name"
-                  onChange={evt => this.onApiKeyStateUpdate(evt, ApiKeyStateProps.Name)}
+                  onChange={(evt) => this.onApiKeyStateUpdate(evt, ApiKeyStateProps.Name)}
                 />
               </div>
               <div className="gf-form">
@@ -204,9 +198,9 @@ export class ApiKeysPage extends PureComponent<Props, any> {
                   <select
                     className="gf-form-input gf-size-auto"
                     value={newApiKey.role}
-                    onChange={evt => this.onApiKeyStateUpdate(evt, ApiKeyStateProps.Role)}
+                    onChange={(evt) => this.onApiKeyStateUpdate(evt, ApiKeyStateProps.Role)}
                   >
-                    {Object.keys(OrgRole).map(role => {
+                    {Object.keys(OrgRole).map((role) => {
                       return (
                         <option key={role} label={role} value={role}>
                           {role}
@@ -224,7 +218,7 @@ export class ApiKeysPage extends PureComponent<Props, any> {
                   placeholder="1d"
                   validationEvents={timeRangeValidationEvents}
                   value={newApiKey.secondsToLive}
-                  onChange={evt => this.onApiKeyStateUpdate(evt, ApiKeyStateProps.SecondsToLive)}
+                  onChange={(evt) => this.onApiKeyStateUpdate(evt, ApiKeyStateProps.SecondsToLive)}
                 />
               </div>
               <div className="gf-form">
@@ -266,7 +260,7 @@ export class ApiKeysPage extends PureComponent<Props, any> {
         <Switch
           label="Show expired"
           checked={includeExpired}
-          onChange={event => {
+          onChange={(event) => {
             // @ts-ignore
             this.onIncludeExpiredChange(event.target.checked);
           }}
@@ -282,7 +276,7 @@ export class ApiKeysPage extends PureComponent<Props, any> {
           </thead>
           {apiKeys.length > 0 ? (
             <tbody>
-              {apiKeys.map(key => {
+              {apiKeys.map((key) => {
                 return (
                   <tr key={key.id}>
                     <td>{key.name}</td>

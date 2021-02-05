@@ -4,8 +4,8 @@ import { shallow, mount } from 'enzyme';
 import { JaegerDatasource, JaegerQuery } from './datasource';
 import { ButtonCascader } from '@grafana/ui';
 
-describe('JaegerQueryField', function() {
-  it('shows empty value if no services returned', function() {
+describe('JaegerQueryField', function () {
+  it('shows empty value if no services returned', function () {
     const wrapper = shallow(
       <JaegerQueryField
         history={[]}
@@ -18,7 +18,7 @@ describe('JaegerQueryField', function() {
     expect(wrapper.find(ButtonCascader).props().options[0].label).toBe('No traces found');
   });
 
-  it('uses URL encoded service name in metadataRequest request', async function() {
+  it('uses URL encoded service name in metadataRequest request', async function () {
     const wrapper = mount(
       <JaegerQueryField
         history={[]}
@@ -64,7 +64,7 @@ describe('JaegerQueryField', function() {
     });
   });
 
-  it('shows root span as 3rd level in cascader', async function() {
+  it('shows root span as 3rd level in cascader', async function () {
     const wrapper = mount(
       <JaegerQueryField
         history={[]}
@@ -98,21 +98,15 @@ describe('JaegerQueryField', function() {
     );
 
     // Simulating selection options. We need this as the function depends on the intermediate state of the component
-    await wrapper
-      .find(ButtonCascader)
-      .props()
-      .loadData([{ value: 'service1', label: 'service1' }]);
+    await wrapper.find(ButtonCascader)!.props().loadData!([{ value: 'service1', label: 'service1' }]);
 
-    await wrapper
-      .find(ButtonCascader)
-      .props()
-      .loadData([
-        { value: 'service1', label: 'service1' },
-        { value: 'op1', label: 'op1' },
-      ]);
+    await wrapper.find(ButtonCascader)!.props().loadData!([
+      { value: 'service1', label: 'service1' },
+      { value: 'op1', label: 'op1' },
+    ]);
 
     wrapper.update();
-    expect(wrapper.find(ButtonCascader).props().options[0].children[1].children[0]).toEqual({
+    expect(wrapper.find(ButtonCascader)!.props().options![0].children![1].children![0]).toEqual({
       label: 'rootOp [0.099 ms]',
       value: '12345',
     });

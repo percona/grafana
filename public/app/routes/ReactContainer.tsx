@@ -22,6 +22,7 @@ export function WrapInProvider(store: any, Component: any, props: any) {
 }
 
 export const provideModalsContext = (component: any) => {
+  // eslint-disable-next-line react/display-name
   return (props: any) => (
     <ModalsProvider>
       <>
@@ -47,7 +48,7 @@ export function reactContainer(
       // Check permissions for this component
       const roles: string[] = $route.current.locals.roles;
       if (roles && roles.length) {
-        if (!roles.some(r => contextSrv.hasRole(r))) {
+        if (!roles.some((r) => contextSrv.hasRole(r))) {
           $location.url('/');
         }
       }
@@ -63,7 +64,7 @@ export function reactContainer(
         $rootScope: $rootScope,
         $scope: scope,
         $contextSrv: contextSrv,
-        routeInfo: $route.current.$$route.routeInfo,
+        routeInfo: $route.current.$$route?.routeInfo,
       };
 
       document.body.classList.add('is-react');

@@ -46,7 +46,7 @@ export class ConfigEditor extends PureComponent<Props> {
   onVersionChanged = (selected: SelectableValue<InfluxVersion>) => {
     const { options, onOptionsChange } = this.props;
 
-    const copy = {
+    const copy: any = {
       ...options,
       jsonData: {
         ...options.jsonData,
@@ -62,21 +62,12 @@ export class ConfigEditor extends PureComponent<Props> {
       delete copy.user;
       delete copy.database;
     }
+
     onOptionsChange(copy);
   };
 
-  onUpdateInflux2xURL = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    const { options, onOptionsChange } = this.props;
-    onOptionsChange({
-      ...options,
-      url: e.currentTarget.value,
-      access: 'proxy',
-      basicAuth: true,
-    });
-  };
-
   renderInflux2x() {
-    const { options } = this.props;
+    const { options, onOptionsChange } = this.props;
     const { secureJsonFields } = options;
     const secureJsonData = (options.secureJsonData || {}) as InfluxSecureJsonData;
 
@@ -95,25 +86,14 @@ export class ConfigEditor extends PureComponent<Props> {
         </div>
         <br />
 
-        <h3 className="page-heading">Connection</h3>
-        <div className="gf-form-inline">
-          <div className="gf-form">
-            <InlineFormLabel
-              className="width-10"
-              tooltip="This URL needs to be accessible from the grafana backend/server."
-            >
-              URL
-            </InlineFormLabel>
-            <div className="width-20">
-              <Input
-                className="width-20"
-                value={options.url || ''}
-                placeholder="http://localhost:9999/api/v2"
-                onChange={this.onUpdateInflux2xURL}
-              />
-            </div>
-          </div>
-        </div>
+        <DataSourceHttpSettings
+          showAccessOptions={false}
+          dataSourceConfig={options}
+          defaultUrl="http://localhost:8086"
+          onChange={onOptionsChange}
+        />
+
+        <h3 className="page-heading">InfluxDB Details</h3>
         <div className="gf-form-inline">
           <div className="gf-form">
             <InlineFormLabel className="width-10">Organization</InlineFormLabel>
@@ -241,7 +221,7 @@ export class ConfigEditor extends PureComponent<Props> {
               </InlineFormLabel>
               <Select
                 className="width-10"
-                value={httpModes.find(httpMode => httpMode.value === options.jsonData.httpMode)}
+                value={httpModes.find((httpMode) => httpMode.value === options.jsonData.httpMode)}
                 options={httpModes}
                 defaultValue={options.jsonData.httpMode}
                 onChange={onUpdateDatasourceJsonDataOptionSelect(this.props, 'httpMode')}
@@ -256,7 +236,8 @@ export class ConfigEditor extends PureComponent<Props> {
             <p>
               Setting the database for this datasource does not deny access to other databases. The InfluxDB query
               syntax allows switching the database in the query. For example:
-              <code>SHOW MEASUREMENTS ON _internal</code> or <code>SELECT * FROM "_internal".."database" LIMIT 10</code>
+              <code>SHOW MEASUREMENTS ON _internal</code> or
+              <code>SELECT * FROM &quot;_internal&quot;..&quot;database&quot; LIMIT 10</code>
               <br />
               <br />
               To support data isolation and security, make sure appropriate permissions are configured in InfluxDB.

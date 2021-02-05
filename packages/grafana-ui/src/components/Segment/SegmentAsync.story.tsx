@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { SelectableValue } from '@grafana/data';
-import { SegmentAsync } from './';
-import { Icon } from '../Icon/Icon';
+import { SegmentAsync, Icon } from '@grafana/ui';
 
 const AddButton = (
   <a className="gf-form-label query-part">
@@ -14,7 +13,7 @@ const toOption = (value: any) => ({ label: value, value: value });
 const options = ['Option1', 'Option2', 'OptionWithLooongLabel', 'Option4'].map(toOption);
 
 const loadOptions = (options: any): Promise<Array<SelectableValue<string>>> =>
-  new Promise(res => setTimeout(() => res(options), 2000));
+  new Promise((res) => setTimeout(() => res(options), 2000));
 
 const SegmentFrame = ({ loadOptions, children }: any) => (
   <>
@@ -25,7 +24,7 @@ const SegmentFrame = ({ loadOptions, children }: any) => (
       {children}
       <SegmentAsync
         Component={AddButton}
-        onChange={value => action('New value added')(value)}
+        onChange={(value) => action('New value added')(value)}
         loadOptions={() => loadOptions(options)}
       />
     </div>
@@ -39,7 +38,7 @@ export const ArrayOptions = () => {
       <SegmentAsync
         value={value}
         loadOptions={() => loadOptions(options)}
-        onChange={item => {
+        onChange={(item) => {
           setValue(item);
           action('Segment value changed')(item.value);
         }}
@@ -81,7 +80,7 @@ export const GroupedArrayOptions = () => {
       <SegmentAsync
         value={value}
         loadOptions={() => loadOptions(groupedOptions)}
-        onChange={item => {
+        onChange={(item) => {
           setValue(item);
           action('Segment value changed')(item.value);
         }}
@@ -98,7 +97,7 @@ export const CustomOptionsAllowed = () => {
         allowCustomValue
         value={value}
         loadOptions={() => loadOptions(options)}
-        onChange={item => {
+        onChange={(item) => {
           setValue(item);
           action('Segment value changed')(item.value);
         }}
@@ -119,6 +118,24 @@ export const CustomLabel = () => {
         onChange={({ value }) => {
           setValue(value);
           action('Segment value changed')(value);
+        }}
+      />
+    </SegmentFrame>
+  );
+};
+
+export const HtmlAttributes = () => {
+  const [value, setValue] = useState<any>(options[0]);
+  return (
+    <SegmentFrame loadOptions={() => loadOptions(options)}>
+      <SegmentAsync
+        data-testid="segment-async-test"
+        id="segment-async"
+        value={value}
+        loadOptions={() => loadOptions(options)}
+        onChange={(item) => {
+          setValue(item);
+          action('Segment value changed')(item.value);
         }}
       />
     </SegmentFrame>

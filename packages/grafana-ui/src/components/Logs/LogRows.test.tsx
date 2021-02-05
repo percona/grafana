@@ -2,7 +2,7 @@ import React from 'react';
 import { range } from 'lodash';
 import { LogRows, PREVIEW_LIMIT } from './LogRows';
 import { mount } from 'enzyme';
-import { LogLevel, LogRowModel, LogsDedupStrategy, MutableDataFrame } from '@grafana/data';
+import { LogLevel, LogRowModel, LogsDedupStrategy, MutableDataFrame, LogsSortOrder } from '@grafana/data';
 import { LogRow } from './LogRow';
 
 describe('LogRows', () => {
@@ -78,7 +78,7 @@ describe('LogRows', () => {
 
   it('renders with default preview limit', () => {
     // PREVIEW_LIMIT * 2 is there because otherwise we just render all rows
-    const rows: LogRowModel[] = range(PREVIEW_LIMIT * 2 + 1).map(num => makeLog({ uid: num.toString() }));
+    const rows: LogRowModel[] = range(PREVIEW_LIMIT * 2 + 1).map((num) => makeLog({ uid: num.toString() }));
     const wrapper = mount(
       <LogRows
         logRows={rows}
@@ -93,10 +93,58 @@ describe('LogRows', () => {
 
     expect(wrapper.find(LogRow).length).toBe(100);
   });
+
+  it('renders asc ordered rows if order and function supplied', () => {
+    const rows: LogRowModel[] = [
+      makeLog({ uid: '1', timeEpochMs: 1 }),
+      makeLog({ uid: '3', timeEpochMs: 3 }),
+      makeLog({ uid: '2', timeEpochMs: 2 }),
+    ];
+    const wrapper = mount(
+      <LogRows
+        logRows={rows}
+        dedupStrategy={LogsDedupStrategy.none}
+        highlighterExpressions={[]}
+        showLabels={false}
+        showTime={false}
+        wrapLogMessage={true}
+        timeZone={'utc'}
+        logsSortOrder={LogsSortOrder.Ascending}
+      />
+    );
+
+    expect(wrapper.find(LogRow).at(0).text()).toBe('log message 1');
+    expect(wrapper.find(LogRow).at(1).text()).toBe('log message 2');
+    expect(wrapper.find(LogRow).at(2).text()).toBe('log message 3');
+  });
+  it('renders desc ordered rows if order and function supplied', () => {
+    const rows: LogRowModel[] = [
+      makeLog({ uid: '1', timeEpochMs: 1 }),
+      makeLog({ uid: '3', timeEpochMs: 3 }),
+      makeLog({ uid: '2', timeEpochMs: 2 }),
+    ];
+    const wrapper = mount(
+      <LogRows
+        logRows={rows}
+        dedupStrategy={LogsDedupStrategy.none}
+        highlighterExpressions={[]}
+        showLabels={false}
+        showTime={false}
+        wrapLogMessage={true}
+        timeZone={'utc'}
+        logsSortOrder={LogsSortOrder.Descending}
+      />
+    );
+
+    expect(wrapper.find(LogRow).at(0).text()).toBe('log message 3');
+    expect(wrapper.find(LogRow).at(1).text()).toBe('log message 2');
+    expect(wrapper.find(LogRow).at(2).text()).toBe('log message 1');
+  });
 });
 
 const makeLog = (overrides: Partial<LogRowModel>): LogRowModel => {
   const uid = overrides.uid || '1';
+  const timeEpochMs = overrides.timeEpochMs || 1;
   const entry = `log message ${uid}`;
   return {
     entryFieldIndex: 0,
@@ -110,8 +158,8 @@ const makeLog = (overrides: Partial<LogRowModel>): LogRowModel => {
     labels: {},
     raw: entry,
     timeFromNow: '',
-    timeEpochMs: 1,
-    timeEpochNs: '1000000',
+    timeEpochMs,
+    timeEpochNs: (timeEpochMs * 1000000).toString(),
     timeLocal: '',
     timeUtc: '',
     searchWords: [],

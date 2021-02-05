@@ -85,7 +85,7 @@ describe('toDataFrame', () => {
     expect(frame).toEqual(array);
     expect(frame instanceof ArrayDataFrame).toEqual(true);
     expect(frame.length).toEqual(orig.length);
-    expect(frame.fields.map(f => f.name)).toEqual(['a', 'b']);
+    expect(frame.fields.map((f) => f.name)).toEqual(['a', 'b']);
   });
 
   it('throws when table rows is not array', () => {
@@ -105,6 +105,17 @@ describe('toDataFrame', () => {
     expect(guessFieldTypeFromValue(false)).toBe(FieldType.boolean);
     expect(guessFieldTypeFromValue(new Date())).toBe(FieldType.time);
     expect(guessFieldTypeFromValue(dateTime())).toBe(FieldType.time);
+  });
+
+  it('Guess Column Types from strings', () => {
+    expect(guessFieldTypeFromValue('1')).toBe(FieldType.number);
+    expect(guessFieldTypeFromValue('1.234')).toBe(FieldType.number);
+    expect(guessFieldTypeFromValue('NaN')).toBe(FieldType.number);
+    expect(guessFieldTypeFromValue('3.125e7')).toBe(FieldType.number);
+    expect(guessFieldTypeFromValue('True')).toBe(FieldType.boolean);
+    expect(guessFieldTypeFromValue('FALSE')).toBe(FieldType.boolean);
+    expect(guessFieldTypeFromValue('true')).toBe(FieldType.boolean);
+    expect(guessFieldTypeFromValue('xxxx')).toBe(FieldType.string);
   });
 
   it('Guess Column Types from strings', () => {
@@ -265,7 +276,7 @@ describe('SeriesData backwards compatibility', () => {
     expect(table.refId).toBe(series.refId);
     expect(table.meta).toEqual(series.meta);
 
-    const names = table.columns.map(c => c.text);
+    const names = table.columns.map((c) => c.text);
     expect(names).toEqual(['T', 'N', 'S']);
   });
 

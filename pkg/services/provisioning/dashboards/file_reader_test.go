@@ -18,16 +18,16 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-var (
+const (
 	defaultDashboards         = "testdata/test-dashboards/folder-one"
 	brokenDashboards          = "testdata/test-dashboards/broken-dashboards"
 	oneDashboard              = "testdata/test-dashboards/one-dashboard"
 	containingID              = "testdata/test-dashboards/containing-id"
 	unprovision               = "testdata/test-dashboards/unprovision"
 	foldersFromFilesStructure = "testdata/test-dashboards/folders-from-files-structure"
-
-	fakeService *fakeDashboardProvisioningService
 )
+
+var fakeService *fakeDashboardProvisioningService
 
 func TestCreatingNewDashboardFileReader(t *testing.T) {
 	Convey("creating new dashboard file reader", t, func() {
@@ -96,7 +96,6 @@ func TestDashboardFileReader(t *testing.T) {
 		logger := log.New("test.logger")
 
 		Convey("Reading dashboards from disk", func() {
-
 			cfg := &config{
 				Name:    "Default",
 				Type:    "file",
@@ -112,7 +111,7 @@ func TestDashboardFileReader(t *testing.T) {
 				reader, err := NewDashboardFileReader(cfg, logger)
 				So(err, ShouldBeNil)
 
-				err = reader.startWalkingDisk()
+				err = reader.walkDisk()
 				So(err, ShouldBeNil)
 
 				folders := 0
@@ -143,7 +142,7 @@ func TestDashboardFileReader(t *testing.T) {
 				reader, err := NewDashboardFileReader(cfg, logger)
 				So(err, ShouldBeNil)
 
-				err = reader.startWalkingDisk()
+				err = reader.walkDisk()
 				So(err, ShouldBeNil)
 
 				So(len(fakeService.inserted), ShouldEqual, 1)
@@ -155,7 +154,7 @@ func TestDashboardFileReader(t *testing.T) {
 				reader, err := NewDashboardFileReader(cfg, logger)
 				So(err, ShouldBeNil)
 
-				err = reader.startWalkingDisk()
+				err = reader.walkDisk()
 				So(err, ShouldBeNil)
 
 				So(len(fakeService.inserted), ShouldEqual, 1)
@@ -168,7 +167,7 @@ func TestDashboardFileReader(t *testing.T) {
 				reader, err := NewDashboardFileReader(cfg, logger)
 				So(err, ShouldBeNil)
 
-				err = reader.startWalkingDisk()
+				err = reader.walkDisk()
 				So(err, ShouldBeNil)
 
 				So(len(fakeService.inserted), ShouldEqual, 5)
@@ -227,13 +226,13 @@ func TestDashboardFileReader(t *testing.T) {
 				reader1, err := NewDashboardFileReader(cfg1, logger)
 				So(err, ShouldBeNil)
 
-				err = reader1.startWalkingDisk()
+				err = reader1.walkDisk()
 				So(err, ShouldBeNil)
 
 				reader2, err := NewDashboardFileReader(cfg2, logger)
 				So(err, ShouldBeNil)
 
-				err = reader2.startWalkingDisk()
+				err = reader2.walkDisk()
 				So(err, ShouldBeNil)
 
 				var folderCount int
@@ -320,7 +319,7 @@ func TestDashboardFileReader(t *testing.T) {
 
 			absPath1, err := filepath.Abs(unprovision + "/dashboard1.json")
 			So(err, ShouldBeNil)
-			// This one does not exist on disc, simulating a deleted file
+			// This one does not exist on disk, simulating a deleted file
 			absPath2, err := filepath.Abs(unprovision + "/dashboard2.json")
 			So(err, ShouldBeNil)
 
@@ -337,19 +336,18 @@ func TestDashboardFileReader(t *testing.T) {
 				reader, err := NewDashboardFileReader(cfg, logger)
 				So(err, ShouldBeNil)
 
-				err = reader.startWalkingDisk()
+				err = reader.walkDisk()
 				So(err, ShouldBeNil)
 
 				So(len(fakeService.provisioned["Default"]), ShouldEqual, 1)
 				So(fakeService.provisioned["Default"][0].ExternalId, ShouldEqual, absPath1)
-
 			})
 
 			Convey("Missing dashboard should be deleted if DisableDeletion = false", func() {
 				reader, err := NewDashboardFileReader(cfg, logger)
 				So(err, ShouldBeNil)
 
-				err = reader.startWalkingDisk()
+				err = reader.walkDisk()
 				So(err, ShouldBeNil)
 
 				So(len(fakeService.provisioned["Default"]), ShouldEqual, 1)

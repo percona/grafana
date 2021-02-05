@@ -27,7 +27,7 @@ describe('processTemplate()', () => {
   it('correctly replaces variables', () => {
     const processedTemplate = processTemplate(
       'this is a test with #{oneVariable}#{anotherVariable} and the same #{oneVariable}',
-      a => a
+      (a) => a
     );
     expect(processedTemplate.parameters).toEqual(['oneVariable', 'anotherVariable']);
     expect(processedTemplate.template({ oneVariable: 'MYFIRSTVAR', anotherVariable: 'SECOND' })).toBe(
@@ -38,7 +38,7 @@ describe('processTemplate()', () => {
   it('correctly uses the encoding function', () => {
     const processedTemplate = processTemplate(
       'this is a test with #{oneVariable}#{anotherVariable} and the same #{oneVariable}',
-      e => `/${e}\\`
+      (e) => `/${e}\\`
     );
     expect(processedTemplate.parameters).toEqual(['oneVariable', 'anotherVariable']);
     expect(processedTemplate.template({ oneVariable: 'MYFIRSTVAR', anotherVariable: 'SECOND' })).toBe(
@@ -64,9 +64,9 @@ describe('processTemplate()', () => {
     expect(() =>
       processTemplate(
         {
-          template: data => `a${data.b}c`,
+          template: (data) => `a${data.b}c`,
         },
-        a => a
+        (a) => a
       )
     ).toThrow();
     expect(() =>
@@ -74,10 +74,10 @@ describe('processTemplate()', () => {
         {
           parameters: ['b'],
         },
-        a => a
+        (a) => a
       )
     ).toThrow();
-    expect(() => processTemplate({}, a => a)).toThrow();
+    expect(() => processTemplate({}, (a) => a)).toThrow();
   });
 });
 
@@ -151,7 +151,10 @@ describe('createTestFunction()', () => {
 });
 
 describe('getParameterInArray()', () => {
-  const data = [{ key: 'mykey', value: 'ok' }, { key: 'otherkey', value: 'v' }];
+  const data = [
+    { key: 'mykey', value: 'ok' },
+    { key: 'otherkey', value: 'v' },
+  ];
 
   it('returns an entry that is present', () => {
     expect(getParameterInArray('mykey', data)).toBe(data[0]);
@@ -224,12 +227,19 @@ describe('getParameterInAncestor()', () => {
           { key: 'd', value: 'd3' },
         ],
       },
-      tags: [{ key: 'a', value: 'a2' }, { key: 'b', value: 'b2' }, { key: 'c', value: 'c2' }],
+      tags: [
+        { key: 'a', value: 'a2' },
+        { key: 'b', value: 'b2' },
+        { key: 'c', value: 'c2' },
+      ],
     },
     {
       depth: 2,
       process: {
-        tags: [{ key: 'a', value: 'a1' }, { key: 'b', value: 'b1' }],
+        tags: [
+          { key: 'a', value: 'a1' },
+          { key: 'b', value: 'b1' },
+        ],
       },
       tags: [{ key: 'a', value: 'a0' }],
     },

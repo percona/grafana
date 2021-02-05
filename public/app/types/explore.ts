@@ -1,24 +1,21 @@
 import { Unsubscribable } from 'rxjs';
 import {
-  HistoryItem,
-  DataQuery,
-  DataSourceApi,
-  QueryHint,
-  PanelData,
-  DataQueryRequest,
-  RawTimeRange,
-  LogLevel,
-  TimeRange,
-  LogsModel,
-  LogsDedupStrategy,
   AbsoluteTimeRange,
-  GraphSeriesXY,
   DataFrame,
-  ExploreMode,
+  DataQuery,
+  DataQueryRequest,
+  DataSourceApi,
   ExploreUrlState,
+  HistoryItem,
+  LogLevel,
+  LogsDedupStrategy,
+  LogsModel,
+  PanelData,
+  QueryHint,
+  RawTimeRange,
+  TimeRange,
+  EventBusExtended,
 } from '@grafana/data';
-
-import { Emitter } from 'app/core/core';
 
 export enum ExploreId {
   left = 'left',
@@ -59,15 +56,7 @@ export interface ExploreItemState {
   /**
    * Datasource instance that has been selected. Datasource-specific logic can be run on this object.
    */
-  datasourceInstance?: DataSourceApi;
-  /**
-   * Current data source name or null if default
-   */
-  requestedDatasourceName: string | null;
-  /**
-   * True if the datasource is loading. `null` if the loading has not started yet.
-   */
-  datasourceLoading: boolean | null;
+  datasourceInstance?: DataSourceApi | null;
   /**
    * True if there is no datasource to be selected.
    */
@@ -75,11 +64,11 @@ export interface ExploreItemState {
   /**
    * Emitter to send events to the rest of Grafana.
    */
-  eventBridge: Emitter;
+  eventBridge: EventBusExtended;
   /**
    * List of timeseries to be shown in the Explore graph result viewer.
    */
-  graphResult: GraphSeriesXY[] | null;
+  graphResult: DataFrame[] | null;
   /**
    * History of recent queries. Datasource-specific and initialized via localStorage.
    */
@@ -118,14 +107,6 @@ export interface ExploreItemState {
    * Current scanning range to be shown to the user while scanning is active.
    */
   scanRange?: RawTimeRange;
-  /**
-   * True if graph result viewer is expanded. Query runs will contain graph queries.
-   */
-  showingGraph: boolean;
-  /**
-   * True if table result viewer is expanded. Query runs will contain table queries.
-   */
-  showingTable: boolean;
 
   loading: boolean;
   /**
@@ -157,7 +138,7 @@ export interface ExploreItemState {
    * Copy of the state of the URL which is in store.location.query. This is duplicated here so we can diff the two
    * after a change to see if we need to sync url state back to redux store (like on clicking Back in browser).
    */
-  urlState: ExploreUrlState;
+  urlState: ExploreUrlState | null;
 
   /**
    * Map of what changed between real url and local urlState so we can partially update just the things that are needed.
@@ -165,7 +146,6 @@ export interface ExploreItemState {
   update: ExploreUpdateState;
 
   latency: number;
-  supportedModes: ExploreMode[];
 
   /**
    * If true, the view is in live tailing mode.
@@ -186,12 +166,13 @@ export interface ExploreItemState {
    * Panel Id that is set if we come to explore from a penel. Used so we can get back to it and optionally modify the
    * query of that panel.
    */
-  originPanelId?: number;
+  originPanelId?: number | null;
 
   showLogs?: boolean;
   showMetrics?: boolean;
   showTable?: boolean;
   showTrace?: boolean;
+  showNodeGraph?: boolean;
 }
 
 export interface ExploreUpdateState {
@@ -199,16 +180,12 @@ export interface ExploreUpdateState {
   queries: boolean;
   range: boolean;
   mode: boolean;
-  ui: boolean;
 }
 
 export interface QueryOptions {
-  minInterval: string;
+  minInterval?: string;
   maxDataPoints?: number;
   liveStreaming?: boolean;
-  showingGraph?: boolean;
-  showingTable?: boolean;
-  mode?: ExploreMode;
 }
 
 export interface QueryTransaction {
@@ -233,3 +210,18 @@ export type RichHistoryQuery = {
   sessionName: string;
   timeRange?: string;
 };
+
+export interface ExplorePanelData extends PanelData {
+  graphFrames: DataFrame[];
+  tableFrames: DataFrame[];
+  logsFrames: DataFrame[];
+  traceFrames: DataFrame[];
+  nodeGraphFrames: DataFrame[];
+  graphResult: DataFrame[] | null;
+  tableResult: DataFrame | null;
+  logsResult: LogsModel | null;
+}
+
+export type SplitOpen = <T extends DataQuery = any>(
+  options?: { datasourceUid: string; query: T; range?: TimeRange } | undefined
+) => void;

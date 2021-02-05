@@ -31,7 +31,7 @@ export const Dimensions: FunctionComponent<Props> = ({ dimensions, loadValues, l
   }, [data]);
 
   const excludeUsedKeys = (options: SelectableStrings) => {
-    return options.filter(({ value }) => !Object.keys(data).includes(value));
+    return options.filter(({ value }) => !Object.keys(data).includes(value!));
   };
 
   return (
@@ -41,13 +41,13 @@ export const Dimensions: FunctionComponent<Props> = ({ dimensions, loadValues, l
           <SegmentAsync
             allowCustomValue
             value={key}
-            loadOptions={() => loadKeys().then(keys => [removeOption, ...excludeUsedKeys(keys)])}
+            loadOptions={() => loadKeys().then((keys) => [removeOption, ...excludeUsedKeys(keys)])}
             onChange={({ value: newKey }) => {
               const { [key]: value, ...newDimensions } = data;
               if (newKey === removeText) {
                 setData({ ...newDimensions });
               } else {
-                setData({ ...newDimensions, [newKey]: '' });
+                setData({ ...newDimensions, [newKey!]: '' });
               }
             }}
           />
@@ -57,14 +57,14 @@ export const Dimensions: FunctionComponent<Props> = ({ dimensions, loadValues, l
             value={value}
             placeholder="select dimension value"
             loadOptions={() => loadValues(key)}
-            onChange={({ value: newValue }) => setData({ ...data, [key]: newValue })}
+            onChange={({ value: newValue }) => setData({ ...data, [key]: newValue! })}
           />
           {Object.values(data).length > 1 && index + 1 !== Object.values(data).length && (
             <label className="gf-form-label query-keyword">AND</label>
           )}
         </Fragment>
       ))}
-      {Object.values(data).every(v => v) && (
+      {Object.values(data).every((v) => v) && (
         <SegmentAsync
           allowCustomValue
           Component={
@@ -73,7 +73,7 @@ export const Dimensions: FunctionComponent<Props> = ({ dimensions, loadValues, l
             </a>
           }
           loadOptions={() => loadKeys().then(excludeUsedKeys)}
-          onChange={({ value: newKey }) => setData({ ...data, [newKey]: '' })}
+          onChange={({ value: newKey }) => setData({ ...data, [newKey!]: '' })}
         />
       )}
     </>

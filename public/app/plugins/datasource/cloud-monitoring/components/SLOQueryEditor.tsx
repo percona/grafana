@@ -7,7 +7,7 @@ import { SLOQuery } from '../types';
 import CloudMonitoringDatasource from '../datasource';
 
 export interface Props {
-  usedAlignmentPeriod: string;
+  usedAlignmentPeriod?: number;
   variableOptionGroup: SelectableValue<string>;
   onChange: (query: SLOQuery) => void;
   onRunQuery: () => void;
@@ -15,14 +15,14 @@ export interface Props {
   datasource: CloudMonitoringDatasource;
 }
 
-export const defaultQuery: SLOQuery = {
-  projectName: '',
+export const defaultQuery: (dataSource: CloudMonitoringDatasource) => SLOQuery = (dataSource) => ({
+  projectName: dataSource.getDefaultProject(),
   alignmentPeriod: 'cloud-monitoring-auto',
   aliasBy: '',
   selectorName: 'select_slo_health',
   serviceId: '',
   sloId: '',
-};
+});
 
 export function SLOQueryEditor({
   query,
@@ -37,7 +37,7 @@ export function SLOQueryEditor({
         templateVariableOptions={variableOptionGroup.options}
         projectName={query.projectName}
         datasource={datasource}
-        onChange={projectName => onChange({ ...query, projectName })}
+        onChange={(projectName) => onChange({ ...query, projectName })}
       />
       <QueryInlineField label="Service">
         <SegmentAsync
@@ -45,7 +45,7 @@ export function SLOQueryEditor({
           value={query?.serviceId}
           placeholder="Select service"
           loadOptions={() =>
-            datasource.getSLOServices(query.projectName).then(services => [
+            datasource.getSLOServices(query.projectName).then((services) => [
               {
                 label: 'Template Variables',
                 options: variableOptionGroup.options,
@@ -63,7 +63,7 @@ export function SLOQueryEditor({
           value={query?.sloId}
           placeholder="Select SLO"
           loadOptions={() =>
-            datasource.getServiceLevelObjectives(query.projectName, query.serviceId).then(sloIds => [
+            datasource.getServiceLevelObjectives(query.projectName, query.serviceId).then((sloIds) => [
               {
                 label: 'Template Variables',
                 options: variableOptionGroup.options,
@@ -82,7 +82,7 @@ export function SLOQueryEditor({
       <QueryInlineField label="Selector">
         <Segment
           allowCustomValue
-          value={[...selectors, ...variableOptionGroup.options].find(s => s.value === query?.selectorName ?? '')}
+          value={[...selectors, ...variableOptionGroup.options].find((s) => s.value === query?.selectorName ?? '')}
           options={[
             {
               label: 'Template Variables',
@@ -100,9 +100,9 @@ export function SLOQueryEditor({
         alignmentPeriod={query.alignmentPeriod || ''}
         perSeriesAligner={query.selectorName === 'select_slo_health' ? 'ALIGN_MEAN' : 'ALIGN_NEXT_OLDER'}
         usedAlignmentPeriod={usedAlignmentPeriod}
-        onChange={alignmentPeriod => onChange({ ...query, alignmentPeriod })}
+        onChange={(alignmentPeriod) => onChange({ ...query, alignmentPeriod })}
       />
-      <AliasBy value={query.aliasBy} onChange={aliasBy => onChange({ ...query, aliasBy })} />
+      <AliasBy value={query.aliasBy} onChange={(aliasBy) => onChange({ ...query, aliasBy })} />
     </>
   );
 }

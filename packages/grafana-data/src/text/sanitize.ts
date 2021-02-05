@@ -22,7 +22,7 @@ export function sanitize(unsanitizedString: string): string {
   try {
     return sanitizeXSS.process(unsanitizedString);
   } catch (error) {
-    console.log('String could not be sanitized', unsanitizedString);
+    console.error('String could not be sanitized', unsanitizedString);
     return unsanitizedString;
   }
 }
@@ -36,9 +36,5 @@ export function hasAnsiCodes(input: string): boolean {
 }
 
 export function escapeHtml(str: string): string {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

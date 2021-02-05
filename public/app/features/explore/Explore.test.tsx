@@ -4,8 +4,7 @@ import { getFirstNonQueryRowSpecificError } from 'app/core/utils/explore';
 import { ExploreId } from 'app/types/explore';
 import { shallow } from 'enzyme';
 import { Explore, ExploreProps } from './Explore';
-import { scanStopAction } from './state/actionTypes';
-import { toggleGraph } from './state/actions';
+import { scanStopAction } from './state/query';
 import { SecondaryActions } from './SecondaryActions';
 import { getTheme } from '@grafana/ui';
 
@@ -17,11 +16,12 @@ const dummyProps: ExploreProps = {
       logs: true,
     },
     components: {
-      ExploreStartPage: {},
+      QueryEditorHelp: {},
     },
   } as DataSourceApi,
   datasourceMissing: false,
   exploreId: ExploreId.left,
+  loading: false,
   initializeExplore: jest.fn(),
   initialized: true,
   modifyQueries: jest.fn(),
@@ -30,7 +30,6 @@ const dummyProps: ExploreProps = {
     queries: false,
     range: false,
     mode: false,
-    ui: false,
   },
   refreshExplore: jest.fn(),
   scanning: false,
@@ -53,25 +52,16 @@ const dummyProps: ExploreProps = {
       to: 'now',
     },
   },
-  initialUI: {
-    showingTable: false,
-    showingGraph: false,
-    showingLogs: false,
-  },
   isLive: false,
   syncedTimes: false,
   updateTimeRange: jest.fn(),
   graphResult: [],
-  loading: false,
   absoluteRange: {
     from: 0,
     to: 0,
   },
-  showingGraph: false,
-  showingTable: false,
   timeZone: 'UTC',
   onHiddenSeriesChanged: jest.fn(),
-  toggleGraph: toggleGraph,
   queryResponse: {
     state: LoadingState.NotStarted,
     series: [],
@@ -111,6 +101,8 @@ const dummyProps: ExploreProps = {
   showLogs: true,
   showTable: true,
   showTrace: true,
+  showNodeGraph: true,
+  splitOpen: (() => {}) as any,
 };
 
 const setupErrors = (hasRefId?: boolean) => {

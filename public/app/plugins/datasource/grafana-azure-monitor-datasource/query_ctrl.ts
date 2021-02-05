@@ -3,11 +3,10 @@ import { QueryCtrl } from 'app/plugins/sdk';
 // import './css/query_editor.css';
 import TimegrainConverter from './time_grain_converter';
 import './editor/editor_component';
-import kbn from 'app/core/utils/kbn';
 
-import { TemplateSrv } from 'app/features/templating/template_srv';
+import { TemplateSrv } from '@grafana/runtime';
 import { auto, IPromise } from 'angular';
-import { DataFrame, PanelEvents } from '@grafana/data';
+import { DataFrame, PanelEvents, rangeUtil } from '@grafana/data';
 import { AzureQueryType, AzureMetricQuery } from './types';
 
 export interface ResultFormat {
@@ -21,6 +20,13 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   defaultDropdownValue = 'select';
 
   dummyDiminsionString = '+';
+
+  queryQueryTypeOptions = [
+    { id: AzureQueryType.ApplicationInsights, label: 'Application Insights' },
+    { id: AzureQueryType.AzureMonitor, label: 'Metrics' },
+    { id: AzureQueryType.LogAnalytics, label: 'Logs' },
+    { id: AzureQueryType.InsightsAnalytics, label: 'Insights Analytics' },
+  ];
 
   target: {
     // should be: AzureMonitorQuery
@@ -467,8 +473,6 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
         this.replace(this.target.azureMonitor.metricName)
       )
       .then((metadata: any) => {
-        console.log('Update metadata', metadata);
-
         this.target.azureMonitor.aggregation = metadata.primaryAggType;
         this.target.azureMonitor.timeGrain = 'auto';
         this.target.azureMonitor.allowedTimeGrainsMs = this.convertTimeGrainsToMs(metadata.supportedTimeGrains || []);
@@ -492,7 +496,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
     const allowedTimeGrainsMs: number[] = [];
     timeGrains.forEach((tg: any) => {
       if (tg.value !== 'auto') {
-        allowedTimeGrainsMs.push(kbn.interval_to_ms(TimegrainConverter.createKbnUnitFromISO8601Duration(tg.value)));
+        allowedTimeGrainsMs.push(rangeUtil.intervalToMs(TimegrainConverter.createKbnUnitFromISO8601Duration(tg.value)));
       }
     });
     return allowedTimeGrainsMs;
@@ -501,8 +505,8 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   generateAutoUnits(timeGrain: string, timeGrains: Array<{ value: string }>) {
     if (timeGrain === 'auto') {
       return TimegrainConverter.findClosestTimeGrain(
-        this.templateSrv.getBuiltInIntervalValue(),
-        _.map(timeGrains, o => TimegrainConverter.createKbnUnitFromISO8601Duration(o.value)) || [
+        '1m',
+        _.map(timeGrains, (o) => TimegrainConverter.createKbnUnitFromISO8601Duration(o.value)) || [
           '1m',
           '5m',
           '15m',
@@ -527,7 +531,6 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   }
 
   azureMonitorAddDimensionFilter() {
-    console.log('Add dimension', this.target.azureMonitor);
     this.target.azureMonitor.dimensionFilters.push({
       dimension: '',
       operator: 'eq',
@@ -538,7 +541,6 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   azureMonitorRemoveDimensionFilter(index: number) {
     this.target.azureMonitor.dimensionFilters.splice(index, 1);
     this.refresh();
-    console.log('Remove dimension', index, this.target.azureMonitor);
   }
 
   /* Azure Log Analytics */
@@ -581,17 +583,7 @@ export class AzureMonitorQueryCtrl extends QueryCtrl {
   };
 
   get templateVariables() {
-    return this.templateSrv.getVariables().map(t => '$' + t.name);
-  }
-
-  /* Application Insights Section */
-
-  getAppInsightsAutoInterval() {
-    const interval = this.templateSrv.getBuiltInIntervalValue();
-    if (interval[interval.length - 1] === 's') {
-      return '1m';
-    }
-    return interval;
+    return this.templateSrv.getVariables().map((t) => '$' + t.name);
   }
 
   getAppInsightsMetricNames() {

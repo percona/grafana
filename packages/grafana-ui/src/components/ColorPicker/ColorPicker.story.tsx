@@ -1,6 +1,6 @@
 import React from 'react';
 import { boolean } from '@storybook/addon-knobs';
-import { SeriesColorPicker, ColorPicker } from './ColorPicker';
+import { SeriesColorPicker, ColorPicker } from '@grafana/ui';
 import { action } from '@storybook/addon-actions';
 import { withCenteredStory } from '../../utils/storybook/withCenteredStory';
 import { UseState } from '../../utils/storybook/UseState';
@@ -56,7 +56,7 @@ export const seriesColorPicker = () => {
             yaxis={1}
             onToggleAxis={() => {}}
             color={selectedColor}
-            onChange={color => updateSelectedColor(color)}
+            onChange={(color) => updateSelectedColor(color)}
           >
             {({ ref, showColorPicker, hideColorPicker }) => (
               <div

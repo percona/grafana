@@ -16,7 +16,7 @@ import {
 } from '@grafana/data';
 import { Unsubscribable } from 'rxjs';
 import { PanelModel } from 'app/features/dashboard/state';
-import { PanelQueryRunner } from '../dashboard/state/PanelQueryRunner';
+import { PanelQueryRunner } from '../query/state/PanelQueryRunner';
 
 class MetricsPanelCtrl extends PanelCtrl {
   scope: any;
@@ -33,8 +33,9 @@ class MetricsPanelCtrl extends PanelCtrl {
   timeInfo?: string;
   skipDataOnInit: boolean;
   dataList: LegacyResponseData[];
-  querySubscription?: Unsubscribable;
+  querySubscription?: Unsubscribable | null;
   useDataFrames = false;
+  panelData?: PanelData;
 
   constructor($scope: any, $injector: any) {
     super($scope, $injector);
@@ -79,6 +80,12 @@ class MetricsPanelCtrl extends PanelCtrl {
       if (!_.isArray(data)) {
         data = data.data;
       }
+
+      this.panelData = {
+        state: LoadingState.Done,
+        series: data,
+        timeRange: this.range,
+      };
 
       // Defer panel rendering till the next digest cycle.
       // For some reason snapshot panels don't init at this time, so this helps to avoid rendering issues.
@@ -130,6 +137,8 @@ class MetricsPanelCtrl extends PanelCtrl {
   // Updates the response with information from the stream
   panelDataObserver = {
     next: (data: PanelData) => {
+      this.panelData = data;
+
       if (data.state === LoadingState.Error) {
         this.loading = false;
         this.processDataError(data.error);
@@ -157,7 +166,7 @@ class MetricsPanelCtrl extends PanelCtrl {
         this.handleDataFrames(data.series);
       } else {
         // Make the results look as if they came directly from a <6.2 datasource request
-        const legacy = data.series.map(v => toLegacyResponseData(v));
+        const legacy = data.series.map((v) => toLegacyResponseData(v));
         this.handleQueryResult({ data: legacy });
       }
 
@@ -202,7 +211,7 @@ class MetricsPanelCtrl extends PanelCtrl {
     this.loading = false;
 
     if (this.dashboard && this.dashboard.snapshot) {
-      this.panel.snapshotData = data.map(frame => toDataFrameDTO(frame));
+      this.panel.snapshotData = data.map((frame) => toDataFrameDTO(frame));
     }
 
     try {

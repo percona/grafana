@@ -22,7 +22,7 @@ export class InsightsConfig extends PureComponent<Props> {
     const { options, onUpdateJsonDataOption, onUpdateSecureJsonDataOption } = this.props;
     return (
       <>
-        <h3 className="page-heading">Application Insights Details</h3>
+        <h3 className="page-heading">Azure Application Insights Details</h3>
         <div className="gf-form-group">
           {options.secureJsonFields.appInsightsApiKey ? (
             <div className="gf-form-inline">
@@ -46,7 +46,7 @@ export class InsightsConfig extends PureComponent<Props> {
                   <Input
                     className="width-30"
                     placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-                    value={options.secureJsonData.appInsightsApiKey || ''}
+                    value={options.secureJsonData!.appInsightsApiKey || ''}
                     onChange={onUpdateSecureJsonDataOption('appInsightsApiKey')}
                   />
                 </div>

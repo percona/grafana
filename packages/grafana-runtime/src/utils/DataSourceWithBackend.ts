@@ -7,9 +7,9 @@ import {
   DataSourceJsonData,
   ScopedVars,
 } from '@grafana/data';
-import { Observable, from, of } from 'rxjs';
-import { config } from '..';
-import { getBackendSrv } from '../services';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { getBackendSrv, getDataSourceSrv } from '../services';
 import { toDataQueryResponse } from './queryResponse';
 
 const ExpressionDatasourceID = '__expr__';
@@ -56,34 +56,37 @@ export class DataSourceWithBackend<
    */
   query(request: DataQueryRequest<TQuery>): Observable<DataQueryResponse> {
     const { intervalMs, maxDataPoints, range, requestId } = request;
-    const orgId = config.bootData.user.orgId;
     let targets = request.targets;
+
     if (this.filterQuery) {
-      targets = targets.filter(q => this.filterQuery!(q));
+      targets = targets.filter((q) => this.filterQuery!(q));
     }
-    const queries = targets.map(q => {
+
+    const queries = targets.map((q) => {
       let datasourceId = this.id;
+
       if (q.datasource === ExpressionDatasourceID) {
         return {
           ...q,
           datasourceId,
-          orgId,
         };
       }
+
       if (q.datasource) {
-        const dsName = q.datasource === 'default' ? config.defaultDatasource : q.datasource;
-        const ds = config.datasources[dsName];
+        const ds = getDataSourceSrv().getInstanceSettings(q.datasource);
+
         if (!ds) {
           throw new Error('Unknown Datasource: ' + q.datasource);
         }
+
         datasourceId = ds.id;
       }
+
       return {
         ...this.applyTemplateVariables(q, request.scopedVars),
         datasourceId,
         intervalMs,
         maxDataPoints,
-        orgId,
       };
     });
 
@@ -92,53 +95,35 @@ export class DataSourceWithBackend<
       return of({ data: [] });
     }
 
-    const body: any = {
-      queries,
-    };
+    const body: any = { queries };
+
     if (range) {
       body.range = range;
       body.from = range.from.valueOf().toString();
       body.to = range.to.valueOf().toString();
     }
 
-    const req: Promise<DataQueryResponse> = getBackendSrv()
-      .datasourceRequest({
+    return getBackendSrv()
+      .fetch({
         url: '/api/ds/query',
         method: 'POST',
         data: body,
         requestId,
       })
-      .then((rsp: any) => {
-        const dqs = toDataQueryResponse(rsp);
-        if (this.processResponse) {
-          return this.processResponse(dqs);
-        }
-        return dqs;
-      })
-      .catch(err => {
-        err.isHandled = true; // Avoid extra popup warning
-        const dqs = toDataQueryResponse(err);
-        if (this.processResponse) {
-          return this.processResponse(dqs);
-        }
-        return dqs;
-      });
-
-    return from(req);
+      .pipe(
+        map((rsp: any) => {
+          return toDataQueryResponse(rsp);
+        }),
+        catchError((err) => {
+          return of(toDataQueryResponse(err));
+        })
+      );
   }
 
   /**
-   * Optionally augment the response before returning the results to the
-   *
-   * NOTE: this was added in 7.1 for azure, and will be removed in 7.2
-   * when the entire response pipeline is Observable
-   *
-   * @internal
-   */
-  processResponse?(res: DataQueryResponse): Promise<DataQueryResponse>;
-
-  /**
    * Override to skip executing a query
+   *
+   * @returns false if the query should be skipped
    *
    * @virtual
    */
@@ -176,31 +161,28 @@ export class DataSourceWithBackend<
    */
   async callHealthCheck(): Promise<HealthCheckResult> {
     return getBackendSrv()
-      .get(`/api/datasources/${this.id}/health`)
-      .then(v => {
+      .request({ method: 'GET', url: `/api/datasources/${this.id}/health`, showErrorAlert: false })
+      .then((v) => {
         return v as HealthCheckResult;
       })
-      .catch(err => {
-        err.isHandled = true; // Avoid extra popup warning
+      .catch((err) => {
         return err.data as HealthCheckResult;
       });
   }
 
   /**
    * Checks the plugin health
+   * see public/app/features/datasources/state/actions.ts for what needs to be returned here
    */
   async testDatasource(): Promise<any> {
-    return this.callHealthCheck().then(res => {
+    return this.callHealthCheck().then((res) => {
       if (res.status === HealthStatus.OK) {
         return {
           status: 'success',
           message: res.message,
         };
       }
-      return {
-        status: 'fail',
-        message: res.message,
-      };
+      throw new Error(res.message);
     });
   }
 }

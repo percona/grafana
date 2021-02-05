@@ -1,17 +1,17 @@
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
-import { from, of, Observable, forkJoin } from 'rxjs';
-import { map, mergeMap, mergeAll } from 'rxjs/operators';
+import { forkJoin, from, Observable, of } from 'rxjs';
+import { catchError, map, mergeAll, mergeMap } from 'rxjs/operators';
 
 import {
-  LoadingState,
-  DataSourceApi,
   DataQuery,
   DataQueryRequest,
   DataQueryResponse,
+  DataSourceApi,
   DataSourceInstanceSettings,
+  LoadingState,
 } from '@grafana/data';
-import { getDataSourceSrv } from '@grafana/runtime';
+import { getDataSourceSrv, toDataQueryError } from '@grafana/runtime';
 
 export const MIXED_DATASOURCE_NAME = '-- Mixed --';
 
@@ -27,7 +27,7 @@ export class MixedDatasource extends DataSourceApi<DataQuery> {
 
   query(request: DataQueryRequest<DataQuery>): Observable<DataQueryResponse> {
     // Remove any invalid queries
-    const queries = request.targets.filter(t => {
+    const queries = request.targets.filter((t) => {
       return t.datasource !== MIXED_DATASOURCE_NAME;
     });
 
@@ -38,14 +38,17 @@ export class MixedDatasource extends DataSourceApi<DataQuery> {
     // Build groups of queries to run in parallel
     const sets: { [key: string]: DataQuery[] } = groupBy(queries, 'datasource');
     const mixed: BatchedQueries[] = [];
+
     for (const key in sets) {
       const targets = sets[key];
       const dsName = targets[0].datasource;
+
       mixed.push({
-        datasource: getDataSourceSrv().get(dsName),
+        datasource: getDataSourceSrv().get(dsName, request.scopedVars),
         targets,
       });
     }
+
     return this.batchQueries(mixed, request);
   }
 
@@ -58,20 +61,32 @@ export class MixedDatasource extends DataSourceApi<DataQuery> {
           dsRequest.targets = query.targets;
 
           return from(api.query(dsRequest)).pipe(
-            map(response => {
+            map((response) => {
               return {
                 ...response,
                 data: response.data || [],
                 state: LoadingState.Loading,
                 key: `mixed-${i}-${response.key || ''}`,
               } as DataQueryResponse;
+            }),
+            catchError((err) => {
+              err = toDataQueryError(err);
+
+              err.message = `${api.name}: ${err.message}`;
+
+              return of({
+                data: [],
+                state: LoadingState.Error,
+                error: err,
+                key: `mixed-${i}-${dsRequest.requestId || ''}`,
+              });
             })
           );
         })
       )
     );
 
-    return forkJoin(runningQueries).pipe(map(this.markAsDone), mergeAll());
+    return forkJoin(runningQueries).pipe(map(this.finalizeResponses), mergeAll());
   }
 
   testDatasource() {
@@ -82,14 +97,20 @@ export class MixedDatasource extends DataSourceApi<DataQuery> {
     return query && Array.isArray(query.targets) && query.targets.length > 0;
   }
 
-  private markAsDone(responses: DataQueryResponse[]): DataQueryResponse[] {
+  private finalizeResponses(responses: DataQueryResponse[]): DataQueryResponse[] {
     const { length } = responses;
 
     if (length === 0) {
       return responses;
     }
 
-    responses[length - 1].state = LoadingState.Done;
+    const error = responses.find((response) => response.state === LoadingState.Error);
+    if (error) {
+      responses.push(error); // adds the first found error entry so error shows up in the panel
+    } else {
+      responses[length - 1].state = LoadingState.Done;
+    }
+
     return responses;
   }
 }

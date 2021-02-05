@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { HTMLProps, useRef, useState } from 'react';
 import { cx, css } from 'emotion';
 import useClickAway from 'react-use/lib/useClickAway';
 import { measureText } from '../../utils/measureText';
 import { useExpandableLabel, SegmentProps } from '.';
 
-export interface SegmentInputProps<T> extends SegmentProps<T> {
+export interface SegmentInputProps<T> extends SegmentProps<T>, Omit<HTMLProps<HTMLInputElement>, 'value' | 'onChange'> {
   value: string | number;
   onChange: (text: string | number) => void;
   autofocus?: boolean;
@@ -19,6 +19,7 @@ export function SegmentInput<T>({
   className,
   placeholder,
   autofocus = false,
+  ...rest
 }: React.PropsWithChildren<SegmentInputProps<T>>) {
   const ref = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState<number | string>(initialValue);
@@ -50,11 +51,12 @@ export function SegmentInput<T>({
 
   return (
     <input
+      {...rest}
       ref={ref}
       autoFocus
       className={cx(`gf-form gf-form-input`, inputWidthStyle)}
       value={value}
-      onChange={item => {
+      onChange={(item) => {
         const { width } = measureText(item.target.value, FONT_SIZE);
         setInputWidth(width);
         setValue(item.target.value);
@@ -63,7 +65,7 @@ export function SegmentInput<T>({
         setExpanded(false);
         onChange(value);
       }}
-      onKeyDown={e => {
+      onKeyDown={(e) => {
         if ([13, 27].includes(e.keyCode)) {
           setExpanded(false);
           onChange(value);

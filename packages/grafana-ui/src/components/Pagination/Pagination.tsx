@@ -4,8 +4,11 @@ import { stylesFactory } from '../../themes';
 import { Button, ButtonVariant } from '../Button';
 
 interface Props {
+  /** The current page index being shown.  */
   currentPage: number;
+  /** Number of total pages.  */
   numberOfPages: number;
+  /** Callback function for fetching the selected page  */
   onNavigate: (toPage: number) => void;
 }
 
@@ -16,7 +19,7 @@ export const Pagination: React.FC<Props> = ({ currentPage, numberOfPages, onNavi
   return (
     <div className={styles.container}>
       <ol>
-        {pages.map(pageIndex => {
+        {pages.map((pageIndex) => {
           const page = pageIndex + 1;
           const variant: ButtonVariant = page === currentPage ? 'primary' : 'secondary';
 

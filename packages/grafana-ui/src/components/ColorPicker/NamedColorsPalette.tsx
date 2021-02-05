@@ -1,10 +1,10 @@
 import React from 'react';
-import { Color, getNamedColorPalette } from '@grafana/data';
+import { getNamedColorPalette } from '@grafana/data';
 import { Themeable } from '../../types/index';
 import NamedColorsGroup from './NamedColorsGroup';
 
 export interface NamedColorsPaletteProps extends Themeable {
-  color?: Color;
+  color?: string;
   onChange: (colorName: string) => void;
 }
 
@@ -17,7 +17,7 @@ export const NamedColorsPalette = ({ color, onChange, theme }: NamedColorsPalett
         theme={theme}
         selectedColor={color}
         colors={colors}
-        onColorSelect={color => {
+        onColorSelect={(color) => {
           onChange(color.name);
         }}
       />

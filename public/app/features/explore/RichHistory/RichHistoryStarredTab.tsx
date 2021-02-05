@@ -8,9 +8,7 @@ import { RichHistoryQuery, ExploreId } from 'app/types/explore';
 // Utils
 import { stylesFactory, useTheme } from '@grafana/ui';
 import { GrafanaTheme, SelectableValue } from '@grafana/data';
-
-import { SortOrder } from '../../../core/utils/explore';
-import { filterAndSortQueries, createDatasourcesList } from '../../../core/utils/richHistory';
+import { filterAndSortQueries, createDatasourcesList, SortOrder } from 'app/core/utils/richHistory';
 
 // Components
 import RichHistoryCard from './RichHistoryCard';
@@ -25,7 +23,7 @@ export interface Props {
   datasourceFilters: SelectableValue[] | null;
   exploreId: ExploreId;
   onChangeSortOrder: (sortOrder: SortOrder) => void;
-  onSelectDatasourceFilters: (value: SelectableValue[] | null) => void;
+  onSelectDatasourceFilters: (value: SelectableValue[]) => void;
 }
 
 const getStyles = stylesFactory((theme: GrafanaTheme) => {
@@ -89,9 +87,9 @@ export function RichHistoryStarredTab(props: Props) {
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const datasourcesRetrievedFromQueryHistory = uniqBy(queries, 'datasourceName').map(d => d.datasourceName);
+  const datasourcesRetrievedFromQueryHistory = uniqBy(queries, 'datasourceName').map((d) => d.datasourceName);
   const listOfDatasources = createDatasourcesList(datasourcesRetrievedFromQueryHistory);
-  const starredQueries = queries.filter(q => q.starred === true);
+  const starredQueries = queries.filter((q) => q.starred === true);
 
   const filterAndSortQueriesDebounced = useCallback(
     debounce((searchValue: string) => {
@@ -99,7 +97,7 @@ export function RichHistoryStarredTab(props: Props) {
         filterAndSortQueries(
           starredQueries,
           sortOrder,
-          datasourceFilters?.map(d => d.value) as string[] | null,
+          datasourceFilters?.map((d) => d.value) as string[] | null,
           searchValue
         )
       );
@@ -112,7 +110,7 @@ export function RichHistoryStarredTab(props: Props) {
       filterAndSortQueries(
         starredQueries,
         sortOrder,
-        datasourceFilters?.map(d => d.value) as string[] | null,
+        datasourceFilters?.map((d) => d.value) as string[] | null,
         searchInput
       )
     );
@@ -148,14 +146,14 @@ export function RichHistoryStarredTab(props: Props) {
           <div aria-label="Sort queries" className={styles.sort}>
             <Select
               options={sortOrderOptions}
-              value={sortOrderOptions.filter(order => order.value === sortOrder)}
+              value={sortOrderOptions.filter((order) => order.value === sortOrder)}
               placeholder="Sort queries by"
-              onChange={e => onChangeSortOrder(e.value as SortOrder)}
+              onChange={(e) => onChangeSortOrder(e.value as SortOrder)}
             />
           </div>
         </div>
-        {filteredQueries.map(q => {
-          const idx = listOfDatasources.findIndex(d => d.label === q.datasourceName);
+        {filteredQueries.map((q) => {
+          const idx = listOfDatasources.findIndex((d) => d.label === q.datasourceName);
           return (
             <RichHistoryCard
               query={q}

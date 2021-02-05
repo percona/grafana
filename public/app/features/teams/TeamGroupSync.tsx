@@ -19,7 +19,7 @@ export interface Props {
 
 interface State {
   isAdding: boolean;
-  newGroupId?: string;
+  newGroupId: string;
 }
 
 const headerTooltip = `Sync LDAP or OAuth groups with your Grafana teams.`;
@@ -140,7 +140,7 @@ export class TeamGroupSync extends PureComponent<Props, State> {
                   <th style={{ width: '1%' }} />
                 </tr>
               </thead>
-              <tbody>{groups.map(group => this.renderGroup(group))}</tbody>
+              <tbody>{groups.map((group) => this.renderGroup(group))}</tbody>
             </table>
           </div>
         )}

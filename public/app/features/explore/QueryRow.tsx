@@ -8,8 +8,6 @@ import { connect } from 'react-redux';
 // Components
 import AngularQueryEditor from './QueryEditor';
 import { QueryRowActions } from './QueryRowActions';
-// Actions
-import { changeQuery, modifyQueries, runQueries } from './state/actions';
 // Types
 import { StoreState } from 'app/types';
 import {
@@ -20,17 +18,20 @@ import {
   TimeRange,
   AbsoluteTimeRange,
   LoadingState,
+  EventBusExtended,
 } from '@grafana/data';
+import { selectors } from '@grafana/e2e-selectors';
 
 import { ExploreItemState, ExploreId } from 'app/types/explore';
-import { Emitter } from 'app/core/utils/emitter';
-import { highlightLogsExpressionAction, removeQueryRowAction } from './state/actionTypes';
+import { highlightLogsExpressionAction } from './state/explorePane';
 import { ErrorContainer } from './ErrorContainer';
+import { changeQuery, modifyQueries, removeQueryRowAction, runQueries } from './state/query';
+import { HelpToggle } from '../query/components/HelpToggle';
 
 interface PropsFromParent {
   exploreId: ExploreId;
   index: number;
-  exploreEvents: Emitter;
+  exploreEvents: EventBusExtended;
 }
 
 export interface QueryRowProps extends PropsFromParent {
@@ -76,10 +77,6 @@ export class QueryRow extends PureComponent<QueryRowProps, QueryRowState> {
     }
   };
 
-  componentWillUnmount() {
-    console.log('QueryRow will unmount');
-  }
-
   onClickToggleDisabled = () => {
     const { exploreId, index, query } = this.props;
     const newQuery = {
@@ -117,23 +114,15 @@ export class QueryRow extends PureComponent<QueryRowProps, QueryRowState> {
   };
 
   renderQueryEditor = () => {
-    const {
-      datasourceInstance,
-      history,
-      query,
-      exploreEvents,
-      range,
-      absoluteRange,
-      queryResponse,
-      exploreId,
-    } = this.props;
+    const { datasourceInstance, history, query, exploreEvents, range, queryResponse, exploreId } = this.props;
 
     const queryErrors = queryResponse.error && queryResponse.error.refId === query.refId ? [queryResponse.error] : [];
 
     const ReactQueryEditor = this.setReactQueryEditor();
 
+    let QueryEditor: JSX.Element;
     if (ReactQueryEditor) {
-      return (
+      QueryEditor = (
         <ReactQueryEditor
           datasource={datasourceInstance}
           query={query}
@@ -142,22 +131,35 @@ export class QueryRow extends PureComponent<QueryRowProps, QueryRowState> {
           onBlur={noopOnBlur}
           onChange={this.onChange}
           data={queryResponse}
-          absoluteRange={absoluteRange}
+          range={range}
           exploreId={exploreId}
         />
       );
+    } else {
+      QueryEditor = (
+        <AngularQueryEditor
+          error={queryErrors}
+          datasource={datasourceInstance}
+          onQueryChange={this.onChange}
+          onExecuteQuery={this.onRunQuery}
+          initialQuery={query}
+          exploreEvents={exploreEvents}
+          range={range}
+          textEditModeEnabled={this.state.textEditModeEnabled}
+        />
+      );
     }
+
+    const DatasourceCheatsheet = datasourceInstance.components?.QueryEditorHelp;
     return (
-      <AngularQueryEditor
-        error={queryErrors}
-        datasource={datasourceInstance}
-        onQueryChange={this.onChange}
-        onExecuteQuery={this.onRunQuery}
-        initialQuery={query}
-        exploreEvents={exploreEvents}
-        range={range}
-        textEditModeEnabled={this.state.textEditModeEnabled}
-      />
+      <>
+        {QueryEditor}
+        {DatasourceCheatsheet && (
+          <HelpToggle>
+            <DatasourceCheatsheet onClickExample={(query) => this.onChange(query)} datasource={datasourceInstance} />
+          </HelpToggle>
+        )}
+      </>
     );
   };
 
@@ -179,7 +181,7 @@ export class QueryRow extends PureComponent<QueryRowProps, QueryRowState> {
 
     return (
       <>
-        <div className="query-row">
+        <div className="query-row" aria-label={selectors.components.QueryEditorRows.rows}>
           <div className="query-row-field flex-shrink-1">{this.renderQueryEditor()}</div>
           <QueryRowActions
             canToggleEditorModes={canToggleEditorModes}

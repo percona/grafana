@@ -8,11 +8,10 @@ import appEvents from 'app/core/app_events';
 import { getBackendSrv } from '@grafana/runtime';
 import { DashboardSrv } from '../dashboard/services/DashboardSrv';
 import DatasourceSrv from '../plugins/datasource_srv';
-import { DataQuery, DataSourceApi } from '@grafana/data';
+import { DataQuery, DataSourceApi, rangeUtil } from '@grafana/data';
 import { PanelModel } from 'app/features/dashboard/state';
 import { getDefaultCondition } from './getAlertingValidationMessage';
 import { CoreEvents } from 'app/types';
-import kbn from 'app/core/utils/kbn';
 import { promiseToDigest } from 'app/core/utils/promiseToDigest';
 
 export class AlertTabCtrl {
@@ -56,7 +55,7 @@ export class AlertTabCtrl {
     this.appSubUrl = config.appSubUrl;
     this.panelCtrl._enableAlert = this.enable;
     this.alertingMinIntervalSecs = config.alertingMinInterval;
-    this.alertingMinInterval = kbn.secondsToHms(config.alertingMinInterval);
+    this.alertingMinInterval = rangeUtil.secondsToHms(config.alertingMinInterval);
   }
 
   $onInit() {
@@ -95,7 +94,7 @@ export class AlertTabCtrl {
       getBackendSrv()
         .get(`/api/annotations?dashboardId=${this.panelCtrl.dashboard.id}&panelId=${this.panel.id}&limit=50&type=alert`)
         .then((res: any) => {
-          this.alertHistory = _.map(res, ah => {
+          this.alertHistory = _.map(res, (ah) => {
             ah.time = this.dashboardSrv.getCurrent().formatDate(ah.time, 'MMM D, YYYY HH:mm:ss');
             ah.stateModel = alertDef.getStateDisplayModel(ah.newState);
             ah.info = alertDef.getAlertAnnotationInfo(ah);
@@ -155,7 +154,7 @@ export class AlertTabCtrl {
     });
 
     // avoid duplicates using both id and uid to be backwards compatible.
-    if (!_.find(this.alert.notifications, n => n.id === model.id || n.uid === model.uid)) {
+    if (!_.find(this.alert.notifications, (n) => n.id === model.id || n.uid === model.uid)) {
       this.alert.notifications.push({ uid: model.uid });
     }
 
@@ -214,7 +213,7 @@ export class AlertTabCtrl {
         memo.push(this.buildConditionModel(value));
         return memo;
       },
-      []
+      [] as string[]
     );
 
     ThresholdMapper.alertToGraphThresholds(this.panel);
@@ -226,6 +225,19 @@ export class AlertTabCtrl {
       // fallback to using id if uid is missing
       if (!model) {
         model = _.find(this.notifications, { id: addedNotification.id });
+        if (!model) {
+          appEvents.emit(CoreEvents.showConfirmModal, {
+            title: 'Notifier with invalid ID is detected',
+            text: `Do you want to delete notifier with invalid ID: ${addedNotification.id} from the dashboard JSON?`,
+            text2: 'After successful deletion, make sure to save the dashboard for storing the update JSON.',
+            icon: 'trash-alt',
+            confirmText: 'Delete',
+            yesText: 'Delete',
+            onConfirm: async () => {
+              this.removeNotification(addedNotification);
+            },
+          });
+        }
       }
 
       if (model && model.isDefault === false) {
@@ -253,7 +265,7 @@ export class AlertTabCtrl {
     this.frequencyWarning = '';
 
     try {
-      const frequencySecs = kbn.interval_to_seconds(this.alert.frequency);
+      const frequencySecs = rangeUtil.intervalToSeconds(this.alert.frequency);
       if (frequencySecs < this.alertingMinIntervalSecs) {
         this.frequencyWarning =
           'A minimum evaluation interval of ' +
@@ -282,7 +294,7 @@ export class AlertTabCtrl {
     }
 
     let firstTarget;
-    let foundTarget: DataQuery = null;
+    let foundTarget: DataQuery | null = null;
 
     const promises: Array<Promise<any>> = [];
     for (const condition of this.alert.conditions) {
@@ -313,7 +325,7 @@ export class AlertTabCtrl {
       const datasourceName = foundTarget.datasource || this.panel.datasource;
       promises.push(
         this.datasourceSrv.get(datasourceName).then(
-          (foundTarget => (ds: DataSourceApi) => {
+          ((foundTarget) => (ds: DataSourceApi) => {
             if (!ds.meta.alerting) {
               return Promise.reject('The datasource does not support alerting queries');
             } else if (ds.targetContainsTemplate && ds.targetContainsTemplate(foundTarget)) {
@@ -329,7 +341,7 @@ export class AlertTabCtrl {
         this.error = '';
         this.$scope.$apply();
       },
-      e => {
+      (e) => {
         this.error = e;
         this.$scope.$apply();
       }
@@ -359,7 +371,7 @@ export class AlertTabCtrl {
         this.validateModel();
       }
       case 'get-param-options': {
-        const result = this.panel.targets.map(target => {
+        const result = this.panel.targets.map((target) => {
           return this.uiSegmentSrv.newSegment({ value: target.refId });
         });
 
@@ -378,6 +390,7 @@ export class AlertTabCtrl {
       case 'action': {
         conditionModel.source.reducer.type = evt.action.value;
         conditionModel.reducerPart = alertDef.createReducerPart(conditionModel.source.reducer);
+        this.evaluatorParamsChanged();
         break;
       }
       case 'get-part-actions': {

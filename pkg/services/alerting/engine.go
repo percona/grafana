@@ -2,29 +2,30 @@ package alerting
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/ext"
-	tlog "github.com/opentracing/opentracing-go/log"
 
 	"github.com/benbjohnson/clock"
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/registry"
 	"github.com/grafana/grafana/pkg/services/rendering"
 	"github.com/grafana/grafana/pkg/setting"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
+	tlog "github.com/opentracing/opentracing-go/log"
 	"golang.org/x/sync/errgroup"
-	"golang.org/x/xerrors"
 )
 
 // AlertEngine is the background process that
 // schedules alert evaluations and makes sure notifications
 // are sent.
 type AlertEngine struct {
-	RenderService rendering.Service `inject:""`
-	Bus           bus.Bus           `inject:""`
+	RenderService    rendering.Service             `inject:""`
+	Bus              bus.Bus                       `inject:""`
+	RequestValidator models.PluginRequestValidator `inject:""`
 
 	execQueue     chan *Job
 	ticker        *Ticker
@@ -46,7 +47,7 @@ func (e *AlertEngine) IsDisabled() bool {
 
 // Init initializes the AlertingService.
 func (e *AlertEngine) Init() error {
-	e.ticker = NewTicker(time.Now(), time.Second*0, clock.New())
+	e.ticker = NewTicker(time.Now(), time.Second*0, clock.New(), 1)
 	e.execQueue = make(chan *Job, 1000)
 	e.scheduler = newScheduler()
 	e.evalHandler = NewEvalHandler()
@@ -164,7 +165,7 @@ func (e *AlertEngine) processJob(attemptID int, attemptChan chan int, cancelChan
 	span := opentracing.StartSpan("alert execution")
 	alertCtx = opentracing.ContextWithSpan(alertCtx, span)
 
-	evalContext := NewEvalContext(alertCtx, job.Rule)
+	evalContext := NewEvalContext(alertCtx, job.Rule, e.RequestValidator)
 	evalContext.Ctx = alertCtx
 
 	go func() {
@@ -214,11 +215,12 @@ func (e *AlertEngine) processJob(attemptID int, attemptChan chan int, cancelChan
 		evalContext.Ctx = resultHandleCtx
 		evalContext.Rule.State = evalContext.GetNewState()
 		if err := e.resultHandler.handle(evalContext); err != nil {
-			if xerrors.Is(err, context.Canceled) {
+			switch {
+			case errors.Is(err, context.Canceled):
 				e.log.Debug("Result handler returned context.Canceled")
-			} else if xerrors.Is(err, context.DeadlineExceeded) {
+			case errors.Is(err, context.DeadlineExceeded):
 				e.log.Debug("Result handler returned context.DeadlineExceeded")
-			} else {
+			default:
 				e.log.Error("Failed to handle result", "err", err)
 			}
 		}

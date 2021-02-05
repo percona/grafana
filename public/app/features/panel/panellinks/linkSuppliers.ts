@@ -6,6 +6,7 @@ import {
   formattedValueToString,
   getFieldDisplayValuesProxy,
   getTimeField,
+  InterpolateFunction,
   Labels,
   LinkModelSupplier,
   ScopedVar,
@@ -39,10 +40,10 @@ interface DataViewVars {
 }
 
 interface DataLinkScopedVars extends ScopedVars {
-  __series?: ScopedVar<SeriesVars>;
-  __field?: ScopedVar<FieldVars>;
-  __value?: ScopedVar<ValueVars>;
-  __data?: ScopedVar<DataViewVars>;
+  __series: ScopedVar<SeriesVars>;
+  __field: ScopedVar<FieldVars>;
+  __value: ScopedVar<ValueVars>;
+  __data: ScopedVar<DataViewVars>;
 }
 
 /**
@@ -53,11 +54,10 @@ export const getFieldLinksSupplier = (value: FieldDisplay): LinkModelSupplier<Fi
   if (!links || links.length === 0) {
     return undefined;
   }
+
   return {
-    getLinks: (existingScopedVars?: any) => {
-      const scopedVars: DataLinkScopedVars = {
-        ...(existingScopedVars ?? {}),
-      };
+    getLinks: (replaceVariables: InterpolateFunction) => {
+      const scopedVars: Partial<DataLinkScopedVars> = {};
 
       if (value.view) {
         const { dataFrame } = value.view;
@@ -71,8 +71,8 @@ export const getFieldLinksSupplier = (value: FieldDisplay): LinkModelSupplier<Fi
         };
 
         const field = value.colIndex !== undefined ? dataFrame.fields[value.colIndex] : undefined;
+
         if (field) {
-          console.log('Full Field Info:', field);
           scopedVars['__field'] = {
             value: {
               name: field.name,
@@ -80,19 +80,19 @@ export const getFieldLinksSupplier = (value: FieldDisplay): LinkModelSupplier<Fi
             },
             text: 'Field',
           };
-        }
 
-        if (!isNaN(value.rowIndex)) {
-          const { timeField } = getTimeField(dataFrame);
-          scopedVars['__value'] = {
-            value: {
-              raw: field.values.get(value.rowIndex),
-              numeric: value.display.numeric,
-              text: formattedValueToString(value.display),
-              time: timeField ? timeField.values.get(value.rowIndex) : undefined,
-            },
-            text: 'Value',
-          };
+          if (value.rowIndex !== undefined && value.rowIndex >= 0) {
+            const { timeField } = getTimeField(dataFrame);
+            scopedVars['__value'] = {
+              value: {
+                raw: field.values.get(value.rowIndex),
+                numeric: value.display.numeric,
+                text: formattedValueToString(value.display),
+                time: timeField ? timeField.values.get(value.rowIndex) : undefined,
+              },
+              text: 'Value',
+            };
+          }
 
           // Expose other values on the row
           if (value.view) {
@@ -123,15 +123,23 @@ export const getFieldLinksSupplier = (value: FieldDisplay): LinkModelSupplier<Fi
         console.log('VALUE', value);
       }
 
+      const replace: InterpolateFunction = (value: string, vars: ScopedVars | undefined, fmt?: string | Function) => {
+        const finalVars: ScopedVars = {
+          ...(scopedVars as ScopedVars),
+          ...vars,
+        };
+        return replaceVariables(value, finalVars, fmt);
+      };
+
       return links.map((link: DataLink) => {
-        return getLinkSrv().getDataLinkUIModel(link, scopedVars, value);
+        return getLinkSrv().getDataLinkUIModel(link, replace, value);
       });
     },
   };
 };
 
-export const getPanelLinksSupplier = (value: PanelModel): LinkModelSupplier<PanelModel> => {
-  const links = value.links;
+export const getPanelLinksSupplier = (panel: PanelModel): LinkModelSupplier<PanelModel> | undefined => {
+  const links = panel.links;
 
   if (!links || links.length === 0) {
     return undefined;
@@ -139,8 +147,8 @@ export const getPanelLinksSupplier = (value: PanelModel): LinkModelSupplier<Pane
 
   return {
     getLinks: () => {
-      return links.map(link => {
-        return getLinkSrv().getDataLinkUIModel(link, value.scopedVars, value);
+      return links.map((link) => {
+        return getLinkSrv().getDataLinkUIModel(link, panel.replaceVariables, panel);
       });
     },
   };

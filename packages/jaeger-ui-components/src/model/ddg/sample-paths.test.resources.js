@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export const simplePayloadElemMaker = label => ({
+export const simplePayloadElemMaker = (label) => ({
   operation: `${label}Operation`,
   service: `${label}Service`,
 });
@@ -24,7 +24,7 @@ const sameFocalServicePayloadElem = {
   service: focalPayloadElem.service,
 };
 
-const pathLengthener = path => {
+const pathLengthener = (path) => {
   const prequels = [];
   const sequels = [];
   path.forEach(({ operation, service }) => {
@@ -49,21 +49,9 @@ export const afterPayloadElem = simplePayloadElemMaker('after');
 export const lastPayloadElem = simplePayloadElemMaker('last');
 
 export const shortPath = [beforePayloadElem, focalPayloadElem];
-export const simplePath = [
-  firstPayloadElem,
-  beforePayloadElem,
-  focalPayloadElem,
-  afterPayloadElem,
-  lastPayloadElem,
-];
+export const simplePath = [firstPayloadElem, beforePayloadElem, focalPayloadElem, afterPayloadElem, lastPayloadElem];
 export const longSimplePath = pathLengthener(simplePath);
-export const noFocalPath = [
-  firstPayloadElem,
-  beforePayloadElem,
-  midPayloadElem,
-  afterPayloadElem,
-  lastPayloadElem,
-];
+export const noFocalPath = [firstPayloadElem, beforePayloadElem, midPayloadElem, afterPayloadElem, lastPayloadElem];
 export const doubleFocalPath = [
   firstPayloadElem,
   beforePayloadElem,
@@ -128,6 +116,6 @@ export const generationPaths = [
   [generationPayloadElems.target, generationPayloadElems.beforeFocalMid, focalPayloadElem],
 ];
 
-export const wrap = paths => ({
-  dependencies: paths.map(path => ({ path, attributes: [] })),
+export const wrap = (paths) => ({
+  dependencies: paths.map((path) => ({ path, attributes: [] })),
 });

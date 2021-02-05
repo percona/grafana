@@ -3,7 +3,7 @@ import { dateTimeFormat } from '@grafana/data';
 import { Legend, Form } from '@grafana/ui';
 import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 import { ImportDashboardForm } from './ImportDashboardForm';
-import { clearLoadedDashboard, saveDashboard } from '../state/actions';
+import { clearLoadedDashboard, importDashboard } from '../state/actions';
 import { DashboardInputs, DashboardSource, ImportDashboardDTO } from '../state/reducers';
 import { StoreState } from 'app/types';
 
@@ -19,7 +19,7 @@ interface ConnectedProps {
 
 interface DispatchProps {
   clearLoadedDashboard: typeof clearLoadedDashboard;
-  saveDashboard: typeof saveDashboard;
+  importDashboard: typeof importDashboard;
 }
 
 type Props = OwnProps & ConnectedProps & DispatchProps;
@@ -34,7 +34,7 @@ class ImportDashboardOverviewUnConnected extends PureComponent<Props, State> {
   };
 
   onSubmit = (form: ImportDashboardDTO) => {
-    this.props.saveDashboard(form);
+    this.props.importDashboard(form);
   };
 
   onCancel = () => {
@@ -60,6 +60,7 @@ class ImportDashboardOverviewUnConnected extends PureComponent<Props, State> {
                   href={`https://grafana.com/dashboards/${dashboard.gnetId}`}
                   className="external-link"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   Grafana.com
                 </a>
@@ -86,7 +87,7 @@ class ImportDashboardOverviewUnConnected extends PureComponent<Props, State> {
           validateFieldsOnMount={['title', 'uid']}
           validateOn="onChange"
         >
-          {({ register, errors, control, getValues }) => (
+          {({ register, errors, control, watch, getValues }) => (
             <ImportDashboardForm
               register={register}
               errors={errors}
@@ -97,6 +98,7 @@ class ImportDashboardOverviewUnConnected extends PureComponent<Props, State> {
               onCancel={this.onCancel}
               onUidReset={this.onUidReset}
               onSubmit={this.onSubmit}
+              watch={watch}
               initialFolderId={folder.id}
             />
           )}
@@ -116,7 +118,7 @@ const mapStateToProps: MapStateToProps<ConnectedProps, OwnProps, StoreState> = (
 
 const mapDispatchToProps: MapDispatchToProps<DispatchProps, OwnProps> = {
   clearLoadedDashboard,
-  saveDashboard,
+  importDashboard,
 };
 
 export const ImportDashboardOverview = connect(mapStateToProps, mapDispatchToProps)(ImportDashboardOverviewUnConnected);

@@ -4,20 +4,17 @@ import React, { PureComponent } from 'react';
 import { AnnoOptions } from './types';
 import { AnnotationEvent, AppEvents, dateTime, DurationUnit, PanelProps } from '@grafana/data';
 import { Tooltip } from '@grafana/ui';
-import { getBackendSrv } from '@grafana/runtime';
+import { getBackendSrv, getLocationSrv } from '@grafana/runtime';
 import { AbstractList } from '@grafana/ui/src/components/List/AbstractList';
 import { TagBadge } from 'app/core/components/TagFilter/TagBadge';
 import { getDashboardSrv } from 'app/features/dashboard/services/DashboardSrv';
 import appEvents from 'app/core/app_events';
-
-import { updateLocation } from 'app/core/actions';
-import { store } from 'app/store/store';
 import { css, cx } from 'emotion';
 
 interface UserInfo {
-  id: number;
-  login: string;
-  email: string;
+  id?: number;
+  login?: string;
+  email?: string;
 }
 
 interface Props extends PanelProps<AnnoOptions> {}
@@ -108,6 +105,10 @@ export class AnnoListPanel extends PureComponent<Props, State> {
 
   onAnnoClick = (e: React.SyntheticEvent, anno: AnnotationEvent) => {
     e.stopPropagation();
+    if (!anno.time) {
+      return;
+    }
+
     const { options } = this.props;
     const dashboardSrv = getDashboardSrv();
     const current = dashboardSrv.getCurrent();
@@ -122,12 +123,10 @@ export class AnnoListPanel extends PureComponent<Props, State> {
     }
 
     if (current.id === anno.dashboardId) {
-      store.dispatch(
-        updateLocation({
-          query: params,
-          partial: true,
-        })
-      );
+      getLocationSrv().update({
+        query: params,
+        partial: true,
+      });
       return;
     }
 
@@ -136,12 +135,10 @@ export class AnnoListPanel extends PureComponent<Props, State> {
       .then((res: any[]) => {
         if (res && res.length && res[0].id === anno.dashboardId) {
           const dash = res[0];
-          store.dispatch(
-            updateLocation({
-              query: params,
-              path: dash.url,
-            })
-          );
+          getLocationSrv().update({
+            query: params,
+            path: dash.url,
+          });
           return;
         }
         appEvents.emit(AppEvents.alertWarning, ['Unknown Dashboard: ' + anno.dashboardId]);
@@ -164,9 +161,9 @@ export class AnnoListPanel extends PureComponent<Props, State> {
     return t.add(incr, unit as DurationUnit).valueOf();
   }
 
-  onTagClick = (e: React.SyntheticEvent, tag: string, remove: boolean) => {
+  onTagClick = (e: React.SyntheticEvent, tag: string, remove?: boolean) => {
     e.stopPropagation();
-    const queryTags = remove ? this.state.queryTags.filter(item => item !== tag) : [...this.state.queryTags, tag];
+    const queryTags = remove ? this.state.queryTags.filter((item) => item !== tag) : [...this.state.queryTags, tag];
 
     this.setState({ queryTags });
   };
@@ -188,16 +185,16 @@ export class AnnoListPanel extends PureComponent<Props, State> {
     });
   };
 
-  renderTags = (tags: string[], remove: boolean): JSX.Element | null => {
+  renderTags = (tags?: string[], remove?: boolean): JSX.Element | null => {
     if (!tags || !tags.length) {
       return null;
     }
     return (
       <>
-        {tags.map(tag => {
+        {tags.map((tag) => {
           return (
-            <span key={tag} onClick={e => this.onTagClick(e, tag, remove)} className="pointer">
-              <TagBadge label={tag} removeIcon={remove} count={0} />
+            <span key={tag} onClick={(e) => this.onTagClick(e, tag, remove)} className="pointer">
+              <TagBadge label={tag} removeIcon={!!remove} count={0} />
             </span>
           );
         })}
@@ -214,7 +211,7 @@ export class AnnoListPanel extends PureComponent<Props, State> {
       <div className="dashlist-item">
         <span
           className="dashlist-link pointer"
-          onClick={e => {
+          onClick={(e) => {
             this.onAnnoClick(e, anno);
           }}
         >
@@ -242,7 +239,7 @@ export class AnnoListPanel extends PureComponent<Props, State> {
                   theme="info"
                   placement="top"
                 >
-                  <span onClick={e => this.onUserClick(e, anno)} className="graph-annotation__user">
+                  <span onClick={(e) => this.onUserClick(e, anno)} className="graph-annotation__user">
                     <img src={anno.avatarUrl} />
                   </span>
                 </Tooltip>
@@ -251,7 +248,9 @@ export class AnnoListPanel extends PureComponent<Props, State> {
             {showTags && this.renderTags(anno.tags, false)}
           </span>
 
-          <span className="pluginlist-version">{showTime && <span>{dashboard.formatDate(anno.time)}</span>}</span>
+          <span className="pluginlist-version">
+            {showTime && anno.time && <span>{dashboard.formatDate(anno.time)}</span>}
+          </span>
         </span>
       </div>
     );
@@ -267,7 +266,7 @@ export class AnnoListPanel extends PureComponent<Props, State> {
     // Previously we showed inidication that it covered all time
     // { timeInfo && (
     //   <span className="panel-time-info">
-    //     <i className="fa fa-clock-o" /> {timeInfo}
+    //     <Icon name="clock-nine" /> {timeInfo}
     //   </span>
     // )}
 
@@ -292,7 +291,7 @@ export class AnnoListPanel extends PureComponent<Props, State> {
         <AbstractList
           items={annotations}
           renderItem={this.renderItem}
-          getItemKey={item => {
+          getItemKey={(item) => {
             return item.id + '';
           }}
           className="dashlist"

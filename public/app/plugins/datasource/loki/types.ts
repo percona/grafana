@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData, QueryResultMeta } from '@grafana/data';
+import { DataQuery, DataSourceJsonData, QueryResultMeta, ScopedVars } from '@grafana/data';
 
 export interface LokiInstantQueryRequest {
   query: string;
@@ -24,13 +24,14 @@ export enum LokiResultType {
 
 export interface LokiQuery extends DataQuery {
   expr: string;
-  liveStreaming?: boolean;
   query?: string;
   format?: string;
   reverse?: boolean;
   legendFormat?: string;
   valueWithRefId?: boolean;
   maxLines?: number;
+  range?: boolean;
+  instant?: boolean;
 }
 
 export interface LokiOptions extends DataSourceJsonData {
@@ -59,7 +60,7 @@ export interface LokiVectorResponse {
 }
 
 export interface LokiMatrixResult {
-  metric: { [label: string]: string };
+  metric: Record<string, string>;
   values: Array<[number, string]>;
 }
 
@@ -91,7 +92,7 @@ export interface LokiTailResponse {
   dropped_entries?: Array<{
     labels: Record<string, string>;
     timestamp: string;
-  }>;
+  }> | null;
 }
 
 export type LokiResult = LokiVectorResult | LokiMatrixResult | LokiStreamResult;
@@ -115,14 +116,15 @@ export type DerivedFieldConfig = {
 };
 
 export interface TransformerOptions {
-  format: string;
-  legendFormat: string;
+  format?: string;
+  legendFormat?: string;
   step: number;
   start: number;
   end: number;
   query: string;
   responseListLength: number;
   refId: string;
+  scopedVars: ScopedVars;
   meta?: QueryResultMeta;
   valueWithRefId?: boolean;
 }

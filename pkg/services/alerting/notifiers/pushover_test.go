@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/grafana/grafana/pkg/services/validations"
+
 	"github.com/grafana/grafana/pkg/services/alerting"
 
 	"github.com/grafana/grafana/pkg/components/simplejson"
@@ -14,7 +16,6 @@ import (
 
 func TestPushoverNotifier(t *testing.T) {
 	Convey("Pushover notifier tests", t, func() {
-
 		Convey("Parsing alert notification from settings", func() {
 			Convey("empty settings should return error", func() {
 				json := `{ }`
@@ -65,7 +66,6 @@ func TestPushoverNotifier(t *testing.T) {
 
 func TestGenPushoverBody(t *testing.T) {
 	Convey("Pushover body generation tests", t, func() {
-
 		Convey("Given common sounds", func() {
 			sirenSound := "siren_sound_tst"
 			successSound := "success_sound_tst"
@@ -75,7 +75,7 @@ func TestGenPushoverBody(t *testing.T) {
 				evalContext := alerting.NewEvalContext(context.Background(),
 					&alerting.Rule{
 						State: models.AlertStateAlerting,
-					})
+					}, &validations.OSSPluginRequestValidator{})
 				_, pushoverBody, err := notifier.genPushoverBody(evalContext, "", "")
 
 				So(err, ShouldBeNil)
@@ -86,13 +86,12 @@ func TestGenPushoverBody(t *testing.T) {
 				evalContext := alerting.NewEvalContext(context.Background(),
 					&alerting.Rule{
 						State: models.AlertStateOK,
-					})
+					}, &validations.OSSPluginRequestValidator{})
 				_, pushoverBody, err := notifier.genPushoverBody(evalContext, "", "")
 
 				So(err, ShouldBeNil)
 				So(strings.Contains(pushoverBody.String(), successSound), ShouldBeTrue)
 			})
 		})
-
 	})
 }

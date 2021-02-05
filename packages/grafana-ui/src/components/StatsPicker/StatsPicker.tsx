@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 
-import isArray from 'lodash/isArray';
 import difference from 'lodash/difference';
 
 import { Select } from '../Select/Select';
@@ -35,10 +34,10 @@ export class StatsPicker extends PureComponent<Props> {
 
     const current = fieldReducers.list(stats);
     if (current.length !== stats.length) {
-      const found = current.map(v => v.id);
+      const found = current.map((v) => v.id);
       const notFound = difference(stats, found);
       console.warn('Unknown stats', notFound, stats);
-      onChange(current.map(stat => stat.id));
+      onChange(current.map((stat) => stat.id));
     }
 
     // Make sure there is only one
@@ -55,8 +54,8 @@ export class StatsPicker extends PureComponent<Props> {
 
   onSelectionChange = (item: SelectableValue<string>) => {
     const { onChange } = this.props;
-    if (isArray(item)) {
-      onChange(item.map(v => v.value));
+    if (Array.isArray(item)) {
+      onChange(item.map((v) => v.value));
     } else {
       onChange(item && item.value ? [item.value] : []);
     }

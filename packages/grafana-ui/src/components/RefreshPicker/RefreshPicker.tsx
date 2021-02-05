@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import classNames from 'classnames';
 import { SelectableValue } from '@grafana/data';
 import { css } from 'emotion';
@@ -9,6 +9,7 @@ import memoizeOne from 'memoize-one';
 import { GrafanaTheme } from '@grafana/data';
 import { withTheme } from '../../themes';
 
+// Default intervals used in the refresh picker component
 export const defaultIntervals = ['5s', '10s', '30s', '1m', '5m', '15m', '30m', '1h', '2h', '1d'];
 
 const getStyles = memoizeOne((theme: GrafanaTheme) => {
@@ -35,7 +36,7 @@ export interface Props {
   theme: GrafanaTheme;
 }
 
-export class RefreshPickerBase extends PureComponent<Props> {
+export class RefreshPickerBase extends Component<Props> {
   static offOption = { label: 'Off', value: '' };
   static liveOption = { label: 'Live', value: 'LIVE' };
   static isLive = (refreshInterval?: string): boolean => refreshInterval === RefreshPicker.liveOption.value;
@@ -46,7 +47,7 @@ export class RefreshPickerBase extends PureComponent<Props> {
 
   intervalsToOptions = (intervals: string[] | undefined): Array<SelectableValue<string>> => {
     const intervalsOrDefault = intervals || defaultIntervals;
-    const options = intervalsOrDefault.map(interval => ({ label: interval, value: interval }));
+    const options = intervalsOrDefault.map((interval) => ({ label: interval, value: interval }));
 
     if (this.props.hasLiveOption) {
       options.unshift(RefreshPicker.liveOption);
@@ -64,11 +65,27 @@ export class RefreshPickerBase extends PureComponent<Props> {
     }
   };
 
+  shouldComponentUpdate(nextProps: Props) {
+    const intervalsDiffer = nextProps.intervals?.some((interval, i) => this.props.intervals?.[i] !== interval);
+
+    return (
+      intervalsDiffer ||
+      this.props.onRefresh !== nextProps.onRefresh ||
+      this.props.onIntervalChanged !== nextProps.onIntervalChanged ||
+      this.props.value !== nextProps.value ||
+      this.props.tooltip !== nextProps.tooltip ||
+      this.props.hasLiveOption !== nextProps.hasLiveOption ||
+      this.props.refreshButton !== nextProps.refreshButton ||
+      this.props.buttonSelectClassName !== nextProps.buttonSelectClassName ||
+      this.props.theme !== nextProps.theme
+    );
+  }
+
   render() {
     const { onRefresh, intervals, tooltip, value, refreshButton, buttonSelectClassName, theme } = this.props;
     const options = this.intervalsToOptions(intervals);
     const currentValue = value || '';
-    const selectedValue = options.find(item => item.value === currentValue) || RefreshPicker.offOption;
+    const selectedValue = options.find((item) => item.value === currentValue) || RefreshPicker.offOption;
     const styles = getStyles(theme);
 
     const cssClasses = classNames({

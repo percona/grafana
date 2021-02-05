@@ -1,7 +1,7 @@
 import { DataQuery, SelectableValue, DataSourceJsonData } from '@grafana/data';
 
 export interface CloudWatchMetricsQuery extends DataQuery {
-  queryMode: 'Metrics';
+  queryMode?: 'Metrics';
 
   id: string;
   region: string;
@@ -30,6 +30,7 @@ export enum CloudWatchLogsQueryStatus {
   Complete = 'Complete',
   Failed = 'Failed',
   Cancelled = 'Cancelled',
+  Timeout = 'Timeout',
 }
 
 export interface CloudWatchLogsQuery extends DataQuery {
@@ -44,6 +45,9 @@ export interface CloudWatchLogsQuery extends DataQuery {
 
 export type CloudWatchQuery = CloudWatchMetricsQuery | CloudWatchLogsQuery;
 
+export const isCloudWatchLogsQuery = (cloudwatchQuery: CloudWatchQuery): cloudwatchQuery is CloudWatchLogsQuery =>
+  (cloudwatchQuery as CloudWatchLogsQuery).queryMode === 'Logs';
+
 export interface AnnotationQuery extends CloudWatchMetricsQuery {
   prefixMatching: boolean;
   actionPrefix: string;
@@ -55,6 +59,7 @@ export type SelectableStrings = Array<SelectableValue<string>>;
 export interface CloudWatchJsonData extends DataSourceJsonData {
   timeField?: string;
   assumeRoleArn?: string;
+  externalId?: string;
   database?: string;
   customMetricsNamespaces?: string;
 }

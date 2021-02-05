@@ -39,7 +39,7 @@ export function queryPartEditorDirective(templateSrv: any) {
         const $input = $link.next();
 
         $input.val(part.params[paramIndex]);
-        $input.css('width', $link.width() + 16 + 'px');
+        $input.css('width', $link.width()! + 16 + 'px');
 
         $link.hide();
         $input.show();
@@ -90,7 +90,7 @@ export function queryPartEditorDirective(templateSrv: any) {
           if (param.options) {
             let options = param.options;
             if (param.type === 'int') {
-              options = _.map(options, val => {
+              options = _.map(options, (val) => {
                 return val.toString();
               });
             }
@@ -99,7 +99,7 @@ export function queryPartEditorDirective(templateSrv: any) {
 
           $scope.$apply(() => {
             $scope.handleEvent({ $event: { name: 'get-param-options' } }).then((result: any) => {
-              const dynamicOptions = _.map(result, op => {
+              const dynamicOptions = _.map(result, (op) => {
                 return _.escape(op.value);
               });
               callback(dynamicOptions);
@@ -123,7 +123,7 @@ export function queryPartEditorDirective(templateSrv: any) {
         });
 
         const typeahead = $input.data('typeahead');
-        typeahead.lookup = function() {
+        typeahead.lookup = function () {
           this.query = this.$element.val() || '';
           const items = this.source(this.query, $.proxy(this.process, this));
           return items ? this.process(items) : items;

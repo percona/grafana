@@ -20,7 +20,9 @@ describe('ConfigEditor', () => {
 
   it('should set defaults', () => {
     const options = createDefaultConfigOptions();
+    // @ts-ignore
     delete options.jsonData.esVersion;
+    // @ts-ignore
     delete options.jsonData.timeField;
     delete options.jsonData.maxConcurrentShardRequests;
 
@@ -28,7 +30,7 @@ describe('ConfigEditor', () => {
 
     mount(
       <ConfigEditor
-        onOptionsChange={options => {
+        onOptionsChange={(options) => {
           expect(options.jsonData.esVersion).toBe(5);
           expect(options.jsonData.timeField).toBe('@timestamp');
           expect(options.jsonData.maxConcurrentShardRequests).toBe(256);
@@ -43,7 +45,7 @@ describe('ConfigEditor', () => {
 
     mount(
       <ConfigEditor
-        onOptionsChange={options => {
+        onOptionsChange={(options) => {
           expect(options.jsonData.esVersion).toBe(70);
           expect(options.jsonData.timeField).toBe('@time');
           expect(options.jsonData.maxConcurrentShardRequests).toBe(300);

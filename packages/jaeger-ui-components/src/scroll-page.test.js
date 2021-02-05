@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/first */
 jest.mock('./Tween');
 
 import { scrollBy, scrollTo, cancel } from './scroll-page';
@@ -27,9 +26,9 @@ describe('scroll-by', () => {
     window.scrollY = 100;
     tweenInstances.length = 0;
     Tween.mockClear();
-    Tween.mockImplementation(opts => {
+    Tween.mockImplementation((opts) => {
       const rv = { to: opts.to, onUpdate: opts.onUpdate };
-      Object.keys(Tween.prototype).forEach(name => {
+      Object.keys(Tween.prototype).forEach((name) => {
         if (name !== 'constructor') {
           rv[name] = jest.fn();
         }

@@ -23,8 +23,8 @@ export interface Props {
   loadTeams: typeof loadTeams;
   deleteTeam: typeof deleteTeam;
   setSearchQuery: typeof setSearchQuery;
-  editorsCanAdmin?: boolean;
-  signedInUser?: User;
+  editorsCanAdmin: boolean;
+  signedInUser: User;
 }
 
 export class TeamList extends PureComponent<Props, any> {
@@ -125,7 +125,7 @@ export class TeamList extends PureComponent<Props, any> {
                 <th style={{ width: '1%' }} />
               </tr>
             </thead>
-            <tbody>{teams.map(team => this.renderTeam(team))}</tbody>
+            <tbody>{teams.map((team) => this.renderTeam(team))}</tbody>
           </table>
         </div>
       </>
@@ -175,4 +175,4 @@ const mapDispatchToProps = {
   setSearchQuery,
 };
 
-export default hot(module)(connectWithCleanUp(mapStateToProps, mapDispatchToProps, state => state.teams)(TeamList));
+export default hot(module)(connectWithCleanUp(mapStateToProps, mapDispatchToProps, (state) => state.teams)(TeamList));

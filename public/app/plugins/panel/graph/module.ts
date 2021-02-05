@@ -11,12 +11,12 @@ import { DataProcessor } from './data_processor';
 import { axesEditorComponent } from './axes_editor';
 import config from 'app/core/config';
 import TimeSeries from 'app/core/time_series2';
-import { getProcessedDataFrames } from 'app/features/dashboard/state/runRequest';
-import { getColorFromHexRgbOrName, PanelEvents, PanelPlugin, DataFrame, FieldConfigProperty } from '@grafana/data';
+import { getProcessedDataFrames } from 'app/features/query/state/runRequest';
+import { DataFrame, FieldConfigProperty, getColorForTheme, PanelEvents, PanelPlugin } from '@grafana/data';
 
 import { GraphContextMenuCtrl } from './GraphContextMenuCtrl';
 import { graphPanelMigrationHandler } from './GraphMigrations';
-import { DataWarning, GraphPanelOptions, GraphFieldConfig } from './types';
+import { DataWarning, GraphFieldConfig, GraphPanelOptions } from './types';
 
 import { auto } from 'angular';
 import { AnnotationsSrv } from 'app/features/annotations/all';
@@ -25,6 +25,8 @@ import { getLocationSrv } from '@grafana/runtime';
 import { getDataTimeRange } from './utils';
 import { changePanelPlugin } from 'app/features/dashboard/state/actions';
 import { dispatch } from 'app/store/store';
+import { ThresholdMapper } from 'app/features/alerting/state/ThresholdMapper';
+import { getAnnotationsFromData } from 'app/features/annotations/standardAnnotationSupport';
 
 export class GraphCtrl extends MetricsPanelCtrl {
   static template = template;
@@ -135,7 +137,10 @@ export class GraphCtrl extends MetricsPanelCtrl {
     seriesOverrides: [],
     thresholds: [],
     timeRegions: [],
-    options: {},
+    options: {
+      // show/hide alert threshold lines and fill
+      alertThreshold: true,
+    },
   };
 
   /** @ngInject */
@@ -230,6 +235,10 @@ export class GraphCtrl extends MetricsPanelCtrl {
           (this.seriesList as any).alertState = this.alertState.state;
         }
 
+        if (this.panelData!.annotations?.length) {
+          this.annotations = getAnnotationsFromData(this.panelData!.annotations!);
+        }
+
         this.render(this.seriesList);
       },
       () => {
@@ -253,7 +262,6 @@ export class GraphCtrl extends MetricsPanelCtrl {
               tip: 'Data exists, but is not timeseries',
               actionText: 'Switch to table view',
               action: () => {
-                console.log('Change from graph to table');
                 dispatch(changePanelPlugin(this.panel, 'table'));
               },
             };
@@ -267,41 +275,43 @@ export class GraphCtrl extends MetricsPanelCtrl {
       };
     }
 
-    // Look for data points outside time range
+    // If any data is in range, do not return an error
     for (const series of this.seriesList) {
       if (!series.isOutsideRange) {
-        continue;
+        return undefined;
       }
-
-      const dataWarning: DataWarning = {
-        title: 'Data outside time range',
-        tip: 'Can be caused by timezone mismatch or missing time filter in query',
-      };
-
-      const range = getDataTimeRange(this.dataList);
-
-      if (range) {
-        dataWarning.actionText = 'Zoom to data';
-        dataWarning.action = () => {
-          getLocationSrv().update({
-            partial: true,
-            query: {
-              from: range.from,
-              to: range.to,
-            },
-          });
-        };
-      }
-
-      return dataWarning;
     }
-    return undefined;
+
+    // All data is outside the time range
+    const dataWarning: DataWarning = {
+      title: 'Data outside time range',
+      tip: 'Can be caused by timezone mismatch or missing time filter in query',
+    };
+
+    const range = getDataTimeRange(this.dataList);
+
+    if (range) {
+      dataWarning.actionText = 'Zoom to data';
+      dataWarning.action = () => {
+        getLocationSrv().update({
+          partial: true,
+          query: {
+            from: range.from,
+            to: range.to,
+          },
+        });
+      };
+    }
+
+    return dataWarning;
   }
 
   onRender() {
     if (!this.seriesList) {
       return;
     }
+
+    ThresholdMapper.alertToGraphThresholds(this.panel);
 
     for (const series of this.seriesList) {
       series.applySeriesOverrides(this.panel.seriesOverrides);
@@ -317,7 +327,7 @@ export class GraphCtrl extends MetricsPanelCtrl {
   }
 
   onColorChange = (series: any, color: string) => {
-    series.setColor(getColorFromHexRgbOrName(color, config.theme.type));
+    series.setColor(getColorForTheme(color, config.theme));
     this.panel.aliasColors[series.alias] = color;
     this.render();
   };
@@ -371,17 +381,21 @@ export class GraphCtrl extends MetricsPanelCtrl {
   getTimeZone = () => this.dashboard.getTimezone();
 
   getDataFrameByRefId = (refId: string) => {
-    return this.dataList.filter(dataFrame => dataFrame.refId === refId)[0];
+    return this.dataList.filter((dataFrame) => dataFrame.refId === refId)[0];
   };
 }
 
 // Use new react style configuration
 export const plugin = new PanelPlugin<GraphPanelOptions, GraphFieldConfig>(null)
   .useFieldConfig({
-    standardOptions: [
-      FieldConfigProperty.DisplayName,
-      FieldConfigProperty.Unit,
-      FieldConfigProperty.Links, // previously saved as dataLinks on options
+    disableStandardOptions: [
+      FieldConfigProperty.NoValue,
+      FieldConfigProperty.Thresholds,
+      FieldConfigProperty.Max,
+      FieldConfigProperty.Min,
+      FieldConfigProperty.Decimals,
+      FieldConfigProperty.Color,
+      FieldConfigProperty.Mappings,
     ],
   })
   .setMigrationHandler(graphPanelMigrationHandler);

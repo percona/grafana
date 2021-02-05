@@ -38,10 +38,6 @@ export default class UiFindInput extends React.PureComponent<Props> {
     this.props.onChange('');
   };
 
-  componentWillUnmount(): void {
-    console.log('unomuet');
-  }
-
   render() {
     const { allowClear, inputProps, value } = this.props;
 
@@ -57,7 +53,7 @@ export default class UiFindInput extends React.PureComponent<Props> {
         autosize={null}
         placeholder="Find..."
         {...inputProps}
-        onChange={e => this.props.onChange(e.target.value)}
+        onChange={(e) => this.props.onChange(e.target.value)}
         suffix={suffix}
         value={value}
       />

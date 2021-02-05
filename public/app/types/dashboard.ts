@@ -34,6 +34,7 @@ export interface DashboardMeta {
   createdBy?: string;
   updated?: string;
   updatedBy?: string;
+  hasUnsavedFolderChange?: boolean;
 }
 
 export interface DashboardDataDTO {
@@ -80,7 +81,7 @@ export interface DashboardState {
   initPhase: DashboardInitPhase;
   isInitSlow: boolean;
   initError: DashboardInitError | null;
-  permissions: DashboardAcl[] | null;
+  permissions: DashboardAcl[];
   modifiedQueries: QueriesToUpdateOnDashboardLoad | null;
   panels: { [id: string]: PanelState };
 }

@@ -6,11 +6,10 @@ import { SqlPart } from 'app/core/components/sql_part/sql_part';
 import MysqlQuery from './mysql_query';
 import sqlPart from './sql_part';
 import { auto } from 'angular';
-import { TemplateSrv } from 'app/features/templating/template_srv';
 import { CoreEvents } from 'app/types';
 import { PanelEvents } from '@grafana/data';
 import { VariableWithMultiSupport } from 'app/features/variables/types';
-import { getLocationSrv } from '@grafana/runtime';
+import { getLocationSrv, TemplateSrv } from '@grafana/runtime';
 
 export interface QueryMeta {
   sql: string;
@@ -126,14 +125,14 @@ export class MysqlQueryCtrl extends QueryCtrl {
 
   updateProjection() {
     this.selectParts = _.map(this.target.select, (parts: any) => {
-      return _.map(parts, sqlPart.create).filter(n => n);
+      return _.map(parts, sqlPart.create).filter((n) => n);
     });
-    this.whereParts = _.map(this.target.where, sqlPart.create).filter(n => n);
-    this.groupParts = _.map(this.target.group, sqlPart.create).filter(n => n);
+    this.whereParts = _.map(this.target.where, sqlPart.create).filter((n) => n);
+    this.groupParts = _.map(this.target.group, sqlPart.create).filter((n) => n);
   }
 
   updatePersistedParts() {
-    this.target.select = _.map(this.selectParts, selectParts => {
+    this.target.select = _.map(this.selectParts, (selectParts) => {
       return _.map(selectParts, (part: any) => {
         return { type: part.def.type, datatype: part.datatype, params: part.params };
       });
@@ -293,7 +292,7 @@ export class MysqlQueryCtrl extends QueryCtrl {
 
   transformToSegments(config: any) {
     return (results: any) => {
-      const segments = _.map(results, segment => {
+      const segments = _.map(results, (segment) => {
         return this.uiSegmentSrv.newSegment({
           value: segment.text,
           expandable: segment.expandable,
@@ -493,10 +492,10 @@ export class MysqlQueryCtrl extends QueryCtrl {
 
     // add aggregates when adding group by
     for (const selectParts of this.selectParts) {
-      if (!selectParts.some(part => part.def.type === 'aggregate')) {
+      if (!selectParts.some((part) => part.def.type === 'aggregate')) {
         const aggregate = sqlPart.create({ type: 'aggregate', params: ['avg'] });
         selectParts.splice(1, 0, aggregate);
-        if (!selectParts.some(part => part.def.type === 'alias')) {
+        if (!selectParts.some((part) => part.def.type === 'alias')) {
           const alias = sqlPart.create({ type: 'alias', params: [selectParts[0].part.params[0]] });
           selectParts.push(alias);
         }

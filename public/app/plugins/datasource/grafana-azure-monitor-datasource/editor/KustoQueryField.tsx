@@ -26,7 +26,7 @@ interface SuggestionGroup {
 
 interface KustoSchema {
   Databases: {
-    Default?: KustoDBSchema;
+    Default: KustoDBSchema;
   };
   Plugins?: any[];
 }
@@ -65,7 +65,8 @@ export default class KustoQueryField extends QueryField {
 
   onTypeahead = (force = false) => {
     const selection = window.getSelection();
-    if (selection.anchorNode) {
+
+    if (selection && selection.anchorNode) {
       const wrapperNode = selection.anchorNode.parentElement;
       if (wrapperNode === null) {
         return;
@@ -134,7 +135,6 @@ export default class KustoQueryField extends QueryField {
       } else if (modelPrefix.match(/(database\(\"(\w+)\"\)\.(.+\b)?$)/i)) {
         typeaheadContext = 'context-database-table';
         const db = this.getDBFromDatabaseFunction(modelPrefix);
-        console.log(db);
         suggestionGroups = this.getTableSuggestions(db);
         prefix = prefix.replace('.', '');
 
@@ -170,19 +170,19 @@ export default class KustoQueryField extends QueryField {
       let results = 0;
       prefix = prefix.toLowerCase();
       const filteredSuggestions = suggestionGroups
-        .map(group => {
+        .map((group) => {
           if (group.items && prefix && !group.skipFilter) {
-            group.items = group.items.filter(c => c.text.length >= prefix.length);
+            group.items = group.items.filter((c) => c.text.length >= prefix.length);
             if (group.prefixMatch) {
-              group.items = group.items.filter(c => c.text.toLowerCase().indexOf(prefix) === 0);
+              group.items = group.items.filter((c) => c.text.toLowerCase().indexOf(prefix) === 0);
             } else {
-              group.items = group.items.filter(c => c.text.toLowerCase().indexOf(prefix) > -1);
+              group.items = group.items.filter((c) => c.text.toLowerCase().indexOf(prefix) > -1);
             }
           }
           results += group.items.length;
           return group;
         })
-        .filter(group => group.items.length > 0);
+        .filter((group) => group.items.length > 0);
 
       // console.log('onTypeahead', selection.anchorNode, wrapperClasses, text, offset, prefix, typeaheadContext);
       // console.log('onTypeahead', prefix, typeaheadContext, force);
@@ -227,12 +227,7 @@ export default class KustoQueryField extends QueryField {
     const forward = midWord ? suffixLength + offset : 0;
 
     this.resetTypeahead(() =>
-      editor
-        .deleteBackward(backward)
-        .deleteForward(forward)
-        .insertText(suggestionText)
-        .moveForward(move)
-        .focus()
+      editor.deleteBackward(backward).deleteForward(forward).insertText(suggestionText).moveForward(move).focus()
     );
 
     return editor;
@@ -408,7 +403,7 @@ export default class KustoQueryField extends QueryField {
     if (match && match.length > 1 && match[0] && match[1]) {
       return match[1];
     } else {
-      return null;
+      return undefined;
     }
   }
 

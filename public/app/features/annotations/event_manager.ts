@@ -13,7 +13,7 @@ import { MetricsPanelCtrl } from 'app/plugins/sdk';
 import { AnnotationEvent } from '@grafana/data';
 
 export class EventManager {
-  event: AnnotationEvent;
+  event: AnnotationEvent | null;
   editorOpen: boolean;
 
   constructor(private panelCtrl: MetricsPanelCtrl) {}
@@ -115,16 +115,16 @@ export class EventManager {
         // add properties used by jquery flot events
         item.min = item.time;
         item.max = item.time;
-        item.eventType = item.source.name;
+        item.eventType = item.type;
 
         if (item.newState) {
           item.eventType = '$__' + item.newState;
           continue;
         }
 
-        if (!types[item.source.name]) {
-          types[item.source.name] = {
-            color: item.source.iconColor,
+        if (!types[item.type]) {
+          types[item.type] = {
+            color: item.color,
             position: 'BOTTOM',
             markerSize: 5,
           };
@@ -158,7 +158,7 @@ function addRegionMarking(regions: any[], flotOptions: { grid: { markings: any }
   const defaultColor = DEFAULT_ANNOTATION_COLOR;
   let fillColor;
 
-  _.each(regions, region => {
+  _.each(regions, (region) => {
     if (region.source) {
       fillColor = region.source.iconColor || defaultColor;
     } else {

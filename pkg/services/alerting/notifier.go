@@ -16,20 +16,20 @@ import (
 )
 
 // for stubbing in tests
+//nolint: gocritic
 var newImageUploaderProvider = func() (imguploader.ImageUploader, error) {
 	return imguploader.NewImageUploader()
 }
 
 // NotifierPlugin holds meta information about a notifier.
 type NotifierPlugin struct {
-	Type            string           `json:"type"`
-	Name            string           `json:"name"`
-	Heading         string           `json:"heading"`
-	Description     string           `json:"description"`
-	Info            string           `json:"info"`
-	OptionsTemplate string           `json:"optionsTemplate"`
-	Factory         NotifierFactory  `json:"-"`
-	Options         []NotifierOption `json:"options"`
+	Type        string           `json:"type"`
+	Name        string           `json:"name"`
+	Heading     string           `json:"heading"`
+	Description string           `json:"description"`
+	Info        string           `json:"info"`
+	Factory     NotifierFactory  `json:"-"`
+	Options     []NotifierOption `json:"options"`
 }
 
 // NotifierOption holds information about options specific for the NotifierPlugin.
@@ -44,6 +44,7 @@ type NotifierOption struct {
 	ShowWhen       ShowWhen       `json:"showWhen"`
 	Required       bool           `json:"required"`
 	ValidationRule string         `json:"validationRule"`
+	Secure         bool           `json:"secure"`
 }
 
 // InputType is the type of input that can be rendered in the frontend.
@@ -64,8 +65,8 @@ const (
 	ElementTypeInput = "input"
 	// ElementTypeSelect will render a select
 	ElementTypeSelect = "select"
-	// ElementTypeSwitch will render a switch
-	ElementTypeSwitch = "switch"
+	// ElementTypeCheckbox will render a checkbox
+	ElementTypeCheckbox = "checkbox"
 	// ElementTypeTextArea will render a textarea
 	ElementTypeTextArea = "textarea"
 )
@@ -130,9 +131,11 @@ func (n *notificationService) sendAndMarkAsComplete(evalContext *EvalContext, no
 	n.log.Debug("Sending notification", "type", notifier.GetType(), "uid", notifier.GetNotifierUID(), "isDefault", notifier.GetIsDefault())
 	metrics.MAlertingNotificationSent.WithLabelValues(notifier.GetType()).Inc()
 
-	err := notifier.Notify(evalContext)
+	if err := evalContext.evaluateNotificationTemplateFields(); err != nil {
+		n.log.Error("failed trying to evaluate notification template fields", "uid", notifier.GetNotifierUID(), "error", err)
+	}
 
-	if err != nil {
+	if err := notifier.Notify(evalContext); err != nil {
 		n.log.Error("failed to send notification", "uid", notifier.GetNotifierUID(), "error", err)
 		metrics.MAlertingNotificationFailed.WithLabelValues(notifier.GetType()).Inc()
 		return err
@@ -159,11 +162,11 @@ func (n *notificationService) sendNotification(evalContext *EvalContext, notifie
 		}
 
 		err := bus.DispatchCtx(evalContext.Ctx, setPendingCmd)
-		if err == models.ErrAlertNotificationStateVersionConflict {
-			return nil
-		}
-
 		if err != nil {
+			if errors.Is(err, models.ErrAlertNotificationStateVersionConflict) {
+				return nil
+			}
+
 			return err
 		}
 
@@ -280,7 +283,7 @@ func (n *notificationService) getNeededNotifiers(orgID int64, notificationUids [
 func InitNotifier(model *models.AlertNotification) (Notifier, error) {
 	notifierPlugin, found := notifierFactories[model.Type]
 	if !found {
-		return nil, errors.New("Unsupported notification type")
+		return nil, fmt.Errorf("unsupported notification type %q", model.Type)
 	}
 
 	return notifierPlugin.Factory(model)

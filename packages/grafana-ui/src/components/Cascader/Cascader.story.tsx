@@ -1,7 +1,6 @@
 import { text } from '@storybook/addon-knobs';
 import { withCenteredStory } from '../../utils/storybook/withCenteredStory';
-import { Cascader } from './Cascader';
-// import { Button } from '../Button';
+import { Cascader } from '@grafana/ui';
 import mdx from './Cascader.mdx';
 import React from 'react';
 
@@ -42,10 +41,10 @@ const options = [
 ];
 
 export const simple = () => (
-  <Cascader separator={text('Separator', '')} options={options} onSelect={val => console.log(val)} />
+  <Cascader separator={text('Separator', '')} options={options} onSelect={(val) => console.log(val)} />
 );
 export const withInitialValue = () => (
-  <Cascader options={options} initialValue="3" onSelect={val => console.log(val)} />
+  <Cascader options={options} initialValue="3" onSelect={(val) => console.log(val)} />
 );
 
 export const withCustomValue = () => {
@@ -54,9 +53,9 @@ export const withCustomValue = () => {
     <Cascader
       options={options}
       allowCustomValue
-      formatCreateLabel={val => onCreateLabel + val}
+      formatCreateLabel={(val) => onCreateLabel + val}
       initialValue="Custom Initial Value"
-      onSelect={val => console.log(val)}
+      onSelect={(val) => console.log(val)}
     />
   );
 };

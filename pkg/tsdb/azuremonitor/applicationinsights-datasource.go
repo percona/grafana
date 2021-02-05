@@ -131,7 +131,6 @@ func (e *ApplicationInsightsDatasource) buildQueries(queries []*tsdb.Query, time
 			aggregation: insightsJSONModel.Aggregation,
 			dimensions:  insightsJSONModel.Dimensions,
 		})
-
 	}
 
 	return applicationInsightsQueries, nil
@@ -173,14 +172,18 @@ func (e *ApplicationInsightsDatasource) executeQuery(ctx context.Context, query 
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
-	defer res.Body.Close()
+	defer func() {
+		if err := res.Body.Close(); err != nil {
+			azlog.Warn("Failed to close response body", "err", err)
+		}
+	}()
 	if err != nil {
 		return nil, err
 	}
 
 	if res.StatusCode/100 != 2 {
 		azlog.Debug("Request failed", "status", res.Status, "body", string(body))
-		return nil, fmt.Errorf("Request failed status: %v", res.Status)
+		return nil, fmt.Errorf("request failed, status: %s", res.Status)
 	}
 
 	mr := MetricsResult{}
@@ -205,7 +208,7 @@ func (e *ApplicationInsightsDatasource) createRequest(ctx context.Context, dsInf
 	// find plugin
 	plugin, ok := plugins.DataSources[dsInfo.Type]
 	if !ok {
-		return nil, errors.New("Unable to find datasource plugin Azure Application Insights")
+		return nil, errors.New("unable to find datasource plugin Azure Application Insights")
 	}
 
 	cloudName := dsInfo.JsonData.Get("cloudName").MustString("azuremonitor")
@@ -258,7 +261,6 @@ func (e *ApplicationInsightsDatasource) getPluginRoute(plugin *plugins.DataSourc
 // formatApplicationInsightsLegendKey builds the legend key or timeseries name
 // Alias patterns like {{metric}} are replaced with the appropriate data values.
 func formatApplicationInsightsLegendKey(alias string, metricName string, labels data.Labels) string {
-
 	// Could be a collision problem if there were two keys that varied only in case, but I don't think that would happen in azure.
 	lowerLabels := data.Labels{}
 	for k, v := range labels {

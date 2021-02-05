@@ -4,109 +4,111 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/commands/commandstest"
 	"github.com/grafana/grafana/pkg/cmd/grafana-cli/models"
-	. "github.com/smartystreets/goconvey/convey"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestFolderNameReplacement(t *testing.T) {
-	Convey("path containing git commit path", t, func() {
-		pluginName := "datasource-plugin-kairosdb"
+func TestRemoveGitBuildFromName(t *testing.T) {
+	pluginName := "datasource-kairosdb"
 
-		paths := map[string]string{
-			"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/":                     "datasource-plugin-kairosdb/",
-			"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/README.md":            "datasource-plugin-kairosdb/README.md",
-			"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/partials/":            "datasource-plugin-kairosdb/partials/",
-			"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/partials/config.html": "datasource-plugin-kairosdb/partials/config.html",
-		}
-
-		Convey("should be replaced with plugin name", func() {
-			for k, v := range paths {
-				So(RemoveGitBuildFromName(pluginName, k), ShouldEqual, v)
-			}
-		})
-	})
-
-	Convey("path containing git commit path", t, func() {
-		pluginName := "app-example"
-		paths := map[string]string{
-			"app-plugin-example-3c28f65ac6fb7f1e234b0364b97081d836495439/": "app-example/",
-		}
-
-		Convey("should be replaced with plugin name", func() {
-			for k, v := range paths {
-				So(RemoveGitBuildFromName(pluginName, k), ShouldEqual, v)
-			}
-		})
-	})
+	// The root directory should get renamed to the plugin name
+	paths := map[string]string{
+		"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/":                     "datasource-kairosdb/",
+		"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/README.md":            "datasource-kairosdb/README.md",
+		"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/partials/":            "datasource-kairosdb/partials/",
+		"datasource-plugin-kairosdb-cc4a3965ef5d3eb1ae0ee4f93e9e78ec7db69e64/partials/config.html": "datasource-kairosdb/partials/config.html",
+	}
+	for pth, exp := range paths {
+		name := removeGitBuildFromName(pluginName, pth)
+		assert.Equal(t, exp, name)
+	}
 }
 
 func TestExtractFiles(t *testing.T) {
 	t.Run("Should preserve file permissions for plugin backend binaries for linux and darwin", func(t *testing.T) {
 		skipWindows(t)
-		pluginDir, del := setupFakePluginsDir(t)
-		defer del()
+		pluginsDir := setupFakePluginsDir(t)
 
-		archive := "testdata/grafana-simple-json-datasource-ec18fa4da8096a952608a7e4c7782b4260b41bcf.zip"
-		err := extractFiles(archive, "grafana-simple-json-datasource", pluginDir, false)
-		assert.Nil(t, err)
+		archive := filepath.Join("testdata", "grafana-simple-json-datasource-ec18fa4da8096a952608a7e4c7782b4260b41bcf.zip")
+		err := extractFiles(archive, "grafana-simple-json-datasource", pluginsDir, false)
+		require.NoError(t, err)
 
-		//File in zip has permissions 755
-		fileInfo, err := os.Stat(pluginDir + "/grafana-simple-json-datasource/simple-plugin_darwin_amd64")
-		assert.Nil(t, err)
+		// File in zip has permissions 755
+		fileInfo, err := os.Stat(filepath.Join(pluginsDir, "grafana-simple-json-datasource",
+			"simple-plugin_darwin_amd64"))
+		require.NoError(t, err)
 		assert.Equal(t, "-rwxr-xr-x", fileInfo.Mode().String())
 
-		//File in zip has permission 755
-		fileInfo, err = os.Stat(pluginDir + "/grafana-simple-json-datasource/simple-plugin_linux_amd64")
-		assert.Nil(t, err)
+		// File in zip has permission 755
+		fileInfo, err = os.Stat(pluginsDir + "/grafana-simple-json-datasource/simple-plugin_linux_amd64")
+		require.NoError(t, err)
 		assert.Equal(t, "-rwxr-xr-x", fileInfo.Mode().String())
 
-		//File in zip has permission 644
-		fileInfo, err = os.Stat(pluginDir + "/grafana-simple-json-datasource/simple-plugin_windows_amd64.exe")
-		assert.Nil(t, err)
+		// File in zip has permission 644
+		fileInfo, err = os.Stat(pluginsDir + "/grafana-simple-json-datasource/simple-plugin_windows_amd64.exe")
+		require.NoError(t, err)
 		assert.Equal(t, "-rw-r--r--", fileInfo.Mode().String())
 
-		//File in zip has permission 755
-		fileInfo, err = os.Stat(pluginDir + "/grafana-simple-json-datasource/non-plugin-binary")
-		assert.Nil(t, err)
+		// File in zip has permission 755
+		fileInfo, err = os.Stat(pluginsDir + "/grafana-simple-json-datasource/non-plugin-binary")
+		require.NoError(t, err)
 		assert.Equal(t, "-rwxr-xr-x", fileInfo.Mode().String())
 	})
 
 	t.Run("Should ignore symlinks if not allowed", func(t *testing.T) {
-		pluginDir, del := setupFakePluginsDir(t)
-		defer del()
+		pluginsDir := setupFakePluginsDir(t)
 
-		err := extractFiles("testdata/plugin-with-symlink.zip", "plugin-with-symlink", pluginDir, false)
-		assert.Nil(t, err)
+		err := extractFiles("testdata/plugin-with-symlink.zip", "plugin-with-symlink", pluginsDir, false)
+		require.NoError(t, err)
 
-		_, err = os.Stat(pluginDir + "/plugin-with-symlink/text.txt")
-		assert.Nil(t, err)
-		_, err = os.Stat(pluginDir + "/plugin-with-symlink/symlink_to_txt")
-		assert.NotNil(t, err)
+		_, err = os.Stat(pluginsDir + "/plugin-with-symlink/text.txt")
+		require.NoError(t, err)
+		_, err = os.Stat(pluginsDir + "/plugin-with-symlink/symlink_to_txt")
+		assert.Error(t, err)
 	})
 
 	t.Run("Should extract symlinks if allowed", func(t *testing.T) {
 		skipWindows(t)
-		pluginDir, del := setupFakePluginsDir(t)
-		defer del()
+		pluginsDir := setupFakePluginsDir(t)
 
-		err := extractFiles("testdata/plugin-with-symlink.zip", "plugin-with-symlink", pluginDir, true)
-		assert.Nil(t, err)
+		err := extractFiles("testdata/plugin-with-symlink.zip", "plugin-with-symlink", pluginsDir, true)
+		require.NoError(t, err)
 
-		_, err = os.Stat(pluginDir + "/plugin-with-symlink/symlink_to_txt")
-		assert.Nil(t, err)
-		fmt.Println(err)
+		_, err = os.Stat(pluginsDir + "/plugin-with-symlink/symlink_to_txt")
+		require.NoError(t, err)
+	})
+
+	t.Run("Should detect if archive members point outside of the destination directory", func(t *testing.T) {
+		pluginsDir := setupFakePluginsDir(t)
+
+		err := extractFiles("testdata/plugin-with-parent-member.zip", "plugin-with-parent-member",
+			pluginsDir, true)
+		require.EqualError(t, err, fmt.Sprintf(
+			`archive member "../member.txt" tries to write outside of plugin directory: %q, this can be a security risk`,
+			pluginsDir,
+		))
+	})
+
+	t.Run("Should detect if archive members are absolute", func(t *testing.T) {
+		pluginsDir := setupFakePluginsDir(t)
+
+		err := extractFiles("testdata/plugin-with-absolute-member.zip", "plugin-with-absolute-member",
+			pluginsDir, true)
+		require.EqualError(t, err, fmt.Sprintf(
+			`archive member "/member.txt" tries to write outside of plugin directory: %q, this can be a security risk`,
+			pluginsDir,
+		))
 	})
 }
 
 func TestInstallPluginCommand(t *testing.T) {
-	pluginsDir, cleanUp := setupFakePluginsDir(t)
-	defer cleanUp()
+	pluginsDir := setupFakePluginsDir(t)
 	c, err := commandstest.NewCliContext(map[string]string{"pluginsDir": pluginsDir})
 	require.NoError(t, err)
 
@@ -114,16 +116,16 @@ func TestInstallPluginCommand(t *testing.T) {
 		GetPluginFunc: func(pluginId, repoUrl string) (models.Plugin, error) {
 			require.Equal(t, "test-plugin-panel", pluginId)
 			plugin := models.Plugin{
-				Id:       "test-plugin-panel",
+				ID:       "test-plugin-panel",
 				Category: "",
 				Versions: []models.Version{
 					{
 						Commit:  "commit",
-						Url:     "url",
+						URL:     "url",
 						Version: "1.0.0",
 						Arch: map[string]models.ArchMeta{
 							fmt.Sprintf("%s-%s", runtime.GOOS, runtime.GOARCH): {
-								Md5: "test",
+								SHA256: "test",
 							},
 						},
 					},
@@ -147,29 +149,13 @@ func TestInstallPluginCommand(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestIsPathSafe(t *testing.T) {
-	dest := fmt.Sprintf("%stest%spath", string(os.PathSeparator), string(os.PathSeparator))
-
-	t.Run("Should be true on nested destinations", func(t *testing.T) {
-		assert.True(t, isPathSafe("dest", dest))
-		assert.True(t, isPathSafe("dest/one", dest))
-		assert.True(t, isPathSafe("../path/dest/one", dest))
-	})
-
-	t.Run("Should be false on destinations outside of path", func(t *testing.T) {
-		assert.False(t, isPathSafe("../dest", dest))
-		assert.False(t, isPathSafe("../../", dest))
-		assert.False(t, isPathSafe("../../test", dest))
-	})
-}
-
 func TestSelectVersion(t *testing.T) {
 	t.Run("Should return error when requested version does not exist", func(t *testing.T) {
 		_, err := SelectVersion(
 			makePluginWithVersions(versionArg{Version: "version"}),
 			"1.1.1",
 		)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("Should return error when no version supports current arch", func(t *testing.T) {
@@ -177,7 +163,7 @@ func TestSelectVersion(t *testing.T) {
 			makePluginWithVersions(versionArg{Version: "version", Arch: []string{"non-existent"}}),
 			"",
 		)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("Should return error when requested version does not support current arch", func(t *testing.T) {
@@ -188,7 +174,7 @@ func TestSelectVersion(t *testing.T) {
 			),
 			"1.1.1",
 		)
-		assert.NotNil(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("Should return latest available for arch when no version specified", func(t *testing.T) {
@@ -199,7 +185,7 @@ func TestSelectVersion(t *testing.T) {
 			),
 			"",
 		)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "1.0.0", ver.Version)
 	})
 
@@ -208,7 +194,7 @@ func TestSelectVersion(t *testing.T) {
 			makePluginWithVersions(versionArg{Version: "2.0.0"}, versionArg{Version: "1.0.0"}),
 			"",
 		)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "2.0.0", ver.Version)
 	})
 
@@ -220,23 +206,27 @@ func TestSelectVersion(t *testing.T) {
 			),
 			"1.0.0",
 		)
-		assert.Nil(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "1.0.0", ver.Version)
 	})
 }
 
-func setupFakePluginsDir(t *testing.T) (string, func()) {
+func setupFakePluginsDir(t *testing.T) string {
 	dirname := "testdata/fake-plugins-dir"
 	err := os.RemoveAll(dirname)
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	err = os.MkdirAll(dirname, 0774)
-	require.Nil(t, err)
+	err = os.MkdirAll(dirname, 0750)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		err := os.RemoveAll(dirname)
+		assert.NoError(t, err)
+	})
 
-	return dirname, func() {
-		err = os.RemoveAll(dirname)
-		assert.Nil(t, err)
-	}
+	dirname, err = filepath.Abs(dirname)
+	require.NoError(t, err)
+
+	return dirname
 }
 
 func skipWindows(t *testing.T) {
@@ -252,7 +242,7 @@ type versionArg struct {
 
 func makePluginWithVersions(versions ...versionArg) *models.Plugin {
 	plugin := &models.Plugin{
-		Id:       "",
+		ID:       "",
 		Category: "",
 		Versions: []models.Version{},
 	}
@@ -261,13 +251,13 @@ func makePluginWithVersions(versions ...versionArg) *models.Plugin {
 		ver := models.Version{
 			Version: version.Version,
 			Commit:  fmt.Sprintf("commit_%s", version.Version),
-			Url:     fmt.Sprintf("url_%s", version.Version),
+			URL:     fmt.Sprintf("url_%s", version.Version),
 		}
 		if version.Arch != nil {
 			ver.Arch = map[string]models.ArchMeta{}
 			for _, arch := range version.Arch {
 				ver.Arch[arch] = models.ArchMeta{
-					Md5: fmt.Sprintf("md5_%s", arch),
+					SHA256: fmt.Sprintf("sha256_%s", arch),
 				}
 			}
 		}

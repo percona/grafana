@@ -35,7 +35,6 @@ func (m *postgresMacroEngine) Interpolate(query *tsdb.Query, timeRange *tsdb.Tim
 	var macroError error
 
 	sql = m.ReplaceAllStringSubmatchFunc(rExp, sql, func(groups []string) string {
-
 		// detect if $__timeGroup is supposed to add AS time for pre 5.3 compatibility
 		// if there is a ',' directly after the macro call $__timeGroup is probably used
 		// in the old way. Inside window function ORDER BY $__timeGroup will be followed
@@ -43,11 +42,9 @@ func (m *postgresMacroEngine) Interpolate(query *tsdb.Query, timeRange *tsdb.Tim
 		if groups[1] == "__timeGroup" {
 			if index := strings.Index(sql, groups[0]); index >= 0 {
 				index += len(groups[0])
-				if len(sql) > index {
-					// check for character after macro expression
-					if sql[index] == ',' {
-						groups[1] = "__timeGroupAlias"
-					}
+				// check for character after macro expression
+				if len(sql) > index && sql[index] == ',' {
+					groups[1] = "__timeGroupAlias"
 				}
 			}
 		}
@@ -71,6 +68,7 @@ func (m *postgresMacroEngine) Interpolate(query *tsdb.Query, timeRange *tsdb.Tim
 	return sql, nil
 }
 
+//nolint: gocyclo
 func (m *postgresMacroEngine) evaluateMacro(name string, args []string) (string, error) {
 	switch name {
 	case "__time":
@@ -120,7 +118,7 @@ func (m *postgresMacroEngine) evaluateMacro(name string, args []string) (string,
 	case "__timeGroupAlias":
 		tg, err := m.evaluateMacro("__timeGroup", args)
 		if err == nil {
-			return tg + " AS \"time\"", err
+			return tg + " AS \"time\"", nil
 		}
 		return "", err
 	case "__unixEpochFilter":
@@ -155,10 +153,10 @@ func (m *postgresMacroEngine) evaluateMacro(name string, args []string) (string,
 	case "__unixEpochGroupAlias":
 		tg, err := m.evaluateMacro("__unixEpochGroup", args)
 		if err == nil {
-			return tg + " AS \"time\"", err
+			return tg + " AS \"time\"", nil
 		}
 		return "", err
 	default:
-		return "", fmt.Errorf("Unknown macro %v", name)
+		return "", fmt.Errorf("unknown macro %q", name)
 	}
 }

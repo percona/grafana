@@ -46,28 +46,21 @@ export class PlaylistEditCtrl {
           .get('/api/playlists/' + playlistId)
           .then((result: any) => {
             this.playlist = result;
-          })
-      );
-
-      promiseToDigest(this.$scope)(
-        getBackendSrv()
-          .get('/api/playlists/' + playlistId + '/items')
-          .then((result: any) => {
-            this.playlistItems = result;
+            this.playlistItems = result.items;
           })
       );
     }
   }
 
   filterFoundPlaylistItems() {
-    this.filteredDashboards = _.reject(this.dashboardresult, playlistItem => {
-      return _.find(this.playlistItems, listPlaylistItem => {
+    this.filteredDashboards = _.reject(this.dashboardresult, (playlistItem) => {
+      return _.find(this.playlistItems, (listPlaylistItem) => {
         return parseInt(listPlaylistItem.value, 10) === playlistItem.id;
       });
     });
 
-    this.filteredTags = _.reject(this.tagresult, tag => {
-      return _.find(this.playlistItems, listPlaylistItem => {
+    this.filteredTags = _.reject(this.tagresult, (tag) => {
+      return _.find(this.playlistItems, (listPlaylistItem) => {
         return listPlaylistItem.value === tag.term;
       });
     });
@@ -95,7 +88,7 @@ export class PlaylistEditCtrl {
   }
 
   removePlaylistItem(playlistItem: PlaylistItem) {
-    _.remove(this.playlistItems, listedPlaylistItem => {
+    _.remove(this.playlistItems, (listedPlaylistItem) => {
       return playlistItem === listedPlaylistItem;
     });
     this.filterFoundPlaylistItems();
