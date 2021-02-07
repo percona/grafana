@@ -5,11 +5,9 @@ import { IntegratedAlertingTabs } from './IntegratedAlertingTabs';
 import { EmptyBlock } from '../EmptyBlock';
 import { Messages } from './IntegratedAlertingContent.messages';
 import { PMM_SETTINGS_URL } from './IntegratedAlertingContent.constants';
+import { IntegratedAlertingContentProps } from './IntegratedAlertingContent.types';
 
-export const IntegratedAlertingContent: FC<{ loadingSettings: boolean; alertingEnabled: boolean }> = ({
-  loadingSettings,
-  alertingEnabled,
-}) => {
+export const IntegratedAlertingContent: FC<IntegratedAlertingContentProps> = ({ loadingSettings, alertingEnabled }) => {
   const styles = useStyles(getStyles);
   if (alertingEnabled) {
     return <IntegratedAlertingTabs />;
