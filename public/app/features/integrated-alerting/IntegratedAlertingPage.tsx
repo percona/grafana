@@ -6,7 +6,7 @@ import { TabKeys } from './IntegratedAlerting.types';
 import { Alerts, AlertRuleTemplate, AlertRules, NotificationChannel } from './components';
 import { IntegratedAlertingService } from './IntegratedAlerting.service';
 import { logger } from '@percona/platform-core';
-import { EmptyBlock } from './components/EmptyBlock/EmptyBlock';
+import { EmptyBlock } from './components/EmptyBlock';
 import { PMM_SETTINGS_URL } from './IntegratedAlerting.constants';
 
 const IntegratedAlertingTabs: FC = () => {
