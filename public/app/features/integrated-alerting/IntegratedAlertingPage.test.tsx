@@ -10,7 +10,7 @@ jest.mock('./IntegratedAlerting.service');
 jest.mock('./components/Alerts/Alerts.service');
 
 describe('IntegratedAlertingPage', () => {
-  let wrapper: any;
+  let wrapper: ReactWrapper;
   it('should display empty block if IA is disabled', async () => {
     await act(async () => {
       wrapper = await mount(<IntegratedAlertingPage />);
