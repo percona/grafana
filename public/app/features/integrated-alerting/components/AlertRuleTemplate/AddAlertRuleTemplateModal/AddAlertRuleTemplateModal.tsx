@@ -24,7 +24,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
       const reader = new FileReader();
 
       if (file) {
-        reader.addEventListener('load', e => change('yaml', e.target.result));
+        reader.addEventListener('load', (e) => change('yaml', e.target.result));
         reader.readAsText(event.target.files[0]);
       }
     },
