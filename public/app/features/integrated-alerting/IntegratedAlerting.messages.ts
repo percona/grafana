@@ -1,8 +1,4 @@
 export const Messages = {
-  general: {
-    alertingDisabled: 'Integrated Alerting is disabled. You can enable it in ',
-    pmmSettings: 'PMM Settings.',
-  },
   tabs: {
     alerts: 'Alerts',
     alertRules: 'Alert Rules',
