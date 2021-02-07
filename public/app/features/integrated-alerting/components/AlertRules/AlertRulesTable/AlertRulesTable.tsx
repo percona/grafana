@@ -30,8 +30,10 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({ pendingRequest, data
           <table {...getTableProps()} data-qa="alert-rules-table">
             <thead data-qa="alert-rules-table-thead">
               {headerGroups.map((headerGroup) => (
+                // eslint-disable-next-line react/jsx-key
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
+                    // eslint-disable-next-line react/jsx-key
                     <th
                       className={css`
                         cursor: pointer;
@@ -51,9 +53,11 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({ pendingRequest, data
                 const alertRule = row.original as AlertRule;
 
                 return (
+                  // eslint-disable-next-line react/jsx-key
                   <>
                     <tr {...row.getRowProps()} className={alertRule.disabled ? style.disabledRow : ''}>
                       {row.cells.map((cell) => (
+                        // eslint-disable-next-line react/jsx-key
                         <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                       ))}
                     </tr>

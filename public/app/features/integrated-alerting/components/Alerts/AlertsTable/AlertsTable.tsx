@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTable, Column } from 'react-table';
 import { cx } from 'emotion';
@@ -123,8 +124,10 @@ export const AlertsTable = () => {
           <table {...getTableProps()} data-qa="alerts-table">
             <thead data-qa="alerts-table-thead">
               {headerGroups.map((headerGroup) => (
+                // eslint-disable-next-line react/jsx-key
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
+                    // eslint-disable-next-line react/jsx-key
                     <th
                       className={css`
                         cursor: pointer;
@@ -142,11 +145,13 @@ export const AlertsTable = () => {
               {rows.map((row) => {
                 prepareRow(row);
                 return (
+                  // eslint-disable-next-line react/jsx-key
                   <tr
                     {...row.getRowProps()}
                     className={(row.original as Alert).status === 'Silenced' ? style.disabledRow : ''}
                   >
                     {row.cells.map((cell) => (
+                      // eslint-disable-next-line react/jsx-key
                       <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     ))}
                   </tr>

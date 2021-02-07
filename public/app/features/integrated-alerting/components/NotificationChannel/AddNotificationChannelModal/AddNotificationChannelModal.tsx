@@ -66,6 +66,8 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="notification-channel-add-button"
+                  // TODO: fix LoaderButton types
+                  // @ts-ignore
                   size="md"
                   variant="primary"
                   disabled={!valid || pristine}

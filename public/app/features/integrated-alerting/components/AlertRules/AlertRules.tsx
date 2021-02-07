@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { FC, useEffect, useState } from 'react';
 import { Column } from 'react-table';
 import { Button, useStyles, IconButton } from '@grafana/ui';
