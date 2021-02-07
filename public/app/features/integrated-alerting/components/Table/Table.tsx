@@ -27,8 +27,10 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
           <table {...getTableProps()} data-qa="table">
             <thead data-qa="table-thead">
               {headerGroups.map((headerGroup) => (
+                // eslint-disable-next-line react/jsx-key
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
+                    // eslint-disable-next-line react/jsx-key
                     <th
                       className={css`
                         cursor: pointer;
@@ -46,8 +48,10 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
               {rows.map((row) => {
                 prepareRow(row);
                 return (
+                  // eslint-disable-next-line react/jsx-key
                   <tr {...row.getRowProps()}>
                     {row.cells.map((cell) => {
+                      // eslint-disable-next-line react/jsx-key
                       return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                     })}
                   </tr>
