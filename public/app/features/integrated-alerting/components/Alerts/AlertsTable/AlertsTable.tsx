@@ -72,7 +72,7 @@ export const AlertsTable = () => {
         Header: labelsColumn,
         accessor: ({ labels }: Alert) => (
           <div className={style.labelsWrapper}>
-            {labels.map(label => (
+            {labels.map((label) => (
               <span key={label} className={style.label}>
                 {label}
               </span>
@@ -122,9 +122,9 @@ export const AlertsTable = () => {
         {rows.length && !pendingRequest ? (
           <table {...getTableProps()} data-qa="alerts-table">
             <thead data-qa="alerts-table-thead">
-              {headerGroups.map(headerGroup => (
+              {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
+                  {headerGroup.headers.map((column) => (
                     <th
                       className={css`
                         cursor: pointer;
@@ -139,14 +139,14 @@ export const AlertsTable = () => {
               ))}
             </thead>
             <tbody {...getTableBodyProps()} data-qa="alerts-table-tbody">
-              {rows.map(row => {
+              {rows.map((row) => {
                 prepareRow(row);
                 return (
                   <tr
                     {...row.getRowProps()}
                     className={(row.original as Alert).status === 'Silenced' ? style.disabledRow : ''}
                   >
-                    {row.cells.map(cell => (
+                    {row.cells.map((cell) => (
                       <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                     ))}
                   </tr>

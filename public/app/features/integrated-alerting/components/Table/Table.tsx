@@ -26,9 +26,9 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
         {rows.length && !pendingRequest ? (
           <table {...getTableProps()} data-qa="table">
             <thead data-qa="table-thead">
-              {headerGroups.map(headerGroup => (
+              {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
+                  {headerGroup.headers.map((column) => (
                     <th
                       className={css`
                         cursor: pointer;
@@ -43,11 +43,11 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
               ))}
             </thead>
             <tbody {...getTableBodyProps()} data-qa="table-tbody">
-              {rows.map(row => {
+              {rows.map((row) => {
                 prepareRow(row);
                 return (
                   <tr {...row.getRowProps()}>
-                    {row.cells.map(cell => {
+                    {row.cells.map((cell) => {
                       return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                     })}
                   </tr>

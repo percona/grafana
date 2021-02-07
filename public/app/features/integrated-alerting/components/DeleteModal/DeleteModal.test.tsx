@@ -47,10 +47,7 @@ describe('DeleteModal', () => {
     const onDelete = jest.fn();
     const wrapper = mount(<DeleteModal setVisible={jest.fn()} onDelete={onDelete} isVisible />);
     console.log(wrapper.html());
-    wrapper
-      .find(dataQa('confirm-delete-modal-button'))
-      .find('button')
-      .simulate('click');
+    wrapper.find(dataQa('confirm-delete-modal-button')).find('button').simulate('click');
 
     expect(onDelete).toHaveBeenCalled();
   });
@@ -59,10 +56,7 @@ describe('DeleteModal', () => {
     const setVisible = jest.fn();
     const wrapper = mount(<DeleteModal setVisible={setVisible} onDelete={jest.fn()} isVisible />);
 
-    wrapper
-      .find(dataQa('cancel-delete-modal-button'))
-      .find('button')
-      .simulate('click');
+    wrapper.find(dataQa('cancel-delete-modal-button')).find('button').simulate('click');
 
     expect(setVisible).toHaveBeenCalledWith(false);
   });

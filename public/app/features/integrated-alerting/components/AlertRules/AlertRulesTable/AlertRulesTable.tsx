@@ -29,9 +29,9 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({ pendingRequest, data
         {rows.length && !pendingRequest ? (
           <table {...getTableProps()} data-qa="alert-rules-table">
             <thead data-qa="alert-rules-table-thead">
-              {headerGroups.map(headerGroup => (
+              {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
+                  {headerGroup.headers.map((column) => (
                     <th
                       className={css`
                         cursor: pointer;
@@ -46,14 +46,14 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({ pendingRequest, data
               ))}
             </thead>
             <tbody {...getTableBodyProps()} data-qa="alert-rules-table-tbody">
-              {rows.map(row => {
+              {rows.map((row) => {
                 prepareRow(row);
                 const alertRule = row.original as AlertRule;
 
                 return (
                   <>
                     <tr {...row.getRowProps()} className={alertRule.disabled ? style.disabledRow : ''}>
-                      {row.cells.map(cell => (
+                      {row.cells.map((cell) => (
                         <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                       ))}
                     </tr>

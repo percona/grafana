@@ -15,20 +15,20 @@ export enum NotificationChannelType {
 
 export interface NotificationChannel {
   type: NotificationChannelType;
-  channelId: string;
+  channelId?: string;
   summary: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 export interface EmailNotificationChannel extends NotificationChannel {
-  sendResolved: boolean;
-  emails: string[];
+  sendResolved?: boolean;
+  emails?: string[];
 }
 
 export interface PagerDutylNotificationChannel extends NotificationChannel {
-  sendResolved: boolean;
-  routingKey: string;
-  serviceKey: string;
+  sendResolved?: boolean;
+  routingKey?: string;
+  serviceKey?: string;
 }
 
 export interface SlackNotificationChannel extends NotificationChannel {
