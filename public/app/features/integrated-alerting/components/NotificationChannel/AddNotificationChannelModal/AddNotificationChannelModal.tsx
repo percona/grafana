@@ -25,7 +25,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
   const { getNotificationChannels } = useContext(NotificationChannelProvider);
   const onSubmit = async (values: NotificationChannelRenderProps) => {
     try {
-      if (notificationChannel) {
+      if (notificationChannel?.channelId) {
         await NotificationChannelService.change(notificationChannel.channelId, values);
       } else {
         await NotificationChannelService.add(values);
@@ -37,7 +37,12 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
       logger.error(e);
     }
   };
+
   const renderTypeFields = useCallback((values: NotificationChannelRenderProps) => {
+    if (!values.type?.value) {
+      return null;
+    }
+
     const TypeFields = TYPE_FIELDS_COMPONENT[values.type.value];
 
     return <TypeFields values={values} />;

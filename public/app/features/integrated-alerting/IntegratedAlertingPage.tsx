@@ -46,7 +46,7 @@ const IntegratedAlertingPage: FC = () => {
           />
         ))}
       </TabsBar>
-      <TabContent>{tabs.find((tab) => tab.key === activeTab).component}</TabContent>
+      <TabContent>{tabs.find((tab) => tab.key === activeTab)?.component || null}</TabContent>
     </div>
   );
 };

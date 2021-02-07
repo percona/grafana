@@ -20,12 +20,13 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const onUploadFile = useCallback(
     (change: FormApi['change']) => (event: ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files.length > 0 ? event.target.files[0] : null;
+      const files: FileList | never[] = event.target.files || [];
+      const file = files.length > 0 ? files[0] : null;
       const reader = new FileReader();
 
       if (file) {
-        reader.addEventListener('load', (e) => change('yaml', e.target.result));
-        reader.readAsText(event.target.files[0]);
+        reader.addEventListener('load', (e) => change('yaml', e.target?.result));
+        reader.readAsText(files[0]);
       }
     },
     []
@@ -61,7 +62,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
                 size="md"
                 variant="secondary"
                 className={styles.uploadAction}
-                onClick={() => inputRef.current.click()}
+                onClick={() => inputRef.current?.click()}
               >
                 <Icon name="upload" />
                 {Messages.alertRuleTemplate.addModal.upload}
