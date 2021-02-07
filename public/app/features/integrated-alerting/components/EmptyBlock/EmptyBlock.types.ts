@@ -1,3 +1,3 @@
-export interface EmptyBlockFields {
+export interface EmptyBlockProps {
   dataQa?: string;
 }
