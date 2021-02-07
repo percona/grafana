@@ -31,8 +31,8 @@ export const TO_MODEL = {
     channelId: channel.channel_id,
     summary: channel.summary,
     disabled: channel.disabled,
-    sendResolved: channel.slack_config.send_resolved,
-    channel: channel.slack_config.channel,
+    sendResolved: !!channel.slack_config?.send_resolved,
+    channel: channel.slack_config?.channel,
   }),
 };
 
@@ -40,7 +40,7 @@ export const TO_API = {
   [NotificationChannelType.email]: (values: NotificationChannelRenderProps): NotificationChannelAPI => ({
     summary: values.name,
     email_config: {
-      to: values.emails.split('\n'),
+      to: (values.emails || '').split('\n'),
     },
   }),
   [NotificationChannelType.pagerDuty]: (values: NotificationChannelRenderProps): NotificationChannelAPI => ({

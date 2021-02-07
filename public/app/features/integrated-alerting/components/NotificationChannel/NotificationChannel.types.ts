@@ -33,7 +33,7 @@ export interface PagerDutylNotificationChannel extends NotificationChannel {
 
 export interface SlackNotificationChannel extends NotificationChannel {
   sendResolved: boolean;
-  channel: string;
+  channel?: string;
 }
 
 export interface NotificationChannelListResponse {
@@ -56,18 +56,18 @@ export interface EmailNotificationChannelAPI {
 
 export interface PagerDutyNotificationChannelAPI {
   send_resolved?: boolean;
-  routing_key: string;
-  service_key: string;
+  routing_key?: string;
+  service_key?: string;
 }
 
 export interface SlackNotificationChannelAPI {
   send_resolved?: boolean;
-  channel: string;
+  channel?: string;
 }
 
 export interface NotificationChannelRenderProps {
   name: string;
-  type: SelectableValue<NotificationChannelType>;
+  type?: SelectableValue<NotificationChannelType>;
   emails?: string;
   routing?: string;
   service?: string;

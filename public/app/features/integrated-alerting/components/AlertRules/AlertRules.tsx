@@ -29,8 +29,8 @@ export const AlertRules: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(false);
-  const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule>();
-  const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule>();
+  const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule | null>();
+  const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule | null>();
   const [data, setData] = useState<AlertRule[]>([]);
 
   const getAlertRules = async () => {

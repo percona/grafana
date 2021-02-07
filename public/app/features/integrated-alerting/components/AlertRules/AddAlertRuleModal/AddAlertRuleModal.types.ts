@@ -4,7 +4,7 @@ import { AlertRule } from '../AlertRules.types';
 export interface AddAlertRuleModalProps {
   isVisible: boolean;
   setVisible: (value: boolean) => void;
-  alertRule?: AlertRule;
+  alertRule?: AlertRule | null;
 }
 
 export enum Severity {
@@ -17,7 +17,7 @@ export enum Severity {
 export interface AddAlertRuleFormValues {
   template: SelectableValue<string>;
   name: string;
-  threshold: string;
+  threshold: string | null;
   duration: number;
   filters: string;
   notificationChannels: Array<SelectableValue<string>>;

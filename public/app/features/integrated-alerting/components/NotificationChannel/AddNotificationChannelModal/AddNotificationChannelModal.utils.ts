@@ -7,6 +7,7 @@ import {
   SlackNotificationChannel,
 } from '../NotificationChannel.types';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
+import { SelectableValue } from '@grafana/data';
 
 export const INITIAL_VALUES = {
   [NotificationChannelType.email]: ({
@@ -16,7 +17,7 @@ export const INITIAL_VALUES = {
   }: EmailNotificationChannel): NotificationChannelRenderProps => ({
     name: summary,
     type: getOptionFrom(type),
-    emails: emails.join('\n'),
+    emails: (emails || []).join('\n'),
   }),
   [NotificationChannelType.pagerDuty]: ({
     type,
@@ -40,11 +41,12 @@ export const INITIAL_VALUES = {
   }),
 };
 
-export const getInitialValues = (notificationChannel?: NotificationChannel) =>
+export const getInitialValues = (notificationChannel?: NotificationChannel | null) =>
   notificationChannel
     ? INITIAL_VALUES[notificationChannel.type](
         notificationChannel as EmailNotificationChannel & SlackNotificationChannel & PagerDutylNotificationChannel
       )
     : { type: TYPE_OPTIONS[0] };
 
-export const getOptionFrom = (type: NotificationChannelType) => TYPE_OPTIONS.find((opt) => opt.value === type);
+export const getOptionFrom = (type: NotificationChannelType): SelectableValue<NotificationChannelType> | undefined =>
+  TYPE_OPTIONS.find((opt: SelectableValue<NotificationChannelType>) => opt.value === type);

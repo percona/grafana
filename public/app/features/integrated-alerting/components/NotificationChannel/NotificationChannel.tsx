@@ -20,7 +20,7 @@ export const NotificationChannel: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Channel[]>([]);
-  const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel>();
+  const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel | null>();
 
   const columns = useMemo(
     () => [
