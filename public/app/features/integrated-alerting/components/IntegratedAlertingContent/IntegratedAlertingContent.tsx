@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from 'app/plugins/panel/homelinks/module';
-import { IntegratedAlertingTabs } from '../IntegratedAlertingTabs';
+import { IntegratedAlertingTabs } from './IntegratedAlertingTabs';
 import { EmptyBlock } from '../EmptyBlock';
 import { Messages } from './IntegratedAlertingContent.messages';
 import { PMM_SETTINGS_URL } from './IntegratedAlertingContent.constants';

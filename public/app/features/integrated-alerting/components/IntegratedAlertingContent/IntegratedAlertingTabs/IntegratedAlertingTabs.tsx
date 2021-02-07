@@ -1,11 +1,11 @@
 import { Tab, TabContent, TabsBar } from '@grafana/ui';
 import React, { FC, useMemo, useState } from 'react';
-import { Messages } from '../../IntegratedAlerting.messages';
-import { TabKeys } from '../../IntegratedAlerting.types';
-import { AlertRules } from '../AlertRules';
-import { AlertRuleTemplate } from '../AlertRuleTemplate';
-import { Alerts } from '../Alerts';
-import { NotificationChannel } from '../NotificationChannel';
+import { Messages } from '../../../IntegratedAlerting.messages';
+import { TabKeys } from '../../../IntegratedAlerting.types';
+import { AlertRules } from '../../AlertRules';
+import { AlertRuleTemplate } from '../../AlertRuleTemplate';
+import { Alerts } from '../../Alerts';
+import { NotificationChannel } from '../../NotificationChannel';
 
 export const IntegratedAlertingTabs: FC = () => {
   const [activeTab, setActiveTab] = useState(TabKeys.alerts);
