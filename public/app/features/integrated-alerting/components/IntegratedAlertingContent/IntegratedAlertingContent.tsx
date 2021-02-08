@@ -20,7 +20,7 @@ export const IntegratedAlertingContent: FC<IntegratedAlertingContentProps> = ({ 
       ) : (
         <>
           {Messages.alertingDisabled}&nbsp;
-          <a className={styles.link} href={PMM_SETTINGS_URL}>
+          <a data-qa="ia-settings-link" className={styles.link} href={PMM_SETTINGS_URL}>
             {Messages.pmmSettings}
           </a>
         </>
