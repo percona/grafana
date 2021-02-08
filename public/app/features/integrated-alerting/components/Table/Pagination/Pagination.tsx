@@ -55,7 +55,7 @@ export const Pagination: FC<PaginationProps> = ({
   return (
     <div className={style.pagination} data-qa="pagination">
       <span className={style.pageSizeContainer}>
-        <span>{Messages.ROWS_PER_PAGE}</span>
+        <span>{Messages.rowsPerPage}</span>
         <span>
           <Select
             data-qa="pagination-size-select"
