@@ -37,7 +37,7 @@ const IntegratedAlertingPage: FC = () => {
   return (
     <div className={styles.integratedAlertingWrapper}>
       <TabsBar>
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <Tab
             key={tab.key}
             label={tab.label}
@@ -46,7 +46,7 @@ const IntegratedAlertingPage: FC = () => {
           />
         ))}
       </TabsBar>
-      <TabContent>{tabs.find(tab => tab.key === activeTab).component}</TabContent>
+      <TabContent>{tabs.find((tab) => tab.key === activeTab).component}</TabContent>
     </div>
   );
 };

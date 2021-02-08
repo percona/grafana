@@ -9,11 +9,6 @@ describe('IntegratedAlertingPage', () => {
     const tabs = wrapper.find('ul');
 
     expect(tabs.children().length).toBe(4);
-    expect(
-      tabs
-        .find('li')
-        .at(0)
-        .text()
-    ).toEqual(Messages.tabs.alerts);
+    expect(tabs.find('li').at(0).text()).toEqual(Messages.tabs.alerts);
   });
 });
