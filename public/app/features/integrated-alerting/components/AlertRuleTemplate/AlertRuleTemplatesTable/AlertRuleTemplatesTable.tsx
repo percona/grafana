@@ -6,7 +6,7 @@ import { css } from 'emotion';
 import { FormattedTemplate, AlertRuleTemplatesTableProps } from './AlertRuleTemplatesTable.types';
 import { Messages } from '../../../IntegratedAlerting.messages';
 import { AlertRuleTemplateActions } from '../AlertRuleTemplateActions/AlertRuleTemplateActions';
-import { EmptyBlock } from '../../EmptyBlock/EmptyBlock';
+import { EmptyBlock } from '../../EmptyBlock';
 
 const { noData, columns } = Messages.alertRuleTemplate.table;
 

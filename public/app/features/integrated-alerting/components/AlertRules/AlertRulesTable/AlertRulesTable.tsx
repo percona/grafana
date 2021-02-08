@@ -6,7 +6,7 @@ import { getStyles } from './AlertRulesTable.styles';
 import { AlertRule } from '../AlertRules.types';
 import { AlertRulesTableProps } from './AlertRulesTable.types';
 import { AlertRulesProvider } from '../AlertRules.provider';
-import { EmptyBlock } from '../../EmptyBlock/EmptyBlock';
+import { EmptyBlock } from '../../EmptyBlock';
 
 export const AlertRulesTable: FC<AlertRulesTableProps> = ({ pendingRequest, data, columns, emptyMessage }) => {
   const style = useStyles(getStyles);

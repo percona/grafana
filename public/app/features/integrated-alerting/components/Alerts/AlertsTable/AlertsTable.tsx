@@ -11,7 +11,7 @@ import { Alert, AlertStatus } from '../Alerts.types';
 import { formatAlerts, getSeverityColors } from './AlertsTable.utils';
 import { AlertsActions } from '../AlertsActions/AlertsActions';
 import { AlertRuleSeverity } from '../../AlertRules/AlertRules.types';
-import { EmptyBlock } from '../../EmptyBlock/EmptyBlock';
+import { EmptyBlock } from '../../EmptyBlock';
 
 const { noData, columns } = Messages.alerts.table;
 

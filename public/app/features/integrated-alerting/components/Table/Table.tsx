@@ -4,7 +4,7 @@ import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';
-import { EmptyBlock } from '../EmptyBlock/EmptyBlock';
+import { EmptyBlock } from '../EmptyBlock';
 
 export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage }) => {
   const style = useStyles(getStyles);
