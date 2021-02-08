@@ -11,7 +11,7 @@ import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
 import { DeleteNotificationChannelModal } from './DeleteNotificationChannelModal/DeleteNotificationChannelModal';
 import { NOTIFICATION_CHANNEL_TABLE_HASH } from './NotificationChannel.constants';
-import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
+import { useStoredTablePageSize } from '../Table/Pagination';
 
 const { emptyTable, nameColumn, typeColumn, actionsColumn, typeLabel } = Messages;
 

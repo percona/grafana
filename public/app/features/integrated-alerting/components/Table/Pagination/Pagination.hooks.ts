@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { logger } from '@percona/platform-core';
-import { PAGE_SIZES } from '../constants';
+import { PAGE_SIZES } from './Pagination.constants';
 
-export const getProperPageSize = (pageSize: number) =>
+export const getPageSize = (pageSize: number) =>
   PAGE_SIZES.find(p => p.value === pageSize) ? pageSize : PAGE_SIZES[0].value;
 
 export const useStoredTablePageSize = (tableHash: string) => {
@@ -18,7 +18,7 @@ export const useStoredTablePageSize = (tableHash: string) => {
   } catch (e) {
     logger.error(e);
   }
-  const [value, setValue] = useState(getProperPageSize(pageSize));
+  const [value, setValue] = useState(getPageSize(pageSize));
 
   useEffect(() => {
     if (tableHash) {

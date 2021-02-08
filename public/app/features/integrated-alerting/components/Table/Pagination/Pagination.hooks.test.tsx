@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 import React, { FC } from 'react';
-import { useStoredTablePageSize } from './useStoredTablePageSize';
-import { PAGE_SIZES } from '../constants';
+import { PAGE_SIZES } from './Pagination.constants';
+import { useStoredTablePageSize } from './Pagination.hooks';
 
 const TABLE_HASH = 'test-hash';
 const TABLE_HASH_STORAGE_ID = `${TABLE_HASH}-table-page-size`;

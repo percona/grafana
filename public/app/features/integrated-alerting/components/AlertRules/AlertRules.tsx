@@ -12,7 +12,7 @@ import { formatRules } from './AlertRules.utils';
 import { AlertRule } from './AlertRules.types';
 import { AlertRulesActions } from './AlertRulesActions';
 import { ALERT_RULES_TABLE_HASH } from './AlertRules.constants';
-import { useStoredTablePageSize } from 'app/core/hooks/useStoredTablePageSize';
+import { useStoredTablePageSize } from '../Table/Pagination';
 
 const { noData, columns } = Messages.alertRules.table;
 
