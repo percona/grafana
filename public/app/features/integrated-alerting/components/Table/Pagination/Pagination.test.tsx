@@ -202,9 +202,9 @@ describe('Pagination', () => {
         nrRowsOnCurrentPage={3}
       />
     );
-    expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.ITEMS_INTERVAL(1, 3, 15));
+    expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.getItemsIntervalMessage(1, 3, 15));
     simulateNextClick(wrapper, 2);
-    expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.ITEMS_INTERVAL(7, 9, 15));
+    expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.getItemsIntervalMessage(7, 9, 15));
   });
 
   it('should show "showing 0 - 0 of 0 items" when empty', () => {
@@ -218,7 +218,7 @@ describe('Pagination', () => {
         nrRowsOnCurrentPage={0}
       />
     );
-    expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.ITEMS_INTERVAL(0, 0, 0));
+    expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.getItemsIntervalMessage(0, 0, 0));
   });
 
   it('should trigger a page change', () => {

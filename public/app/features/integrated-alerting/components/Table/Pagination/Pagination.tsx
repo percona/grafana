@@ -68,7 +68,7 @@ export const Pagination: FC<PaginationProps> = ({
       </span>
       <span className={style.pageButtonsContainer}>
         <span data-qa="pagination-items-inverval">
-          {Messages.ITEMS_INTERVAL(leftItemNumber, rightItemNumber, totalItems)}
+          {Messages.getItemsIntervalMessage(leftItemNumber, rightItemNumber, totalItems)}
         </span>
         <span>
           <Button
