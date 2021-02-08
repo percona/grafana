@@ -25,7 +25,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   const style = useStyles(getStyles);
   const { selectedRuleDetails } = useContext(AlertRulesProvider);
   const manualPagination = totalPages >= 0;
-  const initialState: Partial<TableState> = {
+  const initialState = {
     pageIndex: propPageIndex,
     pageSize: propPageSize,
   } as Partial<TableState>;
