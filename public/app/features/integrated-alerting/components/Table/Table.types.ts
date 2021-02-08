@@ -14,12 +14,12 @@ export interface TableProps {
   onPaginationChanged: (pageSize: number, pageIndex: number) => void;
 }
 
-interface ExtendedTableState extends TableState {
+interface PaginatedTableState extends TableState {
   pageIndex: number;
   pageSize: number;
 }
 
-export interface ExtendedTableInstance extends TableInstance {
+export interface PaginatedTableInstance extends TableInstance {
   page: Row[];
   canPreviousPage: boolean;
   canNextPage: boolean;
@@ -28,10 +28,10 @@ export interface ExtendedTableInstance extends TableInstance {
   nextPage: () => void;
   pageCount: number;
   setPageSize: (size: number) => void;
-  state: ExtendedTableState;
+  state: PaginatedTableState;
 }
 
-export interface ExtendedTableOptions extends TableOptions<object> {
+export interface PaginatedTableOptions extends TableOptions<object> {
   manualPagination?: boolean;
   pageCount?: number;
 }

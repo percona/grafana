@@ -3,7 +3,7 @@ import { useTable, usePagination, TableState } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
-import { TableProps, ExtendedTableInstance, ExtendedTableOptions } from './Table.types';
+import { TableProps, PaginatedTableInstance, PaginatedTableOptions } from './Table.types';
 import { Pagination } from './Pagination';
 import { PAGE_SIZES } from 'app/core/constants';
 
@@ -25,7 +25,7 @@ export const Table: FC<TableProps> = ({
     pageIndex: propPageIndex,
     pageSize: propPageSize,
   } as Partial<TableState>;
-  const tableOptions: ExtendedTableOptions = {
+  const tableOptions: PaginatedTableOptions = {
     columns,
     data,
     initialState,
@@ -36,7 +36,7 @@ export const Table: FC<TableProps> = ({
     tableOptions.pageCount = totalPages;
   }
 
-  const tableInstance = useTable(tableOptions, usePagination) as ExtendedTableInstance;
+  const tableInstance = useTable(tableOptions, usePagination) as PaginatedTableInstance;
   const {
     getTableProps,
     getTableBodyProps,

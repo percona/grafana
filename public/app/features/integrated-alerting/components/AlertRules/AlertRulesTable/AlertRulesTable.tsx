@@ -7,7 +7,7 @@ import { AlertRule } from '../AlertRules.types';
 import { AlertRulesTableProps } from './AlertRulesTable.types';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { Pagination } from '../../Table/Pagination';
-import { ExtendedTableInstance, ExtendedTableOptions } from '../../Table';
+import { PaginatedTableInstance, PaginatedTableOptions } from '../../Table';
 import { PAGE_SIZES } from 'app/core/constants';
 
 export const AlertRulesTable: FC<AlertRulesTableProps> = ({
@@ -29,7 +29,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
     pageIndex: propPageIndex,
     pageSize: propPageSize,
   } as Partial<TableState>;
-  const tableOptions: ExtendedTableOptions = {
+  const tableOptions: PaginatedTableOptions = {
     columns,
     data,
     initialState,
@@ -39,7 +39,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   if (manualPagination) {
     tableOptions.pageCount = totalPages;
   }
-  const tableInstance = useTable(tableOptions, usePagination) as ExtendedTableInstance;
+  const tableInstance = useTable(tableOptions, usePagination) as PaginatedTableInstance;
   const {
     getTableProps,
     getTableBodyProps,
