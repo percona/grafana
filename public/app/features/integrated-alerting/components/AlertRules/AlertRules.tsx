@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React, { FC, useEffect, useState } from 'react';
 import { Column } from 'react-table';
 import { Button, useStyles, IconButton } from '@grafana/ui';
@@ -89,7 +88,7 @@ export const AlertRules: FC = () => {
         Header: filtersColumn,
         accessor: ({ filters }: AlertRule) => (
           <div className={styles.filtersWrapper}>
-            {filters.map((filter) => (
+            {filters.map(filter => (
               <span key={filter} className={styles.filter}>
                 {filter}
               </span>
@@ -118,7 +117,7 @@ export const AlertRules: FC = () => {
 
   const handleAddButton = () => {
     setSelectedAlertRule(null);
-    setAddModalVisible((currentValue) => !currentValue);
+    setAddModalVisible(currentValue => !currentValue);
   };
 
   return (

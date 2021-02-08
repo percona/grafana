@@ -1,5 +1,3 @@
-/* eslint-disable react/display-name */
-
 import React, { FC } from 'react';
 import { useTable, Column } from 'react-table';
 import { Spinner, useStyles } from '@grafana/ui';
@@ -66,11 +64,9 @@ export const AlertRuleTemplatesTable: FC<AlertRuleTemplatesTableProps> = ({
         {rows.length && !pendingRequest ? (
           <table {...getTableProps()} data-qa="alert-rule-templates-table">
             <thead data-qa="alert-rule-templates-table-thead">
-              {headerGroups.map((headerGroup) => (
-                // eslint-disable-next-line react/jsx-key
+              {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column) => (
-                    // eslint-disable-next-line react/jsx-key
+                  {headerGroup.headers.map(column => (
                     <th
                       className={css`
                         cursor: pointer;
@@ -85,13 +81,11 @@ export const AlertRuleTemplatesTable: FC<AlertRuleTemplatesTableProps> = ({
               ))}
             </thead>
             <tbody {...getTableBodyProps()} data-qa="alert-rule-templates-table-tbody">
-              {rows.map((row) => {
+              {rows.map(row => {
                 prepareRow(row);
                 return (
-                  // eslint-disable-next-line react/jsx-key
                   <tr {...row.getRowProps()}>
-                    {row.cells.map((cell) => {
-                      // eslint-disable-next-line react/jsx-key
+                    {row.cells.map(cell => {
                       return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
                     })}
                   </tr>

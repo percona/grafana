@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import React, { FC, useMemo, useState, useEffect } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';

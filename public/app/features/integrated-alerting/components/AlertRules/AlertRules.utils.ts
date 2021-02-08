@@ -21,8 +21,8 @@ export const formatThreshold = (
   template: AlertRulesListPayloadTemplate,
   params: AlertRulesListResponseParam[] | undefined
 ): string => {
-  const templateThresholdParam = template?.params?.find((param) => param.name === 'threshold');
-  const thresholdParam = params?.find((param) => param.name === 'threshold');
+  const templateThresholdParam = template?.params?.find(param => param.name === 'threshold');
+  const thresholdParam = params?.find(param => param.name === 'threshold');
 
   if (!templateThresholdParam) {
     return '';
