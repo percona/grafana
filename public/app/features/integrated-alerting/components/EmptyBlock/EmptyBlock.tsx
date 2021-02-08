@@ -2,8 +2,9 @@ import { useStyles } from '@grafana/ui';
 import React from 'react';
 import { FC } from 'react';
 import { getStyles } from './EmptyBlock.styles';
+import { EmptyBlockProps } from './EmptyBlock.types';
 
-export const EmptyBlock: FC<{ dataQa?: string }> = ({ children, dataQa }) => {
+export const EmptyBlock: FC<EmptyBlockProps> = ({ children, dataQa }) => {
   const style = useStyles(getStyles);
 
   return (
