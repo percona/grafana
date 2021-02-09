@@ -31,7 +31,6 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
                   {headerGroup.headers.map(column => (
                     <th
                       className={css`
-                        cursor: pointer;
                         width: ${column.width};
                       `}
                       {...column.getHeaderProps()}

@@ -32,6 +32,7 @@ export const getStyles = (theme: GrafanaTheme) => {
             th {
               position: sticky;
               top: 0;
+              cursor: pointer;
             }
           }
         }
