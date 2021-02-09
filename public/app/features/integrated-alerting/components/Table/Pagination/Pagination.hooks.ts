@@ -10,7 +10,7 @@ export const useStoredTablePageSize = (tableHash: string) => {
   const fullHash = `${tableHash}-table-page-size`;
 
   try {
-    const storedValue = +localStorage.getItem(fullHash);
+    const storedValue = parseInt(localStorage.getItem(fullHash), 10);
 
     if (storedValue && !isNaN(storedValue)) {
       pageSize = storedValue;

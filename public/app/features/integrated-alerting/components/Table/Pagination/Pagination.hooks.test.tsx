@@ -13,7 +13,7 @@ const TestComponent: FC = () => {
   return (
     <>
       <span>{pageSize}</span>
-      <input type="number" value={pageSize} onChange={e => setPageSize(+e.target.value)} />
+      <input type="number" value={pageSize} onChange={e => setPageSize(parseInt(e.target.value, 10))} />
     </>
   );
 };
@@ -53,7 +53,7 @@ describe('useStoredTablePageSize', () => {
     setDataOnLocalStorage(value);
     const wrapper = mount(<TestComponent />);
     const span = wrapper.find('span').first();
-    expect(+span.text()).toBe(value);
+    expect(parseInt(span.text(), 10)).toBe(value);
   });
 
   it('should set the default if a wrong value is saved', () => {
@@ -61,7 +61,7 @@ describe('useStoredTablePageSize', () => {
     const wrapper = mount(<TestComponent />);
     const span = wrapper.find('span').first();
     const storedSize = getDataFromLocalStorage();
-    expect(+span.text()).toBe(DEFAULT_VALUE);
+    expect(parseInt(span.text(), 10)).toBe(DEFAULT_VALUE);
     expect(storedSize).toBe(DEFAULT_VALUE);
   });
 });
