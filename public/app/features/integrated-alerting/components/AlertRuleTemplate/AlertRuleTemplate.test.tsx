@@ -13,12 +13,15 @@ jest.mock('./AlertRuleTemplate.service', () => ({
     }),
   },
 }));
-jest.mock('@percona/platform-core', () => ({
-  ...jest.requireActual('@percona/platform-core'),
-  logger: {
-    error: jest.fn(),
-  },
-}));
+jest.mock('@percona/platform-core', () => {
+  const originalModule = jest.requireActual('@percona/platform-core');
+  return {
+    ...originalModule,
+    logger: {
+      error: jest.fn(),
+    },
+  };
+});
 
 describe('AlertRuleTemplate', () => {
   afterEach(() => {
