@@ -1,1 +1,1 @@
-export const ALERT_RULES_TABLE_HASH = 'alert-rules';
+export const ALERT_RULES_TABLE_ID = 'alert-rules';

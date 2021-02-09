@@ -11,7 +11,7 @@ import { Messages } from '../../IntegratedAlerting.messages';
 import { formatRules } from './AlertRules.utils';
 import { AlertRule } from './AlertRules.types';
 import { AlertRulesActions } from './AlertRulesActions';
-import { ALERT_RULES_TABLE_HASH } from './AlertRules.constants';
+import { ALERT_RULES_TABLE_ID } from './AlertRules.constants';
 import { useStoredTablePageSize } from '../Table/Pagination';
 
 const { noData, columns } = Messages.alertRules.table;
@@ -33,7 +33,7 @@ export const AlertRules: FC = () => {
   const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule>();
   const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule>();
   const [data, setData] = useState<AlertRule[]>([]);
-  const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_HASH);
+  const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);

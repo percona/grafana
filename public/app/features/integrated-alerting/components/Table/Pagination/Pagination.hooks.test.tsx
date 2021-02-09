@@ -3,12 +3,12 @@ import React, { FC } from 'react';
 import { PAGE_SIZES } from './Pagination.constants';
 import { useStoredTablePageSize } from './Pagination.hooks';
 
-const TABLE_HASH = 'test-hash';
-const TABLE_HASH_STORAGE_ID = `${TABLE_HASH}-table-page-size`;
+const TABLE_ID = 'test-id';
+const TABLE_STORAGE_ID = `${TABLE_ID}-table-page-size`;
 const DEFAULT_VALUE = PAGE_SIZES[0].value;
 
 const TestComponent: FC = () => {
-  const [pageSize, setPageSize] = useStoredTablePageSize(TABLE_HASH);
+  const [pageSize, setPageSize] = useStoredTablePageSize(TABLE_ID);
 
   return (
     <>
@@ -19,24 +19,24 @@ const TestComponent: FC = () => {
 };
 
 const getDataFromLocalStorage = (): number => {
-  return +localStorage.getItem(TABLE_HASH_STORAGE_ID);
+  return +localStorage.getItem(TABLE_STORAGE_ID);
 };
 
-const setDataOnLocalStorage = (pageSize: number) => localStorage.setItem(TABLE_HASH_STORAGE_ID, `${pageSize}`);
+const setDataOnLocalStorage = (pageSize: number) => localStorage.setItem(TABLE_STORAGE_ID, `${pageSize}`);
 
 describe('useStoredTablePageSize', () => {
   beforeAll(() => {
-    localStorage.removeItem(TABLE_HASH_STORAGE_ID);
+    localStorage.removeItem(TABLE_STORAGE_ID);
   });
   afterAll(() => {
-    localStorage.removeItem(TABLE_HASH_STORAGE_ID);
+    localStorage.removeItem(TABLE_STORAGE_ID);
   });
 
   it('should initially store the default pageSize', () => {
     mount(<TestComponent />);
     const storedSize = getDataFromLocalStorage();
     expect(storedSize).toBe(DEFAULT_VALUE);
-    localStorage.removeItem(TABLE_HASH_STORAGE_ID);
+    localStorage.removeItem(TABLE_STORAGE_ID);
   });
 
   it('should store the size on local storage after input changes', () => {
@@ -57,7 +57,7 @@ describe('useStoredTablePageSize', () => {
   });
 
   it('should set the default if a wrong value is saved', () => {
-    localStorage.setItem(TABLE_HASH_STORAGE_ID, '1a');
+    localStorage.setItem(TABLE_STORAGE_ID, '1a');
     const wrapper = mount(<TestComponent />);
     const span = wrapper.find('span').first();
     const storedSize = getDataFromLocalStorage();

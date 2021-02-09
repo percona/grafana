@@ -5,12 +5,12 @@ import { PAGE_SIZES } from './Pagination.constants';
 export const getPageSize = (pageSize: number) =>
   PAGE_SIZES.find(p => p.value === pageSize) ? pageSize : PAGE_SIZES[0].value;
 
-export const useStoredTablePageSize = (tableHash: string) => {
+export const useStoredTablePageSize = (tableId: string) => {
   let pageSize = PAGE_SIZES[0].value;
-  const fullHash = `${tableHash}-table-page-size`;
+  const fullId = `${tableId}-table-page-size`;
 
   try {
-    const storedValue = parseInt(localStorage.getItem(fullHash), 10);
+    const storedValue = parseInt(localStorage.getItem(fullId), 10);
 
     if (storedValue && !isNaN(storedValue)) {
       pageSize = storedValue;
@@ -21,8 +21,8 @@ export const useStoredTablePageSize = (tableHash: string) => {
   const [value, setValue] = useState(getPageSize(pageSize));
 
   useEffect(() => {
-    if (tableHash) {
-      localStorage.setItem(fullHash, `${value}`);
+    if (tableId) {
+      localStorage.setItem(fullId, `${value}`);
     }
   }, [value]);
 

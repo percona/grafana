@@ -10,7 +10,7 @@ import { getStyles } from './NotificationChannel.styles';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
 import { DeleteNotificationChannelModal } from './DeleteNotificationChannelModal/DeleteNotificationChannelModal';
-import { NOTIFICATION_CHANNEL_TABLE_HASH } from './NotificationChannel.constants';
+import { NOTIFICATION_CHANNEL_TABLE_ID } from './NotificationChannel.constants';
 import { useStoredTablePageSize } from '../Table/Pagination';
 
 const { emptyTable, nameColumn, typeColumn, actionsColumn, typeLabel } = Messages;
@@ -22,7 +22,7 @@ export const NotificationChannel: FC = () => {
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Channel[]>([]);
   const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel>();
-  const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_HASH);
+  const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);
 
   const columns = useMemo(
