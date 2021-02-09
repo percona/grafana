@@ -9,7 +9,7 @@ import (
 	"github.com/grafana/grafana/pkg/models"
 )
 
-func GetAPIKey(c *models.ReqContext) Response {
+func GetAPIKeyCurrent(c *models.ReqContext) Response {
 	query := models.GetApiKeyByIdQuery{ApiKeyId: c.ApiKeyId}
 
 	if err := bus.Dispatch(&query); err != nil {

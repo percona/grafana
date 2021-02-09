@@ -226,7 +226,7 @@ func (hs *HTTPServer) registerRoutes() {
 
 		// Current user role
 		apiRoute.Group("/auth/key", func(keyRoute routing.RouteRegister) {
-			keyRoute.Get("/", Wrap(GetAPIKey))
+			keyRoute.Get("/", Wrap(GetAPIKeyCurrent))
 		})
 		// auth api keys
 		apiRoute.Group("/auth/keys", func(keysRoute routing.RouteRegister) {
