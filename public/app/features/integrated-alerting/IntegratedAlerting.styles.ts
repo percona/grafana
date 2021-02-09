@@ -5,7 +5,4 @@ export const getStyles = ({ spacing, colors }: GrafanaTheme) => ({
   integratedAlertingWrapper: css`
     margin: ${spacing.lg};
   `,
-  link: css`
-    color: ${colors.linkExternal};
-  `,
 });

@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import { Spinner, useStyles } from '@grafana/ui';
-import { getStyles } from 'app/plugins/panel/homelinks/module';
 import { IntegratedAlertingTabs } from './IntegratedAlertingTabs';
 import { EmptyBlock } from '../EmptyBlock';
 import { Messages } from './IntegratedAlertingContent.messages';
 import { PMM_SETTINGS_URL } from './IntegratedAlertingContent.constants';
 import { IntegratedAlertingContentProps } from './IntegratedAlertingContent.types';
+import { getStyles } from './IntegratedAlertingContent.styles';
 
 export const IntegratedAlertingContent: FC<IntegratedAlertingContentProps> = ({ loadingSettings, alertingEnabled }) => {
   const styles = useStyles(getStyles);
