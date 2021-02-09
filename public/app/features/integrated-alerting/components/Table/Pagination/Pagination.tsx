@@ -3,6 +3,7 @@ import { useStyles, IconName, Button, Select } from '@grafana/ui';
 import { PaginationProps } from './Pagination.types';
 import { getStyles } from './Pagination.styles';
 import { Messages } from './Pagination.messages';
+import { getShownPages, getLeftItemNumber, getRightItemNumber } from './Pagination.utils';
 
 export const Pagination: FC<PaginationProps> = ({
   pageCount: propPageCount,
@@ -19,20 +20,10 @@ export const Pagination: FC<PaginationProps> = ({
   const [pageCount, setPageCount] = useState(Math.max(propPageCount, 1));
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
-  const maxVisiblePages = Math.min(pagesPerView, pageCount);
   // We want to center our selected page, thus we need to know how many should be on the left
-  const pagesBehind = pagesPerView - (pagesPerView - Math.ceil(pagesPerView / 2)) - 1;
-  let firstPageIndex = Math.max(activePageIndex - pagesBehind, 0);
-  let lastPageIndex = firstPageIndex + maxVisiblePages;
-
-  // If we can't keep the selected page in the center anymore, it should just move rightwards
-  if (lastPageIndex >= pageCount + 1 && lastPageIndex - maxVisiblePages > 0) {
-    lastPageIndex = pageCount;
-    firstPageIndex = lastPageIndex - maxVisiblePages;
-  }
-  const shownPages = pageArray.slice(firstPageIndex, lastPageIndex);
-  const leftItemNumber = propPageCount > 0 ? activePageIndex * pageSize + 1 : 0;
-  const rightItemNumber = activePageIndex * pageSize + nrRowsOnCurrentPage;
+  const shownPages = getShownPages(pageArray, activePageIndex, pagesPerView);
+  const leftItemNumber = getLeftItemNumber(propPageCount, activePageIndex, pageSize);
+  const rightItemNumber = getRightItemNumber(activePageIndex, pageSize, nrRowsOnCurrentPage);
   const style = useStyles(getStyles);
 
   const gotoPage = (pageIndex: number) => {
