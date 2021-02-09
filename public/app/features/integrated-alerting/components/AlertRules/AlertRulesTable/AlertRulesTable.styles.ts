@@ -14,8 +14,6 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme) => {
       border: 1px solid ${borderColor};
       display: block;
       max-width: 100%;
-      max-height: 500px;
-      overflow: auto;
     `,
     table: css`
       /* This is required to make the table full-width */
