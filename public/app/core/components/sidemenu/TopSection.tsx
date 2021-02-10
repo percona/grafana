@@ -24,7 +24,7 @@ const TopSection: FC<any> = () => {
     id: 'backup',
     icon: 'history',
     text: 'Backup',
-    url: '/backup',
+    url: `${config.appSubUrl}/backup`,
   };
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
