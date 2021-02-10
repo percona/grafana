@@ -22,8 +22,9 @@ func GetAPIKeyCurrent(c *models.ReqContext) Response {
 		expiration = &v
 	}
 
-	return JSON(200, &models.ApiKeyDTO{
+	return JSON(200, &models.ApiKeyDetailsDTO{
 		Id:         query.Result.Id,
+		OrgId:      query.Result.OrgId,
 		Name:       query.Result.Name,
 		Role:       query.Result.Role,
 		Expiration: expiration,
