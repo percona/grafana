@@ -39,6 +39,11 @@ export const Pagination: FC<PaginationProps> = ({
     }
   };
 
+  const pageSizeChanged = (pageSize: number) => {
+    onPageSizeChange(pageSize);
+    setActivePageIndex(0);
+  };
+
   useEffect(() => {
     setPageCount(Math.max(propPageCount, 1));
   }, [propPageCount]);
@@ -53,7 +58,7 @@ export const Pagination: FC<PaginationProps> = ({
             isSearchable={false}
             value={pageSize}
             options={pageSizeOptions}
-            onChange={e => onPageSizeChange(e.value)}
+            onChange={e => pageSizeChanged(e.value)}
           />
         </span>
       </span>

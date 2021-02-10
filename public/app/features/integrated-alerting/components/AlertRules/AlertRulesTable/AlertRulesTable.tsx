@@ -49,7 +49,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
     pageCount,
     setPageSize,
     gotoPage,
-    state: { pageSize, pageIndex },
+    state: { pageSize },
   } = tableInstance;
 
   const onPageChanged = (newPageIndex: number) => {
@@ -59,7 +59,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
 
   const onPageSizeChanged = (newPageSize: number) => {
     setPageSize(newPageSize);
-    onPaginationChanged(newPageSize, pageIndex);
+    onPaginationChanged(newPageSize, 0);
   };
 
   return (
