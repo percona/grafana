@@ -20,6 +20,12 @@ const TopSection: FC<any> = () => {
     text: 'DBaaS',
     url: '/graph/d/pmm-dbaas/pmm-dbaas',
   };
+  const backupLink: NavModelItem = {
+    id: 'backup',
+    icon: 'history',
+    text: 'Backup',
+    url: '/backup',
+  };
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
@@ -45,6 +51,7 @@ const TopSection: FC<any> = () => {
         return <TopSectionItem link={link} key={`${link.id}-${index}`} />;
       })}
       {showDBaaS && <TopSectionItem link={dbaasLink} />}
+      <TopSectionItem link={backupLink} />
     </div>
   );
 };
