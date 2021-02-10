@@ -34,7 +34,9 @@ export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClus
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      if (triggerLoading) {
+        setLoading(false);
+      }
     }
   };
 
