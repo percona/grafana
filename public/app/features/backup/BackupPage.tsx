@@ -3,6 +3,7 @@ import React, { FC, useState } from 'react';
 import { Messages } from './Backup.messages';
 import { TabKeys } from './Backup.types';
 import { getStyles } from './Backup.styles';
+import { StorageLocations } from './components/StorageLocations';
 
 const BackupPage: FC = () => {
   const [activeTab, setActiveTab] = useState(TabKeys.locations);
@@ -10,7 +11,7 @@ const BackupPage: FC = () => {
     {
       label: Messages.tabs.locations,
       key: TabKeys.locations,
-      component: <span>HEY</span>,
+      component: <StorageLocations />,
     },
   ];
   const styles = useStyles(getStyles);
