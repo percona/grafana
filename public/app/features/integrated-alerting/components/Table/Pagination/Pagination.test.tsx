@@ -1,18 +1,25 @@
 import React from 'react';
-import { shallow, ShallowWrapper } from 'enzyme';
+import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { Pagination } from './Pagination';
 import { Messages } from './Pagination.messages';
+import { SelectableValue } from '@grafana/data';
 
-const simulateNextClick = (wrapper: ShallowWrapper, numberOfClicks: number) => {
+const simulateNextClick = (wrapper: ShallowWrapper | ReactWrapper, numberOfClicks: number) => {
   for (let i = 0; i < numberOfClicks; i++) {
-    wrapper.find(dataQa('next-page-button')).simulate('click');
+    wrapper
+      .find(dataQa('next-page-button'))
+      .last()
+      .simulate('click');
   }
 };
 
 const simulatePreviousClick = (wrapper: ShallowWrapper, numberOfClicks: number) => {
   for (let i = 0; i < numberOfClicks; i++) {
-    wrapper.find(dataQa('previous-page-button')).simulate('click');
+    wrapper
+      .find(dataQa('previous-page-button'))
+      .last()
+      .simulate('click');
   }
 };
 
@@ -307,5 +314,45 @@ describe('Pagination', () => {
     const activePageButton = wrapper.find(dataQa('page-button')).first();
     expect(activePageButton.prop('variant')).toBe('primary');
     expect(activePageButton.text()).toBe('1');
+  });
+
+  it('should go to first page after page size changes', () => {
+    const cb = jest.fn();
+    const options: Array<SelectableValue<number>> = [
+      {
+        label: '50',
+        value: 50,
+      },
+      {
+        label: '100',
+        value: 100,
+      },
+    ];
+    const wrapper = mount(
+      <Pagination
+        pagesPerView={3}
+        totalItems={15}
+        pageCount={5}
+        pageSizeOptions={options}
+        pageSize={3}
+        nrRowsOnCurrentPage={3}
+        onPageChange={jest.fn()}
+        onPageSizeChange={cb}
+      />
+    );
+    simulateNextClick(wrapper, 5);
+
+    const input = wrapper.find('input').first();
+    input.simulate('keydown', { key: 'ArrowDown' });
+
+    const lastOption = wrapper.find({ 'aria-label': 'Select option' }).last();
+    lastOption.simulate('click');
+    expect(cb).toHaveBeenCalledWith(100);
+    expect(
+      wrapper
+        .find(dataQa('page-button'))
+        .first()
+        .prop('variant')
+    ).toBe('primary');
   });
 });
