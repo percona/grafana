@@ -224,7 +224,7 @@ func (hs *HTTPServer) registerRoutes() {
 			orgsRoute.Get("/", Wrap(GetOrgByName))
 		}, reqGrafanaAdmin)
 
-		// Current user role
+		// current api key
 		apiRoute.Group("/auth/key", func(keyRoute routing.RouteRegister) {
 			keyRoute.Get("/", Wrap(GetAPIKeyCurrent))
 		})
