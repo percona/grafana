@@ -1,11 +1,13 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Column } from 'react-table';
+import { logger } from '@percona/platform-core';
+import { IconButton, useStyles } from '@grafana/ui';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
 import { StorageLocationsService } from './StorageLocations.service';
 import { formatLocationList } from './StorageLocations.utils';
-import { logger } from '@percona/platform-core';
+import { getStyles } from './StorageLocations.styles';
 
 const { noData, columns } = Messages;
 const { name, type, path } = columns;
@@ -13,11 +15,31 @@ const { name, type, path } = columns;
 export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<StorageLocation[]>([]);
+  const styles = useStyles(getStyles);
   const columns = React.useMemo(
     (): Column[] => [
       {
         Header: name,
         accessor: 'name',
+        id: 'location-expander',
+        Cell: ({ row, value }) => (
+          <div className={styles.nameWrapper}>
+            {value}
+            {row.isExpanded ? (
+              <IconButton
+                {...row.getToggleRowExpandedProps()}
+                data-qa="hide-storage-location-details"
+                name="arrow-up"
+              />
+            ) : (
+              <IconButton
+                {...row.getToggleRowExpandedProps()}
+                data-qa="show-storage-location-details"
+                name="arrow-down"
+              />
+            )}
+          </div>
+        ),
       },
       {
         Header: type,
