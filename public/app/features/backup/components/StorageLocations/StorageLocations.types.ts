@@ -4,14 +4,14 @@ export enum LocationType {
   localServer = 'Local Server',
 }
 
-export interface Location {
+export interface StorageLocation {
   name: string;
   description: string;
   type: LocationType;
   path: string;
 }
 
-export interface S3Location extends Location {
+export interface S3Location extends StorageLocation {
   accessKey: string;
   secretKey: string;
 }
@@ -26,7 +26,7 @@ interface FSConfigResponse {
   path: string;
 }
 
-interface LocationResponse {
+export interface StorageLocationReponse {
   location_id: string;
   name: string;
   description: string;
@@ -34,6 +34,6 @@ interface LocationResponse {
   fs_config?: FSConfigResponse;
 }
 
-export interface LocationListResponse {
-  locations: LocationResponse[];
+export interface StorageLocationListReponse {
+  locations: StorageLocationReponse[];
 }
