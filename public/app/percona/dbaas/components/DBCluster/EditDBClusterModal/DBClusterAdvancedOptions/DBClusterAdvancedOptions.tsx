@@ -15,7 +15,7 @@ import {
 import { getStyles } from './DBClusterAdvancedOptions.styles';
 import { EditDBClusterFields } from '../EditDBClusterModal.types';
 import { DBClusterTopology, DBClusterResources } from './DBClusterAdvancedOptions.types';
-import { resourceValidator } from './DBClusterAdvancedOptions.utils';
+import { resourceValidator } from '../../AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.utils';
 
 export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form, valid, pristine, submitting }) => {
   const styles = useStyles(getStyles);

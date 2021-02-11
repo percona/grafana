@@ -1,21 +1,18 @@
-import { apiRequestManagement } from 'app/percona/shared/helpers/api';
+import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes, KubernetesListAPI, NewKubernetesCluster, NewKubernetesClusterAPI } from './Kubernetes.types';
 
 export const KubernetesService = {
   getKubernetes() {
-    return apiRequestManagement.post<KubernetesListAPI, any>('/DBaaS/Kubernetes/List', {});
+    return apiManagement.post<KubernetesListAPI, any>('/DBaaS/Kubernetes/List', {});
   },
   deleteKubernetes(kubernetes: Kubernetes, force?: boolean) {
-    return apiRequestManagement.post<any, any>('/DBaaS/Kubernetes/Unregister', toAPI(kubernetes, force));
+    return apiManagement.post<any, any>('/DBaaS/Kubernetes/Unregister', toAPI(kubernetes, force));
   },
   getKubernetesConfig(kubernetes: Kubernetes) {
-    return apiRequestManagement.post<any, any>('/DBaaS/Kubernetes/Get', toAPI(kubernetes));
+    return apiManagement.post<any, any>('/DBaaS/Kubernetes/Get', toAPI(kubernetes));
   },
   addKubernetes(kubernetes: NewKubernetesCluster) {
-    return apiRequestManagement.post<NewKubernetesClusterAPI, any>(
-      '/DBaaS/Kubernetes/Register',
-      newClusterToApi(kubernetes)
-    );
+    return apiManagement.post<NewKubernetesClusterAPI, any>('/DBaaS/Kubernetes/Register', newClusterToApi(kubernetes));
   },
 };
 

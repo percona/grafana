@@ -55,8 +55,8 @@ export class ApiRequest {
   }
 }
 
-export const apiRequest = new ApiRequest({});
-export const apiRequestQAN = new ApiRequest({ baseURL: '/v0/qan' });
-export const apiRequestManagement = new ApiRequest({ baseURL: '/v1/management' });
-export const apiRequestInventory = new ApiRequest({ baseURL: '/v1/inventory' });
-export const apiRequestSettings = new ApiRequest({ baseURL: '/v1/Settings' });
+export const api = new ApiRequest({});
+export const apiQAN = new ApiRequest({ baseURL: '/v0/qan' });
+export const apiManagement = new ApiRequest({ baseURL: '/v1/management' });
+export const apiInventory = new ApiRequest({ baseURL: '/v1/inventory' });
+export const apiSettings = new ApiRequest({ baseURL: '/v1/Settings' });

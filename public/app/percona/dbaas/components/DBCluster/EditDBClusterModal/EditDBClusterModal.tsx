@@ -1,12 +1,12 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Modal } from '@percona/platform-core';
+import { Modal, logger } from '@percona/platform-core';
 import { Form as FormFinal } from 'react-final-form';
 import { EditDBClusterModalProps, EditDBClusterRenderProps } from './EditDBClusterModal.types';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DEFAULT_SIZES } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { DBClusterServiceFactory } from '../DBClusterService.factory';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
+import { newDBClusterService } from '../DBCluster.utils';
 
 export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
   isVisible,
@@ -22,7 +22,7 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
     }
 
     try {
-      const dbClusterService = DBClusterServiceFactory.newDBClusterService(databaseType);
+      const dbClusterService = newDBClusterService(databaseType);
 
       await dbClusterService.updateDBCluster({
         databaseType,
@@ -36,7 +36,7 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
       setVisible(false);
       onDBClusterChanged();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   };
 

@@ -1,6 +1,6 @@
 import { omit } from 'lodash';
 import { Databases } from 'app/percona/shared/core';
-import { apiRequestManagement } from 'app/percona/shared/helpers/api';
+import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 import {
   DBCluster,
@@ -24,23 +24,23 @@ const DBCLUSTER_STATUS_MAP = {
 
 export class XtraDBService extends DBClusterService {
   getDBClusters(kubernetes: Kubernetes): Promise<DBClusterPayload> {
-    return apiRequestManagement.post<any, Kubernetes>('/DBaaS/XtraDBClusters/List', kubernetes);
+    return apiManagement.post<any, Kubernetes>('/DBaaS/XtraDBClusters/List', kubernetes);
   }
 
   addDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiRequestManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Create', toAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Create', toAPI(dbCluster));
   }
 
   updateDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiRequestManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Update', toAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Update', toAPI(dbCluster));
   }
 
   resumeDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiRequestManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Update', toResumeAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Update', toResumeAPI(dbCluster));
   }
 
   suspendDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiRequestManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Update', toSuspendAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, any>('/DBaaS/XtraDBCluster/Update', toSuspendAPI(dbCluster));
   }
 
   deleteDBClusters(dbCluster: DBCluster): Promise<void> {
@@ -49,18 +49,18 @@ export class XtraDBService extends DBClusterService {
       kubernetes_cluster_name: dbCluster.kubernetesClusterName,
     });
 
-    return apiRequestManagement.post<any, DBClusterActionAPI>('/DBaaS/XtraDBCluster/Delete', toAPI(dbCluster));
+    return apiManagement.post<any, DBClusterActionAPI>('/DBaaS/XtraDBCluster/Delete', toAPI(dbCluster));
   }
 
   getDBClusterCredentials(dbCluster: DBCluster): Promise<void | DBClusterConnectionAPI> {
-    return apiRequestManagement.post<DBClusterConnectionAPI, any>(
+    return apiManagement.post<DBClusterConnectionAPI, any>(
       '/DBaaS/XtraDBClusters/GetCredentials',
       omit(toAPI(dbCluster), ['params'])
     );
   }
 
   restartDBCluster(dbCluster: DBCluster): Promise<void> {
-    return apiRequestManagement.post<any, DBClusterActionAPI>(
+    return apiManagement.post<any, DBClusterActionAPI>(
       '/DBaaS/XtraDBCluster/Restart',
       omit(toAPI(dbCluster), ['params'])
     );

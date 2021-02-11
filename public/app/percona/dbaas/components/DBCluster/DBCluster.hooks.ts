@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import { logger } from '@percona/platform-core';
 import { FulfilledPromiseResult, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { Databases } from 'app/percona/shared/core';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 import { DBCluster, GetDBClustersAction, DBClusterPayload, OperatorDatabasesMap } from './DBCluster.types';
-import { DBClusterServiceFactory } from './DBClusterService.factory';
 import { Operators } from './AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { KubernetesOperatorStatus } from '../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
+import { newDBClusterService } from './DBCluster.utils';
 
 const RECHECK_INTERVAL = 10000;
 const DATABASES = [Databases.mysql, Databases.mongodb];
@@ -32,7 +33,7 @@ export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClus
 
       setDBClusters(clustersList);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       if (triggerLoading) {
         setLoading(false);
@@ -52,7 +53,7 @@ export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClus
 };
 
 const getClusters = async (kubernetes: Kubernetes[], databaseType: Databases): Promise<DBCluster[]> => {
-  const dbClusterService = DBClusterServiceFactory.newDBClusterService(databaseType);
+  const dbClusterService = newDBClusterService(databaseType);
   const kubernetesByOperator = kubernetes.filter(kubernetesCluster => {
     const operator = OPERATORS[databaseType];
 

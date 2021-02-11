@@ -7,7 +7,7 @@ import { OptionContent } from '../../OptionContent/OptionContent';
 import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
 import { KubernetesOptionProps } from './DBClusterBasicOptions.types';
 
-export const kubernetesClusterName = (value: string) => {
+export const kubernetesClusterNameValidator = (value: string) => {
   const clusterNameRegexp = /^[a-z]([-a-z0-9]*[a-z0-9])?$/;
 
   return clusterNameRegexp.test(value) ? undefined : Messages.dbcluster.addModal.validationMessages.clusterName;

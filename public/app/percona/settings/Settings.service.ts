@@ -1,6 +1,7 @@
 import { AppEvents } from '@grafana/data';
+import { logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/app_events';
-import { apiRequest } from 'app/percona/shared/helpers/api';
+import { api } from 'app/percona/shared/helpers/api';
 import { Messages } from './Settings.messages';
 import { Settings } from './Settings.types';
 
@@ -13,10 +14,10 @@ export const SettingsService = {
 
     try {
       setLoading(true);
-      response = await apiRequest.post<any, any>('/v1/Settings/Get', {});
+      response = await api.post<any, any>('/v1/Settings/Get', {});
       setSettings(toModel(response.settings));
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       setLoading(false);
     }
@@ -28,11 +29,11 @@ export const SettingsService = {
 
     try {
       setLoading(true);
-      response = await apiRequest.post<any, any>('/v1/Settings/Change', body);
+      response = await api.post<any, any>('/v1/Settings/Change', body);
       response = toModel(response.settings);
       appEvents.emit(AppEvents.alertSuccess, [Messages.service.success]);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       setLoading(false);
     }

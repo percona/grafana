@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, ClipboardButton, HorizontalGroup, useTheme } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
-import { Modal } from '@percona/platform-core';
+import { Modal, logger } from '@percona/platform-core';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { ViewKubernetesClusterModalProps } from './ViewClusterConfigModal.types';
 import { KubernetesService } from '../Kubernetes.service';
@@ -41,7 +41,7 @@ export const ViewClusterConfigModal: FC<ViewKubernetesClusterModalProps> = ({
 
         setKubeconfig(config.kube_auth.kubeconfig);
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       } finally {
         setLoading(false);
       }

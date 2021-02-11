@@ -8,7 +8,11 @@ import { DatabaseOption, DBClusterBasicOptionsProps } from './DBClusterBasicOpti
 import { DATABASE_OPTIONS } from '../../DBCluster.constants';
 import { AddDBClusterFields } from '../AddDBClusterModal.types';
 import { DBClusterTopology } from '../DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { getKubernetesOptions, kubernetesClusterName, databaseTypeRequired } from './DBClusterBasicOptions.utils';
+import {
+  getKubernetesOptions,
+  kubernetesClusterNameValidator,
+  databaseTypeRequired,
+} from './DBClusterBasicOptions.utils';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 
 export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernetes, form }) => {
@@ -57,7 +61,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
       <TextInputField
         name={AddDBClusterFields.name}
         label={Messages.dbcluster.addModal.fields.clusterName}
-        validators={[required, kubernetesClusterName]}
+        validators={[required, kubernetesClusterNameValidator]}
       />
       <Field
         dataQa="dbcluster-kubernetes-cluster-field"

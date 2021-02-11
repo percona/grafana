@@ -1,5 +1,5 @@
 import React, { FC, useMemo } from 'react';
-import { Modal } from '@percona/platform-core';
+import { Modal, logger } from '@percona/platform-core';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { Icon, useStyles } from '@grafana/ui';
 import { StepProgress } from 'app/percona/dbaas/components/StepProgress/StepProgress';
@@ -8,8 +8,7 @@ import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOpt
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { INITIAL_VALUES } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import { DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { DBClusterServiceFactory } from '../DBClusterService.factory';
-import { buildWarningMessage } from '../DBCluster.utils';
+import { buildWarningMessage, newDBClusterService } from '../DBCluster.utils';
 import { getStyles } from './AddDBClusterModal.styles';
 import { FormRenderProps } from 'react-final-form';
 
@@ -57,7 +56,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
     disk,
   }: Record<string, any>) => {
     try {
-      const dbClusterService = DBClusterServiceFactory.newDBClusterService(databaseType.value);
+      const dbClusterService = newDBClusterService(databaseType.value);
 
       await dbClusterService.addDBCluster({
         kubernetesClusterName: kubernetesCluster.value,
@@ -71,7 +70,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
       setVisible(false);
       onDBClusterAdded();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   };
 

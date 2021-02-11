@@ -1,9 +1,9 @@
 import React, { FC, useCallback } from 'react';
+import { logger } from '@percona/platform-core';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
 import { DBCluster, DBClusterStatus } from '../DBCluster.types';
-import { isClusterChanging } from '../DBCluster.utils';
-import { DBClusterServiceFactory } from '../DBClusterService.factory';
+import { isClusterChanging, newDBClusterService } from '../DBCluster.utils';
 import { DBClusterActionsProps } from './DBClusterActions.types';
 import { styles } from './DBClusterActions.styles';
 
@@ -37,12 +37,12 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
         disabled: isClusterChanging(dbCluster),
         action: async () => {
           try {
-            const dbClusterService = DBClusterServiceFactory.newDBClusterService(dbCluster.databaseType);
+            const dbClusterService = newDBClusterService(dbCluster.databaseType);
 
             await dbClusterService.restartDBCluster(dbCluster);
             getDBClusters();
           } catch (e) {
-            console.error(e);
+            logger.error(e);
           }
         },
       },
@@ -54,7 +54,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
         disabled: dbCluster.status !== DBClusterStatus.ready && dbCluster.status !== DBClusterStatus.suspended,
         action: async () => {
           try {
-            const dbClusterService = DBClusterServiceFactory.newDBClusterService(dbCluster.databaseType);
+            const dbClusterService = newDBClusterService(dbCluster.databaseType);
 
             if (dbCluster.status === DBClusterStatus.ready) {
               await dbClusterService.suspendDBCluster(dbCluster);
@@ -64,7 +64,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
 
             getDBClusters();
           } catch (e) {
-            console.error(e);
+            logger.error(e);
           }
         },
       },

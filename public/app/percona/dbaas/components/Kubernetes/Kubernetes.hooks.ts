@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AppEvents } from '@grafana/data';
+import { logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/app_events';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { KubernetesService } from './Kubernetes.service';
@@ -28,7 +29,7 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
 
       setKubernetes(toModelList(results));
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       setLoading(false);
     }
@@ -40,7 +41,7 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
       await KubernetesService.deleteKubernetes(kubernetesToDelete, force);
       appEvents.emit(AppEvents.alertSuccess, [deleteSuccess]);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       getKubernetes();
     }
@@ -53,7 +54,7 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
       await KubernetesService.addKubernetes(kubernetesToAdd);
       appEvents.emit(AppEvents.alertSuccess, [Messages.kubernetes.messages.clusterAdded]);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
       getKubernetes();
     }

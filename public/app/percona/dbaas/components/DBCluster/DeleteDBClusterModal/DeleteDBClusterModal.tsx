@@ -1,11 +1,11 @@
 import React, { FC, useCallback } from 'react';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
-import { Modal } from '@percona/platform-core';
+import { Modal, logger } from '@percona/platform-core';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { DeleteDBClusterModalProps } from './DeleteDBClusterModal.types';
 import { getStyles } from './DeleteDBClusterModal.styles';
-import { DBClusterServiceFactory } from '../DBClusterService.factory';
+import { newDBClusterService } from '../DBCluster.utils';
 
 export const DeleteDBClusterModal: FC<DeleteDBClusterModalProps> = ({
   isVisible,
@@ -23,13 +23,13 @@ export const DeleteDBClusterModal: FC<DeleteDBClusterModalProps> = ({
     }
 
     try {
-      const dbClusterService = DBClusterServiceFactory.newDBClusterService(selectedCluster?.databaseType);
+      const dbClusterService = newDBClusterService(selectedCluster?.databaseType);
 
       await dbClusterService.deleteDBClusters(selectedCluster);
       setVisible(false);
       onClusterDeleted();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   }, [selectedCluster]);
 

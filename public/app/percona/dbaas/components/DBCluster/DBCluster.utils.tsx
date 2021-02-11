@@ -1,7 +1,9 @@
 import React from 'react';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
+import { Databases } from 'app/percona/shared/core';
 import { DBCluster, DBClusterStatus, DBClusterStatusMap } from './DBCluster.types';
-import { ADVANCED_SETTINGS_URL } from './DBCluster.constants';
+import { ADVANCED_SETTINGS_URL, SERVICE_MAP } from './DBCluster.constants';
+import { DBClusterService } from './DBCluster.service';
 
 export const isClusterChanging = ({ status }: DBCluster) => {
   const isChanging = status === DBClusterStatus.changing || status === DBClusterStatus.deleting;
@@ -26,3 +28,9 @@ export const buildWarningMessage = (className: string) => (
     {Messages.dbcluster.publicAddressWarningEnd}
   </>
 );
+
+export const newDBClusterService = (type: Databases): DBClusterService => {
+  const service = SERVICE_MAP[type];
+
+  return service || SERVICE_MAP[Databases.mysql];
+};
