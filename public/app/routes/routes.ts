@@ -518,6 +518,19 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
     })
     .when('/integrated-alerting', {
       template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () =>
+          SafeDynamicImport(
+            import(
+              /* webpackChunkName: "IntegratedAlertingPage" */ 'app/features/integrated-alerting/IntegratedAlertingPage'
+            )
+          ),
+      },
+    })
+    .when('/integrated-alerting/:tab', {
+      template: '<react-container />',
+      reloadOnSearch: false,
       resolve: {
         component: () =>
           SafeDynamicImport(
