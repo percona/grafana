@@ -24,7 +24,7 @@ export const DeleteNotificationChannelModal: FC<DeleteNotificationChannelModalPr
       await NotificationChannelService.remove(notificationChannel);
       setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [getDeleteSuccess(summary)]);
-      getNotificationChannels(null, null);
+      getNotificationChannels();
     } catch (e) {
       logger.error(e);
     } finally {

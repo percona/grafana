@@ -92,7 +92,6 @@ export const NotificationChannel: FC = () => {
         emptyMessage={emptyTable}
         onPaginationChanged={onPaginationChanged}
         totalItems={data.length}
-        showPagination
         pageSize={pageSize}
         pageIndex={pageIndex}
       />
