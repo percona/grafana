@@ -7,7 +7,7 @@ import {
 } from './StorageLocations.types';
 
 export const isS3Location = (location: StorageLocation | StorageLocationReponse): location is S3Location =>
-  'accessKey' in location || 'access_key' in location;
+  's3_config' in location || 'accessKey' in location;
 
 export const formatLocationList = (rawList: StorageLocationListReponse): StorageLocation[] => {
   const { locations } = rawList;

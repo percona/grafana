@@ -3,7 +3,7 @@ export const Messages = {
   columns: {
     name: 'Name',
     type: 'Type',
-    endpoint: 'Endpoint or path',
+    path: 'Endpoint or path',
     labels: 'Labels',
   },
 };
