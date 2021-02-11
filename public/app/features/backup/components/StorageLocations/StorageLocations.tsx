@@ -1,8 +1,9 @@
 import React, { FC, useState, useEffect } from 'react';
-import { Column } from 'react-table';
+import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { IconButton, useStyles } from '@grafana/ui';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
+import { DescriptionBlock } from '../DescriptionBlock';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
 import { StorageLocationsService } from './StorageLocations.service';
@@ -21,22 +22,14 @@ export const StorageLocations: FC = () => {
       {
         Header: name,
         accessor: 'name',
-        id: 'location-expander',
+        id: 'name',
         Cell: ({ row, value }) => (
-          <div className={styles.nameWrapper}>
+          <div className={styles.nameWrapper} {...row.getToggleRowExpandedProps()}>
             {value}
             {row.isExpanded ? (
-              <IconButton
-                {...row.getToggleRowExpandedProps()}
-                data-qa="hide-storage-location-details"
-                name="arrow-up"
-              />
+              <IconButton data-qa="hide-storage-location-details" name="arrow-up" />
             ) : (
-              <IconButton
-                {...row.getToggleRowExpandedProps()}
-                data-qa="show-storage-location-details"
-                name="arrow-down"
-              />
+              <IconButton data-qa="show-storage-location-details" name="arrow-down" />
             )}
           </div>
         ),
@@ -65,9 +58,22 @@ export const StorageLocations: FC = () => {
     }
   };
 
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row) => <DescriptionBlock description={(row.original as any).description} />,
+    []
+  );
+
   useEffect(() => {
     getData();
   }, []);
 
-  return <Table data={data} columns={columns} emptyMessage={noData} pendingRequest={pending}></Table>;
+  return (
+    <Table
+      data={data}
+      columns={columns}
+      emptyMessage={noData}
+      pendingRequest={pending}
+      renderExpandedRow={renderSelectedSubRow}
+    ></Table>
+  );
 };

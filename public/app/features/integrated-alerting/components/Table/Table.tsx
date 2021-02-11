@@ -1,10 +1,9 @@
 import React, { FC } from 'react';
-import { useExpanded, useTable } from 'react-table';
+import { Row, useExpanded, useTable } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';
-import { TableRow } from '@grafana/ui/src/components/Table/types';
 
 export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage, children, renderExpandedRow }) => {
   const style = useStyles(getStyles);
@@ -75,5 +74,5 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
 };
 
 Table.defaultProps = {
-  renderExpandedRow: (row: TableRow) => <span></span>,
+  renderExpandedRow: (row: Row) => <span></span>,
 };
