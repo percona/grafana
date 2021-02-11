@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import { Form, FormRenderProps } from 'react-final-form';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions';
 import { AddDBClusterFields } from '../AddDBClusterModal.types';
-import { kubernetesClusterName } from './DBClusterBasicOptions.utils';
+import { kubernetesClusterNameValidator } from './DBClusterBasicOptions.utils';
 import { Messages } from '../../../../DBaaS.messages';
 import { kubernetesStub } from '../../../Kubernetes/__mocks__/kubernetesStubs';
 
@@ -40,8 +40,12 @@ describe('DBClusterBasicOptions::', () => {
     const clusterName2 = '1bcd';
     const clusterName3 = 'abcd';
 
-    expect(kubernetesClusterName(clusterName1)).toEqual(Messages.dbcluster.addModal.validationMessages.clusterName);
-    expect(kubernetesClusterName(clusterName2)).toEqual(Messages.dbcluster.addModal.validationMessages.clusterName);
-    expect(kubernetesClusterName(clusterName3)).toEqual(undefined);
+    expect(kubernetesClusterNameValidator(clusterName1)).toEqual(
+      Messages.dbcluster.addModal.validationMessages.clusterName
+    );
+    expect(kubernetesClusterNameValidator(clusterName2)).toEqual(
+      Messages.dbcluster.addModal.validationMessages.clusterName
+    );
+    expect(kubernetesClusterNameValidator(clusterName3)).toEqual(undefined);
   });
 });
