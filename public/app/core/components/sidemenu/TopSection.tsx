@@ -5,6 +5,7 @@ import config from '../../config';
 import { getLocationSrv, getBackendSrv } from '@grafana/runtime';
 import { NavModelItem } from '@grafana/data';
 import { buildIntegratedAlertingMenuItem } from './TopSection.utils';
+import { TabKeys as DBaasTabs } from 'app/percona/dbaas/DBaaS.types';
 
 const TopSection: FC<any> = () => {
   const [showDBaaS, setShowDBaaS] = useState(false);
@@ -18,7 +19,7 @@ const TopSection: FC<any> = () => {
     id: 'dbaas',
     icon: 'database',
     text: 'DBaaS',
-    url: `${config.appSubUrl}/dbaas`,
+    url: `${config.appSubUrl}/dbaas/${DBaasTabs.kubernetes}`,
   };
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });

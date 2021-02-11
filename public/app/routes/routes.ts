@@ -547,6 +547,13 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
           SafeDynamicImport(import(/* webpackChunkName: "IntegratedAlertingPage" */ 'app/percona/dbaas/DBaaS')),
       },
     })
+    .when('/dbaas/:tab', {
+      template: '<react-container />',
+      resolve: {
+        component: () =>
+          SafeDynamicImport(import(/* webpackChunkName: "IntegratedAlertingPage" */ 'app/percona/dbaas/DBaaS')),
+      },
+    })
     .when('/alerting/notification/new', {
       templateUrl: 'public/app/features/alerting/partials/notification_edit.html',
       controller: 'AlertNotificationEditCtrl',
