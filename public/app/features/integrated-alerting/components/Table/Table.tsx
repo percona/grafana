@@ -1,14 +1,15 @@
 import React, { FC } from 'react';
-import { useTable } from 'react-table';
+import { useExpanded, useTable } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';
+import { TableRow } from '@grafana/ui/src/components/Table/types';
 
-export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage, children }) => {
+export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage, children, renderExpandedRow }) => {
   const style = useStyles(getStyles);
-  const tableInstance = useTable({ columns, data });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+  const tableInstance = useTable({ columns, data }, useExpanded);
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, visibleColumns } = tableInstance;
 
   return (
     <div className={style.tableWrap} data-qa="table-outer-wrapper">
@@ -47,15 +48,22 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
                 : rows.map(row => {
                     prepareRow(row);
                     return (
-                      <tr key={row.id} {...row.getRowProps()}>
-                        {row.cells.map(cell => {
-                          return (
-                            <td key={cell.column.id} {...cell.getCellProps()}>
-                              {cell.render('Cell')}
-                            </td>
-                          );
-                        })}
-                      </tr>
+                      <React.Fragment key={row.id}>
+                        <tr {...row.getRowProps()}>
+                          {row.cells.map(cell => {
+                            return (
+                              <td key={cell.column.id} {...cell.getCellProps()}>
+                                {cell.render('Cell')}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                        {row.isExpanded ? (
+                          <tr>
+                            <td colSpan={visibleColumns.length}>{renderExpandedRow(row)}</td>
+                          </tr>
+                        ) : null}
+                      </React.Fragment>
                     );
                   })}
             </tbody>
@@ -64,4 +72,8 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
       </div>
     </div>
   );
+};
+
+Table.defaultProps = {
+  renderExpandedRow: (row: TableRow) => <span></span>,
 };
