@@ -6,4 +6,5 @@ export interface TableProps {
   pendingRequest?: boolean;
   emptyMessage?: string;
   children?: (rows: Row[], table: TableInstance) => React.ReactNode;
+  renderExpandedRow?: (row: Row) => JSX.Element;
 }
