@@ -2,8 +2,13 @@ import { css } from 'emotion';
 
 export const getStyles = () => ({
   input: css`
+    padding: 0;
     &[disabled] {
       background-color: transparent;
     }
+  `,
+  lock: css`
+    cursor: pointer;
+    margin-left: 5px;
   `,
 });
