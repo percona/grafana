@@ -1,11 +1,12 @@
 import React, { FC } from 'react';
 import { useTable, usePagination, TableState } from 'react-table';
 import { css } from 'emotion';
-import { Spinner, useStyles } from '@grafana/ui';
+import { useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps, PaginatedTableInstance, PaginatedTableOptions } from './Table.types';
 import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
+import { TableContent } from './TableContent';
 
 export const Table: FC<TableProps> = ({
   pendingRequest,
@@ -46,8 +47,9 @@ export const Table: FC<TableProps> = ({
     pageCount,
     setPageSize,
     gotoPage,
-    state: { pageSize },
+    state: { pageSize, pageIndex },
   } = tableInstance;
+  const hasData = !!(pageCount && !pendingRequest);
 
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
@@ -55,6 +57,7 @@ export const Table: FC<TableProps> = ({
   };
 
   const onPageSizeChanged = (newPageSize: number) => {
+    gotoPage(0);
     setPageSize(newPageSize);
     onPaginationChanged(newPageSize, 0);
   };
@@ -63,17 +66,7 @@ export const Table: FC<TableProps> = ({
     <>
       <div className={style.tableWrap} data-qa="table-outer-wrapper">
         <div className={style.table} data-qa="table-inner-wrapper">
-          {pendingRequest ? (
-            <div data-qa="table-loading" className={style.empty}>
-              <Spinner />
-            </div>
-          ) : null}
-          {!pageCount && !pendingRequest ? (
-            <div data-qa="table-no-data" className={style.empty}>
-              {<h1>{emptyMessage}</h1>}
-            </div>
-          ) : null}
-          {pageCount && !pendingRequest ? (
+          <TableContent hasData={hasData} emptyMessage={emptyMessage} pending={pendingRequest}>
             <table {...getTableProps()} data-qa="table">
               <thead data-qa="table-thead">
                 {headerGroups.map(headerGroup => (
@@ -105,13 +98,13 @@ export const Table: FC<TableProps> = ({
                 })}
               </tbody>
             </table>
-          ) : null}
+          </TableContent>
         </div>
       </div>
-      {showPagination && (
+      {showPagination && hasData && (
         <Pagination
           pageCount={pageCount}
-          initialPageIndex={0}
+          initialPageIndex={pageIndex}
           totalItems={totalItems}
           pageSizeOptions={PAGE_SIZES}
           pageSize={pageSize}

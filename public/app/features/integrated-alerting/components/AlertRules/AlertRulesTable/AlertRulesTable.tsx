@@ -1,6 +1,6 @@
 import React, { FC, useContext } from 'react';
 import { TableState, useTable, usePagination } from 'react-table';
-import { Spinner, useStyles } from '@grafana/ui';
+import { useStyles } from '@grafana/ui';
 import { css } from 'emotion';
 import { getStyles } from './AlertRulesTable.styles';
 import { AlertRule } from '../AlertRules.types';
@@ -9,6 +9,7 @@ import { AlertRulesProvider } from '../AlertRules.provider';
 import { Pagination } from '../../Table/Pagination';
 import { PaginatedTableInstance, PaginatedTableOptions } from '../../Table';
 import { PAGE_SIZES } from '../../Table/Pagination/Pagination.constants';
+import { TableContent } from '../../Table/TableContent';
 
 export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   pendingRequest,
@@ -49,8 +50,9 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
     pageCount,
     setPageSize,
     gotoPage,
-    state: { pageSize },
+    state: { pageSize, pageIndex },
   } = tableInstance;
+  const hasData = !!(pageCount && !pendingRequest);
 
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
@@ -58,6 +60,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
   };
 
   const onPageSizeChanged = (newPageSize: number) => {
+    gotoPage(0);
     setPageSize(newPageSize);
     onPaginationChanged(newPageSize, 0);
   };
@@ -66,17 +69,7 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
     <>
       <div className={style.tableWrap} data-qa="alert-rules-table-outer-wrapper">
         <div className={style.table} data-qa="alert-rules-inner-wrapper">
-          {pendingRequest ? (
-            <div data-qa="alert-rules-table-loading" className={style.empty}>
-              <Spinner />
-            </div>
-          ) : null}
-          {!pageCount && !pendingRequest ? (
-            <div data-qa="alert-rules-table-no-data" className={style.empty}>
-              {<h1>{emptyMessage}</h1>}
-            </div>
-          ) : null}
-          {pageCount && !pendingRequest ? (
+          <TableContent hasData={hasData} emptyMessage={emptyMessage} pending={pendingRequest}>
             <table {...getTableProps()} data-qa="alert-rules-table">
               <thead data-qa="alert-rules-table-thead">
                 {headerGroups.map(headerGroup => (
@@ -121,13 +114,13 @@ export const AlertRulesTable: FC<AlertRulesTableProps> = ({
                 })}
               </tbody>
             </table>
-          ) : null}
+          </TableContent>
         </div>
       </div>
-      {showPagination && (
+      {showPagination && hasData && (
         <Pagination
           pageCount={pageCount}
-          initialPageIndex={0}
+          initialPageIndex={pageIndex}
           totalItems={totalItems}
           pageSizeOptions={PAGE_SIZES}
           pageSize={pageSize}
