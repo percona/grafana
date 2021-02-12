@@ -14,7 +14,7 @@ export const formatLocationList = (rawList: StorageLocationListReponse): Storage
   const parsedLocations: StorageLocation[] = [];
 
   locations.forEach(location => {
-    const { name, description } = location;
+    const { name, description, pmm_server_config, pmm_client_config } = location;
     const newLocation: Partial<StorageLocation> = { name, description };
 
     if (isS3Location(location)) {
@@ -24,8 +24,9 @@ export const formatLocationList = (rawList: StorageLocationListReponse): Storage
       (newLocation as S3Location).accessKey = access_key;
       (newLocation as S3Location).secretKey = secret_key;
     } else {
-      const { path } = location.fs_config;
-      newLocation.type = LocationType.localClient;
+      const isServer = pmm_server_config;
+      const { path } = isServer ? pmm_server_config : pmm_client_config;
+      newLocation.type = isServer ? LocationType.localServer : LocationType.localClient;
       newLocation.path = path;
     }
 
