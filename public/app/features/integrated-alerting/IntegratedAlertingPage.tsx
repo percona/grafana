@@ -1,9 +1,11 @@
 import React, { FC, useState, useEffect } from 'react';
 import { useStyles } from '@grafana/ui';
+import { logger } from '@percona/platform-core';
+import { Breadcrumb } from 'app/core/components/Breadcrumb';
+import { IntegratedAlertingContent } from './components/IntegratedAlertingContent';
 import { getStyles } from './IntegratedAlerting.styles';
 import { IntegratedAlertingService } from './IntegratedAlerting.service';
-import { logger } from '@percona/platform-core';
-import { IntegratedAlertingContent } from './components/IntegratedAlertingContent';
+import { PAGE_MODEL } from './IntegratedAlerting.constants';
 
 const IntegratedAlertingPage: FC = () => {
   const styles = useStyles(getStyles);
@@ -31,6 +33,7 @@ const IntegratedAlertingPage: FC = () => {
 
   return (
     <div className={styles.integratedAlertingWrapper}>
+      <Breadcrumb pageModel={PAGE_MODEL} />
       <IntegratedAlertingContent loadingSettings={loadingSettings} alertingEnabled={alertingEnabled} />
     </div>
   );
