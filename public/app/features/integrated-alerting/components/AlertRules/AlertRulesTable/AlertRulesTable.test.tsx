@@ -49,43 +49,6 @@ describe('AlertRulesTable', () => {
     expect(wrapper.find(dataQa('alert-rules-details'))).toHaveLength(0);
   });
 
-  it('should render the loader when data fetch is pending', async () => {
-    const wrapper = mount(
-      <AlertRulesTable
-        totalItems={data.length}
-        onPaginationChanged={onPaginationChanged}
-        data={data}
-        columns={columns}
-        pendingRequest
-        pageSize={10}
-        pageIndex={0}
-      />
-    );
-
-    expect(wrapper.find(dataQa('alert-rules-table-loading'))).toHaveLength(1);
-    expect(wrapper.find(dataQa('alert-rules-table'))).toHaveLength(0);
-    expect(wrapper.find(dataQa('alert-rules-table-no-data'))).toHaveLength(0);
-  });
-
-  it('should display the noData section when no data is passed', async () => {
-    const wrapper = mount(
-      <AlertRulesTable
-        totalItems={data.length}
-        onPaginationChanged={onPaginationChanged}
-        data={[]}
-        columns={columns}
-        emptyMessage="empty"
-        pageSize={10}
-        pageIndex={0}
-      />
-    );
-    const noData = wrapper.find(dataQa('alert-rules-table-no-data'));
-
-    expect(wrapper.find(dataQa('alert-rules-table-loading'))).toHaveLength(0);
-    expect(wrapper.find(dataQa('alert-rules-table'))).toHaveLength(0);
-    expect(noData).toHaveLength(1);
-    expect(noData.text()).toEqual('empty');
-  });
   it('should render rule details when rule is selected', async () => {
     const alertRulesContext = {
       getAlertRules: jest.fn(),
