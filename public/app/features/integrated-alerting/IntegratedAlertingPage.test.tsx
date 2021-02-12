@@ -1,6 +1,6 @@
 import React from 'react';
-import { shallow, ShallowWrapper } from 'enzyme';
 import { act } from 'react-dom/test-utils';
+import { shallow, ShallowWrapper } from 'enzyme';
 import IntegratedAlertingPage from './IntegratedAlertingPage';
 import { IntegratedAlertingContent } from './components/IntegratedAlertingContent';
 
