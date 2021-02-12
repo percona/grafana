@@ -11,7 +11,7 @@ export const StorageLocationDetails: FC<StorageLocationDetailsProps> = ({ locati
   const styles = useStyles(getStyles);
 
   return (
-    <div className={styles.wrapper}>
+    <div data-qa="storage-location-wrapper" className={styles.wrapper}>
       <DescriptionBlock description={description} />
       {isS3Location(location) ? <KeysBlock accessKey={location.accessKey} secretKey={location.secretKey} /> : null}
     </div>
