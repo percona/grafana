@@ -3,13 +3,12 @@ import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { IconButton, useStyles } from '@grafana/ui';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
-import { DescriptionBlock } from '../DescriptionBlock';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
 import { StorageLocationsService } from './StorageLocations.service';
 import { formatLocationList } from './StorageLocations.utils';
 import { getStyles } from './StorageLocations.styles';
-import { KeysBlock } from '../KeysBlock/KeysBlock';
+import { StorageLocationDetails } from './StorageLocationDetails';
 
 const { noData, columns } = Messages;
 const { name, type, path } = columns;
@@ -60,12 +59,7 @@ export const StorageLocations: FC = () => {
   };
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row) => (
-      <div>
-        <DescriptionBlock description={(row.original as any).description} />
-        <KeysBlock accessKey={(row.original as any).accessKey} secretKey={(row.original as any).secretKey} />
-      </div>
-    ),
+    (row: Row) => <StorageLocationDetails location={row.original as StorageLocation} />,
     []
   );
 
