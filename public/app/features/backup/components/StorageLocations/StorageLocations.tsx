@@ -9,6 +9,7 @@ import { StorageLocation } from './StorageLocations.types';
 import { StorageLocationsService } from './StorageLocations.service';
 import { formatLocationList } from './StorageLocations.utils';
 import { getStyles } from './StorageLocations.styles';
+import { KeysBlock } from '../KeysBlock/KeysBlock';
 
 const { noData, columns } = Messages;
 const { name, type, path } = columns;
@@ -59,7 +60,12 @@ export const StorageLocations: FC = () => {
   };
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row) => <DescriptionBlock description={(row.original as any).description} />,
+    (row: Row) => (
+      <div>
+        <DescriptionBlock description={(row.original as any).description} />
+        <KeysBlock accessKey={(row.original as any).accessKey} secretKey={(row.original as any).secretKey} />
+      </div>
+    ),
     []
   );
 
