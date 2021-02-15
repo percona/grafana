@@ -5,4 +5,7 @@ export const getStyles = () => ({
     display: inline-block;
     width: 100px;
   `,
+  secretTogglerWrapper: css`
+    display: inline-block;
+  `,
 });

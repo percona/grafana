@@ -1,4 +1,8 @@
+import { TextInputFieldProps } from '@percona/platform-core';
+
 export interface SecretTogglerProps {
-  secret: string;
+  secret?: string;
   readOnly?: boolean;
+  minified?: boolean;
+  fieldProps?: TextInputFieldProps;
 }

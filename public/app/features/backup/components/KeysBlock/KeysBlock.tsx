@@ -4,6 +4,7 @@ import { SecretToggler } from '../SecretToggler';
 import { KeysBlockProps } from './KeysBlock.types';
 import { getStyles } from './KeysBlock.styles';
 import { Messages } from './KeysBlock.messages';
+import { Form } from 'react-final-form';
 
 export const KeysBlock: FC<KeysBlockProps> = ({ accessKey, secretKey }) => {
   const styles = useStyles(getStyles);
@@ -16,7 +17,14 @@ export const KeysBlock: FC<KeysBlockProps> = ({ accessKey, secretKey }) => {
       </div>
       <div data-qa="secret-key">
         <span className={styles.keyLabel}>{Messages.secretKey}</span>
-        <SecretToggler secret={secretKey} />
+        <Form
+          onSubmit={() => null}
+          render={() => (
+            <span className={styles.secretTogglerWrapper}>
+              <SecretToggler minified secret={secretKey} />
+            </span>
+          )}
+        ></Form>
       </div>
     </div>
   );
