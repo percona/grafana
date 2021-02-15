@@ -4,8 +4,13 @@ import { SelectableValue } from '@grafana/data';
 import { withTypes } from 'react-final-form';
 import { TextInputField, TextareaInputField, RadioButtonGroupField, validators } from '@percona/platform-core';
 import { Messages } from './AddStorageLocationModal.messages';
-import { AddStorageLocationFormProps, FormStorageType } from './AddStorageLocationModal.types';
-import { S3Fields } from './S3Fields/S3Fields';
+import {
+  AddStorageLocationFormProps,
+  AddStorageLocationModalProps,
+  FormStorageType,
+} from './AddStorageLocationModal.types';
+import { S3Fields } from './S3Fields';
+import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
 
 const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
   const { type } = values;
@@ -35,10 +40,13 @@ const typeOptions: SelectableValue<FormStorageType>[] = [
 
 const { Form } = withTypes<AddStorageLocationFormProps>();
 
-export const AddStorageLocationModal: FC = () => {
+export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVisible, location }) => {
+  const initialValues = toFormStorageLocation(location);
+
   return (
     <Modal title={Messages.title}>
       <Form
+        initialValues={initialValues}
         onSubmit={() => null}
         render={({ handleSubmit, valid, values }) => (
           <form onSubmit={handleSubmit}>
