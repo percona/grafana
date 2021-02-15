@@ -1,24 +1,39 @@
 import React, { FC } from 'react';
 import { Modal } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import { Form } from 'react-final-form';
+import { withTypes } from 'react-final-form';
 import { TextInputField, TextareaInputField, RadioButtonGroupField, validators } from '@percona/platform-core';
 import { Messages } from './AddStorageLocationModal.messages';
+import { AddStorageLocationFormProps, FormStorageType } from './AddStorageLocationModal.types';
+import { S3Fields } from './S3Fields/S3Fields';
 
-const typeOptions: SelectableValue[] = [
+const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
+  const { type } = values;
+
+  switch (type) {
+    case FormStorageType.S3:
+      return <S3Fields values={values} />;
+    default:
+      return null;
+  }
+};
+
+const typeOptions: SelectableValue<FormStorageType>[] = [
   {
-    value: 'S3',
+    value: FormStorageType.S3,
     label: 'S3',
   },
   {
-    value: 'client',
+    value: FormStorageType.CLIENT,
     label: 'Local Client',
   },
   {
-    value: 'server',
+    value: FormStorageType.SERVER,
     label: 'Local Server',
   },
 ];
+
+const { Form } = withTypes<AddStorageLocationFormProps>();
 
 export const AddStorageLocationModal: FC = () => {
   return (
@@ -30,6 +45,7 @@ export const AddStorageLocationModal: FC = () => {
             <TextInputField name="name" label={Messages.name} validators={[validators.required]} />
             <TextareaInputField name="description" validators={[validators.required]} />
             <RadioButtonGroupField options={typeOptions} name="type" fullWidth />
+            <TypeField values={values} />
           </form>
         )}
       />
