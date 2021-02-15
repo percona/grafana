@@ -10,7 +10,7 @@ export const isS3Location = (location: StorageLocation | StorageLocationReponse)
   's3_config' in location || 'accessKey' in location;
 
 export const formatLocationList = (rawList: StorageLocationListReponse): StorageLocation[] => {
-  const { locations } = rawList;
+  const { locations = [] } = rawList;
   const parsedLocations: StorageLocation[] = [];
 
   locations.forEach(location => {
