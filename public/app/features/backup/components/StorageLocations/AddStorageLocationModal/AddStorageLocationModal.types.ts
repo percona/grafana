@@ -4,6 +4,7 @@ export interface AddStorageLocationModalProps {
   isVisible: boolean;
   location: StorageLocation;
   onClose: () => void;
+  onAdd: (location: StorageLocation) => void;
 }
 
 export enum FormStorageType {

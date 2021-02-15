@@ -66,6 +66,10 @@ export const StorageLocations: FC = () => {
     []
   );
 
+  const onAdd = (location: StorageLocation) => {
+    console.log(location);
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -97,6 +101,7 @@ export const StorageLocations: FC = () => {
         location={selectedLocation}
         isVisible={addModalVisible}
         onClose={() => setAddModalVisible(false)}
+        onAdd={onAdd}
       />
     </>
   );
