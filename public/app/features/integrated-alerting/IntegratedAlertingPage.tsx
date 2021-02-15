@@ -75,7 +75,7 @@ const IntegratedAlertingPage: FC = () => {
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => selectTab(tab.id)} />
         ))}
       </TabsBar>
-      <TabContent>{tabs.find(tab => tab.key === activeTab)?.component || null}</TabContent>
+      <TabContent>{tabs.find(tab => tab.id === activeTab)?.component || null}</TabContent>
     </div>
   );
 };
