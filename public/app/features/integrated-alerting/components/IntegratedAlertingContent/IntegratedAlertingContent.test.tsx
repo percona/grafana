@@ -5,16 +5,21 @@ import { dataQa } from '@percona/platform-core';
 import { IntegratedAlertingContent } from './IntegratedAlertingContent';
 import { Spinner } from '@grafana/ui';
 import { EmptyBlock } from '../EmptyBlock';
-import { IntegratedAlertingTabs } from './IntegratedAlertingTabs';
 
 describe('IntegratedAlertingContent', () => {
   describe('IA disabled', () => {
     it('should display empty block', async () => {
+      const Dummy = () => <span></span>;
       let wrapper: ShallowWrapper;
 
       await act(async () => {
-        wrapper = await shallow(<IntegratedAlertingContent alertingEnabled={false} loadingSettings={false} />);
+        wrapper = await shallow(
+          <IntegratedAlertingContent alertingEnabled={false} loadingSettings={false}>
+            <Dummy />
+          </IntegratedAlertingContent>
+        );
       });
+      expect(wrapper.find(Dummy).exists()).toBeFalsy();
       expect(wrapper.find(EmptyBlock).exists()).toBeTruthy();
     });
 
@@ -38,13 +43,20 @@ describe('IntegratedAlertingContent', () => {
   });
 
   describe('IA enabled', () => {
-    it('should display IntegratedAlertingTabs', async () => {
+    it('should render children', async () => {
+      const Dummy = () => <span></span>;
+
       let wrapper: ShallowWrapper;
 
       await act(async () => {
-        wrapper = await shallow(<IntegratedAlertingContent alertingEnabled={true} loadingSettings={false} />);
+        wrapper = await shallow(
+          <IntegratedAlertingContent alertingEnabled={true} loadingSettings={false}>
+            <Dummy />
+          </IntegratedAlertingContent>
+        );
       });
-      expect(wrapper.find(IntegratedAlertingTabs).exists()).toBeTruthy();
+
+      expect(wrapper.find(Dummy).exists()).toBeTruthy();
     });
   });
 });
