@@ -6,4 +6,5 @@ export const Messages = {
     path: 'Endpoint or path',
     labels: 'Labels',
   },
+  add: 'Add',
 };

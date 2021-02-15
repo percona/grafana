@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
-import { Modal } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { withTypes } from 'react-final-form';
-import { TextInputField, TextareaInputField, RadioButtonGroupField, validators } from '@percona/platform-core';
+import { Modal, TextInputField, TextareaInputField, RadioButtonGroupField, validators } from '@percona/platform-core';
 import { Messages } from './AddStorageLocationModal.messages';
 import {
   AddStorageLocationFormProps,
@@ -23,7 +22,7 @@ const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
   }
 };
 
-const typeOptions: SelectableValue<FormStorageType>[] = [
+const typeOptions: Array<SelectableValue<FormStorageType>> = [
   {
     value: FormStorageType.S3,
     label: 'S3',
@@ -40,13 +39,13 @@ const typeOptions: SelectableValue<FormStorageType>[] = [
 
 const { Form } = withTypes<AddStorageLocationFormProps>();
 
-export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVisible, location }) => {
+export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVisible, location, onClose }) => {
   const initialValues = toFormStorageLocation(location);
 
   const onSubmit = (values: AddStorageLocationFormProps) => {};
 
   return (
-    <Modal title={Messages.title}>
+    <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
       <Form
         initialValues={initialValues}
         onSubmit={onSubmit}
@@ -61,4 +60,8 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVi
       />
     </Modal>
   );
+};
+
+AddStorageLocationModal.defaultProps = {
+  onClose: () => null,
 };

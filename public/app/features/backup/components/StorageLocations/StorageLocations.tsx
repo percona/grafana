@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
-import { IconButton, useStyles } from '@grafana/ui';
+import { Button, IconButton, useStyles } from '@grafana/ui';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
@@ -72,6 +72,20 @@ export const StorageLocations: FC = () => {
 
   return (
     <>
+      <div className={styles.addWrapper}>
+        <Button
+          size="md"
+          icon="plus-square"
+          variant="link"
+          data-qa="storage-location-add-modal-button"
+          onClick={() => {
+            setSelectedLocation(null);
+            setAddModalVisible(true);
+          }}
+        >
+          {Messages.add}
+        </Button>
+      </div>
       <Table
         data={data}
         columns={columns}
@@ -79,7 +93,11 @@ export const StorageLocations: FC = () => {
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
-      <AddStorageLocationModal location={selectedLocation} isVisible={addModalVisible} />
+      <AddStorageLocationModal
+        location={selectedLocation}
+        isVisible={addModalVisible}
+        onClose={() => setAddModalVisible(false)}
+      />
     </>
   );
 };
