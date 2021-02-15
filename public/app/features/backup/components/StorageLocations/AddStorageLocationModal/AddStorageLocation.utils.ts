@@ -23,6 +23,17 @@ export const toStorageLocation = (values: AddStorageLocationFormProps): StorageL
 };
 
 export const toFormStorageLocation = (values: StorageLocation | S3Location): AddStorageLocationFormProps => {
+  if (!values) {
+    return {
+      name: '',
+      description: '',
+      type: FormStorageType.S3,
+      path: '',
+      accessKey: '',
+      secretKey: '',
+    };
+  }
+
   const { name, description, type, path } = values;
   const result: Partial<AddStorageLocationFormProps> = { name, description, path };
 

@@ -9,6 +9,7 @@ import { StorageLocationsService } from './StorageLocations.service';
 import { formatLocationList } from './StorageLocations.utils';
 import { getStyles } from './StorageLocations.styles';
 import { StorageLocationDetails } from './StorageLocationDetails';
+import { AddStorageLocationModal } from './AddStorageLocationModal';
 
 const { noData, columns } = Messages;
 const { name, type, path } = columns;
@@ -16,6 +17,8 @@ const { name, type, path } = columns;
 export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<StorageLocation[]>([]);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<StorageLocation>();
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
     (): Column[] => [
@@ -68,12 +71,15 @@ export const StorageLocations: FC = () => {
   }, []);
 
   return (
-    <Table
-      data={data}
-      columns={columns}
-      emptyMessage={noData}
-      pendingRequest={pending}
-      renderExpandedRow={renderSelectedSubRow}
-    ></Table>
+    <>
+      <Table
+        data={data}
+        columns={columns}
+        emptyMessage={noData}
+        pendingRequest={pending}
+        renderExpandedRow={renderSelectedSubRow}
+      ></Table>
+      <AddStorageLocationModal location={selectedLocation} isVisible={addModalVisible} />
+    </>
   );
 };

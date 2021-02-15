@@ -10,7 +10,7 @@ import {
   FormStorageType,
 } from './AddStorageLocationModal.types';
 import { S3Fields } from './S3Fields';
-import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
+import { toFormStorageLocation } from './AddStorageLocation.utils';
 
 const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
   const { type } = values;
@@ -43,11 +43,13 @@ const { Form } = withTypes<AddStorageLocationFormProps>();
 export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVisible, location }) => {
   const initialValues = toFormStorageLocation(location);
 
+  const onSubmit = (values: AddStorageLocationFormProps) => {};
+
   return (
     <Modal title={Messages.title}>
       <Form
         initialValues={initialValues}
-        onSubmit={() => null}
+        onSubmit={onSubmit}
         render={({ handleSubmit, valid, values }) => (
           <form onSubmit={handleSubmit}>
             <TextInputField name="name" label={Messages.name} validators={[validators.required]} />
