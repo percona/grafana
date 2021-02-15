@@ -3,7 +3,7 @@ import { css } from 'emotion';
 export const getStyles = () => ({
   input: css`
     padding: 0;
-    &[disabled] {
+    &[readonly] {
       background-color: transparent;
     }
   `,

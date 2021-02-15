@@ -3,7 +3,7 @@ import React, { FC, useState, useMemo } from 'react';
 import { SecretTogglerProps } from './SecretToggler.types';
 import { getStyles } from './SecretToggler.styles';
 
-export const SecretToggler: FC<SecretTogglerProps> = ({ secret }) => {
+export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly }) => {
   const [visible, setVisible] = useState(false);
   const styles = useStyles(getStyles);
 
@@ -16,8 +16,13 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret }) => {
 
   return (
     <span>
-      <input className={styles.input} type={visible ? 'text' : 'password'} disabled value={secret}></input>
+      {/* @percona/platorm-core does not yet allow fields out of forms        */}
+      <input className={styles.input} type={visible ? 'text' : 'password'} readOnly={readOnly} value={secret}></input>
       {iconButton}
     </span>
   );
+};
+
+SecretToggler.defaultProps = {
+  readOnly: true,
 };
