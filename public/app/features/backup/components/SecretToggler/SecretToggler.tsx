@@ -16,7 +16,6 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly }) => {
 
   return (
     <span>
-      {/* @percona/platorm-core does not yet allow fields out of forms        */}
       <input className={styles.input} type={visible ? 'text' : 'password'} readOnly={readOnly} value={secret}></input>
       {iconButton}
     </span>
