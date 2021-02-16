@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo, useEffect } from 'react';
+import React, { FC, useState, useMemo } from 'react';
 import { useStyles, IconName, Button, Select } from '@grafana/ui';
 import { PaginationProps } from './Pagination.types';
 import { getStyles } from './Pagination.styles';
@@ -6,7 +6,7 @@ import { Messages } from './Pagination.messages';
 import { getShownPages, getLeftItemNumber, getRightItemNumber } from './Pagination.utils';
 
 export const Pagination: FC<PaginationProps> = ({
-  pageCount: propPageCount,
+  pageCount,
   initialPageIndex,
   pageSize,
   pagesPerView,
@@ -16,13 +16,11 @@ export const Pagination: FC<PaginationProps> = ({
   onPageChange,
   onPageSizeChange,
 }) => {
-  // Zero pages probably won't make the pagination show up, but here we should be agnostic to that
-  const [pageCount, setPageCount] = useState(Math.max(propPageCount, 1));
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
   // We want to center our selected page, thus we need to know how many should be on the left
   const shownPages = getShownPages(pageArray, activePageIndex, pagesPerView);
-  const leftItemNumber = getLeftItemNumber(propPageCount, activePageIndex, pageSize);
+  const leftItemNumber = getLeftItemNumber(pageCount, activePageIndex, pageSize);
   const rightItemNumber = getRightItemNumber(activePageIndex, pageSize, nrRowsOnCurrentPage);
   const style = useStyles(getStyles);
 
@@ -43,10 +41,6 @@ export const Pagination: FC<PaginationProps> = ({
     onPageSizeChange(pageSize);
     setActivePageIndex(0);
   };
-
-  useEffect(() => {
-    setPageCount(Math.max(propPageCount, 1));
-  }, [propPageCount]);
 
   return (
     <div className={style.pagination} data-qa="pagination">
