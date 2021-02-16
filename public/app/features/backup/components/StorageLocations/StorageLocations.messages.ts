@@ -7,4 +7,5 @@ export const Messages = {
     labels: 'Labels',
   },
   add: 'Add',
+  addSuccess: 'Backup location was successfully added',
 };

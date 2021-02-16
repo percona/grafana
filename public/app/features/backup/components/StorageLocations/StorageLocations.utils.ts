@@ -34,3 +34,20 @@ export const formatLocationList = (rawList: StorageLocationListReponse): Storage
   });
   return parsedLocations;
 };
+
+export const formatToRawLocation = (location: StorageLocation | S3Location): StorageLocationReponse => {
+  const { name, description, path, type } = location;
+  const localObj = { path };
+  const result: Partial<StorageLocationReponse> = { name, description };
+
+  if (isS3Location(location)) {
+    const { accessKey, secretKey } = location;
+    result.s3_config = { endpoint: path, access_key: accessKey, secret_key: secretKey };
+  } else if (type === LocationType.localClient) {
+    result.pmm_client_config = localObj;
+  } else {
+    result.pmm_server_config = localObj;
+  }
+
+  return result as StorageLocationReponse;
+};

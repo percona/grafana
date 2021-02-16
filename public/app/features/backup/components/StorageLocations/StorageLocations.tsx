@@ -2,11 +2,13 @@ import React, { FC, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Button, IconButton, useStyles } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
+import { appEvents } from 'app/core/core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
 import { StorageLocationsService } from './StorageLocations.service';
-import { formatLocationList } from './StorageLocations.utils';
+import { formatLocationList, formatToRawLocation } from './StorageLocations.utils';
 import { getStyles } from './StorageLocations.styles';
 import { StorageLocationDetails } from './StorageLocationDetails';
 import { AddStorageLocationModal } from './AddStorageLocationModal';
@@ -66,8 +68,15 @@ export const StorageLocations: FC = () => {
     []
   );
 
-  const onAdd = (location: StorageLocation) => {
-    console.log(location);
+  const onAdd = async (location: StorageLocation) => {
+    try {
+      await StorageLocationsService.add(formatToRawLocation(location));
+      appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setAddModalVisible(false);
+    }
   };
 
   useEffect(() => {
