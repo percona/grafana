@@ -7,6 +7,8 @@ const sliderProps: Props = {
   max: 20,
 };
 
+// TODO: tests fails when try to run test job, however, it's not blocking build
+// Need to check what will happen after upgrade to Grafana 7.4
 xdescribe('Slider', () => {
   xit('renders without error', () => {
     mount(<Slider {...sliderProps} />);
