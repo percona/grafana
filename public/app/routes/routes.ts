@@ -547,6 +547,14 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
           SafeDynamicImport(import(/* webpackChunkName: "BackupPage" */ 'app/features/backup/BackupPage')),
       },
     })
+    .when('/backup/:tab', {
+      template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () =>
+          SafeDynamicImport(import(/* webpackChunkName: "BackupPage" */ 'app/features/backup/BackupPage')),
+      },
+    })
     .when('/alerting/notification/new', {
       templateUrl: 'public/app/features/alerting/partials/notification_edit.html',
       controller: 'AlertNotificationEditCtrl',
