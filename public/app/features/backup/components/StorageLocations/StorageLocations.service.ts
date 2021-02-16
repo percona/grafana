@@ -7,7 +7,7 @@ export const StorageLocationsService = {
   async list(): Promise<StorageLocationListReponse> {
     return getBackendSrv().post(`${BASE_URL}/List`);
   },
-  async add(location: StorageLocationReponse): Promise<void> {
-    return getBackendSrv().post(`${BASE_URL}/Add`);
+  async add(payload: StorageLocationReponse): Promise<void> {
+    return getBackendSrv().post(`${BASE_URL}/Add`, payload);
   },
 };

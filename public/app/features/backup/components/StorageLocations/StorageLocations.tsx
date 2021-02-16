@@ -72,6 +72,7 @@ export const StorageLocations: FC = () => {
     try {
       await StorageLocationsService.add(formatToRawLocation(location));
       appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
+      getData();
     } catch (e) {
       logger.error(e);
     } finally {
