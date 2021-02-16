@@ -1,24 +1,19 @@
 import React, { FC } from 'react';
-import { Spinner, useStyles } from '@grafana/ui';
+import { Spinner } from '@grafana/ui';
+import { EmptyBlock } from '../../EmptyBlock';
 import { TableContentProps } from './TableContent.types';
-import { getStyles } from './TableContent.styles';
 
 export const TableContent: FC<TableContentProps> = ({ pending, hasData, emptyMessage, children }) => {
-  const styles = useStyles(getStyles);
   if (pending) {
     return (
-      <div data-qa="table-loading" className={styles.empty}>
+      <EmptyBlock dataQa="table-loading">
         <Spinner />
-      </div>
+      </EmptyBlock>
     );
   }
 
   if (!hasData) {
-    return (
-      <div data-qa="table-no-data" className={styles.empty}>
-        {<h1>{emptyMessage}</h1>}
-      </div>
-    );
+    return <EmptyBlock dataQa="table-no-data">{<h1>{emptyMessage}</h1>}</EmptyBlock>;
   }
 
   return <>{children}</>;
