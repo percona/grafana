@@ -24,9 +24,9 @@ describe('SecretToggler', () => {
     expect(wrapper.find('input').prop('type')).toBe('text');
   });
 
-  it('should have the input always disabled', () => {
+  it('should have the input as read only by default', () => {
     const wrapper = shallow(<SecretToggler secret="secret" />);
 
-    expect(wrapper.find('input').prop('disabled')).toBeTruthy();
+    expect(wrapper.find('input').prop('readOnly')).toBeTruthy();
   });
 });
