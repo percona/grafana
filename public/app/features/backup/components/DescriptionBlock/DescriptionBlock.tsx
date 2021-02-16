@@ -8,7 +8,7 @@ export const DescriptionBlock: FC<DescriptionBlockProps> = ({ description }) => 
   const styles = useStyles(getStyles);
 
   return (
-    <div className={styles.descriptionWrapper}>
+    <div data-qa="storage-location-description" className={styles.descriptionWrapper}>
       <span>{Messages.description}</span>
       <pre>{description}</pre>
     </div>
