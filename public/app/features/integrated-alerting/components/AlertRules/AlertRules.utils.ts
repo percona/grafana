@@ -44,7 +44,7 @@ export const formatThreshold = (
     value = thresholdParam[type];
   }
 
-  const unit = paramUnit && AlertRulesListPayloadTemplateParamUnits[paramUnit];
+  const unit = paramUnit ? AlertRulesListPayloadTemplateParamUnits[paramUnit] : undefined;
 
   return `${value}${unit ? ` ${unit}` : ''}`;
 };

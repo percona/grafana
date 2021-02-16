@@ -70,8 +70,6 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="alert-rule-template-add-button"
-                  // TODO: fix LoaderButton types
-                  // @ts-ignore
                   size="md"
                   variant="primary"
                   disabled={!valid || pristine}
