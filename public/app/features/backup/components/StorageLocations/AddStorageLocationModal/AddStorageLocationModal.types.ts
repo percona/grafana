@@ -17,7 +17,9 @@ export interface AddStorageLocationFormProps {
   name: string;
   description: string;
   type: FormStorageType;
-  path: string;
+  endpoint: string;
+  client: string;
+  server: string;
   accessKey: string;
   secretKey: string;
 }

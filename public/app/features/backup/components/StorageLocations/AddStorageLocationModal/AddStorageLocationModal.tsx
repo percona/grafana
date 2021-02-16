@@ -16,15 +16,20 @@ import {
   FormStorageType,
 } from './AddStorageLocationModal.types';
 import { S3Fields } from './S3Fields';
+import { LocalFields } from './LocalFields';
 import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
 import { Button, HorizontalGroup } from '@grafana/ui';
 
 const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
-  const { type } = values;
+  const { type, client, server } = values;
 
   switch (type) {
     case FormStorageType.S3:
       return <S3Fields values={values} />;
+    case FormStorageType.SERVER:
+      return <LocalFields name="server" path={server} />;
+    case FormStorageType.CLIENT:
+      return <LocalFields name="client" path={client} />;
     default:
       return null;
   }
