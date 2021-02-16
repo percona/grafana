@@ -1,13 +1,13 @@
 import {
   S3Location,
   StorageLocation,
-  StorageLocationReponse,
   StorageLocationListReponse,
   LocationType,
+  StorageLocationReponse,
 } from './StorageLocations.types';
 
-export const isS3Location = (location: StorageLocation | StorageLocationReponse): location is S3Location =>
-  's3_config' in location || 'accessKey' in location;
+export const isS3Location = (location: StorageLocation): location is S3Location => 'accessKey' in location;
+export const isS3RawLocation = (location: StorageLocationReponse): boolean => 's3_config' in location;
 
 export const formatLocationList = (rawList: StorageLocationListReponse): StorageLocation[] => {
   const { locations = [] } = rawList;
@@ -17,7 +17,7 @@ export const formatLocationList = (rawList: StorageLocationListReponse): Storage
     const { name, description, pmm_server_config, pmm_client_config } = location;
     const newLocation: Partial<StorageLocation> = { name, description };
 
-    if (isS3Location(location)) {
+    if (isS3RawLocation(location)) {
       const { endpoint, access_key, secret_key } = location.s3_config;
       newLocation.type = LocationType.s3;
       newLocation.path = endpoint;

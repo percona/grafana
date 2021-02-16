@@ -1,5 +1,5 @@
 import { LocationType, S3Location, StorageLocation, StorageLocationReponse } from './StorageLocations.types';
-import { isS3Location, formatLocationList } from './StorageLocations.utils';
+import { isS3Location, isS3RawLocation, formatLocationList } from './StorageLocations.utils';
 
 const s3Location: S3Location = {
   name: 's3',
@@ -41,8 +41,8 @@ describe('StorageLocationsUtils', () => {
   it('should infer if location is of S3 type', () => {
     expect(isS3Location(s3Location)).toBeTruthy();
     expect(isS3Location(fsLocation)).toBeFalsy();
-    expect(isS3Location(rawS3Location)).toBeTruthy();
-    expect(isS3Location(rawFSLocation)).toBeFalsy();
+    expect(isS3RawLocation(rawS3Location)).toBeTruthy();
+    expect(isS3RawLocation(rawFSLocation)).toBeFalsy();
   });
 
   it('should correctly convert raw format to StorageLocation array', () => {
