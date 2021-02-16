@@ -156,7 +156,7 @@ export const AlertRules: FC = () => {
                   <tr key={selectedRuleDetails.ruleId}>
                     <td colSpan={columns.length}>
                       <pre data-qa="alert-rules-details" className={styles.details}>
-                        {alertRule.rawValues.template.yaml}
+                        {alertRule.expr}
                       </pre>
                     </td>
                   </tr>
