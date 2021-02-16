@@ -1,27 +1,9 @@
 import React from 'react';
-import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { Pagination } from './Pagination';
 import { Messages } from './Pagination.messages';
 import { SelectableValue } from '@grafana/data';
-
-const simulateNextClick = (wrapper: ShallowWrapper | ReactWrapper, numberOfClicks: number) => {
-  for (let i = 0; i < numberOfClicks; i++) {
-    wrapper
-      .find(dataQa('next-page-button'))
-      .last()
-      .simulate('click');
-  }
-};
-
-const simulatePreviousClick = (wrapper: ShallowWrapper, numberOfClicks: number) => {
-  for (let i = 0; i < numberOfClicks; i++) {
-    wrapper
-      .find(dataQa('previous-page-button'))
-      .last()
-      .simulate('click');
-  }
-};
 
 describe('Pagination', () => {
   it('should render at least one page', () => {
@@ -52,7 +34,10 @@ describe('Pagination', () => {
     const wrapper = shallow(
       <Pagination totalItems={30} pageCount={3} pageSizeOptions={[]} pageSize={10} nrRowsOnCurrentPage={10} />
     );
-    simulateNextClick(wrapper, 1);
+    wrapper
+      .find(dataQa('next-page-button'))
+      .last()
+      .simulate('click');
     expect(wrapper.find(dataQa('previous-page-button')).props().disabled).toBeFalsy();
     expect(wrapper.find(dataQa('first-page-button')).props().disabled).toBeFalsy();
     expect(wrapper.find(dataQa('next-page-button')).props().disabled).toBeFalsy();
@@ -100,7 +85,12 @@ describe('Pagination', () => {
     );
     // There's 7 pages, meaning two clicks will get us to page 3, in the very center
     // Two more clicks should bring 4 and 5 to the center as well
-    simulateNextClick(wrapper, 2);
+    for (let i = 0; i < 2; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     expect(
       wrapper
         .find(dataQa('page-button'))
@@ -113,7 +103,12 @@ describe('Pagination', () => {
         .at(2)
         .prop('variant')
     ).toBe('primary');
-    simulateNextClick(wrapper, 2);
+    for (let i = 0; i < 2; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     expect(
       wrapper
         .find(dataQa('page-button'))
@@ -141,7 +136,12 @@ describe('Pagination', () => {
     );
     // There's 8 pages, meaning two clicks will get us to page 3, in the center-left
     // Two more clicks should bring 4 and 5 to that same position
-    simulateNextClick(wrapper, 2);
+    for (let i = 0; i < 2; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     expect(
       wrapper
         .find(dataQa('page-button'))
@@ -154,7 +154,12 @@ describe('Pagination', () => {
         .at(2)
         .prop('variant')
     ).toBe('primary');
-    simulateNextClick(wrapper, 2);
+    for (let i = 0; i < 2; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     expect(
       wrapper
         .find(dataQa('page-button'))
@@ -183,7 +188,12 @@ describe('Pagination', () => {
     // There's 5 pages and 3 pages/view, meaning two clicks will bring the last page button into the view
     // After that, any click should move the active page button towards the end, instead of keeping in the center
     // That means that with 4 clicks, we should have page 5 selected on the right
-    simulateNextClick(wrapper, 4);
+    for (let i = 0; i < 4; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     expect(
       wrapper
         .find(dataQa('page-button'))
@@ -210,7 +220,12 @@ describe('Pagination', () => {
       />
     );
     expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.getItemsIntervalMessage(1, 3, 15));
-    simulateNextClick(wrapper, 2);
+    for (let i = 0; i < 2; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     expect(wrapper.find(dataQa('pagination-items-inverval')).text()).toBe(Messages.getItemsIntervalMessage(7, 9, 15));
   });
 
@@ -241,7 +256,10 @@ describe('Pagination', () => {
         onPageChange={cb}
       />
     );
-    simulateNextClick(wrapper, 1);
+    wrapper
+      .find(dataQa('next-page-button'))
+      .last()
+      .simulate('click');
     expect(cb).toBeCalledWith(1);
   });
 
@@ -258,7 +276,10 @@ describe('Pagination', () => {
         onPageChange={cb}
       />
     );
-    simulatePreviousClick(wrapper, 1);
+    wrapper
+      .find(dataQa('previous-page-button'))
+      .last()
+      .simulate('click');
     expect(cb).not.toHaveBeenCalled();
   });
 
@@ -275,7 +296,12 @@ describe('Pagination', () => {
         onPageChange={cb}
       />
     );
-    simulateNextClick(wrapper, 5);
+    for (let i = 0; i < 5; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     expect(cb).toHaveBeenCalledTimes(4);
   });
 
@@ -308,7 +334,12 @@ describe('Pagination', () => {
         nrRowsOnCurrentPage={3}
       />
     );
-    simulateNextClick(wrapper, 5);
+    for (let i = 0; i < 5; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
     wrapper.find(dataQa('first-page-button')).simulate('click');
 
     const activePageButton = wrapper.find(dataQa('page-button')).first();
@@ -340,7 +371,12 @@ describe('Pagination', () => {
         onPageSizeChange={cb}
       />
     );
-    simulateNextClick(wrapper, 5);
+    for (let i = 0; i < 5; i++) {
+      wrapper
+        .find(dataQa('next-page-button'))
+        .last()
+        .simulate('click');
+    }
 
     const input = wrapper.find('input').first();
     input.simulate('keydown', { key: 'ArrowDown' });
