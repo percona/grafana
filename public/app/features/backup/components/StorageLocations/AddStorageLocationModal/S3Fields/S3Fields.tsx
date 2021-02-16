@@ -6,10 +6,14 @@ import { SecretToggler } from '../../../SecretToggler';
 
 const required = [validators.required];
 
-export const S3Fields: FC<S3FieldsProps> = () => (
+export const S3Fields: FC<S3FieldsProps> = ({ endpoint, accessKey, secretKey }) => (
   <>
-    <TextInputField name="endpoint" label={Messages.endpoint} validators={required} />
-    <TextInputField name="accessKey" label={Messages.accessKey} validators={required} />
-    <SecretToggler fieldProps={{ name: 'secretKey', label: 'Secret Key', validators: required }} readOnly={false} />
+    <TextInputField name="endpoint" label={Messages.endpoint} validators={required} initialValue={endpoint} />
+    <TextInputField name="accessKey" label={Messages.accessKey} validators={required} initialValue={accessKey} />
+    <SecretToggler
+      fieldProps={{ name: 'secretKey', label: 'Secret Key', validators: required }}
+      secret={secretKey}
+      readOnly={false}
+    />
   </>
 );

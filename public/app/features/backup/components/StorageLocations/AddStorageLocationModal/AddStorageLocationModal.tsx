@@ -21,11 +21,11 @@ import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.u
 import { Button, HorizontalGroup } from '@grafana/ui';
 
 const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
-  const { type, client, server } = values;
+  const { type, client, server, endpoint, accessKey, secretKey } = values;
 
   switch (type) {
     case FormStorageType.S3:
-      return <S3Fields values={values} />;
+      return <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} />;
     case FormStorageType.SERVER:
       return <LocalFields name="server" path={server} />;
     case FormStorageType.CLIENT:
