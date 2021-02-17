@@ -46,7 +46,7 @@ export const StorageLocations: FC = () => {
       // {
       //   Header: actions,
       //   accessor: 'locationID',
-      //   Cell: ({ value }) => <StorageLocationsActions locationID={value} />,
+      //   Cell: ({ row }) => <StorageLocationsActions location={row.original as StorageLocation} />,
       //   width: '130px',
       // },
     ],

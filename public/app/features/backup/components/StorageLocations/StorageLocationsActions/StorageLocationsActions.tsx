@@ -4,7 +4,7 @@ import { DBIcon } from '../../DBIcon';
 import { StorageLocatationsActionProps } from './StorageLocationsActions.types';
 import { getStyles } from './StorageLocationsActions.styles';
 
-export const StorageLocationsActions: FC<StorageLocatationsActionProps> = ({ locationID }) => {
+export const StorageLocationsActions: FC<StorageLocatationsActionProps> = ({ location }) => {
   const styles = useStyles(getStyles);
 
   return (
