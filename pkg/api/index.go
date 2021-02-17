@@ -276,6 +276,23 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 		data.NavTree = append(data.NavTree, profileNode)
 	}
 
+	if setting.AlertingEnabled && (c.OrgRole == models.ROLE_ADMIN || c.OrgRole == models.ROLE_EDITOR) {
+		alertChildNavs := []*dtos.NavLink{
+			{Text: "Alert Rules", Id: "alert-list", Url: setting.AppSubUrl + "/alerting/list", Icon: "list-ul"},
+			{Text: "Notification channels", Id: "channels", Url: setting.AppSubUrl + "/alerting/notifications", Icon: "comment-alt-share"},
+		}
+
+		data.NavTree = append(data.NavTree, &dtos.NavLink{
+			Text:       "Alerting",
+			SubTitle:   "Alert rules & notifications",
+			Id:         "alerting",
+			Icon:       "bell",
+			Url:        setting.AppSubUrl + "/alerting/list",
+			Children:   alertChildNavs,
+			SortWeight: dtos.WeightAlerting,
+		})
+	}
+
 	enabledPlugins, err := plugins.GetEnabledPlugins(c.OrgId)
 	if err != nil {
 		return nil, err
