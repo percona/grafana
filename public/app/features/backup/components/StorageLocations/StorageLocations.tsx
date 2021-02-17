@@ -12,9 +12,10 @@ import { formatLocationList, formatToRawLocation } from './StorageLocations.util
 import { getStyles } from './StorageLocations.styles';
 import { StorageLocationDetails } from './StorageLocationDetails';
 import { AddStorageLocationModal } from './AddStorageLocationModal';
+import { StorageLocationsActions } from './StorageLocationsActions';
 
 const { noData, columns } = Messages;
-const { name, type, path } = columns;
+const { name, type, path, actions } = columns;
 
 export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
@@ -47,13 +48,12 @@ export const StorageLocations: FC = () => {
         Header: path,
         accessor: 'path',
       },
-      // TODO uncomment on feature branches related to the actions
-      // {
-      //   Header: actions,
-      //   accessor: 'locationID',
-      //   Cell: ({ row }) => <StorageLocationsActions location={row.original as StorageLocation} />,
-      //   width: '130px',
-      // },
+      {
+        Header: actions,
+        accessor: 'locationID',
+        Cell: ({ row }) => <StorageLocationsActions onUpdate={onUpdate} location={row.original as StorageLocation} />,
+        width: '130px',
+      },
     ],
     []
   );
@@ -85,6 +85,10 @@ export const StorageLocations: FC = () => {
     } finally {
       setAddModalVisible(false);
     }
+  };
+
+  const onUpdate = (location: StorageLocation) => {
+    console.log(location);
   };
 
   useEffect(() => {
