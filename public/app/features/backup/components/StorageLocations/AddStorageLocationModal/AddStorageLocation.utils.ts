@@ -6,19 +6,19 @@ export const toStorageLocation = (values: AddStorageLocationFormProps): StorageL
   const result: Partial<StorageLocation> = { name, description };
 
   switch (type) {
-    case LocationType.s3:
-      result.type = LocationType.s3;
+    case LocationType.S3:
+      result.type = LocationType.S3;
       result.path = endpoint;
       (result as S3Location).accessKey = accessKey;
       (result as S3Location).secretKey = secretKey;
       break;
-    case LocationType.localClient:
+    case LocationType.CLIENT:
       result.path = client;
-      result.type = LocationType.localClient;
+      result.type = LocationType.CLIENT;
       break;
-    case LocationType.localServer:
+    case LocationType.SERVER:
       result.path = server;
-      result.type = LocationType.localServer;
+      result.type = LocationType.SERVER;
       break;
   }
 
@@ -30,7 +30,7 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location): Add
     return {
       name: '',
       description: '',
-      type: LocationType.s3,
+      type: LocationType.S3,
       endpoint: '',
       client: '',
       server: '',
@@ -43,19 +43,19 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location): Add
   const result: Partial<AddStorageLocationFormProps> = { name, description };
 
   switch (type) {
-    case LocationType.s3:
-      result.type = LocationType.s3;
+    case LocationType.S3:
+      result.type = LocationType.S3;
       result.endpoint = path;
       result.accessKey = (values as S3Location).accessKey;
       result.secretKey = (values as S3Location).secretKey;
       break;
-    case LocationType.localClient:
+    case LocationType.CLIENT:
       result.client = path;
-      result.type = LocationType.localClient;
+      result.type = LocationType.CLIENT;
       break;
-    case LocationType.localServer:
+    case LocationType.SERVER:
       result.server = path;
-      result.type = LocationType.localServer;
+      result.type = LocationType.SERVER;
       break;
   }
 

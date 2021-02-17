@@ -8,7 +8,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toFormStorageLocation(null)).toEqual({
         name: '',
         description: '',
-        type: LocationType.s3,
+        type: LocationType.S3,
         endpoint: '',
         client: '',
         server: '',
@@ -22,7 +22,7 @@ describe('AddStorageLocationUtils', () => {
         name: 'S3',
         description: 'S3 location',
         path: 's3://foo',
-        type: LocationType.s3,
+        type: LocationType.S3,
         accessKey: 'accessKey',
         secretKey: 'secretKey',
       };
@@ -30,7 +30,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toFormStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: LocationType.s3,
+        type: LocationType.S3,
         endpoint: location.path,
         accessKey: location.accessKey,
         secretKey: location.secretKey,
@@ -42,13 +42,13 @@ describe('AddStorageLocationUtils', () => {
         name: 'Local Client',
         description: 'Client location',
         path: '/foo/bar',
-        type: LocationType.localClient,
+        type: LocationType.CLIENT,
       };
 
       expect(toFormStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: LocationType.localClient,
+        type: LocationType.CLIENT,
         client: location.path,
       });
     });
@@ -58,13 +58,13 @@ describe('AddStorageLocationUtils', () => {
         name: 'Local Server',
         description: 'Server location',
         path: '/foo/bar',
-        type: LocationType.localServer,
+        type: LocationType.SERVER,
       };
 
       expect(toFormStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: LocationType.localServer,
+        type: LocationType.SERVER,
         server: location.path,
       });
     });
@@ -75,7 +75,7 @@ describe('AddStorageLocationUtils', () => {
       const location: AddStorageLocationFormProps = {
         name: 'S3 Location',
         description: 'location',
-        type: LocationType.s3,
+        type: LocationType.S3,
         endpoint: 's3://foo',
         client: '',
         server: '',
@@ -86,7 +86,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: LocationType.s3,
+        type: LocationType.S3,
         path: location.endpoint,
         accessKey: location.accessKey,
         secretKey: location.secretKey,
@@ -97,7 +97,7 @@ describe('AddStorageLocationUtils', () => {
       const location: AddStorageLocationFormProps = {
         name: 'Client Location',
         description: 'client',
-        type: LocationType.localClient,
+        type: LocationType.CLIENT,
         endpoint: '',
         client: '/foo/bar',
         server: '',
@@ -108,7 +108,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: LocationType.localClient,
+        type: LocationType.CLIENT,
         path: location.client,
       });
     });
@@ -117,7 +117,7 @@ describe('AddStorageLocationUtils', () => {
       const location: AddStorageLocationFormProps = {
         name: 'Server Location',
         description: 'server',
-        type: LocationType.localServer,
+        type: LocationType.SERVER,
         endpoint: '',
         client: '',
         server: '/foo/bar',
@@ -128,7 +128,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: LocationType.localServer,
+        type: LocationType.SERVER,
         path: location.server,
       });
     });

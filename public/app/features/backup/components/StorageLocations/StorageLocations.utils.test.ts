@@ -4,7 +4,7 @@ import { isS3Location, isS3RawLocation, formatLocationList, formatToRawLocation 
 const s3Location: S3Location = {
   name: 's3',
   description: 'description',
-  type: LocationType.s3,
+  type: LocationType.S3,
   path: 's3://bla',
   secretKey: 'secret',
   accessKey: 'access',
@@ -13,7 +13,7 @@ const s3Location: S3Location = {
 const fsLocation: StorageLocation = {
   name: 'client_fs',
   description: 'description',
-  type: LocationType.localClient,
+  type: LocationType.CLIENT,
   path: '/foo/bar',
 };
 
@@ -51,7 +51,7 @@ describe('StorageLocationsUtils', () => {
     expect(locations[0]).toEqual({
       name: rawS3Location.name,
       description: rawS3Location.description,
-      type: LocationType.s3,
+      type: LocationType.S3,
       path: rawS3Location.s3_config.endpoint,
       accessKey: rawS3Location.s3_config.access_key,
       secretKey: rawS3Location.s3_config.secret_key,
@@ -59,7 +59,7 @@ describe('StorageLocationsUtils', () => {
     expect(locations[1]).toEqual({
       name: rawFSLocation.name,
       description: rawFSLocation.description,
-      type: LocationType.localServer,
+      type: LocationType.SERVER,
       path: rawFSLocation.pmm_server_config.path,
     });
   });
@@ -83,7 +83,7 @@ describe('StorageLocationsUtils', () => {
       },
     });
 
-    expect(formatToRawLocation({ ...fsLocation, type: LocationType.localServer })).toEqual({
+    expect(formatToRawLocation({ ...fsLocation, type: LocationType.SERVER })).toEqual({
       name: fsLocation.name,
       description: fsLocation.description,
       pmm_server_config: {

@@ -21,11 +21,11 @@ const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
   const { type, client, server, endpoint, accessKey, secretKey } = values;
 
   switch (type) {
-    case LocationType.s3:
+    case LocationType.S3:
       return <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} />;
-    case LocationType.localServer:
+    case LocationType.SERVER:
       return <LocalFields name="server" path={server} />;
-    case LocationType.localClient:
+    case LocationType.CLIENT:
       return <LocalFields name="client" path={client} />;
     default:
       return null;
@@ -34,15 +34,15 @@ const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
 
 const typeOptions: Array<SelectableValue<LocationType>> = [
   {
-    value: LocationType.s3,
+    value: LocationType.S3,
     label: 'S3',
   },
   {
-    value: LocationType.localClient,
+    value: LocationType.CLIENT,
     label: 'Local Client',
   },
   {
-    value: LocationType.localServer,
+    value: LocationType.SERVER,
     label: 'Local Server',
   },
 ];
