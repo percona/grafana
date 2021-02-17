@@ -27,7 +27,7 @@ const { Form } = withTypes<NotificationChannelRenderProps>();
 const TypeField: FC<{ values: NotificationChannelRenderProps }> = ({ values }) => {
   const { type } = values;
 
-  switch (type.value) {
+  switch (type?.value) {
     case NotificationChannelType.email:
       return <EmailFields />;
     case NotificationChannelType.pagerDuty:

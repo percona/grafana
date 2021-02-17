@@ -8,7 +8,6 @@ import {
   PagerDutyKeyType,
 } from '../NotificationChannel.types';
 import { TYPE_OPTIONS, PAGER_DUTY_TYPE_OPTIONS } from './AddNotificationChannel.constants';
-import { SelectableValue } from '@grafana/data';
 
 export const INITIAL_VALUES = {
   [NotificationChannelType.email]: ({
@@ -43,7 +42,7 @@ export const INITIAL_VALUES = {
   }),
 };
 
-export const getInitialValues = (notificationChannel?: NotificationChannel) => {
+export const getInitialValues = (notificationChannel?: NotificationChannel | null) => {
   const defaultValues: NotificationChannelRenderProps = {
     name: '',
     type: TYPE_OPTIONS[0],
