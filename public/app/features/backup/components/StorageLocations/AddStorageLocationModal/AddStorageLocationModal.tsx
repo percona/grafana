@@ -48,6 +48,7 @@ const typeOptions: Array<SelectableValue<LocationType>> = [
 ];
 
 const { Form } = withTypes<AddStorageLocationFormProps>();
+const required = [validators.required];
 
 export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVisible, location, onClose, onAdd }) => {
   const initialValues = toFormStorageLocation(location);
@@ -61,8 +62,8 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVi
         onSubmit={onSubmit}
         render={({ handleSubmit, valid, pristine, submitting, values }) => (
           <form onSubmit={handleSubmit}>
-            <TextInputField name="name" label={Messages.name} validators={[validators.required]} />
-            <TextareaInputField name="description" validators={[validators.required]} />
+            <TextInputField name="name" label={Messages.name} validators={required} />
+            <TextareaInputField name="description" validators={required} />
             {/* TODO remove disabled when API allows all three types */}
             <RadioButtonGroupField disabled options={typeOptions} name="type" fullWidth />
             <TypeField values={values} />
