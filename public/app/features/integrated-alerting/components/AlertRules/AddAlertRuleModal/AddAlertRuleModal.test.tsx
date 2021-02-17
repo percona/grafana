@@ -49,7 +49,7 @@ describe('AddAlertRuleModal', () => {
     jest.clearAllMocks();
   });
 
-  it('should correctly render modal', () => {
+  it('should render modal', () => {
     const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
 
     expect(wrapper.find(dataQa('add-alert-rule-modal')).exists()).toBeTruthy();
