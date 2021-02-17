@@ -1,3 +1,5 @@
+import { StorageLocation } from '../StorageLocations.types';
+
 export interface StorageLocatationsActionProps {
-  locationID: string;
+  location: StorageLocation;
 }
