@@ -378,7 +378,15 @@ describe('AddAlertRuleModal utils', () => {
   test('minimum validator', () => {
     expect(minValidator(1)(-1)).not.toBeUndefined();
     expect(minValidator(1)(0)).not.toBeUndefined();
+    expect(minValidator(0)(0)).toBeUndefined();
+    expect(minValidator(0.2)(0.25)).toBeUndefined();
+    expect(minValidator(0.99)(0.991)).toBeUndefined();
     expect(minValidator(1)(1)).toBeUndefined();
     expect(minValidator(1)(100)).toBeUndefined();
+    expect(minValidator(-1)(1)).toBeUndefined();
+    expect(minValidator(Infinity)(1)).not.toBeUndefined();
+    expect(minValidator(1)(Infinity)).toBeUndefined();
+    expect(minValidator(Number.MAX_VALUE)(1)).not.toBeUndefined();
+    expect(minValidator(1)(Number.MAX_VALUE)).toBeUndefined();
   });
 });
