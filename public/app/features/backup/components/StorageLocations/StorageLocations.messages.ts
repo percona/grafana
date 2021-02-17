@@ -5,5 +5,6 @@ export const Messages = {
     type: 'Type',
     path: 'Endpoint or path',
     labels: 'Labels',
+    actions: 'Actions',
   },
 };

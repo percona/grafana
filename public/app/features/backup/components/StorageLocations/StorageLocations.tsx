@@ -9,9 +9,10 @@ import { StorageLocationsService } from './StorageLocations.service';
 import { formatLocationList } from './StorageLocations.utils';
 import { getStyles } from './StorageLocations.styles';
 import { StorageLocationDetails } from './StorageLocationDetails';
+import { StorageLocationsActions } from './StorageLocationsActions';
 
 const { noData, columns } = Messages;
-const { name, type, path } = columns;
+const { name, type, path, actions } = columns;
 
 export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
@@ -41,6 +42,12 @@ export const StorageLocations: FC = () => {
       {
         Header: path,
         accessor: 'path',
+      },
+      {
+        Header: actions,
+        accessor: 'locationID',
+        Cell: ({ value }) => <StorageLocationsActions locationID={value} />,
+        width: '130px',
       },
     ],
     []
