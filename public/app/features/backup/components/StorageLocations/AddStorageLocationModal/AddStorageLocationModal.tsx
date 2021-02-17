@@ -10,42 +10,39 @@ import {
   LoaderButton,
 } from '@percona/platform-core';
 import { Messages } from './AddStorageLocationModal.messages';
-import {
-  AddStorageLocationFormProps,
-  AddStorageLocationModalProps,
-  FormStorageType,
-} from './AddStorageLocationModal.types';
+import { AddStorageLocationFormProps, AddStorageLocationModalProps } from './AddStorageLocationModal.types';
 import { S3Fields } from './S3Fields';
 import { LocalFields } from './LocalFields';
 import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
 import { Button, HorizontalGroup } from '@grafana/ui';
+import { LocationType } from '../StorageLocations.types';
 
 const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
   const { type, client, server, endpoint, accessKey, secretKey } = values;
 
   switch (type) {
-    case FormStorageType.S3:
+    case LocationType.s3:
       return <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} />;
-    case FormStorageType.SERVER:
+    case LocationType.localServer:
       return <LocalFields name="server" path={server} />;
-    case FormStorageType.CLIENT:
+    case LocationType.localClient:
       return <LocalFields name="client" path={client} />;
     default:
       return null;
   }
 };
 
-const typeOptions: Array<SelectableValue<FormStorageType>> = [
+const typeOptions: Array<SelectableValue<LocationType>> = [
   {
-    value: FormStorageType.S3,
+    value: LocationType.s3,
     label: 'S3',
   },
   {
-    value: FormStorageType.CLIENT,
+    value: LocationType.localClient,
     label: 'Local Client',
   },
   {
-    value: FormStorageType.SERVER,
+    value: LocationType.localServer,
     label: 'Local Server',
   },
 ];

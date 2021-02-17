@@ -1,22 +1,22 @@
 import { StorageLocation, LocationType, S3Location } from '../StorageLocations.types';
-import { AddStorageLocationFormProps, FormStorageType } from './AddStorageLocationModal.types';
+import { AddStorageLocationFormProps } from './AddStorageLocationModal.types';
 
 export const toStorageLocation = (values: AddStorageLocationFormProps): StorageLocation => {
   const { name, description, type, endpoint, client, server, accessKey, secretKey } = values;
   const result: Partial<StorageLocation> = { name, description };
 
   switch (type) {
-    case FormStorageType.S3:
+    case LocationType.s3:
       result.type = LocationType.s3;
       result.path = endpoint;
       (result as S3Location).accessKey = accessKey;
       (result as S3Location).secretKey = secretKey;
       break;
-    case FormStorageType.CLIENT:
+    case LocationType.localClient:
       result.path = client;
       result.type = LocationType.localClient;
       break;
-    case FormStorageType.SERVER:
+    case LocationType.localServer:
       result.path = server;
       result.type = LocationType.localServer;
       break;
@@ -30,7 +30,7 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location): Add
     return {
       name: '',
       description: '',
-      type: FormStorageType.S3,
+      type: LocationType.s3,
       endpoint: '',
       client: '',
       server: '',
@@ -44,18 +44,18 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location): Add
 
   switch (type) {
     case LocationType.s3:
-      result.type = FormStorageType.S3;
+      result.type = LocationType.s3;
       result.endpoint = path;
       result.accessKey = (values as S3Location).accessKey;
       result.secretKey = (values as S3Location).secretKey;
       break;
     case LocationType.localClient:
       result.client = path;
-      result.type = FormStorageType.CLIENT;
+      result.type = LocationType.localClient;
       break;
     case LocationType.localServer:
       result.server = path;
-      result.type = FormStorageType.SERVER;
+      result.type = LocationType.localServer;
       break;
   }
 

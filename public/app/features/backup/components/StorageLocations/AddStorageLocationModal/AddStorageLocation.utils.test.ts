@@ -1,6 +1,6 @@
 import { LocationType, S3Location, StorageLocation } from '../StorageLocations.types';
 import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
-import { AddStorageLocationFormProps, FormStorageType } from './AddStorageLocationModal.types';
+import { AddStorageLocationFormProps } from './AddStorageLocationModal.types';
 
 describe('AddStorageLocationUtils', () => {
   describe('toFormStorageLocation', () => {
@@ -8,7 +8,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toFormStorageLocation(null)).toEqual({
         name: '',
         description: '',
-        type: FormStorageType.S3,
+        type: LocationType.s3,
         endpoint: '',
         client: '',
         server: '',
@@ -30,7 +30,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toFormStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: FormStorageType.S3,
+        type: LocationType.s3,
         endpoint: location.path,
         accessKey: location.accessKey,
         secretKey: location.secretKey,
@@ -48,7 +48,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toFormStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: FormStorageType.CLIENT,
+        type: LocationType.localClient,
         client: location.path,
       });
     });
@@ -64,7 +64,7 @@ describe('AddStorageLocationUtils', () => {
       expect(toFormStorageLocation(location)).toEqual({
         name: location.name,
         description: location.description,
-        type: FormStorageType.SERVER,
+        type: LocationType.localServer,
         server: location.path,
       });
     });
@@ -75,7 +75,7 @@ describe('AddStorageLocationUtils', () => {
       const location: AddStorageLocationFormProps = {
         name: 'S3 Location',
         description: 'location',
-        type: FormStorageType.S3,
+        type: LocationType.s3,
         endpoint: 's3://foo',
         client: '',
         server: '',
@@ -97,7 +97,7 @@ describe('AddStorageLocationUtils', () => {
       const location: AddStorageLocationFormProps = {
         name: 'Client Location',
         description: 'client',
-        type: FormStorageType.CLIENT,
+        type: LocationType.localClient,
         endpoint: '',
         client: '/foo/bar',
         server: '',
@@ -117,7 +117,7 @@ describe('AddStorageLocationUtils', () => {
       const location: AddStorageLocationFormProps = {
         name: 'Server Location',
         description: 'server',
-        type: FormStorageType.SERVER,
+        type: LocationType.localServer,
         endpoint: '',
         client: '',
         server: '/foo/bar',
