@@ -5,6 +5,7 @@ export const Messages = {
     type: 'Type',
     path: 'Endpoint or path',
     labels: 'Labels',
+    actions: 'Actions',
   },
   add: 'Add',
   addSuccess: 'Backup location was successfully added',

@@ -14,8 +14,8 @@ export const formatLocationList = (rawList: StorageLocationListReponse): Storage
   const parsedLocations: StorageLocation[] = [];
 
   locations.forEach(location => {
-    const { name, description, pmm_server_config, pmm_client_config } = location;
-    const newLocation: Partial<StorageLocation> = { name, description };
+    const { location_id, name, description, pmm_server_config, pmm_client_config } = location;
+    const newLocation: Partial<StorageLocation> = { name, description, locationID: location_id };
 
     if (isS3RawLocation(location)) {
       const { endpoint, access_key, secret_key } = location.s3_config;

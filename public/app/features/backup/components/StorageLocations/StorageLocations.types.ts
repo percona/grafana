@@ -5,6 +5,7 @@ export enum LocationType {
 }
 
 export interface StorageLocation {
+  locationID: string;
   name: string;
   description: string;
   type: LocationType;

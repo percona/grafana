@@ -47,6 +47,13 @@ export const StorageLocations: FC = () => {
         Header: path,
         accessor: 'path',
       },
+      // TODO uncomment on feature branches related to the actions
+      // {
+      //   Header: actions,
+      //   accessor: 'locationID',
+      //   Cell: ({ value }) => <StorageLocationsActions locationID={value} />,
+      //   width: '130px',
+      // },
     ],
     []
   );
