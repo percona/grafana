@@ -63,9 +63,9 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVi
         render={({ handleSubmit, valid, pristine, submitting, values }) => (
           <form onSubmit={handleSubmit}>
             <TextInputField name="name" label={Messages.name} validators={required} />
-            <TextareaInputField name="description" validators={required} />
+            <TextareaInputField name="description" label={Messages.description} validators={required} />
             {/* TODO remove disabled when API allows all three types */}
-            <RadioButtonGroupField disabled options={typeOptions} name="type" fullWidth />
+            <RadioButtonGroupField disabled options={typeOptions} name="type" label={Messages.type} fullWidth />
             <TypeField values={values} />
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
