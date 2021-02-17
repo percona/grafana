@@ -11,7 +11,7 @@ describe('StorageLocationDetails', () => {
     path: 'path',
     name: 'name',
     description: 'description',
-    type: LocationType.localClient,
+    type: LocationType.CLIENT,
   };
 
   it('should have only a DescriptionBlock when not an S3 location', () => {

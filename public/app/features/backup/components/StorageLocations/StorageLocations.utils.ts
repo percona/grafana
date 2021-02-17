@@ -19,14 +19,14 @@ export const formatLocationList = (rawList: StorageLocationListReponse): Storage
 
     if (isS3RawLocation(location)) {
       const { endpoint, access_key, secret_key } = location.s3_config;
-      newLocation.type = LocationType.s3;
+      newLocation.type = LocationType.S3;
       newLocation.path = endpoint;
       (newLocation as S3Location).accessKey = access_key;
       (newLocation as S3Location).secretKey = secret_key;
     } else {
       const isServer = pmm_server_config;
       const { path } = isServer ? pmm_server_config : pmm_client_config;
-      newLocation.type = isServer ? LocationType.localServer : LocationType.localClient;
+      newLocation.type = isServer ? LocationType.SERVER : LocationType.CLIENT;
       newLocation.path = path;
     }
 

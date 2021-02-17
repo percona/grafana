@@ -1,7 +1,7 @@
 export enum LocationType {
-  s3 = 'S3',
-  localClient = 'Local Client',
-  localServer = 'Local Server',
+  S3 = 'S3',
+  CLIENT = 'Local Client',
+  SERVER = 'Local Server',
 }
 
 export interface StorageLocation {
