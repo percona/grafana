@@ -10,4 +10,7 @@ export const StorageLocationsService = {
   async add(payload: StorageLocationReponse): Promise<void> {
     return getBackendSrv().post(`${BASE_URL}/Add`, payload);
   },
+  async update(payload: StorageLocationReponse): Promise<void> {
+    return getBackendSrv().post(`${BASE_URL}/Change`, payload);
+  },
 };

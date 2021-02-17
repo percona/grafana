@@ -77,7 +77,9 @@ export const StorageLocations: FC = () => {
 
   const onAdd = async (location: StorageLocation) => {
     try {
-      await StorageLocationsService.add(formatToRawLocation(location));
+      (await location.locationID)
+        ? StorageLocationsService.update(formatToRawLocation(location))
+        : StorageLocationsService.add(formatToRawLocation(location));
       appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       getData();
     } catch (e) {
@@ -88,7 +90,8 @@ export const StorageLocations: FC = () => {
   };
 
   const onUpdate = (location: StorageLocation) => {
-    console.log(location);
+    setSelectedLocation(location);
+    setAddModalVisible(true);
   };
 
   useEffect(() => {

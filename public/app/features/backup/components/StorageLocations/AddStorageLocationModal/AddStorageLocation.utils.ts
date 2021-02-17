@@ -2,8 +2,8 @@ import { StorageLocation, LocationType, S3Location } from '../StorageLocations.t
 import { AddStorageLocationFormProps } from './AddStorageLocationModal.types';
 
 export const toStorageLocation = (values: AddStorageLocationFormProps): StorageLocation => {
-  const { name, description, type, endpoint, client, server, accessKey, secretKey } = values;
-  const result: Partial<StorageLocation> = { name, description };
+  const { name, description, type, endpoint, client, server, accessKey, secretKey, locationID } = values;
+  const result: Partial<StorageLocation> = { name, description, locationID };
 
   switch (type) {
     case LocationType.S3:
@@ -28,6 +28,7 @@ export const toStorageLocation = (values: AddStorageLocationFormProps): StorageL
 export const toFormStorageLocation = (values: StorageLocation | S3Location): AddStorageLocationFormProps => {
   if (!values) {
     return {
+      locationID: '',
       name: '',
       description: '',
       type: LocationType.S3,
@@ -39,8 +40,8 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location): Add
     };
   }
 
-  const { name, description, type, path } = values;
-  const result: Partial<AddStorageLocationFormProps> = { name, description };
+  const { name, description, type, path, locationID } = values;
+  const result: Partial<AddStorageLocationFormProps> = { name, description, locationID };
 
   switch (type) {
     case LocationType.S3:

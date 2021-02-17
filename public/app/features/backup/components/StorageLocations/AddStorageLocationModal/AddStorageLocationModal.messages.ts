@@ -4,6 +4,6 @@ export const Messages = {
   description: 'Description',
   type: 'Type',
   addAction: 'Add',
-  editAction: 'Add',
+  editAction: 'Edit',
   cancelAction: 'Cancel',
 };

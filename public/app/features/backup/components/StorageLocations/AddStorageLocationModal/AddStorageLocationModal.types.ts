@@ -8,6 +8,7 @@ export interface AddStorageLocationModalProps {
 }
 
 export interface AddStorageLocationFormProps {
+  locationID?: string;
   name: string;
   description: string;
   type: LocationType;
