@@ -199,7 +199,7 @@
   },
   "dependencies": {
     "@grafana/slate-react": "0.22.9-grafana",
-    "@percona/platform-core": "^0.6.0",
+    "@percona/platform-core": "0.7.0",
     "@reduxjs/toolkit": "1.3.4",
     "@torkelo/react-select": "3.0.8",
     "@types/antlr4": "^4.7.1",
