@@ -73,7 +73,7 @@ describe('AddAlertRuleModal', () => {
     const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
     const button = wrapper.find(dataQa('add-alert-rule-modal-add-button')).find('button');
 
-    expect(button.props().disabled).toBeTruthy();
+    expect(button.props().disabled).toBe(true);
   });
 
   it('should enable the submit button if all fields are valid', () => {
@@ -87,7 +87,7 @@ describe('AddAlertRuleModal', () => {
     });
     const button = wrapper.find(dataQa('add-alert-rule-modal-add-button')).find('button');
 
-    expect(button.props().disabled).toBeFalsy();
+    expect(button.props().disabled).toBe(false);
   });
 
   it('should disable the submit button if a negative duration is inserted', () => {
@@ -108,6 +108,6 @@ describe('AddAlertRuleModal', () => {
     });
     const button = wrapper.find(dataQa('add-alert-rule-modal-add-button')).find('button');
 
-    expect(button.props().disabled).toBeTruthy();
+    expect(button.props().disabled).toBe(true);
   });
 });
