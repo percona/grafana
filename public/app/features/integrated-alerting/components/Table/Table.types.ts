@@ -9,7 +9,7 @@ export interface TableProps {
   totalItems: number;
   totalPages?: number;
   tableHash?: string;
-  pageSize: number;
+  pageSize?: number;
   pageIndex: number;
   onPaginationChanged: (pageSize: number, pageIndex: number) => void;
 }
