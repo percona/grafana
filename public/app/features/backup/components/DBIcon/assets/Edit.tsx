@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { IconProps } from '../DBIcon.types';
 
-export const Edit: FC<IconProps> = ({ size, ...rest }) => (
+export const Edit: FC<IconProps> = ({ size = 22, ...rest }) => (
   <svg width={size} height={size} viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
     <path
       fillRule="evenodd"
@@ -42,7 +42,3 @@ export const Edit: FC<IconProps> = ({ size, ...rest }) => (
     <path d="M17.5215 4.47827V8.39132" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
-
-Edit.defaultProps = {
-  size: 22,
-};
