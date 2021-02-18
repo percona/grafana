@@ -25,7 +25,9 @@ export const toStorageLocation = (values: AddStorageLocationFormProps): StorageL
   return result as StorageLocation;
 };
 
-export const toFormStorageLocation = (values: StorageLocation | S3Location): AddStorageLocationFormProps => {
+export const toFormStorageLocation = (
+  values: StorageLocation | S3Location | undefined
+): AddStorageLocationFormProps => {
   if (!values) {
     return {
       name: '',

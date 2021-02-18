@@ -9,6 +9,7 @@ import { AddStorageLocationModal } from './AddStorageLocationModal';
 describe('AddStorageLocationModal', () => {
   it('should render local TypeField', () => {
     const location: StorageLocation = {
+      locationID: 'Location_1',
       name: 'client_fs',
       description: 'description',
       type: LocationType.CLIENT,
@@ -24,6 +25,7 @@ describe('AddStorageLocationModal', () => {
 
   it('should render S3 TypeField', () => {
     const location: S3Location = {
+      locationID: 'Location_1',
       name: 'client_fs',
       description: 'description',
       type: LocationType.S3,
@@ -42,6 +44,7 @@ describe('AddStorageLocationModal', () => {
   it('should call onAdd callback', () => {
     const onAdd = jest.fn();
     const location: S3Location = {
+      locationID: 'Location_1',
       name: 'client_fs',
       description: 'description',
       type: LocationType.S3,

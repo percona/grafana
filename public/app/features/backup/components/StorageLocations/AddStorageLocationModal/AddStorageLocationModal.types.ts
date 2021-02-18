@@ -2,7 +2,7 @@ import { LocationType, StorageLocation } from '../StorageLocations.types';
 
 export interface AddStorageLocationModalProps {
   isVisible: boolean;
-  location: StorageLocation;
+  location?: StorageLocation;
   onClose: () => void;
   onAdd: (location: StorageLocation) => void;
 }

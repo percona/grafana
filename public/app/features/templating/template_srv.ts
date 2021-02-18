@@ -1,16 +1,13 @@
-import kbn from 'app/core/utils/kbn';
 import _ from 'lodash';
-import { deprecationWarning, ScopedVars, textUtil, TimeRange, dateTime } from '@grafana/data';
+import { deprecationWarning, ScopedVars, TimeRange } from '@grafana/data';
 import { getFilteredVariables, getVariables, getVariableWithName } from '../variables/state/selectors';
 import { variableRegex } from '../variables/utils';
 import { isAdHoc } from '../variables/guard';
 import { VariableModel } from '../variables/types';
 import { setTemplateSrv, TemplateSrv as BaseTemplateSrv } from '@grafana/runtime';
 import { variableAdapters } from '../variables/adapters';
-
-function luceneEscape(value: string) {
-  return value.replace(/([\!\*\+\-\=<>\s\&\|\(\)\[\]\{\}\^\~\?\:\\/"])/g, '\\$1');
-}
+import { formatRegistry, FormatOptions } from './formatRegistry';
+import { ALL_VARIABLE_TEXT } from '../variables/state/types';
 
 interface FieldAccessorCache {
   [key: string]: (obj: any) => any;
@@ -33,13 +30,10 @@ export class TemplateSrv implements BaseTemplateSrv {
   private regex = variableRegex;
   private index: any = {};
   private grafanaVariables: any = {};
-  private builtIns: any = {};
   private timeRange?: TimeRange | null = null;
   private fieldAccessorCache: FieldAccessorCache = {};
 
   constructor(private dependencies: TemplateSrvDependencies = runtimeDependencies) {
-    this.builtIns['__interval'] = { text: '1s', value: '1s' };
-    this.builtIns['__interval_ms'] = { text: '100', value: '100' };
     this._variables = [];
   }
 
@@ -47,10 +41,6 @@ export class TemplateSrv implements BaseTemplateSrv {
     this._variables = variables;
     this.timeRange = timeRange;
     this.updateIndex();
-  }
-
-  getBuiltInIntervalValue() {
-    return this.builtIns.__interval.value;
   }
 
   /**
@@ -118,37 +108,18 @@ export class TemplateSrv implements BaseTemplateSrv {
     return filters;
   }
 
-  luceneFormat(value: any) {
-    if (typeof value === 'string') {
-      return luceneEscape(value);
-    }
-    if (value instanceof Array && value.length === 0) {
-      return '__empty__';
-    }
-    const quotedValues = _.map(value, val => {
-      return '"' + luceneEscape(val) + '"';
-    });
-    return '(' + quotedValues.join(' OR ') + ')';
-  }
-
-  // encode string according to RFC 3986; in contrast to encodeURIComponent()
-  // also the sub-delims "!", "'", "(", ")" and "*" are encoded;
-  // unicode handling uses UTF-8 as in ECMA-262.
-  encodeURIComponentStrict(str: string) {
-    return encodeURIComponent(str).replace(/[!'()*]/g, c => {
-      return (
-        '%' +
-        c
-          .charCodeAt(0)
-          .toString(16)
-          .toUpperCase()
-      );
-    });
-  }
-
-  formatValue(value: any, format: any, variable: any) {
+  formatValue(value: any, format: any, variable: any, text?: string) {
     // for some scopedVars there is no variable
     variable = variable || {};
+
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    // if it's an object transform value to string
+    if (!Array.isArray(value) && typeof value === 'object') {
+      value = `${value}`;
+    }
 
     if (typeof format === 'function') {
       return format(value, variable, this.formatValue);
@@ -167,105 +138,13 @@ export class TemplateSrv implements BaseTemplateSrv {
       args = [];
     }
 
-    switch (format) {
-      case 'regex': {
-        if (typeof value === 'string') {
-          return kbn.regexEscape(value);
-        }
-
-        const escapedValues = _.map(value, kbn.regexEscape);
-        if (escapedValues.length === 1) {
-          return escapedValues[0];
-        }
-        return '(' + escapedValues.join('|') + ')';
-      }
-      case 'lucene': {
-        return this.luceneFormat(value);
-      }
-      case 'pipe': {
-        if (typeof value === 'string') {
-          return value;
-        }
-        return value.join('|');
-      }
-      case 'distributed': {
-        if (typeof value === 'string') {
-          return value;
-        }
-        return this.distributeVariable(value, variable.name);
-      }
-      case 'csv': {
-        if (_.isArray(value)) {
-          return value.join(',');
-        }
-        return value;
-      }
-      case 'html': {
-        if (_.isArray(value)) {
-          return textUtil.escapeHtml(value.join(', '));
-        }
-        return textUtil.escapeHtml(value);
-      }
-      case 'json': {
-        return JSON.stringify(value);
-      }
-      case 'percentencode': {
-        // like glob, but url escaped
-        if (_.isArray(value)) {
-          return this.encodeURIComponentStrict('{' + value.join(',') + '}');
-        }
-        return this.encodeURIComponentStrict(value);
-      }
-      case 'singlequote': {
-        // escape single quotes with backslash
-        const regExp = new RegExp(`'`, 'g');
-        if (_.isArray(value)) {
-          return _.map(value, v => `'${_.replace(v, regExp, `\\'`)}'`).join(',');
-        }
-        return `'${_.replace(value, regExp, `\\'`)}'`;
-      }
-      case 'doublequote': {
-        // escape double quotes with backslash
-        const regExp = new RegExp('"', 'g');
-        if (_.isArray(value)) {
-          return _.map(value, v => `"${_.replace(v, regExp, '\\"')}"`).join(',');
-        }
-        return `"${_.replace(value, regExp, '\\"')}"`;
-      }
-      case 'sqlstring': {
-        // escape single quotes by pairing them
-        const regExp = new RegExp(`'`, 'g');
-        if (_.isArray(value)) {
-          return _.map(value, v => `'${_.replace(v, regExp, "''")}'`).join(',');
-        }
-        return `'${_.replace(value, regExp, "''")}'`;
-      }
-      case 'date': {
-        return this.formatDate(value, args);
-      }
-      default:
-      case 'glob': {
-        if (_.isArray(value) && value.length > 1) {
-          return '{' + value.join(',') + '}';
-        }
-        return value;
-      }
+    const formatItem = formatRegistry.getIfExists(format);
+    if (!formatItem) {
+      throw new Error(`Variable format ${format} not found`);
     }
-  }
 
-  formatDate(value: any, args: string[]): string {
-    const arg = args[0] ?? 'iso';
-
-    switch (arg) {
-      case 'ms':
-        return value;
-      case 'seconds':
-        return `${Math.round(parseInt(value, 10)! / 1000)}`;
-      case 'iso':
-        return dateTime(parseInt(value, 10)).toISOString();
-      default:
-        return dateTime(parseInt(value, 10)).format(arg);
-    }
+    const options: FormatOptions = { value, args, text: text ?? value };
+    return formatItem.formatter(options, variable);
   }
 
   setGrafanaVariable(name: string, value: any) {
@@ -297,7 +176,7 @@ export class TemplateSrv implements BaseTemplateSrv {
     return variableName;
   }
 
-  variableExists(expression: string) {
+  variableExists(expression: string): boolean {
     const name = this.getVariableName(expression);
     const variable = name && this.getVariableAtIndex(name);
     return variable !== null && variable !== undefined;
@@ -311,7 +190,7 @@ export class TemplateSrv implements BaseTemplateSrv {
     str = _.escape(str);
     this.regex.lastIndex = 0;
     return str.replace(this.regex, (match, var1, var2, fmt2, var3) => {
-      if (this.getVariableAtIndex(var1 || var2 || var3) || this.builtIns[var1 || var2 || var3]) {
+      if (this.getVariableAtIndex(var1 || var2 || var3)) {
         return '<span class="template-variable">' + match + '</span>';
       }
       return match;
@@ -329,7 +208,7 @@ export class TemplateSrv implements BaseTemplateSrv {
     return values;
   }
 
-  getFieldAccessor(fieldPath: string) {
+  private getFieldAccessor(fieldPath: string) {
     const accessor = this.fieldAccessorCache[fieldPath];
     if (accessor) {
       return accessor;
@@ -338,7 +217,7 @@ export class TemplateSrv implements BaseTemplateSrv {
     return (this.fieldAccessorCache[fieldPath] = _.property(fieldPath));
   }
 
-  getVariableValue(variableName: string, fieldPath: string | undefined, scopedVars: ScopedVars) {
+  private getVariableValue(variableName: string, fieldPath: string | undefined, scopedVars: ScopedVars) {
     const scopedVar = scopedVars[variableName];
     if (!scopedVar) {
       return null;
@@ -351,9 +230,23 @@ export class TemplateSrv implements BaseTemplateSrv {
     return scopedVar.value;
   }
 
-  replace(target: string, scopedVars?: ScopedVars, format?: string | Function): string {
+  private getVariableText(variableName: string, value: any, scopedVars: ScopedVars) {
+    const scopedVar = scopedVars[variableName];
+
+    if (!scopedVar) {
+      return null;
+    }
+
+    if (scopedVar.value === value || typeof value !== 'string') {
+      return scopedVar.text;
+    }
+
+    return value;
+  }
+
+  replace(target?: string, scopedVars?: ScopedVars, format?: string | Function): string {
     if (!target) {
-      return target;
+      return target ?? '';
     }
 
     this.regex.lastIndex = 0;
@@ -365,8 +258,10 @@ export class TemplateSrv implements BaseTemplateSrv {
 
       if (scopedVars) {
         const value = this.getVariableValue(variableName, fieldPath, scopedVars);
+        const text = this.getVariableText(variableName, value, scopedVars);
+
         if (value !== null && value !== undefined) {
-          return this.formatValue(value, fmt, variable);
+          return this.formatValue(value, fmt, variable, text);
         }
       }
 
@@ -380,8 +275,11 @@ export class TemplateSrv implements BaseTemplateSrv {
       }
 
       let value = variable.current.value;
+      let text = variable.current.text;
+
       if (this.isAllValue(value)) {
         value = this.getAllValue(variable);
+        text = ALL_VARIABLE_TEXT;
         // skip formatting of custom all values
         if (variable.allValue) {
           return this.replace(value);
@@ -390,14 +288,14 @@ export class TemplateSrv implements BaseTemplateSrv {
 
       if (fieldPath) {
         const fieldValue = this.getVariableValue(variableName, fieldPath, {
-          [variableName]: { value: value, text: '' },
+          [variableName]: { value, text },
         });
         if (fieldValue !== null && fieldValue !== undefined) {
-          return this.formatValue(fieldValue, fmt, variable);
+          return this.formatValue(fieldValue, fmt, variable, text);
         }
       }
 
-      const res = this.formatValue(value, fmt, variable);
+      const res = this.formatValue(value, fmt, variable, text);
       return res;
     });
   }
@@ -407,30 +305,8 @@ export class TemplateSrv implements BaseTemplateSrv {
   }
 
   replaceWithText(target: string, scopedVars?: ScopedVars) {
-    if (!target) {
-      return target;
-    }
-
-    let variable;
-    this.regex.lastIndex = 0;
-
-    return target.replace(this.regex, (match: any, var1: any, var2: any, fmt2: any, var3: any) => {
-      if (scopedVars) {
-        const option = scopedVars[var1 || var2 || var3];
-        if (option) {
-          return option.text;
-        }
-      }
-
-      variable = this.getVariableAtIndex(var1 || var2 || var3);
-      if (!variable) {
-        return match;
-      }
-
-      const value = this.grafanaVariables[variable.current.value];
-
-      return typeof value === 'string' ? value : variable.current.text;
-    });
+    deprecationWarning('template_srv.ts', 'replaceWithText()', 'replace(), and specify the :text format');
+    return this.replace(target, scopedVars, 'text');
   }
 
   fillVariableValuesForUrl = (params: any, scopedVars?: ScopedVars) => {
@@ -448,17 +324,6 @@ export class TemplateSrv implements BaseTemplateSrv {
       }
     });
   };
-
-  distributeVariable(value: any, variable: any) {
-    value = _.map(value, (val: any, index: number) => {
-      if (index !== 0) {
-        return variable + '=' + val;
-      } else {
-        return val;
-      }
-    });
-    return value.join(',');
-  }
 
   private getVariableAtIndex(name: string) {
     if (!name) {
@@ -480,4 +345,4 @@ export class TemplateSrv implements BaseTemplateSrv {
 // Expose the template srv
 const srv = new TemplateSrv();
 setTemplateSrv(srv);
-export default srv;
+export const getTemplateSrv = () => srv;

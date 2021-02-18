@@ -7,6 +7,7 @@ export { PopoverController } from './Tooltip/PopoverController';
 export { Popover } from './Tooltip/Popover';
 export { Portal } from './Portal/Portal';
 export { CustomScrollbar } from './CustomScrollbar/CustomScrollbar';
+export { TabbedContainer, TabConfig } from './TabbedContainer/TabbedContainer';
 
 export { ClipboardButton } from './ClipboardButton/ClipboardButton';
 export { Cascader, CascaderOption } from './Cascader/Cascader';
@@ -21,7 +22,7 @@ export { EmptySearchResult } from './EmptySearchResult/EmptySearchResult';
 export { PieChart, PieChartType } from './PieChart/PieChart';
 export { UnitPicker } from './UnitPicker/UnitPicker';
 export { StatsPicker } from './StatsPicker/StatsPicker';
-export { RefreshPicker } from './RefreshPicker/RefreshPicker';
+export { RefreshPicker, defaultIntervals } from './RefreshPicker/RefreshPicker';
 export { TimeRangePicker } from './TimePicker/TimeRangePicker';
 export { TimeOfDayPicker } from './TimePicker/TimeOfDayPicker';
 export { TimeZonePicker } from './TimePicker/TimeZonePicker';
@@ -68,6 +69,15 @@ export {
   BigValueTextMode,
 } from './BigValue/BigValue';
 
+export { GraphCustomFieldConfig } from './uPlot/types';
+export { UPlotChart } from './uPlot/Plot';
+export * from './uPlot/geometries';
+export { usePlotConfigContext } from './uPlot/context';
+export { Canvas } from './uPlot/Canvas';
+export * from './uPlot/plugins';
+export { useRefreshAfterGraphRendered } from './uPlot/hooks';
+export { usePlotContext, usePlotData, usePlotPluginContext } from './uPlot/context';
+
 export { Gauge } from './Gauge/Gauge';
 export { Graph } from './Graph/Graph';
 export { GraphLegend } from './Graph/GraphLegend';
@@ -92,6 +102,7 @@ export {
 export { Alert, AlertVariant } from './Alert/Alert';
 export { GraphSeriesToggler, GraphSeriesTogglerAPI } from './Graph/GraphSeriesToggler';
 export { Collapse, ControlledCollapse } from './Collapse/Collapse';
+export { CollapsableSection } from './Collapse/CollapsableSection';
 export { LogLabels } from './Logs/LogLabels';
 export { LogRows } from './Logs/LogRows';
 export { getLogRowStyles } from './Logs/getLogRowStyles';
@@ -120,6 +131,7 @@ export { FadeTransition } from './transitions/FadeTransition';
 export { SlideOutTransition } from './transitions/SlideOutTransition';
 export { Segment, SegmentAsync, SegmentInput, SegmentSelect } from './Segment/';
 export { default as Chart } from './Chart';
+export { TooltipContainer } from './Chart/TooltipContainer';
 export { Drawer } from './Drawer/Drawer';
 export { Slider } from './Slider/Slider';
 
@@ -142,6 +154,11 @@ export { Label } from './Forms/Label';
 export { Field } from './Forms/Field';
 export { Legend } from './Forms/Legend';
 export { FieldSet } from './Forms/FieldSet';
+export { FieldValidationMessage } from './Forms/FieldValidationMessage';
+export { InlineField } from './Forms/InlineField';
+export { InlineLabel } from './Forms/InlineLabel';
+export { InlineFieldRow } from './Forms/InlineFieldRow';
+export { FieldArray } from './Forms/FieldArray';
 
 export { default as resetSelectStyles } from './Select/resetSelectStyles';
 export * from './Select/Select';

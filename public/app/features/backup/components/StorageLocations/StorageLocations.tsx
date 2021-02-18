@@ -20,7 +20,7 @@ export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<StorageLocation[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<StorageLocation>();
+  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | undefined>();
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
     (): Column[] => [
@@ -28,16 +28,19 @@ export const StorageLocations: FC = () => {
         Header: name,
         accessor: 'name',
         id: 'name',
-        Cell: ({ row, value }) => (
-          <div className={styles.nameWrapper} {...row.getToggleRowExpandedProps()}>
-            {value}
-            {row.isExpanded ? (
-              <IconButton data-qa="hide-storage-location-details" name="arrow-up" />
-            ) : (
-              <IconButton data-qa="show-storage-location-details" name="arrow-down" />
-            )}
-          </div>
-        ),
+        Cell: ({ row, value }) => {
+          const restProps = row.getToggleRowExpandedProps ? row.getToggleRowExpandedProps() : {};
+          return (
+            <div className={styles.nameWrapper} {...restProps}>
+              {value}
+              {row.isExpanded ? (
+                <IconButton data-qa="hide-storage-location-details" name="arrow-up" />
+              ) : (
+                <IconButton data-qa="show-storage-location-details" name="arrow-down" />
+              )}
+            </div>
+          );
+        },
       },
       {
         Header: type,
@@ -100,7 +103,7 @@ export const StorageLocations: FC = () => {
           variant="link"
           data-qa="storage-location-add-modal-button"
           onClick={() => {
-            setSelectedLocation(null);
+            setSelectedLocation(undefined);
             setAddModalVisible(true);
           }}
         >

@@ -50,7 +50,7 @@ func (e *OpenTsdbExecutor) Query(ctx context.Context, dsInfo *models.DataSource,
 		tsdbQuery.Queries = append(tsdbQuery.Queries, metric)
 	}
 
-	if setting.Env == setting.DEV {
+	if setting.Env == setting.Dev {
 		plog.Debug("OpenTsdb request", "params", tsdbQuery)
 	}
 
@@ -106,7 +106,6 @@ func (e *OpenTsdbExecutor) createRequest(dsInfo *models.DataSource, data OpenTsd
 }
 
 func (e *OpenTsdbExecutor) parseResponse(query OpenTsdbQuery, res *http.Response) (map[string]*tsdb.QueryResult, error) {
-
 	queryResults := make(map[string]*tsdb.QueryResult)
 	queryRes := tsdb.NewQueryResult()
 
@@ -150,7 +149,6 @@ func (e *OpenTsdbExecutor) parseResponse(query OpenTsdbQuery, res *http.Response
 }
 
 func (e *OpenTsdbExecutor) buildMetric(query *tsdb.Query) map[string]interface{} {
-
 	metric := make(map[string]interface{})
 
 	// Setting metric and aggregator
@@ -162,7 +160,7 @@ func (e *OpenTsdbExecutor) buildMetric(query *tsdb.Query) map[string]interface{}
 	if !disableDownsampling {
 		downsampleInterval := query.Model.Get("downsampleInterval").MustString()
 		if downsampleInterval == "" {
-			downsampleInterval = "1m" //default value for blank
+			downsampleInterval = "1m" // default value for blank
 		}
 		downsample := downsampleInterval + "-" + query.Model.Get("downsampleAggregator").MustString()
 		if query.Model.Get("downsampleFillPolicy").MustString() != "none" {
@@ -174,7 +172,6 @@ func (e *OpenTsdbExecutor) buildMetric(query *tsdb.Query) map[string]interface{}
 
 	// Setting rate options
 	if query.Model.Get("shouldComputeRate").MustBool() {
-
 		metric["rate"] = true
 		rateOptions := make(map[string]interface{})
 		rateOptions["counter"] = query.Model.Get("isCounter").MustBool()
@@ -209,5 +206,4 @@ func (e *OpenTsdbExecutor) buildMetric(query *tsdb.Query) map[string]interface{}
 	}
 
 	return metric
-
 }
