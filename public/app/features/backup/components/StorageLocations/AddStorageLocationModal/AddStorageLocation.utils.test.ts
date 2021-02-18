@@ -6,6 +6,7 @@ describe('AddStorageLocationUtils', () => {
   describe('toFormStorageLocation', () => {
     it('should return an empty S3 object by default', () => {
       expect(toFormStorageLocation(undefined)).toEqual({
+        locationID: '',
         name: '',
         description: '',
         type: LocationType.S3,
@@ -29,6 +30,7 @@ describe('AddStorageLocationUtils', () => {
       };
 
       expect(toFormStorageLocation(location)).toEqual({
+        locationID: location.locationID,
         name: location.name,
         description: location.description,
         type: LocationType.S3,
@@ -48,6 +50,7 @@ describe('AddStorageLocationUtils', () => {
       };
 
       expect(toFormStorageLocation(location)).toEqual({
+        locationID: location.locationID,
         name: location.name,
         description: location.description,
         type: LocationType.CLIENT,
@@ -65,6 +68,7 @@ describe('AddStorageLocationUtils', () => {
       };
 
       expect(toFormStorageLocation(location)).toEqual({
+        locationID: location.locationID,
         name: location.name,
         description: location.description,
         type: LocationType.SERVER,
@@ -129,6 +133,7 @@ describe('AddStorageLocationUtils', () => {
       };
 
       expect(toStorageLocation(location)).toEqual({
+        locationID: location.locationID,
         name: location.name,
         description: location.description,
         type: LocationType.SERVER,
