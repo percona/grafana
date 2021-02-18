@@ -7,6 +7,7 @@ import (
 
 	"github.com/VividCortex/mysqlerr"
 	"github.com/go-sql-driver/mysql"
+	"github.com/grafana/grafana/pkg/util/errutil"
 	"xorm.io/xorm"
 )
 
@@ -14,7 +15,7 @@ type Mysql struct {
 	BaseDialect
 }
 
-func NewMysqlDialect(engine *xorm.Engine) *Mysql {
+func NewMysqlDialect(engine *xorm.Engine) Dialect {
 	d := Mysql{}
 	d.BaseDialect.dialect = &d
 	d.BaseDialect.engine = engine
@@ -115,19 +116,52 @@ func (db *Mysql) ColumnCheckSql(tableName, columnName string) (string, []interfa
 }
 
 func (db *Mysql) CleanDB() error {
-	tables, _ := db.engine.DBMetas()
+	tables, err := db.engine.DBMetas()
+	if err != nil {
+		return err
+	}
 	sess := db.engine.NewSession()
 	defer sess.Close()
 
 	for _, table := range tables {
 		if _, err := sess.Exec("set foreign_key_checks = 0"); err != nil {
-			return fmt.Errorf("failed to disable foreign key checks")
+			return errutil.Wrap("failed to disable foreign key checks", err)
 		}
 		if _, err := sess.Exec("drop table " + table.Name + " ;"); err != nil {
-			return fmt.Errorf("failed to delete table: %v, err: %v", table.Name, err)
+			return errutil.Wrapf(err, "failed to delete table %q", table.Name)
 		}
 		if _, err := sess.Exec("set foreign_key_checks = 1"); err != nil {
-			return fmt.Errorf("failed to disable foreign key checks")
+			return errutil.Wrap("failed to disable foreign key checks", err)
+		}
+	}
+
+	return nil
+}
+
+// TruncateDBTables truncates all the tables.
+// A special case is the dashboard_acl table where we keep the default permissions.
+func (db *Mysql) TruncateDBTables() error {
+	tables, err := db.engine.DBMetas()
+	if err != nil {
+		return err
+	}
+	sess := db.engine.NewSession()
+	defer sess.Close()
+
+	for _, table := range tables {
+		switch table.Name {
+		case "dashboard_acl":
+			// keep default dashboard permissions
+			if _, err := sess.Exec(fmt.Sprintf("DELETE FROM %v WHERE dashboard_id != -1 AND org_id != -1;", db.Quote(table.Name))); err != nil {
+				return errutil.Wrapf(err, "failed to truncate table %q", table.Name)
+			}
+			if _, err := sess.Exec(fmt.Sprintf("ALTER TABLE %v AUTO_INCREMENT = 3;", db.Quote(table.Name))); err != nil {
+				return errutil.Wrapf(err, "failed to reset table %q", table.Name)
+			}
+		default:
+			if _, err := sess.Exec(fmt.Sprintf("TRUNCATE TABLE %v;", db.Quote(table.Name))); err != nil {
+				return errutil.Wrapf(err, "failed to truncate table %q", table.Name)
+			}
 		}
 	}
 

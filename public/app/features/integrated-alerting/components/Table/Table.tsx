@@ -1,12 +1,19 @@
 import React, { FC } from 'react';
-import { Row, useExpanded, useTable } from 'react-table';
+import { useExpanded, useTable } from 'react-table';
 import { css } from 'emotion';
 import { Spinner, useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';
 import { EmptyBlock } from '../EmptyBlock';
 
-export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMessage, children, renderExpandedRow }) => {
+export const Table: FC<TableProps> = ({
+  pendingRequest,
+  data,
+  columns,
+  emptyMessage,
+  children,
+  renderExpandedRow = () => <></>,
+}) => {
   const style = useStyles(getStyles);
   const tableInstance = useTable({ columns, data }, useExpanded);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, visibleColumns } = tableInstance;
@@ -50,7 +57,7 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
                         <tr {...row.getRowProps()}>
                           {row.cells.map(cell => {
                             return (
-                              <td key={cell.column.id} {...cell.getCellProps()}>
+                              <td {...cell.getCellProps()} key={cell.column.id}>
                                 {cell.render('Cell')}
                               </td>
                             );
@@ -70,8 +77,4 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
       </div>
     </div>
   );
-};
-
-Table.defaultProps = {
-  renderExpandedRow: (row: Row) => <span></span>,
 };

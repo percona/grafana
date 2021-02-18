@@ -20,11 +20,13 @@ export const DeleteNotificationChannelModal: FC<DeleteNotificationChannelModalPr
   const { getNotificationChannels } = useContext(NotificationChannelProvider);
   const onDelete = async () => {
     try {
-      setPending(true);
-      await NotificationChannelService.remove(notificationChannel);
-      setVisible(false);
-      appEvents.emit(AppEvents.alertSuccess, [getDeleteSuccess(summary)]);
-      getNotificationChannels();
+      if (notificationChannel && summary) {
+        setPending(true);
+        await NotificationChannelService.remove(notificationChannel);
+        setVisible(false);
+        appEvents.emit(AppEvents.alertSuccess, [getDeleteSuccess(summary)]);
+        getNotificationChannels();
+      }
     } catch (e) {
       logger.error(e);
     } finally {

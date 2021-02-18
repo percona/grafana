@@ -23,16 +23,19 @@ export const StorageLocations: FC = () => {
         Header: name,
         accessor: 'name',
         id: 'name',
-        Cell: ({ row, value }) => (
-          <div className={styles.nameWrapper} {...row.getToggleRowExpandedProps()}>
-            {value}
-            {row.isExpanded ? (
-              <IconButton data-qa="hide-storage-location-details" name="arrow-up" />
-            ) : (
-              <IconButton data-qa="show-storage-location-details" name="arrow-down" />
-            )}
-          </div>
-        ),
+        Cell: ({ row, value }) => {
+          const restProps = row.getToggleRowExpandedProps ? row.getToggleRowExpandedProps() : {};
+          return (
+            <div className={styles.nameWrapper} {...restProps}>
+              {value}
+              {row.isExpanded ? (
+                <IconButton data-qa="hide-storage-location-details" name="arrow-up" />
+              ) : (
+                <IconButton data-qa="show-storage-location-details" name="arrow-down" />
+              )}
+            </div>
+          );
+        },
       },
       {
         Header: type,

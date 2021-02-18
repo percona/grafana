@@ -50,7 +50,7 @@ const BackupPage: FC = () => {
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => setActiveTab(tab.id)} />
         ))}
       </TabsBar>
-      <TabContent>{tabComponentMap.find(tab => tab.id === activeTab).component}</TabContent>
+      <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component}</TabContent>
     </div>
   );
 };
