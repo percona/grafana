@@ -162,6 +162,8 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="add-alert-rule-modal-add-button"
+                  // TODO: fix LoaderButton types
+                  // @ts-ignore
                   size="md"
                   variant="primary"
                   disabled={!valid || pristine}

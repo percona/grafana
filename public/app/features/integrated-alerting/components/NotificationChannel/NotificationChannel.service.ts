@@ -17,10 +17,13 @@ export const NotificationChannelService = {
       );
   },
   async add(values: NotificationChannelRenderProps): Promise<void> {
-    return getBackendSrv().post(`${BASE_URL}/Add`, TO_API[values.type.value](values));
+    return getBackendSrv().post(`${BASE_URL}/Add`, values.type?.value && TO_API[values.type.value](values));
   },
   async change(channelId: string, values: NotificationChannelRenderProps): Promise<void> {
-    return getBackendSrv().post(`${BASE_URL}/Change`, { channel_id: channelId, ...TO_API[values.type.value](values) });
+    return getBackendSrv().post(`${BASE_URL}/Change`, {
+      channel_id: channelId,
+      ...(values.type?.value ? TO_API[values.type.value](values) : {}),
+    });
   },
   async remove({ channelId }: NotificationChannel): Promise<void> {
     return getBackendSrv().post(`${BASE_URL}/Remove`, { channel_id: channelId });

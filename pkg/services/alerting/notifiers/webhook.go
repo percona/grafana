@@ -15,28 +15,6 @@ func init() {
 		Description: "Sends HTTP POST request to a URL",
 		Heading:     "Webhook settings",
 		Factory:     NewWebHookNotifier,
-		OptionsTemplate: `
-      <h3 class="page-heading">Webhook settings</h3>
-      <div class="gf-form">
-        <span class="gf-form-label width-10">Url</span>
-        <input type="text" required class="gf-form-input max-width-26" ng-model="ctrl.model.settings.url"></input>
-      </div>
-      <div class="gf-form">
-        <span class="gf-form-label width-10">Http Method</span>
-        <div class="gf-form-select-wrapper width-14">
-          <select class="gf-form-input" ng-model="ctrl.model.settings.httpMethod" ng-options="t for t in ['POST', 'PUT']">
-          </select>
-        </div>
-      </div>
-      <div class="gf-form">
-        <span class="gf-form-label width-10">Username</span>
-        <input type="text" class="gf-form-input max-width-14" ng-model="ctrl.model.settings.username"></input>
-      </div>
-      <div class="gf-form">
-        <span class="gf-form-label width-10">Password</span>
-        <input type="text" class="gf-form-input max-width-14" ng-model="ctrl.model.settings.password"></input>
-      </div>
-    `,
 		Options: []alerting.NotifierOption{
 			{
 				Label:        "Url",
@@ -71,10 +49,10 @@ func init() {
 				Element:      alerting.ElementTypeInput,
 				InputType:    alerting.InputTypePassword,
 				PropertyName: "password",
+				Secure:       true,
 			},
 		},
 	})
-
 }
 
 // NewWebHookNotifier is the constructor for
@@ -85,11 +63,13 @@ func NewWebHookNotifier(model *models.AlertNotification) (alerting.Notifier, err
 		return nil, alerting.ValidationError{Reason: "Could not find url property in settings"}
 	}
 
+	password := model.DecryptedValue("password", model.Settings.Get("password").MustString())
+
 	return &WebhookNotifier{
 		NotifierBase: NewNotifierBase(model),
 		URL:          url,
 		User:         model.Settings.Get("username").MustString(),
-		Password:     model.Settings.Get("password").MustString(),
+		Password:     password,
 		HTTPMethod:   model.Settings.Get("httpMethod").MustString("POST"),
 		log:          log.New("alerting.notifier.webhook"),
 	}, nil
