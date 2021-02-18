@@ -6,15 +6,15 @@ import { Messages } from './Pagination.messages';
 import { getShownPages, getLeftItemNumber, getRightItemNumber } from './Pagination.utils';
 
 export const Pagination: FC<PaginationProps> = ({
-  pageCount,
-  initialPageIndex,
+  pageCount = 1,
+  initialPageIndex = 0,
   pageSize,
-  pagesPerView,
+  pagesPerView = 3,
   nrRowsOnCurrentPage,
-  totalItems,
+  totalItems = 0,
   pageSizeOptions,
-  onPageChange,
-  onPageSizeChange,
+  onPageChange = () => 0,
+  onPageSizeChange = () => 0,
 }) => {
   const [activePageIndex, setActivePageIndex] = useState(initialPageIndex);
   const pageArray = useMemo(() => [...Array(pageCount).keys()], [pageCount]);
@@ -52,7 +52,7 @@ export const Pagination: FC<PaginationProps> = ({
             isSearchable={false}
             value={pageSize}
             options={pageSizeOptions}
-            onChange={e => pageSizeChanged(e.value)}
+            onChange={e => pageSizeChanged(e.value || 0)}
           />
         </span>
       </span>
@@ -104,12 +104,4 @@ export const Pagination: FC<PaginationProps> = ({
       </span>
     </div>
   );
-};
-
-Pagination.defaultProps = {
-  pageCount: 1,
-  initialPageIndex: 0,
-  pagesPerView: 3,
-  totalItems: 0,
-  onPageChange: () => 0,
 };

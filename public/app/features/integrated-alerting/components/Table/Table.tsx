@@ -9,13 +9,13 @@ import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableContent } from './TableContent';
 
 export const Table: FC<TableProps> = ({
-  pendingRequest,
+  pendingRequest = false,
   data,
   columns,
   showPagination,
-  totalPages,
+  totalPages = 0,
   onPaginationChanged,
-  emptyMessage,
+  emptyMessage = '',
   totalItems,
   pageSize: propPageSize,
   pageIndex: propPageIndex,

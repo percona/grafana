@@ -6,11 +6,11 @@ export const getPageSize = (pageSize: number) =>
   PAGE_SIZES.find(size => size.value === pageSize) ? pageSize : PAGE_SIZES[0].value;
 
 export const useStoredTablePageSize = (tableId: string) => {
-  let pageSize = PAGE_SIZES[0].value;
+  let pageSize = PAGE_SIZES[0].value as number;
   const fullId = `${tableId}-table-page-size`;
 
   try {
-    const storedValue = parseInt(localStorage.getItem(fullId), 10);
+    const storedValue = parseInt(localStorage.getItem(fullId) as string, 10);
 
     if (storedValue && !isNaN(storedValue)) {
       pageSize = storedValue;

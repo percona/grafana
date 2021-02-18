@@ -44,7 +44,7 @@ export const AlertRules: FC = () => {
       const { rules = [], totals } = await AlertRulesService.list({
         page_params: {
           index: pageIndex,
-          page_size: pageSize,
+          page_size: pageSize as number,
         },
       });
       setData(formatRules(rules));
@@ -163,7 +163,7 @@ export const AlertRules: FC = () => {
         totalItems={totalItems}
         totalPages={totalPages}
         onPaginationChanged={onPaginationChanged}
-        pageSize={pageSize}
+        pageSize={pageSize as number}
         pageIndex={pageIndex}
       />
     </AlertRulesProvider.Provider>

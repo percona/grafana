@@ -12,12 +12,12 @@ import { PAGE_SIZES } from '../../Table/Pagination/Pagination.constants';
 import { TableContent } from '../../Table/TableContent';
 
 export const AlertRulesTable: FC<AlertRulesTableProps> = ({
-  pendingRequest,
+  pendingRequest = false,
   data,
   columns,
-  emptyMessage,
+  emptyMessage = '',
   showPagination,
-  totalPages,
+  totalPages = 0,
   totalItems,
   pageSize: propPageSize,
   pageIndex: propPageIndex,
