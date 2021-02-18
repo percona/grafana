@@ -29,11 +29,6 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form, va
   const { topology, resources, memory, cpu, databaseType } = values;
   const parsePositiveInt = useCallback(value => (value > 0 && Number.isInteger(+value) ? value : undefined), []);
 
-  const parseNonNegativeFloat = useCallback(
-    value => (value > 0 ? (+value).toFixed(1).replace(/\.0+$/, '') : value),
-    []
-  );
-
   const topologies = useMemo(
     () =>
       databaseType?.value !== Databases.mysql
@@ -92,14 +87,12 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form, va
           label={Messages.dbcluster.addModal.fields.memory}
           validators={resourceValidators}
           disabled={resources !== DBClusterResources.custom}
-          parse={parseNonNegativeFloat}
         />
         <NumberInputField
           name={EditDBClusterFields.cpu}
           label={Messages.dbcluster.addModal.fields.cpu}
           validators={resourceValidators}
           disabled={resources !== DBClusterResources.custom}
-          parse={parseNonNegativeFloat}
         />
         <NumberInputField
           name={EditDBClusterFields.disk}
