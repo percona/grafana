@@ -30,7 +30,7 @@ export const buildWarningMessage = (className: string) => (
 );
 
 export const newDBClusterService = (type: Databases): DBClusterService => {
-  const service = SERVICE_MAP[type];
+  const service = SERVICE_MAP[type] as DBClusterService;
 
   return service || SERVICE_MAP[Databases.mysql];
 };

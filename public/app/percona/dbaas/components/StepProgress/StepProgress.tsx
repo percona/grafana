@@ -7,13 +7,13 @@ import { Step, StepStatus } from './Step/Step';
 import { getStyles } from './StepProgress.styles';
 
 export interface StepProgressProps {
-  steps: Step[];
+  steps: StepProps[];
   initialValues?: Record<string, any>;
   submitButtonMessage: string;
   onSubmit: (values: Record<string, any>) => void;
 }
 
-export interface Step {
+export interface StepProps {
   render: (props: FormRenderProps) => ReactNode;
   title?: string;
   fields: string[];

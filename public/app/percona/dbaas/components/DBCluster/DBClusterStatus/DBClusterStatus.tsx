@@ -47,8 +47,8 @@ export const DBClusterStatus: FC<DBClusterStatusProps> = ({ status, message, fin
       {showProgressBar ? (
         <ProgressBar
           status={statusError ? ProgressBarStatus.error : ProgressBarStatus.progress}
-          finishedSteps={finishedSteps}
-          totalSteps={totalSteps}
+          finishedSteps={finishedSteps || 0}
+          totalSteps={totalSteps || 0}
           message={getProgressMessage(status, prevStatus.current)}
           dataQa="cluster-progress-bar"
         />
