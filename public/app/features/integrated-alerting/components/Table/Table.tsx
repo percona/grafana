@@ -46,10 +46,10 @@ export const Table: FC<TableProps> = ({ pendingRequest, data, columns, emptyMess
                 : rows.map(row => {
                     prepareRow(row);
                     return (
-                      <tr key={row.id} {...row.getRowProps()}>
+                      <tr {...row.getRowProps()} key={row.id}>
                         {row.cells.map(cell => {
                           return (
-                            <td key={cell.column.id} {...cell.getCellProps()}>
+                            <td {...cell.getCellProps()} key={cell.column.id}>
                               {cell.render('Cell')}
                             </td>
                           );

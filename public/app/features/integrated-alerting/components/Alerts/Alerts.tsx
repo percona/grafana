@@ -110,12 +110,12 @@ export const Alerts: FC = () => {
           const alert = row.original as Alert;
           return (
             <tr
-              key={alert.alertId}
               {...row.getRowProps()}
+              key={alert.alertId}
               className={alert.status === AlertStatus.SILENCED ? style.disabledRow : ''}
             >
               {row.cells.map(cell => (
-                <td key={cell.column.id} {...cell.getCellProps()}>
+                <td {...cell.getCellProps()} key={cell.column.id}>
                   {cell.render('Cell')}
                 </td>
               ))}

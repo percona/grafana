@@ -147,7 +147,7 @@ export const AlertRules: FC = () => {
               <React.Fragment key={alertRule.ruleId}>
                 <tr {...row.getRowProps()} className={alertRule.disabled ? styles.disabledRow : ''}>
                   {row.cells.map(cell => (
-                    <td key={cell.column.id} {...cell.getCellProps()}>
+                    <td {...cell.getCellProps()} key={cell.column.id}>
                       {cell.render('Cell')}
                     </td>
                   ))}
