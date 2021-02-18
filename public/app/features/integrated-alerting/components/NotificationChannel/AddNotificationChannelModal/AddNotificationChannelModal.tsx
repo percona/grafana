@@ -27,7 +27,7 @@ const { Form } = withTypes<NotificationChannelRenderProps>();
 const TypeField: FC<{ values: NotificationChannelRenderProps }> = ({ values }) => {
   const { type } = values;
 
-  switch (type.value) {
+  switch (type?.value) {
     case NotificationChannelType.email:
       return <EmailFields />;
     case NotificationChannelType.pagerDuty:
@@ -57,7 +57,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
     }
 
     try {
-      if (notificationChannel) {
+      if (notificationChannel?.channelId) {
         await NotificationChannelService.change(notificationChannel.channelId, submittedValues);
       } else {
         await NotificationChannelService.add(submittedValues);
@@ -93,6 +93,8 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="notification-channel-add-button"
+                  // TODO: fix LoaderButton types
+                  // @ts-ignore
                   size="md"
                   variant="primary"
                   disabled={!valid || pristine}

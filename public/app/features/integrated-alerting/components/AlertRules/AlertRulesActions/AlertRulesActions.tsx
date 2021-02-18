@@ -9,6 +9,7 @@ import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { Messages } from './AlertRulesActions.messages';
 import { DeleteModal } from '../../DeleteModal';
+import { AlertRuleCreatePayload } from '../AlertRules.types';
 
 export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => {
   const styles = useStyles(getStyles);
@@ -47,7 +48,7 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
 
     const newSummary = `${Messages.copyOf} ${alertRule.summary}`;
 
-    const createAlertRulePayload = {
+    const createAlertRulePayload: AlertRuleCreatePayload = {
       template_name: rawValues.template.name,
       channel_ids: rawValues.channels?.map(channel => channel.channel_id),
       custom_labels: rawValues.custom_labels,

@@ -17,7 +17,7 @@ export interface FormattedTemplate {
   name: string;
   summary: string;
   source: SourceDescription[keyof SourceDescription];
-  created_at: string;
+  created_at: string | undefined;
   yaml: string;
 }
 
