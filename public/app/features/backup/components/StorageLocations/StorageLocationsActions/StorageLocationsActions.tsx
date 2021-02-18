@@ -10,7 +10,7 @@ export const StorageLocationsActions: FC<StorageLocatationsActionProps> = ({ loc
   return (
     <div className={styles.actionsWrapper}>
       <DBIcon type="edit" data-qa="edit-storage-location-button" role="button" />
-      <DBIcon type="see" data-qa="see-storage-location-button" role="button" />
+      {/* <DBIcon type="see" data-qa="see-storage-location-button" role="button" /> */}
       <DBIcon type="delete" data-qa="delete-storage-location-button" role="button" />
     </div>
   );

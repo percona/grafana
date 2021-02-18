@@ -6,5 +6,5 @@ import * as Icons from './assets';
 export const DBIcon: FC<DBIconProps> = ({ type, size, ...rest }) => {
   //@ts-ignore
   const Icon = Icons[toPascalCase(type)];
-  return <Icon size={size} {...rest} />;
+  return Icon ? <Icon size={size} {...rest} /> : null;
 };

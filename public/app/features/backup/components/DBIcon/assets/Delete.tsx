@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { IconProps } from '../DBIcon.types';
 
-export const Delete: FC<IconProps> = ({ size, ...rest }) => (
+export const Delete: FC<IconProps> = ({ size = 22, ...rest }) => (
   <svg width={size} height={size} viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
     <path
       fillRule="evenodd"
@@ -41,7 +41,3 @@ export const Delete: FC<IconProps> = ({ size, ...rest }) => (
     <path d="M17.5215 4.47803V8.39107" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
-
-Delete.defaultProps = {
-  size: 22,
-};
