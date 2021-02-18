@@ -5357,10 +5357,10 @@
     "@octokit/openapi-types" "^2.3.1"
     "@types/node" ">= 8"
 
-"@percona/platform-core@^0.6.0":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@percona/platform-core/-/platform-core-0.6.1.tgz#773fe0519abdab8b2adbc4b88a81d0a1b4425be0"
-  integrity sha512-a69I/bGb8Bovby5ARBA0tRJ+Fl+Y/cPmm++kxJ2pTSyar75oXLtGlpuPJS2qmF6w1L/bZ8lq6HiK83FuCQFc/A==
+"@percona/platform-core@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@percona/platform-core/-/platform-core-0.7.0.tgz#8c5e1f9a52d1f48c7d110d75bfbe050c2cc69f57"
+  integrity sha512-GNr9br1KnEvlZlv1EXsW9ZZrRYWgmX1pZJTDQLCnqp/23HYOcnViZZZ59krRWq9Y0cR69ji6Vlroi4JhcM88vA==
   dependencies:
     "@popperjs/core" "^2.5.3"
     react-popper "^2.2.3"
