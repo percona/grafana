@@ -29,6 +29,7 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
         <input className={styles.input} type={visible ? 'text' : 'password'} readOnly={readOnly} value={secret}></input>
       ) : (
         <TextInputField
+          name={fieldProps?.name || 'secret'}
           inputProps={{ type: visible ? 'text' : 'password', readOnly }}
           initialValue={secret}
           {...fieldProps}

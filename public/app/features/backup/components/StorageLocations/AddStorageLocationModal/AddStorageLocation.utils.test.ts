@@ -5,7 +5,7 @@ import { AddStorageLocationFormProps } from './AddStorageLocationModal.types';
 describe('AddStorageLocationUtils', () => {
   describe('toFormStorageLocation', () => {
     it('should return an empty S3 object by default', () => {
-      expect(toFormStorageLocation(null)).toEqual({
+      expect(toFormStorageLocation(undefined)).toEqual({
         name: '',
         description: '',
         type: LocationType.S3,
@@ -19,6 +19,7 @@ describe('AddStorageLocationUtils', () => {
 
     it('should convert an S3Location', () => {
       const location: S3Location = {
+        locationID: 'Location_1',
         name: 'S3',
         description: 'S3 location',
         path: 's3://foo',
@@ -39,6 +40,7 @@ describe('AddStorageLocationUtils', () => {
 
     it('should convert a local client location', () => {
       const location: StorageLocation = {
+        locationID: 'Location_1',
         name: 'Local Client',
         description: 'Client location',
         path: '/foo/bar',
@@ -55,6 +57,7 @@ describe('AddStorageLocationUtils', () => {
 
     it('should convert a local server location', () => {
       const location: StorageLocation = {
+        locationID: 'Location_1',
         name: 'Local Server',
         description: 'Server location',
         path: '/foo/bar',

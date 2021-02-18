@@ -28,8 +28,8 @@ export const AlertRules: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule>();
-  const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule>();
+  const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule | null>();
+  const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule | null>();
   const [data, setData] = useState<AlertRule[]>([]);
 
   const getAlertRules = async () => {
@@ -147,7 +147,7 @@ export const AlertRules: FC = () => {
               <React.Fragment key={alertRule.ruleId}>
                 <tr {...row.getRowProps()} className={alertRule.disabled ? styles.disabledRow : ''}>
                   {row.cells.map(cell => (
-                    <td key={cell.column.id} {...cell.getCellProps()}>
+                    <td {...cell.getCellProps()} key={cell.column.id}>
                       {cell.render('Cell')}
                     </td>
                   ))}
