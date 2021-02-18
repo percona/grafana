@@ -36,15 +36,15 @@ export const formatThreshold = (
     return 'Invalid type';
   }
 
-  let value: boolean | number | string;
+  let value: boolean | number | string | undefined;
 
   if (!thresholdParam) {
-    value = templateThresholdParam[type].default;
+    value = templateThresholdParam[type]?.default;
   } else {
     value = thresholdParam[type];
   }
 
-  const unit = AlertRulesListPayloadTemplateParamUnits[paramUnit];
+  const unit = paramUnit ? AlertRulesListPayloadTemplateParamUnits[paramUnit] : undefined;
 
   return `${value}${unit ? ` ${unit}` : ''}`;
 };

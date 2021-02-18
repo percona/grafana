@@ -1,3 +1,5 @@
+// +build integration
+
 package sqlstore
 
 import (
@@ -9,7 +11,6 @@ import (
 )
 
 func TestPlaylistDataAccess(t *testing.T) {
-
 	Convey("Testing Playlist data access", t, func() {
 		InitTestDB(t)
 

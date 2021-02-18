@@ -9,6 +9,7 @@ export const getLogRowStyles = stylesFactory((theme: GrafanaTheme, logLevel?: Lo
   let logColor = selectThemeVariant({ light: theme.palette.gray5, dark: theme.palette.gray2 }, theme.type);
   const borderColor = selectThemeVariant({ light: theme.palette.gray5, dark: theme.palette.gray2 }, theme.type);
   const bgColor = selectThemeVariant({ light: theme.palette.gray5, dark: theme.palette.dark4 }, theme.type);
+  const hoverBgColor = selectThemeVariant({ light: theme.palette.gray7, dark: theme.palette.dark2 }, theme.type);
   const context = css`
     label: context;
     visibility: hidden;
@@ -92,7 +93,7 @@ export const getLogRowStyles = stylesFactory((theme: GrafanaTheme, logLevel?: Lo
       }
 
       &:hover {
-        background: ${theme.colors.bodyBg};
+        background: ${hoverBgColor};
       }
     `,
     logsRowDuplicates: css`
@@ -116,6 +117,10 @@ export const getLogRowStyles = stylesFactory((theme: GrafanaTheme, logLevel?: Lo
         background-color: ${logColor};
       }
     `,
+    logIconError: css`
+      color: ${theme.palette.red};
+      margin-left: -5px;
+    `,
     logsRowToggleDetails: css`
       label: logs-row-toggle-details__level;
       position: relative;
@@ -126,7 +131,6 @@ export const getLogRowStyles = stylesFactory((theme: GrafanaTheme, logLevel?: Lo
     logsRowLocalTime: css`
       label: logs-row__localtime;
       white-space: nowrap;
-      max-width: 12.5em;
     `,
     logsRowLabels: css`
       label: logs-row__labels;

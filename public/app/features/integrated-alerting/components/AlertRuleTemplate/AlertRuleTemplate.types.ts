@@ -25,7 +25,7 @@ export interface Template {
   summary: string;
   name: string;
   source: keyof typeof SourceDescription;
-  created_at: string;
+  created_at: string | undefined;
   yaml: string;
 }
 
