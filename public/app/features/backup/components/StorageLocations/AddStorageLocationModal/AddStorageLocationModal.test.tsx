@@ -1,10 +1,11 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { dataQa } from '@percona/platform-core';
+import { dataQa, LoaderButton } from '@percona/platform-core';
 import { LocationType, S3Location, StorageLocation } from '../StorageLocations.types';
 import { LocalFields } from './LocalFields';
 import { S3Fields } from './S3Fields';
 import { AddStorageLocationModal } from './AddStorageLocationModal';
+import { Messages } from './AddStorageLocationModal.messages';
 
 describe('AddStorageLocationModal', () => {
   it('should render local TypeField', () => {
@@ -57,5 +58,26 @@ describe('AddStorageLocationModal', () => {
     wrapper.find('form').simulate('submit');
 
     expect(onAdd).toHaveBeenCalled();
+  });
+
+  it('should show the "Add" button when no location passed', () => {
+    const wrapper = mount(
+      <AddStorageLocationModal location={undefined} onClose={jest.fn()} onAdd={jest.fn()} isVisible />
+    );
+    expect(wrapper.find(LoaderButton).text()).toBe(Messages.addAction);
+  });
+
+  it('should show the "Edit" button when a location is passed', () => {
+    const location: StorageLocation = {
+      locationID: 'Location_1',
+      name: 'client_fs',
+      description: 'description',
+      type: LocationType.CLIENT,
+      path: '/foo/bar',
+    };
+    const wrapper = mount(
+      <AddStorageLocationModal location={location} onClose={jest.fn()} onAdd={jest.fn()} isVisible />
+    );
+    expect(wrapper.find(LoaderButton).text()).toBe(Messages.editAction);
   });
 });
