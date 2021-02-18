@@ -28,6 +28,8 @@ export const DeleteModal: FC<DeleteModalProps> = ({
         </Button>
         <LoaderButton
           loading={loading}
+          // TODO: fix LoaderButton types
+          // @ts-ignore
           variant="destructive"
           size="md"
           onClick={onDelete}

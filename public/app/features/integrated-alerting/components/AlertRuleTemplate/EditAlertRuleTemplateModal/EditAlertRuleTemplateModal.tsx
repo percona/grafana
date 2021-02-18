@@ -45,6 +45,8 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="alert-rule-template-edit-button"
+                  // TODO: fix LoaderButton types
+                  // @ts-ignore
                   size="md"
                   variant="primary"
                   disabled={!valid || pristine}

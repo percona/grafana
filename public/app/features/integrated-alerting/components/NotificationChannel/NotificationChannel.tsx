@@ -21,7 +21,7 @@ export const NotificationChannel: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(false);
   const [data, setData] = useState<Channel[]>([]);
-  const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel>();
+  const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel | null>();
   const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);
 

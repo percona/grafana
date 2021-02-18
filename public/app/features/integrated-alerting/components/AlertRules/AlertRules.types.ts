@@ -1,9 +1,9 @@
 export interface AlertRulesContext {
-  selectedRuleDetails: AlertRule;
+  selectedRuleDetails?: AlertRule | null;
   getAlertRules: () => void;
   setAddModalVisible: (isVisible: boolean) => void;
-  setSelectedAlertRule: (alertRule: AlertRule) => void;
-  setSelectedRuleDetails: (alertRule: AlertRule) => void;
+  setSelectedAlertRule: (alertRule: AlertRule | null) => void;
+  setSelectedRuleDetails: (alertRule: AlertRule | null) => void;
 }
 
 export enum AlertRuleFilterType {
@@ -45,7 +45,7 @@ export enum AlertRuleSeverity {
 }
 
 export interface AlertRule {
-  ruleId?: string;
+  ruleId: string;
   createdAt: string;
   disabled: boolean;
   duration: string;
@@ -121,15 +121,15 @@ export interface AlertRuleCreateResponse {
 }
 
 export interface AlertRuleCreatePayload {
-  channel_ids: string[];
-  custom_labels: AlertRulePayloadCustomLabels;
+  channel_ids: Array<string | undefined>;
+  custom_labels?: AlertRulePayloadCustomLabels;
   disabled: boolean;
   filters: AlertRulesListPayloadFilter[];
   for: string;
   params?: AlertRulesListPayloadParam[];
-  severity: keyof typeof AlertRuleSeverity;
+  severity?: keyof typeof AlertRuleSeverity;
   summary: string;
-  template_name: string;
+  template_name?: string;
 }
 
 export interface AlertRuleGetPayload {
