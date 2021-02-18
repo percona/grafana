@@ -1,7 +1,7 @@
 import { DBCluster, DBClusterPodLogs } from '../DBCluster.types';
 
 export interface DBClusterLogsModalProps {
-  dbCluster: DBCluster;
+  dbCluster: DBCluster | undefined;
   isVisible: boolean;
   setVisible: (value: boolean) => void;
 }

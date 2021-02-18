@@ -55,7 +55,7 @@ export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClus
 const getClusters = async (kubernetes: Kubernetes[], databaseType: Databases): Promise<DBCluster[]> => {
   const dbClusterService = newDBClusterService(databaseType);
   const kubernetesByOperator = kubernetes.filter(kubernetesCluster => {
-    const operator = OPERATORS[databaseType];
+    const operator = OPERATORS[databaseType] as Operators;
 
     return kubernetesCluster.operators[operator].status === KubernetesOperatorStatus.ok;
   });

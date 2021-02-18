@@ -11,7 +11,8 @@ import { COMPLETE_PROGRESS_DELAY, STATUS_DATA_QA } from './DBClusterStatus.const
 import { getProgressMessage, getShowProgressBarValue } from './DBClusterStatus.utils';
 
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelectedCluster, setLogsModalVisible }) => {
-  const { status, message, finishedSteps, totalSteps } = dbCluster;
+  const { message, finishedSteps, totalSteps } = dbCluster;
+  const status = dbCluster.status as Status;
   const styles = useStyles(getStyles);
   const prevStatus = useRef<Status>();
   const statusError = status === Status.failed || status === Status.invalid;
@@ -52,8 +53,8 @@ export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelect
       {showProgressBar ? (
         <ProgressBar
           status={statusError ? ProgressBarStatus.error : ProgressBarStatus.progress}
-          finishedSteps={finishedSteps}
-          totalSteps={totalSteps}
+          finishedSteps={finishedSteps || 0}
+          totalSteps={totalSteps || 0}
           message={getProgressMessage(status, prevStatus.current)}
           dataQa="cluster-progress-bar"
         />

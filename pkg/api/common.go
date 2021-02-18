@@ -31,7 +31,6 @@ type NormalResponse struct {
 }
 
 func Wrap(action interface{}) macaron.Handler {
-
 	return func(c *models.ReqContext) {
 		var res Response
 		val, err := c.Invoke(action)
@@ -48,7 +47,6 @@ func Wrap(action interface{}) macaron.Handler {
 func (r *NormalResponse) WriteTo(ctx *models.ReqContext) {
 	if r.err != nil {
 		ctx.Logger.Error(r.errMessage, "error", r.err, "remote_addr", ctx.RemoteAddr())
-
 	}
 
 	header := ctx.Resp.Header()
@@ -103,7 +101,7 @@ func Error(status int, message string, err error) *NormalResponse {
 	}
 
 	if err != nil {
-		if setting.Env != setting.PROD {
+		if setting.Env != setting.Prod {
 			data["error"] = err.Error()
 		}
 	}
