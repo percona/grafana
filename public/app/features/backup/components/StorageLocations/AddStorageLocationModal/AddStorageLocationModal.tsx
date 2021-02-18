@@ -75,7 +75,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVi
                 disabled={!valid || pristine}
                 loading={submitting}
               >
-                {location ? Messages.addAction : Messages.editAction}
+                {location ? Messages.editAction : Messages.addAction}
               </LoaderButton>
               <Button data-qa="storage-location-cancel-button" variant="secondary" onClick={onClose}>
                 {Messages.cancelAction}
