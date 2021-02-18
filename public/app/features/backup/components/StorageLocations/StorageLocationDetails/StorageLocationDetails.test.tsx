@@ -8,6 +8,7 @@ import { KeysBlock } from '../../KeysBlock';
 
 describe('StorageLocationDetails', () => {
   const location: StorageLocation = {
+    locationID: 'Location1',
     path: 'path',
     name: 'name',
     description: 'description',
