@@ -103,13 +103,15 @@ module.exports = ({ config, mode }) => {
     minimize: isProductionBuild,
     minimizer: isProductionBuild
       ? [
-          new TerserPlugin({ cache: false, parallel: false, sourceMap: false, exclude: /monaco/ }),
+          new TerserPlugin({ cache: false, parallel: false, sourceMap: false, exclude: /monaco|bizcharts/ }),
           new OptimizeCSSAssetsPlugin({}),
         ]
       : [],
   };
 
   config.resolve.extensions.push('.ts', '.tsx', '.mdx');
+  config.resolve.alias = config.resolve.alias || {};
+  config.resolve.alias['@grafana/ui'] = path.resolve(__dirname, '..');
 
   config.stats = {
     warningsFilter: /export .* was not found in/,
