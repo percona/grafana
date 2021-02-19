@@ -9,7 +9,7 @@ export const KeysBlock: FC<KeysBlockProps> = ({ accessKey, secretKey }) => {
   const styles = useStyles(getStyles);
 
   return (
-    <div>
+    <div className={styles.keysWrapper}>
       <div data-qa="access-key">
         <span className={styles.keyLabel}>{Messages.accessKey}</span>
         {accessKey}
