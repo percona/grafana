@@ -10,14 +10,18 @@ import {
   LoaderButton,
 } from '@percona/platform-core';
 import { Messages } from './AddStorageLocationModal.messages';
-import { AddStorageLocationFormProps, AddStorageLocationModalProps } from './AddStorageLocationModal.types';
+import {
+  AddStorageLocationFormProps,
+  AddStorageLocationModalProps,
+  TypeFieldProps,
+} from './AddStorageLocationModal.types';
 import { S3Fields } from './S3Fields';
 import { LocalFields } from './LocalFields';
 import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
 import { Button, HorizontalGroup } from '@grafana/ui';
 import { LocationType } from '../StorageLocations.types';
 
-const TypeField: FC<{ values: AddStorageLocationFormProps }> = ({ values }) => {
+const TypeField: FC<TypeFieldProps> = ({ values }) => {
   const { type, client, server, endpoint, accessKey, secretKey } = values;
 
   switch (type) {
