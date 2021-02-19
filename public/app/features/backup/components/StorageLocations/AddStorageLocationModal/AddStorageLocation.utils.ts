@@ -2,24 +2,34 @@ import { StorageLocation, LocationType, S3Location } from '../StorageLocations.t
 import { AddStorageLocationFormProps } from './AddStorageLocationModal.types';
 
 export const toStorageLocation = (values: AddStorageLocationFormProps): StorageLocation => {
-  const { name, description, type, endpoint, client, server, accessKey, secretKey } = values;
-  const result: Partial<StorageLocation> = { name, description, type };
+  const { name, description, type, endpoint, client, server, accessKey, secretKey, locationID } = values;
+  const locationMap: Record<typeof LocationType[keyof typeof LocationType], StorageLocation | S3Location> = {
+    [LocationType.S3]: {
+      locationID,
+      name,
+      description,
+      type,
+      path: endpoint,
+      accessKey,
+      secretKey,
+    },
+    [LocationType.CLIENT]: {
+      locationID,
+      name,
+      description,
+      type,
+      path: client,
+    },
+    [LocationType.SERVER]: {
+      locationID,
+      name,
+      description,
+      type,
+      path: server,
+    },
+  };
 
-  switch (type) {
-    case LocationType.S3:
-      result.path = endpoint;
-      (result as S3Location).accessKey = accessKey;
-      (result as S3Location).secretKey = secretKey;
-      break;
-    case LocationType.CLIENT:
-      result.path = client;
-      break;
-    case LocationType.SERVER:
-      result.path = server;
-      break;
-  }
-
-  return result as StorageLocation;
+  return locationMap[type];
 };
 
 export const toFormStorageLocation = (
@@ -27,6 +37,7 @@ export const toFormStorageLocation = (
 ): AddStorageLocationFormProps => {
   if (!values) {
     return {
+      locationID: '',
       name: '',
       description: '',
       type: LocationType.S3,
@@ -38,22 +49,42 @@ export const toFormStorageLocation = (
     };
   }
 
-  const { name, description, type, path } = values;
-  const result: Partial<AddStorageLocationFormProps> = { name, description, type };
+  const { name, description, type, path, locationID } = values;
+  const locationMap: Record<typeof LocationType[keyof typeof LocationType], AddStorageLocationFormProps> = {
+    [LocationType.S3]: {
+      locationID,
+      name,
+      description,
+      type,
+      endpoint: path,
+      accessKey: (values as S3Location).accessKey,
+      secretKey: (values as S3Location).secretKey,
+      client: '',
+      server: '',
+    },
+    [LocationType.CLIENT]: {
+      locationID,
+      name,
+      description,
+      type,
+      endpoint: '',
+      accessKey: '',
+      secretKey: '',
+      client: path,
+      server: '',
+    },
+    [LocationType.SERVER]: {
+      locationID,
+      name,
+      description,
+      type,
+      endpoint: '',
+      accessKey: '',
+      secretKey: '',
+      client: '',
+      server: path,
+    },
+  };
 
-  switch (type) {
-    case LocationType.S3:
-      result.endpoint = path;
-      result.accessKey = (values as S3Location).accessKey;
-      result.secretKey = (values as S3Location).secretKey;
-      break;
-    case LocationType.CLIENT:
-      result.client = path;
-      break;
-    case LocationType.SERVER:
-      result.server = path;
-      break;
-  }
-
-  return result as AddStorageLocationFormProps;
+  return locationMap[type];
 };
