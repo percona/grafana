@@ -8,3 +8,7 @@ export interface DBIconProps extends React.HTMLAttributes<HTMLOrSVGElement> {
 export interface IconProps {
   size?: number;
 }
+
+export type DBIconMap = {
+  [key in DBIconType]: React.FC<IconProps>;
+};

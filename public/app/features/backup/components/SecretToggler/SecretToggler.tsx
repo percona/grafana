@@ -5,7 +5,7 @@ import { getStyles } from './SecretToggler.styles';
 import { TextInputField } from '@percona/platform-core';
 import { cx } from 'emotion';
 
-export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldProps, minified }) => {
+export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldProps, small }) => {
   const [visible, setVisible] = useState(false);
   const styles = useStyles(getStyles);
 
@@ -14,19 +14,19 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
   const iconButton = useMemo(
     () => (
       <Icon
-        size={minified ? 'sm' : 'lg'}
-        className={cx(styles.lock, minified ? [] : styles.fullLock)}
+        size={small ? 'sm' : 'lg'}
+        className={cx(styles.lock, small ? [] : styles.fullLock)}
         onClick={toggleVisibility}
         name={visible ? 'lock' : 'unlock'}
       />
     ),
-    [visible, minified]
+    [visible, small]
   );
 
   return (
     <div className={styles.fieldWrapper}>
-      {minified ? (
-        <input className={styles.input} type={visible ? 'text' : 'password'} readOnly={readOnly} value={secret}></input>
+      {small ? (
+        <input className={styles.input} type={visible ? 'text' : 'password'} readOnly={readOnly} value={secret} />
       ) : (
         <TextInputField
           name={fieldProps?.name || 'secret'}
@@ -42,5 +42,5 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
 
 SecretToggler.defaultProps = {
   readOnly: true,
-  minified: false,
+  small: false,
 };

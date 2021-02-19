@@ -18,3 +18,7 @@ export interface AddStorageLocationFormProps {
   accessKey: string;
   secretKey: string;
 }
+
+export interface TypeFieldProps {
+  values: AddStorageLocationFormProps;
+}
