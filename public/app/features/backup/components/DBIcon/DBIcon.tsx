@@ -1,10 +1,14 @@
 import React, { FC } from 'react';
-import { toPascalCase } from '@grafana/data';
-import { DBIconProps } from './DBIcon.types';
-import * as Icons from './assets';
+import { DBIconProps, DBIconMap } from './DBIcon.types';
+import { Edit, Delete, See } from './assets';
+
+const Icons: DBIconMap = {
+  edit: Edit,
+  delete: Delete,
+  see: See,
+};
 
 export const DBIcon: FC<DBIconProps> = ({ type, size, ...rest }) => {
-  //@ts-ignore
-  const Icon = Icons[toPascalCase(type)];
+  const Icon = Icons[type];
   return Icon ? <Icon size={size} {...rest} /> : null;
 };

@@ -4,6 +4,7 @@ import { css } from 'emotion';
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   descriptionWrapper: css`
     display: flex;
+    align-items: center;
 
     span {
       margin-right: ${spacing.md};
