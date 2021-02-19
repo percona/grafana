@@ -10,11 +10,13 @@ export interface TableProps {
   totalPages?: number;
   tableHash?: string;
   pageSize?: number;
-  pageIndex: number;
-  onPaginationChanged: (pageSize: number, pageIndex: number) => void;
+  pageIndex?: number;
+  pagesPerView?: number;
+  onPaginationChanged?: (pageSize: number, pageIndex: number) => void;
+  children?: (rows: Row[], table: TableInstance) => React.ReactNode;
 }
 
-interface PaginatedTableState extends TableState {
+export interface PaginatedTableState extends TableState {
   pageIndex: number;
   pageSize: number;
 }

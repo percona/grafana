@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
-import { useTable, usePagination, TableState } from 'react-table';
+import { useTable, usePagination } from 'react-table';
 import { css } from 'emotion';
 import { useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
-import { TableProps, PaginatedTableInstance, PaginatedTableOptions } from './Table.types';
+import { TableProps, PaginatedTableInstance, PaginatedTableOptions, PaginatedTableState } from './Table.types';
 import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableContent } from './TableContent';
@@ -13,43 +13,54 @@ export const Table: FC<TableProps> = ({
   data,
   columns,
   showPagination,
-  totalPages = 0,
-  onPaginationChanged,
+  totalPages,
+  onPaginationChanged = () => null,
   emptyMessage = '',
   totalItems,
   pageSize: propPageSize,
-  pageIndex: propPageIndex,
+  pageIndex: propPageIndex = 0,
+  pagesPerView,
+  children,
 }) => {
   const style = useStyles(getStyles);
-  const manualPagination = totalPages >= 0;
-  const initialState: Partial<TableState> = {
+  const manualPagination = !!(totalPages && totalPages >= 0);
+  const initialState: Partial<PaginatedTableState> = {
     pageIndex: propPageIndex,
-    pageSize: propPageSize,
-  } as Partial<TableState>;
+  };
   const tableOptions: PaginatedTableOptions = {
     columns,
     data,
     initialState,
     manualPagination,
   };
+  const plugins = [];
 
-  if (manualPagination) {
-    tableOptions.pageCount = totalPages;
+  if (showPagination) {
+    plugins.push(usePagination);
+
+    if (manualPagination) {
+      tableOptions.pageCount = totalPages;
+    }
+
+    if (propPageSize) {
+      initialState.pageSize = propPageSize;
+    }
   }
 
-  const tableInstance = useTable(tableOptions, usePagination) as PaginatedTableInstance;
+  const tableInstance = useTable(tableOptions, ...plugins) as PaginatedTableInstance;
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     page,
+    rows,
     prepareRow,
     pageCount,
     setPageSize,
     gotoPage,
     state: { pageSize, pageIndex },
   } = tableInstance;
-  const hasData = !!(pageCount && !pendingRequest);
+  const hasData = !!(data.length && !pendingRequest);
 
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
@@ -74,7 +85,6 @@ export const Table: FC<TableProps> = ({
                     {headerGroup.headers.map(column => (
                       <th
                         className={css`
-                          cursor: pointer;
                           width: ${column.width};
                         `}
                         {...column.getHeaderProps()}
@@ -86,16 +96,22 @@ export const Table: FC<TableProps> = ({
                 ))}
               </thead>
               <tbody {...getTableBodyProps()} data-qa="table-tbody">
-                {page.map(row => {
-                  prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()}>
-                      {row.cells.map(cell => {
-                        return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                      })}
-                    </tr>
-                  );
-                })}
+                {children
+                  ? children(showPagination ? page : rows, tableInstance)
+                  : (showPagination ? page : rows).map(row => {
+                      prepareRow(row);
+                      return (
+                        <tr {...row.getRowProps()} key={row.id}>
+                          {row.cells.map(cell => {
+                            return (
+                              <td {...cell.getCellProps()} key={cell.column.id}>
+                                {cell.render('Cell')}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
               </tbody>
             </table>
           </TableContent>
@@ -103,6 +119,7 @@ export const Table: FC<TableProps> = ({
       </div>
       {showPagination && hasData && (
         <Pagination
+          pagesPerView={pagesPerView}
           pageCount={pageCount}
           initialPageIndex={pageIndex}
           totalItems={totalItems}

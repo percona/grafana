@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Column } from 'react-table';
 import { Button, useStyles, IconButton } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
-import { AlertRulesTable } from './AlertRulesTable';
+import { Table } from '../Table/Table';
 import { AddAlertRuleModal } from './AddAlertRuleModal';
 import { getStyles } from './AlertRules.styles';
 import { AlertRulesProvider } from './AlertRules.provider';
@@ -29,7 +29,7 @@ const {
 export const AlertRules: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [pendingRequest, setPendingRequest] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState(true);
   const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule | null>();
   const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule | null>();
   const [data, setData] = useState<AlertRule[]>([]);
@@ -154,18 +154,47 @@ export const AlertRules: FC = () => {
         </Button>
       </div>
       <AddAlertRuleModal isVisible={addModalVisible} setVisible={setAddModalVisible} alertRule={selectedAlertRule} />
-      <AlertRulesTable
+      <Table
         showPagination
-        emptyMessage={noData}
+        totalItems={totalItems}
+        totalPages={totalPages}
+        pageSize={pageSize as number}
+        pageIndex={pageIndex}
+        onPaginationChanged={onPaginationChanged}
         data={data}
         columns={columns}
         pendingRequest={pendingRequest}
-        totalItems={totalItems}
-        totalPages={totalPages}
-        onPaginationChanged={onPaginationChanged}
-        pageSize={pageSize as number}
-        pageIndex={pageIndex}
-      />
+        emptyMessage={noData}
+      >
+        {(rows, table) =>
+          rows.map(row => {
+            const { prepareRow } = table;
+            prepareRow(row);
+            const alertRule = row.original as AlertRule;
+
+            return (
+              <React.Fragment key={alertRule.ruleId}>
+                <tr {...row.getRowProps()} className={alertRule.disabled ? styles.disabledRow : ''}>
+                  {row.cells.map(cell => (
+                    <td {...cell.getCellProps()} key={cell.column.id}>
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+                {selectedRuleDetails && alertRule.ruleId === selectedRuleDetails.ruleId && (
+                  <tr key={selectedRuleDetails.ruleId}>
+                    <td colSpan={columns.length}>
+                      <pre data-qa="alert-rules-details" className={styles.details}>
+                        {alertRule.expr}
+                      </pre>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            );
+          })
+        }
+      </Table>
     </AlertRulesProvider.Provider>
   );
 };

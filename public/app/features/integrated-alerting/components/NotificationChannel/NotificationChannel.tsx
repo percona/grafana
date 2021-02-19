@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { NotificationChannelService } from './NotificationChannel.service';
@@ -10,8 +10,6 @@ import { getStyles } from './NotificationChannel.styles';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
 import { DeleteNotificationChannelModal } from './DeleteNotificationChannelModal/DeleteNotificationChannelModal';
-import { NOTIFICATION_CHANNEL_TABLE_ID } from './NotificationChannel.constants';
-import { useStoredTablePageSize } from '../Table/Pagination';
 
 const { emptyTable, nameColumn, typeColumn, actionsColumn, typeLabel } = Messages;
 
@@ -19,11 +17,9 @@ export const NotificationChannel: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [pendingRequest, setPendingRequest] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState(true);
   const [data, setData] = useState<Channel[]>([]);
   const [selectedNotificationChannel, setSelectedNotificationChannel] = useState<Channel | null>();
-  const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_ID);
-  const [pageIndex, setPageindex] = useState(0);
 
   const columns = useMemo(
     () => [
@@ -58,11 +54,6 @@ export const NotificationChannel: FC = () => {
     }
   };
 
-  const onPaginationChanged = useCallback((pageSize: number, pageIndex: number) => {
-    setPageSize(pageSize);
-    setPageindex(pageIndex);
-  }, []);
-
   useEffect(() => {
     getNotificationChannels();
   }, []);
@@ -90,10 +81,7 @@ export const NotificationChannel: FC = () => {
         columns={columns}
         pendingRequest={pendingRequest}
         emptyMessage={emptyTable}
-        onPaginationChanged={onPaginationChanged}
         totalItems={data.length}
-        pageSize={pageSize}
-        pageIndex={pageIndex}
       />
       <AddNotificationChannelModal
         isVisible={addModalVisible}
