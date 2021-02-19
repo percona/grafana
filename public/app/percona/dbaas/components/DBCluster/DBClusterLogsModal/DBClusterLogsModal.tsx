@@ -30,7 +30,7 @@ export const DBClusterLogsModal: FC<DBClusterLogsModalProps> = ({ dbCluster, isV
   };
   const toggleCollapse = () => {
     setLogs({ pods: toggleLogs(logs.pods, !expanded) });
-    setExpanded(!expanded);
+    setExpanded(currentValue => !currentValue);
   };
   const refresh = () => {
     getClusterLogs();
