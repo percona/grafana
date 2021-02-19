@@ -42,6 +42,22 @@ describe('AddStorageLocationModal', () => {
     expect(wrapper.find(S3Fields).prop('endpoint')).toBe('/foo/bar');
   });
 
+  it('should not render unknown type fields', () => {
+    const location: StorageLocation = {
+      locationID: 'Location_1',
+      name: 'client_fs',
+      description: 'description',
+      path: '',
+      type: 'unknwon' as LocationType,
+    };
+    const wrapper = mount(
+      <AddStorageLocationModal location={location} onClose={jest.fn()} onAdd={jest.fn()} isVisible />
+    );
+
+    expect(wrapper.find(S3Fields).exists()).toBeFalsy();
+    expect(wrapper.find(LocalFields).exists()).toBeFalsy();
+  });
+
   it('should call onAdd callback', () => {
     const onAdd = jest.fn();
     const location: S3Location = {

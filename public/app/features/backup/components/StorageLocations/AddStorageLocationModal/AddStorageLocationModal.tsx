@@ -23,17 +23,13 @@ import { LocationType } from '../StorageLocations.types';
 
 const TypeField: FC<TypeFieldProps> = ({ values }) => {
   const { type, client, server, endpoint, accessKey, secretKey } = values;
+  const fieldMap = {
+    [LocationType.S3]: <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} />,
+    [LocationType.SERVER]: <LocalFields name="server" path={server} />,
+    [LocationType.CLIENT]: <LocalFields name="client" path={client} />,
+  };
 
-  switch (type) {
-    case LocationType.S3:
-      return <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} />;
-    case LocationType.SERVER:
-      return <LocalFields name="server" path={server} />;
-    case LocationType.CLIENT:
-      return <LocalFields name="client" path={client} />;
-    default:
-      return null;
-  }
+  return type in fieldMap ? fieldMap[type] : null;
 };
 
 const typeOptions: Array<SelectableValue<LocationType>> = [
