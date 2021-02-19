@@ -18,7 +18,7 @@ const TopSection: FC<any> = () => {
     id: 'dbaas',
     icon: 'database',
     text: 'DBaaS',
-    url: '/graph/d/pmm-dbaas/pmm-dbaas',
+    url: `${config.appSubUrl}/dbaas`,
   };
   const backupLink: NavModelItem = {
     id: 'backup',
