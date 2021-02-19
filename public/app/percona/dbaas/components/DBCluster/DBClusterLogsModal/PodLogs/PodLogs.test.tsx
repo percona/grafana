@@ -32,7 +32,7 @@ describe('PodLogs::', () => {
     expect(root.find(dataQa('dbcluster-containers')).children().length).toBe(2);
   });
 
-  it("does't render logs when collapsed", () => {
+  it("doesn't render logs when collapsed", () => {
     const root = mount(
       <PodLogs
         podLogs={{

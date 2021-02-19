@@ -29,6 +29,7 @@ describe('DBClusterLogsModal::', () => {
     root.update();
 
     expect(root).not.toContain('pre');
+    expect(root.find(dataQa('dbcluster-logs')).length).toBe(0);
 
     const expandButton = root
       .find(dataQa('dbcluster-logs-actions'))
