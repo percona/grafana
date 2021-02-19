@@ -25,11 +25,7 @@ export const Pagination: FC<PaginationProps> = ({
   const style = useStyles(getStyles);
 
   const gotoPage = (pageIndex: number) => {
-    if (pageIndex < 0) {
-      pageIndex = 0;
-    } else if (pageIndex > pageCount - 1) {
-      pageIndex = pageCount - 1;
-    }
+    pageIndex = Math.max(0, Math.min(pageIndex, pageCount - 1))
 
     if (pageIndex !== activePageIndex) {
       setActivePageIndex(pageIndex);
