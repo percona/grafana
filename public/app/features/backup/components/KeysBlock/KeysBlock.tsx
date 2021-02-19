@@ -17,7 +17,7 @@ export const KeysBlock: FC<KeysBlockProps> = ({ accessKey, secretKey }) => {
       <div data-qa="secret-key">
         <span className={styles.keyLabel}>{Messages.secretKey}</span>
         <span className={styles.secretTogglerWrapper}>
-          <SecretToggler minified secret={secretKey} />
+          <SecretToggler small secret={secretKey} />
         </span>
       </div>
     </div>
