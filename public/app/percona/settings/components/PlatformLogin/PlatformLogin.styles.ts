@@ -33,6 +33,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
   `,
   checkboxLabel: css`
     display: inline-block;
+    font-size: 12px;
     line-height: 1.7;
     padding-right: ${theme.spacing.formInputPaddingHorizontal};
   `,
