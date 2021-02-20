@@ -1,20 +1,19 @@
 import React, { FC, useState } from 'react';
-import { Form, Field } from 'react-final-form';
+import { Form } from 'react-final-form';
 import { Button, Spinner, useTheme } from '@grafana/ui';
 import { RadioButtonGroup } from 'app/percona/shared/components/Form/Radio/RadioButtonGroup';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { MetricsResolutions } from 'app/percona/settings/Settings.types';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
-import { NumericInputField } from 'app/percona/shared/components/Form';
 import validators from 'app/percona/shared/helpers/validators';
-import { resolutionsOptions, defaultResolutions, resolutionMin, resolutionMax } from './MetricsResolution.constants';
+import { defaultResolutions, resolutionsOptions } from './MetricsResolution.constants';
 import { getStyles } from './MetricsResolution.styles';
-import { getResolutionValue, removeUnits, addUnits } from './MetricsResolution.utils';
+import { addUnits, getResolutionValue, removeUnits } from './MetricsResolution.utils';
 import {
-  MetricsResolutionProps,
-  MetricsResolutionPresets,
   MetricsResolutionIntervals,
+  MetricsResolutionPresets,
+  MetricsResolutionProps,
 } from './MetricsResolution.types';
 import { NumberInputField } from '@percona/platform-core';
 import { MAX_DAYS, MIN_DAYS } from '../Advanced/Advanced.constants';
