@@ -1,13 +1,12 @@
 import React, { FC, useState } from 'react';
 import { Field, Form } from 'react-final-form';
-import { css, cx } from 'emotion';
+import { cx } from 'emotion';
 import { Button, Spinner, useTheme, Icon } from '@grafana/ui';
-import { TextInputField, NumberInputField, validators as pv } from '@percona/platform-core';
+import { TextInputField, NumberInputField } from '@percona/platform-core';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { DATA_RETENTION_URL } from 'app/percona/settings/Settings.constants';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
-// import { NumericInputField } from 'app/percona/shared/components/Form';
 import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
 import { transformSecondsToDays } from './Advanced.utils';
@@ -64,6 +63,7 @@ export const Advanced: FC<AdvancedProps> = ({
     alerting: alertingEnabled,
   };
   const [loading, setLoading] = useState(false);
+  // @ts-ignore
   const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting }) => {
     const refresh = !!alerting !== alertingEnabled;
     const body = {
