@@ -2,17 +2,14 @@ import React, { FC } from 'react';
 import { Field, Form, FormRenderProps } from 'react-final-form';
 import { LinkButton, useTheme } from '@grafana/ui';
 import validators from 'app/percona/shared/helpers/validators';
-import { ButtonWithSpinner } from 'app/percona/shared/components/Form';
 import { showErrorNotification, showSuccessNotification } from 'app/percona/shared/helpers';
-import {
-  CheckboxFieldAdapter,
-  InputFieldAdapter,
-} from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
+import { InputFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { Credentials, LoginFormProps } from '../types';
 import { Messages } from '../PlatformLogin.messages';
 import { getStyles } from '../PlatformLogin.styles';
 import { PlatformLoginService } from '../PlatformLogin.service';
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '../PlatformLogin.constants';
+import { LoaderButton, CheckboxField } from '@percona/platform-core';
 
 const passwordValidators = validators.compose(
   validators.required,
@@ -68,34 +65,34 @@ export const SignUp: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
         validate={passwordValidators}
         autoComplete="on"
       />
-      <Field
-        data-qa="sign-up-agreement-checkbox"
-        className={styles.checkboxWrapper}
+      <CheckboxField
         label={<CheckboxLabel />}
+        data-qa="sign-up-agreement-checkbox"
+        validators={[validators.requiredTrue]}
         name="agreement"
-        component={CheckboxFieldAdapter}
-        validate={validators.requiredTrue}
-        type="checkbox"
       />
-      <ButtonWithSpinner
+      <LoaderButton
         data-qa="sign-up-submit-button"
-        className={styles.submitButton}
         type="submit"
+        size="md"
+        variant="primary"
         disabled={!valid || submitting || pristine}
-        isLoading={submitting}
+        loading={submitting}
+        className={styles.submitButton}
       >
         {Messages.signUp}
-      </ButtonWithSpinner>
-      <ButtonWithSpinner
+      </LoaderButton>
+      <LoaderButton
         data-qa="sign-up-to-sign-in-button"
-        className={styles.signInButton}
         type="button"
+        size="md"
         variant="link"
-        onClick={changeMode}
         disabled={submitting}
+        onClick={changeMode}
+        className={styles.submitButton}
       >
         {Messages.toSignIn}
-      </ButtonWithSpinner>
+      </LoaderButton>
     </form>
   );
 

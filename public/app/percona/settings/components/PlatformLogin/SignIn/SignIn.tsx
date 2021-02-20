@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
 import { Field, Form, FormRenderProps } from 'react-final-form';
-import { Button, useTheme } from '@grafana/ui';
+import { useTheme } from '@grafana/ui';
 import validators from 'app/percona/shared/helpers/validators';
-import { ButtonWithSpinner } from 'app/percona/shared/components/Form';
 import { showErrorNotification, showSuccessNotification } from 'app/percona/shared/helpers';
 import { InputFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { Credentials, LoginFormProps } from '../types';
 import { Messages } from '../PlatformLogin.messages';
 import { getStyles } from '../PlatformLogin.styles';
 import { PlatformLoginService } from '../PlatformLogin.service';
+import { LoaderButton } from '@percona/platform-core';
 
 export const SignIn: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
   const theme = useTheme();
@@ -45,24 +45,28 @@ export const SignIn: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
         validate={validators.required}
         autoComplete="on"
       />
-      <Button
+      <LoaderButton
         data-qa="sign-in-submit-button"
-        className={styles.signInButton}
         type="submit"
+        size="md"
+        variant="primary"
         disabled={!valid || submitting || pristine}
+        loading={submitting}
+        className={styles.submitButton}
       >
         {Messages.signIn}
-      </Button>
-      <ButtonWithSpinner
+      </LoaderButton>
+      <LoaderButton
         data-qa="sign-in-to-sign-up-button"
-        className={styles.submitButton}
         type="button"
-        onClick={changeMode}
-        disabled={submitting}
+        size="md"
         variant="link"
+        disabled={submitting}
+        onClick={changeMode}
+        className={styles.submitButton}
       >
         {Messages.signUp}
-      </ButtonWithSpinner>
+      </LoaderButton>
     </form>
   );
 
