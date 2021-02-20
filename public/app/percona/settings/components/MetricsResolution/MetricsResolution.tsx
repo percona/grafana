@@ -16,6 +16,8 @@ import {
   MetricsResolutionPresets,
   MetricsResolutionIntervals,
 } from './MetricsResolution.types';
+import { NumberInputField } from '@percona/platform-core';
+import { MAX_DAYS, MIN_DAYS } from '../Advanced/Advanced.constants';
 
 export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutions, updateSettings }) => {
   const theme = useTheme();
@@ -56,7 +58,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
 
     setResolution(newResolution);
   };
-  const resolutionValidators = validators.compose(validators.required, validators.range(resolutionMin, resolutionMax));
+  const resolutionValidators = [validators.required, validators.range(MIN_DAYS, MAX_DAYS)];
   const applyChanges = (values: MetricsResolutions) => {
     updateSettings({ metrics_resolutions: addUnits(values) }, setLoading);
   };
@@ -81,33 +83,33 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
               className={styles.resolutionsRadioButtonGroup}
               onChange={form.mutators.setNewResolutions}
             />
-            <Field
-              name={MetricsResolutionIntervals.lr}
-              label={low}
-              className={styles.resolutionInput}
-              disabled={resolution !== MetricsResolutionPresets.custom}
-              dataQa="metrics-resolution-lr-input"
-              component={NumericInputField}
-              validate={resolutionValidators}
-            />
-            <Field
-              name={MetricsResolutionIntervals.mr}
-              label={medium}
-              className={styles.resolutionInput}
-              disabled={resolution !== MetricsResolutionPresets.custom}
-              dataQa="metrics-resolution-mr-input"
-              component={NumericInputField}
-              validate={resolutionValidators}
-            />
-            <Field
-              name={MetricsResolutionIntervals.hr}
-              label={high}
-              className={styles.resolutionInput}
-              disabled={resolution !== MetricsResolutionPresets.custom}
-              dataQa="metrics-resolution-hr-input"
-              component={NumericInputField}
-              validate={resolutionValidators}
-            />
+            <div style={{ width: '100px' }}>
+              <NumberInputField
+                label={low}
+                name={MetricsResolutionIntervals.lr}
+                disabled={resolution !== MetricsResolutionPresets.custom}
+                data-qa="metrics-resolution-lr-input"
+                validators={resolutionValidators}
+              />
+            </div>
+            <div style={{ width: '100px' }}>
+              <NumberInputField
+                label={medium}
+                name={MetricsResolutionIntervals.mr}
+                disabled={resolution !== MetricsResolutionPresets.custom}
+                data-qa="metrics-resolution-mr-input"
+                validators={resolutionValidators}
+              />
+            </div>
+            <div style={{ width: '100px' }}>
+              <NumberInputField
+                label={high}
+                name={MetricsResolutionIntervals.hr}
+                disabled={resolution !== MetricsResolutionPresets.custom}
+                data-qa="metrics-resolution-hr-input"
+                validators={resolutionValidators}
+              />
+            </div>
             <Button
               className={settingsStyles.actionButton}
               type="submit"
