@@ -1,5 +1,6 @@
 import { DeleteModal } from 'app/features/integrated-alerting/components/DeleteModal';
 import React, { FC } from 'react';
+import { WarningBlock } from '../WarningBlock/WarningBlock';
 import { Messages } from './RemoveStorageLocationModal.messages';
 import { RemoveStorageLocationModalProps } from './RemoveStorageLocationModal.types';
 
@@ -18,6 +19,8 @@ export const RemoveStorageLocationModal: FC<RemoveStorageLocationModalProps> = (
       setVisible={setVisible}
       message={Messages.getDeleteMessage(location?.name || '')}
       onDelete={handleDelete}
-    />
+    >
+      <WarningBlock message={Messages.deleteLocationWarning} />
+    </DeleteModal>
   );
 };
