@@ -18,7 +18,7 @@ export const Slack: FC<SlackProps> = ({ updateSettings, settings }) => {
   const settingsStyles = getSettingsStyles(theme);
   const [loading, setLoading] = useState(false);
 
-  const applyChanges = values => {
+  const applyChanges = (values: SlackSettings) => {
     updateSettings(
       {
         slack_alerting_settings: values,

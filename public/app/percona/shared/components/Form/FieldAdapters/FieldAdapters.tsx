@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { cx } from 'emotion';
 import { Input, Select, TextArea, useTheme } from '@grafana/ui';

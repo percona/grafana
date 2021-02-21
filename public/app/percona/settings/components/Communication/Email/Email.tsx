@@ -18,7 +18,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
   const settingsStyles = getSettingsStyles(theme);
   const [loading, setLoading] = useState(false);
 
-  const applyChanges = values => {
+  const applyChanges = (values: EmailSettings) => {
     updateSettings(
       {
         email_alerting_settings: values,
