@@ -89,9 +89,10 @@ export const StorageLocations: FC = () => {
   const onDelete = async () => {
     setDeletePending(true);
     try {
-      await StorageLocationsService.delete(selectedLocation?.description || '');
+      await StorageLocationsService.delete(selectedLocation?.locationID || '');
       setDeleteModalVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [Messages.getDeleteSuccess(selectedLocation?.name || '')]);
+      getData();
     } catch (e) {
       logger.error(e);
     } finally {

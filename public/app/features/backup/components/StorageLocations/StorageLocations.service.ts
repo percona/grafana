@@ -9,6 +9,6 @@ export const StorageLocationsService = {
     return getBackendSrv().post(`${BASE_URL}/List`);
   },
   async delete(locationID: string): Promise<void> {
-    api.post(`${BASE_URL}/Remove`, { locationID });
+    api.post(`${BASE_URL}/Remove`, { location_id: locationID });
   },
 };
