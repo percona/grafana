@@ -89,6 +89,7 @@ export const StorageLocations: FC = () => {
       logger.error(e);
     } finally {
       setAddModalVisible(false);
+      setSelectedLocation(undefined);
     }
   };
 
