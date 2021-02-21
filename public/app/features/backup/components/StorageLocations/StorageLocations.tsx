@@ -2,7 +2,11 @@ import React, { FC, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { IconButton, useStyles } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
+import { appEvents } from 'app/core/core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
+import { DeleteModal } from 'app/features/integrated-alerting/components/DeleteModal';
+import { StorageLocationsActions } from './StorageLocationsActions';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
 import { StorageLocationsService } from './StorageLocations.service';
@@ -11,10 +15,13 @@ import { getStyles } from './StorageLocations.styles';
 import { StorageLocationDetails } from './StorageLocationDetails';
 
 const { noData, columns } = Messages;
-const { name, type, path } = columns;
+const { name, type, path, actions } = columns;
 
 export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | undefined>(undefined);
   const [data, setData] = useState<StorageLocation[]>([]);
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
@@ -45,13 +52,14 @@ export const StorageLocations: FC = () => {
         Header: path,
         accessor: 'path',
       },
-      // TODO uncomment on feature branches related to the actions
-      // {
-      //   Header: actions,
-      //   accessor: 'locationID',
-      //   Cell: ({ row }) => <StorageLocationsActions location={row.original as StorageLocation} />,
-      //   width: '130px',
-      // },
+      {
+        Header: actions,
+        accessor: 'locationID',
+        Cell: ({ row }) => (
+          <StorageLocationsActions onDelete={onDeleteCLick} location={row.original as StorageLocation} />
+        ),
+        width: '130px',
+      },
     ],
     []
   );
@@ -73,17 +81,45 @@ export const StorageLocations: FC = () => {
     []
   );
 
+  const onDeleteCLick = (location: StorageLocation) => {
+    setSelectedLocation(location);
+    setDeleteModalVisible(true);
+  };
+
+  const onDelete = async () => {
+    setDeletePending(true);
+    try {
+      await StorageLocationsService.delete(selectedLocation?.description || '');
+      setDeleteModalVisible(false);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.getDeleteSuccess(selectedLocation?.name || '')]);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setSelectedLocation(undefined);
+      setDeletePending(false);
+    }
+  };
+
   useEffect(() => {
     getData();
   }, []);
 
   return (
-    <Table
-      data={data}
-      columns={columns}
-      emptyMessage={noData}
-      pendingRequest={pending}
-      renderExpandedRow={renderSelectedSubRow}
-    ></Table>
+    <>
+      <Table
+        data={data}
+        columns={columns}
+        emptyMessage={noData}
+        pendingRequest={pending}
+        renderExpandedRow={renderSelectedSubRow}
+      ></Table>
+      <DeleteModal
+        message={Messages.getDeleteMessage(selectedLocation?.name || '')}
+        onDelete={onDelete}
+        loading={deletePending}
+        isVisible={deleteModalVisible}
+        setVisible={setDeleteModalVisible}
+      />
+    </>
   );
 };
