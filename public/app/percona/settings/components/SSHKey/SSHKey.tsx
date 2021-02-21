@@ -18,7 +18,7 @@ export const SSHKey: FC<SSHKeyProps> = ({ sshKey, updateSettings }) => {
   } = Messages;
   const [loading, setLoading] = useState(false);
   const isEqual = (a: string, b: string) => !(a && !b) || a === b;
-  const applyChanges = ({ key }) => {
+  const applyChanges = ({ key }: { key: string }) => {
     const body = { ssh_key: key };
 
     updateSettings(body, setLoading);
