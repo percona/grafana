@@ -54,7 +54,9 @@ export const StorageLocations: FC = () => {
       {
         Header: actions,
         accessor: 'locationID',
-        Cell: ({ row }) => <StorageLocationsActions onUpdate={onUpdate} location={row.original as StorageLocation} />,
+        Cell: ({ row }) => (
+          <StorageLocationsActions onUpdate={handleUpdate} location={row.original as StorageLocation} />
+        ),
         width: '130px',
       },
     ],
@@ -93,7 +95,7 @@ export const StorageLocations: FC = () => {
     }
   };
 
-  const onUpdate = (location: StorageLocation) => {
+  const handleUpdate = (location: StorageLocation) => {
     setSelectedLocation(location);
     setAddModalVisible(true);
   };

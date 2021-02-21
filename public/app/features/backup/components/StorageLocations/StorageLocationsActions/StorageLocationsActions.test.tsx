@@ -20,13 +20,13 @@ describe('StorageLocationsActions', () => {
       type: LocationType.S3,
       path: 's3://foo',
     };
-    const onUpdate = jest.fn();
-    const wrapper = shallow(<StorageLocationsActions onUpdate={onUpdate} location={location} />);
+    const handleUpdate = jest.fn();
+    const wrapper = shallow(<StorageLocationsActions onUpdate={handleUpdate} location={location} />);
     wrapper
       .find(DBIcon)
       .first()
       .simulate('click');
 
-    expect(onUpdate).toHaveBeenCalledWith(location);
+    expect(handleUpdate).toHaveBeenCalledWith(location);
   });
 });
