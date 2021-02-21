@@ -5,7 +5,6 @@ import { IconButton, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
-import { DeleteModal } from 'app/features/integrated-alerting/components/DeleteModal';
 import { StorageLocationsActions } from './StorageLocationsActions';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
@@ -13,6 +12,7 @@ import { StorageLocationsService } from './StorageLocations.service';
 import { formatLocationList } from './StorageLocations.utils';
 import { getStyles } from './StorageLocations.styles';
 import { StorageLocationDetails } from './StorageLocationDetails';
+import { RemoveStorageLocationModal } from './RemoveStorageLocationModal';
 
 const { noData, columns } = Messages;
 const { name, type, path, actions } = columns;
@@ -86,12 +86,12 @@ export const StorageLocations: FC = () => {
     setDeleteModalVisible(true);
   };
 
-  const onDelete = async () => {
+  const handleDelete = async (location: StorageLocation) => {
     setDeletePending(true);
     try {
-      await StorageLocationsService.delete(selectedLocation?.locationID || '');
+      await StorageLocationsService.delete(location.locationID);
       setDeleteModalVisible(false);
-      appEvents.emit(AppEvents.alertSuccess, [Messages.getDeleteSuccess(selectedLocation?.name || '')]);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.getDeleteSuccess(location.name)]);
       getData();
     } catch (e) {
       logger.error(e);
@@ -114,12 +114,12 @@ export const StorageLocations: FC = () => {
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
-      <DeleteModal
-        message={Messages.getDeleteMessage(selectedLocation?.name || '')}
-        onDelete={onDelete}
-        loading={deletePending}
+      <RemoveStorageLocationModal
+        location={selectedLocation}
         isVisible={deleteModalVisible}
         setVisible={setDeleteModalVisible}
+        loading={deletePending}
+        onDelete={handleDelete}
       />
     </>
   );
