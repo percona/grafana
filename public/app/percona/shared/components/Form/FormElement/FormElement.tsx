@@ -1,4 +1,3 @@
-// import { Col, Row } from 'antd';
 import React from 'react';
 import { css } from 'emotion';
 
@@ -69,7 +68,7 @@ const VerticalFieldLayout = ({ label, tooltip, alignLabel, element }) => (
   </>
 );
 
-export const FormElement = props => {
+export const FormElement = (props: any) => {
   const { dataQa, type, errors, alignLabel } = props;
 
   return (
