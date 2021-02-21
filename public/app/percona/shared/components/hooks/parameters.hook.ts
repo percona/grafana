@@ -7,7 +7,7 @@ const useQueryParams: ParameterHook = (key, defaultValue) => {
   const query = new URLSearchParams(window.location.search);
   const [value, setValue] = useState<string>(defaultValue ?? '');
 
-  const setParameter = parameter => {
+  const setParameter = (parameter: string) => {
     getLocationSrv().update({
       query: { [key]: parameter },
       partial: true,

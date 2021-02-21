@@ -37,11 +37,11 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
     tooltipLinkText,
   } = Messages;
   const changeResolutions = (state: any, changeValue: any, newResolutions: MetricsResolutions) => {
-    Object.entries(newResolutions).forEach(([key, value]) =>
+    Object.entries(newResolutions).forEach(([key, value]: [MetricsResolutionIntervals, string]) =>
       changeValue(state, MetricsResolutionIntervals[key], () => value)
     );
   };
-  const setNewResolutions = ([newResolution], state: any, { changeValue }) => {
+  const setNewResolutions = ([newResolution]: [MetricsResolutionPresets], state: any, { changeValue }: any) => {
     if (resolution === MetricsResolutionPresets.custom) {
       updateCustomResolutions(state.formState.values as MetricsResolutions);
     }
