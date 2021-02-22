@@ -1,7 +1,6 @@
 import React, { FC, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Button, Spinner, useTheme } from '@grafana/ui';
-import { RadioButtonGroup } from 'app/percona/shared/components/Form/Radio/RadioButtonGroup';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { MetricsResolutions } from 'app/percona/settings/Settings.types';
@@ -15,16 +14,17 @@ import {
   MetricsResolutionPresets,
   MetricsResolutionProps,
 } from './MetricsResolution.types';
-import { NumberInputField } from '@percona/platform-core';
+import { NumberInputField, RadioButtonGroupField } from '@percona/platform-core';
 import { MAX_DAYS, MIN_DAYS } from '../Advanced/Advanced.constants';
+import { FormApi } from 'final-form';
 
 export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutions, updateSettings }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
   const settingsStyles = getSettingsStyles(theme);
-  const initialResolutions: MetricsResolutions = removeUnits(metricsResolutions);
-  const [resolution, setResolution] = useState(getResolutionValue(metricsResolutions).key);
-  const [customResolutions, updateCustomResolutions] = useState(initialResolutions);
+  const [fieldsResolutions, updateFieldsResolutions] = useState(removeUnits(metricsResolutions));
+  const [resolution, setResolution] = useState(getResolutionValue(metricsResolutions).value);
+  const [customResolutions, updateCustomResolutions] = useState(fieldsResolutions);
   const [loading, setLoading] = useState(false);
   const {
     metrics: {
@@ -36,51 +36,50 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
     },
     tooltipLinkText,
   } = Messages;
-  const changeResolutions = (state: any, changeValue: any, newResolutions: MetricsResolutions) => {
-    Object.entries(newResolutions).forEach(([key, value]: [MetricsResolutionIntervals, string]) =>
-      changeValue(state, MetricsResolutionIntervals[key], () => value)
-    );
-  };
-  const setNewResolutions = ([newResolution]: [MetricsResolutionPresets], state: any, { changeValue }: any) => {
-    if (resolution === MetricsResolutionPresets.custom) {
-      updateCustomResolutions(state.formState.values as MetricsResolutions);
-    }
 
-    if (newResolution !== MetricsResolutionPresets.custom) {
-      const newResolutionKey = resolutionsOptions.findIndex(r => r.key === newResolution);
-      const resolutions = removeUnits(defaultResolutions[newResolutionKey]);
-
-      changeResolutions(state, changeValue, resolutions);
-    } else {
-      changeResolutions(state, changeValue, customResolutions);
-    }
-
-    setResolution(newResolution);
-  };
   const resolutionValidators = [validators.required, validators.range(MIN_DAYS, MAX_DAYS)];
   const applyChanges = (values: MetricsResolutions) => {
     updateSettings({ metrics_resolutions: addUnits(values) }, setLoading);
   };
 
+  const updateResolutions = (form: FormApi<any>) => {
+    const { hr, mr, lr, resolutions: newResolution } = form.getState().values;
+
+    if (resolution === newResolution) {
+      return;
+    }
+
+    if (resolution === MetricsResolutionPresets.custom) {
+      updateCustomResolutions({ hr, mr, lr } as MetricsResolutions);
+    }
+
+    if (newResolution !== MetricsResolutionPresets.custom) {
+      const newResolutionKey = resolutionsOptions.findIndex(r => r.value === newResolution);
+      const resolutions = removeUnits(defaultResolutions[newResolutionKey]);
+
+      updateFieldsResolutions(resolutions);
+    } else {
+      updateFieldsResolutions(customResolutions);
+    }
+
+    setResolution(newResolution);
+  };
+
   return (
     <div className={styles.resolutionsWrapper}>
       <Form
-        mutators={{ setNewResolutions }}
         onSubmit={applyChanges}
-        initialValues={initialResolutions}
+        initialValues={{ ...fieldsResolutions, resolutions: resolution }}
         render={({ form, handleSubmit, valid, pristine }) => (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} onChange={() => updateResolutions(form)}>
             <div className={settingsStyles.labelWrapper} data-qa="metrics-resolution-label">
               <span>{label}</span>
               <LinkTooltip tooltipText={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
             </div>
-            <RadioButtonGroup
-              options={resolutionsOptions}
-              selected={resolution}
+            <RadioButtonGroupField
               name="resolutions"
-              dataQa="metrics-resolution-radio-button-group"
-              className={styles.resolutionsRadioButtonGroup}
-              onChange={form.mutators.setNewResolutions}
+              data-qa="metrics-resolution-radio-button-group"
+              options={resolutionsOptions}
             />
             <div style={{ width: '100px' }}>
               <NumberInputField

@@ -14,8 +14,19 @@ export const SettingsService = {
 
     try {
       setLoading(true);
-      response = await api.post<any, any>('/v1/Settings/Get', {});
-
+      // response = await api.post<any, any>('/v1/Settings/Get', {});
+      response = {
+        settings: {
+          telemetry_enabled: true,
+          metrics_resolutions: {
+            hr: '5s',
+            mr: '10s',
+            lr: '60s',
+          },
+          data_retention: '259200s',
+          aws_partitions: ['aws'],
+        },
+      };
       setSettings(toModel(response.settings));
     } catch (e) {
       logger.error(e);
