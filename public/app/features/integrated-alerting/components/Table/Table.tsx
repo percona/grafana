@@ -61,7 +61,7 @@ export const Table: FC<TableProps> = ({
     gotoPage,
     state: { pageSize, pageIndex },
   } = tableInstance;
-  const hasData = data.length >= 0;
+  const hasData = data.length > 0;
 
   const onPageChanged = (newPageIndex: number) => {
     gotoPage(newPageIndex);
@@ -76,7 +76,7 @@ export const Table: FC<TableProps> = ({
 
   return (
     <>
-      <Overlay isPending={pendingRequest}>
+      <Overlay dataQa="table-loading" isPending={pendingRequest}>
         <div className={style.tableWrap} data-qa="table-outer-wrapper">
           <div className={style.table} data-qa="table-inner-wrapper">
             <TableContent hasData={hasData} emptyMessage={emptyMessage}>
