@@ -4,7 +4,6 @@ import { cx } from 'emotion';
 import { Input, Select, TextArea, useTheme } from '@grafana/ui';
 import { getStyles } from './FieldAdapters.styles';
 import { Field } from './Field';
-import { RadioButtonGroup } from '../Radio/RadioButtonGroup';
 
 export const InputFieldAdapter = ({ input, className, label, meta, ...props }) => {
   const theme = useTheme();
@@ -68,38 +67,6 @@ export const SelectFieldAdapter = ({ input, className, options, label, meta, dat
           {meta.touched && meta.error}
         </div>
       </div>
-    </Field>
-  );
-};
-
-export const RadioButtonGroupAdapter = ({
-  input,
-  options,
-  disabledOptions,
-  selected,
-  label,
-  meta,
-  dataQa,
-  ...props
-}) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
-
-  return (
-    <Field label={label}>
-      <>
-        <RadioButtonGroup
-          {...input}
-          {...props}
-          options={options}
-          disabledOptions={disabledOptions}
-          value={input.value || selected}
-          dataQa={dataQa}
-        />
-        <div data-qa="radio-field-error-message" className={styles.errorMessage}>
-          {meta.touched && meta.error}
-        </div>
-      </>
     </Field>
   );
 };
