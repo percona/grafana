@@ -14,6 +14,7 @@ export const RemoveStorageLocationModal: FC<RemoveStorageLocationModalProps> = (
   const handleDelete = () => onDelete(location);
   return (
     <DeleteModal
+      title={Messages.title}
       loading={loading}
       isVisible={isVisible}
       setVisible={setVisible}
