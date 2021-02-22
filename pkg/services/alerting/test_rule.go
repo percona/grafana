@@ -45,13 +45,13 @@ func handleAlertTestCommand(cmd *AlertTestCommand) error {
 		}
 	}
 
-	return fmt.Errorf("Could not find alert with panel id %d", cmd.PanelID)
+	return fmt.Errorf("could not find alert with panel ID %d", cmd.PanelID)
 }
 
 func testAlertRule(rule *Rule) *EvalContext {
 	handler := NewEvalHandler()
 
-	context := NewEvalContext(context.Background(), rule)
+	context := NewEvalContext(context.Background(), rule, fakeRequestValidator{})
 	context.IsTestRun = true
 	context.IsDebug = true
 

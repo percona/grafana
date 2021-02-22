@@ -47,7 +47,7 @@ export function getLoadingNav(): NavModel {
 }
 
 export function loadPlugin(pluginId: string): Promise<GrafanaPlugin> {
-  return getPluginSettings(pluginId).then(info => {
+  return getPluginSettings(pluginId).then((info) => {
     if (info.type === PluginType.app) {
       return importAppPlugin(info);
     }
@@ -55,9 +55,9 @@ export function loadPlugin(pluginId: string): Promise<GrafanaPlugin> {
       return importDataSourcePlugin(info);
     }
     if (info.type === PluginType.panel) {
-      return importPanelPlugin(pluginId).then(plugin => {
+      return importPanelPlugin(pluginId).then((plugin) => {
         // Panel Meta does not have the *full* settings meta
-        return getPluginSettings(pluginId).then(meta => {
+        return getPluginSettings(pluginId).then((meta) => {
           plugin.meta = {
             ...meta, // Set any fields that do not exist
             ...plugin.meta,
@@ -153,7 +153,7 @@ class PluginPage extends PureComponent<Props, State> {
       return <Alert severity={AppNotificationSeverity.Error} title="Plugin Not Found" />;
     }
 
-    const active = nav.main.children!.find(tab => tab.active);
+    const active = nav.main.children!.find((tab) => tab.active);
     if (active) {
       // Find the current config tab
       if (plugin.configPages) {
@@ -212,8 +212,9 @@ class PluginPage extends PureComponent<Props, State> {
     if (item.type === PluginIncludeType.page) {
       const pluginId = this.state.plugin!.meta.id;
       const page = item.name.toLowerCase().replace(' ', '-');
+      const url = item.path ?? `plugins/${pluginId}/page/${page}`;
       return (
-        <a href={`plugins/${pluginId}/page/${page}`}>
+        <a href={url}>
           <i className={getPluginIcon(item.type)} />
           {item.name}
         </a>
@@ -236,7 +237,7 @@ class PluginPage extends PureComponent<Props, State> {
       <section className="page-sidebar-section">
         <h4>Includes</h4>
         <ul className="ui-list plugin-info-list">
-          {includes.map(include => {
+          {includes.map((include) => {
             return (
               <li className="plugin-info-list-item" key={include.name}>
                 {this.renderSidebarIncludeBody(include)}
@@ -258,11 +259,11 @@ class PluginPage extends PureComponent<Props, State> {
         <h4>Dependencies</h4>
         <ul className="ui-list plugin-info-list">
           <li className="plugin-info-list-item">
-            <img src="public/img/grafana_icon.svg" />
+            <img src="public/img/grafana_icon.svg" alt="Grafana logo" />
             Grafana {dependencies.grafanaVersion}
           </li>
           {dependencies.plugins &&
-            dependencies.plugins.map(plug => {
+            dependencies.plugins.map((plug) => {
               return (
                 <li className="plugin-info-list-item" key={plug.name}>
                   <i className={getPluginIcon(plug.type)} />
@@ -284,10 +285,10 @@ class PluginPage extends PureComponent<Props, State> {
       <section className="page-sidebar-section">
         <h4>Links</h4>
         <ul className="ui-list">
-          {info.links.map(link => {
+          {info.links.map((link) => {
             return (
               <li key={link.url}>
-                <a href={link.url} className="external-link" target="_blank" rel="noopener">
+                <a href={link.url} className="external-link" target="_blank" rel="noreferrer noopener">
                   {link.name}
                 </a>
               </li>
@@ -346,16 +347,12 @@ class PluginPage extends PureComponent<Props, State> {
             <div className="sidebar-container">
               <div className="sidebar-content">
                 {plugin.loadError && (
-                  <Alert
-                    severity={AppNotificationSeverity.Error}
-                    title="Error Loading Plugin"
-                    children={
-                      <>
-                        Check the server startup logs for more information. <br />
-                        If this plugin was loaded from git, make sure it was compiled.
-                      </>
-                    }
-                  />
+                  <Alert severity={AppNotificationSeverity.Error} title="Error Loading Plugin">
+                    <>
+                      Check the server startup logs for more information. <br />
+                      If this plugin was loaded from git, make sure it was compiled.
+                    </>
+                  </Alert>
                 )}
                 {this.renderPluginNotice()}
                 {this.renderBody()}
@@ -387,17 +384,15 @@ function getPluginTabsNav(
   let defaultPage: string | undefined;
   const pages: NavModelItem[] = [];
 
-  if (true) {
-    pages.push({
-      text: 'Readme',
-      icon: 'fa fa-fw fa-file-text-o',
-      url: `${appSubUrl}${path}?page=${PAGE_ID_README}`,
-      id: PAGE_ID_README,
-    });
-  }
+  pages.push({
+    text: 'Readme',
+    icon: 'file-alt',
+    url: `${appSubUrl}${path}?page=${PAGE_ID_README}`,
+    id: PAGE_ID_README,
+  });
 
-  // We allow non admins to see plugins but only their readme. Config is hidden even though the API needs to be
-  // public for plugins to work properly.
+  // We allow non admins to see plugins but only their readme. Config is hidden
+  // even though the API needs to be public for plugins to work properly.
   if (isAdmin) {
     // Only show Config/Pages for app
     if (meta.type === PluginType.app) {
@@ -464,7 +459,7 @@ function getPluginTabsNav(
 function setActivePage(pageId: string, pages: NavModelItem[], defaultPageId: string): NavModelItem[] {
   let found = false;
   const selected = pageId || defaultPageId;
-  const changed = pages.map(p => {
+  const changed = pages.map((p) => {
     const active = !found && selected === p.id;
     if (active) {
       found = true;

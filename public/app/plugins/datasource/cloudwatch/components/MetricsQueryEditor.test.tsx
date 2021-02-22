@@ -33,7 +33,7 @@ const setup = () => {
   templateSrv.init([variable]);
 
   const datasource = new CloudWatchDatasource(instanceSettings, templateSrv as any, {} as any);
-  datasource.metricFindQuery = async () => [{ value: 'test', label: 'test' }];
+  datasource.metricFindQuery = async () => [{ value: 'test', label: 'test', text: 'test' }];
 
   const props: Props = {
     query: {
@@ -107,14 +107,9 @@ describe('QueryEditor', () => {
         const props = setup();
         props.query.region = (null as unknown) as string;
         const wrapper = mount(<MetricsQueryEditor {...props} />);
-        expect(
-          wrapper
-            .find('.gf-form-inline')
-            .first()
-            .find('.gf-form-label.query-part')
-            .first()
-            .text()
-        ).toEqual('default');
+        expect(wrapper.find('.gf-form-inline').first().find('.gf-form-label.query-part').first().text()).toEqual(
+          'default'
+        );
       });
     });
 

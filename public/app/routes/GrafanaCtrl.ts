@@ -62,6 +62,8 @@ export class GrafanaCtrl {
     setDashboardSrv(dashboardSrv);
     setLegacyAngularInjector($injector);
 
+    datasourceSrv.init(config.datasources, config.defaultDatasource);
+
     locationUtil.initialize({
       getConfig: () => config,
       getTimeRangeForUrl: getTimeSrv().timeRangeForUrl,
@@ -93,7 +95,7 @@ export class GrafanaCtrl {
 
     $rootScope.colors = colors;
 
-    $rootScope.onAppEvent = function<T>(
+    $rootScope.onAppEvent = function <T>(
       event: AppEvent<T> | string,
       callback: (event: IAngularEvent, ...args: any[]) => void,
       localScope?: any
@@ -209,8 +211,6 @@ export function grafanaAppDirective(
         for (const drop of Drop.drops) {
           drop.destroy();
         }
-
-        appEvents.emit(CoreEvents.hideDashSearch);
       });
 
       // handle kiosk mode
@@ -286,7 +286,7 @@ export function grafanaAppDirective(
       });
 
       // handle document clicks that should hide things
-      body.click(evt => {
+      body.click((evt) => {
         const target = $(evt.target);
         if (target.parents().length === 0) {
           return;

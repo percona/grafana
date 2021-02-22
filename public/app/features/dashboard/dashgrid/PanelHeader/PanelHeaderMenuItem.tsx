@@ -5,10 +5,10 @@ import { Icon, IconName, useTheme } from '@grafana/ui';
 import { selectors } from '@grafana/e2e-selectors';
 
 interface Props {
-  children: any;
+  children?: any;
 }
 
-export const PanelHeaderMenuItem: FC<Props & PanelMenuItem> = props => {
+export const PanelHeaderMenuItem: FC<Props & PanelMenuItem> = (props) => {
   const [ref, setRef] = useState<HTMLLIElement | null>(null);
   const isSubMenu = props.type === 'submenu';
   const isDivider = props.type === 'divider';

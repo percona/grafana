@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { PanelModel } from '../../../state/PanelModel';
-import { DefaultTimeRange, LoadingState, PanelData } from '@grafana/data';
+import { getDefaultTimeRange, LoadingState, PanelData } from '@grafana/data';
 import { DisplayMode } from '../types';
 import store from '../../../../../core/store';
 
@@ -17,9 +17,9 @@ export interface PanelEditorUIState {
   /* Visualization options pane visibility */
   isPanelOptionsVisible: boolean;
   /* Pixels or percentage */
-  rightPaneSize: number | string;
+  rightPaneSize: number;
   /* Pixels or percentage */
-  topPaneSize: number | string;
+  topPaneSize: number;
   /* Visualization size mode */
   mode: DisplayMode;
 }
@@ -51,7 +51,7 @@ export const initialState = (): PanelEditorState => {
     getData: () => ({
       state: LoadingState.NotStarted,
       series: [],
-      timeRange: DefaultTimeRange,
+      timeRange: getDefaultTimeRange(),
     }),
     initDone: false,
     shouldDiscardChanges: false,
@@ -88,7 +88,7 @@ const pluginsSlice = createSlice({
     setPanelEditorUIState: (state, action: PayloadAction<Partial<PanelEditorUIState>>) => {
       state.ui = { ...state.ui, ...action.payload };
     },
-    closeCompleted: state => {
+    closeCompleted: (state) => {
       state.isOpen = false;
       state.initDone = false;
     },

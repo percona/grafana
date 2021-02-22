@@ -3,6 +3,9 @@ package alerting
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"github.com/grafana/grafana/pkg/components/securejsondata"
 
 	"github.com/grafana/grafana/pkg/components/securejsondata"
 
@@ -30,10 +33,10 @@ var (
 )
 
 func init() {
-	bus.AddHandler("alerting", handleNotificationTestCommand)
+	bus.AddHandlerCtx("alerting", handleNotificationTestCommand)
 }
 
-func handleNotificationTestCommand(cmd *NotificationTestCommand) error {
+func handleNotificationTestCommand(ctx context.Context, cmd *NotificationTestCommand) error {
 	notifier := newNotificationService(nil)
 
 	model := &models.AlertNotification{
@@ -83,13 +86,13 @@ func createTestEvalContext(cmd *NotificationTestCommand) *EvalContext {
 		State:       models.AlertStateAlerting,
 	}
 
-	ctx := NewEvalContext(context.Background(), testRule)
+	ctx := NewEvalContext(context.Background(), testRule, fakeRequestValidator{})
 	if cmd.Settings.Get("uploadImage").MustBool(true) {
 		ctx.ImagePublicURL = "https://grafana.com/assets/img/blog/mixed_styles.png"
 	}
 	ctx.IsTestRun = true
 	ctx.Firing = true
-	ctx.Error = fmt.Errorf("This is only a test")
+	ctx.Error = fmt.Errorf("this is only a test")
 	ctx.EvalMatches = evalMatchesBasedOnState()
 
 	return ctx
@@ -108,4 +111,10 @@ func evalMatchesBasedOnState() []*EvalMatch {
 	})
 
 	return matches
+}
+
+type fakeRequestValidator struct{}
+
+func (fakeRequestValidator) Validate(_ string, _ *http.Request) error {
+	return nil
 }
