@@ -8,10 +8,10 @@ const {
 } = Messages;
 
 export const resolutionsOptions: SelectableValue[] = [
-  { key: MetricsResolutionPresets.rare, value: options.rare },
-  { key: MetricsResolutionPresets.standard, value: options.standard },
-  { key: MetricsResolutionPresets.frequent, value: options.frequent },
-  { key: MetricsResolutionPresets.custom, value: options.custom },
+  { value: MetricsResolutionPresets.rare, label: options.rare },
+  { value: MetricsResolutionPresets.standard, label: options.standard },
+  { value: MetricsResolutionPresets.frequent, label: options.frequent },
+  { value: MetricsResolutionPresets.custom, label: options.custom },
 ];
 
 export const defaultResolutions: MetricsResolutions[] = [
