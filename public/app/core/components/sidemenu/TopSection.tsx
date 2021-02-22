@@ -17,23 +17,8 @@ const TopSection: FC<any> = () => {
   const dbaasLink = {
     id: 'dbaas',
     icon: 'database',
-    text: 'Database as a Service',
-    url: '/graph/d/pmm-dbaas/pmm-dbaas',
-    // need to add url after dbaas navigation will be fixed
-    children: [
-      {
-        id: 'dbaas-db-cluster',
-        icon: 'percona-cluster-computing',
-        text: 'DB Cluster',
-        url: '/graph/d/pmm-dbaas/pmm-dbaas',
-      },
-      {
-        id: 'dbaas-kubernetes-cluster',
-        icon: 'percona-kubernetes',
-        text: 'Kubernetes Cluster',
-        url: '/graph/d/pmm-dbaas/pmm-dbaas',
-      },
-    ],
+    text: 'DBaaS',
+    url: `${config.appSubUrl}/dbaas`,
   };
 
   const onOpenSearch = () => {

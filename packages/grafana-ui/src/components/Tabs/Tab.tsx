@@ -16,7 +16,7 @@ export interface TabProps extends HTMLProps<HTMLLIElement> {
   icon?: IconName;
   onChangeTab: (event?: React.MouseEvent<HTMLLIElement>) => void;
   /** A number rendered next to the text. Usually used to display the number of items in a tab's view. */
-  counter?: number;
+  counter?: number | null;
 }
 
 export const Tab = React.forwardRef<HTMLLIElement, TabProps>(
@@ -50,6 +50,8 @@ export const Tab = React.forwardRef<HTMLLIElement, TabProps>(
     );
   }
 );
+
+Tab.displayName = 'Tab';
 
 const getTabStyles = stylesFactory((theme: GrafanaTheme) => {
   const colors = theme.colors;

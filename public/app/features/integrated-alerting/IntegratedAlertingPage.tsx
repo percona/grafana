@@ -88,7 +88,7 @@ const IntegratedAlertingPage: FC = () => {
         ))}
       </TabsBar>
       <IntegratedAlertingContent loadingSettings={loadingSettings} alertingEnabled={alertingEnabled}>
-        <TabContent>{tabComponentMap.find(tab => tab.id === activeTab).component}</TabContent>
+        <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component || null}</TabContent>
       </IntegratedAlertingContent>
     </div>
   );

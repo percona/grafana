@@ -11,7 +11,7 @@ import {
   AlertRulesListResponseChannel,
 } from '../AlertRules.types';
 import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
-import { Template } from '../../AlertRuleTemplate/AlertRuleTemplatesTable/AlertRuleTemplatesTable.types';
+import { Template } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { SelectableValue } from '@grafana/data';
 import { Messages } from './AddAlertRuleModal.messages';
 
@@ -157,7 +157,7 @@ export const formatEditNotificationChannels = (
   channels: AlertRulesListResponseChannel[]
 ): Array<SelectableValue<string>> => (channels ? channels.map(formatEditNotificationChannel) : []);
 
-export const formatEditThreshold = (params: AlertRulesListResponseParam[]): string | null => {
+export const formatEditThreshold = (params?: AlertRulesListResponseParam[]): string | null => {
   const thresholdParam = params?.find(param => param.name === 'threshold');
 
   if (!thresholdParam) {
@@ -174,7 +174,7 @@ export const formatEditThreshold = (params: AlertRulesListResponseParam[]): stri
   return `${thresholdParam[type]}`;
 };
 
-export const getInitialValues = (alertRule: AlertRule): AddAlertRuleFormValues => {
+export const getInitialValues = (alertRule?: AlertRule | null): AddAlertRuleFormValues | undefined => {
   if (!alertRule) {
     return undefined;
   }
