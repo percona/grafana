@@ -109,6 +109,7 @@ export const StorageLocations: FC = () => {
     <>
       <Table
         data={data}
+        totalItems={data.length}
         columns={columns}
         emptyMessage={noData}
         pendingRequest={pending}
