@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import { SelectableValue } from '@grafana/data';
 import { withTypes } from 'react-final-form';
 import {
@@ -22,7 +22,6 @@ import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.u
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LocationType } from '../StorageLocations.types';
 import { cx } from 'emotion';
-import { useState } from 'react';
 
 const TypeField: FC<TypeFieldProps> = ({ values, onPathChanged = () => null }) => {
   const { type, client, server, endpoint, accessKey, secretKey } = values;
@@ -64,22 +63,16 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
   onClose,
   onAdd,
   onTest = () => null,
+  onPathChanged = () => null,
 }) => {
   const initialValues = toFormStorageLocation(location);
   const styles = useStyles(getStyles);
-  const [locationValidated, setLocationValidated] = useState(!!(needsLocationValidation && locationValid));
   const onSubmit = (values: AddStorageLocationFormProps) => onAdd(toStorageLocation(values));
 
   const handleTestClick = (values: AddStorageLocationFormProps) => {
     const location = toStorageLocation(values);
     onTest(location);
   };
-
-  const handlePathChange = () => setLocationValidated(false);
-
-  useEffect(() => {
-    setLocationValidated(!!(needsLocationValidation && locationValid));
-  }, [needsLocationValidation, locationValid]);
 
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
@@ -92,7 +85,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
             <TextareaInputField name="description" label={Messages.description} validators={required} />
             {/* TODO remove disabled when API allows all three types */}
             <RadioButtonGroupField disabled options={typeOptions} name="type" label={Messages.type} fullWidth />
-            <TypeField values={values} onPathChanged={handlePathChange} />
+            <TypeField values={values} onPathChanged={onPathChanged} />
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
                 className={styles.button}
@@ -100,7 +93,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
                 size="md"
                 variant="primary"
                 disabled={
-                  !valid || pristine || (needsLocationValidation && (!locationValidated || waitingLocationValidation))
+                  !valid || pristine || (needsLocationValidation && (!locationValid || waitingLocationValidation))
                 }
                 loading={submitting}
               >

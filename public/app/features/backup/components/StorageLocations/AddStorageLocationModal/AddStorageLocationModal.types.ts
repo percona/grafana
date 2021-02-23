@@ -9,6 +9,7 @@ export interface AddStorageLocationModalProps {
   onClose: () => void;
   onAdd: (location: StorageLocation) => void;
   onTest?: (location: StorageLocation) => void;
+  onPathChanged?: () => any;
 }
 
 export interface AddStorageLocationFormProps {

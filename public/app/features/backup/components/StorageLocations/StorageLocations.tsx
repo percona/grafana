@@ -99,22 +99,31 @@ export const StorageLocations: FC = () => {
     }
   };
 
+  const handleClose = () => {
+    setAddModalVisible(false);
+    setLocationValid(false);
+  };
+
   const handleUpdate = (location: StorageLocation) => {
     setSelectedLocation(location);
+    setLocationValid(true);
     setAddModalVisible(true);
   };
+
   const handleTest = async (location: StorageLocation) => {
     setTestPending(true);
-    try {
-      const rawLocation = formatToRawLocation(location);
-      const valid = await StorageLocationsService.testLocation(rawLocation);
-      setLocationValid(valid);
-    } catch (e) {
-      logger.error(e);
-      setLocationValid(false);
-    } finally {
-      setTestPending(false);
-    }
+    setLocationValid(false);
+    setTimeout(async () => {
+      try {
+        const rawLocation = formatToRawLocation(location);
+        const valid = await StorageLocationsService.testLocation(rawLocation);
+        setLocationValid(valid);
+      } catch (e) {
+        logger.error(e);
+      } finally {
+        setTestPending(false);
+      }
+    }, 1000);
   };
 
   useEffect(() => {
@@ -151,9 +160,10 @@ export const StorageLocations: FC = () => {
         needsLocationValidation={isAdmin}
         locationValid={locationValid}
         waitingLocationValidation={testPending}
-        onClose={() => setAddModalVisible(false)}
+        onClose={handleClose}
         onAdd={onAdd}
         onTest={handleTest}
+        onPathChanged={() => setLocationValid(false)}
       />
     </>
   );
