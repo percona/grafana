@@ -105,17 +105,16 @@ export const StorageLocations: FC = () => {
   };
   const handleTest = async (location: StorageLocation) => {
     setTestPending(true);
-    setTimeout(async () => {
-      try {
-        const valid = await StorageLocationsService.testLocation();
-        setLocationValid(valid);
-      } catch (e) {
-        logger.error(e);
-        setLocationValid(false);
-      } finally {
-        setTestPending(false);
-      }
-    }, 1000);
+    try {
+      const rawLocation = formatToRawLocation(location);
+      const valid = await StorageLocationsService.testLocation(rawLocation);
+      setLocationValid(valid);
+    } catch (e) {
+      logger.error(e);
+      setLocationValid(false);
+    } finally {
+      setTestPending(false);
+    }
   };
 
   useEffect(() => {

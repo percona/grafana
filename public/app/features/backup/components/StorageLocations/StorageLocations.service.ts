@@ -13,7 +13,12 @@ export const StorageLocationsService = {
   async update(payload: StorageLocationReponse): Promise<void> {
     return api.post(`${BASE_URL}/Change`, payload);
   },
-  async testLocation(): Promise<boolean> {
-    return Promise.resolve(Math.random() > 0.5);
+  async testLocation(payload: StorageLocationReponse): Promise<boolean> {
+    const partial: Partial<StorageLocationReponse> = payload;
+    delete partial.location_id;
+    delete partial.name;
+    delete partial.description;
+
+    return api.post(`${BASE_URL}/TestConfig`, partial);
   },
 };
