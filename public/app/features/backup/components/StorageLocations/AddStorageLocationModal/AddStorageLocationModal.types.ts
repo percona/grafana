@@ -23,6 +23,11 @@ export interface AddStorageLocationFormProps {
   secretKey: string;
 }
 
+export interface TypeFieldCommonProps {
+  onPathChanged?: () => void;
+}
+
 export interface TypeFieldProps {
   values: AddStorageLocationFormProps;
+  onPathChanged?: () => void;
 }

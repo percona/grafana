@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { SelectableValue } from '@grafana/data';
 import { withTypes } from 'react-final-form';
 import {
@@ -22,13 +22,16 @@ import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.u
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LocationType } from '../StorageLocations.types';
 import { cx } from 'emotion';
+import { useState } from 'react';
 
-const TypeField: FC<TypeFieldProps> = ({ values }) => {
+const TypeField: FC<TypeFieldProps> = ({ values, onPathChanged = () => null }) => {
   const { type, client, server, endpoint, accessKey, secretKey } = values;
   const fieldMap = {
-    [LocationType.S3]: <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} />,
-    [LocationType.SERVER]: <LocalFields name="server" path={server} />,
-    [LocationType.CLIENT]: <LocalFields name="client" path={client} />,
+    [LocationType.S3]: (
+      <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} onPathChanged={onPathChanged} />
+    ),
+    [LocationType.SERVER]: <LocalFields name="server" path={server} onPathChanged={onPathChanged} />,
+    [LocationType.CLIENT]: <LocalFields name="client" path={client} onPathChanged={onPathChanged} />,
   };
 
   return type in fieldMap ? fieldMap[type] : null;
@@ -64,13 +67,19 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
 }) => {
   const initialValues = toFormStorageLocation(location);
   const styles = useStyles(getStyles);
+  const [locationValidated, setLocationValidated] = useState(!!(needsLocationValidation && locationValid));
   const onSubmit = (values: AddStorageLocationFormProps) => onAdd(toStorageLocation(values));
-  const locationValidated = !!(needsLocationValidation && locationValid);
 
   const handleTestClick = (values: AddStorageLocationFormProps) => {
     const location = toStorageLocation(values);
     onTest(location);
   };
+
+  const handlePathChange = () => setLocationValidated(false);
+
+  useEffect(() => {
+    setLocationValidated(!!(needsLocationValidation && locationValid));
+  }, [needsLocationValidation, locationValid]);
 
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
@@ -83,7 +92,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
             <TextareaInputField name="description" label={Messages.description} validators={required} />
             {/* TODO remove disabled when API allows all three types */}
             <RadioButtonGroupField disabled options={typeOptions} name="type" label={Messages.type} fullWidth />
-            <TypeField values={values} />
+            <TypeField values={values} onPathChanged={handlePathChange} />
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
                 className={styles.button}
