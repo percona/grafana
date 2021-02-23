@@ -21,6 +21,7 @@ import { LocalFields } from './LocalFields';
 import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LocationType } from '../StorageLocations.types';
+import { cx } from 'emotion';
 
 const TypeField: FC<TypeFieldProps> = ({ values }) => {
   const { type, client, server, endpoint, accessKey, secretKey } = values;
@@ -85,6 +86,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
             <TypeField values={values} />
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
+                className={styles.button}
                 data-qa="storage-location-add-button"
                 size="md"
                 variant="primary"
@@ -96,7 +98,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
               {needsLocationValidation ? (
                 <LoaderButton
                   type="button"
-                  className={styles.testButton}
+                  className={cx(styles.button, styles.testButton)}
                   data-qa="storage-location-test-button"
                   size="md"
                   loading={waitingLocationValidation}
@@ -106,7 +108,12 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
                   {Messages.test}
                 </LoaderButton>
               ) : null}
-              <Button data-qa="storage-location-cancel-button" variant="secondary" onClick={onClose}>
+              <Button
+                className={styles.button}
+                data-qa="storage-location-cancel-button"
+                variant="secondary"
+                onClick={onClose}
+              >
                 {Messages.cancelAction}
               </Button>
             </HorizontalGroup>
