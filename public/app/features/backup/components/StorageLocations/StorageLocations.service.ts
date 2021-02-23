@@ -13,4 +13,7 @@ export const StorageLocationsService = {
   async update(payload: StorageLocationReponse): Promise<void> {
     return api.post(`${BASE_URL}/Change`, payload);
   },
+  async testLocation(): Promise<boolean> {
+    return Promise.resolve(Math.random() > 0.5);
+  },
 };

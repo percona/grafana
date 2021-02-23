@@ -55,12 +55,21 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
   isVisible,
   location,
   needsLocationValidation,
+  locationValid,
+  waitingLocationValidation,
   onClose,
   onAdd,
+  onTest = () => null,
 }) => {
   const initialValues = toFormStorageLocation(location);
   const styles = useStyles(getStyles);
   const onSubmit = (values: AddStorageLocationFormProps) => onAdd(toStorageLocation(values));
+  const locationValidated = !!(needsLocationValidation && locationValid);
+
+  const handleTestClick = (values: AddStorageLocationFormProps) => {
+    const location = toStorageLocation(values);
+    onTest(location);
+  };
 
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
@@ -79,13 +88,21 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
                 data-qa="storage-location-add-button"
                 size="md"
                 variant="primary"
-                disabled={!valid || pristine}
+                disabled={!valid || pristine || !locationValidated || waitingLocationValidation}
                 loading={submitting}
               >
                 {location ? Messages.editAction : Messages.addAction}
               </LoaderButton>
               {needsLocationValidation ? (
-                <LoaderButton className={styles.testButton} data-qa="storage-location-test-button" size="md">
+                <LoaderButton
+                  type="button"
+                  className={styles.testButton}
+                  data-qa="storage-location-test-button"
+                  size="md"
+                  loading={waitingLocationValidation}
+                  disabled={!valid}
+                  onClick={() => handleTestClick(values)}
+                >
                   {Messages.test}
                 </LoaderButton>
               ) : null}

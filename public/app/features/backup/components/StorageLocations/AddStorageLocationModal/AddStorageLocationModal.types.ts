@@ -4,8 +4,11 @@ export interface AddStorageLocationModalProps {
   isVisible: boolean;
   location?: StorageLocation;
   needsLocationValidation?: boolean;
+  locationValid?: boolean;
+  waitingLocationValidation?: boolean;
   onClose: () => void;
   onAdd: (location: StorageLocation) => void;
+  onTest?: (location: StorageLocation) => void;
 }
 
 export interface AddStorageLocationFormProps {
