@@ -15,10 +15,11 @@ import {
   AddStorageLocationModalProps,
   TypeFieldProps,
 } from './AddStorageLocationModal.types';
+import { getStyles } from './AddStorageLocationModal.styles';
 import { S3Fields } from './S3Fields';
 import { LocalFields } from './LocalFields';
 import { toFormStorageLocation, toStorageLocation } from './AddStorageLocation.utils';
-import { Button, HorizontalGroup } from '@grafana/ui';
+import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LocationType } from '../StorageLocations.types';
 
 const TypeField: FC<TypeFieldProps> = ({ values }) => {
@@ -53,11 +54,12 @@ const required = [validators.required];
 export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
   isVisible,
   location,
-  onClose = () => null,
-  onAdd = () => null,
+  needsLocationValidation,
+  onClose,
+  onAdd,
 }) => {
   const initialValues = toFormStorageLocation(location);
-
+  const styles = useStyles(getStyles);
   const onSubmit = (values: AddStorageLocationFormProps) => onAdd(toStorageLocation(values));
 
   return (
@@ -82,6 +84,11 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
               >
                 {location ? Messages.editAction : Messages.addAction}
               </LoaderButton>
+              {needsLocationValidation ? (
+                <LoaderButton className={styles.testButton} data-qa="storage-location-test-button" size="md">
+                  {Messages.test}
+                </LoaderButton>
+              ) : null}
               <Button data-qa="storage-location-cancel-button" variant="secondary" onClick={onClose}>
                 {Messages.cancelAction}
               </Button>

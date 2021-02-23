@@ -2,6 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Button, IconButton, useStyles } from '@grafana/ui';
+import { config } from '@grafana/runtime';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
@@ -62,6 +63,7 @@ export const StorageLocations: FC = () => {
     ],
     []
   );
+  const isAdmin = config.bootData.user.isGrafanaAdmin;
 
   const getData = async () => {
     setPending(true);
@@ -131,6 +133,7 @@ export const StorageLocations: FC = () => {
       <AddStorageLocationModal
         location={selectedLocation}
         isVisible={addModalVisible}
+        needsLocationValidation={isAdmin}
         onClose={() => setAddModalVisible(false)}
         onAdd={onAdd}
       />

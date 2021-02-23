@@ -6,4 +6,5 @@ export const Messages = {
   addAction: 'Add',
   editAction: 'Edit',
   cancelAction: 'Cancel',
+  test: 'Test',
 };
