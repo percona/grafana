@@ -90,7 +90,9 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
                 data-qa="storage-location-add-button"
                 size="md"
                 variant="primary"
-                disabled={!valid || pristine || !locationValidated || waitingLocationValidation}
+                disabled={
+                  !valid || pristine || (needsLocationValidation && (!locationValidated || waitingLocationValidation))
+                }
                 loading={submitting}
               >
                 {location ? Messages.editAction : Messages.addAction}
