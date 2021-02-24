@@ -103,7 +103,6 @@ export const Advanced: FC<AdvancedProps> = ({
               <div className={styles.retentionInputWrapper}>
                 <NumberInputField
                   name="retention"
-                  data-qa="advanced-retention-input"
                   validators={[validators.required, validators.range(MIN_DAYS, MAX_DAYS)]}
                 />
               </div>
