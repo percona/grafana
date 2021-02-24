@@ -21,7 +21,7 @@ export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | undefined>(undefined);
+  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | null>(null);
   const [data, setData] = useState<StorageLocation[]>([]);
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
@@ -96,7 +96,7 @@ export const StorageLocations: FC = () => {
     } catch (e) {
       logger.error(e);
     } finally {
-      setSelectedLocation(undefined);
+      setSelectedLocation(null);
       setDeletePending(false);
     }
   };
