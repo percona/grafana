@@ -79,9 +79,7 @@ describe('AddStorageLocationModal', () => {
   });
 
   it('should show the "Add" button when no location passed', () => {
-    const wrapper = mount(
-      <AddStorageLocationModal location={undefined} onClose={jest.fn()} onAdd={jest.fn()} isVisible />
-    );
+    const wrapper = mount(<AddStorageLocationModal location={null} onClose={jest.fn()} onAdd={jest.fn()} isVisible />);
     expect(wrapper.find(LoaderButton).text()).toBe(Messages.addAction);
   });
 
