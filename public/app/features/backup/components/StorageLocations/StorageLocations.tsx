@@ -20,6 +20,7 @@ const { name, type, path, actions } = columns;
 
 export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
+  const [validatingLocation, setValidatingLocation] = useState(false);
   const [data, setData] = useState<StorageLocation[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<StorageLocation | null>(null);
@@ -108,9 +109,17 @@ export const StorageLocations: FC = () => {
     setAddModalVisible(true);
   };
 
-  const isLocationValid = (location: StorageLocation) => {
-    const rawLocation = formatToRawLocation(location);
-    return StorageLocationsService.testLocation(rawLocation);
+  const handleTest = async (location: StorageLocation) => {
+    setValidatingLocation(true);
+    try {
+      const rawLocation = formatToRawLocation(location);
+      // TODO instead of a boolean, a message will be returned
+      await StorageLocationsService.testLocation(rawLocation);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setValidatingLocation(false);
+    }
   };
 
   useEffect(() => {
@@ -144,10 +153,11 @@ export const StorageLocations: FC = () => {
       <AddStorageLocationModal
         location={selectedLocation}
         isVisible={addModalVisible}
-        needsLocationValidation={isAdmin}
+        showLocationValidation={isAdmin}
+        waitingLocationValidation={validatingLocation}
         onClose={handleClose}
         onAdd={onAdd}
-        isLocationValid={isLocationValid}
+        onTest={handleTest}
       />
     </>
   );

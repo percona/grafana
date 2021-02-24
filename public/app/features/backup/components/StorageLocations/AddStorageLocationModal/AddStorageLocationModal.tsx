@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import { SelectableValue } from '@grafana/data';
 import { withTypes } from 'react-final-form';
 import {
@@ -8,7 +8,6 @@ import {
   RadioButtonGroupField,
   validators,
   LoaderButton,
-  logger,
 } from '@percona/platform-core';
 import { Messages } from './AddStorageLocationModal.messages';
 import {
@@ -64,35 +63,16 @@ const required = [validators.required];
 export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
   isVisible,
   location = null,
-  needsLocationValidation,
+  showLocationValidation = false,
+  waitingLocationValidation = false,
   onClose = () => null,
   onAdd = () => null,
-  isLocationValid = () => true,
+  onTest = () => null,
 }) => {
-  const [locationValid, setLocationValid] = useState(!!location);
-  const [waitingLocationValidation, setWaitingLocationValidation] = useState(false);
   const initialValues = toFormStorageLocation(location);
   const styles = useStyles(getStyles);
   const onSubmit = (values: AddStorageLocationFormProps) => onAdd(toStorageLocation(values));
-
-  const test = async (values: AddStorageLocationFormProps) => {
-    setLocationValid(false);
-    setWaitingLocationValidation(true);
-    try {
-      const location = toStorageLocation(values);
-      const validResult = isLocationValid(location);
-      const valid = typeof validResult === 'boolean' ? validResult : await validResult;
-      setLocationValid(valid);
-    } catch (e) {
-      logger.error(e);
-    } finally {
-      setWaitingLocationValidation(false);
-    }
-  };
-
-  useEffect(() => {
-    setLocationValid(!!location);
-  }, [location]);
+  const handleTest = (values: AddStorageLocationFormProps) => onTest(toStorageLocation(values));
 
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
@@ -105,21 +85,19 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
             <TextareaInputField name="description" label={Messages.description} validators={required} />
             {/* TODO remove disabled when API allows all three types */}
             <RadioButtonGroupField disabled options={typeOptions} name="type" label={Messages.type} fullWidth />
-            <TypeField values={values} onPathChanged={() => setLocationValid(false)} />
+            <TypeField values={values} />
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
                 className={styles.button}
                 data-qa="storage-location-add-button"
                 size="md"
                 variant="primary"
-                disabled={
-                  !valid || pristine || (needsLocationValidation && (!locationValid || waitingLocationValidation))
-                }
+                disabled={!valid || pristine || waitingLocationValidation}
                 loading={submitting}
               >
                 {location ? Messages.editAction : Messages.addAction}
               </LoaderButton>
-              {needsLocationValidation ? (
+              {showLocationValidation ? (
                 <LoaderButton
                   type="button"
                   className={cx(styles.button, styles.testButton)}
@@ -127,7 +105,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
                   size="md"
                   loading={waitingLocationValidation}
                   disabled={!valid}
-                  onClick={() => test(values)}
+                  onClick={() => handleTest(values)}
                 >
                   {Messages.test}
                 </LoaderButton>
