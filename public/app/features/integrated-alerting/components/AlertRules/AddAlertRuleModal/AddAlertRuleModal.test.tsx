@@ -27,10 +27,12 @@ describe('AddAlertRuleModal', () => {
     threshold: '1 %',
     lastNotified: '',
     disabled: false,
+    expr: '',
     rawValues: {
       channels: [],
       filters: [],
       disabled: false,
+      expr: '',
       template: {
         name: 'pmm_mongodb_connections_memory_usage',
         summary: 'Memory used by MongoDB connections',
