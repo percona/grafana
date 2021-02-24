@@ -15,12 +15,14 @@ export interface StorageLocation {
 export interface S3Location extends StorageLocation {
   accessKey: string;
   secretKey: string;
+  bucketName: string;
 }
 
 interface S3ConfigResponse {
   endpoint: string;
   access_key: string;
   secret_key: string;
+  bucket_name: string;
 }
 
 interface FSConfigResponse {
