@@ -42,8 +42,8 @@ export const formatToRawLocation = (location: StorageLocation | S3Location): Sto
   const result: Partial<StorageLocationReponse> = { name, description, location_id: locationID };
 
   if (isS3Location(location)) {
-    const { accessKey, secretKey } = location;
-    result.s3_config = { endpoint: path, access_key: accessKey, secret_key: secretKey };
+    const { accessKey, secretKey, bucketName } = location;
+    result.s3_config = { endpoint: path, access_key: accessKey, secret_key: secretKey, bucket_name: bucketName };
   } else if (type === LocationType.CLIENT) {
     result.pmm_client_config = localObj;
   } else {

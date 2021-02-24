@@ -22,9 +22,11 @@ import { Button, HorizontalGroup } from '@grafana/ui';
 import { LocationType } from '../StorageLocations.types';
 
 const TypeField: FC<TypeFieldProps> = ({ values }) => {
-  const { type, client, server, endpoint, accessKey, secretKey } = values;
+  const { type, client, server, endpoint, accessKey, secretKey, bucketName } = values;
   const fieldMap = {
-    [LocationType.S3]: <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} />,
+    [LocationType.S3]: (
+      <S3Fields endpoint={endpoint} bucketName={bucketName} accessKey={accessKey} secretKey={secretKey} />
+    ),
     [LocationType.SERVER]: <LocalFields name="server" path={server} />,
     [LocationType.CLIENT]: <LocalFields name="client" path={client} />,
   };

@@ -15,6 +15,7 @@ describe('AddStorageLocationUtils', () => {
         server: '',
         accessKey: '',
         secretKey: '',
+        bucketName: '',
       });
     });
 
@@ -27,6 +28,7 @@ describe('AddStorageLocationUtils', () => {
         type: LocationType.S3,
         accessKey: 'accessKey',
         secretKey: 'secretKey',
+        bucketName: 'bucket',
       };
 
       expect(toFormStorageLocation(location)).toEqual({
@@ -39,6 +41,7 @@ describe('AddStorageLocationUtils', () => {
         secretKey: location.secretKey,
         client: '',
         server: '',
+        bucketName: 'bucket',
       });
     });
 
@@ -61,6 +64,7 @@ describe('AddStorageLocationUtils', () => {
         server: '',
         accessKey: '',
         secretKey: '',
+        bucketName: '',
       });
     });
 
@@ -83,6 +87,7 @@ describe('AddStorageLocationUtils', () => {
         client: '',
         accessKey: '',
         secretKey: '',
+        bucketName: '',
       });
     });
   });
@@ -99,6 +104,7 @@ describe('AddStorageLocationUtils', () => {
         server: '',
         accessKey: 'accessKey',
         secretKey: 'secretKey',
+        bucketName: 'bucket',
       };
 
       expect(toStorageLocation(location)).toEqual({
@@ -109,6 +115,7 @@ describe('AddStorageLocationUtils', () => {
         path: location.endpoint,
         accessKey: location.accessKey,
         secretKey: location.secretKey,
+        bucketName: location.bucketName,
       });
     });
 
@@ -123,6 +130,7 @@ describe('AddStorageLocationUtils', () => {
         server: '',
         accessKey: '',
         secretKey: '',
+        bucketName: '',
       };
 
       expect(toStorageLocation(location)).toEqual({
@@ -145,6 +153,7 @@ describe('AddStorageLocationUtils', () => {
         server: '/foo/bar',
         accessKey: '',
         secretKey: '',
+        bucketName: '',
       };
 
       expect(toStorageLocation(location)).toEqual({

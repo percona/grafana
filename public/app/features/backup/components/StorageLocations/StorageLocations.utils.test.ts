@@ -78,6 +78,7 @@ describe('StorageLocationsUtils', () => {
         endpoint: s3Location.path,
         access_key: s3Location.accessKey,
         secret_key: s3Location.secretKey,
+        bucket_name: s3Location.bucketName,
       },
     });
 
