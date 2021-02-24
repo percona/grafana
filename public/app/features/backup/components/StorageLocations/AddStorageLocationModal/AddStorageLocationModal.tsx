@@ -54,7 +54,7 @@ const required = [validators.required];
 
 export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
   isVisible,
-  location,
+  location = null,
   onClose = () => null,
   onAdd = () => null,
 }) => {
