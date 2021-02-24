@@ -3,7 +3,7 @@ import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Button, IconButton, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { StorageLocationsActions } from './StorageLocationsActions';
 import { Messages } from './StorageLocations.messages';
@@ -22,7 +22,7 @@ export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | undefined>(undefined);
+  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | null>(null);
   const [data, setData] = useState<StorageLocation[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const styles = useStyles(getStyles);
@@ -119,7 +119,7 @@ export const StorageLocations: FC = () => {
     } catch (e) {
       logger.error(e);
     } finally {
-      setSelectedLocation(undefined);
+      setSelectedLocation(null);
       setDeletePending(false);
     }
   };
