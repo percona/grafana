@@ -22,7 +22,7 @@ export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<StorageLocation[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | undefined>();
+  const [selectedLocation, setSelectedLocation] = useState<StorageLocation | null>();
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
     (): Column[] => [
@@ -126,7 +126,7 @@ export const StorageLocations: FC = () => {
           variant="link"
           data-qa="storage-location-add-modal-button"
           onClick={() => {
-            setSelectedLocation(undefined);
+            setSelectedLocation(null);
             setAddModalVisible(true);
           }}
         >

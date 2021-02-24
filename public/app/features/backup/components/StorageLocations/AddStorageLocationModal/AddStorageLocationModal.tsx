@@ -63,10 +63,10 @@ const required = [validators.required];
 
 export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
   isVisible,
-  location,
+  location = null,
   needsLocationValidation,
-  onClose,
-  onAdd,
+  onClose = () => null,
+  onAdd = () => null,
   isLocationValid = () => true,
 }) => {
   const [locationValid, setLocationValid] = useState(!!location);
