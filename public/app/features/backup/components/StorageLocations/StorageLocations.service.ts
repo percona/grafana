@@ -19,6 +19,7 @@ export const StorageLocationsService = {
     delete partial.name;
     delete partial.description;
 
-    return api.post(`${BASE_URL}/TestConfig`, partial);
+    return Promise.resolve(true);
+    // return api.post(`${BASE_URL}/TestConfig`, partial);
   },
 };

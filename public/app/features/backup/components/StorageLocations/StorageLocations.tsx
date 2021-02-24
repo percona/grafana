@@ -20,8 +20,6 @@ const { name, type, path, actions } = columns;
 
 export const StorageLocations: FC = () => {
   const [pending, setPending] = useState(true);
-  const [testPending, setTestPending] = useState(false);
-  const [locationValid, setLocationValid] = useState(false);
   const [data, setData] = useState<StorageLocation[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<StorageLocation | undefined>();
@@ -101,29 +99,16 @@ export const StorageLocations: FC = () => {
 
   const handleClose = () => {
     setAddModalVisible(false);
-    setLocationValid(false);
   };
 
   const handleUpdate = (location: StorageLocation) => {
     setSelectedLocation(location);
-    setLocationValid(true);
     setAddModalVisible(true);
   };
 
-  const handleTest = async (location: StorageLocation) => {
-    setTestPending(true);
-    setLocationValid(false);
-    setTimeout(async () => {
-      try {
-        const rawLocation = formatToRawLocation(location);
-        const valid = await StorageLocationsService.testLocation(rawLocation);
-        setLocationValid(valid);
-      } catch (e) {
-        logger.error(e);
-      } finally {
-        setTestPending(false);
-      }
-    }, 1000);
+  const isLocationValid = (location: StorageLocation) => {
+    const rawLocation = formatToRawLocation(location);
+    return StorageLocationsService.testLocation(rawLocation);
   };
 
   useEffect(() => {
@@ -158,12 +143,9 @@ export const StorageLocations: FC = () => {
         location={selectedLocation}
         isVisible={addModalVisible}
         needsLocationValidation={isAdmin}
-        locationValid={locationValid}
-        waitingLocationValidation={testPending}
         onClose={handleClose}
         onAdd={onAdd}
-        onTest={handleTest}
-        onPathChanged={() => setLocationValid(false)}
+        isLocationValid={isLocationValid}
       />
     </>
   );

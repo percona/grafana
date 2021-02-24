@@ -96,4 +96,96 @@ describe('AddStorageLocationModal', () => {
     );
     expect(wrapper.find(LoaderButton).text()).toBe(Messages.editAction);
   });
+
+  it('should not show the test button if "needsLocationValidation" prop is not passed', () => {
+    const wrapper = mount(<AddStorageLocationModal onClose={jest.fn()} onAdd={jest.fn()} isVisible />);
+
+    expect(wrapper.find(dataQa('storage-location-test-button')).exists()).toBeFalsy();
+  });
+
+  it('should show the test button if "needsLocationValidation" prop is passed', () => {
+    const wrapper = mount(
+      <AddStorageLocationModal needsLocationValidation onClose={jest.fn()} onAdd={jest.fn()} isVisible />
+    );
+
+    expect(wrapper.find(dataQa('storage-location-test-button')).exists()).toBeTruthy();
+  });
+
+  it('should disable the test button if the form is invalid', () => {
+    const wrapper = mount(
+      <AddStorageLocationModal needsLocationValidation onClose={jest.fn()} onAdd={jest.fn()} isVisible />
+    );
+
+    expect(
+      wrapper
+        .find(dataQa('storage-location-test-button'))
+        .last()
+        .props().disabled
+    ).toBe(true);
+  });
+
+  it('should enable the test button if the form is valid', () => {
+    const location: StorageLocation = {
+      locationID: 'Location_1',
+      name: 'client_fs',
+      description: 'description',
+      type: LocationType.CLIENT,
+      path: '/foo/bar',
+    };
+    const wrapper = mount(
+      <AddStorageLocationModal
+        location={location}
+        needsLocationValidation
+        onClose={jest.fn()}
+        onAdd={jest.fn()}
+        isVisible
+      />
+    );
+
+    expect(
+      wrapper
+        .find(dataQa('storage-location-test-button'))
+        .last()
+        .props().disabled
+    ).toBe(false);
+  });
+
+  it('should disable the add button if the config path is changed', () => {
+    const location: S3Location = {
+      locationID: 'Location_1',
+      name: 'client_fs',
+      description: 'description',
+      type: LocationType.S3,
+      path: '/foo/bar',
+      accessKey: 'accessKey',
+      secretKey: 'secretKey',
+    };
+    const wrapper = mount(
+      <AddStorageLocationModal
+        location={location}
+        needsLocationValidation
+        onClose={jest.fn()}
+        onAdd={jest.fn()}
+        isVisible
+      />
+    );
+
+    wrapper.find(dataQa('name-text-input')).simulate('change', { target: { value: 'new-name' } });
+
+    expect(
+      wrapper
+        .find(dataQa('storage-location-add-button'))
+        .last()
+        .props().disabled
+    ).toBe(false);
+
+    wrapper.find(dataQa('endpoint-text-input')).simulate('change', { target: { value: 's3://foo' } });
+
+    expect(
+      wrapper
+        .find(dataQa('storage-location-add-button'))
+        .last()
+        .props().disabled
+    ).toBe(true);
+  });
 });
