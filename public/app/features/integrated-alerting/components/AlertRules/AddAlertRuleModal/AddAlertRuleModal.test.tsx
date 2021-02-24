@@ -112,4 +112,14 @@ describe('AddAlertRuleModal', () => {
 
     expect(button.props().disabled).toBe(true);
   });
+
+  it('should disable template edition', () => {
+    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
+    expect(
+      wrapper
+        .find(dataQa('template-select-input'))
+        .first()
+        .prop('disabled')
+    ).toBeTruthy();
+  });
 });
