@@ -5,7 +5,7 @@ import { AddStorageLocationFormProps } from './AddStorageLocationModal.types';
 describe('AddStorageLocationUtils', () => {
   describe('toFormStorageLocation', () => {
     it('should return an empty S3 object by default', () => {
-      expect(toFormStorageLocation(undefined)).toEqual({
+      expect(toFormStorageLocation(null)).toEqual({
         locationID: '',
         name: '',
         description: '',
