@@ -17,7 +17,7 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
         size={small ? 'sm' : 'lg'}
         className={cx(styles.lock, small ? [] : styles.fullLock)}
         onClick={toggleVisibility}
-        name={visible ? 'lock' : 'unlock'}
+        name={visible ? 'eye-slash' : 'eye'}
       />
     ),
     [visible, small]

@@ -19,6 +19,7 @@ export interface AddStorageLocationFormProps {
   server: string;
   accessKey: string;
   secretKey: string;
+  bucketName: string;
 }
 
 export interface TypeFieldCommonProps {

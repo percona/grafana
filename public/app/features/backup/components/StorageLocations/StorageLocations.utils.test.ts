@@ -3,6 +3,7 @@ import { isS3Location, formatLocationList, formatToRawLocation } from './Storage
 
 const s3Location: S3Location = {
   locationID: 'location_1',
+  bucketName: 'bucket',
   name: 's3',
   description: 'description',
   type: LocationType.S3,
@@ -27,6 +28,7 @@ const rawS3Location: StorageLocationReponse = {
     endpoint: 's3://foo/bar',
     access_key: 'access',
     secret_key: 'secret',
+    bucket_name: 'bucket',
   },
 };
 
@@ -56,6 +58,7 @@ describe('StorageLocationsUtils', () => {
       path: rawS3Location.s3_config?.endpoint,
       accessKey: rawS3Location.s3_config?.access_key,
       secretKey: rawS3Location.s3_config?.secret_key,
+      bucketName: rawS3Location.s3_config?.bucket_name,
     });
     expect(locations[1]).toEqual({
       locationID: rawFSLocation.location_id,
@@ -75,6 +78,7 @@ describe('StorageLocationsUtils', () => {
         endpoint: s3Location.path,
         access_key: s3Location.accessKey,
         secret_key: s3Location.secretKey,
+        bucket_name: s3Location.bucketName,
       },
     });
 

@@ -25,10 +25,16 @@ import { LocationType } from '../StorageLocations.types';
 import { cx } from 'emotion';
 
 const TypeField: FC<TypeFieldProps> = ({ values, onPathChanged = () => null }) => {
-  const { type, client, server, endpoint, accessKey, secretKey } = values;
+  const { type, client, server, endpoint, accessKey, secretKey, bucketName } = values;
   const fieldMap = {
     [LocationType.S3]: (
-      <S3Fields endpoint={endpoint} accessKey={accessKey} secretKey={secretKey} onPathChanged={onPathChanged} />
+      <S3Fields
+        endpoint={endpoint}
+        bucketName={bucketName}
+        accessKey={accessKey}
+        secretKey={secretKey}
+        onPathChanged={onPathChanged}
+      />
     ),
     [LocationType.SERVER]: <LocalFields name="server" path={server} onPathChanged={onPathChanged} />,
     [LocationType.CLIENT]: <LocalFields name="client" path={client} onPathChanged={onPathChanged} />,

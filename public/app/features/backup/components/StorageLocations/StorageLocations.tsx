@@ -84,9 +84,11 @@ export const StorageLocations: FC = () => {
 
   const onAdd = async (location: StorageLocation) => {
     try {
-      (await location.locationID)
-        ? StorageLocationsService.update(formatToRawLocation(location))
-        : StorageLocationsService.add(formatToRawLocation(location));
+      if (location.locationID) {
+        await StorageLocationsService.update(formatToRawLocation(location));
+      } else {
+        await StorageLocationsService.add(formatToRawLocation(location));
+      }
       appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       getData();
     } catch (e) {
