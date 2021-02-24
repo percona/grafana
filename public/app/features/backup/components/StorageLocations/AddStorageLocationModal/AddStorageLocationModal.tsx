@@ -52,7 +52,12 @@ const typeOptions: Array<SelectableValue<LocationType>> = [
 const { Form } = withTypes<AddStorageLocationFormProps>();
 const required = [validators.required];
 
-export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({ isVisible, location, onClose, onAdd }) => {
+export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
+  isVisible,
+  location = null,
+  onClose,
+  onAdd,
+}) => {
   const initialValues = toFormStorageLocation(location);
 
   const onSubmit = (values: AddStorageLocationFormProps) => onAdd(toStorageLocation(values));
