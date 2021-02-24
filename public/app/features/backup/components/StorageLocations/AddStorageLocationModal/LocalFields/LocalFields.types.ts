@@ -1,6 +1,4 @@
-import { TypeFieldCommonProps } from '../AddStorageLocationModal.types';
-
-export interface LocalFieldsProps extends TypeFieldCommonProps {
+export interface LocalFieldsProps {
   name: string;
   path?: string;
 }

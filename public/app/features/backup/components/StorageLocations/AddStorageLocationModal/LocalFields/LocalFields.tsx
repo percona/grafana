@@ -5,12 +5,6 @@ import { Messages } from './LocalFields.messages';
 
 const required = [validators.required];
 
-export const LocalFields: FC<LocalFieldsProps> = ({ name, path, onPathChanged = () => null }) => (
-  <TextInputField
-    name={name}
-    validators={required}
-    label={Messages.path}
-    initialValue={path}
-    inputProps={{ onInput: onPathChanged }}
-  />
+export const LocalFields: FC<LocalFieldsProps> = ({ name, path }) => (
+  <TextInputField name={name} validators={required} label={Messages.path} initialValue={path} />
 );

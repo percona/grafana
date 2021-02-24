@@ -23,20 +23,14 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LocationType } from '../StorageLocations.types';
 import { cx } from 'emotion';
 
-const TypeField: FC<TypeFieldProps> = ({ values, onPathChanged = () => null }) => {
+const TypeField: FC<TypeFieldProps> = ({ values }) => {
   const { type, client, server, endpoint, accessKey, secretKey, bucketName } = values;
   const fieldMap = {
     [LocationType.S3]: (
-      <S3Fields
-        endpoint={endpoint}
-        bucketName={bucketName}
-        accessKey={accessKey}
-        secretKey={secretKey}
-        onPathChanged={onPathChanged}
-      />
+      <S3Fields endpoint={endpoint} bucketName={bucketName} accessKey={accessKey} secretKey={secretKey} />
     ),
-    [LocationType.SERVER]: <LocalFields name="server" path={server} onPathChanged={onPathChanged} />,
-    [LocationType.CLIENT]: <LocalFields name="client" path={client} onPathChanged={onPathChanged} />,
+    [LocationType.SERVER]: <LocalFields name="server" path={server} />,
+    [LocationType.CLIENT]: <LocalFields name="client" path={client} />,
   };
 
   return type in fieldMap ? fieldMap[type] : null;

@@ -1,6 +1,4 @@
-import { TypeFieldCommonProps } from '../AddStorageLocationModal.types';
-
-export interface S3FieldsProps extends TypeFieldCommonProps {
+export interface S3FieldsProps {
   endpoint?: string;
   accessKey?: string;
   secretKey?: string;
