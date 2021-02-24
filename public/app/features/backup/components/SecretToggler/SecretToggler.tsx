@@ -10,7 +10,7 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly }) => {
   const toggleVisibility = () => setVisible(visible => !visible);
 
   const iconButton = useMemo(
-    () => <Icon className={styles.lock} onClick={toggleVisibility} name={visible ? 'lock' : 'unlock'} />,
+    () => <Icon className={styles.lock} onClick={toggleVisibility} name={visible ? 'eye-slash' : 'eye'} />,
     [visible]
   );
 

@@ -10,17 +10,17 @@ describe('SecretToggler', () => {
     expect(wrapper.find('input').prop('type')).toBe('password');
   });
 
-  it('should show the unlock icon when not showing text', () => {
+  it('should show the eye icon when not showing text', () => {
     const wrapper = shallow(<SecretToggler secret="secret" />);
 
-    expect(wrapper.find(Icon).prop('name')).toBe('unlock');
+    expect(wrapper.find(Icon).prop('name')).toBe('eye');
   });
 
-  it('should reveal the secret when the lock is clicked', () => {
+  it('should reveal the secret when the eye is clicked', () => {
     const wrapper = shallow(<SecretToggler secret="secret" />);
 
     wrapper.find(Icon).simulate('click');
-    expect(wrapper.find(Icon).prop('name')).toBe('lock');
+    expect(wrapper.find(Icon).prop('name')).toBe('eye-slash');
     expect(wrapper.find('input').prop('type')).toBe('text');
   });
 
