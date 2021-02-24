@@ -33,6 +33,7 @@ describe('AddStorageLocationModal', () => {
       path: '/foo/bar',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
+      bucketName: 'bucket',
     };
     const wrapper = mount(
       <AddStorageLocationModal location={location} onClose={jest.fn()} onAdd={jest.fn()} isVisible />
@@ -68,6 +69,7 @@ describe('AddStorageLocationModal', () => {
       path: '/foo/bar',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
+      bucketName: 'bucket',
     };
     const wrapper = mount(<AddStorageLocationModal location={location} onClose={jest.fn()} onAdd={onAdd} isVisible />);
     wrapper.find(dataQa('endpoint-text-input')).simulate('change', { target: { value: 's3://foo' } });
