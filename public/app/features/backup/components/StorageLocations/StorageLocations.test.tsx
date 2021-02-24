@@ -11,11 +11,7 @@ import { StorageLocations } from './StorageLocations';
 import { formatLocationList } from './StorageLocations.utils';
 
 jest.mock('./StorageLocations.service');
-jest.mock('app/core/core', () => ({
-  appEvents: {
-    emit: jest.fn(),
-  },
-}));
+jest.mock('app/core/app_events');
 
 describe('StorageLocations', () => {
   it('should render table with data', async () => {

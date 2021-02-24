@@ -3,7 +3,7 @@ import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { IconButton, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { StorageLocationsActions } from './StorageLocationsActions';
 import { Messages } from './StorageLocations.messages';
