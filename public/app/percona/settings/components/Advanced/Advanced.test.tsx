@@ -15,7 +15,7 @@ describe('Advanced::', () => {
         publicAddress="pmmtest.percona.com"
       />
     );
-    const retentionInput = root.find(dataQa('advanced-retention-input')).find('input');
+    const retentionInput = root.find(dataQa('retention-field-container')).find('input');
     const publicAddressInput = root.find(dataQa('publicAddress-text-input')).find('input');
 
     expect(retentionInput.prop('value')).toEqual(15);
@@ -75,7 +75,7 @@ describe('Advanced::', () => {
     );
 
     root
-      .find('[data-qa="advanced-retention-input"]')
+      .find('[data-qa="retention-field-container"]')
       .find('input')
       .simulate('change', { target: { value: '70' } });
     root.find('form').simulate('submit');
