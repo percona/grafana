@@ -1,8 +1,7 @@
-import { DBClusterStatus } from '../DBCluster.types';
+import { DBCluster } from '../DBCluster.types';
 
 export interface DBClusterStatusProps {
-  status: DBClusterStatus;
-  message?: string;
-  finishedSteps?: number;
-  totalSteps?: number;
+  dbCluster: DBCluster;
+  setSelectedCluster: (dbCluster: DBCluster) => void;
+  setLogsModalVisible: (isVisible: boolean) => void;
 }
