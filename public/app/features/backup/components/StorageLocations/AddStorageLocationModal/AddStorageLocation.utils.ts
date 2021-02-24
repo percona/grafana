@@ -44,9 +44,7 @@ export const toStorageLocation = (values: AddStorageLocationFormProps): StorageL
   return locationMap[type];
 };
 
-export const toFormStorageLocation = (
-  values: StorageLocation | S3Location | undefined
-): AddStorageLocationFormProps => {
+export const toFormStorageLocation = (values: StorageLocation | S3Location | null): AddStorageLocationFormProps => {
   if (!values) {
     return {
       locationID: '',

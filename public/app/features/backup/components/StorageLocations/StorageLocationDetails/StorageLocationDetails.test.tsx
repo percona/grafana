@@ -27,6 +27,7 @@ describe('StorageLocationDetails', () => {
       ...location,
       accessKey: 'access',
       secretKey: 'secret',
+      bucketName: 'bucket',
     };
     const wrapper = shallow(<StorageLocationDetails location={s3Location} />);
     const keysBlock = wrapper.find(KeysBlock);

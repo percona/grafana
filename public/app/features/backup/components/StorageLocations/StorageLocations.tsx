@@ -142,7 +142,7 @@ export const StorageLocations: FC = () => {
           variant="link"
           data-qa="storage-location-add-modal-button"
           onClick={() => {
-            setSelectedLocation(undefined);
+            setSelectedLocation(null);
             setAddModalVisible(true);
           }}
         >
