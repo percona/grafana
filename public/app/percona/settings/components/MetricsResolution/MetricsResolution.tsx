@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Button, Spinner, useTheme } from '@grafana/ui';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
@@ -23,9 +23,13 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
   const styles = getStyles(theme);
   const settingsStyles = getSettingsStyles(theme);
   const [fieldsResolutions, updateFieldsResolutions] = useState(removeUnits(metricsResolutions));
+  const [initialValues, setInitialValues] = useState({});
   const [resolution, setResolution] = useState(getResolutionValue(metricsResolutions).value);
   const [customResolutions, updateCustomResolutions] = useState(fieldsResolutions);
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setInitialValues({ ...removeUnits(metricsResolutions), resolutions: getResolutionValue(metricsResolutions).value });
+  }, [metricsResolutions]);
   const {
     metrics: {
       action,
@@ -58,8 +62,14 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
       const resolutions = removeUnits(defaultResolutions[newResolutionKey]);
 
       updateFieldsResolutions(resolutions);
+      form.change(MetricsResolutionIntervals.lr, resolutions.lr);
+      form.change(MetricsResolutionIntervals.mr, resolutions.mr);
+      form.change(MetricsResolutionIntervals.hr, resolutions.hr);
     } else {
       updateFieldsResolutions(customResolutions);
+      form.change(MetricsResolutionIntervals.lr, customResolutions.lr);
+      form.change(MetricsResolutionIntervals.mr, customResolutions.mr);
+      form.change(MetricsResolutionIntervals.hr, customResolutions.hr);
     }
 
     setResolution(newResolution);
@@ -69,7 +79,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
     <div className={styles.resolutionsWrapper}>
       <Form
         onSubmit={applyChanges}
-        initialValues={{ ...fieldsResolutions, resolutions: resolution }}
+        initialValues={initialValues}
         render={({ form, handleSubmit, valid, pristine }) => (
           <form onSubmit={handleSubmit} onChange={() => updateResolutions(form)}>
             <div className={settingsStyles.labelWrapper} data-qa="metrics-resolution-label">
@@ -81,7 +91,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
               data-qa="metrics-resolution-radio-button-group"
               options={resolutionsOptions}
             />
-            <div style={{ width: '100px' }}>
+            <div className={settingsStyles.numericFieldWrapper}>
               <NumberInputField
                 label={low}
                 name={MetricsResolutionIntervals.lr}
@@ -90,7 +100,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
                 validators={resolutionValidators}
               />
             </div>
-            <div style={{ width: '100px' }}>
+            <div className={settingsStyles.numericFieldWrapper}>
               <NumberInputField
                 label={medium}
                 name={MetricsResolutionIntervals.mr}
@@ -99,7 +109,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
                 validators={resolutionValidators}
               />
             </div>
-            <div style={{ width: '100px' }}>
+            <div className={settingsStyles.numericFieldWrapper}>
               <NumberInputField
                 label={high}
                 name={MetricsResolutionIntervals.hr}
