@@ -20,7 +20,7 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
   const { required } = validators;
   const onSubmit = async (values: EditAlertRuleTemplateRenderProps) => {
     try {
-      await AlertRuleTemplateService.update(values);
+      await AlertRuleTemplateService.update({ ...values, name });
       setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [Messages.editSuccess]);
       getAlertRuleTemplates();
