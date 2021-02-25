@@ -1,8 +1,8 @@
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { InstanceData } from './AddRemoteInstance.types';
 
-export const getInstanceData = (instanceType, credentials): InstanceData => {
-  const extractCredentials = (credentials): InstanceData => {
+export const getInstanceData = (instanceType: Databases, credentials: any): InstanceData => {
+  const extractCredentials = (credentials: any): InstanceData => {
     if (!credentials) {
       return { remoteInstanceCredentials: {} };
     }

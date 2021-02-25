@@ -1,15 +1,14 @@
-import React, { FC, useState } from 'react';
-import { CheckboxField, NumberInputField, validators } from '@percona/platform-core';
+import React, { FC, useEffect, useState } from 'react';
+import { CheckboxField, NumberInputField, RadioButtonGroupField, validators } from '@percona/platform-core';
 import { Databases } from 'app/percona/shared/core';
 import { useTheme } from '@grafana/ui';
-import { Field as FieldWrapper } from 'app/percona/shared/components/Form/FieldAdapters/Field';
-import { Field } from 'react-final-form';
 import { AdditionalOptionsFormPartProps, PostgreSQLAdditionalOptionsProps } from '../FormParts.types';
 import { getStyles } from '../FormParts.styles';
 import { Messages } from '../FormParts.messages';
 import { trackingOptions } from '../FormParts.constants';
 import { tablestatOptions } from './AdditionalOptions.constants';
-import { TablestatOptions } from './AdditionalOptions.types';
+import { TablestatOptionsInterface } from './AdditionalOptions.types';
+import {FormApi} from "final-form";
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -35,54 +34,53 @@ export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
 
 export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = () => (
   <>
-    <div>radio</div>
-    {/*<Field*/}
-    {/*  dataQa="tracking-options-radio-button-group"*/}
-    {/*  name="tracking"*/}
-    {/*  label={Messages.form.labels.trackingOptions}*/}
-    {/*  options={trackingOptions}*/}
-    {/*  component={RadioButtonGroupAdapter}*/}
-    {/*/>*/}
+    <RadioButtonGroupField
+      name="tracking"
+      data-qa="tracking-options-radio-button-group"
+      options={trackingOptions}
+      label={Messages.form.labels.trackingOptions}
+    />
   </>
 );
 
-const getTablestatValues = type => {
+const getTablestatValues = (type: TablestatOptionsInterface) => {
   switch (type) {
-    case TablestatOptions.disabled:
+    case TablestatOptionsInterface.disabled:
       return -1;
     default:
       return 1000;
   }
 };
 
-const MySQLOptions = ({ form }) => {
-  const [selectedValue, setSelectedValue] = useState<string>(TablestatOptions.disabled);
+const MySQLOptions = ({ form }: {form: FormApi}) => {
+  const selectedOption = form.getState().values['tablestat-options'];
+  const [selectedValue, setSelectedValue] = useState<string>(selectedOption || TablestatOptionsInterface.disabled);
+
+  useEffect(() => {
+    setSelectedValue(selectedOption);
+    form.change('tablestats_group_table_limit', getTablestatValues(selectedOption));
+  }, [selectedOption]);
 
   return (
     <>
-      {/*<FieldWrapper label={Messages.form.labels.additionalOptions.tablestatOptions}>*/}
-      {/*  <RadioButtonGroup*/}
-      {/*    options={tablestatOptions}*/}
-      {/*    selected={selectedValue}*/}
-      {/*    name="tablestat-options"*/}
-      {/*    dataQa="tablestat-options-radio-button-group"*/}
-      {/*    onChange={type => {*/}
-      {/*      setSelectedValue(type);*/}
-      {/*      form.change('tablestats_group_table_limit', getTablestatValues(type));*/}
-      {/*    }}*/}
-      {/*  />*/}
-      {/*</FieldWrapper>*/}
+      <RadioButtonGroupField
+        name="tablestat-options"
+        data-qa="tablestat-options-radio-button-group"
+        defaultValue={selectedValue}
+        options={tablestatOptions}
+        label={Messages.form.labels.additionalOptions.tablestatOptions}
+      />
       <NumberInputField
         name="tablestats_group_table_limit"
         defaultValue={-1}
-        disabled={selectedValue !== TablestatOptions.custom}
+        disabled={selectedValue !== TablestatOptionsInterface.custom}
         validate={validators.containsNumber}
       />
     </>
   );
 };
 
-export const getAdditionalOptions = (type, remoteInstanceCredentials, form) => {
+export const getAdditionalOptions = (type: Databases, remoteInstanceCredentials: any, form: FormApi) => {
   switch (type) {
     case Databases.postgresql:
       return (

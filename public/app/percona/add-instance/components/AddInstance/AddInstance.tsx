@@ -28,7 +28,7 @@ export const AddInstance: FC<AddInstanceProps> = ({ onSelectInstanceType }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const selectInstanceType = type => () => onSelectInstanceType({ type });
+  const selectInstanceType = (type: string) => () => onSelectInstanceType({ type });
 
   return (
     <section className={styles.content}>

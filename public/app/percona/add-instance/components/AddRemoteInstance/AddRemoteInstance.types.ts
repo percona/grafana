@@ -14,13 +14,13 @@ export interface InstanceData {
 }
 
 interface Instance {
-  type: string;
+  type: any;
   credentials?: any;
 }
 
 export interface AddRemoteInstanceProps {
   instance: Instance;
-  selectInstance: (Instance) => void;
+  selectInstance: (any) => void;
 }
 
 export interface AddNode {

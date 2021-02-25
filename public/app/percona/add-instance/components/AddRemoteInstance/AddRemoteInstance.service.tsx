@@ -1,37 +1,37 @@
-import { apiRequestManagement } from 'app/percona/shared/helpers/api';
+import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Databases } from 'app/percona/shared/core';
 import { RemoteInstanceExternalservicePayload, TrackingOptions } from './AddRemoteInstance.types';
 
 class AddRemoteInstanceService {
-  static async addMysql(body) {
-    return apiRequestManagement.post<any, any>('/MySQL/Add', body);
+  static async addMysql(body: any) {
+    return apiManagement.post<any, any>('/MySQL/Add', body);
   }
 
-  static async addPostgresql(body) {
-    return apiRequestManagement.post<any, any>('/PostgreSQL/Add', body);
+  static async addPostgresql(body: any) {
+    return apiManagement.post<any, any>('/PostgreSQL/Add', body);
   }
 
-  static async addProxysql(body) {
-    return apiRequestManagement.post<any, any>('/ProxySQL/Add', body);
+  static async addProxysql(body: any) {
+    return apiManagement.post<any, any>('/ProxySQL/Add', body);
   }
 
-  static async addHaproxy(body) {
-    return apiRequestManagement.post<any, any>('/HAProxy/Add', body);
+  static async addHaproxy(body: any) {
+    return apiManagement.post<any, any>('/HAProxy/Add', body);
   }
 
-  static async addMongodb(body) {
-    return apiRequestManagement.post<any, any>('/MongoDB/Add', body);
+  static async addMongodb(body: any) {
+    return apiManagement.post<any, any>('/MongoDB/Add', body);
   }
 
-  static async addRDS(body) {
-    return apiRequestManagement.post<any, any>('/RDS/Add', body);
+  static async addRDS(body: any) {
+    return apiManagement.post<any, any>('/RDS/Add', body);
   }
 
-  static async addExternal(body) {
-    return apiRequestManagement.post<any, any>('/External/Add', body);
+  static async addExternal(body: any) {
+    return apiManagement.post<any, any>('/External/Add', body);
   }
 
-  static addRemote(type, data) {
+  static addRemote(type: Databases, data: any) {
     switch (type) {
       case Databases.mongodb:
         return AddRemoteInstanceService.addMongodb(toPayload(data));
@@ -43,7 +43,7 @@ class AddRemoteInstanceService {
         return AddRemoteInstanceService.addProxysql(toPayload(data));
       case Databases.haproxy:
         return AddRemoteInstanceService.addHaproxy(toExternalServicePayload(data));
-      case 'external':
+      case Databases.external:
         return AddRemoteInstanceService.addExternal(toExternalServicePayload(data));
       default:
         throw new Error('Unknown instance type');
@@ -53,14 +53,14 @@ class AddRemoteInstanceService {
 
 export default AddRemoteInstanceService;
 
-export const toPayload = (values, discoverName?) => {
+export const toPayload = (values: any, discoverName?: string) => {
   const data = { ...values };
 
   if (values.custom_labels) {
     data.custom_labels = data.custom_labels
       .split(/[\n\s]/)
       .filter(Boolean)
-      .reduce((acc, val) => {
+      .reduce((acc: any, val: string) => {
         const [key, value] = val.split(':');
 
         acc[key] = value;
@@ -114,14 +114,14 @@ export const toPayload = (values, discoverName?) => {
   return data;
 };
 
-export const toExternalServicePayload = (values): RemoteInstanceExternalservicePayload => {
+export const toExternalServicePayload = (values: any): RemoteInstanceExternalservicePayload => {
   const data = { ...values };
 
   if (values.custom_labels) {
     data.custom_labels = data.custom_labels
       .split(/[\n\s]/)
       .filter(Boolean)
-      .reduce((acc, val) => {
+      .reduce((acc: any, val: string) => {
         const [key, value] = val.split(':');
 
         acc[key] = value;

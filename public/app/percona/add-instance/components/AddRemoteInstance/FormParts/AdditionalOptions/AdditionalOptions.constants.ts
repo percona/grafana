@@ -1,17 +1,17 @@
 import { Messages } from './AdditionalOptions.messages';
-import { TablestatOptions } from './AdditionalOptions.types';
+import { TablestatOptionsInterface } from './AdditionalOptions.types';
 
 export const tablestatOptions = [
   {
-    key: TablestatOptions.disabled,
-    value: Messages.form.tablestatOptions.disabled,
+    value: TablestatOptionsInterface.disabled,
+    label: Messages.form.tablestatOptions.disabled,
   },
   {
-    key: TablestatOptions.default,
-    value: Messages.form.tablestatOptions.default,
+    value: TablestatOptionsInterface.default,
+    label: Messages.form.tablestatOptions.default,
   },
   {
-    key: TablestatOptions.custom,
-    value: Messages.form.tablestatOptions.custom,
+    value: TablestatOptionsInterface.custom,
+    label: Messages.form.tablestatOptions.custom,
   },
 ];

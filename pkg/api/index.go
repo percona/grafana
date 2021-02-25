@@ -154,10 +154,10 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		})
 	}
 
-	// 	inventoryChildNavs := []*dtos.NavLink{
-	// 		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/d/pmm-inventory/pmm-inventory", Icon: "percona-inventory", HideFromTabs: true},
-	// 		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/d/pmm-add-instance/pmm-add-instance", Icon: "percona-add", HideFromTabs: true},
-	// 	}
+	inventoryChildNavs := []*dtos.NavLink{
+		{Text: "Inventory list", Id: "home", Url: setting.AppSubUrl + "/inventory", Icon: "percona-inventory", HideFromTabs: true},
+		{Text: "Add instance", Id: "home", Url: setting.AppSubUrl + "/add-instance", Icon: "percona-add", HideFromTabs: true},
+	}
 	//
 	// 	nodeSummaryChildNavs := []*dtos.NavLink{
 	// 		{Text: "CPU Utilisation", Id: "home", Url: setting.AppSubUrl + "/d/node-cpu/cpu-utilization-details", Icon: "percona-cpu", HideFromTabs: true},
@@ -298,7 +298,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 	navTree = append(navTree, appLinks...)
 
 	configNodes := []*dtos.NavLink{
-		// 				{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/", Icon: "percona-inventory", HideFromTabs: true, Children: inventoryChildNavs},
+		{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/inventory", Icon: "percona-inventory", HideFromTabs: true, Children: inventoryChildNavs},
 		{Text: "Settings", Id: "home", Url: setting.AppSubUrl + "/settings", Icon: "percona-setting", HideFromTabs: true},
 		{Divider: true},
 	}

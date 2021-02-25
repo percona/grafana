@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useMemo } from 'react';
-import { PasswordInputField, TextInputField, validators } from '@percona/platform-core';
+import { PasswordInputField, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
 import Validators from 'app/percona/shared/helpers/validators';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { Button, useTheme } from '@grafana/ui';
@@ -8,7 +8,7 @@ import { RadioButtonGroupAdapter } from 'app/percona/shared/components/Form/Fiel
 import { ExternalServiceConnectionDetailsFormPartProps } from '../FormParts.types';
 import { getStyles } from '../FormParts.styles';
 import { Messages } from '../FormParts.messages';
-import { schemaOptions } from '../FormParts.constants';
+import { schemaOptions, trackingOptions } from '../FormParts.constants';
 
 export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetailsFormPartProps> = ({ form }) => {
   const theme = useTheme();
@@ -64,7 +64,7 @@ export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetai
         <span>{Messages.form.labels.externalService.schema}</span>
         <LinkTooltip tooltipText={Messages.form.tooltips.externalService.schema} icon="info-circle" />
       </div>
-      <Field dataQa="http-schema-field" name="schema" options={schemaOptions} component={RadioButtonGroupAdapter} />
+      <RadioButtonGroupField name="schema" data-qa="thttp-schema-field" options={schemaOptions} />
       <div className={styles.labelWrapper} data-qa="address-label">
         <span>{Messages.form.labels.externalService.address}</span>
         <LinkTooltip tooltipText={Messages.form.tooltips.externalService.address} icon="info-circle" />
