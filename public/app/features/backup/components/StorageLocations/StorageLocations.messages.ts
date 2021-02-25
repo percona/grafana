@@ -9,4 +9,5 @@ export const Messages = {
   },
   add: 'Add',
   addSuccess: 'Backup location was successfully added',
+  testSuccess: 'This storage location is valid',
 };

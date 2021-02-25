@@ -4,7 +4,7 @@ import { logger } from '@percona/platform-core';
 import { Button, IconButton, useStyles } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { AppEvents } from '@grafana/data';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
@@ -114,6 +114,7 @@ export const StorageLocations: FC = () => {
     try {
       const rawLocation = formatToRawLocation(location, true);
       await StorageLocationsService.testLocation(rawLocation);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.testSuccess]);
     } catch (e) {
       logger.error(e);
     } finally {
