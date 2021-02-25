@@ -91,7 +91,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
               data-qa="metrics-resolution-radio-button-group"
               options={resolutionsOptions}
             />
-            <div className={settingsStyles.numericFieldWrapper}>
+            <div className={styles.numericFieldWrapper}>
               <NumberInputField
                 label={low}
                 name={MetricsResolutionIntervals.lr}
@@ -100,7 +100,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
                 validators={resolutionValidators}
               />
             </div>
-            <div className={settingsStyles.numericFieldWrapper}>
+            <div className={styles.numericFieldWrapper}>
               <NumberInputField
                 label={medium}
                 name={MetricsResolutionIntervals.mr}
@@ -109,7 +109,7 @@ export const MetricsResolution: FC<MetricsResolutionProps> = ({ metricsResolutio
                 validators={resolutionValidators}
               />
             </div>
-            <div className={settingsStyles.numericFieldWrapper}>
+            <div className={styles.numericFieldWrapper}>
               <NumberInputField
                 label={high}
                 name={MetricsResolutionIntervals.hr}
