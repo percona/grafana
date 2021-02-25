@@ -100,10 +100,6 @@ export const StorageLocations: FC = () => {
     }
   };
 
-  const handleClose = () => {
-    setAddModalVisible(false);
-  };
-
   const handleUpdate = (location: StorageLocation) => {
     setSelectedLocation(location);
     setAddModalVisible(true);
@@ -155,7 +151,7 @@ export const StorageLocations: FC = () => {
         isVisible={addModalVisible}
         showLocationValidation={isAdmin}
         waitingLocationValidation={validatingLocation}
-        onClose={handleClose}
+        onClose={() => setAddModalVisible(false)}
         onAdd={onAdd}
         onTest={handleTest}
       />
