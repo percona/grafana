@@ -6,6 +6,7 @@ export const getStyles = () => ({
   `,
   input: css`
     padding: 0;
+    width: 200px;
     border: none;
     &[readonly] {
       background-color: transparent;
