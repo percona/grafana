@@ -10,7 +10,13 @@ jest.mock('app/core/app_events');
 describe('EditAlertRuleTemplateModal', () => {
   it('should render component correctly', () => {
     const wrapper = mount(
-      <EditAlertRuleTemplateModal setVisible={jest.fn()} isVisible yaml="" getAlertRuleTemplates={jest.fn()} />
+      <EditAlertRuleTemplateModal
+        name="template-1"
+        setVisible={jest.fn()}
+        isVisible
+        yaml=""
+        getAlertRuleTemplates={jest.fn()}
+      />
     );
     const addButton = wrapper.find(dataQa('alert-rule-template-edit-button')).find('button');
 
@@ -18,11 +24,18 @@ describe('EditAlertRuleTemplateModal', () => {
     expect(addButton).toBeTruthy();
     expect(addButton.prop('disabled')).toBeTruthy();
     expect(wrapper.find(dataQa('alert-rule-template-cancel-button'))).toBeTruthy();
+    expect(wrapper.find(dataQa('alert-rule-name-warning'))).toBeTruthy();
   });
 
   it('should not render modal when visible is set to false', () => {
     const wrapper = mount(
-      <EditAlertRuleTemplateModal setVisible={jest.fn()} isVisible={false} yaml="" getAlertRuleTemplates={jest.fn()} />
+      <EditAlertRuleTemplateModal
+        name="template-1"
+        setVisible={jest.fn()}
+        isVisible={false}
+        yaml=""
+        getAlertRuleTemplates={jest.fn()}
+      />
     );
 
     expect(wrapper.contains('textarea')).toBeFalsy();
@@ -31,7 +44,13 @@ describe('EditAlertRuleTemplateModal', () => {
   it('should call setVisible on close', () => {
     const setVisible = jest.fn();
     const wrapper = mount(
-      <EditAlertRuleTemplateModal setVisible={setVisible} isVisible yaml="" getAlertRuleTemplates={jest.fn()} />
+      <EditAlertRuleTemplateModal
+        name="template-1"
+        setVisible={setVisible}
+        isVisible
+        yaml=""
+        getAlertRuleTemplates={jest.fn()}
+      />
     );
 
     wrapper.find(dataQa('modal-background')).simulate('click');
@@ -42,6 +61,7 @@ describe('EditAlertRuleTemplateModal', () => {
   it('should render yaml content passed', () => {
     const wrapper = mount(
       <EditAlertRuleTemplateModal
+        name="template-1"
         setVisible={jest.fn()}
         isVisible
         yaml="test content"
@@ -59,6 +79,7 @@ describe('EditAlertRuleTemplateModal', () => {
     const getAlertRuleTemplates = jest.fn();
     const wrapper = mount(
       <EditAlertRuleTemplateModal
+        name="template-1"
         setVisible={setVisible}
         isVisible
         yaml=""

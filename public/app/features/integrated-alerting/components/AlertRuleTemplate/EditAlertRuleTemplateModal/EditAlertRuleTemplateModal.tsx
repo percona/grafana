@@ -44,7 +44,9 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
                 validators={[required]}
                 className={styles.alertRuleTemplate}
               />
-              <div className={styles.warning}>{Messages.nameNotEditable}</div>
+              <div data-qa="alert-rule-name-warning" className={styles.warning}>
+                {Messages.nameNotEditable}
+              </div>
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="alert-rule-template-edit-button"
