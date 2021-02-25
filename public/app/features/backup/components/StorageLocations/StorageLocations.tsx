@@ -112,8 +112,7 @@ export const StorageLocations: FC = () => {
   const handleTest = async (location: StorageLocation) => {
     setValidatingLocation(true);
     try {
-      const rawLocation = formatToRawLocation(location);
-      // TODO instead of a boolean, a message will be returned
+      const rawLocation = formatToRawLocation(location, true);
       await StorageLocationsService.testLocation(rawLocation);
     } catch (e) {
       logger.error(e);
