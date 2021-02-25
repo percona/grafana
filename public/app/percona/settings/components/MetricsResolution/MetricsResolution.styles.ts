@@ -15,4 +15,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
       width: 60px;
     }
   `,
+  numericFieldWrapper: css`
+    width: 100px;
+  `,
 }));
