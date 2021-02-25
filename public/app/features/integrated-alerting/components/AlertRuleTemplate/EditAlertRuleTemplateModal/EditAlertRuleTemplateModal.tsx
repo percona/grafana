@@ -11,6 +11,7 @@ import { Messages } from './EditAlertRuleTemplateModal.messages';
 
 export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = ({
   yaml,
+  name,
   isVisible,
   setVisible,
   getAlertRuleTemplates,
@@ -29,7 +30,7 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
   };
 
   return (
-    <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
+    <Modal title={Messages.getTitle(name)} isVisible={isVisible} onClose={() => setVisible(false)}>
       <Form
         initialValues={{ yaml }}
         onSubmit={onSubmit}
@@ -37,11 +38,13 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
           <form onSubmit={handleSubmit}>
             <>
               <TextareaInputField
+                fieldClassName={styles.field}
                 name="yaml"
                 label={Messages.alertRuleTemplateLabel}
                 validators={[required]}
                 className={styles.alertRuleTemplate}
               />
+              <div className={styles.warning}>{Messages.nameNotEditable}</div>
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="alert-rule-template-edit-button"

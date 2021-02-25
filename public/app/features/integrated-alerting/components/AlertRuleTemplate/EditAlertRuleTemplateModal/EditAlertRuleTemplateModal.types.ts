@@ -1,5 +1,6 @@
 export interface EditAlertRuleTemplateModalProps {
   yaml: string;
+  name: string;
   isVisible: boolean;
   setVisible: (value: boolean) => void;
   getAlertRuleTemplates: () => void;
