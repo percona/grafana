@@ -298,9 +298,9 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 	navTree = append(navTree, appLinks...)
 
 	configNodes := []*dtos.NavLink{
-		// 		{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/", Icon: "percona-inventory", HideFromTabs: true, Children: inventoryChildNavs},
-		// 		{Text: "Settings", Id: "home", Url: setting.AppSubUrl + "/", Icon: "percona-setting", HideFromTabs: true},
-		// 		{Divider: true},
+		// 				{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/", Icon: "percona-inventory", HideFromTabs: true, Children: inventoryChildNavs},
+		{Text: "Settings", Id: "home", Url: setting.AppSubUrl + "/settings", Icon: "percona-setting", HideFromTabs: true},
+		{Divider: true},
 	}
 
 	if c.OrgRole == models.ROLE_ADMIN {
