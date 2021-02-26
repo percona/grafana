@@ -8,6 +8,7 @@ import { EditAlertRuleTemplateModalProps, EditAlertRuleTemplateRenderProps } fro
 import { getStyles } from './EditAlertRuleTemplateModal.styles';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { Messages } from './EditAlertRuleTemplateModal.messages';
+import { WarningBlock } from 'app/features/backup/components/StorageLocations/WarningBlock';
 
 export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = ({
   yaml,
@@ -44,9 +45,7 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
                 validators={[required]}
                 className={styles.alertRuleTemplate}
               />
-              <div data-qa="alert-rule-name-warning" className={styles.warning}>
-                {Messages.nameNotEditable}
-              </div>
+              <WarningBlock message={Messages.nameNotEditable} type="warning" />
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="alert-rule-template-edit-button"
