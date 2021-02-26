@@ -10,12 +10,12 @@ export const getStyles = ({ palette, border }: GrafanaTheme) => ({
     background: linear-gradient(180deg, ${palette.greenBase} 0%, ${palette.greenShade} 100%);
     border: ${border.width.sm} solid ${palette.greenShade};
 
-    &:hover {
+    &:hover,
+    &:focus {
       background: ${palette.greenBase};
     }
 
     &:focus {
-      background: ${palette.greenBase};
       outline: none;
     }
   `,
