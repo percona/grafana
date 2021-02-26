@@ -45,7 +45,7 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
                 validators={[required]}
                 className={styles.alertRuleTemplate}
               />
-              <WarningBlock message={Messages.nameNotEditable} type="warning" />
+              <WarningBlock message={Messages.nameNotEditable} type="warning" dataQa="alert-rule-name-warning" />
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="alert-rule-template-edit-button"
