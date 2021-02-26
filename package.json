@@ -217,6 +217,7 @@
     "@types/common-tags": "^1.8.0",
     "@types/jsurl": "^1.2.28",
     "@types/md5": "^2.1.33",
+    "@types/react-router-dom": "^5.1.5",
     "@types/react-loadable": "5.5.2",
     "@types/hoist-non-react-statics": "3.3.1",
     "@types/react-virtualized-auto-sizer": "1.0.0",

@@ -5,12 +5,13 @@ import { Table } from 'app/percona/shared/components/Elements/Table/Table';
 import { showSuccessNotification } from 'app/percona/shared/helpers';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
-import { CheckboxField, FormElement } from 'app/percona/shared/components/Form';
+import { FormElement } from 'app/percona/shared/components/Form';
 import { AgentsList } from 'app/percona/inventory/Inventory.types';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { InventoryService } from '../Inventory.service';
 import { AGENTS_COLUMNS } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
+import { CheckboxField } from '@percona/platform-core';
 
 interface Agent {
   agent_id: string;
@@ -101,6 +102,7 @@ export const Agents = () => {
                   label="Force mode"
                   element={<CheckboxField name="force" label="Force mode is going to delete all associated agents" />}
                 />
+
                 <HorizontalGroup justify="space-between" spacing="md">
                   <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                     Cancel

@@ -1,5 +1,5 @@
 import { orderBy } from 'lodash';
-import { CustomLabel, InventoryList, ServicesList } from './Inventory.types';
+import { CustomLabel, InventoryList, InventoryType, ServicesList } from './Inventory.types';
 import { inventoryTypes } from './Inventory.constants';
 
 interface Model {
@@ -9,7 +9,7 @@ interface Model {
   [key: string]: any;
 }
 
-const getParams = (params, type): Model => {
+const getParams = (params: any, type: string): Model => {
   const { custom_labels, ...rest } = params;
   const labels =
     custom_labels && Object.keys(custom_labels).length
@@ -25,12 +25,13 @@ const getParams = (params, type): Model => {
 };
 
 const getModel = (item: ServicesList) => {
-  const addType = Object.keys(item).map(type => ({ type, params: item[type] }));
+  const addType = Object.keys(item).map((type: InventoryType) => ({ type, params: item[type] }));
 
   return addType.map(agent =>
     agent.params.map(
-      (arrItem): Model => {
-        const transformAgentType = type => type.replace(/^\w/, c => c.toUpperCase()).replace(/[_-]/g, ' ');
+      (arrItem: any): Model => {
+        const transformAgentType = (type: string) => type.replace(/^\w/, c => c.toUpperCase()).replace(/[_-]/g, ' ');
+        // @ts-ignore
         const type = inventoryTypes[agent.type] || transformAgentType(agent.type);
 
         return getParams(arrItem, type);
@@ -42,19 +43,19 @@ const getModel = (item: ServicesList) => {
 const getServiceModel = (item: InventoryList) => {
   const createParams = getModel(item);
 
-  return orderBy([].concat(...createParams), [(service: Model) => (service.service_name || '').toLowerCase()], ['asc']);
+  return orderBy([...createParams], [(service: Model) => (service.service_name || '').toLowerCase()], ['asc']);
 };
 
 const getNodeModel = (item: InventoryList) => {
   const createParams = getModel(item);
 
-  return orderBy([].concat(...createParams), [(node: Model) => (node.node_name || '').toLowerCase()], ['asc']);
+  return orderBy([...createParams], [(node: Model) => (node.node_name || '').toLowerCase()], ['asc']);
 };
 
 const getAgentModel = (item: InventoryList) => {
   const createParams = getModel(item);
 
-  return orderBy([].concat(...createParams), [(agent: Model) => (agent.type || '').toLowerCase()], ['asc']);
+  return orderBy([...createParams], [(agent: Model) => (agent.type || '').toLowerCase()], ['asc']);
 };
 
 export const InventoryDataService = {

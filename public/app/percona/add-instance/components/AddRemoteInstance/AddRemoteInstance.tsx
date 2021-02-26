@@ -11,7 +11,7 @@ import { Messages } from './AddRemoteInstance.messages';
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
 import { InstanceTypes } from '../../panel.types';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
-import {FormApi} from "final-form";
+import { FormApi } from 'final-form';
 
 const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, credentials }, selectInstance }) => {
   const theme = useTheme();
@@ -46,7 +46,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
     [type, discoverName]
   );
 
-  const ConnectionDetails = ({ form, type }: {form: FormApi, type: InstanceTypes}) => {
+  const ConnectionDetails = ({ form, type }: { form: FormApi; type: InstanceTypes }) => {
     switch (type) {
       case InstanceTypes.external:
         return <ExternalServiceConnectionDetails form={form} />;
@@ -80,6 +80,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
       return Messages.form.titles.addExternalService;
     }
 
+    // @ts-ignore
     return `Add remote ${DATABASE_LABELS[databaseType]} Instance`;
   };
 

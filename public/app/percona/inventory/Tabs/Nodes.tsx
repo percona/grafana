@@ -3,7 +3,7 @@ import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { Form } from 'react-final-form';
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
 import { showSuccessNotification } from 'app/percona/shared/helpers';
-import { CheckboxField, FormElement } from 'app/percona/shared/components/Form';
+import { FormElement } from 'app/percona/shared/components/Form';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
@@ -11,6 +11,7 @@ import { InventoryService } from '../Inventory.service';
 import { NodesList } from '../Inventory.types';
 import { NODES_COLUMNS } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
+import { CheckboxField } from '@percona/platform-core';
 
 interface Node {
   node_id: string;

@@ -3,12 +3,10 @@ import { PasswordInputField, RadioButtonGroupField, TextInputField, validators }
 import Validators from 'app/percona/shared/helpers/validators';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { Button, useTheme } from '@grafana/ui';
-import { Field } from 'react-final-form';
-import { RadioButtonGroupAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { ExternalServiceConnectionDetailsFormPartProps } from '../FormParts.types';
 import { getStyles } from '../FormParts.styles';
 import { Messages } from '../FormParts.messages';
-import { schemaOptions, trackingOptions } from '../FormParts.constants';
+import { schemaOptions } from '../FormParts.constants';
 
 export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetailsFormPartProps> = ({ form }) => {
   const theme = useTheme();
@@ -17,7 +15,7 @@ export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetai
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
 
   const trim = useCallback(value => (value ? value.trim() : value), []);
-  const getUrlParts = value => {
+  const getUrlParts = () => {
     try {
       const url = new URL(form.getState().values.url);
       const protocol = url.protocol.replace(':', '');
@@ -31,8 +29,6 @@ export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetai
     } catch (e) {
       console.log(e);
     }
-
-    return value;
   };
 
   return (

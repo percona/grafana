@@ -3,7 +3,7 @@ import { MAIN_COLUMN } from 'app/percona/inventory/Inventory.constants';
 import { CustomLabel } from 'app/percona/inventory/Inventory.types';
 import * as styles from './ColumnRenderers.styles';
 
-export const servicesDetailsRender = element => {
+export const servicesDetailsRender = (element: any) => {
   const labels = Object.keys(element).filter(label => !MAIN_COLUMN.includes(label));
 
   return (
@@ -16,7 +16,7 @@ export const servicesDetailsRender = element => {
   );
 };
 
-export const agentsDetailsRender = element => {
+export const agentsDetailsRender = (element: any) => {
   const mainColumns = ['agent_id', 'type', 'isDeleted', 'service_ids', 'custom_labels'];
   const labels = Object.keys(element).filter(label => !mainColumns.includes(label));
 
@@ -27,7 +27,7 @@ export const agentsDetailsRender = element => {
       {element.service_ids && element.service_ids.length ? (
         /* TODO(lunaticusgreen): all map renders need a key! */
         <>
-          service_ids: <span>{element.service_ids.map(serviceId => serviceId)}</span>
+          service_ids: <span>{element.service_ids.map((serviceId: any) => serviceId)}</span>
         </>
       ) : null}
       {getCustomLabels(element.custom_labels)}
@@ -35,7 +35,7 @@ export const agentsDetailsRender = element => {
   );
 };
 
-export const nodesDetailsRender = element => {
+export const nodesDetailsRender = (element: any) => {
   const mainColumns = ['node_id', 'node_name', 'address', 'custom_labels', 'type', 'isDeleted'];
   const labels = Object.keys(element).filter(label => !mainColumns.includes(label));
 

@@ -1,6 +1,6 @@
 import { apiManagement } from 'app/percona/shared/helpers/api';
-import { Databases } from 'app/percona/shared/core';
 import { RemoteInstanceExternalservicePayload, TrackingOptions } from './AddRemoteInstance.types';
+import { InstanceTypes } from '../../panel.types';
 
 class AddRemoteInstanceService {
   static async addMysql(body: any) {
@@ -31,19 +31,19 @@ class AddRemoteInstanceService {
     return apiManagement.post<any, any>('/External/Add', body);
   }
 
-  static addRemote(type: Databases, data: any) {
+  static addRemote(type: InstanceTypes, data: any) {
     switch (type) {
-      case Databases.mongodb:
+      case InstanceTypes.mongodb:
         return AddRemoteInstanceService.addMongodb(toPayload(data));
-      case Databases.mysql:
+      case InstanceTypes.mysql:
         return AddRemoteInstanceService.addMysql(toPayload(data));
-      case Databases.postgresql:
+      case InstanceTypes.postgresql:
         return AddRemoteInstanceService.addPostgresql(toPayload(data));
-      case Databases.proxysql:
+      case InstanceTypes.proxysql:
         return AddRemoteInstanceService.addProxysql(toPayload(data));
-      case Databases.haproxy:
+      case InstanceTypes.haproxy:
         return AddRemoteInstanceService.addHaproxy(toExternalServicePayload(data));
-      case Databases.external:
+      case InstanceTypes.external:
         return AddRemoteInstanceService.addExternal(toExternalServicePayload(data));
       default:
         throw new Error('Unknown instance type');

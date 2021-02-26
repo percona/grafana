@@ -3,6 +3,4 @@ export enum Databases {
   mongodb = 'mongodb',
   mysql = 'mysql',
   proxysql = 'proxysql',
-  external = 'external',
-  haproxy = 'haproxy',
 }

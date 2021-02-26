@@ -2,7 +2,7 @@ import { Button } from '@grafana/ui';
 import React from 'react';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 
-const getEngineType = type => {
+const getEngineType = (type?: string) => {
   switch (type) {
     case 'DISCOVER_RDS_MYSQL':
       return DATABASE_LABELS[Databases.mysql];
@@ -15,6 +15,7 @@ const getEngineType = type => {
   }
 };
 
+// @ts-ignore
 export const getInstancesColumns = (credentials, onSelectInstance) => [
   {
     Header: 'Region',
@@ -26,7 +27,8 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Engine',
-    accessor: element => (element.engine ? `${getEngineType(element.engine)}  ${element.engine_version}` : 'nothing'),
+    accessor: (element: any) =>
+      element.engine ? `${getEngineType(element.engine)}  ${element.engine_version}` : 'nothing',
   },
   {
     Header: 'Instance ID',
@@ -34,11 +36,11 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Address',
-    accessor: element => element.address.split(':')[0],
+    accessor: (element: any) => element.address.split(':')[0],
   },
   {
     Header: 'Action',
-    accessor: element => {
+    accessor: (element: any) => {
       const selectionHandler = () => {
         onSelectInstance({
           type: 'mysql',

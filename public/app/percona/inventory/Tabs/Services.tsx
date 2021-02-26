@@ -3,7 +3,7 @@ import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { Form } from 'react-final-form';
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
 import { showSuccessNotification } from 'app/percona/shared/helpers';
-import { CheckboxField, FormElement } from 'app/percona/shared/components/Form';
+import { FormElement } from 'app/percona/shared/components/Form';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
@@ -11,6 +11,7 @@ import { InventoryService } from '../Inventory.service';
 import { ServicesList } from '../Inventory.types';
 import { SERVICES_COLUMNS } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
+import { CheckboxField } from '@percona/platform-core';
 
 interface Service {
   service_id: string;
@@ -102,7 +103,7 @@ export const Services = () => {
                 <FormElement
                   dataQa="form-field-force"
                   label="Force mode"
-                  element={<CheckboxField name="force" label="Force mode is going to delete all associated agents" />}
+                  element={<CheckboxField label="Force mode is going to delete all associated agents" name="force" />}
                 />
                 <HorizontalGroup justify="space-between" spacing="md">
                   <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>

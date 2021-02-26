@@ -1,7 +1,8 @@
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { InstanceData } from './AddRemoteInstance.types';
+import { InstanceTypes } from '../../panel.types';
 
-export const getInstanceData = (instanceType: Databases, credentials: any): InstanceData => {
+export const getInstanceData = (instanceType: InstanceTypes, credentials: any): InstanceData => {
   const extractCredentials = (credentials: any): InstanceData => {
     if (!credentials) {
       return { remoteInstanceCredentials: {} };
@@ -25,25 +26,25 @@ export const getInstanceData = (instanceType: Databases, credentials: any): Inst
   const instance = extractCredentials(credentials);
 
   switch (instanceType) {
-    case Databases.postgresql:
+    case InstanceTypes.postgresql:
       instance.instanceType = DATABASE_LABELS[Databases.postgresql];
       instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 5432;
       break;
-    case Databases.mysql:
+    case InstanceTypes.mysql:
       instance.instanceType = DATABASE_LABELS[Databases.mysql];
       instance.discoverName = 'DISCOVER_RDS_MYSQL';
       instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 3306;
       break;
-    case Databases.mongodb:
+    case InstanceTypes.mongodb:
       instance.instanceType = DATABASE_LABELS[Databases.mongodb];
       instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 27017;
       break;
-    case Databases.proxysql:
+    case InstanceTypes.proxysql:
       instance.instanceType = DATABASE_LABELS[Databases.proxysql];
       instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 6032;
       break;
-    case Databases.haproxy:
-      instance.instanceType = DATABASE_LABELS[Databases.haproxy];
+    case InstanceTypes.haproxy:
+      instance.instanceType = 'HAProxy';
       instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 8404;
       break;
     default:

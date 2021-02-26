@@ -20,7 +20,7 @@ interface Instance {
 
 export interface AddRemoteInstanceProps {
   instance: Instance;
-  selectInstance: (any) => void;
+  selectInstance: (intance: any) => void;
 }
 
 export interface AddNode {
