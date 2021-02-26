@@ -70,7 +70,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
         render={({ handleSubmit, valid, pristine, submitting, values }) => (
           <form onSubmit={handleSubmit}>
             <TextInputField name="name" label={Messages.name} validators={required} />
-            <TextareaInputField name="description" label={Messages.description} validators={required} />
+            <TextareaInputField name="description" label={Messages.description} />
             {/* TODO remove disabled when API allows all three types */}
             <RadioButtonGroupField disabled options={typeOptions} name="type" label={Messages.type} fullWidth />
             <TypeField values={values} />
