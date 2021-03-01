@@ -1,9 +1,10 @@
 import React, { FC } from 'react';
 import { Button, useTheme } from '@grafana/ui';
-import { showErrorNotification, showSuccessNotification } from 'app/percona/shared/helpers';
 import { Messages } from './LoggedIn.messages';
 import { getStyles } from './LoggedIn.styles';
 import { PlatformLoginService } from '../PlatformLogin.service';
+import { AppEvents } from '@grafana/data';
+import { appEvents } from 'app/core/app_events';
 
 interface LoggedInProps {
   email: string;
@@ -19,10 +20,10 @@ export const LoggedIn: FC<LoggedInProps> = ({ email, getSettings }) => {
       await PlatformLoginService.signOut();
 
       getSettings();
-      showSuccessNotification({ message: Messages.signOutSucceeded });
+      appEvents.emit(AppEvents.alertSuccess, [Messages.signOutSucceeded]);
     } catch (e) {
       console.error(e);
-      showErrorNotification({ message: Messages.errors.signOutFailed });
+      appEvents.emit(AppEvents.alertError, [Messages.errors.signOutFailed]);
     }
   };
 
