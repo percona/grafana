@@ -1,22 +1,18 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState, useEffect } from 'react';
 import { Column } from 'react-table';
+import { logger } from '@percona/platform-core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
+import { BackupInventoryService } from './BackupInventory.service';
 
 const { columns, noData } = Messages;
 const { name, created, location } = columns;
 
 export const BackupInventory: FC = () => {
-  const [pending] = useState(false);
-  const [data] = useState<Backup[]>([
-    {
-      name: 'pg-sales-ncarolina-prod-10',
-      created: Date.now(),
-      location: 'postgresql-sles-production',
-    },
-  ]);
+  const [pending, setPending] = useState(false);
+  const [data, setData] = useState<Backup[]>([]);
   const columns = useMemo(
     (): Column[] => [
       {
@@ -36,6 +32,23 @@ export const BackupInventory: FC = () => {
     ],
     []
   );
+
+  const getData = async () => {
+    setPending(true);
+
+    try {
+      const data = await BackupInventoryService.list();
+      setData(data);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setPending(false);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <Table
