@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
-import { Field, Form, FormRenderProps } from 'react-final-form';
+import { Form, FormRenderProps } from 'react-final-form';
 import { useTheme } from '@grafana/ui';
 import validators from 'app/percona/shared/helpers/validators';
-import { showErrorNotification, showSuccessNotification } from 'app/percona/shared/helpers';
-import { InputFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { Credentials, LoginFormProps } from '../types';
 import { Messages } from '../PlatformLogin.messages';
 import { getStyles } from '../PlatformLogin.styles';
 import { PlatformLoginService } from '../PlatformLogin.service';
-import { LoaderButton } from '@percona/platform-core';
+import { LoaderButton, PasswordInputField, TextInputField } from '@percona/platform-core';
+import { AppEvents } from '@grafana/data';
+import { appEvents } from 'app/core/app_events';
 
 export const SignIn: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
   const theme = useTheme();
@@ -19,31 +19,28 @@ export const SignIn: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
       await PlatformLoginService.signIn(credentials);
 
       getSettings();
-      showSuccessNotification({ message: `${Messages.signInSucceeded} ${credentials.email}` });
+      appEvents.emit(AppEvents.alertSuccess, [`${Messages.signInSucceeded} ${credentials.email}`]);
     } catch (e) {
       console.error(e);
-      showErrorNotification({ message: Messages.errors.signInFailed });
+      appEvents.emit(AppEvents.alertError, [Messages.errors.signInFailed]);
     }
   };
 
   const SignInForm: FC<FormRenderProps<Credentials>> = ({ pristine, submitting, valid, handleSubmit }) => (
-    <form data-qa="sign-in-form" className={styles.form} onSubmit={handleSubmit}>
+    <form data-qa="sign-in-form" className={styles.form} onSubmit={handleSubmit} autoComplete="off">
       <legend className={styles.legend}>{Messages.signIn}</legend>
-      <Field
+      <TextInputField
         data-qa="sign-in-email-input"
         name="email"
         label={Messages.emailLabel}
-        component={InputFieldAdapter}
-        validate={validators.compose(validators.required, validators.validateEmail)}
+        validators={[validators.required, validators.validateEmail]}
+        showErrorOnBlur
       />
-      <Field
+      <PasswordInputField
         data-qa="sign-in-password-input"
         name="password"
         label={Messages.passwordLabel}
-        type="password"
-        component={InputFieldAdapter}
-        validate={validators.required}
-        autoComplete="on"
+        validators={[validators.required]}
       />
       <LoaderButton
         data-qa="sign-in-submit-button"
@@ -70,5 +67,5 @@ export const SignIn: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
     </form>
   );
 
-  return <Form onSubmit={handleSignInFormSubmit} render={SignInForm} />;
+  return <Form onSubmit={handleSignInFormSubmit} initialValues={{ email: '', password: '' }} render={SignInForm} />;
 };
