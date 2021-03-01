@@ -11,7 +11,7 @@ export const BackupCreation: FC<BackupCreationProps> = ({ date }) => {
   const hourTime = momentObj.format('HH[:]mm[:]ss');
 
   return (
-    <div>
+    <div data-qa="backup-creation">
       <span>{dayTime}</span>
       <span className={styles.hourWrapper}>{hourTime}</span>
     </div>
