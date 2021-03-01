@@ -10,6 +10,11 @@ export const PAGE_TABS = [
     id: TabKeys.locations,
     path: `backup/${TabKeys.locations}`,
   },
+  {
+    title: Messages.tabs.inventory,
+    id: TabKeys.inventory,
+    path: `backup/${TabKeys.inventory}`,
+  },
 ];
 
 export const PAGE_MODEL: PageModel = {

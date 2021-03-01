@@ -17,6 +17,10 @@ const BackupPage: FC = () => {
   const tabComponentMap = useMemo(
     () => [
       {
+        id: TabKeys.inventory,
+        component: <span />,
+      },
+      {
         id: TabKeys.locations,
         component: <StorageLocations />,
       },
