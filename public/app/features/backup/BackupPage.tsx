@@ -8,6 +8,7 @@ import { Breadcrumb } from 'app/core/components/Breadcrumb';
 import { TabKeys } from './Backup.types';
 import { getStyles } from './Backup.styles';
 import { StorageLocations } from './components/StorageLocations';
+import { BackupInventory } from './components/BackupInventory';
 import { PAGE_MODEL, PAGE_TABS, DEFAULT_TAB } from './BackupPage.constants';
 
 const BackupPage: FC = () => {
@@ -18,7 +19,7 @@ const BackupPage: FC = () => {
     () => [
       {
         id: TabKeys.inventory,
-        component: <span />,
+        component: <BackupInventory />,
       },
       {
         id: TabKeys.locations,
@@ -51,7 +52,7 @@ const BackupPage: FC = () => {
       <Breadcrumb pageModel={PAGE_MODEL} />
       <TabsBar>
         {PAGE_TABS.map(tab => (
-          <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => setActiveTab(tab.id)} />
+          <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => selectTab(tab.id)} />
         ))}
       </TabsBar>
       <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component}</TabContent>

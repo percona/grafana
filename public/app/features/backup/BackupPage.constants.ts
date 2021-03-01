@@ -6,14 +6,14 @@ export const DEFAULT_TAB = TabKeys.locations;
 
 export const PAGE_TABS = [
   {
-    title: Messages.tabs.locations,
-    id: TabKeys.locations,
-    path: `backup/${TabKeys.locations}`,
-  },
-  {
     title: Messages.tabs.inventory,
     id: TabKeys.inventory,
     path: `backup/${TabKeys.inventory}`,
+  },
+  {
+    title: Messages.tabs.locations,
+    id: TabKeys.locations,
+    path: `backup/${TabKeys.locations}`,
   },
 ];
 
