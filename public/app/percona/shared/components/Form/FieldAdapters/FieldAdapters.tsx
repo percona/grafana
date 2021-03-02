@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import { cx } from 'emotion';
-import { Input, Select, TextArea, useTheme } from '@grafana/ui';
+import { Select, useTheme } from '@grafana/ui';
 import { getStyles } from './FieldAdapters.styles';
 import { Field } from './Field';
 
