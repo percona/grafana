@@ -44,10 +44,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
     try {
       const [channelsListResponse, templatesListResponse] = await Promise.all([
         NotificationChannelService.list(),
+        // Asking for only 100 might be considered a limitation
         AlertRuleTemplateService.list({
           page_params: {
             index: 0,
-            page_size: Math.pow(10, 5),
+            page_size: 100,
           },
         }),
       ]);
