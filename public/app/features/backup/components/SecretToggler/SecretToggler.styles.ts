@@ -1,6 +1,7 @@
+import { GrafanaTheme } from '@grafana/data';
 import { css } from 'emotion';
 
-export const getStyles = () => ({
+export const getStyles = ({ spacing }: GrafanaTheme) => ({
   fieldWrapper: css`
     position: relative;
   `,
@@ -8,6 +9,7 @@ export const getStyles = () => ({
     padding: 0;
     width: 200px;
     border: none;
+    margin-right: ${spacing.sm};
     &[readonly] {
       background-color: transparent;
     }
