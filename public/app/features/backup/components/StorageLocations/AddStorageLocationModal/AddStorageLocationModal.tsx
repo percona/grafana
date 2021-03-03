@@ -64,7 +64,7 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
   const onSubmit = (values: AddStorageLocationFormProps) => onAdd(toStorageLocation(values));
 
   return (
-    <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
+    <Modal title={location ? Messages.editTitle : Messages.addTitle} isVisible={isVisible} onClose={onClose}>
       <Form
         initialValues={initialValues}
         onSubmit={onSubmit}
