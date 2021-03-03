@@ -33,7 +33,7 @@ export const StorageLocations: FC = () => {
           const restProps = row.getToggleRowExpandedProps ? row.getToggleRowExpandedProps() : {};
           return (
             <div className={styles.nameWrapper} {...restProps}>
-              {value}
+              <span>{value}</span>
               {row.isExpanded ? (
                 <IconButton data-qa="hide-storage-location-details" name="arrow-up" />
               ) : (
