@@ -28,7 +28,9 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
   return (
     <div className={styles.fieldWrapper}>
       {small ? (
-        <span className={styles.smallPassword}>{visible ? secret : hiddenSecret}</span>
+        <span data-qa="small-secret-holder" className={styles.smallPassword}>
+          {visible ? secret : hiddenSecret}
+        </span>
       ) : (
         <TextInputField
           name={fieldProps?.name || 'secret'}
