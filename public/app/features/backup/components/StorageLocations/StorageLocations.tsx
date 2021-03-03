@@ -29,6 +29,7 @@ export const StorageLocations: FC = () => {
         Header: name,
         accessor: 'name',
         id: 'name',
+        width: '315px',
         Cell: ({ row, value }) => {
           const restProps = row.getToggleRowExpandedProps ? row.getToggleRowExpandedProps() : {};
           return (
@@ -46,6 +47,7 @@ export const StorageLocations: FC = () => {
       {
         Header: type,
         accessor: 'type',
+        width: '150px',
       },
       {
         Header: path,
