@@ -11,4 +11,7 @@ export const getStyles = () => ({
     cursor: pointer;
     margin-left: 5px;
   `,
+  wrapper: css`
+    white-space: nowrap;
+  `,
 });

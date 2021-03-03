@@ -15,7 +15,7 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly }) => {
   );
 
   return (
-    <span>
+    <span className={styles.wrapper}>
       <input className={styles.input} type={visible ? 'text' : 'password'} readOnly={readOnly} value={secret}></input>
       {iconButton}
     </span>
