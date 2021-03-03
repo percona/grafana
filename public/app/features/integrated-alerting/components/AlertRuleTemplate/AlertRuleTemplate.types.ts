@@ -21,12 +21,40 @@ export enum SourceDescription {
   USER_API = 'User-defined (UI)',
 }
 
+enum TemplateParamType {
+  FLOAT = 'FLOAT',
+  BOOL = 'BOOL',
+  STRING = 'STRING',
+}
+
+enum TemplateParamUnit {
+  PERCENTAGE = 'PERCENTAGE',
+}
+
+interface TemplateFloatParam {
+  default: number;
+  has_default: boolean;
+  has_min: boolean;
+  has_max: boolean;
+  min: boolean;
+  max: boolean;
+}
+
+export interface TemplateParam {
+  name: string;
+  type: TemplateParamType;
+  unit: TemplateParamUnit;
+  summary: string;
+  float?: TemplateFloatParam;
+}
+
 export interface Template {
   summary: string;
   name: string;
   source: keyof typeof SourceDescription;
   created_at: string | undefined;
   yaml: string;
+  params: TemplateParam[];
 }
 
 export interface FormattedTemplate {
