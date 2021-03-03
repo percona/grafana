@@ -10,6 +10,7 @@ describe('ResourcesBar::', () => {
     const total = 10;
     const expected = 2;
     const resourceLabel = 'Memory';
+    const units = 'GB';
     const wrapper = mount(
       <ResourcesBar
         icon={<div>Test icon</div>}
@@ -17,16 +18,19 @@ describe('ResourcesBar::', () => {
         expected={expected}
         total={total}
         resourceLabel={resourceLabel}
+        units={units}
       />
     );
 
     expect(wrapper.find(dataQa('resources-bar-icon')).text()).toEqual('Test icon');
-    expect(wrapper.find(dataQa('resources-bar-label')).text()).toEqual(Messages.buildResourcesLabel(allocated, total));
+    expect(wrapper.find(dataQa('resources-bar-label')).text()).toEqual(
+      Messages.buildResourcesLabel(allocated, 20, total, units)
+    );
     expect(wrapper.find(dataQa('resources-bar-allocated-caption')).text()).toEqual(
-      Messages.buildAllocatedLabel(allocated, resourceLabel)
+      Messages.buildAllocatedLabel(resourceLabel)
     );
     expect(wrapper.find(dataQa('resources-bar-expected-caption')).text()).toEqual(
-      Messages.buildExpectedLabel(expected, resourceLabel)
+      Messages.buildExpectedLabel(expected, resourceLabel, units)
     );
   });
   it('renders invalid message for insufficient resources', () => {
@@ -35,7 +39,7 @@ describe('ResourcesBar::', () => {
     const expected = 20;
     const resourceLabel = 'Memory';
     const wrapper = mount(
-      <ResourcesBar allocated={allocated} expected={expected} total={total} resourceLabel={resourceLabel} />
+      <ResourcesBar allocated={allocated} expected={expected} total={total} resourceLabel={resourceLabel} units="GB" />
     );
 
     expect(wrapper.find(dataQa('resources-bar-insufficient-resources')).text()).toEqual(

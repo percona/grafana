@@ -2,6 +2,13 @@ import { css } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ spacing, typography, colors, palette }: GrafanaTheme) => ({
+  modalWrapper: css`
+    div[data-qa='modal-body'] {
+      left: 21%;
+      top: 4%;
+      width: 60%;
+    }
+  `,
   stepProgressWrapper: css`
     overflow: hidden;
 

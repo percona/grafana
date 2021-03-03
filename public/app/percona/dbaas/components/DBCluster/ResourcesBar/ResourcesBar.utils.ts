@@ -5,3 +5,5 @@ export const getResourcesWidth = (allocated: number, total: number) => {
 
   return Math.round(((allocated * 100) / total) * 10) / 10;
 };
+
+export const formatResources = (resource: number) => Math.round(resource * 100 + Number.EPSILON) / 100;
