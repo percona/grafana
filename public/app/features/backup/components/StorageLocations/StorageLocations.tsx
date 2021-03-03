@@ -84,10 +84,11 @@ export const StorageLocations: FC = () => {
     try {
       if (location.locationID) {
         await StorageLocationsService.update(formatToRawLocation(location));
+        appEvents.emit(AppEvents.alertSuccess, [Messages.editSuccess(location.name)]);
       } else {
         await StorageLocationsService.add(formatToRawLocation(location));
+        appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       }
-      appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       getData();
     } catch (e) {
       logger.error(e);
