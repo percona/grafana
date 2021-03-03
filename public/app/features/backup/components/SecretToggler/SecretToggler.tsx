@@ -23,10 +23,12 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
     [visible, small]
   );
 
+  const hiddenSecret = useMemo(() => secret?.replace(/./g, '*'), [secret]);
+
   return (
     <div className={styles.fieldWrapper}>
       {small ? (
-        <input className={styles.input} type={visible ? 'text' : 'password'} readOnly={readOnly} value={secret} />
+        <span className={styles.smallPassword}>{visible ? secret : hiddenSecret}</span>
       ) : (
         <TextInputField
           name={fieldProps?.name || 'secret'}
