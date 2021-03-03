@@ -5,6 +5,7 @@ import { DescriptionBlock } from '../../DescriptionBlock';
 import { StorageLocationDetailsProps } from './StorageLocationDetails.types';
 import { getStyles } from './StorageLocationDetails.styles';
 import { KeysBlock } from '../../KeysBlock';
+import { BucketBlock } from '../../BucketBlock';
 
 export const StorageLocationDetails: FC<StorageLocationDetailsProps> = ({ location }) => {
   const { description } = location;
@@ -13,7 +14,12 @@ export const StorageLocationDetails: FC<StorageLocationDetailsProps> = ({ locati
   return (
     <div data-qa="storage-location-wrapper" className={styles.wrapper}>
       <DescriptionBlock description={description} />
-      {isS3Location(location) ? <KeysBlock accessKey={location.accessKey} secretKey={location.secretKey} /> : null}
+      {isS3Location(location) ? (
+        <>
+          <BucketBlock bucketName={location.bucketName} />
+          <KeysBlock accessKey={location.accessKey} secretKey={location.secretKey} />
+        </>
+      ) : null}
     </div>
   );
 };
