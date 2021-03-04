@@ -7,6 +7,7 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     align-items: center;
 
     & > * {
+      word-break: break-all;
       flex: 1 0 calc(100% / 3);
 
       &:not(:last-child) {
