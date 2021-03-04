@@ -6,6 +6,8 @@ import { MAX_BUCKET_LENGTH, MAX_ACCESS_KEY_LENGTH, MAX_SECRET_LENGTH } from './S
 import { SecretToggler } from '../../../SecretToggler';
 
 const required = [validators.required];
+const bucketValidators = [validators.required, validators.minLength(3)];
+const accessKeyValidators = [validators.required, validators.minLength(16)];
 
 export const S3Fields: FC<S3FieldsProps> = ({ endpoint, accessKey, secretKey, bucketName }) => (
   <>
@@ -14,14 +16,14 @@ export const S3Fields: FC<S3FieldsProps> = ({ endpoint, accessKey, secretKey, bu
       inputProps={{ maxLength: MAX_BUCKET_LENGTH }}
       name="bucketName"
       label={Messages.bucketName}
-      validators={required}
+      validators={bucketValidators}
       initialValue={bucketName}
     />
     <TextInputField
       inputProps={{ maxLength: MAX_ACCESS_KEY_LENGTH }}
       name="accessKey"
       label={Messages.accessKey}
-      validators={required}
+      validators={accessKeyValidators}
       initialValue={accessKey}
     />
     <SecretToggler
