@@ -5,7 +5,7 @@ import { getStyles } from './SecretToggler.styles';
 import { TextInputField } from '@percona/platform-core';
 import { cx } from 'emotion';
 
-export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldProps, small }) => {
+export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldProps, small, maxLength }) => {
   const [visible, setVisible] = useState(false);
   const styles = useStyles(getStyles);
 
@@ -34,7 +34,7 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
       ) : (
         <TextInputField
           name={fieldProps?.name || 'secret'}
-          inputProps={{ type: visible ? 'text' : 'password', readOnly }}
+          inputProps={{ type: visible ? 'text' : 'password', readOnly, maxLength }}
           initialValue={secret}
           {...fieldProps}
         />
