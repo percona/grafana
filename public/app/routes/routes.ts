@@ -576,6 +576,12 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
           SafeDynamicImport(import(/* webpackChunkName: "IntegratedAlertingPage" */ 'app/percona/dbaas/DBaaS')),
       },
     })
+    .when('/check', {
+      template: '<react-container />',
+      resolve: {
+        component: () => SafeDynamicImport(import(/* webpackChunkName: "ChecksPage" */ 'app/percona/check/CheckPanel')),
+      },
+    })
     .when('/settings', {
       template: '<react-container />',
       resolve: {
