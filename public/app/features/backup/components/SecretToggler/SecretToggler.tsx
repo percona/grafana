@@ -2,11 +2,10 @@ import { Icon, useStyles } from '@grafana/ui';
 import React, { FC, useState, useMemo } from 'react';
 import { SecretTogglerProps } from './SecretToggler.types';
 import { getStyles } from './SecretToggler.styles';
-import { MAX_SECRET_LENGTH } from './SecretToggler.constants';
 import { TextInputField } from '@percona/platform-core';
 import { cx } from 'emotion';
 
-export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldProps, small }) => {
+export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldProps, small, maxLength }) => {
   const [visible, setVisible] = useState(false);
   const styles = useStyles(getStyles);
 
@@ -35,7 +34,7 @@ export const SecretToggler: FC<SecretTogglerProps> = ({ secret, readOnly, fieldP
       ) : (
         <TextInputField
           name={fieldProps?.name || 'secret'}
-          inputProps={{ type: visible ? 'text' : 'password', readOnly, maxLength: MAX_SECRET_LENGTH }}
+          inputProps={{ type: visible ? 'text' : 'password', readOnly, maxLength }}
           initialValue={secret}
           {...fieldProps}
         />
