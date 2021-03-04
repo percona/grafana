@@ -1,1 +1,1 @@
-export const MAX_SECRET_LENGTH = 50;
+export const MAX_SECRET_LENGTH = 40;

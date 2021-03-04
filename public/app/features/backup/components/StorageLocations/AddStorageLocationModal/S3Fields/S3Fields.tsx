@@ -2,20 +2,14 @@ import React, { FC } from 'react';
 import { TextInputField, validators } from '@percona/platform-core';
 import { S3FieldsProps } from './S3Fields.types';
 import { Messages } from './S3Fields.Messages';
-import { MAX_BUCKET_LENGTH, MAX_PATH_LENGTH, MAX_ACCESS_KEY_LENGTH } from './S3Fields.constants';
+import { MAX_BUCKET_LENGTH, MAX_ACCESS_KEY_LENGTH } from './S3Fields.constants';
 import { SecretToggler } from '../../../SecretToggler';
 
 const required = [validators.required];
 
 export const S3Fields: FC<S3FieldsProps> = ({ endpoint, accessKey, secretKey, bucketName }) => (
   <>
-    <TextInputField
-      inputProps={{ maxLength: MAX_PATH_LENGTH }}
-      name="endpoint"
-      label={Messages.endpoint}
-      validators={required}
-      initialValue={endpoint}
-    />
+    <TextInputField name="endpoint" label={Messages.endpoint} validators={required} initialValue={endpoint} />
     <TextInputField
       inputProps={{ maxLength: MAX_BUCKET_LENGTH }}
       name="bucketName"
