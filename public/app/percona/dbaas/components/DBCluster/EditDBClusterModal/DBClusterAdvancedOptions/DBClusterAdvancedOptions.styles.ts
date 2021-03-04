@@ -28,7 +28,7 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       display: flex;
       flex-direction: column;
       margin-left: ${spacing.lg};
-      width: 100%;
+      width: 50%;
     `,
     nodesWrapper: css`
       margin-bottom: ${spacing.md};

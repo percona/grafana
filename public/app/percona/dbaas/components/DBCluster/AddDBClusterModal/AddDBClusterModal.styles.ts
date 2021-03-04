@@ -7,6 +7,7 @@ export const getStyles = ({ spacing, typography, colors, palette }: GrafanaTheme
       left: 21%;
       top: 4%;
       width: 60%;
+      max-width: none;
     }
   `,
   stepProgressWrapper: css`

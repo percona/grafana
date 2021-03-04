@@ -6,6 +6,7 @@ export const getStyles = () => ({
       left: 25%;
       top: 6%;
       width: 50%;
+      max-width: none;
     }
   `,
 });

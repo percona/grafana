@@ -24,9 +24,11 @@ import { CPU, Memory } from '../../../DBaaSIcons';
 import {
   CPU_UNITS,
   MEMORY_UNITS,
+  RECHECK_INTERVAL,
 } from '../../AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 
 export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({ selectedCluster, renderProps }) => {
+  let timer: NodeJS.Timeout;
   const { values, form, valid, pristine, submitting } = renderProps;
   const styles = useStyles(getStyles);
   const [prevResources, setPrevResources] = useState(DBClusterResources.small);
@@ -61,14 +63,18 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({ se
     [databaseType]
   );
 
-  const getResources = async () => {
+  const getResources = async (triggerLoading = true) => {
     try {
-      setLoadingResources(true);
+      if (triggerLoading) {
+        setLoadingResources(true);
+      }
       setAllocatedResources(await DBClusterService.getAllocatedResources(selectedCluster.kubernetesClusterName));
     } catch (e) {
       logger.error(e);
     } finally {
-      setLoadingResources(false);
+      if (triggerLoading) {
+        setLoadingResources(false);
+      }
     }
   };
 
@@ -92,7 +98,11 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({ se
   useEffect(() => {
     if (selectedCluster) {
       getResources();
+
+      timer = setInterval(() => getResources(false), RECHECK_INTERVAL);
     }
+
+    return () => clearTimeout(timer);
   }, [selectedCluster]);
 
   return (

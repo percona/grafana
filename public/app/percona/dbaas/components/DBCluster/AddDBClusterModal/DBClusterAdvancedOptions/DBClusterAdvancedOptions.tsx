@@ -16,6 +16,7 @@ import {
   MIN_DISK_SIZE,
   MEMORY_UNITS,
   CPU_UNITS,
+  RECHECK_INTERVAL,
 } from './DBClusterAdvancedOptions.constants';
 import { getStyles } from './DBClusterAdvancedOptions.styles';
 import { AddDBClusterFields } from '../AddDBClusterModal.types';
@@ -27,6 +28,7 @@ import { DBClusterService } from '../../DBCluster.service';
 import { DBClusterAllocatedResources } from '../../DBCluster.types';
 
 export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) => {
+  let timer: NodeJS.Timeout;
   const styles = useStyles(getStyles);
   const [prevResources, setPrevResources] = useState(DBClusterResources.small);
   const [customMemory, setCustomMemory] = useState(DEFAULT_SIZES.small.memory);
@@ -63,14 +65,18 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) 
     [databaseType]
   );
 
-  const getResources = async () => {
+  const getResources = async (triggerLoading = true) => {
     try {
-      setLoadingResources(true);
+      if (triggerLoading) {
+        setLoadingResources(true);
+      }
       setAllocatedResources(await DBClusterService.getAllocatedResources(kubernetesCluster.value));
     } catch (e) {
       logger.error(e);
     } finally {
-      setLoadingResources(false);
+      if (triggerLoading) {
+        setLoadingResources(false);
+      }
     }
   };
 
@@ -97,7 +103,11 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) 
   useEffect(() => {
     if (kubernetesCluster) {
       getResources();
+
+      timer = setInterval(() => getResources(false), RECHECK_INTERVAL);
     }
+
+    return () => clearTimeout(timer);
   }, [kubernetesCluster]);
 
   return (
