@@ -4,9 +4,10 @@ import { css } from 'emotion';
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   wrapper: css`
     display: flex;
+    align-items: center;
 
     & > * {
-      flex: 1 1 0;
+      flex: 1 1 calc(100% / 3);
 
       &:not(:last-child) {
         padding-right: ${spacing.md};

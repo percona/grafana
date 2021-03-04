@@ -31,11 +31,12 @@ export const StorageLocations: FC = () => {
         Header: name,
         accessor: 'name',
         id: 'name',
+        width: '315px',
         Cell: ({ row, value }) => {
           const restProps = row.getToggleRowExpandedProps ? row.getToggleRowExpandedProps() : {};
           return (
             <div className={styles.nameWrapper} {...restProps}>
-              {value}
+              <span>{value}</span>
               {row.isExpanded ? (
                 <IconButton data-qa="hide-storage-location-details" name="arrow-up" />
               ) : (
@@ -48,6 +49,7 @@ export const StorageLocations: FC = () => {
       {
         Header: type,
         accessor: 'type',
+        width: '150px',
       },
       {
         Header: path,
@@ -87,10 +89,11 @@ export const StorageLocations: FC = () => {
     try {
       if (location.locationID) {
         await StorageLocationsService.update(formatToRawLocation(location));
+        appEvents.emit(AppEvents.alertSuccess, [Messages.editSuccess(location.name)]);
       } else {
         await StorageLocationsService.add(formatToRawLocation(location));
+        appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       }
-      appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
       getData();
     } catch (e) {
       logger.error(e);
