@@ -8,6 +8,7 @@ import { EditAlertRuleTemplateModalProps, EditAlertRuleTemplateRenderProps } fro
 import { getStyles } from './EditAlertRuleTemplateModal.styles';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { Messages } from './EditAlertRuleTemplateModal.messages';
+import { MAX_TITLE_LENGTH } from './EditAlertRuleTemplateModal.constants';
 import { WarningBlock } from 'app/features/backup/components/StorageLocations/WarningBlock';
 
 export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = ({
@@ -20,6 +21,7 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
 }) => {
   const styles = useStyles(getStyles);
   const { required } = validators;
+  let truncatedTitle = summary.length > MAX_TITLE_LENGTH ? `${summary.substring(0, MAX_TITLE_LENGTH - 3)}...` : summary;
   const onSubmit = async (values: EditAlertRuleTemplateRenderProps) => {
     try {
       await AlertRuleTemplateService.update({ ...values, name });
@@ -32,7 +34,7 @@ export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = (
   };
 
   return (
-    <Modal title={Messages.getTitle(name)} isVisible={isVisible} onClose={() => setVisible(false)}>
+    <Modal title={Messages.getTitle(truncatedTitle)} isVisible={isVisible} onClose={() => setVisible(false)}>
       <Form
         initialValues={{ yaml }}
         onSubmit={onSubmit}
