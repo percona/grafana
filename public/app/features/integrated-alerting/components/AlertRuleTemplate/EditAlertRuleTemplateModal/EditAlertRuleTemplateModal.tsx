@@ -13,6 +13,7 @@ import { WarningBlock } from 'app/features/backup/components/StorageLocations/Wa
 export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = ({
   yaml,
   name,
+  summary,
   isVisible,
   setVisible,
   getAlertRuleTemplates,

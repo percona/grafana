@@ -12,6 +12,7 @@ describe('EditAlertRuleTemplateModal', () => {
     const wrapper = mount(
       <EditAlertRuleTemplateModal
         name="template-1"
+        summary="summary"
         setVisible={jest.fn()}
         isVisible
         yaml=""
@@ -31,6 +32,7 @@ describe('EditAlertRuleTemplateModal', () => {
     const wrapper = mount(
       <EditAlertRuleTemplateModal
         name="template-1"
+        summary="summary"
         setVisible={jest.fn()}
         isVisible={false}
         yaml=""
@@ -46,6 +48,7 @@ describe('EditAlertRuleTemplateModal', () => {
     const wrapper = mount(
       <EditAlertRuleTemplateModal
         name="template-1"
+        summary="summary"
         setVisible={setVisible}
         isVisible
         yaml=""
@@ -62,6 +65,7 @@ describe('EditAlertRuleTemplateModal', () => {
     const wrapper = mount(
       <EditAlertRuleTemplateModal
         name="template-1"
+        summary="summary"
         setVisible={jest.fn()}
         isVisible
         yaml="test content"
@@ -80,6 +84,7 @@ describe('EditAlertRuleTemplateModal', () => {
     const wrapper = mount(
       <EditAlertRuleTemplateModal
         name="template-1"
+        summary="summary"
         setVisible={setVisible}
         isVisible
         yaml=""
