@@ -3,6 +3,6 @@ export const Messages = {
   submitButton: 'Save',
   cancelAction: 'Cancel',
   editSuccess: 'Alert rule template successfully edited',
-  nameNotEditable: "Name can't be changed. If you need to change it, please create a new Template.",
+  nameNotEditable: 'Name cannot be changed. If you need to change it, please create a new Template.',
   getTitle: (name: string) => `Edit "${name}" Alert Rule Template`,
 };
