@@ -1,1 +1,1 @@
-export const MAX_PATH_LENGTH = 70;
+export const MAX_LENGTH = 200;
