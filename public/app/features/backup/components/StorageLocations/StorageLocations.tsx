@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
-import { IconButton, useStyles } from '@grafana/ui';
+import { Button, IconButton, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
@@ -9,9 +9,10 @@ import { StorageLocationsActions } from './StorageLocationsActions';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';
 import { StorageLocationsService } from './StorageLocations.service';
-import { formatLocationList } from './StorageLocations.utils';
+import { formatLocationList, formatToRawLocation } from './StorageLocations.utils';
 import { getStyles } from './StorageLocations.styles';
 import { StorageLocationDetails } from './StorageLocationDetails';
+import { AddStorageLocationModal } from './AddStorageLocationModal';
 import { RemoveStorageLocationModal } from './RemoveStorageLocationModal';
 
 const { noData, columns } = Messages;
@@ -23,6 +24,7 @@ export const StorageLocations: FC = () => {
   const [deletePending, setDeletePending] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<StorageLocation | null>(null);
   const [data, setData] = useState<StorageLocation[]>([]);
+  const [addModalVisible, setAddModalVisible] = useState(false);
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
     (): Column[] => [
@@ -83,6 +85,18 @@ export const StorageLocations: FC = () => {
     []
   );
 
+  const onAdd = async (location: StorageLocation) => {
+    try {
+      await StorageLocationsService.add(formatToRawLocation(location));
+      appEvents.emit(AppEvents.alertSuccess, [Messages.addSuccess]);
+      getData();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setAddModalVisible(false);
+    }
+  };
+
   const onDeleteCLick = (location: StorageLocation) => {
     setSelectedLocation(location);
     setDeleteModalVisible(true);
@@ -109,6 +123,20 @@ export const StorageLocations: FC = () => {
 
   return (
     <>
+      <div className={styles.addWrapper}>
+        <Button
+          size="md"
+          icon="plus-square"
+          variant="link"
+          data-qa="storage-location-add-modal-button"
+          onClick={() => {
+            setSelectedLocation(null);
+            setAddModalVisible(true);
+          }}
+        >
+          {Messages.add}
+        </Button>
+      </div>
       <Table
         data={data}
         totalItems={data.length}
@@ -117,6 +145,12 @@ export const StorageLocations: FC = () => {
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
+      <AddStorageLocationModal
+        location={selectedLocation}
+        isVisible={addModalVisible}
+        onClose={() => setAddModalVisible(false)}
+        onAdd={onAdd}
+      ></AddStorageLocationModal>
       <RemoveStorageLocationModal
         location={selectedLocation}
         isVisible={deleteModalVisible}
