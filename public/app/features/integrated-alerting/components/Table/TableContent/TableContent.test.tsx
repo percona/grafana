@@ -12,6 +12,14 @@ describe('TableContent', () => {
     expect(noData.text()).toEqual('empty');
   });
 
+  it('should not display the noData section when no data is passed and it is still loading', async () => {
+    const wrapper = mount(<TableContent loading={true} hasData={false} emptyMessage="empty" />);
+    const noData = wrapper.find(dataQa('table-no-data'));
+
+    expect(noData).toHaveLength(1);
+    expect(noData.text()).toHaveLength(0);
+  });
+
   it('should display the table when there is data', async () => {
     const Dummy = () => <span></span>;
     const wrapper = mount(
