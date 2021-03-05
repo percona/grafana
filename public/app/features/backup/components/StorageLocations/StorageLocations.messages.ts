@@ -7,4 +7,5 @@ export const Messages = {
     labels: 'Labels',
     actions: 'Actions',
   },
+  getDeleteSuccess: (name: string) => `Backup location "${name}" successfully deleted.`,
 };

@@ -6,7 +6,9 @@ import { StorageLocation } from '../StorageLocations.types';
 
 describe('StorageLocationsActions', () => {
   it('should have DBIcon', () => {
-    const wrapper = shallow(<StorageLocationsActions location={(null as unknown) as StorageLocation} />);
+    const wrapper = shallow(
+      <StorageLocationsActions onDelete={jest.fn()} location={(null as unknown) as StorageLocation} />
+    );
     expect(wrapper.find(DBIcon).exists()).toBeTruthy();
   });
 });
