@@ -79,7 +79,7 @@ export const Table: FC<TableProps> = ({
       <Overlay dataQa="table-loading" isPending={pendingRequest}>
         <div className={style.tableWrap} data-qa="table-outer-wrapper">
           <div className={style.table} data-qa="table-inner-wrapper">
-            <TableContent hasData={hasData} emptyMessage={emptyMessage}>
+            <TableContent loading={pendingRequest} hasData={hasData} emptyMessage={emptyMessage}>
               <table {...getTableProps()} data-qa="table">
                 <thead data-qa="table-thead">
                   {headerGroups.map(headerGroup => (
