@@ -6,6 +6,7 @@ import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
+import { formatToBackup } from './BackupInventory.utils';
 
 const { columns, noData } = Messages;
 const { name, created, location } = columns;
@@ -37,8 +38,8 @@ export const BackupInventory: FC = () => {
     setPending(true);
 
     try {
-      const data = await BackupInventoryService.list();
-      setData(data);
+      const { backups } = await BackupInventoryService.list();
+      setData(backups.map(backup => formatToBackup(backup)));
     } catch (e) {
       logger.error(e);
     } finally {

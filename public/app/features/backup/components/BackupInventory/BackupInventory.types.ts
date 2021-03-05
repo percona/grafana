@@ -11,3 +11,7 @@ export interface RawBackup {
   location_name: string;
   created_at: string;
 }
+
+export interface BackupResponse {
+  backups: RawBackup[];
+}

@@ -1,24 +1,10 @@
-// TODO remove when API's ready
-const mockedData = [
-  {
-    name: 'pg-sales-ncarolina-prod-10',
-    created: Date.now(),
-    location: 'postgresql-sles-production',
-  },
-  {
-    name: 'pg-sales-ncarolina-prod-11',
-    created: Date.now(),
-    location: 'postgresql-sles-production',
-  },
-  {
-    name: 'pg-sales-ncarolina-prod-12',
-    created: Date.now(),
-    location: 'postgresql-sles-production',
-  },
-];
+import { api } from 'app/percona/shared/helpers/api';
+import { BackupResponse } from './BackupInventory.types';
+
+const BASE_URL = '/v1/management/backup/Backups';
 
 export const BackupInventoryService = {
-  async list(): Promise<any> {
-    return Promise.resolve(mockedData);
+  async list(): Promise<BackupResponse> {
+    return api.post(`${BASE_URL}/List`, {});
   },
 };
