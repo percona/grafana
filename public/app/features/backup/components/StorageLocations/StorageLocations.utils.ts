@@ -1,4 +1,10 @@
-import { S3Location, StorageLocation, StorageLocationListReponse, LocationType } from './StorageLocations.types';
+import {
+  S3Location,
+  StorageLocation,
+  StorageLocationListReponse,
+  LocationType,
+  StorageLocationReponse,
+} from './StorageLocations.types';
 
 export const isS3Location = (location: StorageLocation): location is S3Location => 'accessKey' in location;
 
@@ -28,4 +34,21 @@ export const formatLocationList = (rawList: StorageLocationListReponse): Storage
     parsedLocations.push(newLocation as StorageLocation);
   });
   return parsedLocations;
+};
+
+export const formatToRawLocation = (location: StorageLocation | S3Location): StorageLocationReponse => {
+  const { name, description, path, type } = location;
+  const localObj = { path };
+  const result: Partial<StorageLocationReponse> = { name, description };
+
+  if (isS3Location(location)) {
+    const { accessKey, secretKey, bucketName } = location;
+    result.s3_config = { endpoint: path, access_key: accessKey, secret_key: secretKey, bucket_name: bucketName };
+  } else if (type === LocationType.CLIENT) {
+    result.pmm_client_config = localObj;
+  } else {
+    result.pmm_server_config = localObj;
+  }
+
+  return result as StorageLocationReponse;
 };

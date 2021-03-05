@@ -1,5 +1,5 @@
 import { LocationType, S3Location, StorageLocation, StorageLocationReponse } from './StorageLocations.types';
-import { isS3Location, formatLocationList } from './StorageLocations.utils';
+import { isS3Location, formatLocationList, formatToRawLocation } from './StorageLocations.utils';
 
 const s3Location: S3Location = {
   locationID: 'location_1',
@@ -66,6 +66,35 @@ describe('StorageLocationsUtils', () => {
       description: rawFSLocation.description,
       type: LocationType.SERVER,
       path: rawFSLocation.pmm_server_config?.path,
+    });
+  });
+
+  it('should correctly convert to raw StorageLocationResponse', () => {
+    expect(formatToRawLocation(s3Location)).toEqual({
+      name: s3Location.name,
+      description: s3Location.description,
+      s3_config: {
+        endpoint: s3Location.path,
+        access_key: s3Location.accessKey,
+        secret_key: s3Location.secretKey,
+        bucket_name: s3Location.bucketName,
+      },
+    });
+
+    expect(formatToRawLocation(fsLocation)).toEqual({
+      name: fsLocation.name,
+      description: fsLocation.description,
+      pmm_client_config: {
+        path: fsLocation.path,
+      },
+    });
+
+    expect(formatToRawLocation({ ...fsLocation, type: LocationType.SERVER })).toEqual({
+      name: fsLocation.name,
+      description: fsLocation.description,
+      pmm_server_config: {
+        path: fsLocation.path,
+      },
     });
   });
 });

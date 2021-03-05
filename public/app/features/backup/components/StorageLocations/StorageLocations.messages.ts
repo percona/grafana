@@ -7,5 +7,7 @@ export const Messages = {
     labels: 'Labels',
     actions: 'Actions',
   },
+  add: 'Add',
+  addSuccess: 'Backup location was successfully added',
   getDeleteSuccess: (name: string) => `Backup location "${name}" successfully deleted.`,
 };

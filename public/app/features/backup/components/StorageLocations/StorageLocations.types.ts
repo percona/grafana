@@ -30,7 +30,7 @@ interface FSConfigResponse {
 }
 
 export interface StorageLocationReponse {
-  location_id: string;
+  location_id?: string;
   name: string;
   description: string;
   s3_config?: S3ConfigResponse;

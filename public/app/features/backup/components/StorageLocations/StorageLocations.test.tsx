@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, ReactWrapper } from 'enzyme';
+import { mount, ReactWrapper, shallow } from 'enzyme';
 import { dataQa, LoaderButton } from '@percona/platform-core';
 import { act } from 'react-dom/test-utils';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
@@ -8,6 +8,7 @@ import { stubLocations } from './__mocks__/StorageLocations.service';
 import { DBIcon } from '../DBIcon';
 import { RemoveStorageLocationModal } from './RemoveStorageLocationModal';
 import { StorageLocations } from './StorageLocations';
+import { AddStorageLocationModal } from './AddStorageLocationModal';
 import { formatLocationList } from './StorageLocations.utils';
 
 jest.mock('./StorageLocations.service');
@@ -63,5 +64,13 @@ describe('StorageLocations', () => {
     wrapper.update();
     expect(wrapper.find(RemoveStorageLocationModal).prop('isVisible')).toBe(false);
     expect(spy).toHaveBeenCalledWith(stubLocations.locations[0].location_id);
+  });
+
+  it('should open the modal by clicking the "Add" button', () => {
+    const wrapper = shallow(<StorageLocations />);
+
+    expect(wrapper.find(AddStorageLocationModal).prop('isVisible')).toBeFalsy();
+    wrapper.find(dataQa('storage-location-add-modal-button')).simulate('click');
+    expect(wrapper.find(AddStorageLocationModal).prop('isVisible')).toBeTruthy();
   });
 });

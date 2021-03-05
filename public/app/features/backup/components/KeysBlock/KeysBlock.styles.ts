@@ -12,4 +12,7 @@ export const getStyles = ({ typography }: GrafanaTheme) => ({
     width: 85px;
     font-weight: ${typography.weight.semibold};
   `,
+  secretTogglerWrapper: css`
+    display: inline-block;
+  `,
 });
