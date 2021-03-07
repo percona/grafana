@@ -1,7 +1,8 @@
 import { config } from '@grafana/runtime';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
-import { getTemplateSrv } from 'app/features/templating/template_srv';
+import { createShortLink } from 'app/core/utils/shortLinks';
 import { PanelModel, dateTime, urlUtil } from '@grafana/data';
+import { getAllVariableValuesForUrl } from 'app/features/variables/getAllVariableValuesForUrl';
 
 export function buildParams(
   useCurrentTimeRange: boolean,
@@ -9,7 +10,7 @@ export function buildParams(
   selectedTheme?: string,
   panel?: PanelModel
 ) {
-  const params = urlUtil.getUrlSearchParams();
+  let params = urlUtil.getUrlSearchParams();
 
   const range = getTimeSrv().timeRange();
   params.from = range.from.valueOf();
@@ -22,7 +23,10 @@ export function buildParams(
   }
 
   if (includeTemplateVars) {
-    getTemplateSrv().fillVariableValuesForUrl(params);
+    params = {
+      ...params,
+      ...getAllVariableValuesForUrl(),
+    };
   }
 
   if (selectedTheme !== 'current') {
@@ -38,15 +42,6 @@ export function buildParams(
   return params;
 }
 
-export function buildHostUrl() {
-  return `${window.location.protocol}//${window.location.host}${config.appSubUrl}`;
-}
-
-export function getRelativeURLPath(url: string) {
-  let p = url.replace(buildHostUrl(), '');
-  return p.startsWith('/') ? p.substring(1, p.length) : p;
-}
-
 export function buildBaseUrl() {
   let baseUrl = window.location.href;
   const queryStart = baseUrl.indexOf('?');
@@ -58,16 +53,20 @@ export function buildBaseUrl() {
   return baseUrl;
 }
 
-export function buildShareUrl(
+export async function buildShareUrl(
   useCurrentTimeRange: boolean,
   includeTemplateVars: boolean,
   selectedTheme?: string,
-  panel?: PanelModel
+  panel?: PanelModel,
+  shortenUrl?: boolean
 ) {
   const baseUrl = buildBaseUrl();
   const params = buildParams(useCurrentTimeRange, includeTemplateVars, selectedTheme, panel);
-
-  return urlUtil.appendQueryToUrl(baseUrl, urlUtil.toUrlParams(params));
+  const shareUrl = urlUtil.appendQueryToUrl(baseUrl, urlUtil.toUrlParams(params));
+  if (shortenUrl) {
+    return await createShortLink(shareUrl);
+  }
+  return shareUrl;
 }
 
 export function buildSoloUrl(
@@ -111,11 +110,6 @@ export function buildIframeHtml(
 ) {
   let soloUrl = buildSoloUrl(useCurrentTimeRange, includeTemplateVars, selectedTheme, panel);
   return '<iframe src="' + soloUrl + '" width="450" height="200" frameborder="0"></iframe>';
-}
-
-export function buildShortUrl(uid: string) {
-  const hostUrl = buildHostUrl();
-  return `${hostUrl}/goto/${uid}`;
 }
 
 export function getLocalTimeZone() {

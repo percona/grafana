@@ -6,7 +6,6 @@ import {
   DataQueryRequest,
   DataSourceApi,
   ExploreUrlState,
-  GraphSeriesXY,
   HistoryItem,
   LogLevel,
   LogsDedupStrategy,
@@ -15,9 +14,8 @@ import {
   QueryHint,
   RawTimeRange,
   TimeRange,
+  EventBusExtended,
 } from '@grafana/data';
-
-import { Emitter } from 'app/core/core';
 
 export enum ExploreId {
   left = 'left',
@@ -60,25 +58,17 @@ export interface ExploreItemState {
    */
   datasourceInstance?: DataSourceApi | null;
   /**
-   * Current data source name or null if default
-   */
-  requestedDatasourceName: string | null;
-  /**
-   * True if the datasource is loading. `null` if the loading has not started yet.
-   */
-  datasourceLoading: boolean | null;
-  /**
    * True if there is no datasource to be selected.
    */
   datasourceMissing: boolean;
   /**
    * Emitter to send events to the rest of Grafana.
    */
-  eventBridge: Emitter;
+  eventBridge: EventBusExtended;
   /**
    * List of timeseries to be shown in the Explore graph result viewer.
    */
-  graphResult: GraphSeriesXY[] | null;
+  graphResult: DataFrame[] | null;
   /**
    * History of recent queries. Datasource-specific and initialized via localStorage.
    */
@@ -182,6 +172,7 @@ export interface ExploreItemState {
   showMetrics?: boolean;
   showTable?: boolean;
   showTrace?: boolean;
+  showNodeGraph?: boolean;
 }
 
 export interface ExploreUpdateState {
@@ -225,7 +216,12 @@ export interface ExplorePanelData extends PanelData {
   tableFrames: DataFrame[];
   logsFrames: DataFrame[];
   traceFrames: DataFrame[];
-  graphResult: GraphSeriesXY[] | null;
+  nodeGraphFrames: DataFrame[];
+  graphResult: DataFrame[] | null;
   tableResult: DataFrame | null;
   logsResult: LogsModel | null;
 }
+
+export type SplitOpen = <T extends DataQuery = any>(
+  options?: { datasourceUid: string; query: T; range?: TimeRange } | undefined
+) => void;

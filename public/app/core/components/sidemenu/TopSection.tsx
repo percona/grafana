@@ -8,8 +8,8 @@ import { buildIntegratedAlertingMenuItem } from './TopSection.utils';
 
 const TopSection: FC<any> = () => {
   const [showDBaaS, setShowDBaaS] = useState(false);
-  const navTree = _.cloneDeep(config.bootData.navTree) as NavModelItem[];
-  const [mainLinks, setMainLinks] = useState(_.filter(navTree, item => !item.hideFromMenu));
+  const navTree = _.cloneDeep(config.bootData.navTree);
+  const mainLinks = _.filter(navTree, (item) => !item.hideFromMenu);
   const searchLink = {
     text: 'Search',
     icon: 'search',

@@ -33,6 +33,7 @@ import { TraceLog, TraceSpan, Trace, TraceKeyValuePair, TraceLink } from '@grafa
 import TTraceTimeline from '../types/TTraceTimeline';
 
 import { createStyle, Theme, withTheme } from '../Theme';
+import { CreateSpanLink } from './types';
 
 type TExtractUiFindFromStateReturn = {
   uiFind: string | undefined;
@@ -79,9 +80,7 @@ type TVirtualizedTraceViewOwnProps = {
   addHoverIndentGuideId: (spanID: string) => void;
   removeHoverIndentGuideId: (spanID: string) => void;
   theme: Theme;
-  createSpanLink?: (
-    span: TraceSpan
-  ) => { href: string; onClick?: (e: React.MouseEvent) => void; content: React.ReactNode };
+  createSpanLink?: CreateSpanLink;
   scrollElement?: Element;
 };
 
@@ -190,7 +189,7 @@ export class UnthemedVirtualizedTraceView extends React.Component<VirtualizedTra
     return false;
   }
 
-  componentWillUpdate(nextProps: VirtualizedTraceViewProps) {
+  UNSAFE_componentWillUpdate(nextProps: VirtualizedTraceViewProps) {
     const { childrenHiddenIDs, detailStates, registerAccessors, trace, currentViewRangeTime } = this.props;
     const {
       currentViewRangeTime: nextViewRangeTime,
@@ -411,6 +410,7 @@ export class UnthemedVirtualizedTraceView extends React.Component<VirtualizedTra
       removeHoverIndentGuideId,
       linksGetter,
       theme,
+      createSpanLink,
     } = this.props;
     const detailState = detailStates.get(spanID);
     if (!trace || !detailState) {
@@ -439,6 +439,7 @@ export class UnthemedVirtualizedTraceView extends React.Component<VirtualizedTra
           hoverIndentGuideIds={hoverIndentGuideIds}
           addHoverIndentGuideId={addHoverIndentGuideId}
           removeHoverIndentGuideId={removeHoverIndentGuideId}
+          createSpanLink={createSpanLink}
         />
       </div>
     );

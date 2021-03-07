@@ -11,6 +11,7 @@ interface ButtonComponentProps {
   iconClass?: string;
 }
 
+// eslint-disable-next-line react/display-name
 const ButtonComponent = (buttonProps: ButtonComponentProps) => (props: any) => {
   const { label, className, iconClass } = buttonProps;
 
@@ -71,6 +72,7 @@ export class ButtonSelect<T> extends PureComponent<Props<T>> {
       tabSelectsValue,
       autoFocus = true,
     } = this.props;
+
     const combinedComponents = {
       ...components,
       Control: ButtonComponent({ label, className, iconClass }),

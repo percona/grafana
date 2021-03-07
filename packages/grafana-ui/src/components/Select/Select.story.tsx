@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { withCenteredStory, withHorizontallyCenteredStory } from '../../utils/storybook/withCenteredStory';
 import { SelectableValue } from '@grafana/data';
-import { Icon, Button, ButtonSelect, Select, AsyncSelect, MultiSelect, AsyncMultiSelect } from '@grafana/ui';
+import { Icon, ButtonSelect, Select, AsyncSelect, MultiSelect, AsyncMultiSelect } from '@grafana/ui';
 import { getAvailableIcons, IconName } from '../../types';
 import { select, boolean, number } from '@storybook/addon-knobs';
 import { getIconKnob } from '../../utils/storybook/knobs';
@@ -24,7 +24,7 @@ export default {
 const BEHAVIOUR_GROUP = 'Behaviour props';
 
 const loadAsyncOptions = () => {
-  return new Promise<Array<SelectableValue<string>>>(resolve => {
+  return new Promise<Array<SelectableValue<string>>>((resolve) => {
     setTimeout(() => {
       resolve(generateOptions());
     }, 2000);
@@ -95,7 +95,7 @@ export const Basic = () => {
       <Select
         options={generateOptions()}
         value={value}
-        onChange={v => {
+        onChange={(v) => {
           setValue(v);
         }}
         {...getDynamicProps()}
@@ -114,7 +114,7 @@ export const BasicSelectPlainValue = () => {
       <Select
         options={generateOptions()}
         value={value}
-        onChange={v => {
+        onChange={(v) => {
           setValue(v.value);
         }}
         {...getDynamicProps()}
@@ -146,7 +146,7 @@ export const SelectWithOptionDescriptions = () => {
       <Select
         options={options}
         value={value}
-        onChange={v => {
+        onChange={(v) => {
           setValue(v.value);
         }}
         {...getDynamicProps()}
@@ -166,7 +166,27 @@ export const MultiPlainValue = () => {
       <MultiSelect
         options={generateOptions()}
         value={value}
-        onChange={v => {
+        onChange={(v) => {
+          setValue(v.map((v: any) => v.value));
+        }}
+        {...getDynamicProps()}
+      />
+    </>
+  );
+};
+
+export const MultiSelectWithOptionGroups = () => {
+  const [value, setValue] = useState<string[]>();
+
+  return (
+    <>
+      <MultiSelect
+        options={[
+          { label: '1', value: '1' },
+          { label: '2', value: '2', options: [{ label: '5', value: '5' }] },
+        ]}
+        value={value}
+        onChange={(v) => {
           setValue(v.map((v: any) => v.value));
         }}
         {...getDynamicProps()}
@@ -183,7 +203,7 @@ export const MultiSelectBasic = () => {
       <MultiSelect
         options={generateOptions()}
         value={value}
-        onChange={v => {
+        onChange={(v) => {
           setValue(v);
         }}
         {...getDynamicProps()}
@@ -201,7 +221,7 @@ export const MultiSelectAsync = () => {
       loadOptions={loadAsyncOptions}
       defaultOptions
       value={value}
-      onChange={v => {
+      onChange={(v) => {
         setValue(v);
       }}
       allowCustomValue
@@ -217,7 +237,7 @@ export const ButtonSelectBasic = () => {
       placeholder="Select all the things..."
       value={value}
       options={generateOptions()}
-      onChange={v => {
+      onChange={(v) => {
         setValue(v);
       }}
       allowCustomValue
@@ -235,32 +255,9 @@ export const BasicSelectAsync = () => {
       loadOptions={loadAsyncOptions}
       defaultOptions
       value={value}
-      onChange={v => {
+      onChange={(v) => {
         setValue(v);
       }}
-      {...getDynamicProps()}
-    />
-  );
-};
-
-export const CustomizedControl = () => {
-  const [value, setValue] = useState<SelectableValue<string>>();
-
-  return (
-    <Select
-      options={generateOptions()}
-      value={value}
-      onChange={v => {
-        setValue(v);
-      }}
-      renderControl={React.forwardRef(({ isOpen, value, ...otherProps }, ref) => {
-        return (
-          <Button {...otherProps} ref={ref}>
-            {' '}
-            {isOpen ? 'Open' : 'Closed'}
-          </Button>
-        );
-      })}
       {...getDynamicProps()}
     />
   );
@@ -275,7 +272,7 @@ export const AutoMenuPlacement = () => {
         <Select
           options={generateOptions()}
           value={value}
-          onChange={v => {
+          onChange={(v) => {
             setValue(v);
           }}
           {...getDynamicProps()}
@@ -294,11 +291,11 @@ export const CustomValueCreation = () => {
       <Select
         options={[...options, ...customOptions]}
         value={value}
-        onChange={v => {
+        onChange={(v) => {
           setValue(v);
         }}
         allowCustomValue
-        onCreateOption={v => {
+        onCreateOption={(v) => {
           const customValue: SelectableValue<string> = { value: kebabCase(v), label: v };
           setCustomOptions([...customOptions, customValue]);
           setValue(customValue);

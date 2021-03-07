@@ -88,14 +88,14 @@ function parseHistogramLabel(label: string): number {
 /**
  * Convert buckets into linear array of "cards" - objects, represented heatmap elements.
  * @param  {Object} buckets
- * @return {Object}          Array of "card" objects and stats
+ * @returns {Object}          Array of "card" objects and stats
  */
 function convertToCards(buckets: any, hideZero = false): { cards: HeatmapCard[]; cardStats: HeatmapCardStats } {
   let min = 0,
     max = 0;
   const cards: HeatmapCard[] = [];
-  _.forEach(buckets, xBucket => {
-    _.forEach(xBucket.buckets, yBucket => {
+  _.forEach(buckets, (xBucket) => {
+    _.forEach(xBucket.buckets, (yBucket) => {
       const card: HeatmapCard = {
         x: xBucket.x,
         y: yBucket.y,
@@ -136,10 +136,10 @@ function convertToCards(buckets: any, hideZero = false): { cards: HeatmapCard[];
  *
  * @param  {Object} buckets  Heatmap buckets
  * @param  {Number} minValue Minimum series value
- * @return {Object}          Transformed buckets
+ * @returns {Object}          Transformed buckets
  */
 function mergeZeroBuckets(buckets: any, minValue: number) {
-  _.forEach(buckets, xBucket => {
+  _.forEach(buckets, (xBucket) => {
     const yBuckets = xBucket.buckets;
 
     const emptyBucket: any = {
@@ -177,7 +177,7 @@ function mergeZeroBuckets(buckets: any, minValue: number) {
 
 /**
  * Convert set of time series into heatmap buckets
- * @return {Object}    Heatmap object:
+ * @returns {Object}    Heatmap object:
  * {
  *   xBucketBound_1: {
  *     x: xBucketBound_1,
@@ -217,7 +217,7 @@ function convertToHeatMap(seriesList: TimeSeries[], yBucketSize: number, xBucket
     // |** *|    | ***|    |*   |
     // |____|____|____|____|____|_
     //
-    _.forEach(datapoints, point => {
+    _.forEach(datapoints, (point) => {
       const bucketBound = getBucketBound(point[TIME_INDEX], xBucketSize);
       pushToXBuckets(heatmap, point, bucketBound, seriesName);
     });

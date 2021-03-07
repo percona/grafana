@@ -1,13 +1,13 @@
 import React from 'react';
 import { css, cx } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory, useTheme } from '../../themes';
 import { Icon } from '../Icon/Icon';
 import { IconButton } from '../IconButton/IconButton';
 import { HorizontalGroup } from '../Layout/Layout';
+import { AlertVariant } from '../Alert/Alert';
 import panelArtDark from './panelArt_dark.svg';
 import panelArtLight from './panelArt_light.svg';
-import { AlertVariant } from '../Alert/Alert';
+import { stylesFactory, useTheme } from '../../themes';
 import { getColorsFromSeverity } from '../../utils/colors';
 
 export interface InfoBoxProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -27,16 +27,14 @@ export interface InfoBoxProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
 }
 
 /**
- * This is a simple InfoBox component, the api is not considered stable yet and will likely see breaking changes
- * in future minor releases.
- * @Alpha
+  @public
  */
 export const InfoBox = React.memo(
   React.forwardRef<HTMLDivElement, InfoBoxProps>(
     ({ title, className, children, branded, url, urlTitle, onDismiss, severity = 'info', ...otherProps }, ref) => {
       const theme = useTheme();
       const styles = getInfoBoxStyles(theme, severity);
-      const wrapperClassName = branded ? cx(styles.wrapperBranded, className) : cx(styles.wrapper, className);
+      const wrapperClassName = cx(branded ? styles.wrapperBranded : styles.wrapper, className);
 
       return (
         <div className={wrapperClassName} {...otherProps} ref={ref}>
@@ -48,7 +46,7 @@ export const InfoBox = React.memo(
           </div>
           <div>{children}</div>
           {url && (
-            <a href={url} className={styles.docsLink} target="_blank">
+            <a href={url} className={styles.docsLink} target="_blank" rel="noreferrer">
               <Icon name="book" /> {urlTitle || 'Read more'}
             </a>
           )}
@@ -57,6 +55,7 @@ export const InfoBox = React.memo(
     }
   )
 );
+InfoBox.displayName = 'InfoBox';
 
 const getInfoBoxStyles = stylesFactory((theme: GrafanaTheme, severity: AlertVariant) => ({
   wrapper: css`

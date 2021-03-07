@@ -1,9 +1,8 @@
-import React, { FormEvent } from 'react';
+import React from 'react';
 import { css } from 'emotion';
 import { Tab, TabsBar, Icon, IconName } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
 import { NavModel, NavModelItem, NavModelBreadcrumb } from '@grafana/data';
-import { CoreEvents } from 'app/types';
+import { PanelHeaderMenuItem } from 'app/features/dashboard/dashgrid/PanelHeader/PanelHeaderMenuItem';
 
 export interface Props {
   model: NavModel;
@@ -14,41 +13,33 @@ const SelectNav = ({ children, customCss }: { children: NavModelItem[]; customCs
     return null;
   }
 
-  const defaultSelectedItem = children.find(navItem => {
+  const defaultSelectedItem = children.find((navItem) => {
     return navItem.active === true;
   });
 
-  const gotoUrl = (evt: FormEvent) => {
-    const element = evt.target as HTMLSelectElement;
-    const url = element.options[element.selectedIndex].value;
-    appEvents.emit(CoreEvents.locationChange, { href: url });
-  };
-
   return (
     <div className={`gf-form-select-wrapper width-20 ${customCss}`}>
-      <label
-        className={`gf-form-select-icon ${defaultSelectedItem ? defaultSelectedItem?.icon : ''}`}
-        htmlFor="page-header-select-nav"
-      />
-      {/* Label to make it clickable */}
-      <select
-        className="gf-select-nav gf-form-input"
-        value={defaultSelectedItem?.url ?? ''}
-        onChange={gotoUrl}
-        id="page-header-select-nav"
-      >
-        {children.map((navItem: NavModelItem) => {
-          if (navItem.hideFromTabs) {
-            // TODO: Rename hideFromTabs => hideFromNav
-            return null;
-          }
-          return (
-            <option key={navItem.url} value={navItem.url}>
-              {navItem.text}
-            </option>
-          );
-        })}
-      </select>
+      <div className="dropdown">
+        <div className="gf-form-input dropdown-toggle" data-toggle="dropdown">
+          {defaultSelectedItem?.text}
+        </div>
+        <ul className="dropdown-menu dropdown-menu--menu">
+          {children.map((navItem: NavModelItem) => {
+            if (navItem.hideFromTabs) {
+              // TODO: Rename hideFromTabs => hideFromNav
+              return null;
+            }
+            return (
+              <PanelHeaderMenuItem
+                key={navItem.url}
+                iconClassName={navItem.icon}
+                text={navItem.text}
+                href={navItem.url}
+              />
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 };
@@ -58,17 +49,9 @@ const Navigation = ({ children }: { children: NavModelItem[] }) => {
     return null;
   }
 
-  const goToUrl = (index: number) => {
-    children.forEach((child, i) => {
-      if (i === index) {
-        appEvents.emit(CoreEvents.locationChange, { href: child.url });
-      }
-    });
-  };
-
   return (
     <nav>
-      <SelectNav customCss="page-header__select-nav" children={children} />
+      <SelectNav customCss="page-header__select-nav">{children}</SelectNav>
       <TabsBar className="page-header__tabs" hideBorder={true}>
         {children.map((child, index) => {
           return (
@@ -78,7 +61,6 @@ const Navigation = ({ children }: { children: NavModelItem[] }) => {
                 active={child.active}
                 key={`${child.url}-${index}`}
                 icon={child.icon as IconName}
-                onChangeTab={() => goToUrl(index)}
                 href={child.url}
               />
             )
@@ -139,7 +121,7 @@ export default class PageHeader extends React.Component<Props, any> {
       <div className="page-header__inner">
         <span className="page-header__logo">
           {main.icon && <Icon name={main.icon as IconName} size="xxxl" className={iconClassName} />}
-          {main.img && <img className="page-header__img" src={main.img} />}
+          {main.img && <img className="page-header__img" src={main.img} alt={`logo of ${main.text}`} />}
         </span>
 
         <div className="page-header__info-block">
@@ -165,7 +147,7 @@ export default class PageHeader extends React.Component<Props, any> {
         <div className="page-container">
           <div className="page-header">
             {this.renderHeaderTitle(main)}
-            {children && children.length && <Navigation children={children} />}
+            {children && children.length && <Navigation>{children}</Navigation>}
           </div>
         </div>
       </div>
