@@ -18,7 +18,7 @@ import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem
 export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernetes, form }) => {
   const { required } = validators;
   const { change } = form;
-  const onChangeDatabase = useCallback(databaseType => {
+  const onChangeDatabase = useCallback((databaseType) => {
     if (databaseType.value !== Databases.mysql) {
       change(AddDBClusterFields.topology, DBClusterTopology.cluster);
     }
@@ -29,7 +29,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   const kubernetesOptions = getKubernetesOptions(kubernetes);
 
   const [databaseOptions, setDatabaseOptions] = useState(DATABASE_OPTIONS);
-  const onChangeCluster = useCallback(selectedKubernetes => {
+  const onChangeCluster = useCallback((selectedKubernetes) => {
     const { operators } = selectedKubernetes;
     const availableDatabaseOptions: DatabaseOption[] = [];
 

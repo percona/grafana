@@ -21,22 +21,22 @@ const KubernetesOption: FC<KubernetesOptionProps> = ({
   <OptionContent
     title={kubernetesClusterName}
     description={disabledOperators.length ? Messages.dbcluster.addModal.validationMessages.notInstalledOperator : ''}
-    tags={availableOperators.map(databaseType => DatabaseOperators[databaseType])}
-    disabledTags={disabledOperators.map(databaseType => DatabaseOperators[databaseType])}
+    tags={availableOperators.map((databaseType) => DatabaseOperators[databaseType])}
+    disabledTags={disabledOperators.map((databaseType) => DatabaseOperators[databaseType])}
     dataQa="kubernetes-option"
   />
 );
 
 export const getKubernetesOptions = (kubernetes: Kubernetes[]) =>
   kubernetes
-    .map(kubernetesCluster => {
+    .map((kubernetesCluster) => {
       const { kubernetesClusterName, operators } = kubernetesCluster;
 
       const availableOperators = OPERATORS.filter(
-        databaseType => operators[databaseType].status === KubernetesOperatorStatus.ok
+        (databaseType) => operators[databaseType].status === KubernetesOperatorStatus.ok
       );
       const disabledOperators = OPERATORS.filter(
-        databaseType => operators[databaseType].status !== KubernetesOperatorStatus.ok
+        (databaseType) => operators[databaseType].status !== KubernetesOperatorStatus.ok
       );
 
       return {
@@ -52,7 +52,7 @@ export const getKubernetesOptions = (kubernetes: Kubernetes[]) =>
         availableOperators,
       };
     })
-    .filter(operators => operators.availableOperators.length);
+    .filter((operators) => operators.availableOperators.length);
 
 export const databaseTypeRequired = (value: SelectableValue) =>
   value && value.label && value.value ? undefined : Messages.dbcluster.addModal.validationMessages.requiredDatabaseType;

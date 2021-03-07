@@ -80,14 +80,15 @@ export const Table: FC<TableProps> = ({
           <TableContent hasData={hasData} emptyMessage={emptyMessage} pending={pendingRequest}>
             <table {...getTableProps()} data-qa="table">
               <thead data-qa="table-thead">
-                {headerGroups.map(headerGroup => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (
+                {headerGroups.map((headerGroup, index) => (
+                  <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                    {headerGroup.headers.map((column, headerIndex) => (
                       <th
                         className={css`
                           width: ${column.width};
                         `}
                         {...column.getHeaderProps()}
+                        key={headerIndex}
                       >
                         {column.render('Header')}
                       </th>
@@ -98,11 +99,11 @@ export const Table: FC<TableProps> = ({
               <tbody {...getTableBodyProps()} data-qa="table-tbody">
                 {children
                   ? children(showPagination ? page : rows, tableInstance)
-                  : (showPagination ? page : rows).map(row => {
+                  : (showPagination ? page : rows).map((row) => {
                       prepareRow(row);
                       return (
                         <tr {...row.getRowProps()} key={row.id}>
-                          {row.cells.map(cell => {
+                          {row.cells.map((cell) => {
                             return (
                               <td {...cell.getCellProps()} key={cell.column.id}>
                                 {cell.render('Cell')}
@@ -126,8 +127,8 @@ export const Table: FC<TableProps> = ({
           pageSizeOptions={PAGE_SIZES}
           pageSize={pageSize}
           nrRowsOnCurrentPage={page.length}
-          onPageChange={pageIndex => onPageChanged(pageIndex)}
-          onPageSizeChange={pageSize => onPageSizeChanged(pageSize)}
+          onPageChange={(pageIndex) => onPageChanged(pageIndex)}
+          onPageSizeChange={(pageSize) => onPageSizeChanged(pageSize)}
         />
       )}
     </>

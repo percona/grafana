@@ -28,14 +28,14 @@ interface SubscribeAndExpectOnError<T> extends ObservableTester<T> {
 export const observableTester = () => {
   const subscribeAndExpectOnNext = <T>({ observable, expect, done }: SubscribeAndExpectOnNext<T>): void => {
     observable.subscribe({
-      next: value => {
+      next: (value) => {
         try {
           expect(value);
         } catch (err) {
           done.fail(err);
         }
       },
-      error: err => done.fail(err),
+      error: (err) => done.fail(err),
       complete: () => done(),
     });
   };
@@ -43,7 +43,7 @@ export const observableTester = () => {
   const subscribeAndExpectOnComplete = <T>({ observable, expect, done }: SubscribeAndExpectOnComplete<T>): void => {
     observable.subscribe({
       next: () => {},
-      error: err => done.fail(err),
+      error: (err) => done.fail(err),
       complete: () => {
         try {
           expect();
@@ -70,7 +70,7 @@ export const observableTester = () => {
           done.fail(err);
         }
       },
-      error: err => done.fail(err),
+      error: (err) => done.fail(err),
       complete: () => {
         try {
           expectOnComplete();
@@ -85,7 +85,7 @@ export const observableTester = () => {
   const subscribeAndExpectOnError = <T>({ observable, expect, done }: SubscribeAndExpectOnError<T>): void => {
     observable.subscribe({
       next: () => {},
-      error: err => {
+      error: (err) => {
         try {
           expect(err);
           done();

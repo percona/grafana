@@ -101,7 +101,7 @@ export const AlertRules: FC = () => {
         Header: filtersColumn,
         accessor: ({ filters }: AlertRule) => (
           <div className={styles.filtersWrapper}>
-            {filters.map(filter => (
+            {filters.map((filter) => (
               <span key={filter} className={styles.filter}>
                 {filter}
               </span>
@@ -131,7 +131,7 @@ export const AlertRules: FC = () => {
 
   const handleAddButton = () => {
     setSelectedAlertRule(null);
-    setAddModalVisible(currentValue => !currentValue);
+    setAddModalVisible((currentValue) => !currentValue);
   };
 
   useEffect(() => {
@@ -167,7 +167,7 @@ export const AlertRules: FC = () => {
         emptyMessage={noData}
       >
         {(rows, table) =>
-          rows.map(row => {
+          rows.map((row) => {
             const { prepareRow } = table;
             prepareRow(row);
             const alertRule = row.original as AlertRule;
@@ -175,7 +175,7 @@ export const AlertRules: FC = () => {
             return (
               <React.Fragment key={alertRule.ruleId}>
                 <tr {...row.getRowProps()} className={alertRule.disabled ? styles.disabledRow : ''}>
-                  {row.cells.map(cell => (
+                  {row.cells.map((cell) => (
                     <td {...cell.getCellProps()} key={cell.column.id}>
                       {cell.render('Cell')}
                     </td>

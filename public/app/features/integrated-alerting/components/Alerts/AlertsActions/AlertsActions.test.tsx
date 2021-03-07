@@ -53,10 +53,7 @@ describe('AlertActions', () => {
 
     await act(async () => {
       wrapper = await mount(<AlertsActions alert={formatAlert(alertsStubs[3])} getAlerts={fakeGetAlerts} />);
-      wrapper
-        .find(dataQa('silence-alert-button'))
-        .at(0)
-        .simulate('click');
+      wrapper.find(dataQa('silence-alert-button')).at(0).simulate('click');
     });
     wrapper.update();
     expect(alertsServiceToggle).toBeCalledTimes(1);
@@ -68,10 +65,7 @@ describe('AlertActions', () => {
 
     await act(async () => {
       wrapper = await mount(<AlertsActions alert={formatAlert(alertsStubs[1])} getAlerts={fakeGetAlerts} />);
-      wrapper
-        .find(dataQa('silence-alert-button'))
-        .at(0)
-        .simulate('click');
+      wrapper.find(dataQa('silence-alert-button')).at(0).simulate('click');
     });
 
     wrapper.update();

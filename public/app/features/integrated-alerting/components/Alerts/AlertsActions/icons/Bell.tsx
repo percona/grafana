@@ -1,6 +1,6 @@
 import React, { FC, SVGProps } from 'react';
 
-export const Bell: FC<SVGProps<SVGSVGElement>> = props => (
+export const Bell: FC<SVGProps<SVGSVGElement>> = (props) => (
   <svg
     width={16}
     height={16}

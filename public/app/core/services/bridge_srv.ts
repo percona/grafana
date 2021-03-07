@@ -111,18 +111,6 @@ function getUrlValueForComparison(value: any): any {
   return value;
 }
 
-function getUrlValueForComparison(value: any): any {
-  if (isArray(value)) {
-    if (value.length === 0) {
-      value = undefined;
-    } else if (value.length === 1) {
-      value = value[0];
-    }
-  }
-
-  return value;
-}
-
 export function findTemplateVarChanges(query: UrlQueryMap, old: UrlQueryMap): UrlQueryMap | undefined {
   let count = 0;
   const changes: UrlQueryMap = {};

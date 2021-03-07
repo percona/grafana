@@ -9,7 +9,7 @@ import { DBClusterResources } from './DBClusterAdvancedOptions.types';
 describe('DBClusterAdvancedOptions::', () => {
   it('renders correctly', () => {
     const root = mount(
-      <Form onSubmit={jest.fn()} render={renderProps => <DBClusterAdvancedOptions {...renderProps} />} />
+      <Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />
     );
 
     expect(root.find('[data-qa="topology-radio-state"]')).toBeTruthy();
@@ -63,7 +63,7 @@ describe('DBClusterAdvancedOptions::', () => {
 
   it('should disable button when invalid', () => {
     const root = mount(
-      <Form onSubmit={jest.fn()} render={renderProps => <DBClusterAdvancedOptions {...renderProps} />} />
+      <Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />
     );
     const button = root.find('[data-qa="dbcluster-update-cluster-button"]').find('button');
 
@@ -74,7 +74,7 @@ describe('DBClusterAdvancedOptions::', () => {
     const root = mount(
       <Form
         onSubmit={jest.fn()}
-        render={renderProps => <DBClusterAdvancedOptions {...renderProps} valid pristine={false} />}
+        render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} valid pristine={false} />}
       />
     );
     const button = root.find('[data-qa="dbcluster-update-cluster-button"]').find('button');

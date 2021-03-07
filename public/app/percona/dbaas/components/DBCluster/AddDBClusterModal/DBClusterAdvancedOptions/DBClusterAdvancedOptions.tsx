@@ -31,10 +31,10 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) 
   const parameterValidators = [required, min(MIN_RESOURCES), resourceValidator];
   const { topology, resources, memory, cpu, databaseType, disk } = values;
 
-  const parsePositiveInt = useCallback(value => (value > 0 && Number.isInteger(+value) ? value : undefined), []);
+  const parsePositiveInt = useCallback((value) => (value > 0 && Number.isInteger(+value) ? value : undefined), []);
 
   const parseNonNegativeFloat = useCallback(
-    value => (value > 0 ? (+value).toFixed(1).replace(/\.0+$/, '') : value),
+    (value) => (value > 0 ? (+value).toFixed(1).replace(/\.0+$/, '') : value),
     []
   );
 

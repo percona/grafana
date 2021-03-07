@@ -38,10 +38,7 @@ describe('AlertRuleTemplate', () => {
     expect(wrapper.find('textarea')).toBeTruthy();
     expect(wrapper.contains(dataQa('modal-wrapper'))).toBeFalsy();
 
-    wrapper
-      .find(dataQa('alert-rule-template-add-modal-button'))
-      .find('button')
-      .simulate('click');
+    wrapper.find(dataQa('alert-rule-template-add-modal-button')).find('button').simulate('click');
 
     expect(wrapper.find(dataQa('modal-wrapper'))).toBeTruthy();
   });

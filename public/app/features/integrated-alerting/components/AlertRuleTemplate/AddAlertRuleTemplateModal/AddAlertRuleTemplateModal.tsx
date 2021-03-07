@@ -25,7 +25,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
       const reader = new FileReader();
 
       if (file) {
-        reader.addEventListener('load', e => change('yaml', e.target?.result));
+        reader.addEventListener('load', (e) => change('yaml', e.target?.result));
         reader.readAsText(files[0]);
       }
     },
@@ -70,6 +70,7 @@ export const AddAlertRuleTemplateModal: FC<AddAlertRuleTemplateModalProps> = ({
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
                   data-qa="alert-rule-template-add-button"
+                  // @ts-ignore
                   size="md"
                   variant="primary"
                   disabled={!valid || pristine}

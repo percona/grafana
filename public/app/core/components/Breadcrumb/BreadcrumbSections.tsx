@@ -14,7 +14,7 @@ export const BreadcrumbSections: FC<BreadcrumbProps> = ({ pageModel }) => {
 
   const isCurrentPage = currentLocation === modelPath;
   const activeChild = children?.find(
-    child => currentLocation.startsWith(`${child.path}/`) || currentLocation === child.path
+    (child) => currentLocation.startsWith(`${child.path}/`) || currentLocation === child.path
   );
 
   return (

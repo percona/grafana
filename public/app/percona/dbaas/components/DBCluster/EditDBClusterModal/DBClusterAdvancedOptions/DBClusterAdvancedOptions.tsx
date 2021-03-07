@@ -27,10 +27,10 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form, va
   const nodeValidators = [required, min(MIN_NODES)];
   const resourceValidators = [required, min(MIN_RESOURCES), resourceValidator];
   const { topology, resources, memory, cpu, databaseType } = values;
-  const parsePositiveInt = useCallback(value => (value > 0 && Number.isInteger(+value) ? value : undefined), []);
+  const parsePositiveInt = useCallback((value) => (value > 0 && Number.isInteger(+value) ? value : undefined), []);
 
   const parseNonNegativeFloat = useCallback(
-    value => (value > 0 ? (+value).toFixed(1).replace(/\.0+$/, '') : value),
+    (value) => (value > 0 ? (+value).toFixed(1).replace(/\.0+$/, '') : value),
     []
   );
 
@@ -112,6 +112,7 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form, va
       <HorizontalGroup justify="center" spacing="md">
         <LoaderButton
           data-qa="dbcluster-update-cluster-button"
+          // @ts-ignore
           size="md"
           variant="primary"
           disabled={!valid || pristine || submitting}

@@ -59,19 +59,11 @@ describe('AlertRules', () => {
     });
 
     wrapper.update();
-    wrapper
-      .find(dataQa('show-alert-rule-details'))
-      .at(0)
-      .find('button')
-      .simulate('click');
+    wrapper.find(dataQa('show-alert-rule-details')).at(0).find('button').simulate('click');
 
     expect(wrapper.find(dataQa('alert-rules-details'))).toHaveLength(1);
 
-    wrapper
-      .find(dataQa('hide-alert-rule-details'))
-      .at(0)
-      .find('button')
-      .simulate('click');
+    wrapper.find(dataQa('hide-alert-rule-details')).at(0).find('button').simulate('click');
 
     expect(wrapper.find(dataQa('alert-rules-details'))).toHaveLength(0);
   });

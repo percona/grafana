@@ -9,7 +9,7 @@ import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOption
 describe('DBClusterAdvancedOptions::', () => {
   it('renders correctly', () => {
     const root = mount(
-      <Form onSubmit={jest.fn()} render={renderProps => <DBClusterAdvancedOptions {...renderProps} />} />
+      <Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />
     );
 
     expect(root.find('[data-qa="topology-radio-state"]')).toBeTruthy();
@@ -39,7 +39,7 @@ describe('DBClusterAdvancedOptions::', () => {
   });
   it('should set nodes to 1 when topology is single', () => {
     const root = mount(
-      <Form onSubmit={jest.fn()} render={renderProps => <DBClusterAdvancedOptions {...renderProps} />} />
+      <Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />
     );
     root.find('[data-qa="topology-radio-state"]').simulate('change', { target: { value: DBClusterTopology.single } });
 

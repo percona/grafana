@@ -59,4 +59,4 @@ export const getInitialValues = (notificationChannel?: NotificationChannel | nul
       )
     : defaultValues;
 };
-export const getOptionFrom = (type: NotificationChannelType) => TYPE_OPTIONS.find(opt => opt.value === type);
+export const getOptionFrom = (type: NotificationChannelType) => TYPE_OPTIONS.find((opt) => opt.value === type);

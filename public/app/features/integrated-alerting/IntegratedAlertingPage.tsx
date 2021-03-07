@@ -83,12 +83,12 @@ const IntegratedAlertingPage: FC = () => {
     <div className={styles.integratedAlertingWrapper}>
       <Breadcrumb pageModel={PAGE_MODEL} />
       <TabsBar>
-        {PAGE_TABS.map(tab => (
+        {PAGE_TABS.map((tab) => (
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => selectTab(tab.id)} />
         ))}
       </TabsBar>
       <IntegratedAlertingContent loadingSettings={loadingSettings} alertingEnabled={alertingEnabled}>
-        <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component || null}</TabContent>
+        <TabContent>{tabComponentMap.find((tab) => tab.id === activeTab)?.component || null}</TabContent>
       </IntegratedAlertingContent>
     </div>
   );

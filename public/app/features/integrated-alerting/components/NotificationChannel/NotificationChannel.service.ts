@@ -15,7 +15,7 @@ export const NotificationChannelService = {
     return api
       .post(`${BASE_URL}/List`, {})
       .then(({ channels }: NotificationChannelListResponse) =>
-        channels ? channels.map(channel => TO_MODEL[getType(channel)](channel)) : []
+        channels ? channels.map((channel) => TO_MODEL[getType(channel)](channel)) : []
       );
   },
   async add(values: NotificationChannelRenderProps): Promise<void> {

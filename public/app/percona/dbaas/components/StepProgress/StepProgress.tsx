@@ -31,7 +31,7 @@ const getStepStatus = (
     return StepStatus.current;
   }
 
-  const valid = fields.find(field => form.getFieldState(field)?.invalid) === undefined;
+  const valid = fields.find((field) => form.getFieldState(field)?.invalid) === undefined;
   const visited = stepsVisited.includes(index);
 
   if (visited) {
@@ -82,6 +82,7 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
           <HorizontalGroup justify="center" spacing="md">
             <LoaderButton
               data-qa="step-progress-submit-button"
+              // @ts-ignore
               size="md"
               variant="primary"
               disabled={!valid || pristine || submitting}

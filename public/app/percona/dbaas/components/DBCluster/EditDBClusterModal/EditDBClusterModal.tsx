@@ -86,7 +86,7 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
       <FormFinal
         onSubmit={onSubmit}
         initialValues={initialValues}
-        render={renderProps => (
+        render={(renderProps) => (
           <form onSubmit={renderProps.handleSubmit}>
             <DBClusterAdvancedOptions {...renderProps} />
           </form>

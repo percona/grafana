@@ -58,7 +58,7 @@ export const Alerts: FC = () => {
         Header: labelsColumn,
         accessor: ({ labels }: Alert) => (
           <div className={style.labelsWrapper}>
-            {labels.map(label => (
+            {labels.map((label) => (
               <span key={label} className={style.label}>
                 {label}
               </span>
@@ -104,7 +104,7 @@ export const Alerts: FC = () => {
   return (
     <Table totalItems={data.length} data={data} columns={columns} pendingRequest={pendingRequest} emptyMessage={noData}>
       {(rows, table) =>
-        rows.map(row => {
+        rows.map((row) => {
           const { prepareRow } = table;
           prepareRow(row);
           const alert = row.original as Alert;
@@ -114,7 +114,7 @@ export const Alerts: FC = () => {
               key={alert.alertId}
               className={alert.status === AlertStatus.SILENCED ? style.disabledRow : ''}
             >
-              {row.cells.map(cell => (
+              {row.cells.map((cell) => (
                 <td {...cell.getCellProps()} key={cell.column.id}>
                   {cell.render('Cell')}
                 </td>

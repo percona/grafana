@@ -141,10 +141,7 @@ describe('AddNotificationChannelModal', () => {
       });
 
       act(() => {
-        wrapper
-          .find(dataQa('keyType-radio-button'))
-          .at(1)
-          .simulate('change');
+        wrapper.find(dataQa('keyType-radio-button')).at(1).simulate('change');
       });
 
       wrapper.update();

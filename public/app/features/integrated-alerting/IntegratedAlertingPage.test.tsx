@@ -26,7 +26,7 @@ jest.mock('./components/Alerts/Alerts.service');
 
 describe('IntegratedAlertingPage', () => {
   beforeEach(() => {
-    (useSelector as jest.Mock).mockImplementation(callback => {
+    (useSelector as jest.Mock).mockImplementation((callback) => {
       return callback({ location: { routeParams: { tab: 'alerts' }, path: '/integrated-alerting/alerts' } });
     });
   });
@@ -64,17 +64,14 @@ describe('IntegratedAlertingPage', () => {
     wrapper.update();
     const tabs = wrapper.find('ul');
 
-    tabs
-      .children()
-      .at(1)
-      .simulate('click');
+    tabs.children().at(1).simulate('click');
 
     expect(getLocationSrv).toBeCalledTimes(1);
     expect(fakeLocationUpdate).toBeCalledTimes(1);
   });
 
   it('changes location when trying to access a missing tab', async () => {
-    (useSelector as jest.Mock).mockImplementation(callback => {
+    (useSelector as jest.Mock).mockImplementation((callback) => {
       return callback({ location: { routeParams: { tab: 'test' }, path: '/integrated-alerting/test' } });
     });
 
