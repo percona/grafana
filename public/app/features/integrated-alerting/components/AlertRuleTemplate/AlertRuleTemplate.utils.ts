@@ -1,4 +1,4 @@
-import { SourceDescription, FormattedTemplate, Template } from './AlertRuleTemplate.types';
+import { SourceDescription, FormattedTemplate, Template, TemplateParamUnit } from './AlertRuleTemplate.types';
 import moment from 'moment/moment';
 
 export const formatTemplate = (template: Template): FormattedTemplate => {
@@ -13,3 +13,11 @@ export const formatTemplate = (template: Template): FormattedTemplate => {
 };
 
 export const formatTemplates = (templates: Template[]): FormattedTemplate[] => templates.map(formatTemplate);
+
+export const beautifyUnit = (unit: TemplateParamUnit) => {
+  const unitMap: Record<TemplateParamUnit, string> = {
+    [TemplateParamUnit.PERCENTAGE]: '%',
+  };
+
+  return unitMap[unit];
+};
