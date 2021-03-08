@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import { Form, Field } from 'react-final-form';
 import { Button, HorizontalGroup, Switch, Select, MultiSelect, useStyles } from '@grafana/ui';
 import {
@@ -27,6 +27,7 @@ import {
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
+import { TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { appEvents } from 'app/core/core';
 
@@ -38,6 +39,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const styles = useStyles(getStyles);
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<string>>>();
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
+  const templateParams = useRef<Record<string, TemplateParam[]>>({});
   const { getAlertRules } = useContext(AlertRulesProvider);
 
   const getData = async () => {
@@ -48,6 +50,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       ]);
       setChannelsOptions(formatChannelsOptions(channelsListResponse));
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
+      templatesListResponse.templates.forEach(({ name, params }) => {
+        if (params) {
+          templateParams.current[name] = params;
+        }
+      });
     } catch (e) {
       logger.error(e);
     }
