@@ -21,7 +21,7 @@ export enum SourceDescription {
   USER_API = 'User-defined (UI)',
 }
 
-enum TemplateParamType {
+export enum TemplateParamType {
   FLOAT = 'FLOAT',
   BOOL = 'BOOL',
   STRING = 'STRING',

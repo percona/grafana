@@ -30,6 +30,7 @@ import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTempl
 import { TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { appEvents } from 'app/core/core';
+import { AlertRuleParamField } from '../AlertRuleParamField';
 
 const { required } = validators;
 const durationValidators = [required, minValidator(MINIMUM_DURATION_VALUE)];
@@ -50,10 +51,8 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       ]);
       setChannelsOptions(formatChannelsOptions(channelsListResponse));
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
-      templatesListResponse.templates.forEach(({ name, params }) => {
-        if (params) {
-          templateParams.current[name] = params;
-        }
+      templatesListResponse.templates.forEach(({ name, params = [] }) => {
+        templateParams.current[name] = params;
       });
     } catch (e) {
       logger.error(e);
@@ -95,7 +94,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       <Form
         initialValues={initialValues}
         onSubmit={onSubmit}
-        render={({ handleSubmit, valid, pristine, submitting }) => (
+        render={({ handleSubmit, valid, pristine, submitting, values }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
             {alertRule ? null : (
               <>
@@ -119,7 +118,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               </>
             )}
 
-            <TextInputField label={Messages.thresholdField} name="threshold" />
+            {values.template?.value
+              ? templateParams.current[values.template.value].map(param => (
+                  <AlertRuleParamField key={param.name} param={param} />
+                ))
+              : null}
 
             <NumberInputField label={Messages.durationField} name="duration" validators={durationValidators} />
 
