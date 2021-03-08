@@ -3,6 +3,7 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { Messages } from './AllChecksTab.messages';
 import { CheckTableRowProps } from './types';
 import { LoaderButton } from '@percona/platform-core';
+import * as styles from './CheckTableRow.styles';
 
 export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
   const [changeCheckPending, setChangeCheckPending] = useState(false);
@@ -35,6 +36,7 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
           variant={disabled ? 'primary' : 'destructive'}
           loading={changeCheckPending}
           onClick={changeCheck}
+          className={styles.changeChecksButton}
         >
           {disabled ? Messages.enable : Messages.disable}
         </LoaderButton>

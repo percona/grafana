@@ -18,6 +18,9 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
   `,
   runChecksButton: css`
     width: 140px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
   `,
   actionButtons: css`
     display: flex;
