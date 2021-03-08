@@ -1,5 +1,5 @@
-export const getResourcesWidth = (allocated: number, total: number) => {
-  if (total <= 0) {
+export const getResourcesWidth = (allocated?: number, total?: number) => {
+  if (!allocated || !total || total <= 0) {
     return 0;
   }
 

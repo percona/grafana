@@ -18,8 +18,8 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
 }) => {
   const styles = useStyles(getStyles);
   const requiredResources = allocated && expected ? allocated + expected : undefined;
-  const allocatedWidth = allocated && total ? getResourcesWidth(allocated, total) : 0;
-  const expectedWidth = requiredResources && total ? getResourcesWidth(requiredResources, total) : 0;
+  const allocatedWidth = getResourcesWidth(allocated, total);
+  const expectedWidth = getResourcesWidth(requiredResources, total);
   const isResourceInsufficient = requiredResources && total ? requiredResources > total : false;
 
   return (
