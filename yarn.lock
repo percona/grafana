@@ -5357,7 +5357,7 @@
     "@octokit/openapi-types" "^2.3.1"
     "@types/node" ">= 8"
 
-"@percona/platform-core@0.7.0":
+"@percona/platform-core@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@percona/platform-core/-/platform-core-0.7.0.tgz#8c5e1f9a52d1f48c7d110d75bfbe050c2cc69f57"
   integrity sha512-GNr9br1KnEvlZlv1EXsW9ZZrRYWgmX1pZJTDQLCnqp/23HYOcnViZZZ59krRWq9Y0cR69ji6Vlroi4JhcM88vA==
