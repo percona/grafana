@@ -107,7 +107,7 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) 
       timer = setInterval(() => getResources(false), RECHECK_INTERVAL);
     }
 
-    return () => clearTimeout(timer);
+    return () => clearInterval(timer);
   }, [kubernetesCluster]);
 
   return (
