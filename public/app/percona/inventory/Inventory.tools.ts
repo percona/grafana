@@ -43,19 +43,31 @@ const getModel = (item: ServicesList) => {
 const getServiceModel = (item: InventoryList) => {
   const createParams = getModel(item);
 
-  return orderBy([...createParams], [(service: Model) => (service.service_name || '').toLowerCase()], ['asc']);
+  return orderBy(
+    ([] as Model[]).concat(...createParams),
+    [(service: Model) => (service.service_name || '').toLowerCase()],
+    ['asc']
+  );
 };
 
 const getNodeModel = (item: InventoryList) => {
   const createParams = getModel(item);
 
-  return orderBy([...createParams], [(node: Model) => (node.node_name || '').toLowerCase()], ['asc']);
+  return orderBy(
+    ([] as Model[]).concat(...createParams),
+    [(node: Model) => (node.node_name || '').toLowerCase()],
+    ['asc']
+  );
 };
 
 const getAgentModel = (item: InventoryList) => {
   const createParams = getModel(item);
 
-  return orderBy([...createParams], [(agent: Model) => (agent.type || '').toLowerCase()], ['asc']);
+  return orderBy(
+    ([] as Model[]).concat(...createParams),
+    [(agent: Model) => (agent.type || '').toLowerCase()],
+    ['asc']
+  );
 };
 
 export const InventoryDataService = {
