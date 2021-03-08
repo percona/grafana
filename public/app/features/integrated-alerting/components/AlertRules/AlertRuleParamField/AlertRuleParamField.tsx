@@ -17,6 +17,7 @@ export const AlertRuleParamField: FC<AlertRuleParamFieldProps> = ({ param }) => 
     floatValidators.push(maxValidator(float.max));
   }
 
+  // TODO add remaining params as API starts supporting them
   const componentMap: Record<TemplateParamType, JSX.Element | null> = {
     [TemplateParamType.FLOAT]: (
       <NumberInputField
