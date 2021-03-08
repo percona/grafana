@@ -38,7 +38,7 @@ export const BackupInventory: FC = () => {
     setPending(true);
 
     try {
-      const { backups } = await BackupInventoryService.list();
+      const { backups = [] } = await BackupInventoryService.list();
       setData(backups.map(backup => formatToBackup(backup)));
     } catch (e) {
       logger.error(e);
