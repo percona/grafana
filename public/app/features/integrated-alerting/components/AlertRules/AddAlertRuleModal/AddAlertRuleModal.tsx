@@ -27,7 +27,7 @@ import {
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
-import { TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
+import { Template } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { appEvents } from 'app/core/core';
 import { AlertRuleParamField } from '../AlertRuleParamField';
@@ -40,7 +40,8 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const styles = useStyles(getStyles);
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<string>>>();
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
-  const templateParams = useRef<Record<string, TemplateParam[]>>({});
+  const templates = useRef<Template[]>([]);
+  const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const { getAlertRules } = useContext(AlertRulesProvider);
 
   const getData = async () => {
@@ -56,9 +57,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       ]);
       setChannelsOptions(formatChannelsOptions(channelsListResponse.channels));
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
-      templatesListResponse.templates.forEach(({ name, params = [] }) => {
-        templateParams.current[name] = params;
-      });
+      templates.current = templatesListResponse.templates;
     } catch (e) {
       logger.error(e);
     }
@@ -89,6 +88,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
     setVisible(false);
   };
 
+  const handleTemplateChange = (name = '') => {
+    const template = templates.current.find(template => template.name === name);
+    setCurrentTemplate(template);
+  };
+
   return (
     <Modal
       title={alertRule ? Messages.editRuleTitle : Messages.addRuleTitle}
@@ -112,6 +116,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                     className={styles.select}
                     options={templateOptions}
                     {...input}
+                    onChange={name => {
+                      input.onChange(name);
+                      handleTemplateChange(name.value);
+                    }}
                     data-qa="template-select-input"
                   />
                 </>
@@ -120,11 +128,8 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
             <TextInputField label={Messages.nameField} name="name" validators={nameValidators} />
 
-            {values.template?.value
-              ? templateParams.current[values.template.value].map(param => (
-                  <AlertRuleParamField key={param.name} param={param} />
-                ))
-              : null}
+            {currentTemplate &&
+              currentTemplate.params.map(param => <AlertRuleParamField key={param.name} param={param} />)}
 
             <NumberInputField label={Messages.durationField} name="duration" validators={durationValidators} />
 
