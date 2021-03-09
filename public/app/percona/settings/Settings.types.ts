@@ -17,6 +17,18 @@ export interface AlertingSettings {
   slack: SlackSettings;
 }
 
+export enum SttCheckIntervals {
+  rareInterval = 'rareInterval',
+  standardInterval = 'standardInterval',
+  frequentInterval = 'frequentInterval',
+}
+
+export interface SttCheckIntervalsSettings {
+  [SttCheckIntervals.rareInterval]: string;
+  [SttCheckIntervals.standardInterval]: string;
+  [SttCheckIntervals.frequentInterval]: string;
+}
+
 export interface Settings {
   updatesDisabled: boolean;
   telemetryEnabled: boolean;
@@ -32,6 +44,7 @@ export interface Settings {
   alertingEnabled?: boolean;
   publicAddress?: string;
   alertingSettings: AlertingSettings;
+  sttCheckIntervals: SttCheckIntervalsSettings;
 }
 
 export interface MetricsResolutions {
