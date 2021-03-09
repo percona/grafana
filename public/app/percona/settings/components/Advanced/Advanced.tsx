@@ -9,7 +9,7 @@ import { DATA_RETENTION_URL } from 'app/percona/settings/Settings.constants';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
-import { transformSecondsToDays } from './Advanced.utils';
+import { convertSecondsToDays, convertSecondsToHours } from './Advanced.utils';
 import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS, MIN_STT_CHECK_INTERVAL, STT_CHECK_INTERVALS } from './Advanced.constants';
 import { AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
@@ -58,15 +58,18 @@ export const Advanced: FC<AdvancedProps> = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const settingsStyles = getSettingsStyles(theme);
+  const { rareInterval, standardInterval, frequentInterval } = convertSecondsToHours(sttCheckIntervals);
   const initialValues = {
-    retention: transformSecondsToDays(dataRetention),
+    retention: convertSecondsToDays(dataRetention),
     telemetry: telemetryEnabled,
     updates: !updatesDisabled,
     stt: sttEnabled,
     dbaas: dbaasEnabled,
     publicAddress,
     alerting: alertingEnabled,
-    sttCheckIntervals,
+    rareInterval,
+    standardInterval,
+    frequentInterval,
   };
   const [loading, setLoading] = useState(false);
   // @ts-ignore
