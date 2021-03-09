@@ -36,7 +36,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
           await AddRemoteInstanceService.addRemote(type, values);
         }
 
-        window.location.href = '/graph/d/pmm-inventory/';
+        window.location.href = '/graph/inventory/';
       } catch (e) {
         console.error(e);
       } finally {
