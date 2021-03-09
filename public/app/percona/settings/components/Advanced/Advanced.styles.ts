@@ -76,7 +76,8 @@ export const getStyles = stylesFactory(({ breakpoints, spacing, typography }: Gr
       }
     `,
     sttCheckIntervalsLabel: css`
-      margin: ${spacing.sm};
+      margin-top: ${spacing.sm};
+      margin-bottom: ${spacing.sm};
     `,
   };
 });
