@@ -9,9 +9,16 @@ import { DATA_RETENTION_URL } from 'app/percona/settings/Settings.constants';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
-import { convertSecondsToDays, convertSecondsToHours } from './Advanced.utils';
-import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS, MIN_STT_CHECK_INTERVAL, STT_CHECK_INTERVALS } from './Advanced.constants';
-import { AdvancedProps } from './Advanced.types';
+import { convertSecondsToDays, convertSecondsToHours, convertHoursToSeconds } from './Advanced.utils';
+import {
+  SECONDS_IN_DAY,
+  MIN_DAYS,
+  MAX_DAYS,
+  MIN_STT_CHECK_INTERVAL,
+  STT_CHECK_INTERVAL_STEP,
+  STT_CHECK_INTERVALS,
+} from './Advanced.constants';
+import { AdvancedFormValues, AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
 
 const {
@@ -72,9 +79,22 @@ export const Advanced: FC<AdvancedProps> = ({
     frequentInterval,
   };
   const [loading, setLoading] = useState(false);
-  // @ts-ignore
-  const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting }) => {
+  const applyChanges = ({
+    retention,
+    telemetry,
+    stt,
+    publicAddress,
+    alerting,
+    rareInterval,
+    standardInterval,
+    frequentInterval,
+  }: AdvancedFormValues) => {
     const refresh = !!alerting !== alertingEnabled;
+    const sttCheckIntervals = {
+      rare_interval: `${convertHoursToSeconds(rareInterval)}s`,
+      standard_interval: `${convertHoursToSeconds(standardInterval)}s`,
+      frequent_interval: `${convertHoursToSeconds(frequentInterval)}s`,
+    };
     const body = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
       disable_telemetry: !telemetry,
@@ -85,6 +105,7 @@ export const Advanced: FC<AdvancedProps> = ({
       remove_pmm_public_address: !publicAddress,
       enable_alerting: alerting ? true : undefined,
       disable_alerting: !alerting ? true : undefined,
+      stt_check_intervals: !!stt ? sttCheckIntervals : undefined,
     };
 
     updateSettings(body, setLoading, refresh);
@@ -194,6 +215,7 @@ export const Advanced: FC<AdvancedProps> = ({
                 </div>
                 <div className={styles.inputWrapper}>
                   <NumberInputField
+                    inputProps={{ step: STT_CHECK_INTERVAL_STEP, min: MIN_STT_CHECK_INTERVAL }}
                     disabled={!values.stt}
                     name={name}
                     data-qa={`advanced-stt-check-interval-input-${name}`}

@@ -1,6 +1,17 @@
 import { LoadingCallback } from 'app/percona/settings/Settings.service';
 import { SttCheckIntervalsSettings } from 'app/percona/settings/Settings.types';
 
+export interface AdvancedFormValues {
+  retention: string;
+  telemetry: boolean;
+  stt: boolean;
+  publicAddress: string;
+  alerting: boolean;
+  rareInterval: number;
+  standardInterval: number;
+  frequentInterval: number;
+}
+
 export interface AdvancedProps {
   dataRetention: string;
   telemetryEnabled: boolean;

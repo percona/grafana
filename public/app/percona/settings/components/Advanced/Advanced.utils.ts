@@ -18,6 +18,8 @@ export const convertSecondsToDays = (dataRetention: string) => {
 
 export const convertSecondsStringToHour = (secondsString: string) => parseInt(secondsString, 10) / SECONDS_IN_HOUR;
 
+export const convertHoursToSeconds = (hours: number) => hours * SECONDS_IN_HOUR;
+
 export const convertSecondsToHours = (sttCheckIntervals: SttCheckIntervalsSettings) => {
   const {
     rareInterval: rawRareInterval,

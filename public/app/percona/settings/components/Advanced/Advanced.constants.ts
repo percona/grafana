@@ -9,7 +9,8 @@ export const SECONDS_IN_HOUR = 3600;
 export const MINUTES_IN_HOUR = MINUTES * HOURS;
 export const MIN_DAYS = 1;
 export const MAX_DAYS = 3650;
-export const MIN_STT_CHECK_INTERVAL = 0.01;
+export const MIN_STT_CHECK_INTERVAL = 0.1;
+export const STT_CHECK_INTERVAL_STEP = 0.1;
 
 const {
   advanced: { sttRareIntervalLabel, sttStandardIntervalLabel, sttFrequentIntervalLabel },
