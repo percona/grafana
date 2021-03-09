@@ -4,7 +4,7 @@ import { useTheme } from '@grafana/ui';
 import { AdditionalOptionsFormPartProps, PostgreSQLAdditionalOptionsProps } from '../FormParts.types';
 import { getStyles } from '../FormParts.styles';
 import { Messages } from '../FormParts.messages';
-import { trackingOptions } from '../FormParts.constants';
+import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
 import { tablestatOptions } from './AdditionalOptions.constants';
 import { TablestatOptionsInterface } from './AdditionalOptions.types';
 import { FormApi } from 'final-form';
@@ -32,12 +32,12 @@ export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   );
 };
 
-export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = () => (
+export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ isRDS }) => (
   <>
     <RadioButtonGroupField
       name="tracking"
       data-qa="tracking-options-radio-button-group"
-      options={trackingOptions}
+      options={isRDS ? rdsTrackingOptions : trackingOptions}
       label={Messages.form.labels.trackingOptions}
     />
   </>
@@ -87,7 +87,19 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
-          <PostgreSQLAdditionalOptions />
+          <PostgreSQLAdditionalOptions isRDS={remoteInstanceCredentials.isRDS} />
+          {remoteInstanceCredentials.isRDS ? (
+            <>
+              <CheckboxField
+                label={Messages.form.labels.additionalOptions.disableBasicMetrics}
+                name="disable_basic_metrics"
+              />
+              <CheckboxField
+                label={Messages.form.labels.additionalOptions.disableEnchancedMetrics}
+                name="disable_enhanced_metrics"
+              />
+            </>
+          ) : null}
         </>
       );
     case InstanceTypes.mysql:

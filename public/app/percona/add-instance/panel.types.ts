@@ -1,5 +1,5 @@
 export interface RemoteInstanceCredentials {
-  service_name?: string;
+  serviceName?: string;
   port?: number;
   address?: string;
   isRDS?: boolean;
@@ -19,3 +19,11 @@ export enum InstanceTypes {
   external = 'external',
   haproxy = 'haproxy',
 }
+
+export const INSTANCE_TYPES_LABELS = {
+  [InstanceTypes.mysql]: 'MySQL',
+  [InstanceTypes.mongodb]: 'MongoDB',
+  [InstanceTypes.postgresql]: 'PostgreSQL',
+  [InstanceTypes.proxysql]: 'ProxySQL',
+  [InstanceTypes.haproxy]: 'HAProxy',
+};

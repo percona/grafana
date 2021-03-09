@@ -6,12 +6,23 @@ const getEngineType = (type?: string) => {
   switch (type) {
     case 'DISCOVER_RDS_MYSQL':
       return DATABASE_LABELS[Databases.mysql];
-    case 'DISCOVER_RDS_POSTGRES':
+    case 'DISCOVER_RDS_POSTGRESQL':
       return DATABASE_LABELS[Databases.postgresql];
     case 'DISCOVER_RDS_INVALID':
       return 'Unknown type';
     default:
       return 'Unknown type';
+  }
+};
+
+const getDatabaseType = (type?: string) => {
+  switch (type) {
+    case 'DISCOVER_RDS_MYSQL':
+      return Databases.mysql;
+    case 'DISCOVER_RDS_POSTGRESQL':
+      return Databases.postgresql;
+    default:
+      return '';
   }
 };
 
@@ -43,7 +54,7 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
     accessor: (element: any) => {
       const selectionHandler = () => {
         onSelectInstance({
-          type: 'mysql',
+          type: getDatabaseType(element.engine),
           credentials: { ...{ ...element, ...credentials }, isRDS: true },
         });
       };

@@ -32,6 +32,7 @@ const alwaysMonoIcons = [
   'percona-network',
   'percona-process',
   'percona-setting',
+  'percona-database-checks',
 ];
 
 export interface IconProps extends React.HTMLAttributes<HTMLDivElement> {

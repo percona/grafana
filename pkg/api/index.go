@@ -367,6 +367,20 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		})
 	}
 
+	databaseChecks := []*dtos.NavLink{
+		{Text: "PMM Database checks", Id: "database-checks", Url: setting.AppSubUrl + "/checks", Icon: "percona-database-checks"},
+	}
+
+	navTree = append(navTree, &dtos.NavLink{
+		Text:       "Database Checks",
+		Id:         "databsase checks",
+		SubTitle:   "Manage database security checks",
+		Icon:       "percona-database-checks",
+		Url:        setting.AppSubUrl + "/",
+		SortWeight: dtos.WeightDashboard,
+		Children:   dashboardChildNavs,
+	})
+
 	if c.IsGrafanaAdmin {
 		adminNavLinks := []*dtos.NavLink{
 			{Text: "Users", Id: "global-users", Url: setting.AppSubUrl + "/admin/users", Icon: "user"},
