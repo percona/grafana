@@ -49,11 +49,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({ se
     }),
     [allocatedResources]
   );
-
-  const parseNonNegativeFloat = useCallback(
-    value => (value > 0 ? (+value).toFixed(1).replace(/\.0+$/, '') : value),
-    []
-  );
+  const resourcesInputProps = { step: '0.1' };
 
   const topologies = useMemo(
     () =>
@@ -146,14 +142,14 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({ se
             label={Messages.dbcluster.addModal.fields.memory}
             validators={resourceValidators}
             disabled={resources !== DBClusterResources.custom}
-            parse={parseNonNegativeFloat}
+            inputProps={resourcesInputProps}
           />
           <NumberInputField
             name={EditDBClusterFields.cpu}
             label={Messages.dbcluster.addModal.fields.cpu}
             validators={resourceValidators}
             disabled={resources !== DBClusterResources.custom}
-            parse={parseNonNegativeFloat}
+            inputProps={resourcesInputProps}
           />
           <NumberInputField
             name={EditDBClusterFields.disk}
