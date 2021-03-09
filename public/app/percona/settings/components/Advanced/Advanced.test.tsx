@@ -120,4 +120,42 @@ describe('Advanced::', () => {
 
     expect(publicAddressInput.prop('value')).toEqual('pmmtest.percona.com');
   });
+
+  it('Does not include STT check intervals in the change request if STT checks are disabled', () => {
+    const fakeUpdateSettings = jest.fn();
+
+    const root = mount(
+      <Advanced
+        dataRetention="1296000s"
+        telemetryEnabled={false}
+        sttEnabled={false}
+        updatesDisabled
+        updateSettings={fakeUpdateSettings}
+        sttCheckIntervals={sttCheckIntervalsStub}
+      />
+    );
+
+    root.find('form').simulate('submit');
+
+    expect(fakeUpdateSettings.mock.calls[0][0].stt_check_intervals).toBeUndefined();
+  });
+
+  it('Includes STT check intervals in the change request if STT checks are enabled', () => {
+    const fakeUpdateSettings = jest.fn();
+
+    const root = mount(
+      <Advanced
+        dataRetention="1296000s"
+        telemetryEnabled={false}
+        sttEnabled={true}
+        updatesDisabled
+        updateSettings={fakeUpdateSettings}
+        sttCheckIntervals={sttCheckIntervalsStub}
+      />
+    );
+
+    root.find('form').simulate('submit');
+
+    expect(fakeUpdateSettings.mock.calls[0][0].stt_check_intervals).toBeDefined();
+  });
 });

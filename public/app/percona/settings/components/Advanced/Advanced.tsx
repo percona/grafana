@@ -218,7 +218,6 @@ export const Advanced: FC<AdvancedProps> = ({
                     inputProps={{ step: STT_CHECK_INTERVAL_STEP, min: MIN_STT_CHECK_INTERVAL }}
                     disabled={!values.stt}
                     name={name}
-                    data-qa={`advanced-stt-check-interval-input-${name}`}
                     validators={[validators.required, validators.min(MIN_STT_CHECK_INTERVAL)]}
                   />
                 </div>
