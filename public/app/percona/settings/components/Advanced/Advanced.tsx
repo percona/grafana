@@ -10,9 +10,39 @@ import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/
 import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
 import { transformSecondsToDays } from './Advanced.utils';
-import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS } from './Advanced.constants';
+import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS, MIN_STT_CHECK_INTERVAL, STT_CHECK_INTERVALS } from './Advanced.constants';
 import { AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
+
+const {
+  advanced: {
+    action,
+    retentionLabel,
+    retentionTooltip,
+    retentionUnits,
+    telemetryLabel,
+    telemetryLink,
+    telemetryTooltip,
+    updatesLabel,
+    updatesLink,
+    updatesTooltip,
+    sttLabel,
+    sttLink,
+    sttTooltip,
+    sttCheckIntervalsLabel,
+    sttCheckIntervalTooltip,
+    sttCheckIntervalUnit,
+    dbaasLabel,
+    dbaasTooltip,
+    publicAddressLabel,
+    publicAddressTooltip,
+    publicAddressButton,
+    alertingLabel,
+    alertingTooltip,
+    alertingLink,
+  },
+  tooltipLinkText,
+} = Messages;
 
 export const Advanced: FC<AdvancedProps> = ({
   dataRetention,
@@ -23,36 +53,11 @@ export const Advanced: FC<AdvancedProps> = ({
   alertingEnabled,
   publicAddress,
   updateSettings,
+  sttCheckIntervals,
 }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
   const settingsStyles = getSettingsStyles(theme);
-  const {
-    advanced: {
-      action,
-      retentionLabel,
-      retentionTooltip,
-      retentionUnits,
-      telemetryLabel,
-      telemetryLink,
-      telemetryTooltip,
-      updatesLabel,
-      updatesLink,
-      updatesTooltip,
-      sttLabel,
-      sttLink,
-      sttTooltip,
-      dbaasLabel,
-      dbaasTooltip,
-      publicAddressLabel,
-      publicAddressTooltip,
-      publicAddressButton,
-      alertingLabel,
-      alertingTooltip,
-      alertingLink,
-    },
-    tooltipLinkText,
-  } = Messages;
   const initialValues = {
     retention: transformSecondsToDays(dataRetention),
     telemetry: telemetryEnabled,
@@ -61,6 +66,7 @@ export const Advanced: FC<AdvancedProps> = ({
     dbaas: dbaasEnabled,
     publicAddress,
     alerting: alertingEnabled,
+    sttCheckIntervals,
   };
   const [loading, setLoading] = useState(false);
   // @ts-ignore
@@ -100,13 +106,13 @@ export const Advanced: FC<AdvancedProps> = ({
                   />
                 </div>
               </div>
-              <div className={styles.retentionInputWrapper}>
+              <div className={styles.inputWrapper}>
                 <NumberInputField
                   name="retention"
                   validators={[validators.required, validators.range(MIN_DAYS, MAX_DAYS)]}
                 />
               </div>
-              <span className={styles.retentionUnitslabel}>{retentionUnits}</span>
+              <span className={styles.unitsLabel}>{retentionUnits}</span>
             </div>
             <Field
               name="telemetry"
@@ -130,18 +136,6 @@ export const Advanced: FC<AdvancedProps> = ({
               className={styles.switchDisabled}
               disabled
               dataQa="advanced-updates"
-              component={SwitchRow}
-            />
-            <Field
-              name="stt"
-              type="checkbox"
-              label={sttLabel}
-              tooltip={sttTooltip}
-              tooltipLinkText={tooltipLinkText}
-              link={sttLink}
-              className={cx({ [styles.switchDisabled]: !values.telemetry })}
-              disabled={!values.telemetry}
-              dataQa="advanced-stt"
               component={SwitchRow}
             />
             {dbaasEnabled && (
@@ -168,6 +162,44 @@ export const Advanced: FC<AdvancedProps> = ({
               dataQa="advanced-alerting"
               component={SwitchRow}
             />
+            <Field
+              name="stt"
+              type="checkbox"
+              label={sttLabel}
+              tooltip={sttTooltip}
+              tooltipLinkText={tooltipLinkText}
+              link={sttLink}
+              className={cx({ [styles.switchDisabled]: !values.telemetry })}
+              disabled={!values.telemetry}
+              dataQa="advanced-stt"
+              component={SwitchRow}
+            />
+            <div className={styles.advancedRow}>
+              <div className={cx(styles.advancedCol, styles.advancedChildCol)}>
+                <div className={settingsStyles.labelWrapper} data-qa="check-intervals-label">
+                  <span>{sttCheckIntervalsLabel}</span>
+                </div>
+              </div>
+            </div>
+            {STT_CHECK_INTERVALS.map(({ label, name }) => (
+              <div key={name} className={styles.advancedRow}>
+                <div className={cx(styles.advancedCol, styles.advancedChildCol)}>
+                  <div className={settingsStyles.labelWrapper} data-qa={`check-interval-${name}-label`}>
+                    <span>{label}</span>
+                    <LinkTooltip tooltipText={sttCheckIntervalTooltip} icon="info-circle" />
+                  </div>
+                </div>
+                <div className={styles.inputWrapper}>
+                  <NumberInputField
+                    disabled={!values.stt}
+                    name={name}
+                    data-qa={`advanced-stt-check-interval-input-${name}`}
+                    validators={[validators.required, validators.min(MIN_STT_CHECK_INTERVAL)]}
+                  />
+                </div>
+                <span className={styles.unitsLabel}>{sttCheckIntervalUnit}</span>
+              </div>
+            ))}
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">
