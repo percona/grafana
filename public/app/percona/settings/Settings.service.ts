@@ -61,4 +61,9 @@ const toModel = (response: any): Settings => ({
     slack: response.slack_alerting_settings || {},
   },
   publicAddress: response.pmm_public_address,
+  sttCheckIntervals: {
+    rareInterval: response.stt_check_intervals.rare_interval,
+    standardInterval: response.stt_check_intervals.standard_interval,
+    frequentInterval: response.stt_check_intervals.frequent_interval,
+  },
 });
