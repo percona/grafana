@@ -86,6 +86,7 @@ export const SettingsPanel: FC = () => {
                 alertingEnabled={!!settings.alertingEnabled}
                 publicAddress={settings.publicAddress}
                 updateSettings={updateSettings}
+                sttCheckIntervals={settings.sttCheckIntervals}
               />
             )}
             {tabs[2].active && <SSHKey sshKey={settings.sshKey || ''} updateSettings={updateSettings} />}
