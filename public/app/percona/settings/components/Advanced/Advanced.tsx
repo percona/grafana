@@ -175,7 +175,7 @@ export const Advanced: FC<AdvancedProps> = ({
               component={SwitchRow}
             />
             <div className={styles.advancedRow}>
-              <div className={cx(styles.advancedCol, styles.advancedChildCol)}>
+              <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
                 <div className={settingsStyles.labelWrapper} data-qa="check-intervals-label">
                   <span>{sttCheckIntervalsLabel}</span>
                 </div>
