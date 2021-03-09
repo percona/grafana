@@ -95,7 +95,6 @@ export const Advanced: FC<AdvancedProps> = ({
       standard_interval: `${convertHoursStringToSeconds(standardInterval)}s`,
       frequent_interval: `${convertHoursStringToSeconds(frequentInterval)}s`,
     };
-    console.log(sttCheckIntervals, rareInterval, standardInterval, frequentInterval);
     const body = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
       disable_telemetry: !telemetry,
