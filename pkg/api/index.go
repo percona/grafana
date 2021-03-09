@@ -378,7 +378,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		Icon:       "percona-database-checks",
 		Url:        setting.AppSubUrl + "/",
 		SortWeight: dtos.WeightDashboard,
-		Children:   dashboardChildNavs,
+		Children:   databaseChecks,
 	})
 
 	if c.IsGrafanaAdmin {
