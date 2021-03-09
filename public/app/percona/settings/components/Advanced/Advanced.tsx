@@ -9,7 +9,7 @@ import { DATA_RETENTION_URL } from 'app/percona/settings/Settings.constants';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
-import { convertSecondsToDays, convertSecondsToHours, convertHoursToSeconds } from './Advanced.utils';
+import { convertSecondsToDays, convertCheckIntervalsToHours, convertHoursStringToSeconds } from './Advanced.utils';
 import {
   SECONDS_IN_DAY,
   MIN_DAYS,
@@ -65,7 +65,7 @@ export const Advanced: FC<AdvancedProps> = ({
   const theme = useTheme();
   const styles = getStyles(theme);
   const settingsStyles = getSettingsStyles(theme);
-  const { rareInterval, standardInterval, frequentInterval } = convertSecondsToHours(sttCheckIntervals);
+  const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
   const initialValues = {
     retention: convertSecondsToDays(dataRetention),
     telemetry: telemetryEnabled,
@@ -91,10 +91,11 @@ export const Advanced: FC<AdvancedProps> = ({
   }: AdvancedFormValues) => {
     const refresh = !!alerting !== alertingEnabled;
     const sttCheckIntervals = {
-      rare_interval: `${convertHoursToSeconds(rareInterval)}s`,
-      standard_interval: `${convertHoursToSeconds(standardInterval)}s`,
-      frequent_interval: `${convertHoursToSeconds(frequentInterval)}s`,
+      rare_interval: `${convertHoursStringToSeconds(rareInterval)}s`,
+      standard_interval: `${convertHoursStringToSeconds(standardInterval)}s`,
+      frequent_interval: `${convertHoursStringToSeconds(frequentInterval)}s`,
     };
+    console.log(sttCheckIntervals, rareInterval, standardInterval, frequentInterval);
     const body = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
       disable_telemetry: !telemetry,

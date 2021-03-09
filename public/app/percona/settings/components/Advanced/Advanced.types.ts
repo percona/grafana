@@ -7,9 +7,9 @@ export interface AdvancedFormValues {
   stt: boolean;
   publicAddress: string;
   alerting: boolean;
-  rareInterval: number;
-  standardInterval: number;
-  frequentInterval: number;
+  rareInterval: string;
+  standardInterval: string;
+  frequentInterval: string;
 }
 
 export interface AdvancedProps {

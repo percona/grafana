@@ -2,6 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { Advanced } from './Advanced';
+import { sttCheckIntervalsStub } from './__mocks__/stubs';
 
 describe('Advanced::', () => {
   it('Renders correctly with props', () => {
@@ -13,6 +14,7 @@ describe('Advanced::', () => {
         updatesDisabled
         updateSettings={() => {}}
         publicAddress="pmmtest.percona.com"
+        sttCheckIntervals={sttCheckIntervalsStub}
       />
     );
     const retentionInput = root.find(dataQa('retention-field-container')).find('input');
@@ -24,7 +26,14 @@ describe('Advanced::', () => {
 
   it("Can't change telemetry when stt is on", () => {
     const root = mount(
-      <Advanced dataRetention="1296000s" telemetryEnabled sttEnabled updatesDisabled updateSettings={() => {}} />
+      <Advanced
+        dataRetention="1296000s"
+        telemetryEnabled
+        sttEnabled
+        updatesDisabled
+        updateSettings={() => {}}
+        sttCheckIntervals={sttCheckIntervalsStub}
+      />
     );
     const telemetrySwitch = root.find('[data-qa="advanced-telemetry"]').find('input');
 
@@ -39,6 +48,7 @@ describe('Advanced::', () => {
         sttEnabled={false}
         updatesDisabled
         updateSettings={() => {}}
+        sttCheckIntervals={sttCheckIntervalsStub}
       />
     );
     const sttSwitch = root.find('[data-qa="advanced-stt"]').find('input');
@@ -55,6 +65,7 @@ describe('Advanced::', () => {
         alertingEnabled={false}
         updatesDisabled
         updateSettings={() => {}}
+        sttCheckIntervals={sttCheckIntervalsStub}
       />
     );
     const alertingSwitch = root.find('[data-qa="advanced-alerting"]').find('input');
@@ -71,6 +82,7 @@ describe('Advanced::', () => {
         sttEnabled={false}
         updatesDisabled
         updateSettings={updateSettings}
+        sttCheckIntervals={sttCheckIntervalsStub}
       />
     );
 
@@ -96,6 +108,7 @@ describe('Advanced::', () => {
         sttEnabled={false}
         updatesDisabled
         updateSettings={() => {}}
+        sttCheckIntervals={sttCheckIntervalsStub}
       />
     );
     const publicAddressButton = root.find(dataQa('public-address-button')).find('button');

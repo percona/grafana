@@ -1,4 +1,5 @@
-import { HOURS, MINUTES_IN_HOUR, SECONDS_IN_HOUR, SECONDS_IN_DAY } from './Advanced.constants';
+import moment from 'moment/moment';
+import { HOURS, MINUTES_IN_HOUR, SECONDS_IN_DAY } from './Advanced.constants';
 import { SttCheckIntervalsSettings } from 'app/percona/settings/Settings.types';
 
 export const convertSecondsToDays = (dataRetention: string) => {
@@ -16,19 +17,20 @@ export const convertSecondsToDays = (dataRetention: string) => {
   }
 };
 
-export const convertSecondsStringToHour = (secondsString: string) => parseInt(secondsString, 10) / SECONDS_IN_HOUR;
+export const convertSecondsStringToHour = (seconds: string) =>
+  moment.duration(parseInt(seconds, 10), 'seconds').asHours();
 
-export const convertHoursToSeconds = (hours: number) => hours * SECONDS_IN_HOUR;
+export const convertHoursStringToSeconds = (hours: string) => moment.duration(parseFloat(hours), 'hours').asSeconds();
 
-export const convertSecondsToHours = (sttCheckIntervals: SttCheckIntervalsSettings) => {
+export const convertCheckIntervalsToHours = (sttCheckIntervals: SttCheckIntervalsSettings) => {
   const {
     rareInterval: rawRareInterval,
     standardInterval: rawStandardInterval,
     frequentInterval: rawFrequentInterval,
   } = sttCheckIntervals;
   return {
-    rareInterval: convertSecondsStringToHour(rawRareInterval),
-    standardInterval: convertSecondsStringToHour(rawStandardInterval),
-    frequentInterval: convertSecondsStringToHour(rawFrequentInterval),
+    rareInterval: `${convertSecondsStringToHour(rawRareInterval)}`,
+    standardInterval: `${convertSecondsStringToHour(rawStandardInterval)}`,
+    frequentInterval: `${convertSecondsStringToHour(rawFrequentInterval)}`,
   };
 };
