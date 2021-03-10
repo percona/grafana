@@ -76,6 +76,21 @@ describe('AlertRulesTable utils', () => {
         expr:
           'sum by (node_name) (mongodb_ss_connections{conn_type="current"}) * 1024 * 1024↵/ on (node_name) (node_memory_MemTotal_bytes)↵* 100↵> [[ .threshold ]]',
       },
+      params: [
+        {
+          name: 'threshold',
+          type: TemplateParamType.FLOAT,
+          unit: TemplateParamUnit.PERCENTAGE,
+          summary: 'a threshold',
+          float: {
+            has_default: true,
+            has_min: false,
+            has_max: false,
+            default: 10,
+          },
+          value: 15,
+        },
+      ],
       ruleId: 'test 1',
       createdAt: '2020-11-25 16:53:39.366',
       disabled: false,
@@ -152,6 +167,21 @@ describe('AlertRulesTable utils', () => {
         expr:
           'sum by (node_name) (mongodb_ss_mem_resident * 1024 * 1024)↵/ on (node_name) (node_memory_MemTotal_bytes)↵* 100↵> 20',
       },
+      params: [
+        {
+          name: 'threshold',
+          type: TemplateParamType.FLOAT,
+          unit: TemplateParamUnit.PERCENTAGE,
+          summary: 'a threshold',
+          float: {
+            has_default: true,
+            has_min: false,
+            has_max: false,
+            default: 75,
+          },
+          value: 75,
+        },
+      ],
       ruleId: 'test 4',
       createdAt: '2020-11-25 16:53:39.366',
       disabled: true,
@@ -228,6 +258,21 @@ describe('AlertRulesTable utils', () => {
           expr:
             'sum by (node_name) (mongodb_ss_connections{conn_type="current"}) * 1024 * 1024↵/ on (node_name) (node_memory_MemTotal_bytes)↵* 100↵> [[ .threshold ]]',
         },
+        params: [
+          {
+            name: 'threshold',
+            type: TemplateParamType.FLOAT,
+            unit: TemplateParamUnit.PERCENTAGE,
+            summary: 'a threshold',
+            float: {
+              has_default: true,
+              has_min: false,
+              has_max: false,
+              default: 10,
+            },
+            value: 15,
+          },
+        ],
         ruleId: 'test 1',
         createdAt: '2020-11-25 16:53:39.366',
         disabled: false,
@@ -303,6 +348,21 @@ describe('AlertRulesTable utils', () => {
           expr:
             'sum by (node_name) (mongodb_ss_mem_resident * 1024 * 1024)↵/ on (node_name) (node_memory_MemTotal_bytes)↵* 100↵> 20',
         },
+        params: [
+          {
+            name: 'threshold',
+            type: TemplateParamType.FLOAT,
+            unit: TemplateParamUnit.PERCENTAGE,
+            summary: 'a threshold',
+            float: {
+              has_default: true,
+              has_min: false,
+              has_max: false,
+              default: 75,
+            },
+            value: 75,
+          },
+        ],
         ruleId: 'test 4',
         createdAt: '2020-11-25 16:53:39.366',
         disabled: true,
