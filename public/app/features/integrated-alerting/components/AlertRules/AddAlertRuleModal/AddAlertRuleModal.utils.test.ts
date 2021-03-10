@@ -10,7 +10,6 @@ import {
   formatEditFilters,
   formatEditTemplate,
   formatEditSeverity,
-  formatEditThreshold,
   formatEditNotificationChannel,
   formatEditNotificationChannels,
   minValidator,
@@ -328,51 +327,6 @@ describe('AddAlertRuleModal utils', () => {
         label: 'Test channel 2',
       },
     ]);
-  });
-
-  test('formatEditNotificationChannels', () => {
-    expect(formatEditThreshold([])).toBeNull();
-
-    expect(formatEditThreshold(undefined)).toBeNull();
-
-    expect(
-      formatEditThreshold([
-        {
-          name: 'threshold',
-          type: 'BOOL',
-          bool: true,
-        },
-      ])
-    ).toEqual('true');
-
-    expect(
-      formatEditThreshold([
-        {
-          name: 'threshold',
-          type: 'FLOAT',
-          float: 2.3,
-        },
-      ])
-    ).toEqual('2.3');
-
-    expect(
-      formatEditThreshold([
-        {
-          name: 'threshold',
-          type: 'STRING',
-          string: 'test',
-        },
-      ])
-    ).toEqual('test');
-
-    expect(
-      formatEditThreshold([
-        {
-          name: 'threshold',
-          type: 'PARAM_TYPE_INVALID',
-        },
-      ])
-    ).toBeNull();
   });
 
   test('minimum validator', () => {

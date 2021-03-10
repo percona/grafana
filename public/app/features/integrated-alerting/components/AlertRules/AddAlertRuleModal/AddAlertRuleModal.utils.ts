@@ -6,7 +6,6 @@ import {
   AlertRuleUpdatePayload,
   AlertRulesListPayloadFilter,
   AlertRuleFilterType,
-  AlertRulesListResponseParam,
   AlertRulesListPayloadTemplate,
   AlertRulesListResponseChannel,
 } from '../AlertRules.types';
@@ -137,23 +136,6 @@ export const formatEditNotificationChannels = (
   channels: AlertRulesListResponseChannel[]
 ): Array<SelectableValue<string>> => (channels ? channels.map(formatEditNotificationChannel) : []);
 
-export const formatEditThreshold = (params?: AlertRulesListResponseParam[]): string | null => {
-  const thresholdParam = params?.find(param => param.name === 'threshold');
-
-  if (!thresholdParam) {
-    return null;
-  }
-
-  const paramType = thresholdParam.type;
-  const type = AlertRuleParamType[paramType];
-
-  if (type === AlertRuleParamType.PARAM_TYPE_INVALID) {
-    return null;
-  }
-
-  return `${thresholdParam[type]}`;
-};
-
 export const getInitialValues = (alertRule?: AlertRule | null): AddAlertRuleFormValues | undefined => {
   if (!alertRule) {
     return undefined;
@@ -172,13 +154,12 @@ export const getInitialValues = (alertRule?: AlertRule | null): AddAlertRuleForm
 
   params?.forEach(param => {
     const { float, type } = param;
-    const typeMap: Record<AlertRuleParamType, any> = {
-      [AlertRuleParamType.FLOAT]: float,
-      [AlertRuleParamType.BOOL]: undefined,
-      [AlertRuleParamType.STRING]: undefined,
-      [AlertRuleParamType.PARAM_TYPE_INVALID]: undefined,
+    const typeMap: Record<keyof typeof AlertRuleParamType, any> = {
+      FLOAT: float,
+      BOOL: undefined,
+      STRING: undefined,
     };
-    result[param.name] = typeMap[type.toLowerCase() as AlertRuleParamType];
+    result[param.name] = typeMap[type];
   });
   return result;
 };

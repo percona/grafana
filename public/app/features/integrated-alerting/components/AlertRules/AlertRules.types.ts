@@ -51,7 +51,6 @@ export interface AlertRulesListPayloadFilter {
 }
 
 export enum AlertRuleParamType {
-  PARAM_TYPE_INVALID = 'Invalid type',
   BOOL = 'bool',
   FLOAT = 'float',
   STRING = 'string',
