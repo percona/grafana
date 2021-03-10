@@ -368,7 +368,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 	}
 
 	databaseChecks := []*dtos.NavLink{
-		{Text: "PMM Database checks", Id: "database-checks", Url: setting.AppSubUrl + "/checks", Icon: "percona-database-checks"},
+		{Text: "PMM Database checks", Id: "database-checks", Url: setting.AppSubUrl + "/pmm-database-checks", Icon: "percona-database-checks"},
 	}
 
 	navTree = append(navTree, &dtos.NavLink{
