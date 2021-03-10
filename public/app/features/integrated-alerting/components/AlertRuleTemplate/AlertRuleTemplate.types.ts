@@ -52,6 +52,10 @@ export interface TemplateParam {
   float?: TemplateFloatParam;
 }
 
+export interface TemplateAnnotation {
+  summary?: string;
+}
+
 export interface Template {
   summary: string;
   name: string;
@@ -60,6 +64,7 @@ export interface Template {
   yaml: string;
   params?: TemplateParam[];
   expr: string;
+  annotations?: TemplateAnnotation;
 }
 
 export interface FormattedTemplate {
