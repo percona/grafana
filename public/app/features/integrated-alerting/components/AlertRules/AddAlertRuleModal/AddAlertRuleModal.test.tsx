@@ -1,8 +1,10 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount, ReactWrapper } from 'enzyme';
+import { act } from 'react-dom/test-utils';
 import { dataQa } from '@percona/platform-core';
 import { AddAlertRuleModal } from './AddAlertRuleModal';
 import { AlertRule } from '../AlertRules.types';
+import { TemplateParamType, TemplateParamUnit } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 
 jest.mock('../AlertRules.service');
 jest.mock('../../AlertRuleTemplate/AlertRuleTemplate.service');
@@ -24,7 +26,6 @@ describe('AddAlertRuleModal', () => {
     filters: [],
     severity: 'Critical',
     summary: 'Just a summary',
-    threshold: '1 %',
     lastNotified: '',
     disabled: false,
     expr: '',
@@ -36,7 +37,20 @@ describe('AddAlertRuleModal', () => {
       template: {
         name: 'pmm_mongodb_connections_memory_usage',
         summary: 'Memory used by MongoDB connections',
-        params: [],
+        params: [
+          {
+            name: 'threshold',
+            type: TemplateParamType.FLOAT,
+            unit: TemplateParamUnit.PERCENTAGE,
+            summary: 'A threshold',
+            float: {
+              has_default: true,
+              has_min: false,
+              has_max: false,
+              default: 10,
+            },
+          },
+        ],
       },
       rule_id: '/rule_id/ded33d30-1b65-4b43-ba45-75ca52b48fa5',
       summary: 'Just a summary',
@@ -51,8 +65,12 @@ describe('AddAlertRuleModal', () => {
     jest.clearAllMocks();
   });
 
-  it('should render modal', () => {
-    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+  it('should render modal', async () => {
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+    });
 
     expect(wrapper.find(dataQa('add-alert-rule-modal')).exists()).toBeTruthy();
     expect(wrapper.find(dataQa('add-alert-rule-modal-form')).exists()).toBeTruthy();
@@ -60,28 +78,46 @@ describe('AddAlertRuleModal', () => {
   });
 
   it('does not render the modal when visible is set to false', async () => {
-    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible={false} />);
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible={false} />);
+    });
 
     expect(wrapper.find(dataQa('add-alert-rule-modal-form')).length).toBe(0);
   });
 
   it('renders the modal when visible is set to true', async () => {
-    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+    });
 
     expect(wrapper.find(dataQa('add-alert-rule-modal-form')).length).toBe(1);
   });
 
-  it('should have the submit button disabled by default when adding a new rule', () => {
-    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+  it('should have the submit button disabled by default when adding a new rule', async () => {
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+    });
     const button = wrapper.find(dataQa('add-alert-rule-modal-add-button')).find('button');
 
     expect(button.props().disabled).toBe(true);
   });
 
-  it('should enable the submit button if all fields are valid', () => {
-    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
+  it('should enable the submit button if all fields are valid', async () => {
+    let wrapper: ReactWrapper;
 
-    const thresholdInput = wrapper.find(dataQa('threshold-text-input'));
+    await act(async () => {
+      wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
+    });
+
+    wrapper.update();
+
+    const thresholdInput = wrapper.find(dataQa('threshold-number-input'));
     thresholdInput.simulate('change', {
       target: {
         value: '2',
@@ -92,9 +128,15 @@ describe('AddAlertRuleModal', () => {
     expect(button.props().disabled).toBe(false);
   });
 
-  it('should disable the submit button if a negative duration is inserted', () => {
-    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
-    const thresholdInput = wrapper.find(dataQa('threshold-text-input'));
+  it('should disable the submit button if a negative duration is inserted', async () => {
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
+    });
+
+    wrapper.update();
+    const thresholdInput = wrapper.find(dataQa('threshold-number-input'));
     const durationInput = wrapper.find(dataQa('duration-number-input'));
 
     thresholdInput.simulate('change', {
@@ -113,8 +155,14 @@ describe('AddAlertRuleModal', () => {
     expect(button.props().disabled).toBe(true);
   });
 
-  it('should disable template edition', () => {
-    const wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
+  it('should disable template edition', async () => {
+    let wrapper: ReactWrapper;
+
+    await act(async () => {
+      wrapper = mount(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />);
+    });
+    wrapper.update();
+
     expect(
       wrapper
         .find(dataQa('template-select-input'))

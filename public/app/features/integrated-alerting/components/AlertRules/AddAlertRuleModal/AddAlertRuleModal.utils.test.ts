@@ -1,10 +1,10 @@
+import { TemplateParamType, TemplateParamUnit } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { AddAlertRuleFormValues, Severity } from './AddAlertRuleModal.types';
 import {
   formatCreateAPIPayload,
   formatFilter,
   formatFilters,
   formatTemplateOptions,
-  formatThreshold,
   formatUpdateAPIPayload,
   formatEditFilter,
   formatEditFilters,
@@ -17,44 +17,6 @@ import {
 } from './AddAlertRuleModal.utils';
 
 describe('AddAlertRuleModal utils', () => {
-  test('formatThreshold', () => {
-    expect(formatThreshold('2.')).toEqual({
-      name: 'threshold',
-      float: 2,
-      type: 'FLOAT',
-    });
-
-    expect(formatThreshold('.2')).toEqual({
-      name: 'threshold',
-      float: 0.2,
-      type: 'FLOAT',
-    });
-
-    expect(formatThreshold('2.2')).toEqual({
-      name: 'threshold',
-      float: 2.2,
-      type: 'FLOAT',
-    });
-
-    expect(formatThreshold('2')).toEqual({
-      name: 'threshold',
-      float: 2,
-      type: 'FLOAT',
-    });
-
-    expect(formatThreshold('')).toEqual({
-      name: 'threshold',
-      string: '',
-      type: 'STRING',
-    });
-
-    expect(formatThreshold('true')).toEqual({
-      name: 'threshold',
-      bool: true,
-      type: 'BOOL',
-    });
-  });
-
   test('formatFilter', () => {
     expect(formatFilter('key=value')).toEqual({
       key: 'key',
@@ -136,9 +98,17 @@ describe('AddAlertRuleModal utils', () => {
     expect(formatTemplateOptions([])).toEqual([]);
     expect(
       formatTemplateOptions([
-        { summary: 'test summary 1', name: 'testsum1', source: 'SAAS', created_at: 'test', yaml: 'test' },
-        { summary: '', name: '', source: 'SAAS', created_at: 'test', yaml: 'test' },
-        { summary: '   ', name: 'test2', source: 'SAAS', created_at: 'test', yaml: 'test' },
+        {
+          summary: 'test summary 1',
+          name: 'testsum1',
+          source: 'SAAS',
+          created_at: 'test',
+          yaml: 'test',
+          params: [],
+          expr: '',
+        },
+        { summary: '', name: '', source: 'SAAS', created_at: 'test', yaml: 'test', params: [], expr: '' },
+        { summary: '   ', name: 'test2', source: 'SAAS', created_at: 'test', yaml: 'test', params: [], expr: '' },
       ])
     ).toEqual([
       {
@@ -169,9 +139,24 @@ describe('AddAlertRuleModal utils', () => {
       ],
       severity: { value: Severity.SEVERITY_CRITICAL, label: 'Critical' },
       template: { value: 'Test Template', label: 'Test Template' },
-      threshold: 'true',
+      threshold: 10,
     };
-    expect(formatCreateAPIPayload(inputData)).toEqual({
+    expect(
+      formatCreateAPIPayload(inputData, [
+        {
+          name: 'threshold',
+          type: TemplateParamType.FLOAT,
+          unit: TemplateParamUnit.PERCENTAGE,
+          summary: '',
+          float: {
+            has_default: true,
+            has_min: false,
+            has_max: false,
+            default: 10,
+          },
+        },
+      ])
+    ).toEqual({
       custom_labels: {},
       disabled: true,
       channel_ids: ['pagerDuty', 'email', 'slack'],
@@ -191,8 +176,8 @@ describe('AddAlertRuleModal utils', () => {
       params: [
         {
           name: 'threshold',
-          bool: true,
-          type: 'BOOL',
+          float: 10,
+          type: 'FLOAT',
         },
       ],
       severity: Severity.SEVERITY_CRITICAL,
@@ -214,9 +199,24 @@ describe('AddAlertRuleModal utils', () => {
       ],
       severity: { value: Severity.SEVERITY_CRITICAL, label: 'Critical' },
       template: { value: 'Test Template', label: 'Test Template' },
-      threshold: 'true',
+      threshold: 10,
     };
-    expect(formatUpdateAPIPayload('testId', inputData)).toEqual({
+    expect(
+      formatUpdateAPIPayload('testId', inputData, [
+        {
+          name: 'threshold',
+          type: TemplateParamType.FLOAT,
+          unit: TemplateParamUnit.PERCENTAGE,
+          summary: '',
+          float: {
+            has_default: true,
+            has_min: false,
+            has_max: false,
+            default: 10,
+          },
+        },
+      ])
+    ).toEqual({
       rule_id: 'testId',
       custom_labels: {},
       disabled: true,
@@ -237,8 +237,8 @@ describe('AddAlertRuleModal utils', () => {
       params: [
         {
           name: 'threshold',
-          bool: true,
-          type: 'BOOL',
+          float: 10,
+          type: 'FLOAT',
         },
       ],
       severity: Severity.SEVERITY_CRITICAL,
