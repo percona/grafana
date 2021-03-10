@@ -18,6 +18,7 @@ export const AlertRuleParamField: FC<AlertRuleParamFieldProps> = ({ param }) => 
   }
 
   // TODO add remaining params as API starts supporting them
+  // https://github.com/percona/pmm-managed/blob/PMM-2.0/models/template_model.go#L112
   const componentMap: Record<TemplateParamType, JSX.Element | null> = {
     [TemplateParamType.FLOAT]: (
       <NumberInputField

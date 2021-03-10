@@ -17,6 +17,7 @@ export const formatTemplates = (templates: Template[]): FormattedTemplate[] => t
 export const beautifyUnit = (unit: TemplateParamUnit) => {
   const unitMap: Record<TemplateParamUnit, string> = {
     [TemplateParamUnit.PERCENTAGE]: '%',
+    [TemplateParamUnit.SECONDS]: 'seconds',
   };
 
   return unitMap[unit];

@@ -9,10 +9,10 @@ export const AlertRulesParamsDetails: FC<AlertRulesParamsDetailsProps> = ({ para
   return (
     <>
       {params.map(param => (
-        <div data-qa="alert-rule-params">
+        <div data-qa="alert-rule-params" className={styles.paramWrapper}>
           <span className={styles.paramLabel}>{`${param.name}:`}</span>
           <span>
-            {param.value}
+            {`${param.value} `}
             {beautifyUnit(param.unit)}
           </span>
         </div>
