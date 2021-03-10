@@ -11,7 +11,7 @@ import {
   AlertRulesListResponseChannel,
 } from '../AlertRules.types';
 import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
-import { Template } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
+import { Template, TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { SelectableValue } from '@grafana/data';
 import { Messages } from './AddAlertRuleModal.messages';
 
@@ -62,42 +62,11 @@ export const formatFilters = (filters: string): AlertRulesListPayloadFilter[] =>
   return filterList.map(formatFilter);
 };
 
-export const formatBooleanThreshold = (value: string): AlertRulesListResponseParam => {
-  return {
-    name: 'threshold',
-    type: 'BOOL',
-    bool: value.toLowerCase() === 'true',
-  };
-};
-
-export const formatFloatThreshold = (value: string): AlertRulesListResponseParam => {
-  return {
-    name: 'threshold',
-    type: 'FLOAT',
-    float: parseFloat(value),
-  };
-};
-
-export const formatStringThreshold = (value: string): AlertRulesListResponseParam => {
-  return {
-    name: 'threshold',
-    type: 'STRING',
-    string: value,
-  };
-};
-
-export const formatThreshold = (value: string): AlertRulesListResponseParam => {
-  if (/^true|false$/i.test(value)) {
-    return formatBooleanThreshold(value);
-  } else if (/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(value)) {
-    return formatFloatThreshold(value);
-  } else {
-    return formatStringThreshold(value);
-  }
-};
-
-export const formatCreateAPIPayload = (data: AddAlertRuleFormValues): AlertRuleCreatePayload => {
-  const { enabled, duration, filters, name, notificationChannels, severity, template, threshold } = data;
+export const formatCreateAPIPayload = (
+  data: AddAlertRuleFormValues,
+  params: TemplateParam[] = []
+): AlertRuleCreatePayload => {
+  const { enabled, duration, filters, name, notificationChannels, severity, template } = data;
 
   const payload: AlertRuleCreatePayload = {
     custom_labels: {},
@@ -108,19 +77,30 @@ export const formatCreateAPIPayload = (data: AddAlertRuleFormValues): AlertRuleC
     severity: severity.value,
     template_name: template.value,
     summary: name,
+    params: [],
   };
 
-  const trimmedThreshold = threshold?.trim();
-
-  if (trimmedThreshold) {
-    payload.params = [formatThreshold(trimmedThreshold)];
-  }
+  params.forEach(param => {
+    if (data.hasOwnProperty(param.name)) {
+      const { name, type } = param;
+      const value = data[param.name];
+      payload.params?.push({
+        name,
+        type,
+        [type.toLowerCase()]: value,
+      });
+    }
+  });
 
   return payload;
 };
 
-export const formatUpdateAPIPayload = (ruleId: string, data: AddAlertRuleFormValues): AlertRuleUpdatePayload => {
-  const payload = formatCreateAPIPayload(data);
+export const formatUpdateAPIPayload = (
+  ruleId: string,
+  data: AddAlertRuleFormValues,
+  params: TemplateParam[] = []
+): AlertRuleUpdatePayload => {
+  const payload = formatCreateAPIPayload(data, params);
 
   return {
     ...payload,
@@ -134,7 +114,7 @@ export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string =>
   return `${key}${AlertRuleFilterType[type]}${value}`;
 };
 
-export const formatEditFilters = (filters: AlertRulesListPayloadFilter[]): string => {
+export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): string => {
   return filters ? filters.map(formatEditFilter).join(', ') : '';
 };
 
@@ -180,8 +160,7 @@ export const getInitialValues = (alertRule?: AlertRule | null): AddAlertRuleForm
   }
 
   const { channels, disabled, filters, for: duration, template, severity, summary, params } = alertRule.rawValues;
-
-  return {
+  const result: AddAlertRuleFormValues = {
     enabled: !disabled,
     duration: parseInt(duration, 10),
     filters: formatEditFilters(filters),
@@ -189,8 +168,19 @@ export const getInitialValues = (alertRule?: AlertRule | null): AddAlertRuleForm
     notificationChannels: formatEditNotificationChannels(channels),
     severity: formatEditSeverity(severity),
     template: formatEditTemplate(template),
-    threshold: formatEditThreshold(params),
   };
+
+  params?.forEach(param => {
+    const { float, type } = param;
+    const typeMap: Record<AlertRuleParamType, any> = {
+      [AlertRuleParamType.FLOAT]: float,
+      [AlertRuleParamType.BOOL]: undefined,
+      [AlertRuleParamType.STRING]: undefined,
+      [AlertRuleParamType.PARAM_TYPE_INVALID]: undefined,
+    };
+    result[param.name] = typeMap[type.toLowerCase() as AlertRuleParamType];
+  });
+  return result;
 };
 
 export const minValidator = (min: number) => (value: any): undefined | string =>

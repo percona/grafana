@@ -14,7 +14,7 @@ export const AlertRuleParamField: FC<AlertRuleParamFieldProps> = ({ param }) => 
   }
 
   if (float?.has_max) {
-    floatValidators.push(maxValidator(float.max));
+    floatValidators.push(maxValidator(float.max || 0));
   }
 
   // TODO add remaining params as API starts supporting them
@@ -23,7 +23,7 @@ export const AlertRuleParamField: FC<AlertRuleParamFieldProps> = ({ param }) => 
       <NumberInputField
         name={name}
         label={Messages.getFloatDescription(name, summary, unit, float)}
-        defaultValue={float?.default}
+        initialValue={float?.default}
         validators={floatValidators}
       />
     ),

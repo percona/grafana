@@ -1,3 +1,5 @@
+import { TemplateParam } from '../AlertRuleTemplate/AlertRuleTemplate.types';
+
 export interface AlertRulesContext {
   selectedRuleDetails?: AlertRule | null;
   getAlertRules: () => void;
@@ -15,25 +17,10 @@ export enum AlertRulesListPayloadTemplateParamUnits {
   PERCENTAGE = '%',
 }
 
-export interface AlertRulesListPayloadTemplateParam {
-  [AlertRuleParamType.BOOL]?: {
-    default: boolean;
-  };
-  [AlertRuleParamType.FLOAT]?: {
-    default: number;
-  };
-  [AlertRuleParamType.STRING]?: {
-    default: string;
-  };
-  name: string;
-  unit?: keyof typeof AlertRulesListPayloadTemplateParamUnits;
-  type: keyof typeof AlertRuleParamType;
-}
-
 export interface AlertRulesListPayloadTemplate {
   name: string;
   summary: string;
-  params: AlertRulesListPayloadTemplateParam[];
+  params: TemplateParam[];
   yaml?: string;
 }
 
@@ -53,7 +40,6 @@ export interface AlertRule {
   lastNotified: string;
   severity: AlertRuleSeverity[keyof AlertRuleSeverity];
   summary: string;
-  threshold: string;
   rawValues: AlertRulesListResponseRule;
   expr: string;
 }

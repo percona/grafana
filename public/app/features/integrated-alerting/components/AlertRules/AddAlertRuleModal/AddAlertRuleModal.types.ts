@@ -17,10 +17,10 @@ export enum Severity {
 export interface AddAlertRuleFormValues {
   template: SelectableValue<string>;
   name: string;
-  threshold: string | null;
   duration: number;
   filters: string;
   notificationChannels: Array<SelectableValue<string>>;
   severity: SelectableValue<Severity>;
   enabled: boolean;
+  [field: string]: any;
 }

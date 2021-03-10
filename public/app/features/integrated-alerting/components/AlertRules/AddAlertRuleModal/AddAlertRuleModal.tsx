@@ -44,6 +44,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const { getAlertRules } = useContext(AlertRulesProvider);
 
+  const updateAlertRuleTemplateParams = () => {
+    setCurrentTemplate(templates.current.find(template => template.name === alertRule?.rawValues.template.name));
+  };
+
   const getData = async () => {
     try {
       const [channelsListResponse, templatesListResponse] = await Promise.all([
@@ -58,6 +62,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       setChannelsOptions(formatChannelsOptions(channelsListResponse.channels));
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
       templates.current = templatesListResponse.templates;
+      updateAlertRuleTemplateParams();
     } catch (e) {
       logger.error(e);
     }
@@ -67,14 +72,19 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
     getData();
   }, []);
 
-  const initialValues = getInitialValues(alertRule);
+  useEffect(() => {
+    updateAlertRuleTemplateParams();
+  }, [alertRule]);
 
+  const initialValues = getInitialValues(alertRule);
   const onSubmit = async (values: AddAlertRuleFormValues) => {
     try {
       if (alertRule) {
-        await AlertRulesService.update(formatUpdateAPIPayload(alertRule.rawValues.rule_id, values));
+        await AlertRulesService.update(
+          formatUpdateAPIPayload(alertRule.rawValues.rule_id, values, currentTemplate?.params)
+        );
       } else {
-        await AlertRulesService.create(formatCreateAPIPayload(values));
+        await AlertRulesService.create(formatCreateAPIPayload(values, currentTemplate?.params));
       }
       setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [alertRule ? Messages.updateSuccess : Messages.createSuccess]);
@@ -86,6 +96,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
   const handleClose = () => {
     setVisible(false);
+    setCurrentTemplate(undefined);
   };
 
   const handleTemplateChange = (name = '') => {

@@ -33,12 +33,12 @@ export enum TemplateParamUnit {
 }
 
 export interface TemplateFloatParam {
-  default: number;
   has_default: boolean;
   has_min: boolean;
   has_max: boolean;
-  min: number;
-  max: number;
+  default?: number;
+  min?: number;
+  max?: number;
 }
 
 export interface TemplateParam {
@@ -56,6 +56,7 @@ export interface Template {
   created_at: string | undefined;
   yaml: string;
   params: TemplateParam[];
+  expr: string;
 }
 
 export interface FormattedTemplate {
