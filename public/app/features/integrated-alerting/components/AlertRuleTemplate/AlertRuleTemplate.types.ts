@@ -58,7 +58,7 @@ export interface Template {
   source: keyof typeof SourceDescription;
   created_at: string | undefined;
   yaml: string;
-  params: TemplateParam[];
+  params?: TemplateParam[];
   expr: string;
 }
 

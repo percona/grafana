@@ -140,7 +140,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <TextInputField label={Messages.nameField} name="name" validators={nameValidators} />
 
             {currentTemplate &&
-              currentTemplate.params.map(param => <AlertRuleParamField key={param.name} param={param} />)}
+              currentTemplate.params?.map(param => <AlertRuleParamField key={param.name} param={param} />)}
 
             <NumberInputField label={Messages.durationField} name="duration" validators={durationValidators} />
 
