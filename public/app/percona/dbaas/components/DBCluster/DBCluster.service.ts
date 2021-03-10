@@ -8,6 +8,7 @@ import {
   DBClusterLogsAPI,
   DBClusterAllocatedResources,
   DBClusterAllocatedResourcesAPI,
+  DBClusterExpectedResources,
 } from './DBCluster.types';
 
 export abstract class DBClusterService {
@@ -26,6 +27,8 @@ export abstract class DBClusterService {
   abstract getDBClusterCredentials(dbCluster: DBCluster): Promise<void | DBClusterConnectionAPI>;
 
   abstract restartDBCluster(dbCluster: DBCluster): Promise<void>;
+
+  abstract getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources>;
 
   abstract toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster;
 

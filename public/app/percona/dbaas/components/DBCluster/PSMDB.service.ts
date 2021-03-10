@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import { omit, pick } from 'lodash';
 import { Databases } from 'app/percona/shared/core';
 import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
@@ -6,6 +6,8 @@ import {
   DBCluster,
   DBClusterActionAPI,
   DBClusterConnectionAPI,
+  DBClusterExpectedResources,
+  DBClusterExpectedResourcesAPI,
   DBClusterPayload,
   DBClusterStatus,
 } from './DBCluster.types';
@@ -64,6 +66,18 @@ export class PSMDBService extends DBClusterService {
       '/DBaaS/PSMDBCluster/Restart',
       omit(toAPI(dbCluster), ['params'])
     );
+  }
+
+  getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources> {
+    return apiManagement
+      .post<any, Partial<DBClusterPayload>>('/DBaaS/PSMDBCluster/Resources/Get', pick(toAPI(dbCluster), ['params']))
+      .then((response: DBClusterExpectedResourcesAPI) => ({
+        expected: {
+          cpu: response.expected.cpu_m / 1000,
+          memory: response.expected.memory_bytes / 10 ** 9,
+          disk: response.expected.disk_size / 10 ** 9,
+        },
+      }));
   }
 
   toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster {

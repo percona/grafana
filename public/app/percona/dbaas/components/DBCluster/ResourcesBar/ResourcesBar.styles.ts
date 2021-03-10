@@ -32,6 +32,7 @@ export const getStyles = ({ colors, palette, spacing, typography }: GrafanaTheme
     align-items: center;
     display: flex;
     margin-top: ${spacing.xs};
+    max-height: 18px;
   `,
   captionSquare: css`
     width: 10px;
