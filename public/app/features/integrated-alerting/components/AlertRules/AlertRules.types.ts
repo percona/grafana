@@ -41,8 +41,11 @@ export interface AlertRule {
   severity: AlertRuleSeverity[keyof AlertRuleSeverity];
   summary: string;
   rawValues: AlertRulesListResponseRule;
+  params: AlertRulesParsedParam[];
   expr: string;
 }
+
+export type AlertRulesParsedParam = TemplateParam & { value: string | boolean | number };
 
 export interface AlertRulesListPayloadFilter {
   key: string;
@@ -57,11 +60,11 @@ export enum AlertRuleParamType {
 }
 
 export interface AlertRulesListResponseParam {
+  name: string;
+  type: keyof typeof AlertRuleParamType;
   [AlertRuleParamType.BOOL]?: boolean;
   [AlertRuleParamType.FLOAT]?: number;
-  name: string;
   [AlertRuleParamType.STRING]?: string;
-  type: keyof typeof AlertRuleParamType;
 }
 
 export interface AlertRulesListResponseChannel {

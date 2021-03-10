@@ -5,6 +5,7 @@ import {
   AlertRuleSeverity,
   AlertRulesListPayloadFilter,
   AlertRulesListResponseRule,
+  AlertRulesParsedParam,
 } from './AlertRules.types';
 
 export const formatFilter = (filter: AlertRulesListPayloadFilter): string => {
@@ -27,7 +28,32 @@ export const formatDuration = (duration: string): string => {
 };
 
 export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
-  const { rule_id, created_at, disabled, filters, for: duration, last_notified, severity, summary, expr } = rule;
+  const {
+    rule_id,
+    created_at,
+    disabled,
+    filters,
+    for: duration,
+    last_notified,
+    severity,
+    summary,
+    expr,
+    template,
+    params = [],
+  } = rule;
+  const { params: templateParams } = template;
+  const resultParams: AlertRulesParsedParam[] = [];
+
+  params.forEach(({ name, type, ...rest }) => {
+    const matchingTemplateParam = templateParams.find(param => param.name === name);
+
+    if (matchingTemplateParam) {
+      resultParams.push({
+        ...matchingTemplateParam,
+        value: Object.values(rest).find(value => value !== undefined),
+      });
+    }
+  });
 
   return {
     ruleId: rule_id,
@@ -39,6 +65,7 @@ export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
     summary,
     lastNotified: last_notified ? moment(last_notified).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
     rawValues: rule,
+    params: resultParams,
     expr,
   };
 };
