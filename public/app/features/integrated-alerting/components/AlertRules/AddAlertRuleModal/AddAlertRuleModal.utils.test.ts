@@ -13,6 +13,7 @@ import {
   formatEditNotificationChannel,
   formatEditNotificationChannels,
   minValidator,
+  maxValidator,
 } from './AddAlertRuleModal.utils';
 
 describe('AddAlertRuleModal utils', () => {
@@ -364,5 +365,20 @@ describe('AddAlertRuleModal utils', () => {
     expect(minValidator(1)(Infinity)).toBeUndefined();
     expect(minValidator(Number.MAX_VALUE)(1)).not.toBeUndefined();
     expect(minValidator(1)(Number.MAX_VALUE)).toBeUndefined();
+  });
+
+  test('maximum validator', () => {
+    expect(maxValidator(1)(-1)).toBeUndefined();
+    expect(maxValidator(1)(0)).toBeUndefined();
+    expect(maxValidator(0)(0)).toBeUndefined();
+    expect(maxValidator(0.2)(0.25)).not.toBeUndefined();
+    expect(maxValidator(0.99)(0.991)).not.toBeUndefined();
+    expect(maxValidator(1)(1)).toBeUndefined();
+    expect(maxValidator(1)(100)).not.toBeUndefined();
+    expect(maxValidator(-1)(1)).not.toBeUndefined();
+    expect(maxValidator(Infinity)(1)).toBeUndefined();
+    expect(maxValidator(1)(Infinity)).not.toBeUndefined();
+    expect(maxValidator(Number.MAX_VALUE)(1)).toBeUndefined();
+    expect(maxValidator(1)(Number.MAX_VALUE)).not.toBeUndefined();
   });
 });
