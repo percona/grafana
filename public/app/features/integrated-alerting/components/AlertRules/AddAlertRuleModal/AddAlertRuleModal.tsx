@@ -114,7 +114,16 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       <Form
         initialValues={initialValues}
         onSubmit={onSubmit}
-        render={({ handleSubmit, valid, pristine, submitting, values }) => (
+        mutators={{
+          changeSeverity: ([templateName], state, tools) => {
+            const newSeverity = templates.current.find(template => template.name === templateName)?.severity;
+            // TODO since editing the template name is not allowed so far, no need to keep previous option.
+            // When edition is allowed, the function param below can take the old value as argument, thus we can keep the selection
+            // before changing it, e.g. "(oldSeverity) => oldSeverity | newSeverity"
+            tools.changeValue(state, 'severity', () => newSeverity);
+          },
+        }}
+        render={({ handleSubmit, valid, pristine, submitting, form }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
             <Field name="template" validate={required}>
               {({ input }) => (
@@ -129,6 +138,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                     {...input}
                     onChange={name => {
                       input.onChange(name);
+                      form.mutators.changeSeverity(name.value);
                       handleTemplateChange(name.value);
                     }}
                     data-qa="template-select-input"

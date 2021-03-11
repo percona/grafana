@@ -11,6 +11,13 @@ export interface DeleteAlertRuleTemplatePayload {
   name: string;
 }
 
+export enum Severity {
+  SEVERITY_CRITICAL = 'SEVERITY_CRITICAL',
+  SEVERITY_ERROR = 'SEVERITY_ERROR',
+  SEVERITY_WARNING = 'SEVERITY_WARNING',
+  SEVERITY_NOTICE = 'SEVERITY_NOTICE',
+}
+
 export interface TemplatesList {
   templates: Template[];
 }
@@ -65,6 +72,7 @@ export interface Template {
   params?: TemplateParam[];
   expr: string;
   annotations?: TemplateAnnotation;
+  severity: Severity;
 }
 
 export interface FormattedTemplate {

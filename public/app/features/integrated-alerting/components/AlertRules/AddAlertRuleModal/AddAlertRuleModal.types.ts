@@ -1,4 +1,5 @@
 import { SelectableValue } from '@grafana/data';
+import { Severity } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { AlertRule } from '../AlertRules.types';
 
 export interface AddAlertRuleModalProps {
@@ -6,14 +7,6 @@ export interface AddAlertRuleModalProps {
   setVisible: (value: boolean) => void;
   alertRule?: AlertRule | null;
 }
-
-export enum Severity {
-  SEVERITY_CRITICAL = 'SEVERITY_CRITICAL',
-  SEVERITY_ERROR = 'SEVERITY_ERROR',
-  SEVERITY_WARNING = 'SEVERITY_WARNING',
-  SEVERITY_NOTICE = 'SEVERITY_NOTICE',
-}
-
 export interface AddAlertRuleFormValues {
   template: SelectableValue<string>;
   name: string;

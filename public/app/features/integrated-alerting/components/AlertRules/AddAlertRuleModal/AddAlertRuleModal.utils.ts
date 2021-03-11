@@ -1,4 +1,4 @@
-import { AddAlertRuleFormValues, Severity } from './AddAlertRuleModal.types';
+import { AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import {
   AlertRule,
   AlertRuleParamType,
@@ -10,7 +10,7 @@ import {
   AlertRulesListResponseChannel,
 } from '../AlertRules.types';
 import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
-import { Template, TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
+import { Severity, Template, TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { SelectableValue } from '@grafana/data';
 import { Messages } from './AddAlertRuleModal.messages';
 
