@@ -1,4 +1,10 @@
-import { FormattedTemplate, Template, TemplateParamType, TemplateParamUnit } from '../AlertRuleTemplate.types';
+import {
+  FormattedTemplate,
+  Severity,
+  Template,
+  TemplateParamType,
+  TemplateParamUnit,
+} from '../AlertRuleTemplate.types';
 import { formatTemplates } from '../AlertRuleTemplate.utils';
 
 export const templateStubs: Template[] = [
@@ -8,8 +14,26 @@ export const templateStubs: Template[] = [
     source: 'BUILT_IN',
     summary: 'MySQL database down',
     yaml: 'yaml file content',
-    params: [],
-    expr: '',
+    params: [
+      {
+        name: 'template-1-threshold',
+        type: TemplateParamType.FLOAT,
+        unit: TemplateParamUnit.PERCENTAGE,
+        summary: 'a threshold',
+        float: {
+          has_default: true,
+          has_min: false,
+          has_max: false,
+          default: 12,
+        },
+      },
+    ],
+    expr: 'template_1_expression',
+    severity: Severity.SEVERITY_CRITICAL,
+    for: '10s',
+    annotations: {
+      summary: 'template_1_alert_sample',
+    },
   },
   {
     name: 'template_2',
@@ -19,6 +43,8 @@ export const templateStubs: Template[] = [
     yaml: 'yaml file content',
     params: [],
     expr: '',
+    severity: Severity.SEVERITY_NOTICE,
+    for: '300s',
   },
   {
     name: 'template_3',
@@ -28,24 +54,40 @@ export const templateStubs: Template[] = [
     yaml: 'yaml file content',
     params: [],
     expr: '',
+    severity: Severity.SEVERITY_WARNING,
+    for: '15s',
   },
   {
-    name: 'pmm_mongodb_connections_memory_usage',
+    name: 'template_4',
     created_at: '2020-11-25T16:53:39.366Z',
     source: 'USER_FILE',
     summary: 'Template',
     yaml: 'yaml file content',
+    severity: Severity.SEVERITY_NOTICE,
+    for: '20s',
     params: [
       {
-        name: 'threshold',
+        name: 'template-4-from',
         type: TemplateParamType.FLOAT,
         unit: TemplateParamUnit.PERCENTAGE,
-        summary: '',
+        summary: 'a minimum threshold',
         float: {
           has_default: true,
           has_min: false,
           has_max: false,
           default: 10,
+        },
+      },
+      {
+        name: 'template-4-to',
+        type: TemplateParamType.FLOAT,
+        unit: TemplateParamUnit.PERCENTAGE,
+        summary: 'a maximum threshold',
+        float: {
+          has_default: true,
+          has_min: false,
+          has_max: false,
+          default: 50,
         },
       },
     ],
