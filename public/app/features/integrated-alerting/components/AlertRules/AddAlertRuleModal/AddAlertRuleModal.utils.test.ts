@@ -1,5 +1,5 @@
-import { TemplateParamType, TemplateParamUnit } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
-import { AddAlertRuleFormValues, Severity } from './AddAlertRuleModal.types';
+import { Severity, TemplateParamType, TemplateParamUnit } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
+import { AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import {
   formatCreateAPIPayload,
   formatFilter,
@@ -105,9 +105,31 @@ describe('AddAlertRuleModal utils', () => {
           yaml: 'test',
           params: [],
           expr: '',
+          severity: Severity.SEVERITY_CRITICAL,
+          for: '200s',
         },
-        { summary: '', name: '', source: 'SAAS', created_at: 'test', yaml: 'test', params: [], expr: '' },
-        { summary: '   ', name: 'test2', source: 'SAAS', created_at: 'test', yaml: 'test', params: [], expr: '' },
+        {
+          summary: '',
+          name: '',
+          source: 'SAAS',
+          created_at: 'test',
+          yaml: 'test',
+          params: [],
+          expr: '',
+          severity: Severity.SEVERITY_ERROR,
+          for: '100s',
+        },
+        {
+          summary: '   ',
+          name: 'test2',
+          source: 'SAAS',
+          created_at: 'test',
+          yaml: 'test',
+          params: [],
+          expr: '',
+          severity: Severity.SEVERITY_CRITICAL,
+          for: '150s',
+        },
       ])
     ).toEqual([
       {
