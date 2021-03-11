@@ -116,11 +116,15 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
         onSubmit={onSubmit}
         mutators={{
           changeSeverity: ([templateName], state, tools) => {
-            const newSeverity = templates.current.find(template => template.name === templateName)?.severity;
-            // TODO since editing the template name is not allowed so far, no need to keep previous option.
-            // When edition is allowed, the function param below can take the old value as argument, thus we can keep the selection
-            // before changing it, e.g. "(oldSeverity) => oldSeverity | newSeverity"
-            tools.changeValue(state, 'severity', () => newSeverity);
+            const severityStr = templates.current.find(template => template.name === templateName)?.severity;
+            const newSeverity = SEVERITY_OPTIONS.find(severity => severity.value === severityStr);
+
+            if (newSeverity) {
+              // TODO since editing the template name is not allowed so far, no need to keep previous option.
+              // When edition is allowed, the function param below can take the old value as argument, thus we can keep the selection
+              // before changing it, e.g. "(oldSeverity) => oldSeverity | newSeverity"
+              tools.changeValue(state, 'severity', () => newSeverity);
+            }
           },
           changeDuration: ([templateName], state, tools) => {
             const newDuration = templates.current.find(template => template.name === templateName)?.for;
