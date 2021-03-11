@@ -202,6 +202,7 @@ export const Advanced: FC<AdvancedProps> = ({
               <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
                 <div className={settingsStyles.labelWrapper} data-qa="check-intervals-label">
                   <span>{sttCheckIntervalsLabel}</span>
+                  <LinkTooltip tooltipText={sttCheckIntervalTooltip} icon="info-circle" />
                 </div>
               </div>
             </div>
@@ -210,7 +211,6 @@ export const Advanced: FC<AdvancedProps> = ({
                 <div className={cx(styles.advancedCol, styles.advancedChildCol)}>
                   <div className={settingsStyles.labelWrapper} data-qa={`check-interval-${name}-label`}>
                     <span>{label}</span>
-                    <LinkTooltip tooltipText={sttCheckIntervalTooltip} icon="info-circle" />
                   </div>
                 </div>
                 <div className={styles.inputWrapper}>
