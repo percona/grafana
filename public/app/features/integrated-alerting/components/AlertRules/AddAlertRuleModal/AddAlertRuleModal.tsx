@@ -122,6 +122,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             // before changing it, e.g. "(oldSeverity) => oldSeverity | newSeverity"
             tools.changeValue(state, 'severity', () => newSeverity);
           },
+          changeDuration: ([templateName], state, tools) => {
+            const newDuration = templates.current.find(template => template.name === templateName)?.for;
+            tools.changeValue(state, 'duration', () => (newDuration ? parseInt(newDuration, 10) : undefined));
+          },
         }}
         render={({ handleSubmit, valid, pristine, submitting, form }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
@@ -139,6 +143,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                     onChange={name => {
                       input.onChange(name);
                       form.mutators.changeSeverity(name.value);
+                      form.mutators.changeDuration(name.value);
                       handleTemplateChange(name.value);
                     }}
                     data-qa="template-select-input"
@@ -190,13 +195,13 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
             {currentTemplate && (
               <>
-                <div>
-                  <label className={styles.label}>Template Expression</label>
+                <div data-qa="template-expression" className={styles.templateParsedField}>
+                  <label className={styles.label}>{Messages.templateExpression}</label>
                   <pre>{currentTemplate.expr}</pre>
                 </div>
                 {currentTemplate.annotations?.summary && (
-                  <div>
-                    <label className={styles.label}>Rule Alert</label>
+                  <div data-qa="template-alert" className={styles.templateParsedField}>
+                    <label className={styles.label}>{Messages.ruleAlert}</label>
                     <pre>{currentTemplate.annotations?.summary}</pre>
                   </div>
                 )}

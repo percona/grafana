@@ -73,6 +73,7 @@ export interface Template {
   expr: string;
   annotations?: TemplateAnnotation;
   severity: Severity;
+  for: string;
 }
 
 export interface FormattedTemplate {
