@@ -2,12 +2,7 @@ import { TemplateFloatParam, TemplateParamUnit } from '../../AlertRuleTemplate/A
 import { beautifyUnit } from '../../AlertRuleTemplate/AlertRuleTemplate.utils';
 
 export const Messages = {
-  getFloatDescription: (
-    name: string,
-    summary: string,
-    unit: TemplateParamUnit,
-    float: TemplateFloatParam | undefined
-  ) => {
+  getFloatDescription: (name: string, summary: string, unit: TemplateParamUnit, float?: TemplateFloatParam) => {
     if (!float) {
       return '';
     }
