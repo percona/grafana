@@ -42,14 +42,14 @@ export enum SourceDescription {
   USER_API = 'User-defined (UI)',
 }
 
-// https://github.com/percona/pmm-managed/blob/ec05154dbe2ae131a56d870bff5764e2193349fb/vendor/github.com/percona-platform/saas/pkg/alert/type.go
+// https://github.com/percona-platform/saas/blob/main/pkg/alert/type.go
 export enum TemplateParamType {
   FLOAT = 'FLOAT',
   BOOL = 'BOOL',
   STRING = 'STRING',
 }
 
-// https://github.com/percona/pmm-managed/blob/ec05154dbe2ae131a56d870bff5764e2193349fb/vendor/github.com/percona-platform/saas/pkg/alert/unit.go
+// https://github.com/percona-platform/saas/blob/main/pkg/alert/unit.go
 export enum TemplateParamUnit {
   PERCENTAGE = 'PERCENTAGE',
   SECONDS = 'SECONDS',
