@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { api } from 'app/percona/shared/helpers/api';
 import { Backup, BackupResponse } from './BackupInventory.types';
 
