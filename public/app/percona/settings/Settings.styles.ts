@@ -15,7 +15,6 @@ export const getSettingsStyles = stylesFactory((theme: GrafanaTheme) => {
     settingsWrapper: css`
       display: flex;
       flex-wrap: wrap;
-      margin: ${spacing.lg};
       ${mq} {
         flex-direction: column;
       }

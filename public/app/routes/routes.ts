@@ -589,6 +589,14 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
           SafeDynamicImport(import(/* webpackChunkName: "SettingsPage" */ 'app/percona/settings/Settings')),
       },
     })
+    .when('/settings/:tab', {
+      template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () =>
+          SafeDynamicImport(import(/* webpackChunkName: "SettingsPage" */ 'app/percona/settings/Settings')),
+      },
+    })
     .when('/inventory', {
       template: '<react-container />',
       resolve: {
