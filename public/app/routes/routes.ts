@@ -604,6 +604,14 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
           SafeDynamicImport(import(/* webpackChunkName: "InventoryPage" */ 'app/percona/inventory/Inventory')),
       },
     })
+    .when('/inventory/:tab', {
+      template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () =>
+          SafeDynamicImport(import(/* webpackChunkName: "InventoryPage" */ 'app/percona/inventory/Inventory')),
+      },
+    })
     .when('/add-instance', {
       template: '<react-container />',
       resolve: {

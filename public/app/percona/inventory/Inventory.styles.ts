@@ -13,7 +13,6 @@ export const inventoryWrapper = css`
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 20px;
   width: 100%;
 `;
 
