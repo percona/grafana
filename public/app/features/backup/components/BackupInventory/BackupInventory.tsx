@@ -9,9 +9,10 @@ import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
+import { BackupInventoryActions } from './BackupInventoryActions';
 
 const { columns, noData } = Messages;
-const { name, created, location, vendor, status } = columns;
+const { name, created, location, vendor, status, actions } = columns;
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
@@ -44,9 +45,17 @@ export const BackupInventory: FC = () => {
         accessor: 'status',
         Cell: ({ value }) => <Status status={value} />,
       },
+      {
+        Header: actions,
+        accessor: 'id',
+        Cell: ({ row }) => <BackupInventoryActions onRestore={onRestoreClick} backup={row.original as Backup} />,
+        width: '80px',
+      },
     ],
     []
   );
+
+  const onRestoreClick = () => {};
 
   const getData = async () => {
     setPending(true);

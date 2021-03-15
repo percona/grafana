@@ -6,6 +6,7 @@ export const Messages = {
     location: 'Location',
     vendor: 'Vendor',
     status: 'Status',
+    actions: 'Actions',
   },
   status: {
     invalid: 'Invalid',
