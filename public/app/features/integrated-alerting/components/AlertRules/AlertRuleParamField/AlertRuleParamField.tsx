@@ -9,11 +9,11 @@ export const AlertRuleParamField: FC<AlertRuleParamFieldProps> = ({ param }) => 
   const { name, type, unit, summary, float } = param;
   const floatValidators: any[] = [validators.required];
 
-  if (float?.has_min) {
+  if (float?.hasMin) {
     floatValidators.push(minValidator(float.min || 0));
   }
 
-  if (float?.has_max) {
+  if (float?.hasMax) {
     floatValidators.push(maxValidator(float.max || 0));
   }
 

@@ -11,9 +11,9 @@ describe('AlertRuleParamField', () => {
     unit: TemplateParamUnit.SECONDS,
     summary: 'float param',
     float: {
-      has_default: true,
-      has_min: true,
-      has_max: false,
+      hasDefault: true,
+      hasMin: true,
+      hasMax: false,
     },
   };
 

@@ -7,44 +7,44 @@ describe('AlertRuleParamField::Messages', () => {
     expect(getFloatDescription('threshold', 'a threshold', TemplateParamUnit.SECONDS)).toBe('');
     expect(
       getFloatDescription('threshold', 'a threshold', TemplateParamUnit.SECONDS, {
-        has_default: false,
-        has_min: true,
-        has_max: true,
+        hasDefault: false,
+        hasMin: true,
+        hasMax: true,
         min: 10,
         max: 20,
       })
     ).toBe('Threshold - a threshold (seconds, min: 10, max: 20)');
     expect(
       getFloatDescription('just some param', 'a param', TemplateParamUnit.PERCENTAGE, {
-        has_default: false,
-        has_min: false,
-        has_max: true,
+        hasDefault: false,
+        hasMin: false,
+        hasMax: true,
         min: 10,
         max: 20,
       })
     ).toBe('Just Some Param - a param (%, max: 20)');
     expect(
       getFloatDescription('threshold', 'a threshold', TemplateParamUnit.SECONDS, {
-        has_default: false,
-        has_min: true,
-        has_max: false,
+        hasDefault: false,
+        hasMin: true,
+        hasMax: false,
         min: 10,
         max: 20,
       })
     ).toBe('Threshold - a threshold (seconds, min: 10)');
     expect(
       getFloatDescription('threshold', 'a threshold', TemplateParamUnit.SECONDS, {
-        has_default: false,
-        has_min: true,
-        has_max: true,
+        hasDefault: false,
+        hasMin: true,
+        hasMax: true,
         max: 10,
       })
     ).toBe('Threshold - a threshold (seconds, min: 0, max: 10)');
     expect(
       getFloatDescription('threshold', 'a threshold', TemplateParamUnit.PERCENTAGE, {
-        has_default: false,
-        has_min: false,
-        has_max: false,
+        hasDefault: false,
+        hasMin: false,
+        hasMax: false,
       })
     ).toBe('Threshold - a threshold (%)');
   });

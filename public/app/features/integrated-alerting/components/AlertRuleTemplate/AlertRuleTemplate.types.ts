@@ -30,6 +30,11 @@ interface AlertRuleTemplatesTotals {
   total_pages: number;
 }
 
+export interface TemplatesListAPI {
+  templates: TemplateAPI[];
+  totals: AlertRuleTemplatesTotals;
+}
+
 export interface TemplatesList {
   templates: Template[];
   totals: AlertRuleTemplatesTotals;
@@ -55,7 +60,7 @@ export enum TemplateParamUnit {
   SECONDS = 'SECONDS',
 }
 
-export interface TemplateFloatParam {
+export interface TemplateFloatParamAPI {
   has_default: boolean;
   has_min: boolean;
   has_max: boolean;
@@ -64,11 +69,21 @@ export interface TemplateFloatParam {
   max?: number;
 }
 
-export interface TemplateParam {
+export interface TemplateFloatParam extends Omit<TemplateFloatParamAPI, 'has_default' | 'has_min' | 'has_max'> {
+  hasDefault: boolean;
+  hasMin: boolean;
+  hasMax: boolean;
+}
+
+export interface TemplateParamAPI {
   name: string;
   type: TemplateParamType;
   unit: TemplateParamUnit;
   summary: string;
+  float?: TemplateFloatParamAPI;
+}
+
+export interface TemplateParam extends Omit<TemplateParamAPI, 'float'> {
   float?: TemplateFloatParam;
 }
 
@@ -76,17 +91,21 @@ export interface TemplateAnnotation {
   summary?: string;
 }
 
-export interface Template {
+export interface TemplateAPI {
   summary: string;
   name: string;
   source: keyof typeof SourceDescription;
   created_at: string | undefined;
   yaml: string;
-  params?: TemplateParam[];
+  params?: TemplateParamAPI[];
   expr: string;
   annotations?: TemplateAnnotation;
   severity: Severity;
   for: string;
+}
+
+export interface Template extends Omit<TemplateAPI, 'params'> {
+  params?: TemplateParam[];
 }
 
 export interface FormattedTemplate {

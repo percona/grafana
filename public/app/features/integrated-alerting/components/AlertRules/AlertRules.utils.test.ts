@@ -64,9 +64,9 @@ describe('AlertRulesTable utils', () => {
               unit: TemplateParamUnit.PERCENTAGE,
               summary: 'a threshold',
               float: {
-                has_default: true,
-                has_min: false,
-                has_max: false,
+                hasDefault: true,
+                hasMin: false,
+                hasMax: false,
                 default: 10,
               },
             },
@@ -83,9 +83,9 @@ describe('AlertRulesTable utils', () => {
           unit: TemplateParamUnit.PERCENTAGE,
           summary: 'a threshold',
           float: {
-            has_default: true,
-            has_min: false,
-            has_max: false,
+            hasDefault: true,
+            hasMin: false,
+            hasMax: false,
             default: 10,
           },
           value: 15,
@@ -151,9 +151,9 @@ describe('AlertRulesTable utils', () => {
           params: [
             {
               float: {
-                has_default: true,
-                has_min: false,
-                has_max: false,
+                hasDefault: true,
+                hasMin: false,
+                hasMax: false,
                 default: 75,
               },
               name: 'threshold',
@@ -174,9 +174,9 @@ describe('AlertRulesTable utils', () => {
           unit: TemplateParamUnit.PERCENTAGE,
           summary: 'a threshold',
           float: {
-            has_default: true,
-            has_min: false,
-            has_max: false,
+            hasDefault: true,
+            hasMin: false,
+            hasMax: false,
             default: 75,
           },
           value: 75,
@@ -242,9 +242,9 @@ describe('AlertRulesTable utils', () => {
             params: [
               {
                 float: {
-                  has_default: true,
-                  has_min: false,
-                  has_max: false,
+                  hasDefault: true,
+                  hasMin: false,
+                  hasMax: false,
                   default: 10,
                 },
                 name: 'threshold',
@@ -265,9 +265,9 @@ describe('AlertRulesTable utils', () => {
             unit: TemplateParamUnit.PERCENTAGE,
             summary: 'a threshold',
             float: {
-              has_default: true,
-              has_min: false,
-              has_max: false,
+              hasDefault: true,
+              hasMin: false,
+              hasMax: false,
               default: 10,
             },
             value: 15,
@@ -332,9 +332,9 @@ describe('AlertRulesTable utils', () => {
             params: [
               {
                 float: {
-                  has_default: true,
-                  has_min: false,
-                  has_max: false,
+                  hasDefault: true,
+                  hasMin: false,
+                  hasMax: false,
                   default: 75,
                 },
                 name: 'threshold',
@@ -355,9 +355,9 @@ describe('AlertRulesTable utils', () => {
             unit: TemplateParamUnit.PERCENTAGE,
             summary: 'a threshold',
             float: {
-              has_default: true,
-              has_min: false,
-              has_max: false,
+              hasDefault: true,
+              hasMin: false,
+              hasMax: false,
               default: 75,
             },
             value: 75,
