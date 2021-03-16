@@ -5,7 +5,7 @@ import { css } from 'emotion';
 
 export const getStyles = stylesFactory((theme: GrafanaTheme, status: Status) => {
   const isSuccess = status === Status.SUCCESS;
-  const isError = status === Status.ERROR;
+  const isError = status === Status.ERROR || status === Status.STATUS_INVALID;
 
   if (isSuccess || isError) {
     return {
