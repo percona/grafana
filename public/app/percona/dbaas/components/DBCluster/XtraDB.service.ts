@@ -13,6 +13,7 @@ import {
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { getClusterStatus } from './DBCluster.utils';
+import { BILLION, THOUSAND } from './DBCluster.constants';
 
 const DBCLUSTER_STATUS_MAP = {
   [DBClusterStatus.invalid]: 'XTRA_DB_CLUSTER_STATE_INVALID',
@@ -73,9 +74,9 @@ export class XtraDBService extends DBClusterService {
       .post<any, Partial<DBClusterPayload>>('/DBaaS/XtraDBCluster/Resources/Get', pick(toAPI(dbCluster), ['params']))
       .then((response: DBClusterExpectedResourcesAPI) => ({
         expected: {
-          cpu: response.expected.cpu_m / 1000,
-          memory: response.expected.memory_bytes / 10 ** 9,
-          disk: response.expected.disk_size / 10 ** 9,
+          cpu: response.expected.cpu_m / THOUSAND,
+          memory: response.expected.memory_bytes / BILLION,
+          disk: response.expected.disk_size / BILLION,
         },
       }));
   }
@@ -86,9 +87,9 @@ export class XtraDBService extends DBClusterService {
       kubernetesClusterName,
       databaseType,
       clusterSize: dbCluster.params.cluster_size,
-      memory: (dbCluster.params.pxc?.compute_resources?.memory_bytes || 0) / 10 ** 9,
-      cpu: (dbCluster.params.pxc?.compute_resources?.cpu_m || 0) / 1000,
-      disk: (dbCluster.params.pxc?.disk_size || 0) / 10 ** 9,
+      memory: (dbCluster.params.pxc?.compute_resources?.memory_bytes || 0) / BILLION,
+      cpu: (dbCluster.params.pxc?.compute_resources?.cpu_m || 0) / THOUSAND,
+      disk: (dbCluster.params.pxc?.disk_size || 0) / BILLION,
       status: getClusterStatus(dbCluster.state, DBCLUSTER_STATUS_MAP),
       message: dbCluster.operation?.message,
       finishedSteps: dbCluster.operation?.finished_steps || 0,
@@ -104,18 +105,18 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
     cluster_size: dbCluster.clusterSize,
     pxc: {
       compute_resources: {
-        cpu_m: dbCluster.cpu * 1000,
-        memory_bytes: dbCluster.memory * 10 ** 9,
+        cpu_m: dbCluster.cpu * THOUSAND,
+        memory_bytes: dbCluster.memory * BILLION,
       },
-      disk_size: dbCluster.disk * 10 ** 9,
+      disk_size: dbCluster.disk * BILLION,
     },
     // Temporary mock data
     proxysql: {
       compute_resources: {
-        cpu_m: 1000,
-        memory_bytes: 2 * 10 ** 9,
+        cpu_m: THOUSAND,
+        memory_bytes: 2 * BILLION,
       },
-      disk_size: 1 * 10 ** 9,
+      disk_size: BILLION,
     },
   },
 });
