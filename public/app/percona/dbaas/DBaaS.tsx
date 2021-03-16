@@ -1,5 +1,5 @@
-import React, { FC, useState, useMemo, useEffect } from 'react';
-import { TabsBar, TabContent, Tab, useStyles } from '@grafana/ui';
+import React, { FC, useEffect, useMemo } from 'react';
+import { Tab, TabContent, TabsBar, useStyles } from '@grafana/ui';
 import { KubernetesInventory } from './components/Kubernetes/KubernetesInventory';
 import { DBCluster } from './components/DBCluster/DBCluster';
 import { useKubernetes } from './components/Kubernetes/Kubernetes.hooks';

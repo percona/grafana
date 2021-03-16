@@ -572,16 +572,14 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
     .when('/dbaas', {
       template: '<react-container />',
       resolve: {
-        component: () =>
-          SafeDynamicImport(import(/* webpackChunkName: "DbaasPage" */ 'app/percona/dbaas/DBaaS')),
+        component: () => SafeDynamicImport(import(/* webpackChunkName: "DbaasPage" */ 'app/percona/dbaas/DBaaS')),
       },
     })
     .when('/dbaas/:tab', {
       template: '<react-container />',
       reloadOnSearch: false,
       resolve: {
-        component: () =>
-          SafeDynamicImport(import(/* webpackChunkName: "DbaasPage" */ 'app/percona/dbaas/DBaaS')),
+        component: () => SafeDynamicImport(import(/* webpackChunkName: "DbaasPage" */ 'app/percona/dbaas/DBaaS')),
       },
     })
     .when('/pmm-database-checks', {
