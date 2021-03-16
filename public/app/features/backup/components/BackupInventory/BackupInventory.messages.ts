@@ -4,5 +4,6 @@ export const Messages = {
     name: 'Name',
     created: 'Created',
     location: 'Location',
+    vendor: 'Vendor',
   },
 };

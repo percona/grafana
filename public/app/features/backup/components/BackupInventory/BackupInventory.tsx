@@ -8,7 +8,7 @@ import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 
 const { columns, noData } = Messages;
-const { name, created, location } = columns;
+const { name, created, location, vendor } = columns;
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
@@ -19,6 +19,11 @@ export const BackupInventory: FC = () => {
         Header: name,
         accessor: 'name',
         width: '250px',
+      },
+      {
+        Header: vendor,
+        accessor: 'vendor',
+        width: '150px',
       },
       {
         Header: created,
