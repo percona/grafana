@@ -3,6 +3,7 @@ import { Databases } from 'app/percona/shared/core';
 import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 import {
+  CpuUnits,
   DBCluster,
   DBClusterActionAPI,
   DBClusterConnectionAPI,
@@ -10,6 +11,7 @@ import {
   DBClusterExpectedResourcesAPI,
   DBClusterPayload,
   DBClusterStatus,
+  ResourcesUnits,
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { getClusterStatus } from './DBCluster.utils';
@@ -74,9 +76,9 @@ export class XtraDBService extends DBClusterService {
       .post<any, Partial<DBClusterPayload>>('/DBaaS/XtraDBCluster/Resources/Get', pick(toAPI(dbCluster), ['params']))
       .then((response: DBClusterExpectedResourcesAPI) => ({
         expected: {
-          cpu: response.expected.cpu_m / THOUSAND,
-          memory: response.expected.memory_bytes / BILLION,
-          disk: response.expected.disk_size / BILLION,
+          cpu: { value: response.expected.cpu_m / THOUSAND, units: CpuUnits.MILLI },
+          memory: { value: response.expected.memory_bytes / BILLION, units: ResourcesUnits.GB },
+          disk: { value: response.expected.disk_size / BILLION, units: ResourcesUnits.GB },
         },
       }));
   }
