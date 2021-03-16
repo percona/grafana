@@ -4,13 +4,14 @@ import { logger } from '@percona/platform-core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { BackupInventoryDetails } from './BackupInventoryDetails/BackupInventoryDetails';
+import { Status } from './Status';
 import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 
 const { columns, noData } = Messages;
-const { name, created, location, vendor } = columns;
+const { name, created, location, vendor, status } = columns;
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
@@ -37,6 +38,11 @@ export const BackupInventory: FC = () => {
       {
         Header: location,
         accessor: 'locationName',
+      },
+      {
+        Header: status,
+        accessor: 'status',
+        Cell: ({ value }) => <Status status={value} />,
       },
     ],
     []
