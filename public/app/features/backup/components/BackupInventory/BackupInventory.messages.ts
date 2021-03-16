@@ -12,7 +12,7 @@ export const Messages = {
     inProgress: 'In progress',
     paused: 'Paused',
     success: 'Success',
-    error: 'error',
+    error: 'Error',
   },
   dataModel: {
     invalid: 'Invalid',
