@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState, useEffect } from 'react';
 import { Column } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
+import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
@@ -18,7 +19,9 @@ export const BackupInventory: FC = () => {
       {
         Header: name,
         accessor: 'name',
+        id: 'name',
         width: '250px',
+        Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
         Header: vendor,
