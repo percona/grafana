@@ -32,7 +32,7 @@ export const BackupInventory: FC = () => {
       },
       {
         Header: location,
-        accessor: 'location',
+        accessor: 'locationName',
       },
     ],
     []

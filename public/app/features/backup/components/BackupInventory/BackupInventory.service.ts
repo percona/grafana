@@ -7,11 +7,21 @@ export const BackupInventoryService = {
   async list(): Promise<Backup[]> {
     return api.post<BackupResponse, any>(`${BASE_URL}/List`, {}).then(({ backups = [] }) =>
       backups.map(
-        ({ backup_id, name, location_name, created_at, service_id, service_name, data_model }): Backup => ({
+        ({
+          backup_id,
+          name,
+          location_id,
+          location_name,
+          created_at,
+          service_id,
+          service_name,
+          data_model,
+        }): Backup => ({
           id: backup_id,
           name,
           created: new Date(created_at).getTime(),
-          location: location_name,
+          locationId: location_id,
+          locationName: location_name,
           serviceId: service_id,
           serviceName: service_name,
           dataModel: data_model,

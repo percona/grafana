@@ -17,7 +17,8 @@ export interface Backup {
   id: string;
   name: string;
   created: number;
-  location: string;
+  locationId: string;
+  locationName: string;
   serviceId: string;
   serviceName: string;
   dataModel: DataModel;
@@ -26,6 +27,7 @@ export interface Backup {
 export interface RawBackup {
   backup_id: string;
   name: string;
+  location_id: string;
   location_name: string;
   created_at: string;
   service_id: string;
