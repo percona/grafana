@@ -6,4 +6,17 @@ export const Messages = {
     location: 'Location',
     vendor: 'Vendor',
   },
+  status: {
+    invalid: 'Invalid',
+    pending: 'Pending',
+    inProgress: 'In progress',
+    paused: 'Paused',
+    success: 'Success',
+    error: 'error',
+  },
+  dataModel: {
+    invalid: 'Invalid',
+    physical: 'Physical',
+    logical: 'Logical',
+  },
 };
