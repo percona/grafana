@@ -12,13 +12,13 @@ export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, 
   return (
     <div className={styles.detailsWrapper} data-qa="backup-artifact-details-wrapper">
       <span data-qa="backup-artifact-details-name">
-        <span>{Messages.backupName}</span> <span>{name}</span>
+        <span className={styles.detailLabel}>{Messages.backupName}</span> <span>{name}</span>
       </span>
       <span data-qa="backup-artifact-details-status">
-        <span>{Messages.testResuts}</span> <span>{statusMsg}</span>
+        <span className={styles.detailLabel}>{Messages.testResuts}</span> <span>{statusMsg}</span>
       </span>
-      <span>
-        <span data-qa="backup-artifact-details-data-model">{Messages.dataModel}</span> <span>{dataModelMsg}</span>
+      <span data-qa="backup-artifact-details-data-model">
+        <span className={styles.detailLabel}>{Messages.dataModel}</span> <span>{dataModelMsg}</span>
       </span>
     </div>
   );
