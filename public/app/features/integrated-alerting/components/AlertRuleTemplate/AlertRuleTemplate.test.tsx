@@ -4,15 +4,8 @@ import { dataQa } from '@percona/platform-core';
 import { act } from 'react-dom/test-utils';
 import { AlertRuleTemplate } from './AlertRuleTemplate';
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
-import { templateStubs } from './__mocks__/alertRuleTemplateStubs';
 
-jest.mock('./AlertRuleTemplate.service', () => ({
-  AlertRuleTemplateService: {
-    list: () => ({
-      templates: templateStubs,
-    }),
-  },
-}));
+jest.mock('./AlertRuleTemplate.service');
 jest.mock('@percona/platform-core', () => {
   const originalModule = jest.requireActual('@percona/platform-core');
   return {
@@ -86,7 +79,6 @@ describe('AlertRuleTemplate', () => {
     });
 
     expect(wrapper.find(dataQa('table-loading'))).toHaveLength(1);
-    expect(wrapper.find(dataQa('table-thead')).find('tr')).toHaveLength(0);
-    expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(0);
+    expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(1);
   });
 });
