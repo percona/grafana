@@ -10,7 +10,6 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
       display: flex;
       flex-direction: column;
       height: 100%;
-      margin: ${theme.spacing.lg};
     `,
     spinner: css`
       display: flex;

@@ -1,5 +1,7 @@
 import { Failed } from './components';
-import { CheckPanelOptions, Column, SeverityMap } from './types';
+import { CheckPanelOptions, Column, SeverityMap, TabKeys } from './types';
+import { Messages } from './CheckPanel.messages';
+import { PageModel } from '../../core/components/Breadcrumb';
 
 export const PMM_SETTINGS_URL = '/graph/settings/advanced-settings';
 
@@ -48,3 +50,25 @@ export const COLUMNS: Column[] = [
     key: 'actions',
   },
 ];
+
+export const DEFAULT_TAB = '';
+
+export const PAGE_TABS = [
+  {
+    title: Messages.failedChecksTitle,
+    id: TabKeys.failedChecks,
+    path: `pmm-database-checks/${TabKeys.failedChecks}`,
+  },
+  {
+    title: Messages.allChecksTitle,
+    id: TabKeys.allChecks,
+    path: `pmm-database-checks/${TabKeys.allChecks}`,
+  },
+];
+
+export const PAGE_MODEL: PageModel = {
+  title: Messages.pageTitle,
+  path: 'pmm-database-checks',
+  id: TabKeys.rootChecks,
+  children: PAGE_TABS.map(({ title, id, path }) => ({ title, id, path })),
+};

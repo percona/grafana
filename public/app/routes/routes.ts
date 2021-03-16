@@ -582,6 +582,13 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
         component: () => SafeDynamicImport(import(/* webpackChunkName: "ChecksPage" */ 'app/percona/check/CheckPanel')),
       },
     })
+    .when('/pmm-database-checks/:tab', {
+      template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () => SafeDynamicImport(import(/* webpackChunkName: "ChecksPage" */ 'app/percona/check/CheckPanel')),
+      },
+    })
     .when('/settings', {
       template: '<react-container />',
       resolve: {
