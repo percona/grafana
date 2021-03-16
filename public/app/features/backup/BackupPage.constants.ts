@@ -2,7 +2,7 @@ import { PageModel } from 'app/core/components/Breadcrumb';
 import { Messages } from './Backup.messages';
 import { TabKeys } from './Backup.types';
 
-export const DEFAULT_TAB = TabKeys.locations;
+export const DEFAULT_TAB = TabKeys.inventory;
 
 export const PAGE_TABS = [
   {
