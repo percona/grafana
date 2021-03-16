@@ -619,6 +619,14 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
           SafeDynamicImport(import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/add-instance/panel')),
       },
     })
+    .when('/add-instance/:tab', {
+      template: '<react-container />',
+      reloadOnSearch: false,
+      resolve: {
+        component: () =>
+          SafeDynamicImport(import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/add-instance/panel')),
+      },
+    })
     .when('/alerting/notification/new', {
       template: '<react-container />',
       resolve: {
