@@ -1,8 +1,9 @@
 import React, { FC, useMemo, useState, useEffect } from 'react';
-import { Column } from 'react-table';
+import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Table } from 'app/features/integrated-alerting/components/Table/Table';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
+import { BackupInventoryDetails } from './BackupInventoryDetails/BackupInventoryDetails';
 import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
@@ -54,6 +55,17 @@ export const BackupInventory: FC = () => {
     }
   };
 
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<Backup>) => (
+      <BackupInventoryDetails
+        name={row.original.name}
+        status={row.original.status}
+        dataModel={row.original.dataModel}
+      />
+    ),
+    []
+  );
+
   useEffect(() => {
     getData();
   }, []);
@@ -65,6 +77,7 @@ export const BackupInventory: FC = () => {
       columns={columns}
       emptyMessage={noData}
       pendingRequest={pending}
+      renderExpandedRow={renderSelectedSubRow}
     ></Table>
   );
 };
