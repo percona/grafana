@@ -22,6 +22,7 @@ export interface Backup {
   serviceId: string;
   serviceName: string;
   dataModel: DataModel;
+  status: Status;
 }
 
 export interface RawBackup {
@@ -33,6 +34,7 @@ export interface RawBackup {
   service_id: string;
   service_name: string;
   data_model: DataModel;
+  status: Status;
 }
 
 export interface BackupResponse {

@@ -16,6 +16,7 @@ export const BackupInventoryService = {
           service_id,
           service_name,
           data_model,
+          status,
         }): Backup => ({
           id: backup_id,
           name,
@@ -25,6 +26,7 @@ export const BackupInventoryService = {
           serviceId: service_id,
           serviceName: service_name,
           dataModel: data_model,
+          status,
         })
       )
     );
