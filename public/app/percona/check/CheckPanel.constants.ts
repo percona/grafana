@@ -51,7 +51,7 @@ export const COLUMNS: Column[] = [
   },
 ];
 
-export const DEFAULT_TAB = '';
+export const DEFAULT_TAB = TabKeys.failedChecks;
 
 export const PAGE_TABS = [
   {
