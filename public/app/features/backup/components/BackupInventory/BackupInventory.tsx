@@ -10,12 +10,15 @@ import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 import { BackupInventoryActions } from './BackupInventoryActions';
+import { RestoreBackupModal } from './RestoreBackupModal';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
+  const [restoreModalVisible, setRestoreModalVisible] = useState(false);
+  const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [data, setData] = useState<Backup[]>([]);
   const columns = useMemo(
     (): Column[] => [
@@ -55,7 +58,15 @@ export const BackupInventory: FC = () => {
     []
   );
 
-  const onRestoreClick = () => {};
+  const onRestoreClick = (backup: Backup) => {
+    setSelectedBackup(backup);
+    setRestoreModalVisible(true);
+  };
+
+  const handleClose = () => {
+    setSelectedBackup(null);
+    setRestoreModalVisible(false);
+  };
 
   const getData = async () => {
     setPending(true);
@@ -86,13 +97,16 @@ export const BackupInventory: FC = () => {
   }, []);
 
   return (
-    <Table
-      data={data}
-      totalItems={data.length}
-      columns={columns}
-      emptyMessage={noData}
-      pendingRequest={pending}
-      renderExpandedRow={renderSelectedSubRow}
-    ></Table>
+    <>
+      <Table
+        data={data}
+        totalItems={data.length}
+        columns={columns}
+        emptyMessage={noData}
+        pendingRequest={pending}
+        renderExpandedRow={renderSelectedSubRow}
+      ></Table>
+      <RestoreBackupModal backup={selectedBackup} isVisible={restoreModalVisible} onClose={handleClose} />
+    </>
   );
 };

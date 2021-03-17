@@ -2,11 +2,18 @@ import { Backup } from '../BackupInventory.types';
 
 export interface RestoreBackupModalProps {
   isVisible: boolean;
-  backup: Backup;
+  backup: Backup | null;
+  onClose: () => void;
 }
 
 export interface RestoreBackupFormProps {
-  serviceName: string;
+  serviceType: string;
   vendor: string;
+  serviceName: string;
   dataModel: string;
+}
+
+export enum ServiceTypeSelect {
+  SAME = 'SAME',
+  COMPATIBLE = 'COMPATIBLE',
 }
