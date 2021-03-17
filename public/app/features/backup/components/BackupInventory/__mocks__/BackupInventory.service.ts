@@ -28,6 +28,6 @@ export const stubs: Backup[] = [
   },
 ];
 
-export const BackupInventoryService = jest.genMockFromModule<typeof service>('../BackupInventoryService.service')
+export const BackupInventoryService = jest.genMockFromModule<typeof service>('../BackupInventory.service')
   .BackupInventoryService;
 BackupInventoryService.list = () => Promise.resolve(stubs);
