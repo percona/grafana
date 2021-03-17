@@ -6,6 +6,7 @@ import { ExpandableCell } from 'app/percona/shared/components/Elements/Expandabl
 import { BackupInventoryDetails } from './BackupInventoryDetails/BackupInventoryDetails';
 import { Status } from './Status';
 import { BackupCreation } from './BackupCreation';
+import { RestoreBackupFormProps } from './RestoreBackupModal/RestoreBackupModal.types';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
@@ -68,6 +69,8 @@ export const BackupInventory: FC = () => {
     setRestoreModalVisible(false);
   };
 
+  const handleRestore = (values: RestoreBackupFormProps) => {};
+
   const getData = async () => {
     setPending(true);
 
@@ -106,7 +109,12 @@ export const BackupInventory: FC = () => {
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
-      <RestoreBackupModal backup={selectedBackup} isVisible={restoreModalVisible} onClose={handleClose} />
+      <RestoreBackupModal
+        backup={selectedBackup}
+        isVisible={restoreModalVisible}
+        onClose={handleClose}
+        onRestore={handleRestore}
+      />
     </>
   );
 };

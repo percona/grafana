@@ -24,7 +24,7 @@ const serviceTypeOptions: Array<SelectableValue<ServiceTypeSelect>> = [
 export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisible, onClose }) => {
   const styles = useStyles(getStyles);
   const initialValues = backup ? toFormProps(backup) : undefined;
-  const handleSubmit = () => {};
+  const handleSubmit = (values: RestoreBackupFormProps) => {};
 
   return (
     <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>
