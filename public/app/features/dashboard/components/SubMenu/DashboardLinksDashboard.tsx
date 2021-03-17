@@ -26,7 +26,7 @@ export const DashboardLinksDashboard: React.FC<Props> = props => {
       { id: 'pmm-add-instance', url: '/graph/add-instance', title: 'PMM Add Instance' },
       { id: 'pmm-database-checks', url: '/graph/pmm-database-checks', title: 'PMM Database Checks' },
       { id: 'pmm-inventory', url: '/graph/inventory', title: 'PMM Inventory' },
-      { id: 'pmm-settings', url: '/graph/add-instance', title: 'PMM Settings' },
+      { id: 'pmm-settings', url: '/graph/settings', title: 'PMM Settings' },
     ];
   }
 
