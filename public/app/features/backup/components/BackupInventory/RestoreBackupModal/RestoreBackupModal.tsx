@@ -6,6 +6,7 @@ import { Modal, LoaderButton, RadioButtonGroupField, TextInputField, validators 
 import { RestoreBackupModalProps, RestoreBackupFormProps, ServiceTypeSelect } from './RestoreBackupModal.types';
 import { Messages } from './RestoreBackupModal.messages';
 import { getStyles } from './RestoreBackupModal.styles';
+import { toFormProps } from './RestoreBackupModal.utils';
 
 const { Form } = withTypes<RestoreBackupFormProps>();
 
@@ -22,19 +23,20 @@ const serviceTypeOptions: Array<SelectableValue<ServiceTypeSelect>> = [
 
 export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisible, onClose }) => {
   const styles = useStyles(getStyles);
+  const initialValues = backup ? toFormProps(backup) : undefined;
   const handleSubmit = () => {};
 
   return (
     <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>
       <Form
+        initialValues={initialValues}
         onSubmit={handleSubmit}
-        render={({ handleSubmit, valid, pristine, submitting }) => (
+        render={({ handleSubmit, valid, submitting, values }) => (
           <form onSubmit={handleSubmit}>
             <div className={styles.formHalvesContainer}>
               <div>
                 <RadioButtonGroupField
                   className={styles.radioGroup}
-                  disabled
                   options={serviceTypeOptions}
                   name="serviceType"
                   label={Messages.serviceSelection}
@@ -50,7 +52,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisi
                         {Messages.serviceName}
                       </label>
                       <Select
-                        disabled={!!backup}
+                        disabled={values.serviceType === ServiceTypeSelect.SAME}
                         className={styles.select}
                         options={[]}
                         {...input}
@@ -63,13 +65,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisi
               </div>
             </div>
             <HorizontalGroup justify="center" spacing="md">
-              <LoaderButton
-                data-qa="restore-button"
-                size="md"
-                variant="primary"
-                disabled={!valid || pristine}
-                loading={submitting}
-              >
+              <LoaderButton data-qa="restore-button" size="md" variant="primary" disabled={!valid} loading={submitting}>
                 {Messages.restore}
               </LoaderButton>
               <Button data-qa="restore-cancel-button" variant="secondary" onClick={onClose}>

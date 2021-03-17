@@ -7,7 +7,7 @@ export interface RestoreBackupModalProps {
 }
 
 export interface RestoreBackupFormProps {
-  serviceType: string;
+  serviceType: ServiceTypeSelect;
   vendor: string;
   serviceName: string;
   dataModel: string;
