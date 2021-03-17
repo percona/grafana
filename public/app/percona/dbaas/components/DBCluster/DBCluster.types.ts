@@ -90,6 +90,7 @@ interface DBClusterResources {
 export interface ResourcesWithUnits {
   value: number;
   units: ResourcesUnits | CpuUnits;
+  original: number;
 }
 
 export enum ResourcesUnits {

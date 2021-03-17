@@ -52,20 +52,27 @@ export abstract class DBClusterService {
       .post<DBClusterAllocatedResourcesAPI, any>('/DBaaS/Kubernetes/Resources/Get', {
         kubernetes_cluster_name: kubernetesClusterName,
       })
-      .then(response => ({
-        total: {
-          cpu: { value: response.all.cpu_m / THOUSAND, units: CpuUnits.MILLI },
-          memory: { value: response.all.memory_bytes / BILLION, units: ResourcesUnits.GB },
-          disk: formatResources(response.all.disk_size, RESOURCES_PRECISION),
-        },
-        allocated: {
-          cpu: { value: (response.all.cpu_m - response.available.cpu_m) / THOUSAND, units: CpuUnits.MILLI },
-          memory: {
-            value: (response.all.memory_bytes - response.available.memory_bytes) / BILLION,
-            units: ResourcesUnits.GB,
+      .then(({ all, available }) => {
+        const allocatedCpu = all.cpu_m - available.cpu_m;
+        const allocatedMemory = all.memory_bytes - available.memory_bytes;
+        const allocatedDisk = all.disk_size - available.disk_size;
+
+        return {
+          total: {
+            cpu: { value: all.cpu_m / THOUSAND, units: CpuUnits.MILLI, original: +all.cpu_m },
+            memory: { value: all.memory_bytes / BILLION, units: ResourcesUnits.GB, original: +all.memory_bytes },
+            disk: formatResources(+all.disk_size, RESOURCES_PRECISION),
           },
-          disk: { value: (response.all.disk_size - response.available.disk_size) / BILLION, units: ResourcesUnits.GB },
-        },
-      }));
+          allocated: {
+            cpu: { value: allocatedCpu / THOUSAND, units: CpuUnits.MILLI, original: allocatedCpu },
+            memory: {
+              value: allocatedMemory / BILLION,
+              units: ResourcesUnits.GB,
+              original: allocatedMemory,
+            },
+            disk: { value: allocatedDisk / BILLION, units: ResourcesUnits.GB, original: allocatedDisk },
+          },
+        };
+      });
   }
 }

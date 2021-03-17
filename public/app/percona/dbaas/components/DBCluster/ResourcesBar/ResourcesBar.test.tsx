@@ -7,9 +7,9 @@ import { ResourcesUnits } from '../DBCluster.types';
 
 describe('ResourcesBar::', () => {
   it('renders correctly with icon, allocated, expected and label', () => {
-    const allocated = { value: 2, units: ResourcesUnits.GB };
-    const total = { value: 10, units: ResourcesUnits.GB };
-    const expected = { value: 2, units: ResourcesUnits.GB };
+    const allocated = { value: 2, units: ResourcesUnits.GB, original: 2 };
+    const total = { value: 10, units: ResourcesUnits.GB, original: 10 };
+    const expected = { value: 2, units: ResourcesUnits.GB, original: 2 };
     const resourceLabel = 'Memory';
     const wrapper = mount(
       <ResourcesBar
@@ -33,9 +33,9 @@ describe('ResourcesBar::', () => {
     );
   });
   it('renders invalid message for insufficient resources', () => {
-    const allocated = { value: 2, units: ResourcesUnits.GB };
-    const total = { value: 10, units: ResourcesUnits.GB };
-    const expected = { value: 20, units: ResourcesUnits.GB };
+    const allocated = { value: 2, units: ResourcesUnits.GB, original: 2 };
+    const total = { value: 10, units: ResourcesUnits.GB, original: 10 };
+    const expected = { value: 20, units: ResourcesUnits.GB, original: 20 };
     const resourceLabel = 'Memory';
     const wrapper = mount(
       <ResourcesBar allocated={allocated} expected={expected} total={total} resourceLabel={resourceLabel} />

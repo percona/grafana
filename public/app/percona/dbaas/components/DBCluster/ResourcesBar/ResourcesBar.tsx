@@ -16,10 +16,10 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
   className,
 }) => {
   const styles = useStyles(getStyles);
-  const requiredResources = allocated && expected ? allocated.value + expected.value : undefined;
-  const allocatedWidth = getResourcesWidth(allocated?.value, total?.value);
-  const expectedWidth = getResourcesWidth(requiredResources, total?.value);
-  const isResourceInsufficient = requiredResources && total ? requiredResources > total.value : false;
+  const requiredResources = allocated && expected ? allocated.original + expected.original : undefined;
+  const allocatedWidth = getResourcesWidth(allocated?.original, total?.original);
+  const expectedWidth = getResourcesWidth(requiredResources, total?.original);
+  const isResourceInsufficient = requiredResources && total ? requiredResources > total.original : false;
 
   return (
     <div data-qa={dataQa} className={cx(styles.resourcesBarWrapper, className)}>

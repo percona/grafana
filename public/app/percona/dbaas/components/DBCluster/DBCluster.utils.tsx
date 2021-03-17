@@ -39,5 +39,5 @@ export const formatResources = (bytes: number, decimals: number): ResourcesWithU
   const i = Math.floor(Math.log(bytes) / Math.log(THOUSAND));
   const units = Object.values(ResourcesUnits)[i];
 
-  return { value: parseFloat((bytes / Math.pow(THOUSAND, i)).toFixed(decimals)), units };
+  return { value: parseFloat((bytes / Math.pow(THOUSAND, i)).toFixed(decimals)), units, original: bytes };
 };
