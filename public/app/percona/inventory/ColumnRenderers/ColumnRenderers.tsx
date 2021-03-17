@@ -25,9 +25,13 @@ export const agentsDetailsRender = (element: any) => {
       {labels.map((label, key) => (element[label] ? <span key={key}>{`${label}: ${element[label]}`}</span> : null))}
       {element.username ? <span>password: ******</span> : null}
       {element.service_ids && element.service_ids.length ? (
-        /* TODO(lunaticusgreen): all map renders need a key! */
         <>
-          service_ids: <span>{element.service_ids.map((serviceId: any) => serviceId)}</span>
+          service_ids:{' '}
+          <span>
+            {element.service_ids.map((serviceId: any) => (
+              <span key={serviceId}>{serviceId}</span>
+            ))}
+          </span>
         </>
       ) : null}
       {getCustomLabels(element.custom_labels)}

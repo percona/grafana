@@ -1,8 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-// @ts-ignore
-import { createBrowserHistory } from 'history';
 import { Spinner, Tab, TabContent, TabsBar, useStyles } from '@grafana/ui';
-import { Link, Route, Router } from 'react-router-dom';
 import { PMM_SETTINGS_URL } from 'app/percona/check/CheckPanel.constants';
 import { Settings, TabEntry, TabKeys } from './types';
 import { CheckService } from './Check.service';
@@ -15,8 +12,6 @@ import { DEFAULT_TAB, PAGE_MODEL } from './CheckPanel.constants';
 import { UrlQueryValue } from '@grafana/data';
 import { getLocationSrv } from '@grafana/runtime';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
-
-const history = createBrowserHistory();
 
 export const CheckPanel: FC = () => {
   const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
@@ -112,9 +107,9 @@ export const CheckPanel: FC = () => {
           ) : (
             <div className={styles.empty} data-qa="db-check-panel-settings-link">
               {Messages.sttDisabled}{' '}
-              <Link className={styles.link} to={PMM_SETTINGS_URL}>
+              <a className={styles.link} href={PMM_SETTINGS_URL}>
                 {Messages.pmmSettings}
-              </Link>
+              </a>
             </div>
           ))}
       </div>
@@ -122,12 +117,4 @@ export const CheckPanel: FC = () => {
   );
 };
 
-export const CheckPanelRouter: FC = () => (
-  <Router history={history}>
-    <Route>
-      <CheckPanel />
-    </Route>
-  </Router>
-);
-
-export default CheckPanelRouter;
+export default CheckPanel;
