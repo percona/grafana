@@ -4,7 +4,7 @@ import { Messages } from './BackupInventory.messages';
 const { status: statusMsg, dataModel: dataModelMsg } = Messages;
 
 export const formatStatus = (status: Status): string => {
-  const map: Record<keyof typeof Status, string> = {
+  const map: Record<Status, string> = {
     [Status.STATUS_INVALID]: statusMsg.invalid,
     [Status.PENDING]: statusMsg.pending,
     [Status.IN_PROGRESS]: statusMsg.inProgress,
@@ -13,15 +13,15 @@ export const formatStatus = (status: Status): string => {
     [Status.ERROR]: statusMsg.error,
   };
 
-  return map[status];
+  return map[status] || '';
 };
 
 export const formatDataModel = (model: DataModel): string => {
-  const map: Record<keyof typeof DataModel, string> = {
+  const map: Record<DataModel, string> = {
     [DataModel.DATA_MODEL_INVALID]: dataModelMsg.invalid,
     [DataModel.PHYSICAL]: dataModelMsg.physical,
     [DataModel.LOGICAL]: dataModelMsg.logical,
   };
 
-  return map[model];
+  return map[model] || '';
 };
