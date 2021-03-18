@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect, useCallback } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
-import { Messages } from 'app/features/integrated-alerting/IntegratedAlerting.messages';
+import { Messages } from 'app/percona/integrated-alerting/IntegratedAlerting.messages';
 import { getStyles } from './AlertRuleTemplate.styles';
 import { AddAlertRuleTemplateModal } from './AddAlertRuleTemplateModal';
 import { Table } from '../Table/Table';

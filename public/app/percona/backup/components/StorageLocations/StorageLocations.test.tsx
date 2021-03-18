@@ -2,7 +2,7 @@ import React from 'react';
 import { mount, ReactWrapper, shallow } from 'enzyme';
 import { dataQa, LoaderButton } from '@percona/platform-core';
 import { act } from 'react-dom/test-utils';
-import { Table } from 'app/features/integrated-alerting/components/Table/Table';
+import { Table } from 'app/percona/integrated-alerting/components/Table/Table';
 import { StorageLocationsService } from './StorageLocations.service';
 import { stubLocations } from './__mocks__/StorageLocations.service';
 import { DBIcon } from '../DBIcon';

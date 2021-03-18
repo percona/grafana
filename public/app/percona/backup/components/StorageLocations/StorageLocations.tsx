@@ -5,7 +5,7 @@ import { Button, IconButton, useStyles } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
-import { Table } from 'app/features/integrated-alerting/components/Table/Table';
+import { Table } from 'app/percona/integrated-alerting/components/Table/Table';
 import { StorageLocationsActions } from './StorageLocationsActions';
 import { Messages } from './StorageLocations.messages';
 import { StorageLocation } from './StorageLocations.types';

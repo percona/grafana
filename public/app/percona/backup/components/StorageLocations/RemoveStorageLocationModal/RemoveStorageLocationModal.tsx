@@ -1,4 +1,4 @@
-import { DeleteModal } from 'app/features/integrated-alerting/components/DeleteModal';
+import { DeleteModal } from 'app/percona/integrated-alerting/components/DeleteModal';
 import React, { FC } from 'react';
 import { WarningBlock } from '../WarningBlock/WarningBlock';
 import { Messages } from './RemoveStorageLocationModal.messages';
