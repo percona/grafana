@@ -9,7 +9,7 @@ import { getStyles } from './EditAlertRuleTemplateModal.styles';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 import { Messages } from './EditAlertRuleTemplateModal.messages';
 import { MAX_TITLE_LENGTH } from './EditAlertRuleTemplateModal.constants';
-import { WarningBlock } from 'app/percona/backup/components/StorageLocations/WarningBlock';
+import { WarningBlock } from 'app/percona/shared/components/Elements/WarningBlock';
 
 export const EditAlertRuleTemplateModal: FC<EditAlertRuleTemplateModalProps> = ({
   yaml,

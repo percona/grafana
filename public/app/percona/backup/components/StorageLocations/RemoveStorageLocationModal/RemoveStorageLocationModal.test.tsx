@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { LocationType, StorageLocation } from '../StorageLocations.types';
-import { WarningBlock } from '../WarningBlock/WarningBlock';
+import { WarningBlock } from '../../../../shared/components/Elements/WarningBlock/WarningBlock';
 import { RemoveStorageLocationModal } from './RemoveStorageLocationModal';
 
 describe('RemoveStorageLocationModal', () => {
