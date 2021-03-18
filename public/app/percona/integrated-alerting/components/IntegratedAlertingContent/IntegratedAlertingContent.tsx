@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { Spinner, useStyles } from '@grafana/ui';
-import { EmptyBlock } from 'app/percona/shared/EmptyBlock';
+import { EmptyBlock } from 'app/percona/shared/components/Elements/EmptyBlock';
 import { Messages } from './IntegratedAlertingContent.messages';
 import { PMM_SETTINGS_URL } from './IntegratedAlertingContent.constants';
 import { IntegratedAlertingContentProps } from './IntegratedAlertingContent.types';

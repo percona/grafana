@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useStyles } from '@grafana/ui';
-import { SecretToggler } from 'app/percona/shared/SecretToggler';
+import { SecretToggler } from 'app/percona/shared/components/Elements/SecretToggler';
 import { KeysBlockProps } from './KeysBlock.types';
 import { getStyles } from './KeysBlock.styles';
 import { Messages } from './KeysBlock.messages';

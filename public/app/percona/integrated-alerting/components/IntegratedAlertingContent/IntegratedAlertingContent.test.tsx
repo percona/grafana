@@ -4,7 +4,7 @@ import { act } from 'react-dom/test-utils';
 import { dataQa } from '@percona/platform-core';
 import { IntegratedAlertingContent } from './IntegratedAlertingContent';
 import { Spinner } from '@grafana/ui';
-import { EmptyBlock } from 'app/percona/shared/EmptyBlock';
+import { EmptyBlock } from 'app/percona/shared/components/Elements/EmptyBlock';
 
 describe('IntegratedAlertingContent', () => {
   describe('IA disabled', () => {
