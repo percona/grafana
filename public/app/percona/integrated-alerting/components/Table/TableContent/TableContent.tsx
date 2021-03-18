@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { EmptyBlock } from '../../EmptyBlock';
+import { EmptyBlock } from 'app/percona/shared/EmptyBlock';
 import { TableContentProps } from './TableContent.types';
 
 export const TableContent: FC<TableContentProps> = ({ hasData, emptyMessage, loading, children }) =>
