@@ -2,7 +2,7 @@ import React, { FC, useContext, useState } from 'react';
 import { logger } from '@percona/platform-core';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/core';
-import { DeleteModal } from '../../DeleteModal';
+import { DeleteModal } from 'app/percona/shared/DeleteModal';
 import { NotificationChannelService } from '../NotificationChannel.service';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
 import { DeleteNotificationChannelModalProps } from './DeleteNotificationChannelModal.types';

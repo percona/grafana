@@ -8,7 +8,7 @@ import { AlertRulesActionsProps } from './AlertRulesActions.types';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { Messages } from './AlertRulesActions.messages';
-import { DeleteModal } from '../../DeleteModal';
+import { DeleteModal } from 'app/percona/shared/DeleteModal';
 import { AlertRuleCreatePayload } from '../AlertRules.types';
 
 export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => {

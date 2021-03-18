@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { logger } from '@percona/platform-core';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/core';
-import { DeleteModal } from '../../DeleteModal';
+import { DeleteModal } from 'app/percona/shared/DeleteModal';
 import { DeleteRuleTemplateModalProps } from './DeleteRuleTemplateModal.types';
 import { Messages } from './DeleteRuleTemplateModal.messages';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
