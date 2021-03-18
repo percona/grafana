@@ -20,7 +20,7 @@ export const DashboardLinksDashboard: React.FC<Props> = props => {
   const [opened, setOpened] = useState(0);
   let resolvedLinks = useResolvedLinks(props, opened);
 
-  // TODO: remove it ASAP after migration transition period is finished
+  // TODO: PMM-7736 remove it ASAP after migration transition period is finished
   if (props.link.title === 'PMM') {
     resolvedLinks = [
       { id: 'pmm-add-instance', url: '/graph/add-instance', title: 'PMM Add Instance' },
