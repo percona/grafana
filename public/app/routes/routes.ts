@@ -558,7 +558,7 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
       template: '<react-container />',
       resolve: {
         component: () =>
-          SafeDynamicImport(import(/* webpackChunkName: "BackupPage" */ 'app/features/backup/BackupPage')),
+          SafeDynamicImport(import(/* webpackChunkName: "BackupPage" */ 'app/percona/backup/BackupPage')),
       },
     })
     .when('/backup/:tab', {
@@ -566,7 +566,7 @@ export function setupAngularRoutes($routeProvider: route.IRouteProvider, $locati
       reloadOnSearch: false,
       resolve: {
         component: () =>
-          SafeDynamicImport(import(/* webpackChunkName: "BackupPage" */ 'app/features/backup/BackupPage')),
+          SafeDynamicImport(import(/* webpackChunkName: "BackupPage" */ 'app/percona/backup/BackupPage')),
       },
     })
     .when('/dbaas', {
