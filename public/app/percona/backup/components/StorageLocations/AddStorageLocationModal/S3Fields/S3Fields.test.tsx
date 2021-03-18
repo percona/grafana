@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { TextInputField } from '@percona/platform-core';
 import { S3Fields } from './S3Fields';
-import { SecretToggler } from '../../../SecretToggler';
+import { SecretToggler } from 'app/percona/shared/SecretToggler';
 
 describe('S3Fields', () => {
   it('should pass initial values', () => {

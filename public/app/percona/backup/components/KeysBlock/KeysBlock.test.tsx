@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { KeysBlock } from './KeysBlock';
 import { Messages } from './KeysBlock.messages';
-import { SecretToggler } from '../SecretToggler';
+import { SecretToggler } from 'app/percona/shared/SecretToggler';
 
 describe('KeysBlock', () => {
   it('should have access key next to label', () => {

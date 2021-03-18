@@ -3,7 +3,7 @@ import { TextInputField, validators } from '@percona/platform-core';
 import { S3FieldsProps } from './S3Fields.types';
 import { Messages } from './S3Fields.Messages';
 import { MAX_LENGTH } from './S3Fields.constants';
-import { SecretToggler } from '../../../SecretToggler';
+import { SecretToggler } from 'app/percona/shared/SecretToggler';
 
 const required = [validators.required];
 
