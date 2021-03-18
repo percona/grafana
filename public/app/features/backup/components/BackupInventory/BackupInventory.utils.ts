@@ -13,7 +13,7 @@ export const formatStatus = (status: Status): string => {
     [Status.ERROR]: statusMsg.error,
   };
 
-  return map[status] || '';
+  return map[status] ?? '';
 };
 
 export const formatDataModel = (model: DataModel): string => {
@@ -23,5 +23,5 @@ export const formatDataModel = (model: DataModel): string => {
     [DataModel.LOGICAL]: dataModelMsg.logical,
   };
 
-  return map[model] || '';
+  return map[model] ?? '';
 };
