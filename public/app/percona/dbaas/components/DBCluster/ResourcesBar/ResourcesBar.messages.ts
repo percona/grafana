@@ -6,5 +6,6 @@ export const Messages = {
   buildExpectedLabel: (expected: ResourcesWithUnits, resourceLabel: string) =>
     `Required ${resourceLabel} (${expected.value} ${expected.units})`,
   buildAllocatedLabel: (resourceLabel: string) => `Consumed ${resourceLabel}`,
-  buildInsufficientLabel: (resourceLabel: string) => `Insufficient ${resourceLabel}`,
+  buildInsufficientLabel: (expected: ResourcesWithUnits, resourceLabel: string) =>
+    `Insufficient ${resourceLabel} (${expected.value} ${expected.units} required)`,
 };

@@ -44,7 +44,7 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
             {Messages.buildResourcesLabel(formatResources(allocated), allocatedWidth, formatResources(total))}
           </span>
         )}
-        {allocated && !isResourceInsufficient && (
+        {allocated && (
           <div className={styles.captionWrapper}>
             <div className={cx(styles.captionSquare, styles.allocatedSquare)}></div>
             <span data-qa="resources-bar-allocated-caption" className={styles.captionLabel}>
@@ -52,7 +52,7 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
             </span>
           </div>
         )}
-        {expected && (
+        {expected && !isResourceInsufficient && (
           <div className={styles.captionWrapper}>
             <div className={cx(styles.captionSquare, styles.expectedSquare)}></div>
             <span data-qa="resources-bar-expected-caption" className={styles.captionLabel}>
@@ -60,11 +60,11 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
             </span>
           </div>
         )}
-        {isResourceInsufficient && (
+        {expected && isResourceInsufficient && (
           <div className={styles.captionWrapper}>
             <Icon className={styles.insufficientIcon} name="exclamation-triangle" />
             <span data-qa="resources-bar-insufficient-resources" className={styles.captionLabel}>
-              {Messages.buildInsufficientLabel(resourceLabel)}
+              {Messages.buildInsufficientLabel(formatResources(expected), resourceLabel)}
             </span>
           </div>
         )}

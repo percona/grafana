@@ -42,7 +42,7 @@ describe('ResourcesBar::', () => {
     );
 
     expect(wrapper.find(dataQa('resources-bar-insufficient-resources')).text()).toEqual(
-      Messages.buildInsufficientLabel(resourceLabel)
+      Messages.buildInsufficientLabel(expected, resourceLabel)
     );
   });
 });
