@@ -1,4 +1,4 @@
-import { isClusterChanging, getClusterStatus } from './DBCluster.utils';
+import { isClusterChanging, getClusterStatus, isOptionEmpty } from './DBCluster.utils';
 import { dbClustersStub } from './__mocks__/dbClustersStubs';
 import { DBClusterStatus } from './DBCluster.types';
 
@@ -71,5 +71,11 @@ describe('DBCluster.utils::', () => {
     const result = getClusterStatus('XTRA_DB_CLUSTER_STATE_UNKNOWN', DBCLUSTER_STATUS_MAP);
 
     expect(result).toBe(DBClusterStatus.unknown);
+  });
+  it('indentifies empty option correctly', () => {
+    expect(isOptionEmpty(undefined)).toBeTruthy();
+    expect(isOptionEmpty({})).toBeTruthy();
+    expect(isOptionEmpty({ label: 'test label' })).toBeTruthy();
+    expect(isOptionEmpty({ value: 'test value' })).toBeFalsy();
   });
 });
