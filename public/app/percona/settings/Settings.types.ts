@@ -1,11 +1,11 @@
 export interface EmailSettings {
-  authType: EmailAuthType;
   from: string;
   smarthost: string;
   hello: string;
   username?: string;
   password?: string;
   secret?: string;
+  identity?: string;
 }
 
 export interface SlackSettings {

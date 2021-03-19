@@ -1,21 +1,49 @@
 import { EmailSettings, EmailAuthType } from '../../../Settings.types';
+import { FormEmailSettings } from './Email.types';
 
 export const isEmailFieldNeeded = (field: keyof EmailSettings, authType: EmailAuthType): boolean => {
-  let neededFields: EmailAuthType[] = [];
+  let needingAuths: EmailAuthType[] = [];
 
   switch (field) {
     case 'username':
-      neededFields = [EmailAuthType.CRAM, EmailAuthType.LOGIN, EmailAuthType.PLAIN];
+      needingAuths = [EmailAuthType.CRAM, EmailAuthType.LOGIN, EmailAuthType.PLAIN];
       break;
     case 'password':
-      neededFields = [EmailAuthType.LOGIN, EmailAuthType.PLAIN];
+      needingAuths = [EmailAuthType.LOGIN, EmailAuthType.PLAIN];
       break;
     case 'secret':
-      neededFields = [EmailAuthType.CRAM];
+      needingAuths = [EmailAuthType.CRAM];
+      break;
+    case 'identity':
+      needingAuths = [EmailAuthType.PLAIN];
       break;
     default:
+      needingAuths = [EmailAuthType.CRAM, EmailAuthType.LOGIN, EmailAuthType.PLAIN, EmailAuthType.NONE];
       break;
   }
 
-  return neededFields.length >= 0 && neededFields.includes(authType);
+  return needingAuths.length >= 0 && needingAuths.includes(authType);
+};
+
+export const getAuthTypeFromFields = (settings: EmailSettings): EmailAuthType => {
+  if (settings.identity) {
+    return EmailAuthType.PLAIN;
+  }
+
+  if (settings.secret) {
+    return EmailAuthType.CRAM;
+  }
+
+  if (settings.username) {
+    return EmailAuthType.LOGIN;
+  }
+
+  return EmailAuthType.NONE;
+};
+
+export const getInitialValues = (settings: EmailSettings): FormEmailSettings => {
+  const resultSettings = { ...settings, authType: getAuthTypeFromFields(settings) };
+  delete resultSettings['identity'];
+
+  return resultSettings;
 };
