@@ -57,6 +57,17 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
             <TextInputField name="from" validators={[validators.required]} />
 
             <div className={settingsStyles.labelWrapper}>
+              <span>{Messages.fields.hello.label}</span>
+              <LinkTooltip
+                tooltipText={Messages.fields.hello.tooltipText}
+                link={Messages.fields.hello.tooltipLink}
+                linkText={Messages.fields.hello.tooltipLinkText}
+                icon="info-circle"
+              />
+            </div>
+            <TextInputField name="hello" />
+
+            <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.username.label}</span>
               <LinkTooltip
                 tooltipText={Messages.fields.username.tooltipText}
@@ -77,17 +88,6 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
               />
             </div>
             <PasswordInputField name="password" />
-
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.hello.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.hello.tooltipText}
-                link={Messages.fields.hello.tooltipLink}
-                linkText={Messages.fields.hello.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <TextInputField name="hello" />
 
             <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.identity.label}</span>
