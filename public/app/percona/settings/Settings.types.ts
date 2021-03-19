@@ -1,11 +1,10 @@
 export interface EmailSettings {
   authType: EmailAuthType;
-  from?: string;
-  smarthost?: string;
-  hello?: string;
+  from: string;
+  smarthost: string;
+  hello: string;
   username?: string;
   password?: string;
-  identity?: string;
   secret?: string;
 }
 

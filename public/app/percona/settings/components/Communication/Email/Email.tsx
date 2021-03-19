@@ -78,7 +78,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
                 icon="info-circle"
               />
             </div>
-            <TextInputField name="hello" />
+            <TextInputField validators={[validators.required]} name="hello" />
 
             {isEmailFieldNeeded('username', values.authType) && (
               <>
@@ -91,7 +91,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
                     icon="info-circle"
                   />
                 </div>
-                <TextInputField name="username" />
+                <TextInputField validators={[validators.required]} name="username" />
               </>
             )}
 
@@ -106,20 +106,9 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
                     icon="info-circle"
                   />
                 </div>
-                <PasswordInputField name="password" />
+                <PasswordInputField validators={[validators.required]} name="password" />
               </>
             )}
-
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.identity.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.identity.tooltipText}
-                link={Messages.fields.identity.tooltipLink}
-                linkText={Messages.fields.identity.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <TextInputField name="identity" />
 
             {isEmailFieldNeeded('secret', values.authType) && (
               <>
@@ -132,7 +121,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
                     icon="info-circle"
                   />
                 </div>
-                <PasswordInputField name="secret" />
+                <PasswordInputField validators={[validators.required]} name="secret" />
               </>
             )}
 
