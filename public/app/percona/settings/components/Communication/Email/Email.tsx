@@ -45,7 +45,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
         onSubmit={applyChanges}
         initialValues={initialValues}
         render={({ handleSubmit, valid, pristine, values }) => (
-          <form onSubmit={handleSubmit}>
+          <form className={settingsStyles.emailForm} onSubmit={handleSubmit}>
             <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.type.label}</span>
               <LinkTooltip

@@ -71,5 +71,8 @@ export const getSettingsStyles = stylesFactory((theme: GrafanaTheme) => {
         white-space: nowrap;
       }
     `,
+    emailForm: css`
+      margin-top: ${spacing.md};
+    `,
   };
 });
