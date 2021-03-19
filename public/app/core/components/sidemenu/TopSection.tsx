@@ -20,6 +20,7 @@ const TopSection: FC<any> = () => {
     text: 'DBaaS',
     url: `${config.appSubUrl}/dbaas`,
   };
+
   const onOpenSearch = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
