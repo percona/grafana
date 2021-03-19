@@ -1,34 +1,49 @@
-import { Form } from 'react-final-form';
+import { withTypes } from 'react-final-form';
 import React, { FC, useState } from 'react';
 import { Button, Spinner, useTheme } from '@grafana/ui';
 import { TextInputField, PasswordInputField, validators, RadioButtonGroupField } from '@percona/platform-core';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';
-import { EmailSettings } from '../../../Settings.types';
-import { isEmailFieldNeeded } from './Email.utils';
+import { isEmailFieldNeeded, getInitialValues } from './Email.utils';
 import { emailOptions } from './Email.constants';
-import { EmailProps } from './Email.types';
+import { EmailProps, FormEmailSettings } from './Email.types';
+import { EmailAuthType, EmailSettings } from 'app/percona/settings/Settings.types';
 
 export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
   const theme = useTheme();
   const settingsStyles = getSettingsStyles(theme);
   const [loading, setLoading] = useState(false);
 
-  const applyChanges = (values: EmailSettings) => {
+  const applyChanges = (values: FormEmailSettings) => {
+    const baseSettings: any = { ...values };
+
+    if (values.authType === EmailAuthType.PLAIN) {
+      baseSettings.identity = btoa(`${values.username}${values.password}`);
+    }
+
+    Object.keys(baseSettings).forEach((field: keyof EmailSettings) => {
+      if (!isEmailFieldNeeded(field, values.authType)) {
+        delete baseSettings[field];
+      }
+    });
+
     updateSettings(
       {
-        email_alerting_settings: values,
+        email_alerting_settings: baseSettings,
       },
       setLoading
     );
   };
 
+  const initialValues = getInitialValues(settings);
+  const { Form } = withTypes<FormEmailSettings>();
+
   return (
     <>
       <Form
         onSubmit={applyChanges}
-        initialValues={settings}
+        initialValues={initialValues}
         render={({ handleSubmit, valid, pristine, values }) => (
           <form onSubmit={handleSubmit}>
             <div className={settingsStyles.labelWrapper}>
