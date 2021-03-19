@@ -1,17 +1,37 @@
 import { Form } from 'react-final-form';
-import { Button, Spinner, useTheme } from '@grafana/ui';
 import React, { FC, useState } from 'react';
-import { TextInputField, PasswordInputField, validators } from '@percona/platform-core';
+import { Button, Spinner, useTheme } from '@grafana/ui';
+import { SelectableValue } from '@grafana/data';
+import { TextInputField, PasswordInputField, validators, RadioButtonGroupField } from '@percona/platform-core';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';
 import { LoadingCallback } from '../../../Settings.service';
-import { EmailSettings } from '../../../Settings.types';
+import { EmailSettings, EmailAuthType } from '../../../Settings.types';
 
 export interface EmailProps {
   settings: EmailSettings;
   updateSettings: (body: any, callback: LoadingCallback) => void;
 }
+
+const options: Array<SelectableValue<EmailAuthType>> = [
+  {
+    value: EmailAuthType.NONE,
+    label: 'None',
+  },
+  {
+    value: EmailAuthType.PLAIN,
+    label: 'Plain',
+  },
+  {
+    value: EmailAuthType.LOGIN,
+    label: 'Login',
+  },
+  {
+    value: EmailAuthType.CRAM,
+    label: 'CRAM-MD5',
+  },
+];
 
 export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
   const theme = useTheme();
@@ -34,6 +54,22 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
         initialValues={settings}
         render={({ handleSubmit, valid, pristine }) => (
           <form onSubmit={handleSubmit}>
+            <div className={settingsStyles.labelWrapper}>
+              <span>{Messages.fields.type.label}</span>
+              <LinkTooltip
+                tooltipText={Messages.fields.type.tooltipText}
+                link={Messages.fields.type.tooltipLink}
+                linkText={Messages.fields.type.tooltipLinkText}
+                icon="info-circle"
+              />
+            </div>
+            <RadioButtonGroupField
+              className={settingsStyles.authRadioGroup}
+              options={options}
+              name="authType"
+              fullWidth
+            />
+
             <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.smarthost.label}</span>
               <LinkTooltip

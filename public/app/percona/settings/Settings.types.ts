@@ -48,3 +48,10 @@ export enum TabKeys {
   perconaPlatform = 'percona-platform',
   communication = 'communication',
 }
+
+export enum EmailAuthType {
+  NONE = 'NONE',
+  PLAIN = 'PLAIN',
+  LOGIN = 'LOGIN',
+  CRAM = 'CRAM-MD5',
+}

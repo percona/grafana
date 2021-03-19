@@ -4,6 +4,12 @@ const COMMUNICATION_LINK = `${HOW_TO_DOC_URL}/configure.html#communication`;
 
 export const Messages = {
   fields: {
+    type: {
+      label: 'Auth Type',
+      tooltipText: 'Authentication type',
+      tooltipLinkText: 'Read more',
+      tooltipLink: COMMUNICATION_LINK,
+    },
     from: {
       label: 'From',
       tooltipText: 'The sender address',
