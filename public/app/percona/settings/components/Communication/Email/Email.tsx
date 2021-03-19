@@ -16,7 +16,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
   const [loading, setLoading] = useState(false);
 
   const applyChanges = (values: FormEmailSettings) => {
-    const baseSettings: any = { ...values };
+    const baseSettings: EmailSettings = { ...values };
 
     if (values.authType === EmailAuthType.PLAIN) {
       baseSettings.identity = btoa(`${values.username}${values.password}`);
