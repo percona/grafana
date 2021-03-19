@@ -1,37 +1,14 @@
 import { Form } from 'react-final-form';
 import React, { FC, useState } from 'react';
 import { Button, Spinner, useTheme } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
 import { TextInputField, PasswordInputField, validators, RadioButtonGroupField } from '@percona/platform-core';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';
-import { LoadingCallback } from '../../../Settings.service';
-import { EmailSettings, EmailAuthType } from '../../../Settings.types';
-
-export interface EmailProps {
-  settings: EmailSettings;
-  updateSettings: (body: any, callback: LoadingCallback) => void;
-}
-
-const options: Array<SelectableValue<EmailAuthType>> = [
-  {
-    value: EmailAuthType.NONE,
-    label: 'None',
-  },
-  {
-    value: EmailAuthType.PLAIN,
-    label: 'Plain',
-  },
-  {
-    value: EmailAuthType.LOGIN,
-    label: 'Login',
-  },
-  {
-    value: EmailAuthType.CRAM,
-    label: 'CRAM-MD5',
-  },
-];
+import { EmailSettings } from '../../../Settings.types';
+import { isEmailFieldNeeded } from './Email.utils';
+import { emailOptions } from './Email.constants';
+import { EmailProps } from './Email.types';
 
 export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
   const theme = useTheme();
@@ -52,7 +29,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
       <Form
         onSubmit={applyChanges}
         initialValues={settings}
-        render={({ handleSubmit, valid, pristine }) => (
+        render={({ handleSubmit, valid, pristine, values }) => (
           <form onSubmit={handleSubmit}>
             <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.type.label}</span>
@@ -65,7 +42,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
             </div>
             <RadioButtonGroupField
               className={settingsStyles.authRadioGroup}
-              options={options}
+              options={emailOptions}
               name="authType"
               fullWidth
             />
@@ -103,27 +80,35 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
             </div>
             <TextInputField name="hello" />
 
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.username.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.username.tooltipText}
-                link={Messages.fields.username.tooltipLink}
-                linkText={Messages.fields.username.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <TextInputField name="username" />
+            {isEmailFieldNeeded('username', values.authType) && (
+              <>
+                <div className={settingsStyles.labelWrapper}>
+                  <span>{Messages.fields.username.label}</span>
+                  <LinkTooltip
+                    tooltipText={Messages.fields.username.tooltipText}
+                    link={Messages.fields.username.tooltipLink}
+                    linkText={Messages.fields.username.tooltipLinkText}
+                    icon="info-circle"
+                  />
+                </div>
+                <TextInputField name="username" />
+              </>
+            )}
 
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.password.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.password.tooltipText}
-                link={Messages.fields.password.tooltipLink}
-                linkText={Messages.fields.password.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <PasswordInputField name="password" />
+            {isEmailFieldNeeded('password', values.authType) && (
+              <>
+                <div className={settingsStyles.labelWrapper}>
+                  <span>{Messages.fields.password.label}</span>
+                  <LinkTooltip
+                    tooltipText={Messages.fields.password.tooltipText}
+                    link={Messages.fields.password.tooltipLink}
+                    linkText={Messages.fields.password.tooltipLinkText}
+                    icon="info-circle"
+                  />
+                </div>
+                <PasswordInputField name="password" />
+              </>
+            )}
 
             <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.identity.label}</span>
@@ -136,16 +121,20 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
             </div>
             <TextInputField name="identity" />
 
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.secret.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.secret.tooltipText}
-                link={Messages.fields.secret.tooltipLink}
-                linkText={Messages.fields.secret.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <PasswordInputField name="secret" />
+            {isEmailFieldNeeded('secret', values.authType) && (
+              <>
+                <div className={settingsStyles.labelWrapper}>
+                  <span>{Messages.fields.secret.label}</span>
+                  <LinkTooltip
+                    tooltipText={Messages.fields.secret.tooltipText}
+                    link={Messages.fields.secret.tooltipLink}
+                    linkText={Messages.fields.secret.tooltipLinkText}
+                    icon="info-circle"
+                  />
+                </div>
+                <PasswordInputField name="secret" />
+              </>
+            )}
 
             <Button
               className={settingsStyles.actionButton}
