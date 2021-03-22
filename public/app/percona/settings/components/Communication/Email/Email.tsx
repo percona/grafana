@@ -2,6 +2,7 @@ import { withTypes } from 'react-final-form';
 import React, { FC, useState } from 'react';
 import { Button, Spinner, useTheme } from '@grafana/ui';
 import { TextInputField, PasswordInputField, validators, RadioButtonGroupField } from '@percona/platform-core';
+import { FormApi } from 'final-form';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';
@@ -23,6 +24,11 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
       setLoading
     );
 
+  const resetUsernameAndPasswordState = (form: FormApi<FormEmailSettings>) => {
+    form.resetFieldState('username');
+    form.resetFieldState('password');
+  };
+
   const initialValues = getInitialValues(settings);
   const { Form } = withTypes<FormEmailSettings>();
 
@@ -31,7 +37,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
       <Form
         onSubmit={applyChanges}
         initialValues={initialValues}
-        render={({ handleSubmit, valid, pristine, values }) => (
+        render={({ handleSubmit, valid, pristine, values, form }) => (
           <form className={settingsStyles.emailForm} onSubmit={handleSubmit}>
             <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.smarthost.label}</span>
@@ -76,37 +82,44 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
               />
             </div>
             <RadioButtonGroupField
+              inputProps={{
+                onInput: () => resetUsernameAndPasswordState(form),
+              }}
               className={settingsStyles.authRadioGroup}
               options={emailOptions}
               name="authType"
               fullWidth
             />
 
-            {values.authType !== EmailAuthType.NONE && (
-              <>
-                <div className={settingsStyles.labelWrapper}>
-                  <span>{Messages.fields.username.label}</span>
-                  <LinkTooltip
-                    tooltipText={Messages.fields.username.tooltipText}
-                    link={Messages.fields.username.tooltipLink}
-                    linkText={Messages.fields.username.tooltipLinkText}
-                    icon="info-circle"
-                  />
-                </div>
-                <TextInputField validators={[validators.required]} name="username" />
+            <div className={settingsStyles.labelWrapper}>
+              <span>{Messages.fields.username.label}</span>
+              <LinkTooltip
+                tooltipText={Messages.fields.username.tooltipText}
+                link={Messages.fields.username.tooltipLink}
+                linkText={Messages.fields.username.tooltipLinkText}
+                icon="info-circle"
+              />
+            </div>
+            <TextInputField
+              disabled={values.authType === EmailAuthType.NONE}
+              validators={values.authType === EmailAuthType.NONE ? [] : [validators.required]}
+              name="username"
+            />
 
-                <div className={settingsStyles.labelWrapper}>
-                  <span>{Messages.fields.password.label}</span>
-                  <LinkTooltip
-                    tooltipText={Messages.fields.password.tooltipText}
-                    link={Messages.fields.password.tooltipLink}
-                    linkText={Messages.fields.password.tooltipLinkText}
-                    icon="info-circle"
-                  />
-                </div>
-                <PasswordInputField validators={[validators.required]} name="password" />
-              </>
-            )}
+            <div className={settingsStyles.labelWrapper}>
+              <span>{Messages.fields.password.label}</span>
+              <LinkTooltip
+                tooltipText={Messages.fields.password.tooltipText}
+                link={Messages.fields.password.tooltipLink}
+                linkText={Messages.fields.password.tooltipLinkText}
+                icon="info-circle"
+              />
+            </div>
+            <PasswordInputField
+              disabled={values.authType === EmailAuthType.NONE}
+              validators={values.authType === EmailAuthType.NONE ? [] : [validators.required]}
+              name="password"
+            />
 
             <Button
               className={settingsStyles.actionButton}
