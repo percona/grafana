@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 import { LinkButton, useTheme } from '@grafana/ui';
 import validators from 'app/percona/shared/helpers/validators';
-import { Credentials, LoginFormProps } from '../types';
+import { SignUpCredentials, LoginFormProps } from '../types';
 import { Messages } from '../PlatformLogin.messages';
 import { getStyles } from '../PlatformLogin.styles';
 import { PlatformLoginService } from '../PlatformLogin.service';
@@ -14,7 +14,7 @@ import { appEvents } from 'app/core/app_events';
 export const SignUp: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
   const styles = getStyles(useTheme());
 
-  const handleSignUpFormSubmit = async (credentials: Credentials) => {
+  const handleSignUpFormSubmit = async (credentials: SignUpCredentials) => {
     try {
       await PlatformLoginService.signUp(credentials);
 
@@ -39,7 +39,7 @@ export const SignUp: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
     </span>
   );
 
-  const SignUpForm: FC<FormRenderProps<Credentials>> = ({ pristine, submitting, valid, handleSubmit }) => (
+  const SignUpForm: FC<FormRenderProps<SignUpCredentials>> = ({ pristine, submitting, valid, handleSubmit }) => (
     <form data-qa="sign-up-form" className={styles.form} onSubmit={handleSubmit}>
       <legend className={styles.legend}>{Messages.signUp}</legend>
       <TextInputField
