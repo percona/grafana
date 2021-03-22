@@ -7,16 +7,9 @@ import { Messages } from '../PlatformLogin.messages';
 import { getStyles } from '../PlatformLogin.styles';
 import { PlatformLoginService } from '../PlatformLogin.service';
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '../PlatformLogin.constants';
-import { CheckboxField, LoaderButton, PasswordInputField, TextInputField } from '@percona/platform-core';
+import { CheckboxField, LoaderButton, TextInputField } from '@percona/platform-core';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
-
-const passwordValidators = [
-  validators.required,
-  validators.containBothCases,
-  validators.containNumbers,
-  validators.minLength(8),
-];
 
 export const SignUp: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
   const styles = getStyles(useTheme());
@@ -56,11 +49,18 @@ export const SignUp: FC<LoginFormProps> = ({ changeMode, getSettings }) => {
         validators={[validators.required, validators.validateEmail]}
         showErrorOnBlur
       />
-      <PasswordInputField
-        data-qa="sign-up-password-input"
-        name="password"
-        label={Messages.passwordLabel}
-        validators={passwordValidators}
+      <TextInputField
+        data-qa="sign-up-first-name-input"
+        name="firstName"
+        label={Messages.firstNameLabel}
+        validators={[validators.required]}
+        showErrorOnBlur
+      />
+      <TextInputField
+        data-qa="sign-up-last-name-input"
+        name="lastName"
+        label={Messages.lastNameLabel}
+        validators={[validators.required]}
         showErrorOnBlur
       />
       <CheckboxField

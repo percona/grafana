@@ -1,5 +1,13 @@
 export interface Credentials {
   email: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface SignUpPayload {
+  email: string;
+  first_name: string;
+  last_name: string;
   password: string;
 }
 
