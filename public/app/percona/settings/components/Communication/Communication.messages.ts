@@ -40,13 +40,6 @@ export const Messages = {
       tooltipLinkText: 'Read more',
       tooltipLink: COMMUNICATION_LINK,
     },
-
-    secret: {
-      label: 'Secret',
-      tooltipText: 'SMTP authentication information.  Secret',
-      tooltipLinkText: 'Read more',
-      tooltipLink: COMMUNICATION_LINK,
-    },
     identity: {
       label: 'Identity',
       tooltipText: 'SMTP authentication information. Identity',

@@ -6,6 +6,6 @@ export interface EmailProps {
   updateSettings: (body: any, callback: LoadingCallback) => void;
 }
 
-export interface FormEmailSettings extends Omit<EmailSettings, 'identity'> {
+export interface FormEmailSettings extends Omit<EmailSettings, 'identity' | 'secret'> {
   authType: EmailAuthType;
 }

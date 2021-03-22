@@ -20,6 +20,8 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
 
     if (values.authType === EmailAuthType.PLAIN) {
       baseSettings.identity = btoa(`${values.username}${values.password}`);
+    } else if (values.authType === EmailAuthType.CRAM) {
+      baseSettings.secret = baseSettings.password;
     }
 
     Object.keys(baseSettings).forEach((field: keyof EmailSettings) => {
@@ -95,50 +97,39 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
               fullWidth
             />
 
-            {isEmailFieldNeeded('username', values.authType) && (
-              <>
-                <div className={settingsStyles.labelWrapper}>
-                  <span>{Messages.fields.username.label}</span>
-                  <LinkTooltip
-                    tooltipText={Messages.fields.username.tooltipText}
-                    link={Messages.fields.username.tooltipLink}
-                    linkText={Messages.fields.username.tooltipLinkText}
-                    icon="info-circle"
-                  />
-                </div>
-                <TextInputField validators={[validators.required]} name="username" />
-              </>
-            )}
+            <>
+              <div className={settingsStyles.labelWrapper}>
+                <span>{Messages.fields.username.label}</span>
+                <LinkTooltip
+                  tooltipText={Messages.fields.username.tooltipText}
+                  link={Messages.fields.username.tooltipLink}
+                  linkText={Messages.fields.username.tooltipLinkText}
+                  icon="info-circle"
+                />
+              </div>
+              <TextInputField
+                disabled={values.authType === EmailAuthType.NONE}
+                validators={[validators.required]}
+                name="username"
+              />
+            </>
 
-            {isEmailFieldNeeded('password', values.authType) && (
-              <>
-                <div className={settingsStyles.labelWrapper}>
-                  <span>{Messages.fields.password.label}</span>
-                  <LinkTooltip
-                    tooltipText={Messages.fields.password.tooltipText}
-                    link={Messages.fields.password.tooltipLink}
-                    linkText={Messages.fields.password.tooltipLinkText}
-                    icon="info-circle"
-                  />
-                </div>
-                <PasswordInputField validators={[validators.required]} name="password" />
-              </>
-            )}
-
-            {isEmailFieldNeeded('secret', values.authType) && (
-              <>
-                <div className={settingsStyles.labelWrapper}>
-                  <span>{Messages.fields.secret.label}</span>
-                  <LinkTooltip
-                    tooltipText={Messages.fields.secret.tooltipText}
-                    link={Messages.fields.secret.tooltipLink}
-                    linkText={Messages.fields.secret.tooltipLinkText}
-                    icon="info-circle"
-                  />
-                </div>
-                <PasswordInputField validators={[validators.required]} name="secret" />
-              </>
-            )}
+            <>
+              <div className={settingsStyles.labelWrapper}>
+                <span>{Messages.fields.password.label}</span>
+                <LinkTooltip
+                  tooltipText={Messages.fields.password.tooltipText}
+                  link={Messages.fields.password.tooltipLink}
+                  linkText={Messages.fields.password.tooltipLinkText}
+                  icon="info-circle"
+                />
+              </div>
+              <PasswordInputField
+                disabled={values.authType === EmailAuthType.NONE}
+                validators={[validators.required]}
+                name="password"
+              />
+            </>
 
             <Button
               className={settingsStyles.actionButton}
