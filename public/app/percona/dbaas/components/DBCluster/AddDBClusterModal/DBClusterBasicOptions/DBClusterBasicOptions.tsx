@@ -8,11 +8,15 @@ import { DatabaseOption, DBClusterBasicOptionsProps } from './DBClusterBasicOpti
 import { DATABASE_OPTIONS } from '../../DBCluster.constants';
 import { AddDBClusterFields } from '../AddDBClusterModal.types';
 import { DBClusterTopology } from '../DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { getKubernetesOptions, kubernetesClusterNameValidator, optionRequired } from './DBClusterBasicOptions.utils';
+import {
+  findDefaultDatabaseVersion,
+  getKubernetesOptions,
+  kubernetesClusterNameValidator,
+  optionRequired,
+} from './DBClusterBasicOptions.utils';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
-import { DBClusterService } from '../../DBCluster.service';
 import { SelectableValue } from '@grafana/data';
-import { isOptionEmpty } from '../../DBCluster.utils';
+import { isOptionEmpty, newDBClusterService } from '../../DBCluster.utils';
 
 export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernetes, form }) => {
   const { required } = validators;
@@ -62,8 +66,14 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
 
   const getDatabaseVersions = async () => {
     try {
+      const dbClusterService = newDBClusterService(databaseType.value);
+
       setLoadingDatabaseVersions(true);
-      setDatabaseVersions(await DBClusterService.getDatabaseVersions(kubernetesCluster, databaseType));
+
+      const databaseVersions = await dbClusterService.getDatabaseVersions(kubernetesCluster);
+
+      setDatabaseVersions(databaseVersions);
+      change(AddDBClusterFields.databaseVersion, findDefaultDatabaseVersion(databaseVersions));
     } catch (e) {
       logger.error(e);
     } finally {

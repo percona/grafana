@@ -3,8 +3,10 @@ import { Databases } from 'app/percona/shared/core';
 import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 import {
+  DatabaseVersion,
   DBCluster,
   DBClusterActionAPI,
+  DBClusterComponentsAPI,
   DBClusterConnectionAPI,
   DBClusterPayload,
   DBClusterStatus,
@@ -66,6 +68,22 @@ export class PSMDBService extends DBClusterService {
     );
   }
 
+  getComponents({ kubernetesClusterName }: Kubernetes): Promise<DBClusterComponentsAPI> {
+    return apiManagement.post<DBClusterComponentsAPI, any>('/DBaaS/Components/GetPSMDB', {
+      kubernetes_cluster_name: kubernetesClusterName,
+    });
+  }
+
+  getDatabaseVersions(kubernetes: Kubernetes): Promise<DatabaseVersion[]> {
+    return this.getComponents(kubernetes).then(({ versions }) => {
+      return Object.entries(versions[0].matrix.mongod).map(([version, component]) => ({
+        value: component.image_path,
+        label: version,
+        default: !!component.default,
+      }));
+    });
+  }
+
   toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster {
     return {
       clusterName: dbCluster.name,
@@ -95,6 +113,7 @@ const toAPI = (dbCluster: DBCluster) => ({
       },
       disk_size: dbCluster.disk * 10 ** 9,
     },
+    image: dbCluster.databaseImage,
   },
 });
 

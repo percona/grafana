@@ -1,6 +1,5 @@
-import { SelectableValue } from '@grafana/data';
 import { Databases } from 'app/percona/shared/core';
-import { apiManagement, api } from 'app/percona/shared/helpers/api';
+import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 import {
   DBCluster,
@@ -9,6 +8,8 @@ import {
   DBClusterLogsAPI,
   DBClusterAllocatedResources,
   DBClusterAllocatedResourcesAPI,
+  DatabaseVersion,
+  DBClusterComponentsAPI,
 } from './DBCluster.types';
 
 export abstract class DBClusterService {
@@ -27,6 +28,10 @@ export abstract class DBClusterService {
   abstract getDBClusterCredentials(dbCluster: DBCluster): Promise<void | DBClusterConnectionAPI>;
 
   abstract restartDBCluster(dbCluster: DBCluster): Promise<void>;
+
+  abstract getComponents(kubernetes: Kubernetes): Promise<DBClusterComponentsAPI>;
+
+  abstract getDatabaseVersions(kubernetes: Kubernetes): Promise<DatabaseVersion[]>;
 
   abstract toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster;
 
@@ -58,17 +63,5 @@ export abstract class DBClusterService {
           disk: (response.all.disk_size - response.available.disk_size) / 10 ** 9,
         },
       }));
-  }
-
-  static async getOperatorMatrix({ kubernetesClusterName }: Kubernetes): Promise<any> {
-    console.log(kubernetesClusterName);
-    return api.get<any, any>('https://check.percona.com/versions/v1/pxc-operator/1.7.0');
-  }
-
-  static async getDatabaseVersions(kubernetes: Kubernetes, databaseType: Databases): Promise<SelectableValue[]> {
-    console.log(databaseType);
-    return this.getOperatorMatrix(kubernetes).then(({ versions }) =>
-      Object.keys(versions[0].matrix.pxc).map(version => ({ value: version, label: version }))
-    );
   }
 }
