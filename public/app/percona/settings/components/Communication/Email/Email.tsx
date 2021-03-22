@@ -47,6 +47,39 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
         render={({ handleSubmit, valid, pristine, values }) => (
           <form className={settingsStyles.emailForm} onSubmit={handleSubmit}>
             <div className={settingsStyles.labelWrapper}>
+              <span>{Messages.fields.smarthost.label}</span>
+              <LinkTooltip
+                tooltipText={Messages.fields.smarthost.tooltipText}
+                link={Messages.fields.smarthost.tooltipLink}
+                linkText={Messages.fields.smarthost.tooltipLinkText}
+                icon="info-circle"
+              />
+            </div>
+            <TextInputField name="smarthost" validators={[validators.required]} />
+
+            <div className={settingsStyles.labelWrapper}>
+              <span>{Messages.fields.hello.label}</span>
+              <LinkTooltip
+                tooltipText={Messages.fields.hello.tooltipText}
+                link={Messages.fields.hello.tooltipLink}
+                linkText={Messages.fields.hello.tooltipLinkText}
+                icon="info-circle"
+              />
+            </div>
+            <TextInputField validators={[validators.required]} name="hello" />
+
+            <div className={settingsStyles.labelWrapper}>
+              <span>{Messages.fields.from.label}</span>
+              <LinkTooltip
+                tooltipText={Messages.fields.from.tooltipText}
+                link={Messages.fields.from.tooltipLink}
+                linkText={Messages.fields.from.tooltipLinkText}
+                icon="info-circle"
+              />
+            </div>
+            <TextInputField name="from" validators={[validators.required]} />
+
+            <div className={settingsStyles.labelWrapper}>
               <span>{Messages.fields.type.label}</span>
               <LinkTooltip
                 tooltipText={Messages.fields.type.tooltipText}
@@ -61,39 +94,6 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
               name="authType"
               fullWidth
             />
-
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.smarthost.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.smarthost.tooltipText}
-                link={Messages.fields.smarthost.tooltipLink}
-                linkText={Messages.fields.smarthost.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <TextInputField name="smarthost" validators={[validators.required]} />
-
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.from.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.from.tooltipText}
-                link={Messages.fields.from.tooltipLink}
-                linkText={Messages.fields.from.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <TextInputField name="from" validators={[validators.required]} />
-
-            <div className={settingsStyles.labelWrapper}>
-              <span>{Messages.fields.hello.label}</span>
-              <LinkTooltip
-                tooltipText={Messages.fields.hello.tooltipText}
-                link={Messages.fields.hello.tooltipLink}
-                linkText={Messages.fields.hello.tooltipLinkText}
-                icon="info-circle"
-              />
-            </div>
-            <TextInputField validators={[validators.required]} name="hello" />
 
             {isEmailFieldNeeded('username', values.authType) && (
               <>
