@@ -26,20 +26,27 @@ const availableInstanceTypes = [
 
 const AddInstancePanel = () => {
   const styles = getStyles();
+  const { path: basePath } = PAGE_MODEL;
 
   const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
-  const { path: basePath } = PAGE_MODEL;
+  const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
+
   const isValidTab = (tab: UrlQueryValue) => Object.values(InstanceTypes).includes(tab as InstanceTypes);
   const selectTab = (tabKey: string) => {
     if (tabKey === activeTab) {
       return;
     }
+
     getLocationSrv().update({
       path: tabKey ? `${basePath}/${tabKey}` : basePath,
     });
   };
 
   useEffect(() => {
+    if (!isSamePage) {
+      return;
+    }
+
     isValidTab(activeTab) || selectTab(DEFAULT_TAB);
   }, [activeTab]);
 

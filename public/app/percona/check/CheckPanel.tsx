@@ -14,8 +14,10 @@ import { getLocationSrv } from '@grafana/runtime';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 
 export const CheckPanel: FC = () => {
-  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
   const { path: basePath } = PAGE_MODEL;
+
+  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
+  const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
   const isValidTab = (tab: UrlQueryValue) => Object.values(TabKeys).includes(tab as TabKeys);
   const selectTab = (tabKey: string) => {
     getLocationSrv().update({
@@ -24,6 +26,10 @@ export const CheckPanel: FC = () => {
   };
 
   useEffect(() => {
+    if (!isSamePage) {
+      return;
+    }
+
     isValidTab(activeTab) || selectTab(DEFAULT_TAB);
   }, [activeTab]);
 
@@ -38,7 +44,6 @@ export const CheckPanel: FC = () => {
       const resp = (await CheckService.getSettings()) as Settings;
 
       setIsSttEnabled(!!resp.settings?.stt_enabled);
-      setIsSttEnabled(true);
       setHasNoAccess(false);
     } catch (err) {
       setHasNoAccess(err.response?.status === 401);

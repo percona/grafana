@@ -58,8 +58,11 @@ export const PAGE_MODEL: PageModel = {
 };
 
 export const SettingsPanel: FC = () => {
-  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab) || TabKeys.metrics;
   const { path: basePath } = PAGE_MODEL;
+
+  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
+  const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
+
   const isValidTab = (tab: UrlQueryValue) => Object.values(TabKeys).includes(tab as TabKeys);
   const selectTab = (tabKey: string) => {
     getLocationSrv().update({
@@ -67,12 +70,11 @@ export const SettingsPanel: FC = () => {
     });
   };
   useEffect(() => {
+    if (!isSamePage) {
+      return;
+    }
     isValidTab(activeTab) || selectTab(DEFAULT_TAB);
   }, []);
-
-  // useEffect(() => {
-  //   selectTab(isValidTab(activeTab) ? (activeTab as TabKeys) : DEFAULT_TAB);
-  // }, [activeTab]);
 
   const theme = useTheme();
   const styles = getSettingsStyles(theme);

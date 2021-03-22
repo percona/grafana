@@ -183,10 +183,80 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		{Text: "PXC/Galera Nodes Compare", Id: "home", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "percona-cluster", HideFromTabs: true},
 	}
 
+	mysqlSummaryChildNavs := []*dtos.NavLink{
+		{
+			Text: "MySQL Command/Handler Counters Compare",
+			Id:   "mysql-command-handler-counters-compare",
+			Url:  setting.AppSubUrl + "/d/mysql-commandhandler-compare/mysql-command-handler-counters-compare",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL InnoDB Compression Details",
+			Id:   "mysql-innodb-compression-details",
+			Url:  setting.AppSubUrl + "/d/mysql-innodb-compression/mysql-innodb-compression-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL Performance Schema Details",
+			Id:   "mysql-performance-schema-details",
+			Url:  setting.AppSubUrl + "/d/mysql-performance-schema/mysql-performance-schema-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL Query Response Time Details",
+			Id:   "mysql-query-response-time-details",
+			Url:  setting.AppSubUrl + "/d/mysql-queryresponsetime/mysql-query-response-time-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL Table Details",
+			Id:   "mysql-table-details",
+			Url:  setting.AppSubUrl + "/d/mysql-table/mysql-table-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL TokuDB Details",
+			Id:   "mysql-tokudb-details",
+			Url:  setting.AppSubUrl + "/d/mysql-tokudb/mysql-tokudb-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL User Details",
+			Id:   "mysql-user-details",
+			Url:  setting.AppSubUrl + "/d/mysql-user/mysql-user-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL Wait Event Analyses Details",
+			Id:   "mysql-wait-event-analyses-details",
+			Url:  setting.AppSubUrl + "/d/mysql-waitevents-analysis/mysql-wait-event-analyses-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL MyISAM/Aria Details",
+			Id:   "mysql-myisam-aria-details",
+			Url:  setting.AppSubUrl + "/d/mysql-myisamaria/mysql-myisam-aria-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL MyRocks Details",
+			Id:   "mysql-myrocks-details",
+			Url:  setting.AppSubUrl + "/d/mysql-myrocks/mysql-myrocks-details",
+			Icon: "sitemap",
+		},
+		{
+			Text: "MySQL Amazon Aurora Details",
+			Id:   "mysql-amazon-aurora-details",
+			Url:  setting.AppSubUrl + "/d/mysql-amazonaurora/mysql-amazon-aurora-details",
+			Icon: "sitemap",
+		},
+	}
+
+
 	mysqlChildNavs := []*dtos.NavLink{
 		{Text: "HA (High availability)", Id: "home", Icon: "percona-cluster", HideFromTabs: true, Children: mysqlHAChildNavs},
 		{Text: "MySQL Overview", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "percona-cluster-network", HideFromTabs: true},
-		{Text: "MySQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-summary/mysql-instances-summary", Icon: "percona-summary", HideFromTabs: true},
+		{Text: "MySQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-summary/mysql-instances-summary", Icon: "percona-summary", HideFromTabs: true, Children: mysqlSummaryChildNavs},
 	}
 
 	mongodbHAChildNavs := []*dtos.NavLink{

@@ -15,8 +15,11 @@ import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 
 export const DBaaS: FC = () => {
   const styles = useStyles(getStyles);
-  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
   const { path: basePath } = PAGE_MODEL;
+
+  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
+  const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
+
   const isValidTab = (tab: UrlQueryValue) => Object.values(TabKeys).includes(tab as TabKeys);
   const selectTab = (tabKey: string) => {
     getLocationSrv().update({
@@ -25,6 +28,9 @@ export const DBaaS: FC = () => {
   };
 
   useEffect(() => {
+    if (!isSamePage) {
+      return;
+    }
     isValidTab(activeTab) || selectTab(DEFAULT_TAB);
   }, [activeTab]);
 
