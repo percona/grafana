@@ -17,12 +17,16 @@ export const isEmailFieldNeeded = (field: keyof EmailSettings, authType: EmailAu
     case 'identity':
       needingAuths = [EmailAuthType.PLAIN];
       break;
-    default:
+    case 'smarthost':
+    case 'from':
+    case 'hello':
       needingAuths = [EmailAuthType.CRAM, EmailAuthType.LOGIN, EmailAuthType.PLAIN, EmailAuthType.NONE];
+      break;
+    default:
       break;
   }
 
-  return needingAuths.length >= 0 && needingAuths.includes(authType);
+  return needingAuths.length > 0 && needingAuths.includes(authType);
 };
 
 export const getAuthTypeFromFields = (settings: EmailSettings): EmailAuthType => {
