@@ -286,7 +286,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 
 	proxysqlChildNavs := []*dtos.NavLink{
 		{Text: "HA (High availability)", Id: "home", Icon: "percona-cluster", HideFromTabs: true, Children: proxysqlHAChildNavs},
-		{Text: "Proxy SQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "percona-summary", HideFromTabs: true},
+		{Text: "ProxySQL Summary", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "percona-summary", HideFromTabs: true},
 	}
 
 	pmmChildNavs := []*dtos.NavLink{

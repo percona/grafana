@@ -30,6 +30,10 @@ const DropDownChild: FC<Props> = props => {
         e.target.href = variableUrl;
       } else {
         e.target.href = child.url;
+
+        if (!child.url) {
+          e.target.href = '#';
+        }
       }
 
       return false;
