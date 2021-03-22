@@ -97,39 +97,31 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
               fullWidth
             />
 
-            <>
-              <div className={settingsStyles.labelWrapper}>
-                <span>{Messages.fields.username.label}</span>
-                <LinkTooltip
-                  tooltipText={Messages.fields.username.tooltipText}
-                  link={Messages.fields.username.tooltipLink}
-                  linkText={Messages.fields.username.tooltipLinkText}
-                  icon="info-circle"
-                />
-              </div>
-              <TextInputField
-                disabled={values.authType === EmailAuthType.NONE}
-                validators={[validators.required]}
-                name="username"
-              />
-            </>
+            {values.authType !== EmailAuthType.NONE && (
+              <>
+                <div className={settingsStyles.labelWrapper}>
+                  <span>{Messages.fields.username.label}</span>
+                  <LinkTooltip
+                    tooltipText={Messages.fields.username.tooltipText}
+                    link={Messages.fields.username.tooltipLink}
+                    linkText={Messages.fields.username.tooltipLinkText}
+                    icon="info-circle"
+                  />
+                </div>
+                <TextInputField validators={[validators.required]} name="username" />
 
-            <>
-              <div className={settingsStyles.labelWrapper}>
-                <span>{Messages.fields.password.label}</span>
-                <LinkTooltip
-                  tooltipText={Messages.fields.password.tooltipText}
-                  link={Messages.fields.password.tooltipLink}
-                  linkText={Messages.fields.password.tooltipLinkText}
-                  icon="info-circle"
-                />
-              </div>
-              <PasswordInputField
-                disabled={values.authType === EmailAuthType.NONE}
-                validators={[validators.required]}
-                name="password"
-              />
-            </>
+                <div className={settingsStyles.labelWrapper}>
+                  <span>{Messages.fields.password.label}</span>
+                  <LinkTooltip
+                    tooltipText={Messages.fields.password.tooltipText}
+                    link={Messages.fields.password.tooltipLink}
+                    linkText={Messages.fields.password.tooltipLinkText}
+                    icon="info-circle"
+                  />
+                </div>
+                <PasswordInputField validators={[validators.required]} name="password" />
+              </>
+            )}
 
             <Button
               className={settingsStyles.actionButton}
