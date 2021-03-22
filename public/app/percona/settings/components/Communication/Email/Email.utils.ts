@@ -51,3 +51,21 @@ export const getInitialValues = (settings: EmailSettings): FormEmailSettings => 
 
   return resultSettings;
 };
+
+export const cleanupFormValues = (values: FormEmailSettings): EmailSettings => {
+  const baseSettings: EmailSettings = { ...values };
+
+  if (values.authType === EmailAuthType.PLAIN) {
+    baseSettings.identity = btoa(`${values.username}${values.password}`);
+  } else if (values.authType === EmailAuthType.CRAM) {
+    baseSettings.secret = baseSettings.password;
+  }
+
+  Object.keys(baseSettings).forEach((field: keyof EmailSettings) => {
+    if (!isEmailFieldNeeded(field, values.authType)) {
+      delete baseSettings[field];
+    }
+  });
+
+  return baseSettings;
+};
