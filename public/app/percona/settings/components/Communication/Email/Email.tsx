@@ -5,38 +5,23 @@ import { TextInputField, PasswordInputField, validators, RadioButtonGroupField }
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';
-import { isEmailFieldNeeded, getInitialValues } from './Email.utils';
+import { getInitialValues, cleanupFormValues } from './Email.utils';
 import { emailOptions } from './Email.constants';
 import { EmailProps, FormEmailSettings } from './Email.types';
-import { EmailAuthType, EmailSettings } from 'app/percona/settings/Settings.types';
+import { EmailAuthType } from 'app/percona/settings/Settings.types';
 
 export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
   const theme = useTheme();
   const settingsStyles = getSettingsStyles(theme);
   const [loading, setLoading] = useState(false);
 
-  const applyChanges = (values: FormEmailSettings) => {
-    const baseSettings: EmailSettings = { ...values };
-
-    if (values.authType === EmailAuthType.PLAIN) {
-      baseSettings.identity = btoa(`${values.username}${values.password}`);
-    } else if (values.authType === EmailAuthType.CRAM) {
-      baseSettings.secret = baseSettings.password;
-    }
-
-    Object.keys(baseSettings).forEach((field: keyof EmailSettings) => {
-      if (!isEmailFieldNeeded(field, values.authType)) {
-        delete baseSettings[field];
-      }
-    });
-
+  const applyChanges = (values: FormEmailSettings) =>
     updateSettings(
       {
-        email_alerting_settings: baseSettings,
+        email_alerting_settings: cleanupFormValues(values),
       },
       setLoading
     );
-  };
 
   const initialValues = getInitialValues(settings);
   const { Form } = withTypes<FormEmailSettings>();
