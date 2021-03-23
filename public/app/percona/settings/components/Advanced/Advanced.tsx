@@ -13,6 +13,7 @@ import { transformSecondsToDays } from './Advanced.utils';
 import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS } from './Advanced.constants';
 import { AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
+import { AdvancedChangePayload } from '../../Settings.types';
 
 export const Advanced: FC<AdvancedProps> = ({
   dataRetention,
@@ -66,7 +67,7 @@ export const Advanced: FC<AdvancedProps> = ({
   // @ts-ignore
   const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting }) => {
     const refresh = !!alerting !== alertingEnabled;
-    const body = {
+    const body: AdvancedChangePayload = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
       disable_telemetry: !telemetry,
       enable_telemetry: telemetry,

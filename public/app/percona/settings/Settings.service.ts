@@ -3,7 +3,7 @@ import { logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/app_events';
 import { api } from 'app/percona/shared/helpers/api';
 import { Messages } from './Settings.messages';
-import { Settings, SettingsAPI } from './Settings.types';
+import { Settings, SettingsAPIChangePayload, SettingsPayload } from './Settings.types';
 
 export type LoadingCallback = (value: boolean) => void;
 export type SettingsCallback = (settings: Settings) => void;
@@ -25,7 +25,7 @@ export const SettingsService = {
 
     return response;
   },
-  async setSettings(body: SettingsAPI, setLoading: LoadingCallback) {
+  async setSettings(body: SettingsAPIChangePayload, setLoading: LoadingCallback) {
     let response: Settings = {
       awsPartitions: [],
       updatesDisabled: false,
@@ -54,7 +54,7 @@ export const SettingsService = {
 
     try {
       setLoading(true);
-      const { settings }: { settings: SettingsAPI } = await api.post<any, any>('/v1/Settings/Change', body);
+      const { settings }: { settings: SettingsPayload } = await api.post<any, any>('/v1/Settings/Change', body);
       response = toModel(settings);
       appEvents.emit(AppEvents.alertSuccess, [Messages.service.success]);
     } catch (e) {
@@ -67,7 +67,7 @@ export const SettingsService = {
   },
 };
 
-const toModel = (response: SettingsAPI): Settings => ({
+const toModel = (response: SettingsPayload): Settings => ({
   awsPartitions: response.aws_partitions,
   updatesDisabled: response.updates_disabled,
   telemetryEnabled: response.telemetry_enabled,

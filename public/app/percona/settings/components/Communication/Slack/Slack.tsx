@@ -6,11 +6,11 @@ import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/
 import { getSettingsStyles } from '../../../Settings.styles';
 import { LoadingCallback } from '../../../Settings.service';
 import { Messages } from '../Communication.messages';
-import { SettingsAPI, SlackSettings } from '../../../Settings.types';
+import { SlackPayload, SlackSettings } from '../../../Settings.types';
 
 export interface SlackProps {
   settings: SlackSettings;
-  updateSettings: (body: Pick<SettingsAPI, 'slack_alerting_settings'>, callback: LoadingCallback) => void;
+  updateSettings: (body: SlackPayload, callback: LoadingCallback) => void;
 }
 
 export const Slack: FC<SlackProps> = ({ updateSettings, settings }) => {

@@ -1,9 +1,9 @@
-import { MetricsResolutions, SettingsAPI } from 'app/percona/settings/Settings.types';
+import { MetricsResolutions, MetricsResolutionsPayload } from 'app/percona/settings/Settings.types';
 import { LoadingCallback } from 'app/percona/settings/Settings.service';
 
 export interface MetricsResolutionProps {
   metricsResolutions: MetricsResolutions;
-  updateSettings: (body: Pick<SettingsAPI, 'metrics_resolutions'>, callback: LoadingCallback) => void;
+  updateSettings: (body: MetricsResolutionsPayload, callback: LoadingCallback) => void;
 }
 
 export enum MetricsResolutionIntervals {
