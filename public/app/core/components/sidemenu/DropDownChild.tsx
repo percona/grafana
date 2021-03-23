@@ -44,7 +44,7 @@ const DropDownChild: FC<Props> = props => {
   const renderChildren = !!children.length;
   return (
     <li className={listItemClassName}>
-      <a onMouseDown={onLinkMouseDown}>
+      <a href={child.url} onMouseDown={onLinkMouseDown}>
         {child.icon && <Icon name={child.icon as IconName} className={iconClassName} />}
         {child.text}
         <span style={{ marginLeft: 'auto' }}>{renderChildren && <Icon name={'angle-right'} />}</span>

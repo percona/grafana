@@ -295,7 +295,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		{Text: "MySQL", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: mysqlChildNavs},
 		{Text: "MongoDB", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: mongodbChildNavs},
 		{Text: "PostgreSQL", Id: "home", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: postgresqlChildNavs},
-		{Text: "Proxy SQL", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "percona-database", HideFromTabs: true, Children: proxysqlChildNavs},
+		{Text: "ProxySQL", Id: "home", Url: setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary", Icon: "percona-database", HideFromTabs: true, Children: proxysqlChildNavs},
 	}
 
 	dashboardChildNavs := []*dtos.NavLink{
