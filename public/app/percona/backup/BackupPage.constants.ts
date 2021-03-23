@@ -18,7 +18,7 @@ export const PAGE_TABS = [
 ];
 
 export const PAGE_MODEL: PageModel = {
-  title: 'Backups',
+  title: 'Backup Management',
   path: 'backup',
   id: 'backup',
   children: PAGE_TABS.map(({ title, id, path }) => ({ title, id, path })),
