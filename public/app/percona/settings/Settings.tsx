@@ -4,7 +4,7 @@ import { cx } from 'emotion';
 import { TabsVertical } from 'app/percona/shared/components/Elements/TabsVertical/TabsVertical';
 import { Advanced, AlertManager, Diagnostics, MetricsResolution, PlatformLogin, SSHKey } from './components';
 import { LoadingCallback, SettingsService } from './Settings.service';
-import { Settings, TabKeys } from './Settings.types';
+import { Settings, TabKeys, SettingsAPI } from './Settings.types';
 import { Messages } from './Settings.messages';
 import { getSettingsStyles } from './Settings.styles';
 import { Communication } from './components/Communication/Communication';
@@ -99,7 +99,7 @@ export const SettingsPanel: FC = () => {
     [activeTab, settings]
   );
 
-  const updateSettings = async (body: any, callback: LoadingCallback, refresh?: boolean) => {
+  const updateSettings = async (body: SettingsAPI, callback: LoadingCallback, refresh?: boolean) => {
     const response: Settings = await SettingsService.setSettings(body, callback);
     const {
       email_alerting_settings: { password },

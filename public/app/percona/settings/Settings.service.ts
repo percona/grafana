@@ -25,7 +25,7 @@ export const SettingsService = {
 
     return response;
   },
-  async setSettings(body: any, setLoading: LoadingCallback) {
+  async setSettings(body: SettingsAPI, setLoading: LoadingCallback) {
     let response: Settings = {
       awsPartitions: [],
       updatesDisabled: false,
