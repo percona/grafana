@@ -68,14 +68,14 @@ export class PSMDBService extends DBClusterService {
     );
   }
 
-  getComponents({ kubernetesClusterName }: Kubernetes): Promise<DBClusterComponentsAPI> {
+  getComponents(kubernetesClusterName: string): Promise<DBClusterComponentsAPI> {
     return apiManagement.post<DBClusterComponentsAPI, any>('/DBaaS/Components/GetPSMDB', {
       kubernetes_cluster_name: kubernetesClusterName,
     });
   }
 
-  getDatabaseVersions(kubernetes: Kubernetes): Promise<DatabaseVersion[]> {
-    return this.getComponents(kubernetes).then(({ versions }) => {
+  getDatabaseVersions(kubernetesClusterName: string): Promise<DatabaseVersion[]> {
+    return this.getComponents(kubernetesClusterName).then(({ versions }) => {
       return Object.entries(versions[0].matrix.mongod).map(([version, component]) => ({
         value: component.image_path,
         label: version,

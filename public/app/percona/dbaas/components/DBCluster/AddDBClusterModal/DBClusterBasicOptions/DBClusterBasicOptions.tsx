@@ -70,7 +70,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
 
       setLoadingDatabaseVersions(true);
 
-      const databaseVersions = await dbClusterService.getDatabaseVersions(kubernetesCluster);
+      const databaseVersions = await dbClusterService.getDatabaseVersions(kubernetesCluster.value);
 
       setDatabaseVersions(databaseVersions);
       change(AddDBClusterFields.databaseVersion, findDefaultDatabaseVersion(databaseVersions));
