@@ -2,7 +2,7 @@ import { ResourcesWithUnits } from '../DBCluster.types';
 
 export const Messages = {
   buildResourcesLabel: (allocated: ResourcesWithUnits, allocatedWidth: number, total: ResourcesWithUnits) =>
-    `${allocated.value} ${allocated.units} (${allocatedWidth}%) of ${total.value} ${total.units} used`,
+    `Using ${allocated.value} ${allocated.units} (${allocatedWidth}%) of ${total.value} ${total.units} in total`,
   buildExpectedLabel: (expected: ResourcesWithUnits, resourceLabel: string) =>
     `Required ${resourceLabel} (${expected.value} ${expected.units})`,
   buildAllocatedLabel: (resourceLabel: string) => `Consumed ${resourceLabel}`,
