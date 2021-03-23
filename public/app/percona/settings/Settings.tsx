@@ -101,6 +101,9 @@ export const SettingsPanel: FC = () => {
 
   const updateSettings = async (body: any, callback: LoadingCallback, refresh?: boolean) => {
     const response = await SettingsService.setSettings(body, callback);
+    const {
+      email_alerting_settings: { password },
+    } = body;
 
     if (refresh) {
       window.location.reload();
@@ -109,7 +112,12 @@ export const SettingsPanel: FC = () => {
     }
 
     if (response) {
-      setSettings(response);
+      // password is not being returned by the API, hence this construction
+      const newSettings = {
+        ...response,
+        alertingSettings: { ...response.alertingSettings, email: { ...response.alertingSettings.email, password } },
+      };
+      setSettings(newSettings);
     }
   };
 

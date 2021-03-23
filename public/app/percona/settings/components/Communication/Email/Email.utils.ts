@@ -46,8 +46,12 @@ export const getAuthTypeFromFields = (settings: EmailSettings): EmailAuthType =>
 };
 
 export const getInitialValues = (settings: EmailSettings): FormEmailSettings => {
-  const resultSettings = { ...settings, authType: getAuthTypeFromFields(settings) };
-  delete resultSettings['identity'];
+  const authType = getAuthTypeFromFields(settings);
+  const resultSettings: FormEmailSettings = {
+    ...settings,
+    password: authType === EmailAuthType.CRAM ? settings.secret : settings.password,
+    authType,
+  };
 
   return resultSettings;
 };
