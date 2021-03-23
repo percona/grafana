@@ -17,6 +17,24 @@ export interface AlertingSettings {
   slack: SlackSettings;
 }
 
+export interface SettingsAPI {
+  aws_partitions: string[];
+  updates_disabled: boolean;
+  telemetry_enabled: boolean;
+  metrics_resolutions: MetricsResolutions;
+  data_retention: string;
+  ssh_key: string;
+  alert_manager_url: string;
+  alert_manager_rules: string;
+  stt_enabled: boolean;
+  platform_email: string;
+  dbaas_enabled: boolean;
+  alerting_enabled: boolean;
+  email_alerting_settings: EmailSettings;
+  slack_alerting_settings: SlackSettings;
+  pmm_public_address: string;
+}
+
 export interface Settings {
   updatesDisabled: boolean;
   telemetryEnabled: boolean;
