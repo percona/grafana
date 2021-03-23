@@ -7,7 +7,7 @@ export const Messages = {
   notificationSettings: 'Notification Settings',
   agreementFirstPart: 'Check here to indicate that you have read and agree to the ',
   agreementSecondPart: 'and',
-  signUpSucceeded: 'You have successfully created your credentials',
+  signUpSucceeded: 'An account activation email has been sent to you',
   signInSucceeded: 'You are signed in as',
   passwordLabel: 'Password',
   confirmPasswordLabel: 'Confirm Password',
