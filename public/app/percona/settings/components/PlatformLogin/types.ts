@@ -9,12 +9,7 @@ export interface SignUpCredentials {
   lastName: string;
 }
 
-export interface SignUpPayload {
-  email: string;
-  first_name: string;
-  last_name: string;
-  password: string;
-}
+export type SignUpPayload = SignUpCredentials;
 
 export interface SignUpProps {
   userEmail: string | undefined;
