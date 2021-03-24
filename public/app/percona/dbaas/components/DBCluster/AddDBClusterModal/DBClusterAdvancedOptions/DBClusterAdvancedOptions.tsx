@@ -108,29 +108,6 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) 
     }
   };
 
-  const getExpectedResources = async () => {
-    try {
-      const dbClusterService = newDBClusterService(databaseType.value);
-
-      setLoadingExpectedResources(true);
-      setExpectedResources(
-        await dbClusterService.getExpectedResources({
-          clusterName: name,
-          kubernetesClusterName: kubernetesCluster,
-          databaseType: databaseType.value,
-          clusterSize: topology === DBClusterTopology.cluster ? nodes : single,
-          cpu,
-          memory,
-          disk,
-        })
-      );
-    } catch (e) {
-      logger.error(e);
-    } finally {
-      setLoadingExpectedResources(false);
-    }
-  };
-
   useEffect(() => {
     if (prevResources === DBClusterResources.custom) {
       setCustomMemory(memory);
