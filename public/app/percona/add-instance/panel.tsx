@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { BrowserRouter as Router, Route, useLocation, useHistory } from 'react-router-dom';
 import { Button } from '@grafana/ui';
 import { cx } from 'emotion';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';
@@ -7,12 +8,8 @@ import { AddInstance } from './components/AddInstance/AddInstance';
 import { getStyles } from './panel.styles';
 import { Messages } from './components/AddRemoteInstance/AddRemoteInstance.messages';
 import { InstanceTypes } from './panel.types';
-import { useSelector } from 'react-redux';
-import { StoreState } from '../../types';
-import { UrlQueryValue } from '@grafana/data';
-import { getLocationSrv } from '@grafana/runtime';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
-import { DEFAULT_TAB, PAGE_MODEL } from './panel.constants';
+import { PAGE_MODEL } from './panel.constants';
 
 const availableInstanceTypes = [
   InstanceTypes.rds,
@@ -26,43 +23,34 @@ const availableInstanceTypes = [
 
 const AddInstancePanel = () => {
   const styles = getStyles();
-  const { path: basePath } = PAGE_MODEL;
-
-  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
-  const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
-
-  const isValidTab = (tab: UrlQueryValue) => Object.values(InstanceTypes).includes(tab as InstanceTypes);
-  const selectTab = (tabKey: string) => {
-    if (tabKey === activeTab) {
-      return;
-    }
-
-    getLocationSrv().update({
-      path: tabKey ? `${basePath}/${tabKey}` : basePath,
-    });
-  };
-
-  useEffect(() => {
-    if (!isSamePage) {
-      return;
-    }
-
-    isValidTab(activeTab) || selectTab(DEFAULT_TAB);
-  }, [activeTab]);
-
+  const history = useHistory();
+  const location = useLocation();
+  const urlParams = new URLSearchParams(window.location.search);
+  const instanceType = urlParams.get('instance_type') || '';
   const [selectedInstance, selectInstance] = useState({
-    type: availableInstanceTypes.includes(activeTab as InstanceTypes) ? activeTab : '',
+    type: availableInstanceTypes.includes(instanceType as InstanceTypes) ? instanceType : '',
   });
 
   useEffect(() => {
-    selectTab(selectedInstance.type as string);
-  }, [selectedInstance.type]);
+    const searchParams = new URLSearchParams(location.search);
+
+    searchParams.set('instance_type', selectedInstance.type);
+    history.push({
+      pathname: location.pathname,
+      search: searchParams.toString(),
+    });
+  }, [selectedInstance]);
 
   const InstanceForm = useMemo(
     () => () => (
       <>
         <div className={styles.content}>
-          <Button variant="secondary" onClick={() => selectTab('')} className={styles.returnButton} icon="arrow-left">
+          <Button
+            variant="secondary"
+            onClick={() => selectInstance({ type: '' })}
+            className={styles.returnButton}
+            icon="arrow-left"
+          >
             {Messages.form.buttons.toMenu}
           </Button>
         </div>
@@ -85,4 +73,10 @@ const AddInstancePanel = () => {
   );
 };
 
-export default AddInstancePanel;
+const AddPanel = () => (
+  <Router>
+    <Route path="*" component={AddInstancePanel} />
+  </Router>
+);
+
+export default AddPanel;

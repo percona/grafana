@@ -2,8 +2,6 @@ import { Messages as AddInstanceMessages } from './components/AddInstance/AddIns
 import { InstanceTypes } from './panel.types';
 import { PageModel } from '../../core/components/Breadcrumb';
 
-export const DEFAULT_TAB = '';
-
 export const PAGE_TABS = [
   {
     title: AddInstanceMessages.titles.rds,
