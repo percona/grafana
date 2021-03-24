@@ -106,6 +106,29 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({ se
     }
   };
 
+  const getExpectedResources = async () => {
+    try {
+      const dbClusterService = newDBClusterService(selectedCluster.databaseType);
+
+      setLoadingExpectedResources(true);
+      setExpectedResources(
+        await dbClusterService.getExpectedResources({
+          clusterName: selectedCluster.clusterName,
+          kubernetesClusterName: selectedCluster.kubernetesClusterName,
+          databaseType: selectedCluster.databaseType,
+          clusterSize: topology === DBClusterTopology.cluster ? nodes : single,
+          cpu,
+          memory,
+          disk,
+        })
+      );
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setLoadingExpectedResources(false);
+    }
+  };
+
   useEffect(() => {
     if (prevResources === DBClusterResources.custom) {
       setCustomMemory(memory);
