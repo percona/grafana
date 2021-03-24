@@ -76,11 +76,13 @@ export const CheckPanel: FC = () => {
 
   if (hasNoAccess) {
     return (
-      <div className={styles.panel} data-qa="db-check-panel">
-        <div className={styles.empty} data-qa="db-check-panel-unauthorized">
-          {Messages.unauthorized}
+      <PageWrapper pageModel={PAGE_MODEL}>
+        <div className={styles.panel} data-qa="db-check-panel">
+          <div className={styles.empty} data-qa="db-check-panel-unauthorized">
+            {Messages.unauthorized}
+          </div>
         </div>
-      </div>
+      </PageWrapper>
     );
   }
 
