@@ -26,6 +26,9 @@ class AddRemoteInstanceService {
   static async addRDS(body: any) {
     return apiManagement.post<any, any>('/RDS/Add', body);
   }
+  static async addAzure(body: any) {
+    return apiManagement.post<any, any>('/AzureDatabase/Add', body);
+  }
 
   static async addExternal(body: any) {
     return apiManagement.post<any, any>('/External/Add', body);
@@ -93,8 +96,12 @@ export const toPayload = (values: any, discoverName?: string) => {
     };
   }
 
-  if (discoverName) {
+  if (values.isRDS && discoverName) {
     data.engine = discoverName;
+  }
+
+  if (values.isAzure && discoverName) {
+    data.type = discoverName;
   }
 
   if (!data.pmm_agent_id) {
@@ -104,6 +111,10 @@ export const toPayload = (values: any, discoverName?: string) => {
 
   if (values.isRDS) {
     data.rds_exporter = true;
+  }
+
+  if (values.isAzure) {
+    data.azure_database_exporter = true;
   }
 
   data.metrics_mode = 1;

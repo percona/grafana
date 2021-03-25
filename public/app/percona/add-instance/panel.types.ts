@@ -12,6 +12,7 @@ export interface RemoteInstanceCredentials {
 
 export enum InstanceTypes {
   rds = 'rds',
+  azure = 'azure',
   postgresql = 'postgresql',
   mysql = 'mysql',
   proxysql = 'proxysql',

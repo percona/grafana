@@ -17,6 +17,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
   const theme = useTheme();
   const styles = getStyles(theme);
 
+  console.log(credentials)
   const { remoteInstanceCredentials, discoverName } = getInstanceData(type, credentials);
   const [loading, setLoading] = useState<boolean>(false);
   const initialValues: any = { ...remoteInstanceCredentials, tracking: 'qan_postgresql_pgstatements_agent' };
@@ -32,6 +33,8 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
 
         if (values.isRDS) {
           await AddRemoteInstanceService.addRDS(toPayload(values, discoverName));
+        } else if (values.isAzure) {
+          await AddRemoteInstanceService.addAzure(toPayload(values, discoverName));
         } else {
           await AddRemoteInstanceService.addRemote(type, values);
         }

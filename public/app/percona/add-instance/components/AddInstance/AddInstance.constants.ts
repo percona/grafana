@@ -3,6 +3,7 @@ import { InstanceTypes } from '../../panel.types';
 
 export const instanceList = [
   { type: InstanceTypes.rds, title: Messages.titles.rds },
+  { type: InstanceTypes.azure, title: Messages.titles.azure },
   { type: InstanceTypes.postgresql, title: Messages.titles.postgresql },
   { type: InstanceTypes.mysql, title: Messages.titles.mysql },
   { type: InstanceTypes.mongodb, title: Messages.titles.mongodb },

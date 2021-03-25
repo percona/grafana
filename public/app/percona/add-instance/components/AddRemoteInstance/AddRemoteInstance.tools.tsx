@@ -1,25 +1,51 @@
 import { InstanceData } from './AddRemoteInstance.types';
 import { INSTANCE_TYPES_LABELS, InstanceTypes } from '../../panel.types';
 
+const getAzureCredentials = credentials => {
+  return {
+    remoteInstanceCredentials: {
+      serviceName: credentials.fully_qualified_domain_name,
+      port: credentials.port,
+      address: credentials.fully_qualified_domain_name,
+      isAzure: true,
+      region: credentials.location,
+      client_id: credentials.client_id,
+      client_secret: credentials.client_secret,
+      tenant_id: credentials.tenant_id,
+      subscription_id: credentials.subscription_id,
+      instance_id: credentials.instance_id,
+      az: credentials.az,
+    },
+  };
+};
+
+const getRDSCredentials = credentials => {
+  return {
+    remoteInstanceCredentials: {
+      serviceName: !credentials.isRDS ? credentials.address : credentials.instance_id,
+      port: credentials.port,
+      address: credentials.address,
+      isRDS: true,
+      region: credentials.region,
+      aws_access_key: credentials.aws_access_key,
+      aws_secret_key: credentials.aws_secret_key,
+      instance_id: credentials.instance_id,
+      az: credentials.az,
+    },
+  };
+};
+
 export const getInstanceData = (instanceType: string, credentials: any): InstanceData => {
   const extractCredentials = (credentials?: any): InstanceData => {
     if (!credentials) {
       return { remoteInstanceCredentials: {} };
     }
 
-    return {
-      remoteInstanceCredentials: {
-        serviceName: !credentials.isRDS ? credentials.address : credentials.instance_id,
-        port: credentials.port,
-        address: credentials.address,
-        isRDS: credentials.isRDS,
-        region: credentials.region,
-        aws_access_key: credentials.aws_access_key,
-        aws_secret_key: credentials.aws_secret_key,
-        instance_id: credentials.instance_id,
-        az: credentials.az,
-      },
-    };
+    if (credentials.isRDS) {
+      return getRDSCredentials(credentials);
+    } else if (credentials.isAzure) {
+      return getAzureCredentials(credentials);
+    }
   };
 
   const instance = extractCredentials(credentials);
