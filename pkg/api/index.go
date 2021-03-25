@@ -436,14 +436,6 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 			Children:   configNodes,
 		})
 	}
-	navTree = append(navTree, &dtos.NavLink{
-		Text:       "PMM Database checks",
-		Id:         "databsase checks",
-		SubTitle:   "Manage database security checks",
-		Icon:       "percona-database-checks",
-		Url:        setting.AppSubUrl + "/pmm-database-checks",
-		SortWeight: dtos.WeightDashboard,
-	})
 
 	if c.IsGrafanaAdmin {
 		adminNavLinks := []*dtos.NavLink{
