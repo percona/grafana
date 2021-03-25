@@ -12,3 +12,14 @@ export interface AdvancedProps {
   publicAddress?: string;
   updateSettings: (body: AdvancedChangePayload, callback: LoadingCallback, refresh?: boolean) => void;
 }
+
+export interface AdvancedFormProps {
+  retention: number | string;
+  telemetry: boolean;
+  updates: boolean;
+  backup: boolean;
+  stt: boolean;
+  dbaas?: boolean;
+  publicAddress?: string;
+  alerting?: boolean;
+}

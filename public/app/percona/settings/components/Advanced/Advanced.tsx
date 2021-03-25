@@ -1,8 +1,8 @@
 import React, { FC, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Field, withTypes } from 'react-final-form';
 import { cx } from 'emotion';
 import { Button, Spinner, useTheme, Icon } from '@grafana/ui';
-import { TextInputField, NumberInputField, CheckboxField } from '@percona/platform-core';
+import { TextInputField, NumberInputField } from '@percona/platform-core';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { DATA_RETENTION_URL } from 'app/percona/settings/Settings.constants';
@@ -11,7 +11,7 @@ import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
 import { transformSecondsToDays } from './Advanced.utils';
 import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS } from './Advanced.constants';
-import { AdvancedProps } from './Advanced.types';
+import { AdvancedFormProps, AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
 import { AdvancedChangePayload } from '../../Settings.types';
 
@@ -58,7 +58,7 @@ export const Advanced: FC<AdvancedProps> = ({
     },
     tooltipLinkText,
   } = Messages;
-  const initialValues = {
+  const initialValues: AdvancedFormProps = {
     retention: transformSecondsToDays(dataRetention),
     telemetry: telemetryEnabled,
     updates: !updatesDisabled,
@@ -70,7 +70,8 @@ export const Advanced: FC<AdvancedProps> = ({
   };
   const [loading, setLoading] = useState(false);
   // @ts-ignore
-  const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting, backup }) => {
+  const applyChanges = (values: AdvancedFormProps) => {
+    const { retention, telemetry, stt, publicAddress, alerting, backup } = values;
     const refresh = !!alerting !== alertingEnabled;
     const body: AdvancedChangePayload = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
@@ -88,6 +89,7 @@ export const Advanced: FC<AdvancedProps> = ({
 
     updateSettings(body, setLoading, refresh);
   };
+  const { Form } = withTypes<AdvancedFormProps>();
 
   return (
     <div className={styles.advancedWrapper}>

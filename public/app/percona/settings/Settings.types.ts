@@ -31,7 +31,7 @@ export interface AlertManagerChangePayload extends AlertManagerPayload {
 
 export interface AdvancedPayload {
   data_retention: string;
-  pmm_public_address: string;
+  pmm_public_address?: string;
 }
 
 export interface AdvancedChangePayload extends AdvancedPayload {
