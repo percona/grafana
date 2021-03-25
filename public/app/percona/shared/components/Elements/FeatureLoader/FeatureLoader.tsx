@@ -2,11 +2,11 @@ import React, { FC, useEffect, useState } from 'react';
 import { Spinner, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { EmptyBlock } from 'app/features/integrated-alerting/components/EmptyBlock';
-import { IntegratedAlertingService } from 'app/features/integrated-alerting/IntegratedAlerting.service';
 import { FeatureLoaderProps } from './FeatureLoader.types';
 import { Messages } from './FeatureLoader.messages';
 import { PMM_SETTINGS_URL } from './FeatureLoader.constants';
 import { getStyles } from './FeatureLoader.styles';
+import { FeatureLoaderService } from './FeatureLoader.service';
 
 export const FeatureLoader: FC<FeatureLoaderProps> = ({ featureName, featureFlag, children }) => {
   const styles = useStyles(getStyles);
@@ -17,7 +17,7 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({ featureName, featureFlag
     setLoadingSettings(true);
 
     try {
-      const { settings } = await IntegratedAlertingService.getSettings();
+      const { settings } = await FeatureLoaderService.getSettings();
       setFeatureEnabled(!!settings[featureFlag]);
     } catch (e) {
       logger.error(e);
