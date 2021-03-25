@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { BrowserRouter as Router, Route, useLocation, useHistory } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Button } from '@grafana/ui';
 import { cx } from 'emotion';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';
@@ -23,23 +23,10 @@ const availableInstanceTypes = [
 
 const AddInstancePanel = () => {
   const styles = getStyles();
-  const history = useHistory();
-  const location = useLocation();
-  const urlParams = new URLSearchParams(window.location.search);
-  const instanceType = urlParams.get('instance_type') || '';
+  const instanceType = '';
   const [selectedInstance, selectInstance] = useState({
     type: availableInstanceTypes.includes(instanceType as InstanceTypes) ? instanceType : '',
   });
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-
-    searchParams.set('instance_type', selectedInstance.type);
-    history.push({
-      pathname: location.pathname,
-      search: searchParams.toString(),
-    });
-  }, [selectedInstance]);
 
   const InstanceForm = useMemo(
     () => () => (
