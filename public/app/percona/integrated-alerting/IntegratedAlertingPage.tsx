@@ -10,6 +10,7 @@ import { UrlQueryValue } from '@grafana/data';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/types';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { Messages } from './IntegratedAlerting.messages';
 
 const tabComponentMap = [
   {
@@ -63,7 +64,7 @@ const IntegratedAlertingPage: FC = () => {
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => selectTab(tab.id)} />
         ))}
       </TabsBar>
-      <FeatureLoader featureName="Integrated Alerting" featureFlag="alerting_enabled">
+      <FeatureLoader featureName={Messages.integratedAlerting} featureFlag={Messages.integratedAlertingFeature}>
         <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component || null}</TabContent>
       </FeatureLoader>
     </div>

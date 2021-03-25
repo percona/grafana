@@ -56,4 +56,6 @@ export const Messages = {
       },
     },
   },
+  integratedAlerting: 'Integrated Alerting',
+  integratedAlertingFeature: 'alerting_enabled',
 };

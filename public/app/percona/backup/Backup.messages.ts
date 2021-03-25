@@ -4,4 +4,6 @@ export const Messages = {
     scheduled: 'Scheduled Inventory',
     locations: 'Storage Locations',
   },
+  backupManagement: 'Backup Management',
+  backupFeature: 'backup_management_enabled',
 };
