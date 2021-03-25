@@ -42,6 +42,8 @@ export interface AdvancedChangePayload extends AdvancedPayload {
   remove_pmm_public_address: boolean;
   enable_alerting?: boolean;
   disable_alerting?: boolean;
+  enable_backup_management?: boolean;
+  disable_backup_management?: boolean;
 }
 
 export interface MetricsResolutionsPayload {
@@ -74,6 +76,7 @@ export interface SettingsPayload
   stt_enabled: boolean;
   dbaas_enabled: boolean;
   alerting_enabled: boolean;
+  backup_management_enabled: boolean;
 }
 
 export type SettingsAPIChangePayload = AlertManagerChangePayload &
@@ -86,6 +89,7 @@ export type SettingsAPIChangePayload = AlertManagerChangePayload &
 export interface Settings {
   updatesDisabled: boolean;
   telemetryEnabled: boolean;
+  backupEnabled: boolean;
   metricsResolutions: MetricsResolutions;
   dataRetention: string;
   sshKey: string;

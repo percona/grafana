@@ -30,6 +30,7 @@ export const SettingsService = {
       awsPartitions: [],
       updatesDisabled: false,
       telemetryEnabled: false,
+      backupEnabled: false,
       metricsResolutions: {
         hr: '',
         mr: '',
@@ -85,4 +86,5 @@ const toModel = (response: SettingsPayload): Settings => ({
     slack: response.slack_alerting_settings || {},
   },
   publicAddress: response.pmm_public_address,
+  backupEnabled: response.backup_management_enabled,
 });
