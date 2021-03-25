@@ -15,6 +15,8 @@ import { AdvancedFormProps, AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
 import { AdvancedChangePayload } from '../../Settings.types';
 
+const refreshingFeatureKeys: Array<keyof AdvancedFormProps> = ['alerting', 'backup'];
+
 export const Advanced: FC<AdvancedProps> = ({
   dataRetention,
   telemetryEnabled,
@@ -72,7 +74,7 @@ export const Advanced: FC<AdvancedProps> = ({
   // @ts-ignore
   const applyChanges = (values: AdvancedFormProps) => {
     const { retention, telemetry, stt, publicAddress, alerting, backup } = values;
-    const refresh = !!alerting !== alertingEnabled;
+    const refresh = !!refreshingFeatureKeys.find(feature => !!values[feature] !== initialValues[feature]);
     const body: AdvancedChangePayload = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
       disable_telemetry: !telemetry,
