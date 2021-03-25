@@ -101,9 +101,7 @@ export const SettingsPanel: FC = () => {
 
   const updateSettings = async (body: SettingsAPIChangePayload, callback: LoadingCallback, refresh?: boolean) => {
     const response: Settings = await SettingsService.setSettings(body, callback);
-    const {
-      email_alerting_settings: { password },
-    } = body;
+    const { email_alerting_settings: { password = '' } = {} } = body;
 
     if (refresh) {
       window.location.reload();
