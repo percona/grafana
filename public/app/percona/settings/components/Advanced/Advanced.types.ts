@@ -7,6 +7,7 @@ export interface AdvancedProps {
   sttEnabled: boolean;
   updatesDisabled: boolean;
   dbaasEnabled?: boolean;
+  backupEnabled: boolean;
   alertingEnabled?: boolean;
   publicAddress?: string;
   updateSettings: (body: AdvancedChangePayload, callback: LoadingCallback, refresh?: boolean) => void;

@@ -42,8 +42,8 @@ export interface AdvancedChangePayload extends AdvancedPayload {
   remove_pmm_public_address: boolean;
   enable_alerting?: boolean;
   disable_alerting?: boolean;
-  enable_backup_management?: boolean;
-  disable_backup_management?: boolean;
+  enable_backup_management: boolean;
+  disable_backup_management: boolean;
 }
 
 export interface MetricsResolutionsPayload {

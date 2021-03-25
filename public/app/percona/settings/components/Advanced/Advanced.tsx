@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { cx } from 'emotion';
 import { Button, Spinner, useTheme, Icon } from '@grafana/ui';
-import { TextInputField, NumberInputField } from '@percona/platform-core';
+import { TextInputField, NumberInputField, CheckboxField } from '@percona/platform-core';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { DATA_RETENTION_URL } from 'app/percona/settings/Settings.constants';
@@ -18,6 +18,7 @@ import { AdvancedChangePayload } from '../../Settings.types';
 export const Advanced: FC<AdvancedProps> = ({
   dataRetention,
   telemetryEnabled,
+  backupEnabled,
   updatesDisabled,
   sttEnabled,
   dbaasEnabled,
@@ -51,6 +52,9 @@ export const Advanced: FC<AdvancedProps> = ({
       alertingLabel,
       alertingTooltip,
       alertingLink,
+      backupLabel,
+      backupTooltip,
+      backupLink,
     },
     tooltipLinkText,
   } = Messages;
@@ -58,6 +62,7 @@ export const Advanced: FC<AdvancedProps> = ({
     retention: transformSecondsToDays(dataRetention),
     telemetry: telemetryEnabled,
     updates: !updatesDisabled,
+    backup: backupEnabled,
     stt: sttEnabled,
     dbaas: dbaasEnabled,
     publicAddress,
@@ -65,7 +70,7 @@ export const Advanced: FC<AdvancedProps> = ({
   };
   const [loading, setLoading] = useState(false);
   // @ts-ignore
-  const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting }) => {
+  const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting, backup }) => {
     const refresh = !!alerting !== alertingEnabled;
     const body: AdvancedChangePayload = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
@@ -77,6 +82,8 @@ export const Advanced: FC<AdvancedProps> = ({
       remove_pmm_public_address: !publicAddress,
       enable_alerting: alerting ? true : undefined,
       disable_alerting: !alerting ? true : undefined,
+      enable_backup_management: backup,
+      disable_backup_management: !backup,
     };
 
     updateSettings(body, setLoading, refresh);
@@ -167,6 +174,18 @@ export const Advanced: FC<AdvancedProps> = ({
               className={cx({ [styles.switchDisabled]: !values.telemetry })}
               disabled={!values.telemetry}
               dataQa="advanced-alerting"
+              component={SwitchRow}
+            />
+            <Field
+              name="backup"
+              type="checkbox"
+              label={backupLabel}
+              tooltip={backupTooltip}
+              tooltipLinkText={tooltipLinkText}
+              link={backupLink}
+              className={cx({ [styles.switchDisabled]: !values.backup })}
+              disabled={!values.telemetry}
+              dataQa="advanced-backup"
               component={SwitchRow}
             />
             <div className={styles.advancedRow}>

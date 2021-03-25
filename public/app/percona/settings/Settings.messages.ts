@@ -23,6 +23,9 @@ export const Messages = {
     alertingLabel: 'Integrated Alerting',
     alertingTooltip: 'Option to enable/disable Integrated Alerting features.',
     alertingLink: `${HOW_TO_DOC_URL}/configure.html#integrated-alerting`,
+    backupLabel: 'Backup Management',
+    backupTooltip: 'Option to enable/disable Backup Management features.',
+    backupLink: `${HOW_TO_DOC_URL}/configure.html#integrated-alerting`,
   },
   alertmanager: {
     action: 'Apply Alertmanager settings',
