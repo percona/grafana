@@ -5,6 +5,7 @@ import { UrlQueryValue } from '@grafana/data';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/types';
 import { Breadcrumb } from 'app/core/components/Breadcrumb';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TabKeys } from './Backup.types';
 import { getStyles } from './Backup.styles';
 import { StorageLocations } from './components/StorageLocations';
@@ -50,7 +51,9 @@ const BackupPage: FC = () => {
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => setActiveTab(tab.id)} />
         ))}
       </TabsBar>
-      <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component}</TabContent>
+      <FeatureLoader featureName="Backup Management" featureFlag="backup_management_enabled">
+        <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component}</TabContent>
+      </FeatureLoader>
     </div>
   );
 };
