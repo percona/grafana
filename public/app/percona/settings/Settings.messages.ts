@@ -25,6 +25,11 @@ export const Messages = {
     alertingLabel: 'Integrated Alerting',
     alertingTooltip: 'Option to enable/disable Integrated Alerting features.',
     alertingLink: `${HOW_TO_DOC_URL}/configure.html#integrated-alerting`,
+    technicalPreviewLegend: 'Technical preview features',
+    technicalPreviewDescription:
+      'These are technical preview features, not recommended to be used in productions environments. Read more\n' +
+      '                  about feature status',
+    technicalPreviewLinkText: 'here',
   },
   alertmanager: {
     action: 'Apply Alertmanager settings',

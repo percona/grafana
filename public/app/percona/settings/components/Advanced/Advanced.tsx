@@ -53,6 +53,9 @@ export const Advanced: FC<AdvancedProps> = ({
       alertingLink,
       azureDiscoverLabel,
       azureDiscoverTooltip,
+      technicalPreviewLegend,
+      technicalPreviewDescription,
+      technicalPreviewLinkText,
     },
     tooltipLinkText,
   } = Messages;
@@ -182,14 +185,13 @@ export const Advanced: FC<AdvancedProps> = ({
               </div>
             </div>
             <fieldset className={styles.technicalPreview}>
-              <legend>Experimental features (Tech preview)</legend>
+              <legend>{technicalPreviewLegend}</legend>
               <p className={styles.technicalPreviewDoc}>
                 <Icon name="info-circle" size={'xl'} className={styles.technicalPreviewIcon} />
                 <p>
-                  These are exprerimental features, not recommended to be used in productions environments. Read more
-                  about feature status on{' '}
-                  <a href="https://www.percona.com/docs/pmm/2.x/experimental-features.html" target="_blank">
-                    https://www.percona.com/docs/pmm/2.x/experimental-features.html
+                  {technicalPreviewDescription}{' '}
+                  <a href="https://per.co.na/pmm-feature-status" target="_blank">
+                    {technicalPreviewLinkText}
                   </a>
                 </p>
               </p>
