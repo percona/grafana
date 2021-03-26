@@ -4,8 +4,6 @@ import { cx } from 'emotion';
 import { useStyles } from '@grafana/ui';
 import { CheckboxField, validators } from '@percona/platform-core';
 import { getStyles } from './MultiCheckboxField.styles';
-import { formatOptions } from './MultiCheckboxField.utils';
-import { NAME_PREFIX } from './MultiCheckboxField.constants';
 import { MultiCheckboxFieldProps, MultiCheckboxRenderProps } from './MultiCheckboxField.types';
 
 const { compose } = validators;
@@ -26,12 +24,13 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
     ...fieldConfig
   }) => {
     const styles = useStyles(getStyles);
-    const [selectedOptions, setSelectedOptions] = useState(formatOptions(initialOptions));
+    const [selectedOptions, setSelectedOptions] = useState(initialOptions);
     const validate = useMemo(() => (Array.isArray(validators) ? compose(...validators) : undefined), [validators]);
     const onChangeOption = useCallback(
       (input: FieldInputProps<string, HTMLElement>) => ({ target }: ChangeEvent<HTMLInputElement>) => {
-        const name = target.name.replace(NAME_PREFIX, '');
-        const newSelectedOptions = { ...selectedOptions, [name]: target.checked };
+        const newSelectedOptions = selectedOptions.map(option =>
+          option.name === target.name ? { ...option, value: target.checked } : option
+        );
 
         input.onChange(newSelectedOptions);
         setSelectedOptions(newSelectedOptions);
@@ -59,14 +58,14 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
                 className={cx(styles.getOptionsWrapperStyles(!!validationError), fieldClassName)}
                 data-qa={`${name}-options`}
               >
-                {Object.entries(selectedOptions).map(([label, value]) => (
-                  <div className={styles.optionWrapper} key={label} data-qa={`${label}-option`}>
+                {selectedOptions.map(({ name, label, value }) => (
+                  <div className={styles.optionWrapper} key={name} data-qa={`${name}-option`}>
                     <span className={styles.optionLabel}>{label}</span>
-                    {recommendedOption?.label === label && (
+                    {recommendedOption?.name === name && (
                       <span className={styles.recommendedLabel}>{recommendedLabel}</span>
                     )}
                     <CheckboxField
-                      name={`${label}${NAME_PREFIX}`}
+                      name={name}
                       inputProps={{
                         checked: value,
                         onChange: onChangeOption(input),
