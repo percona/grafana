@@ -8,9 +8,8 @@ import { Breadcrumb } from 'app/core/components/Breadcrumb';
 import { TabKeys } from './Backup.types';
 import { getStyles } from './Backup.styles';
 import { StorageLocations } from './components/StorageLocations';
-import { PAGE_MODEL, PAGE_TABS, DEFAULT_TAB } from './BackupPage.constants';
-import {TechnicalPreview} from "../shared/components/Elements/TechnicalPreview/TechnicalPreview";
-import PageWrapper from "../shared/components/PageWrapper/PageWrapper";
+import { DEFAULT_TAB, PAGE_MODEL, PAGE_TABS } from './BackupPage.constants';
+import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
 
 const BackupPage: FC = () => {
   const [activeTab, setActiveTab] = useState(TabKeys.locations);
