@@ -15,6 +15,7 @@ import { DataModel } from '../BackupInventory.types';
 import { AddBackupModalProps, RetryMode } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
+import { toFormBackup } from './AddBackupModal.utils';
 
 const dataModelOptions: Array<SelectableValue<DataModel>> = [
   {
@@ -40,12 +41,14 @@ const retryModeOptions: Array<SelectableValue<RetryMode>> = [
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose }) => {
   const styles = useStyles(getStyles);
+  const initialValues = toFormBackup(backup);
 
   const handleSubmit = () => undefined;
 
   return (
     <Modal title="Backup On Demand" isVisible={isVisible} onClose={onClose}>
       <Form
+        initialValues={initialValues}
         onSubmit={handleSubmit}
         render={({ handleSubmit, valid, pristine, submitting }) => (
           <form>

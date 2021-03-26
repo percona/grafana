@@ -1,4 +1,4 @@
-import { Backup } from '../BackupInventory.types';
+import { Backup, DataModel } from '../BackupInventory.types';
 
 export interface AddBackupModalProps {
   backup: Backup | null;
@@ -9,4 +9,17 @@ export interface AddBackupModalProps {
 export enum RetryMode {
   AUTO = 'AUTO',
   MANUAL = 'MANUAL',
+}
+
+export interface AddBackupFormProps {
+  serviceName: string;
+  vendor: string;
+  dataModel: DataModel;
+  databases: string[];
+  backupName: string;
+  description: string;
+  location: string;
+  retryMode: RetryMode;
+  retryTimes: number;
+  retryInterval: number;
 }
