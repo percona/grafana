@@ -9,4 +9,6 @@ export const Messages = {
   retryMode: 'Retry mode',
   backupAction: 'Backup',
   cancelAction: 'Cancel',
+  retryTimes: 'Retry, times',
+  retryInterval: 'Retry interval, seconds',
 };

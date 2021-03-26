@@ -4,6 +4,7 @@ import { SelectableValue } from '@grafana/data';
 import {
   LoaderButton,
   Modal,
+  NumberInputField,
   RadioButtonGroupField,
   TextareaInputField,
   TextInputField,
@@ -92,6 +93,14 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
               )}
             </Field>
             <RadioButtonGroupField options={retryModeOptions} name="retryMode" label={Messages.retryMode} fullWidth />
+            <div className={styles.retryFields}>
+              <NumberInputField fieldClassName={styles.retrySelect} name="retryTimes" label={Messages.retryTimes} />
+              <NumberInputField
+                fieldClassName={styles.retrySelect}
+                name="retryInterval"
+                label={Messages.retryInterval}
+              />
+            </div>
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
                 data-qa="backup-add-button"
