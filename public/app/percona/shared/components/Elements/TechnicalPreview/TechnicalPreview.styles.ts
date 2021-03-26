@@ -12,10 +12,9 @@ export const getStyles = stylesFactory(
 
         h1 {
           font-size: ${typography.size.lg};
-          font-weight: 200;
-          color: ${colors.linkExternal};
+          color: #828282;
           padding: 5px 5px 5px;
-          border: 2px solid ${colors.linkExternal};
+          border: 1px solid #9fa7b3;
           border-radius: ${border.radius.md};
           user-select: none;
         }

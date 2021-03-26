@@ -25,7 +25,7 @@ export const TechnicalPreview = () => {
     <div className={styles.labelWrapper}>
       <Tooltip placement="top" theme="info" content={<ReadMoreLink />}>
         <h1>
-          {Messages.labelText} <Icon name={'info-circle'} />
+          <Icon name={'info-circle'} /> {Messages.labelText}
         </h1>
       </Tooltip>
     </div>
