@@ -127,6 +127,18 @@ export const Advanced: FC<AdvancedProps> = ({
               component={SwitchRow}
             />
             <Field
+              name="stt"
+              type="checkbox"
+              label={sttLabel}
+              tooltip={sttTooltip}
+              tooltipLinkText={tooltipLinkText}
+              link={sttLink}
+              className={cx({ [styles.switchDisabled]: !values.telemetry })}
+              disabled={!values.telemetry}
+              dataQa="advanced-stt"
+              component={SwitchRow}
+            />
+            <Field
               name="updates"
               type="checkbox"
               label={updatesLabel}
@@ -139,42 +151,6 @@ export const Advanced: FC<AdvancedProps> = ({
               component={SwitchRow}
             />
             <Field
-              name="stt"
-              type="checkbox"
-              label={sttLabel}
-              tooltip={sttTooltip}
-              tooltipLinkText={tooltipLinkText}
-              link={sttLink}
-              className={cx({ [styles.switchDisabled]: !values.telemetry })}
-              disabled={!values.telemetry}
-              dataQa="advanced-stt"
-              component={SwitchRow}
-            />
-            {dbaasEnabled && (
-              <Field
-                name="dbaas"
-                type="checkbox"
-                label={dbaasLabel}
-                tooltip={dbaasTooltip}
-                className={styles.switchDisabled}
-                disabled
-                dataQa="advanced-dbaas"
-                component={SwitchRow}
-              />
-            )}
-            <Field
-              name="alerting"
-              type="checkbox"
-              label={alertingLabel}
-              tooltip={alertingTooltip}
-              tooltipLinkText={tooltipLinkText}
-              link={alertingLink}
-              className={cx({ [styles.switchDisabled]: !values.telemetry })}
-              disabled={!values.telemetry}
-              dataQa="advanced-alerting"
-              component={SwitchRow}
-            />
-            <Field
               name="azureDiscover"
               type="checkbox"
               label={azureDiscoverLabel}
@@ -183,6 +159,7 @@ export const Advanced: FC<AdvancedProps> = ({
               dataQa="advanced-alerting"
               component={SwitchRow}
             />
+
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">
@@ -204,6 +181,43 @@ export const Advanced: FC<AdvancedProps> = ({
                 </Button>
               </div>
             </div>
+            <fieldset className={styles.technicalPreview}>
+              <legend>Experimental features (Tech preview)</legend>
+              <p className={styles.technicalPreviewDoc}>
+                <Icon name="info-circle" size={'xl'} className={styles.technicalPreviewIcon} />
+                <p>
+                  These are exprerimental features, not recommended to be used in productions environments. Read more
+                  about feature status on{' '}
+                  <a href="https://www.percona.com/docs/pmm/2.x/experimental-features.html" target="_blank">
+                    https://www.percona.com/docs/pmm/2.x/experimental-features.html
+                  </a>
+                </p>
+              </p>
+              {dbaasEnabled && (
+                <Field
+                  name="dbaas"
+                  type="checkbox"
+                  label={dbaasLabel}
+                  tooltip={dbaasTooltip}
+                  className={styles.switchDisabled}
+                  disabled
+                  dataQa="advanced-dbaas"
+                  component={SwitchRow}
+                />
+              )}
+              <Field
+                name="alerting"
+                type="checkbox"
+                label={alertingLabel}
+                tooltip={alertingTooltip}
+                tooltipLinkText={tooltipLinkText}
+                link={alertingLink}
+                className={cx({ [styles.switchDisabled]: !values.telemetry })}
+                disabled={!values.telemetry}
+                dataQa="advanced-alerting"
+                component={SwitchRow}
+              />
+            </fieldset>
             <Button
               className={settingsStyles.actionButton}
               type="submit"
