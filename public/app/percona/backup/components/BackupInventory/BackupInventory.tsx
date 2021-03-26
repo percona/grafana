@@ -85,7 +85,7 @@ export const BackupInventory: FC = () => {
     []
   );
 
-  const onBackupClick = (backup: Backup) => {
+  const onBackupClick = (backup: Backup | null) => {
     setSelectedBackup(backup);
     setBackupModalVisible(true);
   };
@@ -102,7 +102,13 @@ export const BackupInventory: FC = () => {
   return (
     <>
       <div className={styles.addWrapper}>
-        <Button size="md" icon="plus-square" variant="link" data-qa="backup-add-modal-button">
+        <Button
+          size="md"
+          icon="plus-square"
+          variant="link"
+          data-qa="backup-add-modal-button"
+          onClick={() => onBackupClick(null)}
+        >
           {Messages.add}
         </Button>
       </div>
