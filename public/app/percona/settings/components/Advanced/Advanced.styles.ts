@@ -71,7 +71,7 @@ export const getStyles = stylesFactory(({ breakpoints, spacing, typography, bord
       border: ${border.width.sm} solid ${colors.pageHeaderBorder};
       padding: ${spacing.md};
       border-radius: ${border.radius.sm};
-      width: 900px;
+      width: 950px;
 
       ${mq} {
         width: 100%;

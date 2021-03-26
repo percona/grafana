@@ -14,7 +14,6 @@ import { UrlQueryValue } from '@grafana/data';
 import { getLocationSrv } from '@grafana/runtime';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { PageModel } from '../../core/components/Breadcrumb';
-import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
 
 export const DEFAULT_TAB = TabKeys.metrics;
 
@@ -124,7 +123,6 @@ export const SettingsPanel: FC = () => {
 
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
-      <TechnicalPreview />
       <div className={styles.settingsWrapper}>
         <TabsVertical className={styles.tabsWrapper} dataQa="settings-tabs">
           {tabs

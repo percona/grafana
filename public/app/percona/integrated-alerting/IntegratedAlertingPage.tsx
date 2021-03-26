@@ -12,6 +12,8 @@ import { getLocationSrv } from '@grafana/runtime';
 import { UrlQueryValue } from '@grafana/data';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/types';
+import {TechnicalPreview} from "../shared/components/Elements/TechnicalPreview/TechnicalPreview";
+import PageWrapper from "../shared/components/PageWrapper/PageWrapper";
 
 const tabComponentMap = [
   {
@@ -81,6 +83,7 @@ const IntegratedAlertingPage: FC = () => {
   return (
     <div className={styles.integratedAlertingWrapper}>
       <Breadcrumb pageModel={PAGE_MODEL} />
+      <TechnicalPreview />
       <TabsBar>
         {PAGE_TABS.map(tab => (
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => selectTab(tab.id)} />
