@@ -4,7 +4,8 @@ import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
-import { BackupInventoryDetails } from './BackupInventoryDetails/BackupInventoryDetails';
+import { BackupInventoryDetails } from './BackupInventoryDetails';
+import { AddBackupModal } from './AddBackupModal';
 import { Status } from './Status';
 import { BackupInventoryActions } from './BackupInventoryActions';
 import { BackupCreation } from './BackupCreation';
@@ -18,7 +19,8 @@ const { name, created, location, vendor, status, actions } = columns;
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
-  const [, setSelectedBackup] = useState<Backup | null>(null);
+  const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
+  const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
   const columns = useMemo(
     (): Column[] => [
@@ -85,6 +87,12 @@ export const BackupInventory: FC = () => {
 
   const onBackupClick = (backup: Backup) => {
     setSelectedBackup(backup);
+    setBackupModalVisible(true);
+  };
+
+  const handleClose = () => {
+    setSelectedBackup(null);
+    setBackupModalVisible(false);
   };
 
   useEffect(() => {
@@ -106,6 +114,7 @@ export const BackupInventory: FC = () => {
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
+      <AddBackupModal backup={selectedBackup} isVisible={backupModalVisible} onClose={handleClose} />
     </>
   );
 };

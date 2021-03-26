@@ -1,0 +1,12 @@
+export const Messages = {
+  serviceName: 'Service name',
+  vendor: 'Vendor',
+  dataModel: 'Data model',
+  databases: 'Databases',
+  backupName: 'Backup name',
+  description: 'Description',
+  location: 'Location',
+  retryMode: 'Retry mode',
+  backupAction: 'Backup',
+  cancelAction: 'Cancel',
+};
