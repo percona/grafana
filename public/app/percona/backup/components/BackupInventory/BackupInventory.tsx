@@ -6,6 +6,7 @@ import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { BackupInventoryDetails } from './BackupInventoryDetails/BackupInventoryDetails';
 import { Status } from './Status';
+import { BackupInventoryActions } from './BackupInventoryActions';
 import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
@@ -13,10 +14,11 @@ import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
 
 const { columns, noData } = Messages;
-const { name, created, location, vendor, status } = columns;
+const { name, created, location, vendor, status, actions } = columns;
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
+  const [, setSelectedBackup] = useState<Backup | null>(null);
   const [data, setData] = useState<Backup[]>([]);
   const columns = useMemo(
     (): Column[] => [
@@ -46,6 +48,12 @@ export const BackupInventory: FC = () => {
         accessor: 'status',
         Cell: ({ value }) => <Status status={value} />,
       },
+      {
+        Header: actions,
+        accessor: 'id',
+        Cell: ({ row }) => <BackupInventoryActions onBackup={onBackupClick} backup={row.original as Backup} />,
+        width: '80px',
+      },
     ],
     []
   );
@@ -74,6 +82,10 @@ export const BackupInventory: FC = () => {
     ),
     []
   );
+
+  const onBackupClick = (backup: Backup) => {
+    setSelectedBackup(backup);
+  };
 
   useEffect(() => {
     getData();
