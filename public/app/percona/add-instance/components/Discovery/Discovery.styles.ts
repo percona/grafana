@@ -5,6 +5,7 @@ export const getStyles = stylesFactory(() => ({
   content: css`
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
+    width: 100%;
   `,
 }));

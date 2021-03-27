@@ -1,7 +1,7 @@
 import { InstanceData } from './AddRemoteInstance.types';
 import { INSTANCE_TYPES_LABELS, InstanceTypes } from '../../panel.types';
 
-const getAzureCredentials = credentials => {
+const getAzureCredentials = (credentials: any) => {
   return {
     remoteInstanceCredentials: {
       serviceName: credentials.fully_qualified_domain_name,
@@ -19,7 +19,7 @@ const getAzureCredentials = credentials => {
   };
 };
 
-const getRDSCredentials = credentials => {
+const getRDSCredentials = (credentials: any) => {
   return {
     remoteInstanceCredentials: {
       serviceName: !credentials.isRDS ? credentials.address : credentials.instance_id,
@@ -46,6 +46,8 @@ export const getInstanceData = (instanceType: string, credentials: any): Instanc
     } else if (credentials.isAzure) {
       return getAzureCredentials(credentials);
     }
+
+    return { remoteInstanceCredentials: {} };
   };
 
   const instance = extractCredentials(credentials);

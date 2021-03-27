@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Button } from '@grafana/ui';
 import { cx } from 'emotion';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';

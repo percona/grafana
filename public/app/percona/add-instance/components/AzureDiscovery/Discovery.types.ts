@@ -9,9 +9,9 @@ export interface Instance {
   node_model: string;
   address: string;
   port: number;
-  engine: string;
+  type: string;
   engine_version: string;
 }
-export interface RDSInstances {
-  rds_instances: Instance;
+export interface AzureDatabaseInstances {
+  azure_database_instance: Instance;
 }

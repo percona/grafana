@@ -1,8 +1,11 @@
-export interface CredentialsForm {
-  aws_access_key: string;
-  aws_secret_key: string;
+export interface AzureCredentialsForm {
+  client_id?: string;
+  client_secret?: string;
+  tenant_id?: string;
+  subscription_id?: string;
 }
 
 export interface CredentialsProps {
-  onSetCredentials: (CredentialsForm) => void;
+  onSetCredentials: (credentials: AzureCredentialsForm) => void;
+  selectInstance: (instance: any) => void;
 }

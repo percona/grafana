@@ -9,7 +9,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   const styles = getStyles();
 
   const [instances, setInstances] = useState([] as any);
-  const [credentials, setCredentials] = useState({ aws_secret_key: '', aws_access_key: '' });
+  const [credentials, setCredentials] = useState({});
   const [loading, startLoading] = useState(false);
 
   useEffect(() => {

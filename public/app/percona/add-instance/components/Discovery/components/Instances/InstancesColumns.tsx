@@ -42,10 +42,6 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
       element.engine ? `${getEngineType(element.engine)}  ${element.engine_version}` : 'nothing',
   },
   {
-    Header: 'Instance ID',
-    accessor: 'instance_id',
-  },
-  {
     Header: 'Address',
     accessor: (element: any) => element.address.split(':')[0],
   },

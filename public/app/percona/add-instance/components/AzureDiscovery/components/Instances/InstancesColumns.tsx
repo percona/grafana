@@ -44,8 +44,7 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Engine',
-    accessor: (element: any) =>
-      element.type ? `${getEngineType(element.type)}` : 'nothing',
+    accessor: (element: any) => (element.type ? `${getEngineType(element.type)}` : 'nothing'),
   },
   {
     Header: 'Instance ID',
