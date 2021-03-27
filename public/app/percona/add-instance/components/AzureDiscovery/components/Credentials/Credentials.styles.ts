@@ -6,17 +6,19 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
   instanceForm: css`
     padding: 0px;
     margin-bottom: ${theme.spacing.sm};
-    width: 800px;
   `,
   searchPanel: css`
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     width: 100%;
+    align-items: baseline;
   `,
   credentialsField: css`
-    width: 42%;
+    width: 48%;
   `,
   credentialsSubmit: css`
     margin-top: 2px;
+    margin-left: ${theme.spacing.md};
+    margin-right: ${theme.spacing.sm};
   `,
 }));

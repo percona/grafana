@@ -33,16 +33,18 @@ const AddInstancePanel = () => {
   const InstanceForm = useMemo(
     () => () => (
       <>
-        <div className={styles.content}>
-          <Button
-            variant="secondary"
-            onClick={() => selectInstance({ type: '' })}
-            className={styles.returnButton}
-            icon="arrow-left"
-          >
-            {Messages.form.buttons.toMenu}
-          </Button>
-        </div>
+        {selectedInstance.type !== InstanceTypes.rds && selectedInstance.type !== InstanceTypes.azure && (
+          <div className={styles.content}>
+            <Button
+              variant="secondary"
+              onClick={() => selectInstance({ type: '' })}
+              className={styles.returnButton}
+              icon="arrow-left"
+            >
+              {Messages.form.buttons.toMenu}
+            </Button>
+          </div>
+        )}
         {selectedInstance.type === InstanceTypes.rds && <Discovery selectInstance={selectInstance} />}
         {selectedInstance.type === InstanceTypes.azure && <AzureDiscovery selectInstance={selectInstance} />}
         {selectedInstance.type !== InstanceTypes.rds && selectedInstance.type !== InstanceTypes.azure && (
@@ -62,10 +64,4 @@ const AddInstancePanel = () => {
   );
 };
 
-const AddPanel = () => (
-  <Router>
-    <Route path="*" component={AddInstancePanel} />
-  </Router>
-);
-
-export default AddPanel;
+export default AddInstancePanel;

@@ -16,7 +16,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
     const updateInstances = async () => {
       try {
         const result = await DiscoveryService.discoveryAzure(credentials);
-        console.log(result.azure_database_instance)
+        console.log(result.azure_database_instance);
         if (result) {
           setInstances(result.azure_database_instance);
         }
@@ -37,7 +37,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   return (
     <>
       <div className={styles.content}>
-        <Credentials onSetCredentials={setCredentials} />
+        <Credentials onSetCredentials={setCredentials} selectInstance={selectInstance} />
         <Instances instances={instances} selectInstance={selectInstance} credentials={credentials} loading={loading} />
       </div>
     </>
