@@ -37,7 +37,7 @@ export abstract class DBClusterService {
   abstract getComponents(kubernetesClusterName: string): Promise<DBClusterComponentsAPI>;
 
   abstract getDatabaseVersions(kubernetesClusterName: string): Promise<DatabaseVersion[]>;
-  
+
   abstract getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources>;
 
   abstract toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster;

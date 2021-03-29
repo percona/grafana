@@ -88,7 +88,7 @@ export class XtraDBService extends DBClusterService {
       }));
     });
   }
-  
+
   getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources> {
     return apiManagement
       .post<any, Partial<DBClusterPayload>>('/DBaaS/XtraDBCluster/Resources/Get', pick(toAPI(dbCluster), ['params']))
