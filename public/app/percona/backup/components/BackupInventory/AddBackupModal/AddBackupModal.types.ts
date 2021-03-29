@@ -15,7 +15,6 @@ export interface AddBackupFormProps {
   serviceName: string;
   vendor: string;
   dataModel: DataModel;
-  databases: string[];
   backupName: string;
   description: string;
   location: string;

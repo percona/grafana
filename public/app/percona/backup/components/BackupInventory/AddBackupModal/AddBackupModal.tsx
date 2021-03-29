@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Button, HorizontalGroup, MultiSelect, Select, AsyncSelect, useStyles } from '@grafana/ui';
+import { Button, HorizontalGroup, Select, AsyncSelect, useStyles } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import {
   LoaderButton,
@@ -79,16 +79,6 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
               )}
             </Field>
             <RadioButtonGroupField options={dataModelOptions} name="dataModel" label={Messages.dataModel} fullWidth />
-            <Field name="databases" validate={validators.required}>
-              {({ input }) => (
-                <div>
-                  <label className={styles.label} data-qa="databases-select-label">
-                    {Messages.databases}
-                  </label>
-                  <MultiSelect className={styles.select} options={[]} {...input} data-qa="databases-select-input" />
-                </div>
-              )}
-            </Field>
             <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
             <TextareaInputField name="description" label={Messages.description} />
             <Field name="location" validate={validators.required}>
