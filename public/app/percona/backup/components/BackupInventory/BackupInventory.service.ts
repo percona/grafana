@@ -1,4 +1,5 @@
 //@ts-nocheck
+import { Databases } from 'app/percona/shared/core';
 import { api } from 'app/percona/shared/helpers/api';
 import { Backup, BackupResponse, DataModel, Status } from './BackupInventory.types';
 
@@ -18,7 +19,7 @@ export const BackupInventoryService = {
         serviceName: 'Service 1',
         dataModel: DataModel.LOGICAL,
         status: Status.SUCCESS,
-        vendor: 'PostgreSQL',
+        vendor: Databases.mysql,
       },
       {
         id: 'backup_2',
@@ -30,7 +31,7 @@ export const BackupInventoryService = {
         serviceName: 'Service 3',
         dataModel: DataModel.PHYSICAL,
         status: Status.IN_PROGRESS,
-        vendor: 'PostgreSQL',
+        vendor: Databases.mysql,
       },
     ];
   },

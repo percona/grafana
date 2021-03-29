@@ -1,3 +1,4 @@
+import { Databases } from 'app/percona/shared/core';
 import { Backup, DataModel } from '../BackupInventory.types';
 
 export interface AddBackupModalProps {
@@ -13,7 +14,7 @@ export enum RetryMode {
 
 export interface AddBackupFormProps {
   serviceName: string;
-  vendor: string;
+  vendor: Databases;
   dataModel: DataModel;
   backupName: string;
   description: string;

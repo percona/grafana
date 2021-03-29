@@ -1,3 +1,5 @@
+import { Databases } from 'app/percona/shared/core';
+
 export enum DataModel {
   DATA_MODEL_INVALID = 'DATA_MODEL_INVALID',
   PHYSICAL = 'PHYSICAL',
@@ -23,7 +25,7 @@ export interface Backup {
   serviceName: string;
   dataModel: DataModel;
   status: Status;
-  vendor: string;
+  vendor: Databases;
 }
 
 export interface RawBackup {
@@ -36,7 +38,7 @@ export interface RawBackup {
   service_name: string;
   data_model: DataModel;
   status: Status;
-  vendor: string;
+  vendor: Databases;
 }
 
 export interface BackupResponse {

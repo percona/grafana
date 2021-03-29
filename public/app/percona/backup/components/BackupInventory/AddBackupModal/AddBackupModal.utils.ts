@@ -1,3 +1,4 @@
+import { Databases } from 'app/percona/shared/core';
 import { Backup, DataModel } from '../BackupInventory.types';
 import { AddBackupFormProps, RetryMode } from './AddBackupModal.types';
 
@@ -5,7 +6,7 @@ export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
   if (!backup) {
     return {
       serviceName: '',
-      vendor: '',
+      vendor: Databases.mysql,
       dataModel: DataModel.PHYSICAL,
       backupName: '',
       description: '',

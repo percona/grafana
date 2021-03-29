@@ -3,6 +3,7 @@ import { Column, Row } from 'react-table';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
+import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { BackupInventoryDetails } from './BackupInventoryDetails';
 import { AddBackupModal } from './AddBackupModal';
@@ -33,7 +34,7 @@ export const BackupInventory: FC = () => {
       },
       {
         Header: vendor,
-        accessor: 'vendor',
+        accessor: ({ vendor }: Backup) => DATABASE_LABELS[vendor],
         width: '150px',
       },
       {

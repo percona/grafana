@@ -1,12 +1,20 @@
 import React, { FC } from 'react';
-import { Button, HorizontalGroup, Select, AsyncSelect, useStyles } from '@grafana/ui';
-import { LoaderButton, Modal, TextareaInputField, TextInputField, validators } from '@percona/platform-core';
+import { Button, HorizontalGroup, AsyncSelect, useStyles } from '@grafana/ui';
+import {
+  LoaderButton,
+  Modal,
+  RadioButtonGroupField,
+  TextareaInputField,
+  TextInputField,
+  validators,
+} from '@percona/platform-core';
 import { Field, Form } from 'react-final-form';
 import { AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
 import { toFormBackup } from './AddBackupModal.utils';
 import { loadServiceOptions, loadLocationOptions } from './AddBackupModal.service';
+import { VENDOR_OPTIONS } from './AddBackupModal.constants';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose }) => {
   const styles = useStyles(getStyles);
@@ -38,16 +46,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                 </div>
               )}
             </Field>
-            <Field name="vendor" validate={validators.required}>
-              {({ input }) => (
-                <div>
-                  <label className={styles.label} data-qa="vendor-select-label">
-                    {Messages.vendor}
-                  </label>
-                  <Select className={styles.select} options={[]} {...input} data-qa="vendor-select-input" />
-                </div>
-              )}
-            </Field>
+            <RadioButtonGroupField disabled options={VENDOR_OPTIONS} name="vendor" label={Messages.vendor} fullWidth />
             {/* <RadioButtonGroupField options={dataModelOptions} name="dataModel" label={Messages.dataModel} fullWidth /> */}
             <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
             <TextareaInputField name="description" label={Messages.description} />
