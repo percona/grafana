@@ -26,10 +26,13 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
         startLoading(false);
       }
     };
-    startLoading(true);
-    updateInstances();
 
-    if (credentials.client_id && credentials.client_secret && credentials.tenant_id && credentials.subscription_id) {
+    if (
+      credentials.azure_client_id &&
+      credentials.azure_client_secret &&
+      credentials.azure_tenant_id &&
+      credentials.azure_subscription_id
+    ) {
       startLoading(true);
       updateInstances();
     }
