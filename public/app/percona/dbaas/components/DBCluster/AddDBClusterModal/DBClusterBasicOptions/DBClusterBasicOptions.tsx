@@ -1,6 +1,6 @@
-import React, { FC, useCallback, useState, useMemo, useEffect } from 'react';
+import React, { FC, useCallback, useState, useMemo } from 'react';
 import { Field } from 'react-final-form';
-import { TextInputField, validators, logger } from '@percona/platform-core';
+import { TextInputField, validators } from '@percona/platform-core';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { SelectFieldAdapter, AsyncSelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
@@ -8,15 +8,11 @@ import { DatabaseOption, DBClusterBasicOptionsProps } from './DBClusterBasicOpti
 import { DATABASE_OPTIONS } from '../../DBCluster.constants';
 import { AddDBClusterFields } from '../AddDBClusterModal.types';
 import { DBClusterTopology } from '../DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import {
-  findDefaultDatabaseVersion,
-  getKubernetesOptions,
-  kubernetesClusterNameValidator,
-  optionRequired,
-} from './DBClusterBasicOptions.utils';
+import { getKubernetesOptions, kubernetesClusterNameValidator, optionRequired } from './DBClusterBasicOptions.utils';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { SelectableValue } from '@grafana/data';
-import { isOptionEmpty, newDBClusterService } from '../../DBCluster.utils';
+import { isOptionEmpty } from '../../DBCluster.utils';
+import { useDatabaseVersions } from './DBClusterBasicOptions.hooks';
 
 export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernetes, form }) => {
   const { required } = validators;
@@ -64,28 +60,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
 
   const isDatabaseVersionDisabled = useMemo(() => isOptionEmpty(databaseType), [databaseType]);
 
-  const getDatabaseVersions = async () => {
-    try {
-      const dbClusterService = newDBClusterService(databaseType.value);
-
-      setLoadingDatabaseVersions(true);
-
-      const databaseVersions = await dbClusterService.getDatabaseVersions(kubernetesCluster.value);
-
-      setDatabaseVersions(databaseVersions);
-      change(AddDBClusterFields.databaseVersion, findDefaultDatabaseVersion(databaseVersions));
-    } catch (e) {
-      logger.error(e);
-    } finally {
-      setLoadingDatabaseVersions(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!isOptionEmpty(databaseType) && !isOptionEmpty(kubernetesCluster)) {
-      getDatabaseVersions();
-    }
-  }, [databaseType, kubernetesCluster]);
+  useDatabaseVersions(form, databaseType, kubernetesCluster, setLoadingDatabaseVersions, setDatabaseVersions);
 
   return (
     <>
