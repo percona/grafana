@@ -52,7 +52,7 @@ const BackupPage: FC = () => {
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => setActiveTab(tab.id)} />
         ))}
       </TabsBar>
-      <FeatureLoader featureName={Messages.backupManagement} featureFlag={Messages.backupFeature}>
+      <FeatureLoader featureName={Messages.backupManagement} featureFlag="backupEnabled">
         <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component}</TabContent>
       </FeatureLoader>
     </div>

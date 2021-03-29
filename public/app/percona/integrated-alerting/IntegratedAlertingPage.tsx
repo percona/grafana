@@ -64,7 +64,7 @@ const IntegratedAlertingPage: FC = () => {
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => selectTab(tab.id)} />
         ))}
       </TabsBar>
-      <FeatureLoader featureName={Messages.integratedAlerting} featureFlag={Messages.integratedAlertingFeature}>
+      <FeatureLoader featureName={Messages.integratedAlerting} featureFlag="alertingEnabled">
         <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component || null}</TabContent>
       </FeatureLoader>
     </div>

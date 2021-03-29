@@ -2,7 +2,7 @@ import React from 'React';
 import { mount, ReactWrapper } from 'enzyme';
 import { FeatureLoader } from './FeatureLoader';
 import { act } from 'react-dom/test-utils';
-import { EmptyBlock } from 'app/features/integrated-alerting/components/EmptyBlock';
+import { EmptyBlock } from '../EmptyBlock';
 
 jest.mock('./FeatureLoader.service');
 
@@ -12,7 +12,7 @@ describe('FeatureLoader', () => {
     const Dummy = () => <></>;
     await act(async () => {
       wrapper = mount(
-        <FeatureLoader featureName="IA" featureFlag="alerting_enabled">
+        <FeatureLoader featureName="IA" featureFlag="alertingEnabled">
           <Dummy />
         </FeatureLoader>
       );
@@ -26,7 +26,7 @@ describe('FeatureLoader', () => {
     const Dummy = () => <></>;
     await act(async () => {
       wrapper = mount(
-        <FeatureLoader featureName="IA" featureFlag="alerting_enabled">
+        <FeatureLoader featureName="IA" featureFlag="alertingEnabled">
           <Dummy />
         </FeatureLoader>
       );

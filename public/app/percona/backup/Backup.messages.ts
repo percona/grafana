@@ -5,5 +5,4 @@ export const Messages = {
     locations: 'Storage Locations',
   },
   backupManagement: 'Backup Management',
-  backupFeature: 'backup_management_enabled',
 };
