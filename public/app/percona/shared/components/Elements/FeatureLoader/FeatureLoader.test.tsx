@@ -4,7 +4,7 @@ import { FeatureLoader } from './FeatureLoader';
 import { act } from 'react-dom/test-utils';
 import { EmptyBlock } from '../EmptyBlock';
 
-jest.mock('./FeatureLoader.service');
+jest.mock('app/percona/settings/Settings.service');
 
 describe('FeatureLoader', () => {
   it('should not have children initially', async () => {
