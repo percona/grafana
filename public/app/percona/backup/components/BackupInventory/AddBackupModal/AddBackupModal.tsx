@@ -1,43 +1,11 @@
 import React, { FC } from 'react';
 import { Button, HorizontalGroup, Select, AsyncSelect, useStyles } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
-import {
-  LoaderButton,
-  Modal,
-  NumberInputField,
-  RadioButtonGroupField,
-  TextareaInputField,
-  TextInputField,
-  validators,
-} from '@percona/platform-core';
+import { LoaderButton, Modal, TextareaInputField, TextInputField, validators } from '@percona/platform-core';
 import { Field, Form } from 'react-final-form';
-import { DataModel } from '../BackupInventory.types';
-import { AddBackupModalProps, RetryMode } from './AddBackupModal.types';
+import { AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
 import { toFormBackup, loadServiceOptions } from './AddBackupModal.utils';
-
-const dataModelOptions: Array<SelectableValue<DataModel>> = [
-  {
-    value: DataModel.PHYSICAL,
-    label: 'Physical',
-  },
-  {
-    value: DataModel.LOGICAL,
-    label: 'Logical',
-  },
-];
-
-const retryModeOptions: Array<SelectableValue<RetryMode>> = [
-  {
-    value: RetryMode.AUTO,
-    label: 'Auto',
-  },
-  {
-    value: RetryMode.MANUAL,
-    label: 'Manual',
-  },
-];
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose }) => {
   const styles = useStyles(getStyles);
@@ -45,6 +13,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
 
   const handleSubmit = () => undefined;
 
+  // TODO uncomment remaining fields when we support them
   return (
     <Modal title="Backup On Demand" isVisible={isVisible} onClose={onClose}>
       <Form
@@ -78,7 +47,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                 </div>
               )}
             </Field>
-            <RadioButtonGroupField options={dataModelOptions} name="dataModel" label={Messages.dataModel} fullWidth />
+            {/* <RadioButtonGroupField options={dataModelOptions} name="dataModel" label={Messages.dataModel} fullWidth /> */}
             <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
             <TextareaInputField name="description" label={Messages.description} />
             <Field name="location" validate={validators.required}>
@@ -91,7 +60,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                 </div>
               )}
             </Field>
-            <RadioButtonGroupField options={retryModeOptions} name="retryMode" label={Messages.retryMode} fullWidth />
+            {/* <RadioButtonGroupField options={retryModeOptions} name="retryMode" label={Messages.retryMode} fullWidth />
             <div className={styles.retryFields}>
               <NumberInputField fieldClassName={styles.retrySelect} name="retryTimes" label={Messages.retryTimes} />
               <NumberInputField
@@ -99,7 +68,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                 name="retryInterval"
                 label={Messages.retryInterval}
               />
-            </div>
+            </div> */}
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
                 data-qa="backup-add-button"
