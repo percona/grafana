@@ -4,19 +4,19 @@ import Credentials from './components/Credentials/Credentials';
 import Instances from './components/Instances/Instances';
 import { getStyles } from './Discovery.styles';
 import { DiscoverySearchPanelProps } from './Discovery.types';
+import { AzureCredentialsForm } from './components/Credentials/Credentials.types';
 
 const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   const styles = getStyles();
 
   const [instances, setInstances] = useState([] as any);
-  const [credentials, setCredentials] = useState({});
+  const [credentials, setCredentials] = useState<AzureCredentialsForm>({});
   const [loading, startLoading] = useState(false);
 
   useEffect(() => {
     const updateInstances = async () => {
       try {
         const result = await DiscoveryService.discoveryAzure(credentials);
-        console.log(result.azure_database_instance);
         if (result) {
           setInstances(result.azure_database_instance);
         }
@@ -28,10 +28,11 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
     };
     startLoading(true);
     updateInstances();
-    // if (credentials.aws_secret_key && credentials.aws_access_key) {
-    //   startLoading(true);
-    //   updateInstances();
-    // }
+
+    if (credentials.client_id && credentials.client_secret && credentials.tenant_id && credentials.subscription_id) {
+      startLoading(true);
+      updateInstances();
+    }
   }, [credentials]);
 
   return (

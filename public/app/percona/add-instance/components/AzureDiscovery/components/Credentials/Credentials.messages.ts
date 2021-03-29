@@ -3,22 +3,22 @@ export const Messages = {
     fields: {
       clientId: {
         placeholder: 'Client ID',
-        name: 'client_id',
+        name: 'azure_client_id',
         label: 'Client ID',
       },
       clientSecret: {
         placeholder: 'Client Secret',
-        name: 'client_secret',
+        name: 'azure_client_secret',
         label: 'Client Secret',
       },
       tenantId: {
         placeholder: 'Tenant ID',
-        name: 'tenant_id',
+        name: 'azure_tenant_id',
         label: 'Tenant ID',
       },
       subscriptionId: {
         placeholder: 'Subscription ID',
-        name: 'subscription_id',
+        name: 'azure_subscription_id',
         label: 'Subscription ID',
       },
     },

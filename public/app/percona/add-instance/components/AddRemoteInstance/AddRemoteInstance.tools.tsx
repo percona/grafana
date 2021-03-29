@@ -4,9 +4,9 @@ import { INSTANCE_TYPES_LABELS, InstanceTypes } from '../../panel.types';
 const getAzureCredentials = (credentials: any) => {
   return {
     remoteInstanceCredentials: {
-      serviceName: credentials.fully_qualified_domain_name,
+      serviceName: credentials.address,
       port: credentials.port,
-      address: credentials.fully_qualified_domain_name,
+      address: credentials.address,
       isAzure: true,
       region: credentials.location,
       client_id: credentials.client_id,

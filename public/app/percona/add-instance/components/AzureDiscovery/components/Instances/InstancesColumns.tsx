@@ -7,7 +7,7 @@ const getEngineType = (type?: string) => {
     case 'DISCOVER_AZURE_DATABASE_TYPE_MYSQL':
       return DATABASE_LABELS[Databases.mysql];
     case 'DISCOVER_AZURE_DATABASE_TYPE_MARIADB':
-      return DATABASE_LABELS[Databases.mysql];
+      return DATABASE_LABELS[Databases.mariadb];
     case 'DISCOVER_AZURE_DATABASE_TYPE_POSTGRESQL':
       return DATABASE_LABELS[Databases.postgresql];
     case 'DISCOVER_AZURE_DATABASE_INVALID':
@@ -32,7 +32,7 @@ const getDatabaseType = (type?: string) => {
 export const getInstancesColumns = (credentials, onSelectInstance) => [
   {
     Header: 'Region',
-    accessor: 'location',
+    accessor: 'region',
   },
   {
     Header: 'Resource group',
@@ -44,7 +44,7 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Engine',
-    accessor: (element: any) => (element.type ? `${getEngineType(element.type)}` : 'nothing'),
+    accessor: (element: any) => (element.engine ? `${getEngineType(element.engine)}` : 'nothing'),
   },
   {
     Header: 'Instance ID',
@@ -52,7 +52,7 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Address',
-    accessor: 'fully_qualified_domain_name',
+    accessor: 'address',
   },
   {
     Header: 'Action',
