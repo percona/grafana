@@ -5,7 +5,8 @@ import { Field, Form } from 'react-final-form';
 import { AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
-import { toFormBackup, loadServiceOptions } from './AddBackupModal.utils';
+import { toFormBackup } from './AddBackupModal.utils';
+import { loadServiceOptions, loadLocationOptions } from './AddBackupModal.service';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose }) => {
   const styles = useStyles(getStyles);
@@ -56,7 +57,13 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                   <label className={styles.label} data-qa="location-select-label">
                     {Messages.location}
                   </label>
-                  <Select className={styles.select} options={[]} {...input} data-qa="location-select-input" />
+                  <AsyncSelect
+                    className={styles.select}
+                    loadOptions={loadLocationOptions}
+                    defaultOptions
+                    {...input}
+                    data-qa="location-select-input"
+                  />
                 </div>
               )}
             </Field>
