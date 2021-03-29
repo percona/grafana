@@ -62,6 +62,10 @@ export interface SSHPayload {
   ssh_key: string;
 }
 
+export interface SettingsAPIResponse {
+  settings: SettingsPayload;
+}
+
 export interface SettingsPayload
   extends AlertManagerPayload,
     AdvancedPayload,

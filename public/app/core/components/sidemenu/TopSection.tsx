@@ -4,9 +4,10 @@ import TopSectionItem from './TopSectionItem';
 import config from '../../config';
 import { getLocationSrv } from '@grafana/runtime';
 import { NavModelItem } from '@grafana/data';
+import { logger } from '@percona/platform-core';
 import { buildIntegratedAlertingMenuItem } from './TopSection.utils';
-import { FeatureLoaderService } from 'app/percona/shared/components/Elements/FeatureLoader/FeatureLoader.service';
 import { LinkConfig } from './TopSection.types';
+import { SettingsService } from 'app/percona/settings/Settings.service';
 
 const TopSection: FC<any> = () => {
   const [showDBaaS, setShowDBaaS] = useState(false);
@@ -56,13 +57,18 @@ const TopSection: FC<any> = () => {
     getLocationSrv().update({ query: { search: 'open' }, partial: true });
   };
   const updateMenu = async () => {
-    const { settings } = await FeatureLoaderService.getSettings();
-    setShowDBaaS(settings.dbaas_enabled);
-    setShowSTT(settings.stt_enabled);
-    setShowBackup(settings.backup_management_enabled);
+    try {
+      const settings = await SettingsService.getSettings();
 
-    if (settings.alerting_enabled) {
-      setMainLinks([...buildIntegratedAlertingMenuItem(mainLinks)]);
+      setShowDBaaS(!!settings.dbaasEnabled);
+      setShowSTT(settings.sttEnabled);
+      setShowBackup(settings.backupEnabled);
+
+      if (settings.alertingEnabled) {
+        setMainLinks([...buildIntegratedAlertingMenuItem(mainLinks)]);
+      }
+    } catch (e) {
+      logger.error(e);
     }
   };
 

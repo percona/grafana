@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Spinner, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
-import { EmptyBlock } from 'app/features/integrated-alerting/components/EmptyBlock';
+import { EmptyBlock } from '../EmptyBlock';
 import { FeatureLoaderProps } from './FeatureLoader.types';
 import { Messages } from './FeatureLoader.messages';
 import { PMM_SETTINGS_URL } from './FeatureLoader.constants';
