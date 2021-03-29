@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Button, HorizontalGroup, MultiSelect, Select, useStyles } from '@grafana/ui';
+import { Button, HorizontalGroup, MultiSelect, Select, AsyncSelect, useStyles } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import {
   LoaderButton,
@@ -15,7 +15,7 @@ import { DataModel } from '../BackupInventory.types';
 import { AddBackupModalProps, RetryMode } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
-import { toFormBackup } from './AddBackupModal.utils';
+import { toFormBackup, loadServiceOptions } from './AddBackupModal.utils';
 
 const dataModelOptions: Array<SelectableValue<DataModel>> = [
   {
@@ -58,7 +58,13 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                   <label className={styles.label} data-qa="service-select-label">
                     {Messages.serviceName}
                   </label>
-                  <Select className={styles.select} options={[]} {...input} data-qa="service-select-input" />
+                  <AsyncSelect
+                    loadOptions={loadServiceOptions}
+                    defaultOptions
+                    className={styles.select}
+                    {...input}
+                    data-qa="service-select-input"
+                  />
                 </div>
               )}
             </Field>
