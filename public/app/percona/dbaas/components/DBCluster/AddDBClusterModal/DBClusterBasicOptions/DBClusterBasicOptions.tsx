@@ -1,23 +1,29 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useState, useMemo, useEffect } from 'react';
 import { Field } from 'react-final-form';
-import { TextInputField, validators } from '@percona/platform-core';
+import { TextInputField, validators, logger } from '@percona/platform-core';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
-import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters';
+import { SelectFieldAdapter, AsyncSelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { DatabaseOption, DBClusterBasicOptionsProps } from './DBClusterBasicOptions.types';
 import { DATABASE_OPTIONS } from '../../DBCluster.constants';
 import { AddDBClusterFields } from '../AddDBClusterModal.types';
 import { DBClusterTopology } from '../DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import {
+  findDefaultDatabaseVersion,
   getKubernetesOptions,
   kubernetesClusterNameValidator,
-  databaseTypeRequired,
+  optionRequired,
 } from './DBClusterBasicOptions.utils';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
+import { SelectableValue } from '@grafana/data';
+import { isOptionEmpty, newDBClusterService } from '../../DBCluster.utils';
 
 export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernetes, form }) => {
   const { required } = validators;
   const { change } = form;
+  const { kubernetesCluster, databaseType } = form.getState().values;
+  const [databaseVersions, setDatabaseVersions] = useState<SelectableValue[]>([]);
+  const [loadingDatabaseVersions, setLoadingDatabaseVersions] = useState(false);
   const onChangeDatabase = useCallback(databaseType => {
     if (databaseType.value !== Databases.mysql) {
       change(AddDBClusterFields.topology, DBClusterTopology.cluster);
@@ -56,6 +62,31 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
     change(AddDBClusterFields.kubernetesCluster, selectedKubernetes);
   }, []);
 
+  const isDatabaseVersionDisabled = useMemo(() => isOptionEmpty(databaseType), [databaseType]);
+
+  const getDatabaseVersions = async () => {
+    try {
+      const dbClusterService = newDBClusterService(databaseType.value);
+
+      setLoadingDatabaseVersions(true);
+
+      const databaseVersions = await dbClusterService.getDatabaseVersions(kubernetesCluster.value);
+
+      setDatabaseVersions(databaseVersions);
+      change(AddDBClusterFields.databaseVersion, findDefaultDatabaseVersion(databaseVersions));
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setLoadingDatabaseVersions(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOptionEmpty(databaseType) && !isOptionEmpty(kubernetesCluster)) {
+      getDatabaseVersions();
+    }
+  }, [databaseType, kubernetesCluster]);
+
   return (
     <>
       <TextInputField
@@ -80,8 +111,18 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
         label={Messages.dbcluster.addModal.fields.databaseType}
         options={databaseOptions}
         component={SelectFieldAdapter}
-        validate={databaseTypeRequired}
+        validate={optionRequired}
         onChange={onChangeDatabase}
+      />
+      <Field
+        disabled={isDatabaseVersionDisabled}
+        dataQa="dbcluster-database-version-field"
+        name={AddDBClusterFields.databaseVersion}
+        label={Messages.dbcluster.addModal.fields.databaseVersion}
+        component={AsyncSelectFieldAdapter}
+        loading={loadingDatabaseVersions}
+        options={databaseVersions}
+        validate={optionRequired}
       />
     </>
   );
