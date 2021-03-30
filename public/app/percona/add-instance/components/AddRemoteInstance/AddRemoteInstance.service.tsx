@@ -115,6 +115,7 @@ export const toPayload = (values: any, discoverName?: string) => {
 
   if (values.isAzure) {
     data.azure_database_exporter = true;
+    data.qan = true;
   }
 
   data.metrics_mode = 1;

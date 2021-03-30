@@ -1,6 +1,7 @@
 import { Button } from '@grafana/ui';
 import React from 'react';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
+import { styles } from './Instances.styles';
 
 const getEngineType = (type?: string) => {
   switch (type) {
@@ -42,6 +43,10 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
       element.engine ? `${getEngineType(element.engine)}  ${element.engine_version}` : 'nothing',
   },
   {
+    Header: 'Instance ID',
+    accessor: 'instance_id',
+  },
+  {
     Header: 'Address',
     accessor: (element: any) => element.address.split(':')[0],
   },
@@ -56,9 +61,11 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
       };
 
       return (
-        <Button variant="primary" onClick={selectionHandler}>
-          Start monitoring
-        </Button>
+        <div className={styles.actionButtonWrapper}>
+          <Button variant="primary" onClick={selectionHandler}>
+            Start monitoring
+          </Button>
+        </div>
       );
     },
   },

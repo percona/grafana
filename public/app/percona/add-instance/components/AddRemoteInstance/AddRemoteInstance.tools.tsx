@@ -1,8 +1,8 @@
 import { InstanceData } from './AddRemoteInstance.types';
 import { INSTANCE_TYPES_LABELS, InstanceTypes } from '../../panel.types';
 
-const getAzureCredentials = (credentials: any) => {
-  return {
+const getAzureCredentials = (credentials: any, instanceType: string) => {
+  const instance: any = {
     remoteInstanceCredentials: {
       serviceName: credentials.address,
       port: credentials.port,
@@ -17,10 +17,32 @@ const getAzureCredentials = (credentials: any) => {
       az: credentials.az,
     },
   };
+
+  switch (instanceType) {
+    case InstanceTypes.postgresql:
+      instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.postgresql];
+      instance.discoverName = 'DISCOVER_AZURE_DATABASE_TYPE_POSTGRESQL';
+      instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 5432;
+      break;
+    case InstanceTypes.mysql:
+      instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.mysql];
+      instance.discoverName = 'DISCOVER_AZURE_DATABASE_TYPE_MYSQL';
+      instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 3306;
+      break;
+    case InstanceTypes.mariadb:
+      instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.mariadb];
+      instance.discoverName = 'DISCOVER_AZURE_DATABASE_TYPE_MARIADB';
+      instance.remoteInstanceCredentials.port = instance.remoteInstanceCredentials.port || 3306;
+      break;
+    default:
+      console.error('Not implemented');
+  }
+
+  return instance;
 };
 
-const getRDSCredentials = (credentials: any) => {
-  return {
+const getRDSCredentials = (credentials: any, instanceType: string) => {
+  const instance: any = {
     remoteInstanceCredentials: {
       serviceName: !credentials.isRDS ? credentials.address : credentials.instance_id,
       port: credentials.port,
@@ -33,24 +55,6 @@ const getRDSCredentials = (credentials: any) => {
       az: credentials.az,
     },
   };
-};
-
-export const getInstanceData = (instanceType: string, credentials: any): InstanceData => {
-  const extractCredentials = (credentials?: any): InstanceData => {
-    if (!credentials) {
-      return { remoteInstanceCredentials: {} };
-    }
-
-    if (credentials.isRDS) {
-      return getRDSCredentials(credentials);
-    } else if (credentials.isAzure) {
-      return getAzureCredentials(credentials);
-    }
-
-    return { remoteInstanceCredentials: {} };
-  };
-
-  const instance = extractCredentials(credentials);
 
   switch (instanceType) {
     case InstanceTypes.postgresql:
@@ -80,4 +84,22 @@ export const getInstanceData = (instanceType: string, credentials: any): Instanc
   }
 
   return instance;
+};
+
+export const getInstanceData = (instanceType: string, credentials: any): InstanceData => {
+  const extractCredentials = (credentials?: any): InstanceData => {
+    if (!credentials) {
+      return { remoteInstanceCredentials: {} };
+    }
+
+    if (credentials.isRDS) {
+      return getRDSCredentials(credentials, instanceType);
+    } else if (credentials.isAzure) {
+      return getAzureCredentials(credentials, instanceType);
+    }
+
+    return { remoteInstanceCredentials: {} };
+  };
+
+  return extractCredentials(credentials);
 };

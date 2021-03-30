@@ -1,6 +1,7 @@
 import { Button } from '@grafana/ui';
 import React from 'react';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
+import { styles } from './Instances.styles';
 
 const getEngineType = (type?: string) => {
   switch (type) {
@@ -20,6 +21,7 @@ const getEngineType = (type?: string) => {
 const getDatabaseType = (type?: string) => {
   switch (type) {
     case 'DISCOVER_AZURE_DATABASE_TYPE_MYSQL':
+    case 'DISCOVER_AZURE_DATABASE_TYPE_MARIADB':
       return Databases.mysql;
     case 'DISCOVER_AZURE_DATABASE_TYPE_POSTGRESQL':
       return Databases.postgresql;
@@ -36,19 +38,15 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Resource group',
-    accessor: 'resource_group',
+    accessor: 'azure_resource_group',
   },
   {
     Header: 'Name',
-    accessor: 'name',
+    accessor: 'service_name',
   },
   {
     Header: 'Engine',
-    accessor: (element: any) => (element.engine ? `${getEngineType(element.engine)}` : 'nothing'),
-  },
-  {
-    Header: 'Instance ID',
-    accessor: 'instance_id',
+    accessor: (element: any) => (element.type ? `${getEngineType(element.type)}` : 'nothing'),
   },
   {
     Header: 'Address',
@@ -65,9 +63,11 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
       };
 
       return (
-        <Button variant="primary" onClick={selectionHandler}>
-          Start monitoring
-        </Button>
+        <div className={styles.actionButtonWrapper}>
+          <Button variant="primary" onClick={selectionHandler}>
+            Start monitoring
+          </Button>
+        </div>
       );
     },
   },

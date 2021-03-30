@@ -5,4 +5,8 @@ export const styles = {
     margin-top: 10px;
     width: 100%;
   `,
+  actionButtonWrapper: css`
+    diplay: flex;
+    justify-content: center;
+  `,
 };

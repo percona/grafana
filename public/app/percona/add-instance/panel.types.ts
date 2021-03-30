@@ -19,10 +19,12 @@ export enum InstanceTypes {
   mongodb = 'mongodb',
   external = 'external',
   haproxy = 'haproxy',
+  mariadb = 'mariadb',
 }
 
 export const INSTANCE_TYPES_LABELS = {
   [InstanceTypes.mysql]: 'MySQL',
+  [InstanceTypes.mariadb]: 'MariaDB',
   [InstanceTypes.mongodb]: 'MongoDB',
   [InstanceTypes.postgresql]: 'PostgreSQL',
   [InstanceTypes.proxysql]: 'ProxySQL',
