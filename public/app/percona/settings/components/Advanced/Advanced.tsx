@@ -53,6 +53,8 @@ export const Advanced: FC<AdvancedProps> = ({
       technicalPreviewLegend,
       technicalPreviewDescription,
       technicalPreviewLinkText,
+      azureDiscoverLabel,
+      azureDiscoverTooltip
     },
     tooltipLinkText,
   } = Messages;
@@ -67,7 +69,7 @@ export const Advanced: FC<AdvancedProps> = ({
   };
   const [loading, setLoading] = useState(false);
   // @ts-ignore
-  const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting }) => {
+  const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting, azureDiscover }) => {
     const refresh = !!alerting !== alertingEnabled;
     const body = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
@@ -75,6 +77,8 @@ export const Advanced: FC<AdvancedProps> = ({
       enable_telemetry: telemetry,
       disable_stt: !stt,
       enable_stt: stt,
+      disable_azurediscover: !azureDiscover,
+      enable_azurediscover: azureDiscover,
       pmm_public_address: publicAddress,
       remove_pmm_public_address: !publicAddress,
       enable_alerting: alerting ? true : undefined,
@@ -200,6 +204,17 @@ export const Advanced: FC<AdvancedProps> = ({
                 tooltipLinkText={tooltipLinkText}
                 link={alertingLink}
                 className={cx({ [styles.switchDisabled]: !values.telemetry })}
+                disabled={!values.telemetry}
+                dataQa="advanced-alerting"
+                component={SwitchRow}
+              />
+              <Field
+                name="azureDiscover"
+                type="checkbox"
+                label={azureDiscoverLabel}
+                tooltip={azureDiscoverTooltip}
+                // tooltipLinkText={tooltipLinkText}
+                // link={alertingLink}
                 disabled={!values.telemetry}
                 dataQa="advanced-alerting"
                 component={SwitchRow}
