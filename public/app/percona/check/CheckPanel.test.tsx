@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { dataQa } from '@percona/platform-core';
 import { ReactWrapper, mount } from 'enzyme';
-import { CheckPanelRouter } from './CheckPanel';
+import { CheckPanel } from './CheckPanel';
 import { CheckService } from './Check.service';
 import { Messages } from './CheckPanel.messages';
 
@@ -28,7 +28,7 @@ describe('CheckPanel::', () => {
   it('should fetch settings at startup', () => {
     const spy = jest.spyOn(CheckService, 'getSettings');
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     expect(spy).toBeCalledTimes(1);
 
@@ -37,7 +37,7 @@ describe('CheckPanel::', () => {
   });
 
   it('should render a spinner at startup, while loading', async () => {
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     expect(wrapper.find(dataQa('db-check-spinner'))).toHaveLength(1);
 
@@ -54,7 +54,7 @@ describe('CheckPanel::', () => {
       throw Error('test');
     });
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     expect(console.error).toBeCalledTimes(1);
 
@@ -71,7 +71,7 @@ describe('CheckPanel::', () => {
       })
     );
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     await runAllPromises();
     wrapper.update();
@@ -98,7 +98,7 @@ describe('CheckPanel::', () => {
       throw UnauthorizedError();
     });
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     await runAllPromises();
     wrapper.update();
