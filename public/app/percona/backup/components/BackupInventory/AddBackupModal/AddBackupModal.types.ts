@@ -1,3 +1,4 @@
+import { SelectableValue } from '@grafana/data';
 import { Databases } from 'app/percona/shared/core';
 import { Backup, DataModel } from '../BackupInventory.types';
 
@@ -13,12 +14,12 @@ export enum RetryMode {
 }
 
 export interface AddBackupFormProps {
-  serviceName: string;
+  service: SelectableValue<string>;
   vendor: Databases;
   dataModel: DataModel;
   backupName: string;
   description: string;
-  location: string;
+  location: SelectableValue<string>;
   retryMode: RetryMode;
   retryTimes: number;
   retryInterval: number;

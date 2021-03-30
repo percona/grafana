@@ -1,6 +1,7 @@
+import { SelectableValue } from '@grafana/data';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
-export const VENDOR_OPTIONS = [
+export const VENDOR_OPTIONS: Array<SelectableValue<Databases>> = [
   {
     value: Databases.mysql,
     label: DATABASE_LABELS.mysql,

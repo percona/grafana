@@ -5,27 +5,27 @@ import { AddBackupFormProps, RetryMode } from './AddBackupModal.types';
 export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
   if (!backup) {
     return {
-      serviceName: '',
+      service: { label: '', value: '' },
       vendor: Databases.mysql,
       dataModel: DataModel.PHYSICAL,
       backupName: '',
       description: '',
-      location: '',
+      location: { label: '', value: '' },
       retryMode: RetryMode.AUTO,
       retryTimes: 0,
       retryInterval: 0,
     };
   }
 
-  const { serviceName, vendor, dataModel, locationName } = backup;
+  const { serviceName, serviceId, vendor, dataModel, locationName, locationId } = backup;
 
   return {
-    serviceName,
+    service: { label: serviceName, value: serviceId },
     vendor,
     dataModel,
     backupName: '',
     description: '',
-    location: locationName,
+    location: { label: locationName, value: locationId },
     retryMode: RetryMode.AUTO,
     retryTimes: 0,
     retryInterval: 0,

@@ -20,7 +20,9 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
   const styles = useStyles(getStyles);
   const initialValues = toFormBackup(backup);
 
-  const handleSubmit = () => undefined;
+  const handleSubmit = (values: AddBackupModalProps) => {
+    console.log(values);
+  };
 
   // TODO uncomment remaining fields when we support them
   return (
@@ -29,8 +31,8 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
         initialValues={initialValues}
         onSubmit={handleSubmit}
         render={({ handleSubmit, valid, pristine, submitting }) => (
-          <form>
-            <Field name="serviceName" validate={validators.required}>
+          <form onSubmit={handleSubmit}>
+            <Field name="service" validate={validators.required}>
               {({ input }) => (
                 <div>
                   <label className={styles.label} data-qa="service-select-label">
