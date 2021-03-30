@@ -6,8 +6,6 @@ import { Table } from 'app/percona/check/components';
 import { FailedChecksTabProps } from './types';
 import { FailedChecksTab } from './FailedChecksTab';
 
-jest.mock('app/percona/shared/components/helpers/notification-manager');
-
 const originalConsoleError = console.error;
 
 const dataQa = (label: string) => `[data-qa="${label}"]`;

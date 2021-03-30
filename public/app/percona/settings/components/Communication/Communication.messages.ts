@@ -30,19 +30,19 @@ export const Messages = {
     },
     username: {
       label: 'Username',
-      tooltipText: 'SMTP authentication information. Username',
+      tooltipText: 'SMTP authentication information',
       tooltipLinkText: 'Read more',
       tooltipLink: COMMUNICATION_LINK,
     },
     password: {
       label: 'Password',
-      tooltipText: 'SMTP authentication information. Password',
+      tooltipText: 'SMTP authentication information',
       tooltipLinkText: 'Read more',
       tooltipLink: COMMUNICATION_LINK,
     },
     identity: {
       label: 'Identity',
-      tooltipText: 'SMTP authentication information. Identity',
+      tooltipText: 'SMTP authentication information',
       tooltipLinkText: 'Read more',
       tooltipLink: COMMUNICATION_LINK,
     },

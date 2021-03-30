@@ -3,8 +3,6 @@ import { shallow } from 'enzyme';
 import { activeCheckStub } from 'app/percona/check/__mocks__/stubs';
 import { TableBody } from './TableBody';
 
-jest.mock('app/percona/shared/components/helpers/notification-manager');
-
 describe('TableBody::', () => {
   it('renders a table body', () => {
     const root = shallow(<TableBody data={activeCheckStub} />);

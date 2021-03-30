@@ -2,8 +2,6 @@ import { mount } from 'enzyme';
 import React from 'react';
 import Discovery from './Discovery';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
-
 describe('Discovery instance:: ', () => {
   it('Should render correct', () => {
     const selectInstance = jest.fn();

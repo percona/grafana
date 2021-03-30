@@ -5,8 +5,6 @@ import { Form } from 'react-final-form';
 import { act } from 'react-dom/test-utils';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
-
 describe('Add remote instance:: ', () => {
   it('should render correct for mysql and highlight empty mandatory fields on submit', async () => {
     const root = mount(
@@ -31,7 +29,6 @@ describe('Add remote instance:: ', () => {
 
     root.update();
 
-    expect(root.find('#https[type="radio"]').length).toBe(1);
     expect(root.find(dataQa('address-text-input')).props().value).toEqual('localhost');
     expect(root.find(dataQa('metrics_path-text-input')).props().value).toEqual('/metrics');
     expect(root.find(dataQa('port-text-input')).props().value).toEqual('443');
