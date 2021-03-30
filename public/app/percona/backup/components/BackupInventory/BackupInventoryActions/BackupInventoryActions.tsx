@@ -3,6 +3,7 @@ import { useStyles } from '@grafana/ui';
 import { DBIcon } from '../../DBIcon';
 import { BackupInventoryActionsProps } from './BackupInventoryActions.types';
 import { getStyles } from './BackupInventoryActions.styles';
+import { Messages } from './BackupInventoryActions.messages';
 
 export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({ backup, onRestore }) => {
   const styles = useStyles(getStyles);
@@ -10,7 +11,13 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({ backup
 
   return (
     <div className={styles.actionsWrapper}>
-      <DBIcon type="restore" data-qa="restore-backup-artifact-button" role="button" onClick={handeClick} />
+      <DBIcon
+        tooltipText={Messages.restoreBackup}
+        type="restore"
+        data-qa="restore-backup-artifact-button"
+        role="button"
+        onClick={handeClick}
+      />
     </div>
   );
 };
