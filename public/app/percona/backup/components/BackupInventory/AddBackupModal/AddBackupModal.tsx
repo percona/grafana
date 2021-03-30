@@ -13,7 +13,7 @@ import { AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
 import { toFormBackup } from './AddBackupModal.utils';
-import { loadServiceOptions, loadLocationOptions } from './AddBackupModal.service';
+import { AddBackupModalService } from './AddBackupModal.service';
 import { VENDOR_OPTIONS } from './AddBackupModal.constants';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose }) => {
@@ -39,7 +39,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                     {Messages.serviceName}
                   </label>
                   <AsyncSelect
-                    loadOptions={loadServiceOptions}
+                    loadOptions={AddBackupModalService.loadServiceOptions}
                     defaultOptions
                     className={styles.select}
                     {...input}
@@ -60,7 +60,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                   </label>
                   <AsyncSelect
                     className={styles.select}
-                    loadOptions={loadLocationOptions}
+                    loadOptions={AddBackupModalService.loadLocationOptions}
                     defaultOptions
                     {...input}
                     data-qa="location-select-input"
