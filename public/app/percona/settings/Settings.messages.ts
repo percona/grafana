@@ -16,6 +16,8 @@ export const Messages = {
     sttLink: `${GUI_DOC_URL}#security-threat-tool`,
     sttTooltip: 'Enable Security Threat Tool and get updated checks from Percona.',
     dbaasLabel: 'DBaaS',
+    azureDiscoverLabel: 'Azure Discover',
+    azureDiscoverTooltip: 'Enable azure discover',
     dbaasTooltip: 'Read-only option to show if DBaaS features are enabled.',
     publicAddressLabel: 'Public Address',
     publicAddressTooltip: 'Public Address to this PMM server.',
