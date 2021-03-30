@@ -54,7 +54,7 @@ export const Advanced: FC<AdvancedProps> = ({
       technicalPreviewDescription,
       technicalPreviewLinkText,
       azureDiscoverLabel,
-      azureDiscoverTooltip
+      azureDiscoverTooltip,
     },
     tooltipLinkText,
   } = Messages;
@@ -213,8 +213,6 @@ export const Advanced: FC<AdvancedProps> = ({
                 type="checkbox"
                 label={azureDiscoverLabel}
                 tooltip={azureDiscoverTooltip}
-                // tooltipLinkText={tooltipLinkText}
-                // link={alertingLink}
                 disabled={!values.telemetry}
                 dataQa="advanced-alerting"
                 component={SwitchRow}
