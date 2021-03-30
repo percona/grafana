@@ -16,5 +16,11 @@ export const DBIcon: FC<DBIconProps> = ({ type, size, tooltipText, ...rest }) =>
   const Icon = Icons[type];
   const IconEl = <Icon size={size} {...rest} />;
 
-  return tooltipText ? <Tooltip content={tooltipText}>{IconEl}</Tooltip> : IconEl;
+  return tooltipText ? (
+    <Tooltip placement="top" content={tooltipText}>
+      <span>{IconEl}</span>
+    </Tooltip>
+  ) : (
+    IconEl
+  );
 };
