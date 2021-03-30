@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { dataQa } from '@percona/platform-core';
 import { HAProxyConnectionDetails } from './HAProxyConnectionDetails';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
+
 
 describe('HAProxy connection details:: ', () => {
   it('should trim username and password values right', async () => {

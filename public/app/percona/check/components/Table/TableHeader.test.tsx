@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 import { COLUMNS } from 'app/percona/check/CheckPanel.constants';
 import { TableHeader } from './TableHeader';
 
-jest.mock('app/percona/shared/components/helpers/notification-manager');
+
 
 describe('TableHeader::', () => {
   it('should render a colgroup with 3 columns', () => {

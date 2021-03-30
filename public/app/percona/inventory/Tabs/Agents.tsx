@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { Form } from 'react-final-form';
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
-import { showSuccessNotification } from 'app/percona/shared/helpers';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
 import { FormElement } from 'app/percona/shared/components/Form';
@@ -12,6 +11,8 @@ import { InventoryService } from '../Inventory.service';
 import { AGENTS_COLUMNS } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
 import { CheckboxField } from '@percona/platform-core';
+import { appEvents } from '../../../core/app_events';
+import { AppEvents } from '@grafana/data';
 
 interface Agent {
   agent_id: string;
@@ -52,9 +53,9 @@ export const Agents = () => {
 
       const successfullyDeleted = results.filter(filterFulfilled).length;
 
-      showSuccessNotification({
-        message: `${successfullyDeleted} of ${agents.length} agents successfully deleted`,
-      });
+      appEvents.emit(AppEvents.alertSuccess, [
+        `${successfullyDeleted} of ${agents.length} agents successfully deleted`,
+      ]);
     } catch (e) {
       console.error(e);
     } finally {

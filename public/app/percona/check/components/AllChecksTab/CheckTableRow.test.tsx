@@ -5,7 +5,7 @@ import { CheckTableRow } from './CheckTableRow';
 import { Messages } from './AllChecksTab.messages';
 import { LoaderButton } from '@percona/platform-core';
 
-jest.mock('app/percona/shared/components/helpers/notification-manager');
+
 
 const originalConsoleError = jest.fn();
 

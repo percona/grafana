@@ -1,6 +1,6 @@
 import { toExternalServicePayload, toPayload } from './AddRemoteInstance.service';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
+
 
 describe('AddRemoteInstanceService:: ', () => {
   it('should properly convert remote external service form to a payload', () => {

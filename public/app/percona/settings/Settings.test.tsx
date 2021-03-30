@@ -3,7 +3,7 @@ import { act } from 'react-dom/test-utils';
 import { mount } from 'enzyme';
 import { SettingsPanel } from './Settings';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
+
 jest.mock('app/percona/shared/components/hooks/parameters.hook');
 
 describe('SettingsPanel::', () => {

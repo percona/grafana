@@ -1,6 +1,6 @@
 import { getInstanceData } from './AddRemoteInstance.tools';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
+
 
 describe('Get instance data:: ', () => {
   it('should return correct one when isRDS is false', () => {

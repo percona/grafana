@@ -4,7 +4,7 @@ import { Button } from '@grafana/ui';
 import { LoggedIn } from './LoggedIn';
 import { PlatformLoginService } from '../PlatformLogin.service';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
+
 
 describe('LoggedIn::', () => {
   it('Should show the passed email correctly', () => {

@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import { PlatformLogin } from './PlatformLogin';
 import { LoggedIn } from './LoggedIn/LoggedIn';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
+
 
 describe('Platform login::', () => {
   it('Should show a login form if an undefined email is passed', () => {

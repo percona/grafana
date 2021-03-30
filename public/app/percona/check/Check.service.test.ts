@@ -4,7 +4,7 @@ import { API } from 'app/percona/shared/core';
 import { activeCheckStub, alertsStub } from './__mocks__/stubs';
 
 jest.mock('axios');
-jest.mock('app/percona/shared/components/helpers/notification-manager');
+
 
 describe('CheckService::', () => {
   it('should properly convert Alerts to ActiveChecks', () => {

@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import { act } from 'react-dom/test-utils';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails';
 
-jest.mock('app/percona/shared/helpers/notification-manager');
+
 
 describe('Add remote instance:: ', () => {
   it('should render correct for mysql and highlight empty mandatory fields on submit', async () => {

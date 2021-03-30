@@ -6,7 +6,7 @@ import { CheckPanelRouter } from './CheckPanel';
 import { CheckService } from './Check.service';
 import { Messages } from './CheckPanel.messages';
 
-jest.mock('app/percona/shared/components/helpers/notification-manager');
+
 
 jest.mock('./Check.service');
 

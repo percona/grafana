@@ -8,7 +8,7 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { makeSilencePayload } from './SilenceAlertButton.utils';
 import { LoaderButton } from '@percona/platform-core';
 
-jest.mock('app/percona/shared/components/helpers/notification-manager');
+
 
 jest.mock('../../Check.service');
 
