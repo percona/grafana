@@ -1,4 +1,5 @@
 export const Messages = {
+  title: 'Backup On Demand',
   serviceName: 'Service name',
   vendor: 'Vendor',
   dataModel: 'Data model',

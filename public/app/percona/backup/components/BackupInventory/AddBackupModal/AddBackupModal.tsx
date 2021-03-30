@@ -26,7 +26,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
 
   // TODO uncomment remaining fields when we support them
   return (
-    <Modal title="Backup On Demand" isVisible={isVisible} onClose={onClose}>
+    <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
       <Form
         initialValues={initialValues}
         onSubmit={handleSubmit}
