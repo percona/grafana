@@ -30,7 +30,25 @@ export const SettingsService = {
 
     try {
       setLoading(true);
-      response = await api.post<any, any>('/v1/Settings/Change', body);
+      // response = await api.post<any, any>('/v1/Settings/Change', body);
+
+      response = {
+        settings: {
+          telemetry_enabled: true,
+          metrics_resolutions: {
+            hr: '5s',
+            mr: '10s',
+            lr: '60s',
+          },
+          data_retention: '2592000s',
+          aws_partitions: ['aws'],
+          stt_check_intervals: {
+            standard_interval: '86400s',
+            rare_interval: '280800s',
+            frequent_interval: '14400s',
+          },
+        },
+      };
       response = toModel(response.settings);
       appEvents.emit(AppEvents.alertSuccess, [Messages.service.success]);
     } catch (e) {

@@ -5,11 +5,20 @@ import { ReactWrapper, mount } from 'enzyme';
 import { CheckPanel } from './CheckPanel';
 import { CheckService } from './Check.service';
 import { Messages } from './CheckPanel.messages';
+import {useSelector} from "react-redux";
 
 
 
 jest.mock('./Check.service');
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useSelector: jest.fn(),
+}));
 
+jest.mock('@grafana/runtime', () => ({
+  ...jest.requireActual('@grafana/runtime'),
+  getLocationSrv: jest.fn().mockImplementation(() => ({ update: fakeLocationUpdate })),
+}));
 const originalConsoleError = console.error;
 
 // immediately resolves all pending promises: allows to run expectations after a promise
@@ -18,6 +27,9 @@ const runAllPromises = () => new Promise(setImmediate);
 describe('CheckPanel::', () => {
   beforeEach(() => {
     console.error = jest.fn();
+    (useSelector as jest.Mock).mockImplementation(callback => {
+      return callback({ location: { routeParams: { tab: 'alerts' }, path: '/integrated-alerting/alerts' } });
+    });
   });
 
   afterEach(() => {
@@ -77,12 +89,10 @@ describe('CheckPanel::', () => {
     wrapper.update();
 
     expect(wrapper.find(dataQa('db-check-panel-settings-link'))).toHaveLength(1);
-    const text = `${Messages.sttDisabled} ${Messages.pmmSettings}`;
+    const text = `${Messages.pmmSettings}`;
 
     expect(wrapper.find(dataQa('db-check-panel-settings-link')).text()).toEqual(text);
-
-    expect(wrapper.find(Link).length).toEqual(1);
-
+    
     spy.mockClear();
     wrapper.unmount();
   });
