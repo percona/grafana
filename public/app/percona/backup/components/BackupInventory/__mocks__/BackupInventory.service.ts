@@ -1,4 +1,5 @@
 import { Backup, DataModel, Status } from '../BackupInventory.types';
+import { Databases } from 'app/percona/shared/core';
 import * as service from '../BackupInventory.service';
 
 export const stubs: Backup[] = [
@@ -12,7 +13,7 @@ export const stubs: Backup[] = [
     serviceName: 'Service 1',
     dataModel: DataModel.LOGICAL,
     status: Status.SUCCESS,
-    vendor: 'PostgreSQL',
+    vendor: Databases.mysql,
   },
   {
     id: 'backup_2',
@@ -24,7 +25,7 @@ export const stubs: Backup[] = [
     serviceName: 'Service 3',
     dataModel: DataModel.PHYSICAL,
     status: Status.IN_PROGRESS,
-    vendor: 'PostgreSQL',
+    vendor: Databases.mysql,
   },
 ];
 
