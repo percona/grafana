@@ -1,5 +1,5 @@
 import React, { FC, useCallback } from 'react';
-import { css } from 'emotion';
+import { css, cx } from 'emotion';
 import { Icon, IconName, useTheme } from '@grafana/ui';
 import { getLinkSrv } from '../../../features/panel/panellinks/link_srv';
 
@@ -10,6 +10,11 @@ export interface Props {
 const DropDownChild: FC<Props> = props => {
   const { child } = props;
   const listItemClassName = child.divider ? 'divider' : '';
+  const linkClass = css`
+    a[href^='#'] {
+      cursor: default;
+    }
+  `;
   const theme = useTheme();
   const iconClassName = css`
     margin-right: ${theme.spacing.sm};
@@ -43,8 +48,8 @@ const DropDownChild: FC<Props> = props => {
 
   const renderChildren = !!children.length;
   return (
-    <li className={listItemClassName}>
-      <a href={child.url} onMouseDown={onLinkMouseDown}>
+    <li className={cx(listItemClassName, linkClass)}>
+      <a href={child.url || '#'} onMouseDown={onLinkMouseDown}>
         {child.icon && <Icon name={child.icon as IconName} className={iconClassName} />}
         {child.text}
         <span style={{ marginLeft: 'auto' }}>{renderChildren && <Icon name={'angle-right'} />}</span>

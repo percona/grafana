@@ -3,18 +3,17 @@ import { mount } from 'enzyme';
 import { MetricsResolution } from './MetricsResolution';
 import { defaultResolutions } from './MetricsResolution.constants';
 import { removeUnits } from './MetricsResolution.utils';
+import { dataQa } from '@percona/platform-core';
 
 describe('MetricsResolution::', () => {
   it('Renders correctly with props for standard resolution', () => {
     const root = mount(<MetricsResolution metricsResolutions={defaultResolutions[1]} updateSettings={() => {}} />);
-    const radio = root.find('[data-qa="metrics-resolution-radio-button-group"]');
-    const radioLabel = radio.childAt(1).find('label');
-    const lrInput = root.find('[data-qa="metrics-resolution-lr-input"]');
-    const mrInput = root.find('[data-qa="metrics-resolution-mr-input"]');
-    const hrInput = root.find('[data-qa="metrics-resolution-hr-input"]');
+    const radio = root.find('[data-qa="resolutions-radio-button"]');
+    const lrInput = root.find('[data-qa="lr-number-input"]');
+    const mrInput = root.find('[data-qa="mr-number-input"]');
+    const hrInput = root.find('[data-qa="hr-number-input"]');
     const standardRes = removeUnits(defaultResolutions[1]);
 
-    expect(radioLabel.prop('className')).toContain('active');
     expect(lrInput.find('input').prop('value')).toEqual(standardRes.lr);
     expect(mrInput.find('input').prop('value')).toEqual(standardRes.mr);
     expect(hrInput.find('input').prop('value')).toEqual(standardRes.hr);
@@ -22,14 +21,13 @@ describe('MetricsResolution::', () => {
 
   it('Renders correctly with props for rare resolution', () => {
     const root = mount(<MetricsResolution metricsResolutions={defaultResolutions[0]} updateSettings={() => {}} />);
-    const radio = root.find('[data-qa="metrics-resolution-radio-button-group"]');
-    const radioLabel = radio.childAt(0).find('label');
-    const lrInput = root.find('[data-qa="metrics-resolution-lr-input"]');
-    const mrInput = root.find('[data-qa="metrics-resolution-mr-input"]');
-    const hrInput = root.find('[data-qa="metrics-resolution-hr-input"]');
+    const radio = root.find('[data-qa="resolutions-radio-button"]');
+
+    const lrInput = root.find('[data-qa="lr-number-input"]');
+    const mrInput = root.find('[data-qa="mr-number-input"]');
+    const hrInput = root.find('[data-qa="hr-number-input"]');
     const standardRes = removeUnits(defaultResolutions[0]);
 
-    expect(radioLabel.prop('className')).toContain('active');
     expect(lrInput.find('input').prop('value')).toEqual(standardRes.lr);
     expect(mrInput.find('input').prop('value')).toEqual(standardRes.mr);
     expect(hrInput.find('input').prop('value')).toEqual(standardRes.hr);
@@ -37,14 +35,12 @@ describe('MetricsResolution::', () => {
 
   it('Renders correctly with props for frequent resolution', () => {
     const root = mount(<MetricsResolution metricsResolutions={defaultResolutions[2]} updateSettings={() => {}} />);
-    const radio = root.find('[data-qa="metrics-resolution-radio-button-group"]');
-    const radioLabel = radio.childAt(2).find('label');
-    const lrInput = root.find('[data-qa="metrics-resolution-lr-input"]');
-    const mrInput = root.find('[data-qa="metrics-resolution-mr-input"]');
-    const hrInput = root.find('[data-qa="metrics-resolution-hr-input"]');
+
+    const lrInput = root.find('[data-qa="lr-number-input"]');
+    const mrInput = root.find('[data-qa="mr-number-input"]');
+    const hrInput = root.find('[data-qa="hr-number-input"]');
     const standardRes = removeUnits(defaultResolutions[2]);
 
-    expect(radioLabel.prop('className')).toContain('active');
     expect(lrInput.find('input').prop('value')).toEqual(standardRes.lr);
     expect(mrInput.find('input').prop('value')).toEqual(standardRes.mr);
     expect(hrInput.find('input').prop('value')).toEqual(standardRes.hr);
@@ -54,13 +50,11 @@ describe('MetricsResolution::', () => {
     const root = mount(
       <MetricsResolution metricsResolutions={{ lr: '400s', mr: '100s', hr: '50s' }} updateSettings={() => {}} />
     );
-    const radio = root.find('[data-qa="metrics-resolution-radio-button-group"]');
-    const radioLabel = radio.childAt(3).find('label');
-    const lrInput = root.find('[data-qa="metrics-resolution-lr-input"]');
-    const mrInput = root.find('[data-qa="metrics-resolution-mr-input"]');
-    const hrInput = root.find('[data-qa="metrics-resolution-hr-input"]');
 
-    expect(radioLabel.prop('className')).toContain('active');
+    const lrInput = root.find('[data-qa="lr-number-input"]');
+    const mrInput = root.find('[data-qa="mr-number-input"]');
+    const hrInput = root.find('[data-qa="hr-number-input"]');
+
     expect(lrInput.find('input').prop('value')).toEqual('400');
     expect(mrInput.find('input').prop('value')).toEqual('100');
     expect(hrInput.find('input').prop('value')).toEqual('50');
@@ -68,20 +62,15 @@ describe('MetricsResolution::', () => {
 
   it('Changes input values when changing resolution', () => {
     const root = mount(<MetricsResolution metricsResolutions={defaultResolutions[0]} updateSettings={() => {}} />);
-    let radio = root.find('[data-qa="metrics-resolution-radio-button-group"]');
-    let radioLabelFrequent = radio.childAt(2).find('label');
+    let radio = root.find(dataQa('resolutions-radio-button')).at(2);
 
-    radioLabelFrequent.simulate('click');
+    radio.simulate('click');
 
-    radio = root.find('[data-qa="metrics-resolution-radio-button-group"]');
-    radioLabelFrequent = radio.childAt(2).find('label');
+    const lrInput = root.find('[data-qa="lr-number-input"]');
+    const mrInput = root.find('[data-qa="mr-number-input"]');
+    const hrInput = root.find('[data-qa="hr-number-input"]');
+    const standardRes = removeUnits(defaultResolutions[0]);
 
-    const lrInput = root.find('[data-qa="metrics-resolution-lr-input"]');
-    const mrInput = root.find('[data-qa="metrics-resolution-mr-input"]');
-    const hrInput = root.find('[data-qa="metrics-resolution-hr-input"]');
-    const standardRes = removeUnits(defaultResolutions[2]);
-
-    expect(radioLabelFrequent.prop('className')).toContain('active');
     expect(lrInput.find('input').prop('value')).toEqual(standardRes.lr);
     expect(mrInput.find('input').prop('value')).toEqual(standardRes.mr);
     expect(hrInput.find('input').prop('value')).toEqual(standardRes.hr);
@@ -101,7 +90,7 @@ describe('MetricsResolution::', () => {
     );
 
     root
-      .find('[data-qa="metrics-resolution-lr-input"]')
+      .find('[data-qa="lr-number-input"]')
       .find('input')
       .simulate('change', { target: { value: '70' } });
     root.find('form').simulate('submit');

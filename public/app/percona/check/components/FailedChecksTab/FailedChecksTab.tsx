@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Table } from 'app/percona/check/components';
-import { showSuccessNotification } from 'app/percona/shared/helpers';
 import { ActiveCheck } from 'app/percona/check/types';
 import { COLUMNS } from 'app/percona/check/CheckPanel.constants';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
@@ -11,6 +10,8 @@ import { Messages } from './FailedChecksTab.messages';
 import { getStyles } from './FailedChecksTab.styles';
 import { loadShowSilencedValue, saveShowSilencedValue } from './FailedChecksTab.utils';
 import { LoaderButton } from '@percona/platform-core';
+import { appEvents } from '../../../../core/app_events';
+import { AppEvents } from '@grafana/data';
 
 export const FailedChecksTab: FC<FailedChecksTabProps> = ({ hasNoAccess }) => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(false);
@@ -44,7 +45,7 @@ export const FailedChecksTab: FC<FailedChecksTabProps> = ({ hasNoAccess }) => {
     setTimeout(async () => {
       setRunChecksPending(false);
       await fetchAlerts();
-      showSuccessNotification({ message: 'Done running DB checks. The latest results are displayed.' });
+      appEvents.emit(AppEvents.alertSuccess, ['Done running DB checks. The latest results are displayed.']);
     }, 10000);
   };
 

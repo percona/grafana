@@ -4,8 +4,6 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { AllChecksTab } from './AllChecksTab';
 import { Messages } from './AllChecksTab.messages';
 
-jest.mock('app/percona/shared/components/helpers/notification-manager');
-
 const originalConsoleError = console.error;
 
 const dataQa = (label: string) => `[data-qa="${label}"]`;

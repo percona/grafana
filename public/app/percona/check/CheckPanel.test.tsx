@@ -2,14 +2,21 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { dataQa } from '@percona/platform-core';
 import { ReactWrapper, mount } from 'enzyme';
-import { CheckPanelRouter } from './CheckPanel';
+import { CheckPanel } from './CheckPanel';
 import { CheckService } from './Check.service';
 import { Messages } from './CheckPanel.messages';
-
-jest.mock('app/percona/shared/components/helpers/notification-manager');
+import { useSelector } from 'react-redux';
 
 jest.mock('./Check.service');
+jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
+  useSelector: jest.fn(),
+}));
 
+jest.mock('@grafana/runtime', () => ({
+  ...jest.requireActual('@grafana/runtime'),
+  getLocationSrv: jest.fn().mockImplementation(() => ({ update: fakeLocationUpdate })),
+}));
 const originalConsoleError = console.error;
 
 // immediately resolves all pending promises: allows to run expectations after a promise
@@ -18,6 +25,9 @@ const runAllPromises = () => new Promise(setImmediate);
 describe('CheckPanel::', () => {
   beforeEach(() => {
     console.error = jest.fn();
+    (useSelector as jest.Mock).mockImplementation(callback => {
+      return callback({ location: { routeParams: { tab: 'alerts' }, path: '/integrated-alerting/alerts' } });
+    });
   });
 
   afterEach(() => {
@@ -28,7 +38,7 @@ describe('CheckPanel::', () => {
   it('should fetch settings at startup', () => {
     const spy = jest.spyOn(CheckService, 'getSettings');
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     expect(spy).toBeCalledTimes(1);
 
@@ -37,7 +47,7 @@ describe('CheckPanel::', () => {
   });
 
   it('should render a spinner at startup, while loading', async () => {
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     expect(wrapper.find(dataQa('db-check-spinner'))).toHaveLength(1);
 
@@ -54,7 +64,7 @@ describe('CheckPanel::', () => {
       throw Error('test');
     });
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     expect(console.error).toBeCalledTimes(1);
 
@@ -71,17 +81,15 @@ describe('CheckPanel::', () => {
       })
     );
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     await runAllPromises();
     wrapper.update();
 
     expect(wrapper.find(dataQa('db-check-panel-settings-link'))).toHaveLength(1);
-    const text = `${Messages.sttDisabled} ${Messages.pmmSettings}`;
+    const text = `${Messages.pmmSettings}`;
 
     expect(wrapper.find(dataQa('db-check-panel-settings-link')).text()).toEqual(text);
-
-    expect(wrapper.find(Link).length).toEqual(1);
 
     spy.mockClear();
     wrapper.unmount();
@@ -98,7 +106,7 @@ describe('CheckPanel::', () => {
       throw UnauthorizedError();
     });
 
-    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanelRouter />);
+    const wrapper: ReactWrapper<{}, {}, any> = mount(<CheckPanel />);
 
     await runAllPromises();
     wrapper.update();

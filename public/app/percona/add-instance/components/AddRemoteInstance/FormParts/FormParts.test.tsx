@@ -2,7 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { Form } from 'react-final-form';
 import { FormApi } from 'final-form';
-import { rdsTrackingOptions } from './FormParts.constants';
+import { rdsTrackingOptions, trackingOptions } from './FormParts.constants';
 import { AdditionalOptionsFormPart, getAdditionalOptions } from './AdditionalOptions/AdditionalOptions';
 import { LabelsFormPart } from './Labels/Labels';
 import { MainDetailsFormPart } from './MainDetails/MainDetails';
@@ -10,6 +10,7 @@ import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDet
 
 const form = {
   change: jest.fn(),
+  getState: () => ({}),
 };
 
 describe('MainDetailsFormPart ::', () => {
@@ -55,7 +56,7 @@ describe('ExternalServiceConnectionDetails ::', () => {
 
     const fields = root.find('input');
 
-    expect(fields.length).toBe(10);
+    expect(fields.length).toBe(11);
   });
 });
 
@@ -126,7 +127,7 @@ describe('getAdditionalOptions ::', () => {
     const fields = root.find('input');
 
     expect(root.find('input[name="qan_mysql_perfschema"]').length).toBe(1);
-    expect(fields.length).toBe(7);
+    expect(fields.length).toBe(8);
   });
 
   it('should render correct for RDS MySQL', async () => {
@@ -143,7 +144,7 @@ describe('getAdditionalOptions ::', () => {
     expect(root.find('input[name="qan_mysql_perfschema"]').length).toBe(1);
     expect(root.find('input[name="disable_basic_metrics"]').length).toBe(1);
     expect(root.find('input[name="disable_enhanced_metrics"]').length).toBe(1);
-    expect(fields.length).toBe(9);
+    expect(fields.length).toBe(10);
   });
 
   it('should render correct for PostgreSQL', async () => {
@@ -157,7 +158,7 @@ describe('getAdditionalOptions ::', () => {
     );
     const fields = root.find('input');
 
-    expect(root.find('input[name="tracking"]').length).toBe(rdsTrackingOptions.length);
-    expect(fields.length).toBe(6);
+    expect(root.find('input[name="tracking"]').length).toBe(trackingOptions.length);
+    expect(fields.length).toBe(7);
   });
 });

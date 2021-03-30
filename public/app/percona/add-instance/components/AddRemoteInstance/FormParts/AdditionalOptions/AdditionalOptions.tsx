@@ -53,7 +53,7 @@ const getTablestatValues = (type: TablestatOptionsInterface) => {
 };
 
 const MySQLOptions = ({ form }: { form: FormApi }) => {
-  const selectedOption = form.getState().values['tablestat-options'];
+  const selectedOption = form.getState().values && form.getState().values['tablestat-options'];
   const [selectedValue, setSelectedValue] = useState<string>(selectedOption || TablestatOptionsInterface.disabled);
 
   useEffect(() => {

@@ -112,9 +112,9 @@ export const CheckPanel: FC = () => {
               </TabContent>
             </>
           ) : (
-            <div className={styles.empty} data-qa="db-check-panel-settings-link">
+            <div className={styles.empty}>
               {Messages.sttDisabled}{' '}
-              <a className={styles.link} href={PMM_SETTINGS_URL}>
+              <a className={styles.link} href={PMM_SETTINGS_URL} data-qa="db-check-panel-settings-link">
                 {Messages.pmmSettings}
               </a>
             </div>
