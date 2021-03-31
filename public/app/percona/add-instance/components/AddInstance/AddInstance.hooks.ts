@@ -16,7 +16,7 @@ export const useAzure = () => {
 
   useEffect(() => {
     if (settings) {
-      setShowAzure(settings.azurediscoverEnabled);
+      setShowAzure(settings.azureDiscoverEnabled);
     }
   }, [settings]);
 
