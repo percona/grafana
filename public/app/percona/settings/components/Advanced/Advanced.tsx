@@ -21,6 +21,7 @@ export const Advanced: FC<AdvancedProps> = ({
   sttEnabled,
   dbaasEnabled,
   alertingEnabled,
+  azureDiscoverEnabled,
   publicAddress,
   updateSettings,
 }) => {
@@ -61,6 +62,7 @@ export const Advanced: FC<AdvancedProps> = ({
     updates: !updatesDisabled,
     stt: sttEnabled,
     dbaas: dbaasEnabled,
+    azureDiscover: azureDiscoverEnabled,
     publicAddress,
     alerting: alertingEnabled,
   };

@@ -27,7 +27,7 @@ export interface Settings {
   alertManagerUrl: string;
   alertManagerRules: string;
   sttEnabled: boolean;
-  azurediscoverEnabled?: boolean;
+  azureDiscoverEnabled?: boolean;
   platformEmail?: string;
   dbaasEnabled?: boolean;
   alertingEnabled?: boolean;
