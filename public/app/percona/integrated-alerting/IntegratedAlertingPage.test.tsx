@@ -9,7 +9,7 @@ import { DEFAULT_TAB } from './IntegratedAlerting.constants';
 
 const fakeLocationUpdate = jest.fn();
 
-jest.mock('./IntegratedAlerting.service');
+jest.mock('app/percona/settings/Settings.service');
 jest.mock('./components/Alerts/Alerts.service');
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
