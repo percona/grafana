@@ -172,6 +172,15 @@ export const Advanced: FC<AdvancedProps> = ({
               dataQa="advanced-alerting"
               component={SwitchRow}
             />
+            <Field
+              name="azureDiscover"
+              type="checkbox"
+              label={azureDiscoverLabel}
+              tooltip={azureDiscoverTooltip}
+              disabled={!values.telemetry}
+              dataQa="advanced-alerting"
+              component={SwitchRow}
+            />
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">
