@@ -37,7 +37,7 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
     <RadioButtonGroupField
       name="tracking"
       data-qa="tracking-options-radio-button-group"
-      options={(isRDS || isAzure) ? rdsTrackingOptions : trackingOptions}
+      options={isRDS || isAzure ? rdsTrackingOptions : trackingOptions}
       label={Messages.form.labels.trackingOptions}
     />
   </>
