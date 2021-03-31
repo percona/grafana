@@ -42,6 +42,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisi
             <div className={styles.formHalvesContainer}>
               <div>
                 <RadioButtonGroupField
+                  disabled
                   className={styles.radioGroup}
                   options={serviceTypeOptions}
                   name="serviceType"
