@@ -6,8 +6,6 @@ import { Messages } from './AddInstance.messages';
 import { AddInstanceProps, SelectInstanceProps } from './AddInstance.types';
 import { InstanceTypes } from '../../panel.types';
 import { useAzure } from './AddInstance.hooks';
-import { validators } from '@percona/platform-core';
-import Validators from '../../../shared/helpers/validators';
 
 export const SelectInstance: FC<SelectInstanceProps> = ({ type, selectInstanceType, title }) => {
   const theme = useTheme();
