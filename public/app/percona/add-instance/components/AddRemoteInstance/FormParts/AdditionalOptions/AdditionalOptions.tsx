@@ -103,6 +103,12 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
               />
             </>
           ) : null}
+          {remoteInstanceCredentials.isAzure ? (
+            <CheckboxField
+              label={Messages.form.labels.additionalOptions.azureDatabaseExporter}
+              name="azure_database_exporter"
+            />
+          ) : null}
         </>
       );
     case InstanceTypes.mysql:
@@ -126,6 +132,12 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
                 name="disable_enhanced_metrics"
               />
             </>
+          ) : null}
+          {remoteInstanceCredentials.isAzure ? (
+            <CheckboxField
+              label={Messages.form.labels.additionalOptions.azureDatabaseExporter}
+              name="azure_database_exporter"
+            />
           ) : null}
         </>
       );

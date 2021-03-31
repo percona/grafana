@@ -6,6 +6,7 @@ const getAzureCredentials = (credentials: any, instanceType: string) => {
     remoteInstanceCredentials: {
       serviceName: credentials.address,
       port: credentials.port,
+      username: credentials.username,
       address: credentials.address,
       isAzure: true,
       region: credentials.region,
@@ -89,17 +90,39 @@ const getRDSCredentials = (credentials: any, instanceType: string) => {
 
 export const getInstanceData = (instanceType: string, credentials: any): InstanceData => {
   const extractCredentials = (credentials?: any): InstanceData => {
-    if (!credentials) {
-      return { remoteInstanceCredentials: {} };
-    }
-
-    if (credentials.isRDS) {
+    if (credentials?.isRDS) {
       return getRDSCredentials(credentials, instanceType);
-    } else if (credentials.isAzure) {
+    } else if (credentials?.isAzure) {
       return getAzureCredentials(credentials, instanceType);
     }
 
-    return { remoteInstanceCredentials: {} };
+    const instance: any = { remoteInstanceCredentials: {} };
+
+    switch (instanceType) {
+      case InstanceTypes.postgresql:
+        instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.postgresql];
+        instance.remoteInstanceCredentials.port = 5432;
+        break;
+      case InstanceTypes.mysql:
+        instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.mysql];
+        instance.remoteInstanceCredentials.port = 3306;
+        break;
+      case InstanceTypes.mongodb:
+        instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.mongodb];
+        instance.remoteInstanceCredentials.port = 27017;
+        break;
+      case InstanceTypes.proxysql:
+        instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.proxysql];
+        instance.remoteInstanceCredentials.port = 6032;
+        break;
+      case InstanceTypes.haproxy:
+        instance.instanceType = INSTANCE_TYPES_LABELS[InstanceTypes.haproxy];
+        instance.remoteInstanceCredentials.port = 8404;
+        break;
+      default:
+        console.error('Not implemented');
+    }
+    return instance;
   };
 
   return extractCredentials(credentials);
