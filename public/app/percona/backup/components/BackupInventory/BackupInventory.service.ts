@@ -1,11 +1,11 @@
 import { api } from 'app/percona/shared/helpers/api';
 import { Backup, BackupResponse } from './BackupInventory.types';
 
-const BASE_URL = '/v1/management/backup/Artifacts';
+const BASE_URL = '/v1/management/backup';
 
 export const BackupInventoryService = {
   async list(): Promise<Backup[]> {
-    const { backups = [] } = await api.post<BackupResponse, any>(`${BASE_URL}/List`, {});
+    const { backups = [] } = await api.post<BackupResponse, any>(`${BASE_URL}/Artifacts/List`, {});
     return backups.map(
       ({
         backup_id,
@@ -31,5 +31,12 @@ export const BackupInventoryService = {
         vendor,
       })
     );
+  },
+  async restore(serviceId: string, locationId: string, artifactId: string): Promise<any> {
+    return api.post(`${BASE_URL}/Backups/StartBackup`, {
+      service_id: serviceId,
+      location_id: locationId,
+      artifact_id: artifactId,
+    });
   },
 };
