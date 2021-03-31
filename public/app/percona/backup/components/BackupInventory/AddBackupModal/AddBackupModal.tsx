@@ -8,21 +8,20 @@ import {
   TextInputField,
   validators,
 } from '@percona/platform-core';
-import { Field, Form } from 'react-final-form';
-import { AddBackupModalProps } from './AddBackupModal.types';
+import { Field, withTypes } from 'react-final-form';
+import { AddBackupFormProps, AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
 import { toFormBackup } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { VENDOR_OPTIONS } from './AddBackupModal.constants';
 
-export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose }) => {
+export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose, onBackup }) => {
   const styles = useStyles(getStyles);
   const initialValues = toFormBackup(backup);
+  const { Form } = withTypes<AddBackupFormProps>();
 
-  const handleSubmit = (values: AddBackupModalProps) => {
-    console.log(values);
-  };
+  const handleSubmit = (values: AddBackupFormProps) => onBackup(values);
 
   // TODO uncomment remaining fields when we support them
   return (

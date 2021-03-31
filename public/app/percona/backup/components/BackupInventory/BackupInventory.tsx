@@ -7,6 +7,7 @@ import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { BackupInventoryDetails } from './BackupInventoryDetails';
 import { AddBackupModal } from './AddBackupModal';
+import { AddBackupFormProps } from './AddBackupModal/AddBackupModal.types';
 import { Status } from './Status';
 import { BackupInventoryActions } from './BackupInventoryActions';
 import { BackupCreation } from './BackupCreation';
@@ -96,6 +97,15 @@ export const BackupInventory: FC = () => {
     setBackupModalVisible(false);
   };
 
+  const handleBackup = async ({ service, location, backupName, description }: AddBackupFormProps) => {
+    try {
+      await BackupInventoryService.backup(service.value || '', location.value || '', backupName, description);
+      setBackupModalVisible(false);
+    } catch (e) {
+      logger.error(e);
+    }
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -121,7 +131,12 @@ export const BackupInventory: FC = () => {
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
-      <AddBackupModal backup={selectedBackup} isVisible={backupModalVisible} onClose={handleClose} />
+      <AddBackupModal
+        backup={selectedBackup}
+        isVisible={backupModalVisible}
+        onClose={handleClose}
+        onBackup={handleBackup}
+      />
     </>
   );
 };

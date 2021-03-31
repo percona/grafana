@@ -6,6 +6,7 @@ export interface AddBackupModalProps {
   backup: Backup | null;
   isVisible: boolean;
   onClose: () => void;
+  onBackup: (values: AddBackupFormProps) => void;
 }
 
 export enum RetryMode {

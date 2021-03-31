@@ -5,7 +5,7 @@ const BASE_URL = '/v1/management/backup/Artifacts';
 
 export const BackupInventoryService = {
   async list(): Promise<Backup[]> {
-    const { backups = [] } = await api.post<BackupResponse, any>(`${BASE_URL}/List`, {});
+    const { backups = [] } = await api.post<BackupResponse, any>(`${BASE_URL}/Artifacts/List`, {});
     return backups.map(
       ({
         backup_id,
@@ -31,5 +31,13 @@ export const BackupInventoryService = {
         vendor,
       })
     );
+  },
+  async backup(serviceId: string, locationId: string, name: string, description: string): Promise<any> {
+    return api.post(`${BASE_URL}/Backups/StartBackup`, {
+      service_id: serviceId,
+      location_id: locationId,
+      name,
+      description,
+    });
   },
 };
