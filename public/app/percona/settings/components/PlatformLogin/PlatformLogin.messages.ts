@@ -12,8 +12,4 @@ export const Messages = {
   passwordLabel: 'Password',
   confirmPasswordLabel: 'Confirm Password',
   emailLabel: 'Email',
-  errors: {
-    signInFailed: 'There was a problem during the login process, please try again',
-    signUpFailed: 'There was a problem during the sign up process, please try again',
-  },
 };
