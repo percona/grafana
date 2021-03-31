@@ -9,7 +9,7 @@ class DiscoveryService {
     azure_tenant_id,
     azure_subscription_id,
   }: AzureCredentialsForm) {
-    return apiManagement.post<AzureDatabaseInstances, AzureCredentialsForm>('/AzureDatabase/Discover', {
+    return apiManagement.post<AzureDatabaseInstances, AzureCredentialsForm>('/azure/AzureDatabase/Discover', {
       azure_client_id,
       azure_client_secret,
       azure_tenant_id,

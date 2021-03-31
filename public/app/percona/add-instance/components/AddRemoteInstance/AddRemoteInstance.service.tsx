@@ -27,7 +27,7 @@ class AddRemoteInstanceService {
     return apiManagement.post<any, any>('/RDS/Add', body);
   }
   static async addAzure(body: any) {
-    return apiManagement.post<any, any>('/AzureDatabase/Add', body);
+    return apiManagement.post<any, any>('/azure/AzureDatabase/Add', body);
   }
 
   static async addExternal(body: any) {
