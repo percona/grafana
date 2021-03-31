@@ -1,3 +1,4 @@
+import { SelectableValue } from '@grafana/data';
 import { Backup } from '../BackupInventory.types';
 
 export interface RestoreBackupModalProps {
@@ -10,7 +11,7 @@ export interface RestoreBackupModalProps {
 export interface RestoreBackupFormProps {
   serviceType: ServiceTypeSelect;
   vendor: string;
-  serviceName: string;
+  service: SelectableValue<string>;
   dataModel: string;
 }
 

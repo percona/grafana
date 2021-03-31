@@ -45,7 +45,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisi
                 <TextInputField disabled name="vendor" label={Messages.vendor} />
               </div>
               <div>
-                <Field name="serviceName" validate={validators.required}>
+                <Field name="service" validate={validators.required}>
                   {({ input }) => (
                     <div>
                       <label className={styles.label} data-qa="service-select-label">
