@@ -17,6 +17,7 @@ const getAzureCredentials = (credentials: any, instanceType: string) => {
       azure_resource_group: credentials.azure_resource_group,
       instance_id: credentials.instance_id,
       az: credentials.az,
+      azure_database_exporter: true,
     },
   };
 

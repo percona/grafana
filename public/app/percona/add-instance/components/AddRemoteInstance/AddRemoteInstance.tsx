@@ -19,10 +19,14 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
 
   const { remoteInstanceCredentials, discoverName } = getInstanceData(type, credentials);
   const [loading, setLoading] = useState<boolean>(false);
-  const initialValues: any = { ...remoteInstanceCredentials, tracking: 'qan_postgresql_pgstatements_agent' };
+  const initialValues: any = { ...remoteInstanceCredentials };
 
-  if (type === Databases.mysql) {
+  if (type === Databases.mysql || type === Databases.mariadb) {
     initialValues.qan_mysql_perfschema = true;
+  }
+
+  if (type === Databases.postgresql) {
+    initialValues.tracking = 'qan_postgresql_pgstatements_agent';
   }
 
   const onSubmit = useCallback(

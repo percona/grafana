@@ -72,15 +72,15 @@ export const toPayload = (values: any, discoverName?: string) => {
       }, {});
   }
 
-  if (data.isRDS && data.tracking === TrackingOptions.pgStatements) {
-    data.qan_postgresql_pgstatements = true;
-  } else if (!data.isRDS && data.tracking === TrackingOptions.pgStatements) {
-    data.qan_postgresql_pgstatements_agent = true;
-  } else if (!data.isRDS && data.tracking === TrackingOptions.pgMonitor) {
-    data.qan_postgresql_pgstatmonitor_agent = true;
+  if (!values.isAzure) {
+    if (data.isRDS && data.tracking === TrackingOptions.pgStatements) {
+      data.qan_postgresql_pgstatements = true;
+    } else if (!data.isRDS && data.tracking === TrackingOptions.pgStatements) {
+      data.qan_postgresql_pgstatements_agent = true;
+    } else if (!data.isRDS && data.tracking === TrackingOptions.pgMonitor) {
+      data.qan_postgresql_pgstatmonitor_agent = true;
+    }
   }
-
-  delete data.tracking;
 
   data.service_name = data.serviceName;
   delete data.serviceName;
@@ -89,7 +89,7 @@ export const toPayload = (values: any, discoverName?: string) => {
     data.service_name = data.address;
   }
 
-  if (data.add_node === undefined) {
+  if (!values.isAzure && data.add_node === undefined) {
     data.add_node = {
       node_name: data.service_name,
       node_type: 'REMOTE_NODE',
@@ -114,12 +114,14 @@ export const toPayload = (values: any, discoverName?: string) => {
   }
 
   if (values.isAzure) {
+    data.node_name = data.service_name;
     if (data.tracking === TrackingOptions.pgStatements || data.qan_mysql_perfschema) {
       data.qan = true;
     }
   }
 
   data.metrics_mode = 1;
+  delete data.tracking;
 
   return data;
 };
