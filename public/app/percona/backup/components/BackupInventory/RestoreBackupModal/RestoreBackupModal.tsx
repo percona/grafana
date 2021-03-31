@@ -21,10 +21,16 @@ const serviceTypeOptions: Array<SelectableValue<ServiceTypeSelect>> = [
   },
 ];
 
-export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisible, onClose }) => {
+export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisible, onClose, onRestore }) => {
   const styles = useStyles(getStyles);
   const initialValues = backup ? toFormProps(backup) : undefined;
-  const handleSubmit = (values: RestoreBackupFormProps) => {};
+  const handleSubmit = ({ serviceType, service }: RestoreBackupFormProps) => {
+    if (backup) {
+      const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
+      const { locationId, id } = backup;
+      onRestore(serviceId || '', locationId, id);
+    }
+  };
 
   return (
     <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>

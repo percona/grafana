@@ -6,7 +6,6 @@ import { ExpandableCell } from 'app/percona/shared/components/Elements/Expandabl
 import { BackupInventoryDetails } from './BackupInventoryDetails/BackupInventoryDetails';
 import { Status } from './Status';
 import { BackupCreation } from './BackupCreation';
-import { RestoreBackupFormProps } from './RestoreBackupModal/RestoreBackupModal.types';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
@@ -69,7 +68,14 @@ export const BackupInventory: FC = () => {
     setRestoreModalVisible(false);
   };
 
-  const handleRestore = (values: RestoreBackupFormProps) => {};
+  const handleRestore = async (serviceId: string, locationId: string, artifactId: string) => {
+    try {
+      await BackupInventoryService.restore(serviceId, locationId, artifactId);
+      setRestoreModalVisible(false);
+    } catch (e) {
+      logger.error(e);
+    }
+  };
 
   const getData = async () => {
     setPending(true);

@@ -5,7 +5,7 @@ export interface RestoreBackupModalProps {
   isVisible: boolean;
   backup: Backup | null;
   onClose: () => void;
-  onRestore: (backup: RestoreBackupFormProps) => void;
+  onRestore: (serviceId: string, locationId: string, artifactId: string) => void;
 }
 
 export interface RestoreBackupFormProps {
