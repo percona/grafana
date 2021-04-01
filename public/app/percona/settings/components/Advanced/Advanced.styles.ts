@@ -88,7 +88,7 @@ export const getStyles = stylesFactory(({ breakpoints, spacing, typography, bord
       align-items: center;
       border: ${border.width.sm} solid ${colors.pageHeaderBorder};
       border-radius: ${border.radius.sm};
-      color: #828282;
+      color: ${colors.textWeak};
       padding: ${spacing.sm};
 
       p {
