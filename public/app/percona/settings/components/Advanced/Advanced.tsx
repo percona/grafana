@@ -153,16 +153,6 @@ export const Advanced: FC<AdvancedProps> = ({
               dataQa="advanced-updates"
               component={SwitchRow}
             />
-            <Field
-              name="azureDiscover"
-              type="checkbox"
-              label={azureDiscoverLabel}
-              tooltip={azureDiscoverTooltip}
-              disabled={!values.telemetry}
-              dataQa="advanced-alerting"
-              component={SwitchRow}
-            />
-
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">
@@ -217,6 +207,14 @@ export const Advanced: FC<AdvancedProps> = ({
                 className={cx({ [styles.switchDisabled]: !values.telemetry })}
                 disabled={!values.telemetry}
                 dataQa="advanced-alerting"
+                component={SwitchRow}
+              />
+              <Field
+                name="azureDiscover"
+                type="checkbox"
+                label={azureDiscoverLabel}
+                tooltip={azureDiscoverTooltip}
+                dataQa="advanced-azure-discover"
                 component={SwitchRow}
               />
             </fieldset>
