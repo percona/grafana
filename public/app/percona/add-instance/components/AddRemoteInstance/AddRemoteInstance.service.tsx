@@ -1,33 +1,37 @@
 import { apiManagement } from 'app/percona/shared/helpers/api';
-import { RemoteInstanceExternalservicePayload, TrackingOptions } from './AddRemoteInstance.types';
+import {
+  RemoteInstanceExternalservicePayload,
+  RemoteInstancePayload,
+  TrackingOptions,
+} from './AddRemoteInstance.types';
 import { InstanceTypes } from '../../panel.types';
 
 class AddRemoteInstanceService {
-  static async addMysql(body: any) {
-    return apiManagement.post<any, any>('/MySQL/Add', body);
+  static async addMysql(body: RemoteInstancePayload) {
+    return apiManagement.post<any, RemoteInstancePayload>('/MySQL/Add', body);
   }
 
-  static async addPostgresql(body: any) {
-    return apiManagement.post<any, any>('/PostgreSQL/Add', body);
+  static async addPostgresql(body: RemoteInstancePayload) {
+    return apiManagement.post<any, RemoteInstancePayload>('/PostgreSQL/Add', body);
   }
 
-  static async addProxysql(body: any) {
-    return apiManagement.post<any, any>('/ProxySQL/Add', body);
+  static async addProxysql(body: RemoteInstancePayload) {
+    return apiManagement.post<any, RemoteInstancePayload>('/ProxySQL/Add', body);
   }
 
-  static async addHaproxy(body: any) {
-    return apiManagement.post<any, any>('/HAProxy/Add', body);
+  static async addHaproxy(body: RemoteInstancePayload) {
+    return apiManagement.post<any, RemoteInstancePayload>('/HAProxy/Add', body);
   }
 
-  static async addMongodb(body: any) {
-    return apiManagement.post<any, any>('/MongoDB/Add', body);
+  static async addMongodb(body: RemoteInstancePayload) {
+    return apiManagement.post<any, RemoteInstancePayload>('/MongoDB/Add', body);
   }
 
-  static async addRDS(body: any) {
-    return apiManagement.post<any, any>('/RDS/Add', body);
+  static async addRDS(body: RemoteInstancePayload) {
+    return apiManagement.post<any, RemoteInstancePayload>('/RDS/Add', body);
   }
-  static async addAzure(body: any) {
-    return apiManagement.post<any, any>('/azure/AzureDatabase/Add', body);
+  static async addAzure(body: RemoteInstancePayload) {
+    return apiManagement.post<any, RemoteInstancePayload>('/azure/AzureDatabase/Add', body);
   }
 
   static async addExternal(body: any) {
@@ -56,7 +60,7 @@ class AddRemoteInstanceService {
 
 export default AddRemoteInstanceService;
 
-export const toPayload = (values: any, discoverName?: string) => {
+export const toPayload = (values: any, discoverName?: string): RemoteInstancePayload => {
   const data = { ...values };
 
   if (values.custom_labels) {

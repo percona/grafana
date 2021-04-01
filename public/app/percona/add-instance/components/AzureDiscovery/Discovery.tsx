@@ -3,13 +3,14 @@ import DiscoveryService from './Discovery.service';
 import Credentials from './components/Credentials/Credentials';
 import Instances from './components/Instances/Instances';
 import { getStyles } from './Discovery.styles';
-import { DiscoverySearchPanelProps } from './Discovery.types';
+import { DiscoverySearchPanelProps, Instance } from './Discovery.types';
 import { AzureCredentialsForm } from './components/Credentials/Credentials.types';
+import { logger } from '@percona/platform-core';
 
 const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   const styles = getStyles();
 
-  const [instances, setInstances] = useState([] as any);
+  const [instances, setInstances] = useState<Instance[]>([]);
   const [credentials, setCredentials] = useState<AzureCredentialsForm>({});
   const [loading, startLoading] = useState(false);
 
@@ -21,7 +22,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
           setInstances(result.azure_database_instance);
         }
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       } finally {
         startLoading(false);
       }

@@ -12,6 +12,7 @@ import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceCon
 import { InstanceTypes } from '../../panel.types';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
 import { FormApi } from 'final-form';
+import { logger } from '@percona/platform-core';
 
 const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, credentials }, selectInstance }) => {
   const theme = useTheme();
@@ -44,7 +45,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
 
         window.location.href = '/graph/inventory/';
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       } finally {
         setLoading(false);
       }

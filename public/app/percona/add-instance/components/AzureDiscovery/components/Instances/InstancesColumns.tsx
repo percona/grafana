@@ -2,6 +2,10 @@ import { Button } from '@grafana/ui';
 import React from 'react';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { styles } from './Instances.styles';
+import { Instance } from '../../Discovery.types';
+import { Messages } from './Instances.messages';
+import { RemoteInstanceCredentials } from '../../../../panel.types';
+import { OnSelectInstance } from './Instances.types';
 
 const getEngineType = (type?: string) => {
   switch (type) {
@@ -18,7 +22,7 @@ const getEngineType = (type?: string) => {
   }
 };
 
-const getDatabaseType = (type?: string) => {
+const getDatabaseType = (type?: string): Databases | string => {
   switch (type) {
     case 'DISCOVER_AZURE_DATABASE_TYPE_MYSQL':
     case 'DISCOVER_AZURE_DATABASE_TYPE_MARIADB':
@@ -30,8 +34,7 @@ const getDatabaseType = (type?: string) => {
   }
 };
 
-// @ts-ignore
-export const getInstancesColumns = (credentials, onSelectInstance) => [
+export const getInstancesColumns = (credentials: RemoteInstanceCredentials, onSelectInstance: OnSelectInstance) => [
   {
     Header: 'Region',
     accessor: 'region',
@@ -46,7 +49,7 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Engine',
-    accessor: (element: any) => (element.type ? `${getEngineType(element.type)}` : 'nothing'),
+    accessor: (element: Instance) => (element.type ? `${getEngineType(element.type)}` : Messages.notAvailableType),
   },
   {
     Header: 'Address',
@@ -54,7 +57,7 @@ export const getInstancesColumns = (credentials, onSelectInstance) => [
   },
   {
     Header: 'Action',
-    accessor: (element: any) => {
+    accessor: (element: Instance) => {
       const selectionHandler = () => {
         onSelectInstance({
           type: getDatabaseType(element.type),

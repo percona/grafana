@@ -11,7 +11,9 @@ export interface Instance {
   port: number;
   type: string;
   engine_version: string;
+  isAzure?: boolean;
 }
+
 export interface AzureDatabaseInstances {
-  azure_database_instance: Instance;
+  azure_database_instance: Instance[];
 }
