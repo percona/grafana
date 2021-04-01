@@ -11,8 +11,6 @@ import * as styles from './AllChecksTab.styles';
 import { FetchChecks } from './types';
 import { CheckTableRow } from './CheckTableRow';
 
-import { allChecksStub } from '../../__mocks__/stubs';
-
 export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const [checks, setChecks] = useState<CheckDetails[] | undefined>();
@@ -38,7 +36,7 @@ export const AllChecksTab: FC = () => {
     setFetchChecksPending(true);
 
     try {
-      const checks = allChecksStub; // await CheckService.getAllChecks();
+      const checks = await CheckService.getAllChecks();
 
       setChecks(checks);
     } catch (err) {
