@@ -48,7 +48,7 @@ export enum Interval {
 export interface CheckDetails {
   name: string;
   summary: string;
-  interval: Interval;
+  interval: keyof typeof Interval;
   description?: string;
   disabled?: boolean;
   readMoreUrl?: string;
@@ -67,13 +67,14 @@ export interface ChangeCheckBody {
 }
 
 export interface ChangeIntervalBody {
-  interval: Interval;
+  interval: keyof typeof Interval;
   name: string;
 }
 
 export enum TabKeys {
   allChecks = 'allChecks',
   failedChecks = 'failedChecks',
+  rootChecks = 'root-checks',
 }
 
 export interface TabEntry {

@@ -8,7 +8,7 @@ import { Interval } from 'app/percona/check/types';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { getStyles } from './CheckTableRow.styles';
 
-const formatInterval = (interval: Interval): typeof Interval => Interval[interval];
+const formatInterval = (interval: keyof typeof Interval): Interval => Interval[interval];
 
 export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
   const styles = useStyles(getStyles);
@@ -60,6 +60,7 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
         isVisible={checkIntervalModalVisible}
         setVisible={setCheckIntervalModalVisible}
         checkName={name}
+        interval={interval}
       />
     </>
   );

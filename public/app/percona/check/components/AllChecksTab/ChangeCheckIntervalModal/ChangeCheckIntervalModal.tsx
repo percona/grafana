@@ -1,21 +1,26 @@
 import React, { FC, useState } from 'react';
 import { logger, RadioButtonGroupField } from '@percona/platform-core';
-import { showSuccessNotification } from 'shared/components/helpers';
 import { Messages } from './ChangeCheckIntervalModal.messages';
 import { Form } from 'react-final-form';
 import { FormApi } from 'final-form';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LoaderButton, Modal } from '@percona/platform-core';
-import { CheckService } from 'pmm-check/Check.service';
-import { Interval } from 'pmm-check/types';
+import { appEvents } from 'app/core/app_events';
+import { CheckService } from 'app/percona/check/Check.service';
 import { getStyles } from './ChangeCheckIntervalModal.styles';
 import { ChangeCheckIntervalModalProps } from './types';
 import { checkIntervalOptions } from './ChangeCheckIntervalModal.constants';
+import { AppEvents } from '@grafana/data';
 
-export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({ checkName, isVisible, setVisible }) => {
+export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
+  interval,
+  checkName,
+  isVisible,
+  setVisible,
+}) => {
   const styles = useStyles(getStyles);
   const [pending, setPending] = useState(false);
-  const [selectedInterval, setSelectedInterval] = useState(Interval.STANDARD);
+  const [selectedInterval] = useState(interval);
 
   const onSave = async () => {
     try {
@@ -25,7 +30,7 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({ ch
         interval: selectedInterval,
       });
       setVisible(false);
-      showSuccessNotification({ message: Messages.getSuccess(checkName) });
+      appEvents.emit(AppEvents.alertSuccess, [Messages.getSuccess(checkName)]);
     } catch (e) {
       logger.error(e);
     } finally {
@@ -33,16 +38,12 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({ ch
     }
   };
 
-  interface Values {
-    interval: Interval;
-  }
-
-  const updateCheckInterval = (form: FormApi<Values>) => {
+  const updateCheckInterval = (form: FormApi) => {
     console.log(form.getFieldState('interval'));
   };
 
   const initialValues = {
-    interval: Interval.STANDARD,
+    interval,
   };
 
   return (
