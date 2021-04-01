@@ -6,6 +6,10 @@ import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions';
 import { AddDBClusterFields } from '../AddDBClusterModal.types';
 import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions.types';
 
+jest.mock('../../DBCluster.service');
+jest.mock('../../PSMDB.service');
+jest.mock('../../XtraDB.service');
+
 describe('DBClusterAdvancedOptions::', () => {
   it('renders correctly', () => {
     const root = mount(
@@ -17,6 +21,9 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(root.find('[data-qa="resources-radio-button"]')).toBeTruthy();
     expect(root.find('[data-qa="memory-number-input"]')).toBeTruthy();
     expect(root.find('[data-qa="cpu-number-input"]')).toBeTruthy();
+    expect(root.find('[data-qa="disk-number-input"]')).toBeTruthy();
+    expect(root.find('[data-qa="dbcluster-resources-bar-memory"]')).toBeTruthy();
+    expect(root.find('[data-qa="dbcluster-resources-bar-cpu"]')).toBeTruthy();
     expect(root.find('[data-qa="disk-number-input"]')).toBeTruthy();
     expect(root.find('[data-qa="step-progress-submit-button"]')).toBeTruthy();
   });

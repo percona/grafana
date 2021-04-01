@@ -48,6 +48,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
     name,
     kubernetesCluster,
     databaseType,
+    databaseVersion,
     topology,
     nodes,
     single,
@@ -66,6 +67,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
         cpu,
         memory,
         disk,
+        databaseImage: databaseVersion.value,
       });
       setVisible(false);
       onDBClusterAdded();
@@ -75,21 +77,23 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   };
 
   return (
-    <Modal title={Messages.dbcluster.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>
-      <div className={styles.stepProgressWrapper}>
-        {showMonitoringWarning && (
-          <div className={styles.warningWrapper} data-qa="add-cluster-monitoring-warning">
-            <Icon name="exclamation-triangle" className={styles.warningIcon} />
-            <span className={styles.warningMessage}>{buildWarningMessage(styles.settingsLink)}</span>
-          </div>
-        )}
-        <StepProgress
-          steps={steps}
-          initialValues={INITIAL_VALUES}
-          submitButtonMessage={Messages.dbcluster.addModal.confirm}
-          onSubmit={onSubmit}
-        />
-      </div>
-    </Modal>
+    <div className={styles.modalWrapper}>
+      <Modal title={Messages.dbcluster.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>
+        <div className={styles.stepProgressWrapper}>
+          {showMonitoringWarning && (
+            <div className={styles.warningWrapper} data-qa="add-cluster-monitoring-warning">
+              <Icon name="exclamation-triangle" className={styles.warningIcon} />
+              <span className={styles.warningMessage}>{buildWarningMessage(styles.settingsLink)}</span>
+            </div>
+          )}
+          <StepProgress
+            steps={steps}
+            initialValues={INITIAL_VALUES}
+            submitButtonMessage={Messages.dbcluster.addModal.confirm}
+            onSubmit={onSubmit}
+          />
+        </div>
+      </Modal>
+    </div>
   );
 };
