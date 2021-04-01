@@ -27,7 +27,7 @@ export const Messages = {
     alertingLink: `${HOW_TO_DOC_URL}/configure.html#integrated-alerting`,
     technicalPreviewLegend: 'Technical preview features',
     technicalPreviewDescription:
-      'These are technical preview features, not recommended to be used in productions environments. Read more\n' +
+      'These are technical preview features, not recommended to be used in production environments. Read more\n' +
       '                  about feature status',
     technicalPreviewLinkText: 'here',
   },
