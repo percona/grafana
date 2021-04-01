@@ -1,11 +1,11 @@
 import React from 'react';
 import { ReactWrapper, mount } from 'enzyme';
 import { CheckService } from 'app/percona/check/Check.service';
+import { LoaderButton } from '@percona/platform-core';
 import { CheckTableRow } from './CheckTableRow';
 import { Messages } from './AllChecksTab.messages';
-import { LoaderButton } from '@percona/platform-core';
 
-
+jest.mock('shared/components/helpers/notification-manager');
 
 const originalConsoleError = jest.fn();
 

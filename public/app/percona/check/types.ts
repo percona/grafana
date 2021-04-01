@@ -39,9 +39,16 @@ export enum AlertState {
   unprocessed = 'unprocessed',
 }
 
+export enum Interval {
+  STANDARD = 'Standard',
+  RARE = 'Rare',
+  FREQUENT = 'Frequent',
+}
+
 export interface CheckDetails {
   name: string;
   summary: string;
+  interval: Interval;
   description?: string;
   disabled?: boolean;
   readMoreUrl?: string;
@@ -59,10 +66,14 @@ export interface ChangeCheckBody {
   }>;
 }
 
+export interface ChangeIntervalBody {
+  interval: Interval;
+  name: string;
+}
+
 export enum TabKeys {
-  allChecks = 'all-checks',
-  failedChecks = 'failed-checks',
-  rootChecks = 'root-checks',
+  allChecks = 'allChecks',
+  failedChecks = 'failedChecks',
 }
 
 export interface TabEntry {

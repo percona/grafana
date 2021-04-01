@@ -4,8 +4,6 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { AllChecksTab } from './AllChecksTab';
 import { Messages } from './AllChecksTab.messages';
 
-
-
 const originalConsoleError = console.error;
 
 const dataQa = (label: string) => `[data-qa="${label}"]`;
@@ -65,12 +63,14 @@ describe('AllChecksTab::', () => {
           summary: 'Test',
           name: 'test enabled',
           description: 'test enabled description',
+          interval: 'STANDARD',
           disabled: false,
         },
         {
           summary: 'Test disabled',
           name: 'test disabled',
           description: 'test disabled description',
+          interval: 'STANDARD',
           disabled: true,
         },
       ])

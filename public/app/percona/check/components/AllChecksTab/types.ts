@@ -1,4 +1,4 @@
-import { CheckDetails } from 'app/percona/check/types';
+import { CheckDetails } from 'pmm-check/types';
 
 export type ChangeCheck = (checkName: string, enabled: boolean) => Promise<void>;
 
