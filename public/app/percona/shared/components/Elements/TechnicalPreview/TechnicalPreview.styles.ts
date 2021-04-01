@@ -12,7 +12,7 @@ export const getStyles = stylesFactory(
 
         h1 {
           font-size:${typography.size.md};
-          color: #828282;
+          color: ${colors.textWeak};
           padding: 5px ${spacing.sm} 5px ${spacing.sm};
           ${border.width.sm} solid ${colors.pageHeaderBorder};
           border-radius: ${border.radius.md};
