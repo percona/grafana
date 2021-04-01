@@ -10,7 +10,7 @@ import {
   DBClusterAllocatedResources,
   DBClusterAllocatedResourcesAPI,
   DatabaseVersion,
-  DBClusterComponentsAPI,
+  DBClusterComponents,
   DBClusterExpectedResources,
   ResourcesUnits,
   CpuUnits,
@@ -34,7 +34,7 @@ export abstract class DBClusterService {
 
   abstract restartDBCluster(dbCluster: DBCluster): Promise<void>;
 
-  abstract getComponents(kubernetesClusterName: string): Promise<DBClusterComponentsAPI>;
+  abstract getComponents(kubernetesClusterName: string): Promise<DBClusterComponents>;
 
   abstract getDatabaseVersions(kubernetesClusterName: string): Promise<DatabaseVersion[]>;
 

@@ -7,13 +7,14 @@ import {
   CpuUnits,
   DBCluster,
   DBClusterActionAPI,
-  DBClusterComponentsAPI,
+  DBClusterComponents,
   DBClusterConnectionAPI,
   DBClusterExpectedResources,
   DBClusterExpectedResourcesAPI,
   DBClusterPayload,
   DBClusterStatus,
   ResourcesUnits,
+  DBClusterComponent,
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { getClusterStatus } from './DBCluster.utils';
@@ -73,15 +74,15 @@ export class PSMDBService extends DBClusterService {
     );
   }
 
-  getComponents(kubernetesClusterName: string): Promise<DBClusterComponentsAPI> {
-    return apiManagement.post<DBClusterComponentsAPI, any>('/DBaaS/Components/GetPSMDB', {
+  getComponents(kubernetesClusterName: string): Promise<DBClusterComponents> {
+    return apiManagement.post<DBClusterComponents, any>('/DBaaS/Components/GetPSMDB', {
       kubernetes_cluster_name: kubernetesClusterName,
     });
   }
 
   getDatabaseVersions(kubernetesClusterName: string): Promise<DatabaseVersion[]> {
     return this.getComponents(kubernetesClusterName).then(({ versions }) => {
-      return Object.entries(versions[0].matrix.mongod).map(([version, component]) => ({
+      return Object.entries(versions[0].matrix.mongod as DBClusterComponent).map(([version, component]) => ({
         value: component.image_path,
         label: version,
         default: !!component.default,
