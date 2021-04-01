@@ -2,7 +2,7 @@ import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { css } from 'emotion';
 
-export const getStyles = stylesFactory(({ breakpoints, spacing, typography }: GrafanaTheme) => {
+export const getStyles = stylesFactory(({ breakpoints, spacing, typography, border, colors }: GrafanaTheme) => {
   const mq = `@media (max-width: ${breakpoints.md})`;
 
   return {
@@ -66,6 +66,42 @@ export const getStyles = stylesFactory(({ breakpoints, spacing, typography }: Gr
       ${mq} {
         margin-left: 0;
       }
+    `,
+    technicalPreview: css`
+      border: ${border.width.sm} solid ${colors.pageHeaderBorder};
+      padding: ${spacing.md};
+      border-radius: ${border.radius.sm};
+      width: 900px;
+
+      ${mq} {
+        width: 100%;
+      }
+
+      legend {
+        font-size: 14px;
+        width: auto;
+        padding: 0 ${spacing.sm};
+      }
+    `,
+    technicalPreviewDoc: css`
+      display: flex;
+      align-items: center;
+      border: ${border.width.sm} solid ${colors.pageHeaderBorder};
+      border-radius: ${border.radius.sm};
+      color: #828282;
+      padding: ${spacing.sm};
+
+      p {
+        margin: 0;
+      }
+
+      a {
+        color: ${colors.linkExternal};
+      }
+    `,
+    technicalPreviewIcon: css`
+      margin: ${spacing.sm};
+      fill: ${colors.linkExternal};
     `,
   };
 });
