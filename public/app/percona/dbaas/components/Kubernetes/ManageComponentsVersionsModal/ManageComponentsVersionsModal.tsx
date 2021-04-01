@@ -5,7 +5,7 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { LoaderButton, Modal, logger } from '@percona/platform-core';
 import appEvents from 'app/core/app_events';
-import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters';
+import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { MultiCheckboxField } from 'app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField';
 import { requiredVersions, buildVersionsFieldName, findRecommendedVersions } from './ManageComponentsVersions.utils';
 import { Messages } from './ManageComponentsVersionsModal.messages';
