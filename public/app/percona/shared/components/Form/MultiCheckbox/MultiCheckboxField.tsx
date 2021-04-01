@@ -12,7 +12,6 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
   ({
     className,
     disabled = false,
-    fieldClassName,
     label,
     name,
     required = false,
@@ -57,7 +56,7 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
                 </label>
               )}
               <div
-                className={cx(styles.getOptionsWrapperStyles(!!validationError), fieldClassName)}
+                className={cx(styles.getOptionsWrapperStyles(!!validationError), className)}
                 data-qa={`${name}-options`}
               >
                 {selectedOptions.map(({ name, label, value }) => (

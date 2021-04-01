@@ -5,7 +5,6 @@ import { FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-final-for
 export interface MultiCheckboxFieldProps extends UseFieldConfig<string> {
   className?: string;
   disabled?: boolean;
-  fieldClassName?: string;
   label?: string | ReactNode;
   name: string;
   required?: boolean;
