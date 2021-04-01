@@ -10,7 +10,7 @@ import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/
 import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
 import { transformSecondsToDays } from './Advanced.utils';
-import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS } from './Advanced.constants';
+import { SECONDS_IN_DAY, MIN_DAYS, MAX_DAYS, TECHNICAL_PREVIEW_DOC_URL } from './Advanced.constants';
 import { AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
 
@@ -180,7 +180,7 @@ export const Advanced: FC<AdvancedProps> = ({
                 <Icon name="info-circle" size={'xl'} className={styles.technicalPreviewIcon} />
                 <p>
                   {technicalPreviewDescription}{' '}
-                  <a href="https://per.co.na/pmm-feature-status" target="_blank">
+                  <a href={TECHNICAL_PREVIEW_DOC_URL} target="_blank">
                     {technicalPreviewLinkText}
                   </a>
                 </p>
