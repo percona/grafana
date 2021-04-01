@@ -11,7 +11,7 @@ export const getStyles = stylesFactory(
         right: 24px;
 
         h1 {
-          font-size: 14px;
+          font-size:${typography.size.md};
           color: #828282;
           padding: 5px ${spacing.sm} 5px ${spacing.sm};
           ${border.width.sm} solid ${colors.pageHeaderBorder};
