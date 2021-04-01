@@ -38,6 +38,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                     {Messages.serviceName}
                   </label>
                   <AsyncSelect
+                    isSearchable={false}
                     loadOptions={AddBackupModalService.loadServiceOptions}
                     defaultOptions
                     className={styles.select}
@@ -59,6 +60,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                   </label>
                   <AsyncSelect
                     className={styles.select}
+                    isSearchable={false}
                     loadOptions={AddBackupModalService.loadLocationOptions}
                     defaultOptions
                     {...input}
