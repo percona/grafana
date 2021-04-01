@@ -5,7 +5,7 @@ import { StorageLocationsService } from '../../StorageLocations/StorageLocations
 export const AddBackupModalService = {
   async loadServiceOptions(): Promise<Array<SelectableValue<string>>> {
     let result: Array<SelectableValue<string>> = [];
-    const services = await InventoryService.getServices();
+    const services = await InventoryService.getDbServices();
 
     // TODO remove this constraint when more DB types are supported
     if (services.mysql) {
