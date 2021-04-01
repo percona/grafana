@@ -32,7 +32,6 @@ export const AlertRules: FC = () => {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
   const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule | null>();
-  const [selectedRuleDetails, setSelectedRuleDetails] = useState<AlertRule | null>();
   const [data, setData] = useState<AlertRule[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);
@@ -150,9 +149,7 @@ export const AlertRules: FC = () => {
   }, [pageSize, pageIndex]);
 
   return (
-    <AlertRulesProvider.Provider
-      value={{ getAlertRules, setAddModalVisible, setSelectedAlertRule, setSelectedRuleDetails, selectedRuleDetails }}
-    >
+    <AlertRulesProvider.Provider value={{ getAlertRules, setAddModalVisible, setSelectedAlertRule }}>
       <div className={styles.actionsWrapper}>
         <Button
           size="md"
