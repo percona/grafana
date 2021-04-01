@@ -1,7 +1,7 @@
 import { api } from 'app/percona/shared/helpers/api';
 import { Backup, BackupResponse } from './BackupInventory.types';
 
-const BASE_URL = '/v1/management/backup/Artifacts';
+const BASE_URL = '/v1/management/backup';
 
 export const BackupInventoryService = {
   async list(): Promise<Backup[]> {
