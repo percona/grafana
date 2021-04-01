@@ -42,7 +42,7 @@ describe('MultiCheckboxField', () => {
           <MultiCheckboxField
             name="test"
             initialOptions={optionsStub}
-            recommendedOption={optionsStub[1]}
+            recommendedOptions={[optionsStub[1]]}
             recommendedLabel="Recommended"
           />
         )}

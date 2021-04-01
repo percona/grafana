@@ -13,7 +13,7 @@ export interface MultiCheckboxFieldProps extends UseFieldConfig<string> {
   initialOptions: SelectableValue[];
   // Validator type is not exported from platform-core
   validators?: any;
-  recommendedOption?: SelectableValue;
+  recommendedOptions?: SelectableValue[];
   recommendedLabel?: string;
 }
 

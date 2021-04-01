@@ -1,4 +1,4 @@
-import React, { FC, ChangeEvent, FocusEvent, useState, useMemo, useCallback } from 'react';
+import React, { FC, ChangeEvent, FocusEvent, useState, useMemo, useCallback, useEffect } from 'react';
 import { Field, FieldInputProps } from 'react-final-form';
 import { cx } from 'emotion';
 import { useStyles } from '@grafana/ui';
@@ -19,7 +19,7 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
     showErrorOnBlur = false,
     initialOptions,
     validators,
-    recommendedOption,
+    recommendedOptions = [],
     recommendedLabel,
     ...fieldConfig
   }) => {
@@ -42,6 +42,8 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
       []
     );
 
+    useEffect(() => setSelectedOptions(initialOptions), [initialOptions]);
+
     return (
       <Field {...fieldConfig} name={name} initialValue={selectedOptions} validate={validate}>
         {({ input, meta }: MultiCheckboxRenderProps) => {
@@ -61,7 +63,7 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
                 {selectedOptions.map(({ name, label, value }) => (
                   <div className={styles.optionWrapper} key={name} data-qa={`${name}-option`}>
                     <span className={styles.optionLabel}>{label}</span>
-                    {recommendedOption?.name === name && (
+                    {recommendedOptions.some(r => r.name === name) && (
                       <span className={styles.recommendedLabel}>{recommendedLabel}</span>
                     )}
                     <CheckboxField
