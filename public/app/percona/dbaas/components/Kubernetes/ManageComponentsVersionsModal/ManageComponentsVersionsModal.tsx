@@ -1,12 +1,15 @@
 import React, { FC } from 'react';
 import { Form, Field, FormRenderProps } from 'react-final-form';
 import { FormApi } from 'final-form';
-import { Button, HorizontalGroup } from '@grafana/ui';
-import { Modal } from '@percona/platform-core';
+import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
+import { LoaderButton, Modal, logger } from '@percona/platform-core';
+import appEvents from 'app/core/app_events';
 import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters';
 import { MultiCheckboxField } from 'app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField';
 import { requiredVersions, buildVersionsFieldName, findRecommendedVersions } from './ManageComponentsVersions.utils';
 import { Messages } from './ManageComponentsVersionsModal.messages';
+import { Databases } from 'app/percona/shared/core';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import {
   ManageComponentsVersionsModalProps,
@@ -16,12 +19,17 @@ import {
 import { SelectableValue } from '@grafana/data';
 import { Operators } from '../../DBCluster/AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { useOperatorsComponentsVersions } from './ManageComponentsVersions.hooks';
+import { KubernetesOperatorStatus } from '../OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
+import { newDBClusterService } from '../../DBCluster/DBCluster.utils';
+import { DATABASE_OPERATORS } from '../../DBCluster/DBCluster.constants';
+import { getStyles } from './ManageComponentsVersionsModal.styles';
 
 export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProps> = ({
   selectedKubernetes,
   isVisible,
   setVisible,
 }) => {
+  const styles = useStyles(getStyles);
   const [
     initialValues,
     operatorsOptions,
@@ -60,16 +68,39 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
     change(ManageComponentVersionsFields.component, newComponentOptions[0]);
     change(ManageComponentVersionsFields.operator, operator);
   };
+  const onSubmit = async (values: ManageComponentsVersionsRenderProps) => {
+    const { operators, kubernetesClusterName } = selectedKubernetes;
+    const operatorsList = Object.entries(operators);
+
+    try {
+      for (const [operator, { status }] of operatorsList) {
+        if (status === KubernetesOperatorStatus.ok) {
+          const service = newDBClusterService(DATABASE_OPERATORS[operator as Operators] as Databases);
+
+          await service.setComponents(kubernetesClusterName, values);
+        }
+      }
+
+      setVisible(false);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.success]);
+    } catch (e) {
+      logger.error(e);
+    }
+  };
 
   return (
     <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
       <Overlay isPending={loadingComponents}>
         <Form
           initialValues={initialValues}
-          onSubmit={(values: ManageComponentsVersionsRenderProps) => {
-            console.log(values);
-          }}
-          render={({ handleSubmit, valid, form, values }: FormRenderProps<ManageComponentsVersionsRenderProps>) => {
+          onSubmit={onSubmit}
+          render={({
+            handleSubmit,
+            valid,
+            submitting,
+            form,
+            values,
+          }: FormRenderProps<ManageComponentsVersionsRenderProps>) => {
             return (
               <form onSubmit={handleSubmit}>
                 <>
@@ -79,6 +110,7 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
                     label={Messages.fields.operator}
                     options={operatorsOptions}
                     component={SelectFieldAdapter}
+                    disabled={!valid}
                     onChange={onChangeOperator(values, form.change)}
                   />
                   <Field
@@ -87,10 +119,12 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
                     label={Messages.fields.component}
                     options={componentOptions}
                     component={SelectFieldAdapter}
+                    disabled={!valid}
                     onChange={onChangeComponent(values, form.change)}
                   />
                   <MultiCheckboxField
                     name={versionsFieldName}
+                    className={styles.versionsWrapper}
                     label={Messages.fields.versions}
                     initialOptions={versionsOptions}
                     recommendedOptions={findRecommendedVersions(versionsOptions)}
@@ -106,15 +140,15 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
                     >
                       {Messages.cancel}
                     </Button>
-                    <Button
+                    <LoaderButton
                       variant="primary"
                       size="md"
                       disabled={!valid}
-                      onClick={() => console.log('SAVE')}
+                      loading={submitting}
                       data-qa="kubernetes-components-versions-save"
                     >
                       {Messages.save}
-                    </Button>
+                    </LoaderButton>
                   </HorizontalGroup>
                 </>
               </form>

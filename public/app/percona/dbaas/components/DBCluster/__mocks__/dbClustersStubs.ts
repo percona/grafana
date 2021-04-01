@@ -167,7 +167,6 @@ export const xtradbComponentsVersionsStubs = {
       matrix: {
         pxc: versionsStub,
         proxysql: versionsStub,
-        backup: versionsStub,
       },
     },
   ],
@@ -180,7 +179,6 @@ export const psmdbComponentsVersionsStubs = {
       operator: '1',
       matrix: {
         mongod: versionsStub,
-        backup: versionsStub,
       },
     },
   ],

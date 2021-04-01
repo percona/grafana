@@ -10,6 +10,7 @@ import {
   versionsStubs,
 } from './__mocks__/componentsVersionsStubs';
 
+jest.mock('app/core/app_events');
 jest.mock('./ManageComponentsVersions.hooks');
 
 describe('ManageComponentsVersionsModal::', () => {

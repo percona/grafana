@@ -6,22 +6,16 @@ export const versionsStubs = [
 export const initialValuesStubs = {
   operator: { name: 'psmdb', value: 'psmdb', label: 'PSMDB 1' },
   component: { name: 'mongod', value: 'mongod', label: 'PSMDB' },
-  psmdbbackup: versionsStubs,
   psmdbmongod: versionsStubs,
   xtradbpxc: versionsStubs,
   xtradbproxysql: versionsStubs,
-  xtradbbackup: versionsStubs,
 };
 
 export const possibleComponentOptionsStubs = {
-  psmdb: [
-    { name: 'mongod', value: 'mongod', label: 'PSMDB' },
-    { name: 'backup', value: 'backup', label: 'Backup' },
-  ],
+  psmdb: [{ name: 'mongod', value: 'mongod', label: 'PSMDB' }],
   xtradb: [
     { name: 'pxc', value: 'pxc', label: 'PXC' },
     { name: 'proxysql', value: 'proxysql', label: 'ProxySQL' },
-    { name: 'backup', value: 'backup', label: 'Backup' },
   ],
 };
 
@@ -30,9 +24,6 @@ export const operatorsOptionsStubs = [
   { name: 'xtradb', value: 'xtradb', label: 'PXC 1' },
 ];
 
-export const psmdbComponentOptionsStubs = [
-  { name: 'mongod', value: 'mongod', label: 'PSMDB' },
-  { name: 'backup', value: 'backup', label: 'Backup' },
-];
+export const psmdbComponentOptionsStubs = [{ name: 'mongod', value: 'mongod', label: 'PSMDB' }];
 
 export const versionsFieldNameStub = 'psmdbmongod';

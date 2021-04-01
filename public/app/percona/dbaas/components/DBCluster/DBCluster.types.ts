@@ -214,10 +214,29 @@ export interface DBClusterComponent {
     status: string;
     critical: boolean;
     default: boolean;
+    disabled?: boolean;
   };
 }
 
 export enum DBClusterComponentVersionStatus {
   available = 'available',
   recommended = 'recommended',
+}
+
+export interface DBClusterChangeComponentsAPI {
+  kubernetes_cluster_name: string;
+  pxc?: DBClusterChangeComponentAPI;
+  proxysql?: DBClusterChangeComponentAPI;
+  mongod?: DBClusterChangeComponentAPI;
+}
+
+export interface DBClusterChangeComponentAPI {
+  default_version?: string;
+  versions: DBClusterChangeComponentVersionAPI[];
+}
+
+export interface DBClusterChangeComponentVersionAPI {
+  version: string;
+  disable?: boolean;
+  enable?: boolean;
 }

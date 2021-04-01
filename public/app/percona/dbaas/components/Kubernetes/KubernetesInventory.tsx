@@ -161,7 +161,7 @@ export const KubernetesInventory: FC<KubernetesProps> = ({ kubernetes, deleteKub
           )}
         />
       </Modal>
-      {selectedCluster && (
+      {selectedCluster && manageComponentsModalVisible && (
         <ManageComponentsVersionsModal
           selectedKubernetes={selectedCluster}
           isVisible={manageComponentsModalVisible}

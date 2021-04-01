@@ -15,10 +15,17 @@ import {
   DBClusterStatus,
   ResourcesUnits,
   DBClusterComponent,
+  DBClusterChangeComponentsAPI,
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { getClusterStatus } from './DBCluster.utils';
 import { BILLION, THOUSAND } from './DBCluster.constants';
+import {
+  ManageComponentsVersionsRenderProps,
+  SupportedComponents,
+} from '../Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersionsModal.types';
+import { getComponentChange } from './DBCluster.service.utils';
+import { Operators } from './AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 const DBCLUSTER_STATUS_MAP = {
   [DBClusterStatus.invalid]: 'XTRA_DB_CLUSTER_STATE_INVALID',
@@ -77,6 +84,14 @@ export class XtraDBService extends DBClusterService {
   getComponents(kubernetesClusterName: string): Promise<DBClusterComponents> {
     return apiManagement.post<DBClusterComponents, any>('/DBaaS/Components/GetPXC', {
       kubernetes_cluster_name: kubernetesClusterName,
+    });
+  }
+
+  setComponents(kubernetesClusterName: string, componentsVersions: ManageComponentsVersionsRenderProps): Promise<void> {
+    return apiManagement.post<any, DBClusterChangeComponentsAPI>('/DBaaS/Components/ChangePXC', {
+      kubernetes_cluster_name: kubernetesClusterName,
+      pxc: getComponentChange(Operators.xtradb, SupportedComponents.pxc, componentsVersions),
+      proxysql: getComponentChange(Operators.xtradb, SupportedComponents.proxysql, componentsVersions),
     });
   }
 

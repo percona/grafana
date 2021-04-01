@@ -11,6 +11,7 @@ export const Messages = {
   required: 'Required field',
   recommended: 'Recommended',
   save: 'Save',
+  success: 'Components versions updated successfully',
   operatorLabel: {
     [Operators.xtradb]: (version: string) => `PXC ${version}`,
     [Operators.psmdb]: (version: string) => `PSMDB ${version}`,

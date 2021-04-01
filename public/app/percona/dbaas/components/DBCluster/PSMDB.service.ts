@@ -15,10 +15,17 @@ import {
   DBClusterStatus,
   ResourcesUnits,
   DBClusterComponent,
+  DBClusterChangeComponentsAPI,
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { getClusterStatus } from './DBCluster.utils';
 import { BILLION, THOUSAND } from './DBCluster.constants';
+import {
+  ManageComponentsVersionsRenderProps,
+  SupportedComponents,
+} from '../Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersionsModal.types';
+import { getComponentChange } from './DBCluster.service.utils';
+import { Operators } from './AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 const DBCLUSTER_STATUS_MAP = {
   [DBClusterStatus.invalid]: 'PSMDB_CLUSTER_STATE_INVALID',
@@ -77,6 +84,13 @@ export class PSMDBService extends DBClusterService {
   getComponents(kubernetesClusterName: string): Promise<DBClusterComponents> {
     return apiManagement.post<DBClusterComponents, any>('/DBaaS/Components/GetPSMDB', {
       kubernetes_cluster_name: kubernetesClusterName,
+    });
+  }
+
+  setComponents(kubernetesClusterName: string, componentsVersions: ManageComponentsVersionsRenderProps): Promise<void> {
+    return apiManagement.post<any, DBClusterChangeComponentsAPI>('/DBaaS/Components/ChangePSMDB', {
+      kubernetes_cluster_name: kubernetesClusterName,
+      mongod: getComponentChange(Operators.psmdb, SupportedComponents.mongod, componentsVersions),
     });
   }
 

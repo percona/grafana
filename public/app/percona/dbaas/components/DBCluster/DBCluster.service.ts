@@ -1,6 +1,7 @@
 import { Databases } from 'app/percona/shared/core';
 import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
+import { ManageComponentsVersionsRenderProps } from '../Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersionsModal.types';
 import { BILLION, RESOURCES_PRECISION, THOUSAND } from './DBCluster.constants';
 import {
   DBCluster,
@@ -35,6 +36,11 @@ export abstract class DBClusterService {
   abstract restartDBCluster(dbCluster: DBCluster): Promise<void>;
 
   abstract getComponents(kubernetesClusterName: string): Promise<DBClusterComponents>;
+
+  abstract setComponents(
+    kubernetesClusterName: string,
+    componentsVersions: ManageComponentsVersionsRenderProps
+  ): Promise<void>;
 
   abstract getDatabaseVersions(kubernetesClusterName: string): Promise<DatabaseVersion[]>;
 

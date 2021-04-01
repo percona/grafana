@@ -27,9 +27,9 @@ export const componentsToOptions = (value: DBClusterMatrix): SelectableValue[] =
     }));
 
 export const versionsToOptions = (component: DBClusterComponent): SelectableValue[] =>
-  Object.entries(component).map(([key, { status }]) => ({
+  Object.entries(component).map(([key, { status, disabled }]) => ({
     name: `v${key}`,
-    value: true,
+    value: !disabled,
     label: key,
     status,
   }));
