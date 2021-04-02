@@ -4,12 +4,13 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { LoaderButton } from '@percona/platform-core';
 import { CheckTableRow } from './CheckTableRow';
 import { Messages } from './AllChecksTab.messages';
+import { CheckDetails } from 'app/percona/check/types';
 
 const originalConsoleError = jest.fn();
 
 const runAllPromises = () => new Promise(setImmediate);
 
-const TEST_CHECK = {
+const TEST_CHECK: CheckDetails = {
   summary: 'Test',
   name: 'test',
   interval: 'FREQUENT',
@@ -17,7 +18,7 @@ const TEST_CHECK = {
   disabled: false,
 };
 
-const TEST_CHECK_DISABLED = {
+const TEST_CHECK_DISABLED: CheckDetails = {
   summary: 'Test disabled',
   name: 'test disabled',
   interval: 'RARE',
