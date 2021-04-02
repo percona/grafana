@@ -99,7 +99,7 @@ export const BackupInventory: FC = () => {
 
   const handleBackup = async ({ service, location, backupName, description }: AddBackupFormProps) => {
     try {
-      await BackupInventoryService.backup(service.value || '', location.value || '', backupName, description);
+      await BackupInventoryService.backup(service.value?.id || '', location.value || '', backupName, description);
       setBackupModalVisible(false);
     } catch (e) {
       logger.error(e);

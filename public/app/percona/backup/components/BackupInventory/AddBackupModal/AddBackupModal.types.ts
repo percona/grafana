@@ -14,9 +14,13 @@ export enum RetryMode {
   MANUAL = 'MANUAL',
 }
 
-export interface AddBackupFormProps {
-  service: SelectableValue<string>;
+export interface SelectableService {
   vendor: Databases;
+  id: string;
+}
+
+export interface AddBackupFormProps {
+  service: SelectableValue<SelectableService>;
   dataModel: DataModel;
   backupName: string;
   description: string;

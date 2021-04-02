@@ -1,13 +1,11 @@
 import { SelectableValue } from '@grafana/data';
-import { Databases } from 'app/percona/shared/core';
 import { Backup, DataModel } from '../BackupInventory.types';
-import { AddBackupFormProps, RetryMode } from './AddBackupModal.types';
+import { AddBackupFormProps, RetryMode, SelectableService } from './AddBackupModal.types';
 
 export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
   if (!backup) {
     return {
-      service: (null as unknown) as SelectableValue<string>,
-      vendor: Databases.mysql,
+      service: (null as unknown) as SelectableValue<SelectableService>,
       dataModel: DataModel.PHYSICAL,
       backupName: '',
       description: '',
@@ -21,8 +19,7 @@ export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
   const { serviceName, serviceId, vendor, dataModel, locationName, locationId } = backup;
 
   return {
-    service: { label: serviceName, value: serviceId },
-    vendor,
+    service: { label: serviceName, value: { id: serviceId, vendor } },
     dataModel,
     backupName: '',
     description: '',
