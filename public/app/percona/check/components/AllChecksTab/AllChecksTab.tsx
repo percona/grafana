@@ -10,6 +10,7 @@ import { Messages } from './AllChecksTab.messages';
 import * as styles from './AllChecksTab.styles';
 import { FetchChecks } from './types';
 import { CheckTableRow } from './CheckTableRow';
+import { ChecksReloadContext } from './AllChecks.context';
 
 export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
@@ -75,9 +76,11 @@ export const AllChecksTab: FC = () => {
             </tr>
           </thead>
           <tbody data-qa="db-checks-all-checks-tbody">
-            {checks?.map(check => (
-              <CheckTableRow key={check.name} check={check} onSuccess={updateUI} />
-            ))}
+            <ChecksReloadContext.Provider value={{ fetchChecks }}>
+              {checks?.map(check => (
+                <CheckTableRow key={check.name} check={check} onSuccess={updateUI} />
+              ))}
+            </ChecksReloadContext.Provider>
           </tbody>
         </table>
       )}
