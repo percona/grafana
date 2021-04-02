@@ -54,9 +54,6 @@ export const Advanced: FC<AdvancedProps> = ({
       alertingLabel,
       alertingTooltip,
       alertingLink,
-      backupLabel,
-      backupTooltip,
-      backupLink,
     },
     tooltipLinkText,
   } = Messages;
@@ -178,7 +175,8 @@ export const Advanced: FC<AdvancedProps> = ({
               dataQa="advanced-alerting"
               component={SwitchRow}
             />
-            <Field
+            {/* TODO remove comment when feature is ready to come out */}
+            {/* <Field
               name="backup"
               type="checkbox"
               label={backupLabel}
@@ -189,7 +187,7 @@ export const Advanced: FC<AdvancedProps> = ({
               disabled={!values.telemetry}
               dataQa="advanced-backup"
               component={SwitchRow}
-            />
+            /> */}
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">

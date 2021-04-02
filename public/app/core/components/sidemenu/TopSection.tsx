@@ -31,15 +31,16 @@ const TopSection: FC<any> = () => {
         },
         show: showDBaaS,
       },
-      {
-        linkObject: {
-          id: 'backup',
-          icon: 'history',
-          text: 'Backup',
-          url: `${config.appSubUrl}/backup`,
-        },
-        show: showBackup,
-      },
+      // TODO remove comment when feature is ready to come out
+      // {
+      //   linkObject: {
+      //     id: 'backup',
+      //     icon: 'history',
+      //     text: 'Backup',
+      //     url: `${config.appSubUrl}/backup`,
+      //   },
+      //   show: showBackup,
+      // },
       {
         linkObject: {
           id: 'database-checks',
