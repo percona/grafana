@@ -46,5 +46,8 @@ export const getStyles = ({ palette, colors, spacing }: GrafanaTheme) => {
     details: css`
       margin-top: ${spacing.md};
     `,
+    disabledRow: css`
+      background-color: ${colors.dashboardBg} !important;
+    `,
   };
 };

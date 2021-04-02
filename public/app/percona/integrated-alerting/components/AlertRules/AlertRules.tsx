@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Column, Row } from 'react-table';
+import { Cell, Column, Row } from 'react-table';
 import { Button, useStyles, IconButton } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { Table } from '../Table/Table';
@@ -135,12 +135,20 @@ export const AlertRules: FC = () => {
     setAddModalVisible(currentValue => !currentValue);
   };
 
-  const renderSelectedSubRow = React.useCallback(
+  const renderSelectedSubRow = useCallback(
     ({ original }: Row<AlertRule>) => (
       <pre data-qa="alert-rules-details" className={styles.details}>
         {original.expr}
       </pre>
     ),
+    []
+  );
+
+  const getCellProps = useCallback(
+    (cell: Cell<AlertRule>) => ({
+      className: cell.row.original.disabled ? styles.disabledRow : '',
+      key: cell.row.original.ruleId,
+    }),
     []
   );
 
@@ -174,6 +182,7 @@ export const AlertRules: FC = () => {
         columns={columns}
         pendingRequest={pendingRequest}
         emptyMessage={noData}
+        getCellProps={getCellProps}
       />
     </AlertRulesProvider.Provider>
   );
