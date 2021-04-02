@@ -6,11 +6,11 @@ export const getStyles = (theme: GrafanaTheme) => ({
     margin-bottom: ${theme.spacing.xl};
   `,
   content: css`
-    margin-bottom: ${theme.spacing.xl};
     text-align: center;
     word-break: break-word;
   `,
-  form: css`
+  intervalRadioWrapper: css`
+    margin-bottom: ${theme.spacing.lg};
     display: inline-flex;
   `,
 });
