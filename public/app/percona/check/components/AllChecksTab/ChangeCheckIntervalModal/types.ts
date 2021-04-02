@@ -6,3 +6,7 @@ export interface ChangeCheckIntervalModalProps {
   isVisible: boolean;
   setVisible: (value: boolean) => void;
 }
+
+export interface ChangeCheckIntervalFormValues {
+  interval: keyof typeof Interval;
+}
