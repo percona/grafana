@@ -1,4 +1,3 @@
-import { Databases } from 'app/percona/shared/core';
 import { stubs as backupStubs } from '../__mocks__/BackupInventory.service';
 import { DataModel } from '../BackupInventory.types';
 import { AddBackupFormProps, RetryMode } from './AddBackupModal.types';
@@ -8,12 +7,11 @@ describe('AddBackupModal::utils', () => {
   describe('toFormBackup', () => {
     it('should return default values if a null Backup is passed', () => {
       expect(toFormBackup(null)).toEqual<AddBackupFormProps>({
-        service: { label: '', value: '' },
-        vendor: Databases.mysql,
+        service: null as any,
         dataModel: DataModel.PHYSICAL,
         backupName: '',
         description: '',
-        location: { label: '', value: '' },
+        location: null as any,
         retryMode: RetryMode.AUTO,
         retryTimes: 0,
         retryInterval: 0,
@@ -25,8 +23,7 @@ describe('AddBackupModal::utils', () => {
       const { serviceName, serviceId, vendor, dataModel, locationName, locationId } = backup;
 
       expect(toFormBackup(backup)).toEqual<AddBackupFormProps>({
-        service: { label: serviceName, value: serviceId },
-        vendor,
+        service: { label: serviceName, value: { id: serviceId, vendor } },
         dataModel,
         backupName: '',
         description: '',
