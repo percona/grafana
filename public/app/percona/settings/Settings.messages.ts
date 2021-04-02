@@ -18,7 +18,7 @@ export const Messages = {
     dbaasLabel: 'DBaaS',
     azureDiscoverLabel: 'Microsoft Azure monitoring',
     azureDiscoverTooltip: 'Option to enable/disable Microsoft Azure DB instanced  discovery and monitoring',
-    azureDiscoverLink: `${HOW_TO_DOC_URL}/configure.html#advanced-settings`,
+    azureDiscoverLink: `${HOW_TO_DOC_URL}/configure.html#microsoft-azure-feature-toggle`,
     dbaasTooltip: 'Read-only option to show if DBaaS features are enabled.',
     publicAddressLabel: 'Public Address',
     publicAddressTooltip: 'Public Address to this PMM server.',
