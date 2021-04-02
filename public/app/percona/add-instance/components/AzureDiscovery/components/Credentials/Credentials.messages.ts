@@ -24,6 +24,6 @@ export const Messages = {
     },
     submitButton: 'Discover',
     toMenuButton: 'Return to menu',
-    credentialsDocLink: 'Where do I get the security credentials for my Azure DB instance',
+    credentialsDocLink: 'Where do I get the security credentials for my Microsoft Azure DB instance',
   },
 };
