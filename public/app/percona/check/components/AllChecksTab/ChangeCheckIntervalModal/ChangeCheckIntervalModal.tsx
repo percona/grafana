@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { withTypes } from 'react-final-form';
 import { logger, RadioButtonGroupField } from '@percona/platform-core';
 import { Messages } from './ChangeCheckIntervalModal.messages';
@@ -21,12 +21,10 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
   setVisible,
 }) => {
   const styles = useStyles(getStyles);
-  const [pending, setPending] = useState(false);
   const checksReloadContext = React.useContext(ChecksReloadContext);
 
   const changeInterval = async ({ interval }: ChangeCheckIntervalFormValues) => {
     try {
-      setPending(true);
       await CheckService.changeInterval({
         name: checkName,
         interval,
@@ -36,8 +34,6 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
       appEvents.emit(AppEvents.alertSuccess, [Messages.getSuccess(checkName)]);
     } catch (e) {
       logger.error(e);
-    } finally {
-      setPending(false);
     }
   };
 
@@ -46,21 +42,26 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
   };
 
   return (
-    <Modal title={Messages.title} isVisible={isVisible} onClose={() => setVisible(false)}>
+    <Modal
+      data-qa="change-check-interval-modal"
+      title={Messages.title}
+      isVisible={isVisible}
+      onClose={() => setVisible(false)}
+    >
       <div className={styles.content}>
         <h4 className={styles.title}>{Messages.getDescription(checkName)}</h4>
         <Form
           onSubmit={changeInterval}
           initialValues={initialValues}
-          render={({ handleSubmit, pristine }) => (
-            <form onSubmit={handleSubmit}>
-              <div className={styles.intervalRadioWrapper}>
+          render={({ handleSubmit, submitting, pristine }) => (
+            <form data-qa="change-check-interval-form" onSubmit={handleSubmit}>
+              <div data-qa="change-check-interval-radio-group-wrapper" className={styles.intervalRadioWrapper}>
                 <RadioButtonGroupField name="interval" options={checkIntervalOptions} />
               </div>
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
-                  disabled={pristine}
-                  loading={pending}
+                  disabled={submitting || pristine}
+                  loading={submitting}
                   variant="destructive"
                   size="md"
                   data-qa="change-check-interval-modal-save"
