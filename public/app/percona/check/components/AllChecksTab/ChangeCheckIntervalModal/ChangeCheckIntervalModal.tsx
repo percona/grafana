@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react';
 import { logger, RadioButtonGroupField } from '@percona/platform-core';
 import { Messages } from './ChangeCheckIntervalModal.messages';
 import { Form } from 'react-final-form';
-import { FormApi } from 'final-form';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LoaderButton, Modal } from '@percona/platform-core';
 import { appEvents } from 'app/core/app_events';
@@ -22,7 +21,7 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
   const [pending, setPending] = useState(false);
   const [selectedInterval] = useState(interval);
 
-  const onSave = async () => {
+  const changeInterval = async () => {
     try {
       setPending(true);
       await CheckService.changeInterval({
@@ -38,10 +37,6 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
     }
   };
 
-  const updateCheckInterval = (form: FormApi) => {
-    console.log(form.getFieldState('interval'));
-  };
-
   const initialValues = {
     interval,
   };
@@ -54,7 +49,7 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
           onSubmit={() => {}}
           initialValues={initialValues}
           render={({ form, handleSubmit, valid, pristine }) => (
-            <form className={styles.form} onSubmit={handleSubmit} onChange={() => updateCheckInterval(form)}>
+            <form className={styles.form} onSubmit={handleSubmit}>
               <RadioButtonGroupField name="interval" options={checkIntervalOptions} />
             </form>
           )}
@@ -65,7 +60,7 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
           loading={pending}
           variant="destructive"
           size="md"
-          onClick={onSave}
+          onClick={changeInterval}
           data-qa="change-check-interval-modal-save"
         >
           {Messages.save}
