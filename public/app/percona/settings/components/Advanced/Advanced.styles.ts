@@ -19,7 +19,7 @@ export const getStyles = stylesFactory(({ breakpoints, spacing, typography, bord
     advancedCol: css`
       align-items: center;
       display: flex;
-      width: 180px;
+      width: 210px;
     `,
     retentionInputWrapper: css`
       display: flex;
