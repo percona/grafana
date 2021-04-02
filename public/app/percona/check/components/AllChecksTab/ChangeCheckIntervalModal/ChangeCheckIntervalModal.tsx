@@ -1,15 +1,18 @@
 import React, { FC, useState } from 'react';
+import { withTypes } from 'react-final-form';
 import { logger, RadioButtonGroupField } from '@percona/platform-core';
 import { Messages } from './ChangeCheckIntervalModal.messages';
-import { Form } from 'react-final-form';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LoaderButton, Modal } from '@percona/platform-core';
+import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
 import { CheckService } from 'app/percona/check/Check.service';
 import { getStyles } from './ChangeCheckIntervalModal.styles';
-import { ChangeCheckIntervalModalProps } from './types';
+import { ChangeCheckIntervalModalProps, ChangeCheckIntervalFormValues } from './types';
 import { checkIntervalOptions } from './ChangeCheckIntervalModal.constants';
-import { AppEvents } from '@grafana/data';
+import { ChecksReloadContext } from '../AllChecks.context';
+
+const { Form } = withTypes<ChangeCheckIntervalFormValues>();
 
 export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
   interval,
@@ -19,16 +22,17 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
 }) => {
   const styles = useStyles(getStyles);
   const [pending, setPending] = useState(false);
-  const [selectedInterval] = useState(interval);
+  const checksReloadContext = React.useContext(ChecksReloadContext);
 
-  const changeInterval = async () => {
+  const changeInterval = async ({ interval }: ChangeCheckIntervalFormValues) => {
     try {
       setPending(true);
       await CheckService.changeInterval({
         name: checkName,
-        interval: selectedInterval,
+        interval,
       });
       setVisible(false);
+      await checksReloadContext.fetchChecks();
       appEvents.emit(AppEvents.alertSuccess, [Messages.getSuccess(checkName)]);
     } catch (e) {
       logger.error(e);
@@ -37,7 +41,7 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
     }
   };
 
-  const initialValues = {
+  const initialValues: ChangeCheckIntervalFormValues = {
     interval,
   };
 
@@ -46,34 +50,36 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
       <div className={styles.content}>
         <h4 className={styles.title}>{Messages.getDescription(checkName)}</h4>
         <Form
-          onSubmit={() => {}}
+          onSubmit={changeInterval}
           initialValues={initialValues}
-          render={({ form, handleSubmit, valid, pristine }) => (
-            <form className={styles.form} onSubmit={handleSubmit}>
-              <RadioButtonGroupField name="interval" options={checkIntervalOptions} />
+          render={({ handleSubmit, pristine }) => (
+            <form onSubmit={handleSubmit}>
+              <div className={styles.intervalRadioWrapper}>
+                <RadioButtonGroupField name="interval" options={checkIntervalOptions} />
+              </div>
+              <HorizontalGroup justify="center" spacing="md">
+                <LoaderButton
+                  disabled={pristine}
+                  loading={pending}
+                  variant="destructive"
+                  size="md"
+                  data-qa="change-check-interval-modal-save"
+                >
+                  {Messages.save}
+                </LoaderButton>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setVisible(false)}
+                  data-qa="change-check-interval-modal-cancel"
+                >
+                  {Messages.cancel}
+                </Button>
+              </HorizontalGroup>
             </form>
           )}
         />
       </div>
-      <HorizontalGroup justify="center" spacing="md">
-        <LoaderButton
-          loading={pending}
-          variant="destructive"
-          size="md"
-          onClick={changeInterval}
-          data-qa="change-check-interval-modal-save"
-        >
-          {Messages.save}
-        </LoaderButton>
-        <Button
-          variant="secondary"
-          size="md"
-          onClick={() => setVisible(false)}
-          data-qa="change-check-interval-modal-cancel"
-        >
-          {Messages.cancel}
-        </Button>
-      </HorizontalGroup>
     </Modal>
   );
 };
