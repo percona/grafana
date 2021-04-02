@@ -36,6 +36,9 @@ export const CheckService = {
   async changeCheck(): Promise<void | {}> {
     return {};
   },
+  async changeInterval(): Promise<void | {}> {
+    return {};
+  },
 };
 
 export const processData = (data: Alert[]): ActiveCheck[] => {
