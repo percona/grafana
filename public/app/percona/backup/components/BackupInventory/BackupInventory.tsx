@@ -101,6 +101,8 @@ export const BackupInventory: FC = () => {
     try {
       await BackupInventoryService.backup(service.value?.id || '', location.value || '', backupName, description);
       setBackupModalVisible(false);
+      setSelectedBackup(null);
+      getData();
     } catch (e) {
       logger.error(e);
     }
