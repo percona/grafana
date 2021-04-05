@@ -21,7 +21,7 @@ export const DBaaS: FC = () => {
       {
         label: Messages.tabs.kubernetes,
         key: TabKeys.kubernetes,
-        component: (
+        component: () => (
           <KubernetesInventory
             key={TabKeys.kubernetes}
             kubernetes={kubernetes}
@@ -35,7 +35,7 @@ export const DBaaS: FC = () => {
         label: Messages.tabs.dbcluster,
         key: TabKeys.dbclusters,
         disabled: kubernetes.length === 0,
-        component: <DBCluster key={TabKeys.dbclusters} kubernetes={kubernetes} />,
+        component: () => <DBCluster key={TabKeys.dbclusters} kubernetes={kubernetes} />,
       },
     ],
     [kubernetes, kubernetesLoading]

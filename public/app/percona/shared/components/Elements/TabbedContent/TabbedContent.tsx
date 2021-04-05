@@ -41,7 +41,7 @@ export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath }) =
           />
         ))}
       </TabsBar>
-      <TabContent>{tabs.map(tab => tab.key === activeTab && tab.component)}</TabContent>
+      <TabContent>{tabs.find(tab => tab.key === activeTab)?.component()}</TabContent>
     </>
   );
 };
