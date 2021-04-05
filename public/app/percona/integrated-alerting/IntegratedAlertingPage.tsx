@@ -1,9 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
-import { Breadcrumb } from 'app/core/components/Breadcrumb';
 import { IntegratedAlertingContent } from './components/IntegratedAlertingContent';
-import { getStyles } from './IntegratedAlerting.styles';
 import { IntegratedAlertingService } from './IntegratedAlerting.service';
 import { PAGE_MODEL } from './IntegratedAlerting.constants';
 import { TabKeys } from './IntegratedAlerting.types';
@@ -11,9 +8,9 @@ import { AlertRules, AlertRuleTemplate, Alerts, NotificationChannel } from './co
 import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { TabbedContent, ContentTab } from '../shared/components/Elements/TabbedContent';
 import { Messages } from './IntegratedAlerting.messages';
+import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 
 const IntegratedAlertingPage: FC = () => {
-  const styles = useStyles(getStyles);
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [alertingEnabled, setAlertingEnabled] = useState(false);
 
@@ -65,8 +62,7 @@ const IntegratedAlertingPage: FC = () => {
   }, []);
 
   return (
-    <div className={styles.integratedAlertingWrapper}>
-      <Breadcrumb pageModel={PAGE_MODEL} />
+    <PageWrapper pageModel={PAGE_MODEL}>
       <TechnicalPreview />
       <TabbedContent
         tabs={tabs}
@@ -77,7 +73,7 @@ const IntegratedAlertingPage: FC = () => {
           </IntegratedAlertingContent>
         )}
       />
-    </div>
+    </PageWrapper>
   );
 };
 
