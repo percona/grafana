@@ -19,6 +19,7 @@ export interface AdvancedProps {
   updatesDisabled: boolean;
   dbaasEnabled?: boolean;
   alertingEnabled?: boolean;
+  azureDiscoverEnabled?: boolean;
   publicAddress?: string;
   updateSettings: (body: any, callback: LoadingCallback, refresh?: boolean) => void;
   sttCheckIntervals: SttCheckIntervalsSettings;

@@ -17,6 +17,7 @@ import {
   MIN_STT_CHECK_INTERVAL,
   STT_CHECK_INTERVAL_STEP,
   STT_CHECK_INTERVALS,
+  TECHNICAL_PREVIEW_DOC_URL,
 } from './Advanced.constants';
 import { AdvancedFormValues, AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
@@ -58,6 +59,7 @@ export const Advanced: FC<AdvancedProps> = ({
   sttEnabled,
   dbaasEnabled,
   alertingEnabled,
+  azureDiscoverEnabled,
   publicAddress,
   updateSettings,
   sttCheckIntervals,
@@ -66,12 +68,46 @@ export const Advanced: FC<AdvancedProps> = ({
   const styles = getStyles(theme);
   const settingsStyles = getSettingsStyles(theme);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
+  const {
+    advanced: {
+      action,
+      retentionLabel,
+      retentionTooltip,
+      retentionUnits,
+      telemetryLabel,
+      telemetryLink,
+      telemetryTooltip,
+      updatesLabel,
+      updatesLink,
+      updatesTooltip,
+      sttLabel,
+      sttLink,
+      sttTooltip,
+      dbaasLabel,
+      dbaasTooltip,
+      publicAddressLabel,
+      publicAddressTooltip,
+      publicAddressButton,
+      alertingLabel,
+      alertingTooltip,
+      alertingLink,
+      azureDiscoverLabel,
+      azureDiscoverTooltip,
+      azureDiscoverLink,
+      technicalPreviewLegend,
+      technicalPreviewDescription,
+      technicalPreviewLinkText,
+    },
+    tooltipLinkText,
+  } = Messages;
+
   const initialValues = {
     retention: convertSecondsToDays(dataRetention),
     telemetry: telemetryEnabled,
     updates: !updatesDisabled,
     stt: sttEnabled,
     dbaas: dbaasEnabled,
+    azureDiscover: azureDiscoverEnabled,
     publicAddress,
     alerting: alertingEnabled,
     rareInterval,
@@ -79,12 +115,14 @@ export const Advanced: FC<AdvancedProps> = ({
     frequentInterval,
   };
   const [loading, setLoading] = useState(false);
+  // @ts-ignore
   const applyChanges = ({
     retention,
     telemetry,
     stt,
     publicAddress,
     alerting,
+    azureDiscover
     rareInterval,
     standardInterval,
     frequentInterval,
@@ -101,6 +139,8 @@ export const Advanced: FC<AdvancedProps> = ({
       enable_telemetry: telemetry,
       disable_stt: !stt,
       enable_stt: stt,
+      disable_azurediscover: !azureDiscover,
+      enable_azurediscover: azureDiscover,
       pmm_public_address: publicAddress,
       remove_pmm_public_address: !publicAddress,
       enable_alerting: alerting ? true : undefined,
@@ -175,18 +215,6 @@ export const Advanced: FC<AdvancedProps> = ({
               />
             )}
             <Field
-              name="alerting"
-              type="checkbox"
-              label={alertingLabel}
-              tooltip={alertingTooltip}
-              tooltipLinkText={tooltipLinkText}
-              link={alertingLink}
-              className={cx({ [styles.switchDisabled]: !values.telemetry })}
-              disabled={!values.telemetry}
-              dataQa="advanced-alerting"
-              component={SwitchRow}
-            />
-            <Field
               name="stt"
               type="checkbox"
               label={sttLabel}
@@ -245,6 +273,52 @@ export const Advanced: FC<AdvancedProps> = ({
                 </Button>
               </div>
             </div>
+            <fieldset className={styles.technicalPreview}>
+              <legend>{technicalPreviewLegend}</legend>
+              <p className={styles.technicalPreviewDoc}>
+                <Icon name="info-circle" size={'xl'} className={styles.technicalPreviewIcon} />
+                <p>
+                  {technicalPreviewDescription}{' '}
+                  <a href={TECHNICAL_PREVIEW_DOC_URL} target="_blank">
+                    {technicalPreviewLinkText}
+                  </a>
+                </p>
+              </p>
+              {dbaasEnabled && (
+                <Field
+                  name="dbaas"
+                  type="checkbox"
+                  label={dbaasLabel}
+                  tooltip={dbaasTooltip}
+                  className={styles.switchDisabled}
+                  disabled
+                  dataQa="advanced-dbaas"
+                  component={SwitchRow}
+                />
+              )}
+              <Field
+                name="alerting"
+                type="checkbox"
+                label={alertingLabel}
+                tooltip={alertingTooltip}
+                tooltipLinkText={tooltipLinkText}
+                link={alertingLink}
+                className={cx({ [styles.switchDisabled]: !values.telemetry })}
+                disabled={!values.telemetry}
+                dataQa="advanced-alerting"
+                component={SwitchRow}
+              />
+              <Field
+                name="azureDiscover"
+                type="checkbox"
+                label={azureDiscoverLabel}
+                tooltip={azureDiscoverTooltip}
+                tooltipLinkText={tooltipLinkText}
+                link={azureDiscoverLink}
+                dataQa="advanced-azure-discover"
+                component={SwitchRow}
+              />
+            </fieldset>
             <Button
               className={settingsStyles.actionButton}
               type="submit"

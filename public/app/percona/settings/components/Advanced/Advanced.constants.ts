@@ -29,3 +29,5 @@ export const STT_CHECK_INTERVALS = [
     name: SttCheckIntervals.frequentInterval,
   },
 ];
+
+export const TECHNICAL_PREVIEW_DOC_URL = 'https://per.co.na/pmm-feature-status';

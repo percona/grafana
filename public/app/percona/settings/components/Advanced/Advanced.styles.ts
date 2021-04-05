@@ -2,7 +2,7 @@ import { stylesFactory } from '@grafana/ui';
 import { GrafanaTheme } from '@grafana/data';
 import { css } from 'emotion';
 
-export const getStyles = stylesFactory(({ breakpoints, spacing, typography }: GrafanaTheme) => {
+export const getStyles = stylesFactory(({ breakpoints, spacing, typography, border, colors }: GrafanaTheme) => {
   const mq = `@media (max-width: ${breakpoints.md})`;
 
   return {
@@ -19,7 +19,7 @@ export const getStyles = stylesFactory(({ breakpoints, spacing, typography }: Gr
     advancedCol: css`
       align-items: center;
       display: flex;
-      width: 180px;
+      width: 210px;
     `,
     advancedChildCol: css`
       width: 150px;
@@ -78,6 +78,42 @@ export const getStyles = stylesFactory(({ breakpoints, spacing, typography }: Gr
     sttCheckIntervalsLabel: css`
       margin-top: ${spacing.sm};
       margin-bottom: ${spacing.sm};
+    `,
+    technicalPreview: css`
+      border: ${border.width.sm} solid ${colors.pageHeaderBorder};
+      padding: ${spacing.md};
+      border-radius: ${border.radius.sm};
+      width: 950px;
+
+      ${mq} {
+        width: 100%;
+      }
+
+      legend {
+        font-size: 14px;
+        width: auto;
+        padding: 0 ${spacing.sm};
+      }
+    `,
+    technicalPreviewDoc: css`
+      display: flex;
+      align-items: center;
+      border: ${border.width.sm} solid ${colors.pageHeaderBorder};
+      border-radius: ${border.radius.sm};
+      color: ${colors.textWeak};
+      padding: ${spacing.sm};
+
+      p {
+        margin: 0;
+      }
+
+      a {
+        color: ${colors.linkExternal};
+      }
+    `,
+    technicalPreviewIcon: css`
+      margin: ${spacing.sm};
+      fill: ${colors.linkExternal};
     `,
   };
 });
