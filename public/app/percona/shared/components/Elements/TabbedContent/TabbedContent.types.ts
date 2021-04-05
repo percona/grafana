@@ -1,4 +1,4 @@
-export interface Tab {
+export interface ContentTab {
   label: string;
   key: string;
   disabled?: boolean;
@@ -11,6 +11,6 @@ export interface TabComponentMap {
 }
 
 export interface TabbedContentProps {
-  tabs: Tab[];
+  tabs: ContentTab[];
   basePath: string;
 }
