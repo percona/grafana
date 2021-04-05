@@ -38,3 +38,9 @@ export interface CustomLabel {
   key: string;
   value: string;
 }
+
+export enum TabKeys {
+  services = 'services',
+  agents = 'agents',
+  nodes = 'nodes',
+}

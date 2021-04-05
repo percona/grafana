@@ -17,7 +17,7 @@ export const DBaaS: FC = () => {
 
   const [kubernetes, deleteKubernetes, addKubernetes, kubernetesLoading] = useKubernetes();
   const tabs: ContentTab[] = useMemo(
-    () => [
+    (): ContentTab[] => [
       {
         label: Messages.tabs.kubernetes,
         key: TabKeys.kubernetes,
