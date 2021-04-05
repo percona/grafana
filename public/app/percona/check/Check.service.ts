@@ -52,7 +52,7 @@ export const CheckService = {
   },
   changeCheck(body: ChangeCheckBody): Promise<void | {}> {
     return api.post<{}, ChangeCheckBody>('/v1/management/SecurityChecks/Change', body);
-  }
+  },
 };
 
 export const processData = (data: Alert[]): ActiveCheck[] => {
