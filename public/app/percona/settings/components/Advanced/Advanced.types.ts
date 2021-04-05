@@ -7,6 +7,7 @@ export interface AdvancedFormValues {
   stt: boolean;
   publicAddress: string;
   alerting: boolean;
+  azureDiscover: boolean;
   rareInterval: string;
   standardInterval: string;
   frequentInterval: string;

@@ -22,36 +22,6 @@ import {
 import { AdvancedFormValues, AdvancedProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
 
-const {
-  advanced: {
-    action,
-    retentionLabel,
-    retentionTooltip,
-    retentionUnits,
-    telemetryLabel,
-    telemetryLink,
-    telemetryTooltip,
-    updatesLabel,
-    updatesLink,
-    updatesTooltip,
-    sttLabel,
-    sttLink,
-    sttTooltip,
-    sttCheckIntervalsLabel,
-    sttCheckIntervalTooltip,
-    sttCheckIntervalUnit,
-    dbaasLabel,
-    dbaasTooltip,
-    publicAddressLabel,
-    publicAddressTooltip,
-    publicAddressButton,
-    alertingLabel,
-    alertingTooltip,
-    alertingLink,
-  },
-  tooltipLinkText,
-} = Messages;
-
 export const Advanced: FC<AdvancedProps> = ({
   dataRetention,
   telemetryEnabled,
@@ -83,6 +53,9 @@ export const Advanced: FC<AdvancedProps> = ({
       sttLabel,
       sttLink,
       sttTooltip,
+      sttCheckIntervalsLabel,
+      sttCheckIntervalTooltip,
+      sttCheckIntervalUnit,
       dbaasLabel,
       dbaasTooltip,
       publicAddressLabel,
@@ -122,7 +95,7 @@ export const Advanced: FC<AdvancedProps> = ({
     stt,
     publicAddress,
     alerting,
-    azureDiscover
+    azureDiscover,
     rareInterval,
     standardInterval,
     frequentInterval,
