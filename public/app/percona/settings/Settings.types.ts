@@ -42,6 +42,8 @@ export interface AdvancedChangePayload extends AdvancedPayload {
   remove_pmm_public_address: boolean;
   enable_alerting?: boolean;
   disable_alerting?: boolean;
+  disable_azurediscover?: boolean;
+  enable_azurediscover?: boolean;
 }
 
 export interface MetricsResolutionsPayload {
