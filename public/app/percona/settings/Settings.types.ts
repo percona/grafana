@@ -76,6 +76,7 @@ export interface SettingsPayload
   stt_enabled: boolean;
   dbaas_enabled: boolean;
   alerting_enabled: boolean;
+  azurediscover_enabled: boolean;
 }
 
 export type SettingsAPIChangePayload = AlertManagerChangePayload &
