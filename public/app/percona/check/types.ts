@@ -62,13 +62,9 @@ export interface ChangeCheckBody {
   params: Array<{
     name: string;
     enable?: boolean;
+    interval?: keyof typeof Interval;
     disable?: boolean;
   }>;
-}
-
-export interface ChangeIntervalBody {
-  interval: keyof typeof Interval;
-  name: string;
 }
 
 export enum TabKeys {

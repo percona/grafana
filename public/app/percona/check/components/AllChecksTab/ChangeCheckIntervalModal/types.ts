@@ -8,5 +8,5 @@ export interface ChangeCheckIntervalModalProps {
 }
 
 export interface ChangeCheckIntervalFormValues {
-  interval: keyof typeof Interval;
+  interval?: keyof typeof Interval;
 }

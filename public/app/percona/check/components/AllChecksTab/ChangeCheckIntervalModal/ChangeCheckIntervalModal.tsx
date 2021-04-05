@@ -25,9 +25,13 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
 
   const changeInterval = async ({ interval }: ChangeCheckIntervalFormValues) => {
     try {
-      await CheckService.changeInterval({
-        name: checkName,
-        interval,
+      await CheckService.changeCheck({
+        params: [
+          {
+            name: checkName,
+            interval,
+          },
+        ],
       });
       setVisible(false);
       await checksReloadContext.fetchChecks();

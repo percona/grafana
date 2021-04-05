@@ -7,7 +7,6 @@ import {
   AlertState,
   AllChecks,
   ChangeCheckBody,
-  ChangeIntervalBody,
   CheckDetails,
   FailedChecks,
   Settings,
@@ -53,10 +52,7 @@ export const CheckService = {
   },
   changeCheck(body: ChangeCheckBody): Promise<void | {}> {
     return api.post<{}, ChangeCheckBody>('/v1/management/SecurityChecks/Change', body);
-  },
-  changeInterval(body: ChangeIntervalBody): Promise<void | {}> {
-    return api.post<{}, ChangeIntervalBody>('/v1/management/SecurityChecks/ChangeInterval', body);
-  },
+  }
 };
 
 export const processData = (data: Alert[]): ActiveCheck[] => {
