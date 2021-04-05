@@ -8,6 +8,7 @@ import { logger } from '@percona/platform-core';
 import { buildIntegratedAlertingMenuItem } from './TopSection.utils';
 import { LinkConfig } from './TopSection.types';
 import { SettingsService } from 'app/percona/settings/Settings.service';
+import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 
 const TopSection: FC<any> = () => {
   const [showDBaaS, setShowDBaaS] = useState(false);
@@ -74,7 +75,7 @@ const TopSection: FC<any> = () => {
   };
 
   useEffect(() => {
-    if (config.bootData.user.isGrafanaAdmin) {
+    if (isPmmAdmin(config.bootData.user)) {
       updateMenu();
     }
   }, []);
