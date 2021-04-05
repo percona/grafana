@@ -9,8 +9,9 @@ import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoa
 import { TabKeys } from './Backup.types';
 import { getStyles } from './Backup.styles';
 import { StorageLocations } from './components/StorageLocations';
-import { PAGE_MODEL, PAGE_TABS, DEFAULT_TAB } from './BackupPage.constants';
 import { Messages } from './Backup.messages';
+import { DEFAULT_TAB, PAGE_MODEL, PAGE_TABS } from './BackupPage.constants';
+import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
 
 const BackupPage: FC = () => {
   const [activeTab, setActiveTab] = useState(TabKeys.locations);
@@ -47,6 +48,7 @@ const BackupPage: FC = () => {
   return (
     <div className={styles.backupWrapper}>
       <Breadcrumb pageModel={PAGE_MODEL} />
+      <TechnicalPreview />
       <TabsBar>
         {PAGE_TABS.map(tab => (
           <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => setActiveTab(tab.id)} />

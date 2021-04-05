@@ -44,6 +44,8 @@ export interface AdvancedChangePayload extends AdvancedPayload {
   disable_alerting?: boolean;
   enable_backup_management: boolean;
   disable_backup_management: boolean;
+  disable_azurediscover?: boolean;
+  enable_azurediscover?: boolean;
 }
 
 export interface MetricsResolutionsPayload {
@@ -81,6 +83,7 @@ export interface SettingsPayload
   dbaas_enabled: boolean;
   alerting_enabled: boolean;
   backup_management_enabled: boolean;
+  azurediscover_enabled: boolean;
 }
 
 export type SettingsAPIChangePayload = AlertManagerChangePayload &
@@ -101,6 +104,7 @@ export interface Settings {
   alertManagerUrl: string;
   alertManagerRules: string;
   sttEnabled: boolean;
+  azureDiscoverEnabled?: boolean;
   platformEmail?: string;
   dbaasEnabled?: boolean;
   alertingEnabled?: boolean;

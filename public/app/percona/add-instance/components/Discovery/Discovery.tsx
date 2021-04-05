@@ -4,6 +4,7 @@ import Credentials from './components/Credentials/Credentials';
 import Instances from './components/Instances/Instances';
 import { getStyles } from './Discovery.styles';
 import { DiscoverySearchPanelProps } from './Discovery.types';
+import { logger } from '@percona/platform-core';
 
 const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   const styles = getStyles();
@@ -21,7 +22,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
           setInstances(result.rds_instances);
         }
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       } finally {
         startLoading(false);
       }
@@ -36,7 +37,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   return (
     <>
       <div className={styles.content}>
-        <Credentials onSetCredentials={setCredentials} />
+        <Credentials onSetCredentials={setCredentials} selectInstance={selectInstance} />
         <Instances instances={instances} selectInstance={selectInstance} credentials={credentials} loading={loading} />
       </div>
     </>

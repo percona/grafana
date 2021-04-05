@@ -67,6 +67,7 @@ const toModel = (response: SettingsPayload): Settings => ({
   alertManagerRules: response.alert_manager_rules,
   sttEnabled: response.stt_enabled,
   platformEmail: response.platform_email,
+  azureDiscoverEnabled: response.azurediscover_enabled,
   dbaasEnabled: response.dbaas_enabled,
   alertingEnabled: response.alerting_enabled,
   alertingSettings: {

@@ -165,6 +165,7 @@ export const SettingsPanel: FC = () => {
                   dbaasEnabled={!!settings.dbaasEnabled}
                   alertingEnabled={!!settings.alertingEnabled}
                   backupEnabled={!!settings.backupEnabled}
+                  azureDiscoverEnabled={!!settings.azureDiscoverEnabled}
                   publicAddress={settings.publicAddress}
                   updateSettings={updateSettings}
                 />

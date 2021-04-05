@@ -9,6 +9,7 @@ export interface AdvancedProps {
   dbaasEnabled?: boolean;
   backupEnabled: boolean;
   alertingEnabled?: boolean;
+  azureDiscoverEnabled?: boolean;
   publicAddress?: string;
   updateSettings: (body: AdvancedChangePayload, callback: LoadingCallback, refresh?: boolean) => void;
 }
@@ -22,4 +23,5 @@ export interface AdvancedFormProps {
   dbaas?: boolean;
   publicAddress?: string;
   alerting?: boolean;
+  azureDiscover?: boolean;
 }
