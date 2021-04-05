@@ -7,7 +7,15 @@ import { LoaderButton, Modal, logger } from '@percona/platform-core';
 import appEvents from 'app/core/app_events';
 import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { MultiCheckboxField } from 'app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField';
-import { requiredVersions, buildVersionsFieldName, findRecommendedVersions } from './ManageComponentsVersions.utils';
+import {
+  requiredVersions,
+  buildVersionsFieldName,
+  findRecommendedVersions,
+  getDefaultOptions,
+  defaultRequired,
+  buildDefaultFieldName,
+  findDefaultVersion,
+} from './ManageComponentsVersions.utils';
 import { Messages } from './ManageComponentsVersionsModal.messages';
 import { Databases } from 'app/percona/shared/core';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
@@ -37,36 +45,49 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
     possibleComponentOptions,
     versionsOptions,
     versionsFieldName,
+    defaultFieldName,
     loadingComponents,
     setComponentOptions,
     setVersionsOptions,
     setVersionsFieldName,
+    setDefaultFieldName,
   ] = useOperatorsComponentsVersions(selectedKubernetes);
   const onChangeComponent = (values: ManageComponentsVersionsRenderProps, change: FormApi['change']) => (
     component: SelectableValue
   ) => {
-    const name = buildVersionsFieldName({ ...values, [ManageComponentVersionsFields.component]: component });
+    const newValues = { ...values, [ManageComponentVersionsFields.component]: component };
+    const name = buildVersionsFieldName(newValues) as string;
+    const defaultName = buildDefaultFieldName(newValues) as string;
+    const options = values[name];
 
     setVersionsFieldName(name);
-    setVersionsOptions(values[name]);
+    setVersionsOptions(options);
+    setDefaultFieldName(defaultName);
+
     change(ManageComponentVersionsFields.component, component);
+    change(defaultName, findDefaultVersion(options));
   };
   const onChangeOperator = (values: ManageComponentsVersionsRenderProps, change: FormApi['change']) => (
     operator: SelectableValue
   ) => {
     const newComponentOptions = possibleComponentOptions[operator.value as Operators] as SelectableValue[];
-    const name = buildVersionsFieldName({
+    const newValues = {
       ...values,
       [ManageComponentVersionsFields.operator]: operator,
       [ManageComponentVersionsFields.component]: newComponentOptions[0],
-    });
+    };
+    const name = buildVersionsFieldName(newValues) as string;
+    const defaultName = buildDefaultFieldName(newValues) as string;
+    const options = values[name];
 
     setComponentOptions(newComponentOptions);
     setVersionsFieldName(name);
-    setVersionsOptions(values[name]);
+    setVersionsOptions(options);
+    setDefaultFieldName(defaultName);
 
     change(ManageComponentVersionsFields.component, newComponentOptions[0]);
     change(ManageComponentVersionsFields.operator, operator);
+    change(defaultName, findDefaultVersion(options));
   };
   const onSubmit = async (values: ManageComponentsVersionsRenderProps) => {
     const { operators, kubernetesClusterName } = selectedKubernetes;
@@ -101,6 +122,24 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
             form,
             values,
           }: FormRenderProps<ManageComponentsVersionsRenderProps>) => {
+            const name = buildVersionsFieldName(values);
+            const defaultName = buildDefaultFieldName(values);
+            const defaultVersionOptions = getDefaultOptions(values);
+            const defaultVersion = defaultName ? values[defaultName] : undefined;
+            const showDefaultErrorOnBlur = !defaultName && defaultVersionOptions.length === 0;
+            const selectedVersions = (name ? values[name] : []) as SelectableValue[];
+            const isDefaultDisabled = defaultVersion
+              ? selectedVersions.find(({ name, value }) => name === defaultVersion.name && !value)
+              : false;
+
+            // clear default version when the version is disabled
+            if (defaultName && defaultVersion && isDefaultDisabled) {
+              form.change(defaultName, {
+                value: undefined,
+                label: undefined,
+              });
+            }
+
             return (
               <form onSubmit={handleSubmit}>
                 <>
@@ -130,6 +169,15 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
                     recommendedOptions={findRecommendedVersions(versionsOptions)}
                     recommendedLabel={Messages.recommended}
                     validators={[requiredVersions]}
+                  />
+                  <Field
+                    dataQa="kubernetes-default-version"
+                    name={defaultFieldName}
+                    label={Messages.fields.default}
+                    options={defaultVersionOptions}
+                    showErrorOnBlur={showDefaultErrorOnBlur}
+                    component={SelectFieldAdapter}
+                    validate={defaultRequired}
                   />
                   <HorizontalGroup justify="space-between" spacing="md">
                     <Button

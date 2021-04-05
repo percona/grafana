@@ -50,7 +50,9 @@ describe('ManageComponentsVersions.hooks::', () => {
       versionsFieldName,
     ] = wrapper.result.current;
 
-    expect(initialValues).toEqual(_.omit(initialValuesStubs, ['xtradbpxc', 'xtradbproxysql', 'xtradbbackup']));
+    expect(initialValues).toEqual(
+      _.omit(initialValuesStubs, ['xtradbpxc', 'xtradbproxysql', 'xtradbpxcdefault', 'xtradbproxysqldefault'])
+    );
     expect(possibleComponentOptions).toEqual(_.omit(possibleComponentOptionsStubs, 'xtradb'));
     expect(operatorsOptions).toEqual([operatorsOptionsStubs[0]]);
     expect(componentOptions).toEqual(psmdbComponentOptionsStubs);

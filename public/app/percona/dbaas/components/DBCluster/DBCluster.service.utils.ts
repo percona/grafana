@@ -1,4 +1,5 @@
 import { SelectableValue } from '@grafana/data';
+import { DEFAULT_SUFFIX } from '../Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersionsModal.constants';
 import {
   ManageComponentsVersionsRenderProps,
   SupportedComponents,
@@ -11,9 +12,13 @@ export const getComponentChange = (
   component: SupportedComponents,
   componentsVersions: ManageComponentsVersionsRenderProps
 ): DBClusterChangeComponentAPI => {
-  const versions = componentsVersions[`${operator}${component}`] as SelectableValue[];
+  const name = `${operator}${component}`;
+  const defaultName = `${name}${DEFAULT_SUFFIX}`;
+  const versions = componentsVersions[name] as SelectableValue[];
+  const defaultVersion = componentsVersions[defaultName];
 
   return {
+    default_version: defaultVersion.label,
     versions: versions.map(({ label, value }) => ({
       version: label as string,
       ...(value && { enable: true }),

@@ -7,7 +7,13 @@ import { KubernetesOperatorStatus } from '../OperatorStatusItem/KubernetesOperat
 import { newDBClusterService } from '../../DBCluster/DBCluster.utils';
 import { DATABASE_OPERATORS } from '../../DBCluster/DBCluster.constants';
 import { Operators } from '../../DBCluster/AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
-import { buildVersionsFieldName, componentsToOptions, versionsToOptions } from './ManageComponentsVersions.utils';
+import {
+  buildDefaultFieldName,
+  buildVersionsFieldName,
+  componentsToOptions,
+  findDefaultVersion,
+  versionsToOptions,
+} from './ManageComponentsVersions.utils';
 import { Messages } from './ManageComponentsVersionsModal.messages';
 import {
   ManageComponentsVersionsRenderProps,
@@ -17,8 +23,10 @@ import {
   SetComponentOptionsAction,
   SetVersionsOptionsAction,
   SetVersionsFieldNameAction,
+  SetDefaultFieldNameAction,
 } from './ManageComponentsVersionsModal.types';
 import { DBClusterVersion } from '../../DBCluster/DBCluster.types';
+import { DEFAULT_SUFFIX } from './ManageComponentsVersionsModal.constants';
 
 export const useOperatorsComponentsVersions = (
   kubernetes: Kubernetes
@@ -29,10 +37,12 @@ export const useOperatorsComponentsVersions = (
   PossibleComponentOptions,
   SelectableValue[],
   string,
+  string,
   boolean,
   SetComponentOptionsAction,
   SetVersionsOptionsAction,
-  SetVersionsFieldNameAction
+  SetVersionsFieldNameAction,
+  SetDefaultFieldNameAction
 ] => {
   const [initialValues, setInitialValues] = useState({} as ManageComponentsVersionsRenderProps);
   const [operatorsOptions, setOperatorsOptions] = useState<SelectableValue[]>([]);
@@ -40,6 +50,7 @@ export const useOperatorsComponentsVersions = (
   const [possibleComponentOptions, setPossibleComponentOptions] = useState({} as PossibleComponentOptions);
   const [versionsOptions, setVersionsOptions] = useState<SelectableValue[]>([]);
   const [versionsFieldName, setVersionsFieldName] = useState('');
+  const [defaultFieldName, setDefaultFieldName] = useState(DEFAULT_SUFFIX);
   const [loadingComponents, setLoadingComponents] = useState(false);
 
   const getComponents = async () => {
@@ -64,7 +75,8 @@ export const useOperatorsComponentsVersions = (
         }
       }
 
-      const name = buildVersionsFieldName(initialValues);
+      const name = buildVersionsFieldName(initialValues) as string;
+      const defaultName = buildDefaultFieldName(initialValues) as string;
       const selectedOperator = initialValues.operator.value as Operators;
 
       setComponentOptions(possibleComponentOptions[selectedOperator] as SelectableValue[]);
@@ -72,6 +84,7 @@ export const useOperatorsComponentsVersions = (
       setPossibleComponentOptions(possibleComponentOptions);
       setVersionsOptions(initialValues[name]);
       setVersionsFieldName(name);
+      setDefaultFieldName(defaultName);
       setInitialValues(initialValues);
     } catch (e) {
       logger.error(e);
@@ -91,10 +104,12 @@ export const useOperatorsComponentsVersions = (
     possibleComponentOptions,
     versionsOptions,
     versionsFieldName,
+    defaultFieldName,
     loadingComponents,
     setComponentOptions,
     setVersionsOptions,
     setVersionsFieldName,
+    setDefaultFieldName,
   ];
 };
 
@@ -144,7 +159,10 @@ const buildInitialValues = (
     const versions = operatorVersion.matrix[key];
 
     if (versions) {
-      newInitialValues[`${operator}${key}`] = versionsToOptions(versions);
+      const versionsOptions = versionsToOptions(versions);
+
+      newInitialValues[`${operator}${key}`] = versionsOptions;
+      newInitialValues[`${operator}${key}${DEFAULT_SUFFIX}`] = findDefaultVersion(versionsOptions);
     }
   });
 

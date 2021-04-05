@@ -5,6 +5,7 @@ import {
   psmdbComponentOptionsStubs,
   versionsFieldNameStub,
   versionsStubs,
+  defaultFieldNameStub,
 } from './componentsVersionsStubs';
 
 export const useOperatorsComponentsVersions = () => [
@@ -14,7 +15,9 @@ export const useOperatorsComponentsVersions = () => [
   possibleComponentOptionsStubs,
   versionsStubs,
   versionsFieldNameStub,
+  defaultFieldNameStub,
   false,
+  jest.fn(),
   jest.fn(),
   jest.fn(),
   jest.fn(),

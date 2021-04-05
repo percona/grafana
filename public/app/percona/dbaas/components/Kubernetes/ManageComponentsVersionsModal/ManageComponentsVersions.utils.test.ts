@@ -2,7 +2,9 @@ import { psmdbComponentOptionsStubs, versionsStubs as versions } from './__mocks
 import {
   buildVersionsFieldName,
   componentsToOptions,
+  findDefaultVersion,
   findRecommendedVersions,
+  getDefaultOptions,
   requiredVersions,
   versionsToOptions,
 } from './ManageComponentsVersions.utils';
@@ -10,6 +12,11 @@ import { psmdbComponentsVersionsStubs, versionsStub as versionsAPI } from '../..
 import { ManageComponentVersionsFields } from './ManageComponentsVersionsModal.types';
 
 describe('ManageComponentsVersions.utils::', () => {
+  const values = {
+    [ManageComponentVersionsFields.operator]: { value: 'test_operator' },
+    [ManageComponentVersionsFields.component]: { value: 'test_component' },
+  };
+
   it('checks that at least one version is checked', () => {
     expect(requiredVersions(versions)).toBeUndefined();
     expect(requiredVersions(versions.map(v => ({ ...v, value: false })))).not.toBeUndefined();
@@ -23,15 +30,26 @@ describe('ManageComponentsVersions.utils::', () => {
     expect(versionsToOptions(versionsAPI)).toEqual(versions);
   });
   it('builds versions field name', () => {
-    const values = {
-      [ManageComponentVersionsFields.operator]: { value: 'test_operator' },
-      [ManageComponentVersionsFields.component]: { value: 'test_component' },
-    };
-
     expect(buildVersionsFieldName(values)).toEqual('test_operatortest_component');
   });
   it('finds recommended versions', () => {
     expect(findRecommendedVersions(versions).length).toBe(1);
     expect(findRecommendedVersions([versions[0]]).length).toBe(0);
+  });
+  it('finds default version', () => {
+    expect(findDefaultVersion(versions)).toBe(versions[1]);
+    expect(findDefaultVersion([versions[0]])).toBeUndefined();
+  });
+  it('returns default options', () => {
+    const options = [
+      { name: 'test option 1', value: true },
+      { name: 'test option 2', value: false },
+      { name: 'test option 3', value: true },
+    ];
+    const newValues = {
+      ...values,
+      test_operatortest_component: options,
+    };
+    expect(getDefaultOptions(newValues).length).toBe(2);
   });
 });

@@ -46,7 +46,7 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
     return (
       <Field {...fieldConfig} name={name} initialValue={selectedOptions} validate={validate}>
         {({ input, meta }: MultiCheckboxRenderProps) => {
-          const validationError = ((!showErrorOnBlur && meta.modified) || meta.touched) && meta.error;
+          const validationError = meta.error && typeof meta.error === 'string' ? meta.error : undefined;
 
           return (
             <div className={styles.field} data-qa={`${name}-field-container`}>

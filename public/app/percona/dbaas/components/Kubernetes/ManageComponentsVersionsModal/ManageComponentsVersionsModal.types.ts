@@ -35,3 +35,4 @@ export enum ManageComponentVersionsFields {
 export type SetComponentOptionsAction = (options: SelectableValue[]) => void;
 export type SetVersionsOptionsAction = (options: SelectableValue[]) => void;
 export type SetVersionsFieldNameAction = (name: string) => void;
+export type SetDefaultFieldNameAction = (name: string) => void;

@@ -213,7 +213,7 @@ export interface DBClusterComponent {
     image_hash: string;
     status: string;
     critical: boolean;
-    default: boolean;
+    default?: boolean;
     disabled?: boolean;
   };
 }
