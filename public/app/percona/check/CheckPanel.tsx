@@ -1,37 +1,17 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { Spinner, Tab, TabContent, TabsBar, useStyles } from '@grafana/ui';
+import { Spinner, useStyles } from '@grafana/ui';
 import { PMM_SETTINGS_URL } from 'app/percona/check/CheckPanel.constants';
-import { Settings, TabEntry, TabKeys } from './types';
+import { Settings, TabKeys } from './types';
 import { CheckService } from './Check.service';
 import { getStyles } from './CheckPanel.styles';
 import { Messages } from './CheckPanel.messages';
 import { AllChecksTab, FailedChecksTab } from './components';
-import { useSelector } from 'react-redux';
-import { StoreState } from '../../types';
-import { DEFAULT_TAB, PAGE_MODEL } from './CheckPanel.constants';
-import { UrlQueryValue } from '@grafana/data';
-import { getLocationSrv } from '@grafana/runtime';
+import { PAGE_MODEL } from './CheckPanel.constants';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
+import { TabbedContent, ContentTab } from '../shared/components/Elements/TabbedContent';
 
 export const CheckPanel: FC = () => {
   const { path: basePath } = PAGE_MODEL;
-
-  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
-  const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
-  const isValidTab = (tab: UrlQueryValue) => Object.values(TabKeys).includes(tab as TabKeys);
-  const selectTab = (tabKey: string) => {
-    getLocationSrv().update({
-      path: tabKey ? `${basePath}/${tabKey}` : basePath,
-    });
-  };
-
-  useEffect(() => {
-    if (!isSamePage) {
-      return;
-    }
-
-    isValidTab(activeTab) || selectTab(DEFAULT_TAB);
-  }, [activeTab]);
 
   const [hasNoAccess, setHasNoAccess] = useState(false);
   const [isSttEnabled, setIsSttEnabled] = useState(false);
@@ -58,17 +38,17 @@ export const CheckPanel: FC = () => {
     getSettings();
   }, []);
 
-  const tabs = useMemo<TabEntry[]>(
-    () => [
+  const tabs = useMemo<ContentTab[]>(
+    (): ContentTab[] => [
       {
         label: Messages.failedChecksTitle,
         key: TabKeys.failedChecks,
-        component: <FailedChecksTab key="failed-checks" hasNoAccess={hasNoAccess} />,
+        component: () => <FailedChecksTab key="failed-checks" hasNoAccess={hasNoAccess} />,
       },
       {
         label: Messages.allChecksTitle,
         key: TabKeys.allChecks,
-        component: <AllChecksTab key="all-checks" />,
+        component: () => <AllChecksTab key="all-checks" />,
       },
     ],
     [hasNoAccess, isSttEnabled]
@@ -86,6 +66,7 @@ export const CheckPanel: FC = () => {
     );
   }
 
+  // TODO replace with FeatureLoader when available
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
       <div className={styles.panel} data-qa="db-check-panel">
@@ -96,21 +77,7 @@ export const CheckPanel: FC = () => {
         )}
         {!getSettingsPending &&
           (isSttEnabled ? (
-            <>
-              <TabsBar className={styles.tabBar} data-qa="db-check-tabs-bar">
-                {tabs.map(tab => (
-                  <Tab
-                    key={tab.key}
-                    label={tab.label}
-                    active={tab.key === activeTab}
-                    onChangeTab={() => selectTab(tab.key)}
-                  />
-                ))}
-              </TabsBar>
-              <TabContent className={styles.tabContent} data-qa="db-check-tab-content">
-                {tabs.map(tab => tab.key === activeTab && tab.component)}
-              </TabContent>
-            </>
+            <TabbedContent tabs={tabs} basePath={basePath} />
           ) : (
             <div className={styles.empty}>
               {Messages.sttDisabled}{' '}
