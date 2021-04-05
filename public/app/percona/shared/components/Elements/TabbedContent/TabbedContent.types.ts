@@ -10,7 +10,13 @@ export interface TabComponentMap {
   component: JSX.Element;
 }
 
+export interface TabRenderProps {
+  Content: () => JSX.Element;
+  tab?: ContentTab;
+}
+
 export interface TabbedContentProps {
   tabs: ContentTab[];
   basePath: string;
+  renderTab?: (props: TabRenderProps) => void;
 }

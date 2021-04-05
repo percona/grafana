@@ -1,19 +1,18 @@
 import React, { FC, useEffect } from 'react';
-import { UrlQueryValue } from '@grafana/data';
 import { getLocationSrv } from '@grafana/runtime';
 import { Tab, TabContent, TabsBar, useStyles } from '@grafana/ui';
 import { StoreState } from 'app/types';
 import { useSelector } from 'react-redux';
-import { TabbedContentProps } from './TabbedContent.types';
+import { ContentTab, TabbedContentProps } from './TabbedContent.types';
 import { getStyles } from './TabbedContent.styles';
 
-export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath }) => {
+export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, renderTab }) => {
   const styles = useStyles(getStyles);
   const defaultTab = tabs[0].key;
   const tabKeys = tabs.map(tab => tab.key);
-  const activeTab = useSelector((state: StoreState) => state.location.routeParams.tab);
+  const activeTab = useSelector((state: StoreState) => tabs.find(tab => tab.key === state.location.routeParams.tab));
   const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
-  const isValidTab = (tab: UrlQueryValue) => Object.values(tabKeys).includes(tab?.toString() || '');
+  const isValidTab = (tab?: ContentTab) => Object.values(tabKeys).includes(tab?.key || '');
 
   const selectTab = (tabKey: string) => {
     getLocationSrv().update({
@@ -35,13 +34,17 @@ export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath }) =
           <Tab
             key={index}
             label={tab.label}
-            active={tab.key === activeTab}
+            active={tab.key === activeTab?.key}
             style={tab.disabled ? styles.disabled : undefined}
             onChangeTab={() => selectTab(tab.key)}
           />
         ))}
       </TabsBar>
-      <TabContent>{tabs.find(tab => tab.key === activeTab)?.component()}</TabContent>
+      {renderTab ? (
+        renderTab({ Content: () => <TabContent>{activeTab?.component()}</TabContent>, tab: activeTab })
+      ) : (
+        <TabContent>{activeTab?.component()}</TabContent>
+      )}
     </>
   );
 };
