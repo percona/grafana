@@ -1,5 +1,8 @@
 import { SelectableValue } from '@grafana/data';
-import { DEFAULT_SUFFIX } from '../Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersionsModal.constants';
+import {
+  DEFAULT_SUFFIX,
+  VERSION_PREFIX,
+} from '../Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersionsModal.constants';
 import {
   ManageComponentsVersionsRenderProps,
   SupportedComponents,
@@ -18,7 +21,7 @@ export const getComponentChange = (
   const defaultVersion = componentsVersions[defaultName];
 
   return {
-    default_version: defaultVersion.label,
+    default_version: defaultVersion.name.replace(VERSION_PREFIX, ''),
     versions: versions.map(({ label, value }) => ({
       version: label as string,
       ...(value && { enable: true }),

@@ -5,4 +5,14 @@ export const getStyles = () => ({
     min-height: 40px;
     max-height: 200px;
   `,
+  defaultWrapper: css`
+    div[class$='-Menu'] {
+      svg {
+        display: none;
+      }
+    }
+    div[class$='-SingleValue'] {
+      width: 100%;
+    }
+  `,
 });

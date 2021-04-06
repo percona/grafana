@@ -12,6 +12,7 @@ import {
   buildVersionsFieldName,
   componentsToOptions,
   findDefaultVersion,
+  parseDefaultVersionsOptions,
   versionsToOptions,
 } from './ManageComponentsVersions.utils';
 import { Messages } from './ManageComponentsVersionsModal.messages';
@@ -162,7 +163,9 @@ const buildInitialValues = (
       const versionsOptions = versionsToOptions(versions);
 
       newInitialValues[`${operator}${key}`] = versionsOptions;
-      newInitialValues[`${operator}${key}${DEFAULT_SUFFIX}`] = findDefaultVersion(versionsOptions);
+      newInitialValues[`${operator}${key}${DEFAULT_SUFFIX}`] = parseDefaultVersionsOptions([
+        findDefaultVersion(versionsOptions) as SelectableValue,
+      ])[0];
     }
   });
 

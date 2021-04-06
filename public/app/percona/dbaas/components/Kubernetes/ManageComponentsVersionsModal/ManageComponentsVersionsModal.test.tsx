@@ -25,6 +25,7 @@ describe('ManageComponentsVersionsModal::', () => {
     expect(operator.text().includes(operatorsOptionsStubs[0].label)).toBeTruthy();
     expect(component.text().includes(psmdbComponentOptionsStubs[0].label)).toBeTruthy();
     expect(versions.children().length).toBe(versionsStubs.length);
+    expect(root.find(dataQa('kubernetes-default-version')).exists()).toBeTruthy();
   });
   it('calls setVisible on cancel', () => {
     const setVisible = jest.fn();

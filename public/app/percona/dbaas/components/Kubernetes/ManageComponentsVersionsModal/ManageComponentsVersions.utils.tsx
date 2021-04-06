@@ -1,12 +1,14 @@
+import React from 'react';
 import { SelectableValue } from '@grafana/data';
 import { DBClusterComponent, DBClusterComponentVersionStatus, DBClusterMatrix } from '../../DBCluster/DBCluster.types';
-import { DEFAULT_SUFFIX } from './ManageComponentsVersionsModal.constants';
+import { DEFAULT_SUFFIX, VERSION_PREFIX } from './ManageComponentsVersionsModal.constants';
 import { Messages } from './ManageComponentsVersionsModal.messages';
 import {
   ManageComponentsVersionsRenderProps,
   ManageComponentVersionsFields,
   SupportedComponents,
 } from './ManageComponentsVersionsModal.types';
+import { OptionContent } from '../../DBCluster/OptionContent/OptionContent';
 
 export const requiredVersions = (versions: SelectableValue[]) => {
   if (!versions || !Array.isArray(versions)) {
@@ -29,7 +31,7 @@ export const componentsToOptions = (value: DBClusterMatrix): SelectableValue[] =
 
 export const versionsToOptions = (component: DBClusterComponent): SelectableValue[] =>
   Object.entries(component).map(([key, { status, disabled, default: isDefault }]) => ({
-    name: `v${key}`,
+    name: `${VERSION_PREFIX}${key}`,
     value: !disabled,
     label: key,
     status,
@@ -70,3 +72,16 @@ export const getDefaultOptions = (values: ManageComponentsVersionsRenderProps): 
 };
 
 export const defaultRequired = (option: SelectableValue) => (option && option.label ? undefined : Messages.required);
+
+export const parseDefaultVersionsOptions = (options: SelectableValue[]) =>
+  options.map(({ label, status, ...option }) => ({
+    ...option,
+    status,
+    label: (
+      <OptionContent
+        title={label as string}
+        tags={status === DBClusterComponentVersionStatus.recommended ? [Messages.recommended] : []}
+        dataQa="kubernetes-default-version-option"
+      />
+    ),
+  }));

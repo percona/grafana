@@ -16,6 +16,10 @@ export const initialValuesStubs = {
   xtradbpxcdefault: versionsStubs[1],
 };
 
+// use to omit default labels form testing
+// due to parsing the label to a component to show the recommended option
+export const omitDefaultLabels = ['psmdbmongoddefault.label', 'xtradbproxysqldefault.label', 'xtradbpxcdefault.label'];
+
 export const possibleComponentOptionsStubs = {
   psmdb: [{ name: 'mongod', value: 'mongod', label: 'PSMDB' }],
   xtradb: [

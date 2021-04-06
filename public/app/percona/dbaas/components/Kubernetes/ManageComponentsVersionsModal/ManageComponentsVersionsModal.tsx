@@ -14,7 +14,7 @@ import {
   getDefaultOptions,
   defaultRequired,
   buildDefaultFieldName,
-  findDefaultVersion,
+  parseDefaultVersionsOptions,
 } from './ManageComponentsVersions.utils';
 import { Messages } from './ManageComponentsVersionsModal.messages';
 import { Databases } from 'app/percona/shared/core';
@@ -65,7 +65,7 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
     setDefaultFieldName(defaultName);
 
     change(ManageComponentVersionsFields.component, component);
-    change(defaultName, findDefaultVersion(options));
+    change(defaultName, values[defaultName]);
   };
   const onChangeOperator = (values: ManageComponentsVersionsRenderProps, change: FormApi['change']) => (
     operator: SelectableValue
@@ -87,7 +87,7 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
 
     change(ManageComponentVersionsFields.component, newComponentOptions[0]);
     change(ManageComponentVersionsFields.operator, operator);
-    change(defaultName, findDefaultVersion(options));
+    change(defaultName, values[defaultName]);
   };
   const onSubmit = async (values: ManageComponentsVersionsRenderProps) => {
     const { operators, kubernetesClusterName } = selectedKubernetes;
@@ -172,9 +172,10 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
                   />
                   <Field
                     dataQa="kubernetes-default-version"
+                    className={styles.defaultWrapper}
                     name={defaultFieldName}
                     label={Messages.fields.default}
-                    options={defaultVersionOptions}
+                    options={parseDefaultVersionsOptions(defaultVersionOptions)}
                     showErrorOnBlur={showDefaultErrorOnBlur}
                     component={SelectFieldAdapter}
                     validate={defaultRequired}
