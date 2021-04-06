@@ -5,10 +5,13 @@ import { UrlQueryValue } from '@grafana/data';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/types';
 import { Breadcrumb } from 'app/core/components/Breadcrumb';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TabKeys } from './Backup.types';
 import { getStyles } from './Backup.styles';
 import { StorageLocations } from './components/StorageLocations';
+import { Messages } from './Backup.messages';
 import { DEFAULT_TAB, PAGE_MODEL, PAGE_TABS } from './BackupPage.constants';
+import { BackupInventory } from './components/BackupInventory';
 import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
 
 const BackupPage: FC = () => {
@@ -17,6 +20,10 @@ const BackupPage: FC = () => {
   const styles = useStyles(getStyles);
   const tabComponentMap = useMemo(
     () => [
+      {
+        id: TabKeys.inventory,
+        component: <BackupInventory />,
+      },
       {
         id: TabKeys.locations,
         component: <StorageLocations />,
@@ -49,10 +56,12 @@ const BackupPage: FC = () => {
       <TechnicalPreview />
       <TabsBar>
         {PAGE_TABS.map(tab => (
-          <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => setActiveTab(tab.id)} />
+          <Tab key={tab.id} label={tab.title} active={tab.id === activeTab} onChangeTab={() => selectTab(tab.id)} />
         ))}
       </TabsBar>
-      <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component}</TabContent>
+      <FeatureLoader featureName={Messages.backupManagement} featureFlag="backupEnabled">
+        <TabContent>{tabComponentMap.find(tab => tab.id === activeTab)?.component}</TabContent>
+      </FeatureLoader>
     </div>
   );
 };
