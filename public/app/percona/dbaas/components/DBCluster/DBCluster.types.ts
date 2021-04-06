@@ -115,6 +115,7 @@ export enum CpuUnits {
 
 export interface DatabaseVersion extends SelectableValue {
   default: boolean;
+  disabled: boolean;
 }
 
 export interface DBClusterPayload {

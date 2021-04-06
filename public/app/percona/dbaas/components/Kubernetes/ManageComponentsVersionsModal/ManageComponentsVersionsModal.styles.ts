@@ -11,8 +11,5 @@ export const getStyles = () => ({
         display: none;
       }
     }
-    div[class$='-SingleValue'] {
-      width: 100%;
-    }
   `,
 });
