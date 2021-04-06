@@ -26,7 +26,7 @@ const TopSection: FC<any> = () => {
   const sttLink = {
     id: 'databsase-checks',
     icon: 'percona-database-checks',
-    text: 'PMM Database checks',
+    text: 'Security Checks',
     url: `${config.appSubUrl}/pmm-database-checks`,
   };
 
