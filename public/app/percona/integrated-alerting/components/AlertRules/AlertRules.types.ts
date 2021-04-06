@@ -1,11 +1,9 @@
 import { TemplateParam } from '../AlertRuleTemplate/AlertRuleTemplate.types';
 
 export interface AlertRulesContext {
-  selectedRuleDetails?: AlertRule | null;
   getAlertRules: () => void;
   setAddModalVisible: (isVisible: boolean) => void;
   setSelectedAlertRule: (alertRule: AlertRule | null) => void;
-  setSelectedRuleDetails: (alertRule: AlertRule | null) => void;
 }
 
 export enum AlertRuleFilterType {
