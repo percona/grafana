@@ -59,8 +59,7 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
       <ChangeCheckIntervalModal
         isVisible={checkIntervalModalVisible}
         setVisible={setCheckIntervalModalVisible}
-        checkName={name}
-        interval={interval}
+        check={check}
       />
     </>
   );

@@ -1,8 +1,7 @@
-import { Interval } from 'app/percona/check/types';
+import { Interval, CheckDetails } from 'app/percona/check/types';
 
 export interface ChangeCheckIntervalModalProps {
-  interval: keyof typeof Interval;
-  checkName: string;
+  check: CheckDetails;
   isVisible: boolean;
   setVisible: (value: boolean) => void;
 }

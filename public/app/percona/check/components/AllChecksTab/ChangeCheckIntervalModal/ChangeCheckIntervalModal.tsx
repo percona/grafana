@@ -14,28 +14,24 @@ import { ChecksReloadContext } from '../AllChecks.context';
 
 const { Form } = withTypes<ChangeCheckIntervalFormValues>();
 
-export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
-  interval,
-  checkName,
-  isVisible,
-  setVisible,
-}) => {
+export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({ check, isVisible, setVisible }) => {
   const styles = useStyles(getStyles);
   const checksReloadContext = React.useContext(ChecksReloadContext);
+  const { summary, name, interval } = check;
 
   const changeInterval = async ({ interval }: ChangeCheckIntervalFormValues) => {
     try {
       await CheckService.changeCheck({
         params: [
           {
-            name: checkName,
+            name: name,
             interval,
           },
         ],
       });
       setVisible(false);
       await checksReloadContext.fetchChecks();
-      appEvents.emit(AppEvents.alertSuccess, [Messages.getSuccess(checkName)]);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.getSuccess(summary)]);
     } catch (e) {
       logger.error(e);
     }
@@ -53,7 +49,7 @@ export const ChangeCheckIntervalModal: FC<ChangeCheckIntervalModalProps> = ({
       onClose={() => setVisible(false)}
     >
       <div className={styles.content}>
-        <h4 className={styles.title}>{Messages.getDescription(checkName)}</h4>
+        <h4 className={styles.title}>{Messages.getDescription(summary)}</h4>
         <Form
           onSubmit={changeInterval}
           initialValues={initialValues}
