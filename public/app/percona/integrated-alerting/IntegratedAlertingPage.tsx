@@ -1,7 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
-import { logger } from '@percona/platform-core';
-import { IntegratedAlertingContent } from './components/IntegratedAlertingContent';
-import { IntegratedAlertingService } from './IntegratedAlerting.service';
+import React, { FC, useMemo } from 'react';
 import { PAGE_MODEL } from './IntegratedAlerting.constants';
 import { TabKeys } from './IntegratedAlerting.types';
 import { AlertRules, AlertRuleTemplate, Alerts, NotificationChannel } from './components';
@@ -9,10 +6,10 @@ import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview
 import { TabbedContent, ContentTab } from '../shared/components/Elements/TabbedContent';
 import { Messages } from './IntegratedAlerting.messages';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
+import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
 
 const IntegratedAlertingPage: FC = () => {
-  const [loadingSettings, setLoadingSettings] = useState(true);
-  const [alertingEnabled, setAlertingEnabled] = useState(false);
+  const { path: basePath } = PAGE_MODEL;
 
   const tabs: ContentTab[] = useMemo(
     (): ContentTab[] => [
@@ -40,27 +37,6 @@ const IntegratedAlertingPage: FC = () => {
     []
   );
 
-  const { path: basePath } = PAGE_MODEL;
-
-  const getSettings = async () => {
-    setLoadingSettings(true);
-
-    try {
-      const {
-        settings: { alerting_enabled },
-      } = await IntegratedAlertingService.getSettings();
-      setAlertingEnabled(!!alerting_enabled);
-    } catch (e) {
-      logger.error(e);
-    } finally {
-      setLoadingSettings(false);
-    }
-  };
-
-  useEffect(() => {
-    getSettings();
-  }, []);
-
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
       <TechnicalPreview />
@@ -68,9 +44,9 @@ const IntegratedAlertingPage: FC = () => {
         tabs={tabs}
         basePath={basePath}
         renderTab={({ Content }) => (
-          <IntegratedAlertingContent loadingSettings={loadingSettings} alertingEnabled={alertingEnabled}>
+          <FeatureLoader featureName={Messages.integratedAlerting} featureFlag="alertingEnabled">
             <Content />
-          </IntegratedAlertingContent>
+          </FeatureLoader>
         )}
       />
     </PageWrapper>
