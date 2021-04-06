@@ -62,7 +62,7 @@ const IntegratedAlertingPage: FC = () => {
   }, []);
 
   return (
-    <PageWrapper pageModel={PAGE_MODEL} pageTitle={Messages.title}>
+    <PageWrapper pageModel={PAGE_MODEL}>
       <TechnicalPreview />
       <TabbedContent
         tabs={tabs}

@@ -7,11 +7,11 @@ import { usePageTitle } from '../hooks/pageTitle.hook';
 import { getStyles } from './PageWrapper.styles';
 import { PageWrapperProps } from './PageWrapper.types';
 
-const PageWrapper: FC<PageWrapperProps> = ({ children, pageModel, pageTitle }) => {
+const PageWrapper: FC<PageWrapperProps> = ({ children, pageModel }) => {
   const styles = useStyles(getStyles);
   const locationPath = useSelector((state: StoreState) => state.location.path);
   const currentLocation = locationPath.slice(1);
-  usePageTitle(pageTitle);
+  usePageTitle(pageModel.title);
 
   return (
     <div className={styles.wrapper}>
