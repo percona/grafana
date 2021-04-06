@@ -3,13 +3,15 @@ import { useStyles } from '@grafana/ui';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/types';
 import { Breadcrumb } from 'app/core/components/Breadcrumb';
+import { usePageTitle } from '../hooks/pageTitle.hook';
 import { getStyles } from './PageWrapper.styles';
 import { PageWrapperProps } from './PageWrapper.types';
 
-const PageWrapper: FC<PageWrapperProps> = ({ children, pageModel }) => {
+const PageWrapper: FC<PageWrapperProps> = ({ children, pageModel, pageTitle }) => {
   const styles = useStyles(getStyles);
   const locationPath = useSelector((state: StoreState) => state.location.path);
   const currentLocation = locationPath.slice(1);
+  usePageTitle(pageTitle);
 
   return (
     <div className={styles.wrapper}>
