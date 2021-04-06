@@ -1,4 +1,5 @@
 import { LoadingCallback } from 'app/percona/settings/Settings.service';
+import { AdvancedChangePayload } from '../../Settings.types';
 
 export interface AdvancedProps {
   dataRetention: string;
@@ -7,6 +8,7 @@ export interface AdvancedProps {
   updatesDisabled: boolean;
   dbaasEnabled?: boolean;
   alertingEnabled?: boolean;
+  azureDiscoverEnabled?: boolean;
   publicAddress?: string;
-  updateSettings: (body: any, callback: LoadingCallback, refresh?: boolean) => void;
+  updateSettings: (body: AdvancedChangePayload, callback: LoadingCallback, refresh?: boolean) => void;
 }
