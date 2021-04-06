@@ -5,7 +5,7 @@ export const usePageTitle = (title?: string) => {
   const [pageTitle, setPageTitle] = useState(title);
 
   useEffect(() => {
-    document.title = `${Branding.AppTitle}${pageTitle ? ' - ' + pageTitle : ''}`;
+    document.title = `${pageTitle ? pageTitle + ' - ' : ''}${Branding.AppTitle}`;
   }, [pageTitle]);
 
   return [pageTitle, setPageTitle] as const;
