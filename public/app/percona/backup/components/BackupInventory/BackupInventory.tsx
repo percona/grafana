@@ -1,16 +1,21 @@
 import React, { FC, useMemo, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
+import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
+import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
-import { BackupInventoryDetails } from './BackupInventoryDetails/BackupInventoryDetails';
+import { BackupInventoryDetails } from './BackupInventoryDetails';
+import { AddBackupModal } from './AddBackupModal';
+import { AddBackupFormProps } from './AddBackupModal/AddBackupModal.types';
 import { Status } from './Status';
+import { BackupInventoryActions } from './BackupInventoryActions';
 import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
-import { BackupInventoryActions } from './BackupInventoryActions';
 import { RestoreBackupModal } from './RestoreBackupModal';
+import { getStyles } from './BackupInventory.styles';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
@@ -19,6 +24,7 @@ export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
   const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
+  const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
   const columns = useMemo(
     (): Column[] => [
@@ -31,7 +37,7 @@ export const BackupInventory: FC = () => {
       },
       {
         Header: vendor,
-        accessor: 'vendor',
+        accessor: ({ vendor }: Backup) => DATABASE_LABELS[vendor],
         width: '150px',
       },
       {
@@ -51,12 +57,15 @@ export const BackupInventory: FC = () => {
       {
         Header: actions,
         accessor: 'id',
-        Cell: ({ row }) => <BackupInventoryActions onRestore={onRestoreClick} backup={row.original as Backup} />,
+        Cell: ({ row }) => (
+          <BackupInventoryActions onRestore={onRestoreClick} onBackup={onBackupClick} backup={row.original as Backup} />
+        ),
         width: '110px',
       },
     ],
     []
   );
+  const styles = useStyles(getStyles);
 
   const onRestoreClick = (backup: Backup) => {
     setSelectedBackup(backup);
@@ -66,6 +75,7 @@ export const BackupInventory: FC = () => {
   const handleClose = () => {
     setSelectedBackup(null);
     setRestoreModalVisible(false);
+    setBackupModalVisible(false);
   };
 
   const handleRestore = async (serviceId: string, locationId: string, artifactId: string) => {
@@ -101,12 +111,39 @@ export const BackupInventory: FC = () => {
     []
   );
 
+  const onBackupClick = (backup: Backup | null) => {
+    setSelectedBackup(backup);
+    setBackupModalVisible(true);
+  };
+
+  const handleBackup = async ({ service, location, backupName, description }: AddBackupFormProps) => {
+    try {
+      await BackupInventoryService.backup(service.value?.id || '', location.value || '', backupName, description);
+      setBackupModalVisible(false);
+      setSelectedBackup(null);
+      getData();
+    } catch (e) {
+      logger.error(e);
+    }
+  };
+
   useEffect(() => {
     getData();
   }, []);
 
   return (
     <>
+      <div className={styles.addWrapper}>
+        <Button
+          size="md"
+          icon="plus-square"
+          variant="link"
+          data-qa="backup-add-modal-button"
+          onClick={() => onBackupClick(null)}
+        >
+          {Messages.add}
+        </Button>
+      </div>
       <Table
         data={data}
         totalItems={data.length}
@@ -120,6 +157,12 @@ export const BackupInventory: FC = () => {
         isVisible={restoreModalVisible}
         onClose={handleClose}
         onRestore={handleRestore}
+      />
+      <AddBackupModal
+        backup={selectedBackup}
+        isVisible={backupModalVisible}
+        onClose={handleClose}
+        onBackup={handleBackup}
       />
     </>
   );

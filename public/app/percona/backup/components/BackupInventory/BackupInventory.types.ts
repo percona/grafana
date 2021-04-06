@@ -29,7 +29,7 @@ export interface Backup {
 }
 
 export interface RawBackup {
-  backup_id: string;
+  artifact_id: string;
   name: string;
   location_id: string;
   location_name: string;
@@ -42,5 +42,5 @@ export interface RawBackup {
 }
 
 export interface BackupResponse {
-  backups: RawBackup[];
+  artifacts: RawBackup[];
 }
