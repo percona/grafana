@@ -73,7 +73,7 @@ export const Advanced: FC<AdvancedProps> = ({
   const [loading, setLoading] = useState(false);
   // @ts-ignore
   const applyChanges = ({ retention, telemetry, stt, publicAddress, alerting, azureDiscover }) => {
-    const refresh = !!alerting !== alertingEnabled;
+    const refresh = !!alerting !== alertingEnabled || !!stt !== sttEnabled;
     const body = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
       disable_telemetry: !telemetry,
