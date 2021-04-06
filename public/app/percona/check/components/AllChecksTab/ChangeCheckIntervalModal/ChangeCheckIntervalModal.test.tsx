@@ -3,6 +3,7 @@ import { mount, ReactWrapper } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import { dataQa } from '@percona/platform-core';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
+import { CheckDetails } from 'app/percona/check/types';
 
 jest.mock('../../../Check.service');
 jest.mock('app/core/app_events', () => {
@@ -13,6 +14,14 @@ jest.mock('app/core/app_events', () => {
   };
 });
 
+const TEST_CHECK: CheckDetails = {
+  summary: 'Test',
+  name: 'test',
+  interval: 'STANDARD',
+  description: 'test description',
+  disabled: false,
+};
+
 describe('ChangeCheckIntervalModal', () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -22,9 +31,7 @@ describe('ChangeCheckIntervalModal', () => {
     let wrapper: ReactWrapper;
 
     act(() => {
-      wrapper = mount(
-        <ChangeCheckIntervalModal checkName="test" interval="STANDARD" setVisible={jest.fn()} isVisible />
-      );
+      wrapper = mount(<ChangeCheckIntervalModal check={TEST_CHECK} setVisible={jest.fn()} isVisible />);
     });
 
     expect(wrapper!.find(dataQa('change-check-interval-modal')).exists()).toBeTruthy();
@@ -36,9 +43,7 @@ describe('ChangeCheckIntervalModal', () => {
     let wrapper: ReactWrapper;
 
     act(() => {
-      wrapper = mount(
-        <ChangeCheckIntervalModal checkName="test" interval="STANDARD" setVisible={jest.fn()} isVisible={false} />
-      );
+      wrapper = mount(<ChangeCheckIntervalModal check={TEST_CHECK} setVisible={jest.fn()} isVisible={false} />);
     });
 
     expect(wrapper!.find(dataQa('change-check-interval-form')).length).toBe(0);
@@ -48,9 +53,7 @@ describe('ChangeCheckIntervalModal', () => {
     let wrapper: ReactWrapper;
 
     act(() => {
-      wrapper = mount(
-        <ChangeCheckIntervalModal checkName="test" interval="STANDARD" setVisible={jest.fn()} isVisible />
-      );
+      wrapper = mount(<ChangeCheckIntervalModal check={TEST_CHECK} setVisible={jest.fn()} isVisible />);
     });
 
     expect(wrapper!.find(dataQa('change-check-interval-form')).length).toBe(1);
@@ -61,9 +64,7 @@ describe('ChangeCheckIntervalModal', () => {
     const setVisible = jest.fn();
 
     act(() => {
-      wrapper = mount(
-        <ChangeCheckIntervalModal checkName="test" interval="STANDARD" setVisible={setVisible} isVisible />
-      );
+      wrapper = mount(<ChangeCheckIntervalModal check={TEST_CHECK} setVisible={setVisible} isVisible />);
     });
 
     wrapper!.find(dataQa('modal-background')).simulate('click');
@@ -76,9 +77,7 @@ describe('ChangeCheckIntervalModal', () => {
     const setVisible = jest.fn();
 
     act(() => {
-      wrapper = mount(
-        <ChangeCheckIntervalModal checkName="test" interval="STANDARD" setVisible={setVisible} isVisible />
-      );
+      wrapper = mount(<ChangeCheckIntervalModal check={TEST_CHECK} setVisible={setVisible} isVisible />);
     });
 
     // @ts-expect-error
