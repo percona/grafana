@@ -52,7 +52,7 @@ export const BackupInventory: FC = () => {
         Header: actions,
         accessor: 'id',
         Cell: ({ row }) => <BackupInventoryActions onRestore={onRestoreClick} backup={row.original as Backup} />,
-        width: '80px',
+        width: '110px',
       },
     ],
     []
