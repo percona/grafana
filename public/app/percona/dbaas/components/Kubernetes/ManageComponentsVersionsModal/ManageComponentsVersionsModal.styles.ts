@@ -6,7 +6,8 @@ export const getStyles = () => ({
     max-height: 200px;
   `,
   defaultWrapper: css`
-    div[class$='-Menu'] {
+    div[class$='-Menu'],
+    div[class$='-grafana-select-menu'] {
       svg {
         display: none;
       }
