@@ -11,19 +11,17 @@ export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, ren
   const defaultTab = tabs[0].key;
   const tabKeys = tabs.map(tab => tab.key);
   const activeTab = useSelector((state: StoreState) => tabs.find(tab => tab.key === state.location.routeParams.tab));
-  const isSamePage = useSelector((state: StoreState) => state.location.path.includes(basePath));
   const isValidTab = (tab?: ContentTab) => Object.values(tabKeys).includes(tab?.key || '');
 
   const selectTab = (tabKey: string) => {
-    getLocationSrv().update({
-      path: `${basePath}/${tabKey}`,
-    });
+    if (tabKey !== activeTab?.key) {
+      getLocationSrv().update({
+        path: `${basePath}/${tabKey}`,
+      });
+    }
   };
 
   useEffect(() => {
-    if (!isSamePage) {
-      return;
-    }
     isValidTab(activeTab) || selectTab(defaultTab);
   }, []);
 
