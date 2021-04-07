@@ -33,7 +33,7 @@ export const BackupInventoryService = {
     );
   },
   async restore(serviceId: string, locationId: string, artifactId: string): Promise<any> {
-    return api.post(`${BASE_URL}/Backups/StartBackup`, {
+    return api.post(`${BASE_URL}/Backups/RestoreBackup`, {
       service_id: serviceId,
       location_id: locationId,
       artifact_id: artifactId,
