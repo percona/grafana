@@ -23,9 +23,9 @@ const SideMenuDropDown: FC<Props> = props => {
       </li>
       {childrenLinks.map((child, index) => {
         return (
-          <>
-            <DropDownChild child={child} key={`${child.url}-${index}`} />
-          </>
+          <React.Fragment key={`${child.url}-${index}`}>
+            <DropDownChild child={child} />
+          </React.Fragment>
         );
       })}
     </ul>
