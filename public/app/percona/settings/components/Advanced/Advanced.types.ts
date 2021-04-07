@@ -1,16 +1,6 @@
 import { LoadingCallback } from 'app/percona/settings/Settings.service';
 import { SttCheckIntervalsSettings } from 'app/percona/settings/Settings.types';
-
-export interface AdvancedFormValues {
-  retention: string;
-  telemetry: boolean;
-  stt: boolean;
-  publicAddress: string;
-  alerting: boolean;
-  rareInterval: string;
-  standardInterval: string;
-  frequentInterval: string;
-}
+import { AdvancedChangePayload } from '../../Settings.types';
 
 export interface AdvancedProps {
   dataRetention: string;
@@ -18,9 +8,25 @@ export interface AdvancedProps {
   sttEnabled: boolean;
   updatesDisabled: boolean;
   dbaasEnabled?: boolean;
+  backupEnabled: boolean;
   alertingEnabled?: boolean;
   azureDiscoverEnabled?: boolean;
   publicAddress?: string;
-  updateSettings: (body: any, callback: LoadingCallback, refresh?: boolean) => void;
   sttCheckIntervals: SttCheckIntervalsSettings;
+  updateSettings: (body: AdvancedChangePayload, callback: LoadingCallback, refresh?: boolean) => void;
+}
+
+export interface AdvancedFormProps {
+  retention: number | string;
+  telemetry: boolean;
+  updates: boolean;
+  backup: boolean;
+  stt: boolean;
+  dbaas?: boolean;
+  publicAddress?: string;
+  alerting?: boolean;
+  azureDiscover?: boolean;
+  rareInterval: string;
+  standardInterval: string;
+  frequentInterval: string;
 }

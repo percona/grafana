@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Field, withTypes } from 'react-final-form';
 import { cx } from 'emotion';
 import { Button, Spinner, useTheme, Icon } from '@grafana/ui';
 import { TextInputField, NumberInputField } from '@percona/platform-core';
@@ -19,8 +19,11 @@ import {
   STT_CHECK_INTERVALS,
   TECHNICAL_PREVIEW_DOC_URL,
 } from './Advanced.constants';
-import { AdvancedFormValues, AdvancedProps } from './Advanced.types';
+import { AdvancedProps, AdvancedFormProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
+import { AdvancedChangePayload } from '../../Settings.types';
+
+const refreshingFeatureKeys: Array<keyof AdvancedFormProps> = ['alerting', 'backup'];
 
 const {
   advanced: {
@@ -55,6 +58,7 @@ const {
 export const Advanced: FC<AdvancedProps> = ({
   dataRetention,
   telemetryEnabled,
+  backupEnabled,
   updatesDisabled,
   sttEnabled,
   dbaasEnabled,
@@ -101,10 +105,11 @@ export const Advanced: FC<AdvancedProps> = ({
     tooltipLinkText,
   } = Messages;
 
-  const initialValues = {
+  const initialValues: AdvancedFormProps = {
     retention: convertSecondsToDays(dataRetention),
     telemetry: telemetryEnabled,
     updates: !updatesDisabled,
+    backup: backupEnabled,
     stt: sttEnabled,
     dbaas: dbaasEnabled,
     azureDiscover: azureDiscoverEnabled,
@@ -120,6 +125,7 @@ export const Advanced: FC<AdvancedProps> = ({
     retention,
     telemetry,
     stt,
+    backup,
     publicAddress,
     alerting,
     azureDiscover
@@ -127,13 +133,13 @@ export const Advanced: FC<AdvancedProps> = ({
     standardInterval,
     frequentInterval,
   }: AdvancedFormValues) => {
-    const refresh = !!alerting !== alertingEnabled;
     const sttCheckIntervals = {
       rare_interval: `${convertHoursStringToSeconds(rareInterval)}s`,
       standard_interval: `${convertHoursStringToSeconds(standardInterval)}s`,
       frequent_interval: `${convertHoursStringToSeconds(frequentInterval)}s`,
     };
-    const body = {
+    const refresh = !!refreshingFeatureKeys.find(feature => !!values[feature] !== initialValues[feature]);
+    const body: AdvancedChangePayload = {
       data_retention: `${+retention * SECONDS_IN_DAY}s`,
       disable_telemetry: !telemetry,
       enable_telemetry: telemetry,
@@ -146,10 +152,13 @@ export const Advanced: FC<AdvancedProps> = ({
       enable_alerting: alerting ? true : undefined,
       disable_alerting: !alerting ? true : undefined,
       stt_check_intervals: !!stt ? sttCheckIntervals : undefined,
+      enable_backup_management: backup,
+      disable_backup_management: !backup,
     };
 
     updateSettings(body, setLoading, refresh);
   };
+  const { Form } = withTypes<AdvancedFormProps>();
 
   return (
     <div className={styles.advancedWrapper}>
@@ -252,6 +261,19 @@ export const Advanced: FC<AdvancedProps> = ({
                 <span className={styles.unitsLabel}>{sttCheckIntervalUnit}</span>
               </div>
             ))}
+            {/* TODO remove comment when feature is ready to come out */}
+            {/* <Field
+              name="backup"
+              type="checkbox"
+              label={backupLabel}
+              tooltip={backupTooltip}
+              tooltipLinkText={tooltipLinkText}
+              link={backupLink}
+              className={cx({ [styles.switchDisabled]: !values.backup })}
+              disabled={!values.telemetry}
+              dataQa="advanced-backup"
+              component={SwitchRow}
+            /> */}
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">
