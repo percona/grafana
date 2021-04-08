@@ -7,3 +7,6 @@ export const DEFAULT_PORTS = {
   [InstanceTypes.proxysql]: '6032',
   [InstanceTypes.haproxy]: '8404',
 };
+
+export const ADD_RDS_TOKEN = 'addRds';
+export const ADD_AZURE_TOKEN = 'addAzure';
