@@ -23,7 +23,7 @@ import { AdvancedProps, AdvancedFormProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
 import { AdvancedChangePayload } from '../../Settings.types';
 
-const refreshingFeatureKeys: Array<keyof AdvancedFormProps> = ['alerting', 'backup'];
+const refreshingFeatureKeys: Array<keyof AdvancedFormProps> = ['alerting', 'backup', 'stt'];
 
 const {
   advanced: {
