@@ -11,7 +11,7 @@ import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { InventoryService } from '../Inventory.service';
 import { NodesList } from '../Inventory.types';
-import { GET_NODES_TOKEN, NODES_COLUMNS, REMOVE_NODE_TOKEN } from '../Inventory.constants';
+import { GET_NODES_TOKEN, NODES_COLUMNS } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
 import { CheckboxField } from '@percona/platform-core';
 import { appEvents } from '../../../core/app_events';
@@ -55,10 +55,7 @@ export const NodesTab = () => {
       setLoading(true);
       // eslint-disable-next-line max-len
       const requests = nodes.map(node =>
-        InventoryService.removeNode(
-          { node_id: node.original.node_id, force: forceMode },
-          generateToken(REMOVE_NODE_TOKEN)
-        )
+        InventoryService.removeNode({ node_id: node.original.node_id, force: forceMode })
       );
 
       const results = await processPromiseResults(requests);

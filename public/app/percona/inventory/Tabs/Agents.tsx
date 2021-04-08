@@ -11,7 +11,7 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { AgentsList } from 'app/percona/inventory/Inventory.types';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { InventoryService } from '../Inventory.service';
-import { AGENTS_COLUMNS, GET_AGENTS_TOKEN, REMOVE_AGENT_TOKEN } from '../Inventory.constants';
+import { AGENTS_COLUMNS, GET_AGENTS_TOKEN } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
 import { CheckboxField } from '@percona/platform-core';
 import { appEvents } from '../../../core/app_events';
@@ -53,10 +53,7 @@ export const Agents = () => {
       setLoading(true);
       // eslint-disable-next-line max-len
       const requests = agents.map(agent =>
-        InventoryService.removeAgent(
-          { agent_id: agent.original.agent_id, force: forceMode },
-          generateToken(REMOVE_AGENT_TOKEN)
-        )
+        InventoryService.removeAgent({ agent_id: agent.original.agent_id, force: forceMode })
       );
       const results = await processPromiseResults(requests);
 
