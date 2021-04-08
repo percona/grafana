@@ -2,6 +2,8 @@ import React, { FC, useMemo, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
@@ -15,6 +17,7 @@ import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
+import { BACKUP_TOKEN, LIST_ARTIFACTS_TOKEN } from './BackupInventory.constants';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
@@ -24,6 +27,7 @@ export const BackupInventory: FC = () => {
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
+  const [generateToken] = useCancelToken();
   const columns = useMemo(
     (): Column[] => [
       {
@@ -67,13 +71,15 @@ export const BackupInventory: FC = () => {
     setPending(true);
 
     try {
-      const backups = await BackupInventoryService.list();
+      const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_TOKEN));
       setData(backups);
     } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
       logger.error(e);
-    } finally {
-      setPending(false);
     }
+    setPending(false);
   };
 
   const renderSelectedSubRow = React.useCallback(
@@ -99,11 +105,20 @@ export const BackupInventory: FC = () => {
 
   const handleBackup = async ({ service, location, backupName, description }: AddBackupFormProps) => {
     try {
-      await BackupInventoryService.backup(service.value?.id || '', location.value || '', backupName, description);
+      await BackupInventoryService.backup(
+        service.value?.id || '',
+        location.value || '',
+        backupName,
+        description,
+        generateToken(BACKUP_TOKEN)
+      );
       setBackupModalVisible(false);
       setSelectedBackup(null);
       getData();
     } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
       logger.error(e);
     }
   };
