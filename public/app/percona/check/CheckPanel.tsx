@@ -8,6 +8,7 @@ import { PAGE_MODEL } from './CheckPanel.constants';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { TabbedContent, ContentTab } from '../shared/components/Elements/TabbedContent';
 import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
+import { AxiosError } from 'axios';
 
 export const CheckPanel: FC = () => {
   const { path: basePath } = PAGE_MODEL;
@@ -15,7 +16,7 @@ export const CheckPanel: FC = () => {
   const [hasNoAccess, setHasNoAccess] = useState(false);
   const styles = useStyles(getStyles);
 
-  const handleError = (error: any) => {
+  const handleError = (error: AxiosError) => {
     setHasNoAccess(error.response?.status === 401);
   };
 
