@@ -125,3 +125,10 @@ export const PAGE_MODEL: PageModel = {
   id: 'inventory',
   children: PAGE_TABS.map(({ title, id, path }) => ({ title, id, path })),
 };
+
+export const GET_SERVICES_TOKEN = 'getServices';
+export const REMOVE_SERVICE_TOKEN = 'removeService';
+export const GET_NODES_TOKEN = 'getNodes';
+export const REMOVE_NODE_TOKEN = 'removeNode';
+export const GET_AGENTS_TOKEN = 'getAgents';
+export const REMOVE_AGENT_TOKEN = 'removeAgent';
