@@ -15,12 +15,12 @@ const BackupPage: FC = () => {
       {
         key: TabKeys.locations,
         label: Messages.tabs.locations,
-        component: () => <StorageLocations />,
+        component: <StorageLocations />,
       },
       {
         key: TabKeys.inventory,
         label: Messages.tabs.inventory,
-        component: () => <BackupInventory />,
+        component: <BackupInventory />,
       },
     ],
     []

@@ -39,9 +39,9 @@ export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, ren
         ))}
       </TabsBar>
       {renderTab ? (
-        renderTab({ Content: () => <TabContent>{activeTab?.component()}</TabContent>, tab: activeTab })
+        renderTab({ Content: () => <TabContent>{activeTab?.component}</TabContent>, tab: activeTab })
       ) : (
-        <TabContent>{activeTab?.component()}</TabContent>
+        <TabContent>{activeTab?.component}</TabContent>
       )}
     </>
   );

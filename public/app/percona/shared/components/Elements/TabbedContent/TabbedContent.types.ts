@@ -2,7 +2,7 @@ export interface ContentTab {
   label: string;
   key: string;
   disabled?: boolean;
-  component: () => JSX.Element;
+  component: JSX.Element;
 }
 
 export interface TabComponentMap {

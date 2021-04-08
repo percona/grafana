@@ -24,12 +24,12 @@ export const CheckPanel: FC = () => {
       {
         label: Messages.failedChecksTitle,
         key: TabKeys.failedChecks,
-        component: () => <FailedChecksTab key="failed-checks" hasNoAccess={hasNoAccess} />,
+        component: <FailedChecksTab key="failed-checks" hasNoAccess={hasNoAccess} />,
       },
       {
         label: Messages.allChecksTitle,
         key: TabKeys.allChecks,
-        component: () => <AllChecksTab key="all-checks" />,
+        component: <AllChecksTab key="all-checks" />,
       },
     ],
     [hasNoAccess]

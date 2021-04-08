@@ -19,17 +19,17 @@ export const InventoryPanel = () => {
       {
         label: Messages.tabs.services,
         key: TabKeys.services,
-        component: () => <Services />,
+        component: <Services />,
       },
       {
         label: Messages.tabs.agents,
         key: TabKeys.agents,
-        component: () => <Agents />,
+        component: <Agents />,
       },
       {
         label: Messages.tabs.nodes,
         key: TabKeys.nodes,
-        component: () => <NodesTab />,
+        component: <NodesTab />,
       },
     ],
     []

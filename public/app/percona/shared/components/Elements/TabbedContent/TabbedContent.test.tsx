@@ -25,12 +25,12 @@ const contentTabs: ContentTab[] = [
   {
     label: 'Tab 1',
     key: 'tab_1',
-    component: () => <Dummy />,
+    component: <Dummy />,
   },
   {
     label: 'Tab 2',
     key: 'tab_2',
-    component: () => <Dummy />,
+    component: <Dummy />,
   },
 ];
 
