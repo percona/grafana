@@ -29,6 +29,12 @@ export interface SttCheckIntervalsSettings {
   [SttCheckIntervals.frequentInterval]: string;
 }
 
+export interface SttCheckIntervalsPayload {
+  rare_interval: string;
+  standard_interval: string;
+  frequent_interval: string;
+}
+
 export interface AlertManagerPayload {
   alert_manager_url: string;
   alert_manager_rules: string;
@@ -58,6 +64,7 @@ export interface AdvancedChangePayload extends AdvancedPayload {
   disable_backup_management: boolean;
   disable_azurediscover?: boolean;
   enable_azurediscover?: boolean;
+  stt_check_intervals?: SttCheckIntervalsPayload;
 }
 
 export interface MetricsResolutionsPayload {
@@ -96,6 +103,7 @@ export interface SettingsPayload
   alerting_enabled: boolean;
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
+  stt_check_intervals: SttCheckIntervalsPayload;
 }
 
 export type SettingsAPIChangePayload = AlertManagerChangePayload &

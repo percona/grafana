@@ -13,34 +13,8 @@ export const SettingsService = {
     const { settings }: SettingsAPIResponse = await api.post('/v1/Settings/Get', {});
     return toModel(settings);
   },
-  async setSettings(body: SettingsAPIChangePayload, setLoading: LoadingCallback) {
-    let response: Settings = {
-      awsPartitions: [],
-      updatesDisabled: false,
-      telemetryEnabled: false,
-      backupEnabled: false,
-      metricsResolutions: {
-        hr: '',
-        mr: '',
-        lr: '',
-      },
-      dataRetention: '',
-      sshKey: '',
-      alertManagerUrl: '',
-      alertManagerRules: '',
-      sttEnabled: false,
-      alertingSettings: {
-        email: {
-          from: '',
-          smarthost: '',
-          hello: '',
-        },
-        slack: {
-          url: '',
-        },
-      },
-    };
-
+  async setSettings(body: SettingsAPIChangePayload, setLoading: LoadingCallback): Promise<Settings | undefined> {
+    let response;
     try {
       setLoading(true);
       const { settings }: SettingsAPIResponse = await api.post<any, any>('/v1/Settings/Change', body);

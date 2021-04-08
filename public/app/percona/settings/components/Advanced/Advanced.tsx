@@ -26,33 +26,7 @@ import { AdvancedChangePayload } from '../../Settings.types';
 const refreshingFeatureKeys: Array<keyof AdvancedFormProps> = ['alerting', 'backup', 'stt'];
 
 const {
-  advanced: {
-    action,
-    retentionLabel,
-    retentionTooltip,
-    retentionUnits,
-    telemetryLabel,
-    telemetryLink,
-    telemetryTooltip,
-    updatesLabel,
-    updatesLink,
-    updatesTooltip,
-    sttLabel,
-    sttLink,
-    sttTooltip,
-    sttCheckIntervalsLabel,
-    sttCheckIntervalTooltip,
-    sttCheckIntervalUnit,
-    dbaasLabel,
-    dbaasTooltip,
-    publicAddressLabel,
-    publicAddressTooltip,
-    publicAddressButton,
-    alertingLabel,
-    alertingTooltip,
-    alertingLink,
-  },
-  tooltipLinkText,
+  advanced: { sttCheckIntervalsLabel, sttCheckIntervalTooltip, sttCheckIntervalUnit },
 } = Messages;
 
 export const Advanced: FC<AdvancedProps> = ({
@@ -121,18 +95,19 @@ export const Advanced: FC<AdvancedProps> = ({
   };
   const [loading, setLoading] = useState(false);
   // @ts-ignore
-  const applyChanges = ({
-    retention,
-    telemetry,
-    stt,
-    backup,
-    publicAddress,
-    alerting,
-    azureDiscover
-    rareInterval,
-    standardInterval,
-    frequentInterval,
-  }: AdvancedFormValues) => {
+  const applyChanges = (values: AdvancedFormProps) => {
+    const {
+      retention,
+      telemetry,
+      stt,
+      publicAddress,
+      alerting,
+      backup,
+      azureDiscover,
+      rareInterval,
+      standardInterval,
+      frequentInterval,
+    } = values;
     const sttCheckIntervals = {
       rare_interval: `${convertHoursStringToSeconds(rareInterval)}s`,
       standard_interval: `${convertHoursStringToSeconds(standardInterval)}s`,
