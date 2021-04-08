@@ -1,4 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
+import { logger } from '@percona/platform-core';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/check/components';
 import { ActiveCheck } from 'app/percona/check/types';
 import { COLUMNS } from 'app/percona/check/CheckPanel.constants';
@@ -12,6 +15,7 @@ import { loadShowSilencedValue, saveShowSilencedValue } from './FailedChecksTab.
 import { LoaderButton } from '@percona/platform-core';
 import { appEvents } from '../../../../core/app_events';
 import { AppEvents } from '@grafana/data';
+import { GET_ACTIVE_ALERTS_TOKEN } from './FailedChecksTab.constants';
 
 export const FailedChecksTab: FC<FailedChecksTabProps> = ({ hasNoAccess }) => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(false);
@@ -19,19 +23,22 @@ export const FailedChecksTab: FC<FailedChecksTabProps> = ({ hasNoAccess }) => {
   const [showSilenced, setShowSilenced] = useState(loadShowSilencedValue());
   const [dataSource, setDataSource] = useState<ActiveCheck[] | undefined>();
   const styles = useStyles(getStyles);
+  const [generateToken] = useCancelToken();
 
   const fetchAlerts = async (): Promise<void> => {
     setFetchAlertsPending(true);
 
     try {
-      const dataSource = await CheckService.getActiveAlerts(showSilenced);
+      const dataSource = await CheckService.getActiveAlerts(showSilenced, generateToken(GET_ACTIVE_ALERTS_TOKEN));
 
       setDataSource(dataSource);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setFetchAlertsPending(false);
+    } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
+      logger.error(e);
     }
+    setFetchAlertsPending(false);
   };
 
   const handleRunChecksClick = async () => {
