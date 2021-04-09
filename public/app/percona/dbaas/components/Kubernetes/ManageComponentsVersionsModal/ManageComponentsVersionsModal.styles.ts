@@ -5,4 +5,12 @@ export const getStyles = () => ({
     min-height: 40px;
     max-height: 200px;
   `,
+  defaultWrapper: css`
+    div[class$='-Menu'],
+    div[class$='-grafana-select-menu'] {
+      svg {
+        display: none;
+      }
+    }
+  `,
 });

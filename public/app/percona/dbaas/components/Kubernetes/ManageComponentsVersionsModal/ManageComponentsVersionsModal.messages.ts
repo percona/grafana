@@ -6,6 +6,7 @@ export const Messages = {
     component: 'Component',
     versions: 'Versions',
     operator: 'Operator',
+    default: 'Default',
   },
   title: 'Manage Components Versions',
   required: 'Required field',

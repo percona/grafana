@@ -100,6 +100,7 @@ export class PSMDBService extends DBClusterService {
         value: component.image_path,
         label: version,
         default: !!component.default,
+        disabled: !!component.disabled,
       }));
     });
   }

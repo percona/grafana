@@ -9,6 +9,7 @@ import {
   possibleComponentOptionsStubs,
   versionsStubs,
   versionsFieldNameStub,
+  omitDefaultLabels,
 } from './__mocks__/componentsVersionsStubs';
 
 jest.mock('../../DBCluster/XtraDB.service');
@@ -29,7 +30,7 @@ describe('ManageComponentsVersions.hooks::', () => {
       versionsFieldName,
     ] = wrapper.result.current;
 
-    expect(initialValues).toEqual(initialValuesStubs);
+    expect(_.omit(initialValues, omitDefaultLabels)).toEqual(_.omit(initialValuesStubs, omitDefaultLabels));
     expect(possibleComponentOptions).toEqual(possibleComponentOptionsStubs);
     expect(operatorsOptions).toEqual(operatorsOptionsStubs);
     expect(componentOptions).toEqual(psmdbComponentOptionsStubs);
@@ -50,7 +51,12 @@ describe('ManageComponentsVersions.hooks::', () => {
       versionsFieldName,
     ] = wrapper.result.current;
 
-    expect(initialValues).toEqual(_.omit(initialValuesStubs, ['xtradbpxc', 'xtradbproxysql', 'xtradbbackup']));
+    expect(_.omit(initialValues, omitDefaultLabels)).toEqual(
+      _.omit(
+        initialValuesStubs,
+        ['xtradbpxc', 'xtradbproxysql', 'xtradbpxcdefault', 'xtradbproxysqldefault'].concat(omitDefaultLabels)
+      )
+    );
     expect(possibleComponentOptions).toEqual(_.omit(possibleComponentOptionsStubs, 'xtradb'));
     expect(operatorsOptions).toEqual([operatorsOptionsStubs[0]]);
     expect(componentOptions).toEqual(psmdbComponentOptionsStubs);
