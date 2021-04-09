@@ -15,7 +15,7 @@ import {
   AddKubernetesAction,
 } from './Kubernetes.types';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
-import { ADD_KUBERNETES_TOKEN, DELETE_KUBERNETES_TOKEN, GET_KUBERNETES_TOKEN } from './Kubernetes.hooks.constants';
+import { ADD_KUBERNETES_TOKEN, GET_KUBERNETES_TOKEN } from './Kubernetes.hooks.constants';
 
 export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKubernetesAction, boolean] => {
   const [kubernetes, setKubernetes] = useState<Kubernetes[]>([]);
@@ -44,7 +44,7 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
   const deleteKubernetes = async (kubernetesToDelete: Kubernetes, force?: boolean) => {
     try {
       setLoading(true);
-      await KubernetesService.deleteKubernetes(kubernetesToDelete, force, generateToken(DELETE_KUBERNETES_TOKEN));
+      await KubernetesService.deleteKubernetes(kubernetesToDelete, force);
       appEvents.emit(AppEvents.alertSuccess, [deleteSuccess]);
     } catch (e) {
       if (isApiCancelError(e)) {
