@@ -1,13 +1,14 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { getLocationSrv } from '@grafana/runtime';
 import { Tab, TabContent, TabsBar, useStyles } from '@grafana/ui';
 import { StoreState } from 'app/types';
-import { useSelector } from 'react-redux';
 import { ContentTab, TabbedContentProps } from './TabbedContent.types';
 import { getStyles } from './TabbedContent.styles';
 
 export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, renderTab }) => {
   const styles = useStyles(getStyles);
+  const routeUpdated = useRef(false);
   const defaultTab = tabs[0].key;
   const tabKeys = tabs.map(tab => tab.key);
   const activeTab = useSelector((state: StoreState) => tabs.find(tab => tab.key === state.location.routeParams.tab));
@@ -15,8 +16,9 @@ export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, ren
 
   const selectTab = (tabKey: string) => {
     if (tabKey !== activeTab?.key) {
+      routeUpdated.current = true;
       getLocationSrv().update({
-        path: `${basePath}/${tabKey}`,
+        path: `/${basePath}/${tabKey}`,
       });
     }
   };
@@ -38,7 +40,7 @@ export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, ren
           />
         ))}
       </TabsBar>
-      {renderTab ? (
+      {routeUpdated.current ? null : renderTab ? (
         renderTab({ Content: () => <TabContent>{activeTab?.component}</TabContent>, tab: activeTab })
       ) : (
         <TabContent>{activeTab?.component}</TabContent>
