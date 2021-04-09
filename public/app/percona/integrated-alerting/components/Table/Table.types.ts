@@ -1,4 +1,16 @@
-import { Column, TableInstance, TableState, Row, TableOptions } from 'react-table';
+import {
+  Column,
+  TableInstance,
+  TableState,
+  Row,
+  TableOptions,
+  TableHeaderProps,
+  TableRowProps,
+  TableCellProps,
+  Cell,
+  ColumnInstance,
+  HeaderGroup,
+} from 'react-table';
 
 export interface TableProps {
   data: object[];
@@ -14,7 +26,11 @@ export interface TableProps {
   pagesPerView?: number;
   onPaginationChanged?: (pageSize: number, pageIndex: number) => void;
   children?: (rows: Row[], table: TableInstance) => React.ReactNode;
-  renderExpandedRow?: (row: Row) => JSX.Element;
+  renderExpandedRow?: (row: Row<any>) => JSX.Element;
+  getHeaderProps?: (column: HeaderGroup) => TableHeaderProps;
+  getRowProps?: (row: Row<any>) => TableRowProps;
+  getColumnProps?: (column: ColumnInstance) => TableCellProps;
+  getCellProps?: (cell: Cell<any, any>) => TableCellProps;
 }
 
 export interface PaginatedTableState extends TableState {

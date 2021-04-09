@@ -1,10 +1,11 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Spinner, Tab, TabContent, useTheme } from '@grafana/ui';
 import { cx } from 'emotion';
+import { logger } from '@percona/platform-core';
 import { TabsVertical } from 'app/percona/shared/components/Elements/TabsVertical/TabsVertical';
 import { Advanced, AlertManager, Diagnostics, MetricsResolution, PlatformLogin, SSHKey } from './components';
 import { LoadingCallback, SettingsService } from './Settings.service';
-import { Settings, TabKeys } from './Settings.types';
+import { Settings, TabKeys, SettingsAPIChangePayload } from './Settings.types';
 import { Messages } from './Settings.messages';
 import { getSettingsStyles } from './Settings.styles';
 import { Communication } from './components/Communication/Communication';
@@ -99,8 +100,9 @@ export const SettingsPanel: FC = () => {
     [activeTab, settings]
   );
 
-  const updateSettings = async (body: any, callback: LoadingCallback, refresh?: boolean) => {
+  const updateSettings = async (body: SettingsAPIChangePayload, callback: LoadingCallback, refresh?: boolean) => {
     const response = await SettingsService.setSettings(body, callback);
+    const { email_alerting_settings: { password = '' } = {} } = body;
 
     if (refresh) {
       window.location.reload();
@@ -109,12 +111,25 @@ export const SettingsPanel: FC = () => {
     }
 
     if (response) {
-      setSettings(response);
+      // password is not being returned by the API, hence this construction
+      const newSettings: Settings = {
+        ...response,
+        alertingSettings: { ...response.alertingSettings, email: { ...response.alertingSettings.email, password } },
+      };
+      setSettings(newSettings);
     }
   };
 
-  const getSettings = () => {
-    SettingsService.getSettings(setLoading, setSettings).then();
+  const getSettings = async () => {
+    try {
+      setLoading(true);
+      const settings = await SettingsService.getSettings();
+      setSettings(settings);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -149,8 +164,11 @@ export const SettingsPanel: FC = () => {
                   sttEnabled={!!settings.sttEnabled}
                   dbaasEnabled={!!settings.dbaasEnabled}
                   alertingEnabled={!!settings.alertingEnabled}
+                  backupEnabled={!!settings.backupEnabled}
+                  azureDiscoverEnabled={!!settings.azureDiscoverEnabled}
                   publicAddress={settings.publicAddress}
                   updateSettings={updateSettings}
+                  sttCheckIntervals={settings.sttCheckIntervals}
                 />
               )}
               {tabs[2].active && <SSHKey sshKey={settings.sshKey || ''} updateSettings={updateSettings} />}
