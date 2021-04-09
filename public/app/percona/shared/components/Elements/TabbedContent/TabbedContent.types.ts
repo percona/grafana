@@ -1,3 +1,5 @@
+import { FC } from 'react';
+
 export enum TabOrientation {
   Vertical = 'vertical',
   Horizontal = 'horizontal',
@@ -15,8 +17,12 @@ export interface TabComponentMap {
   component: JSX.Element;
 }
 
+interface ContentProps {
+  className?: string;
+}
+
 export interface TabRenderProps {
-  Content: () => JSX.Element;
+  Content: FC<ContentProps>;
   tab?: ContentTab;
 }
 
@@ -24,5 +30,6 @@ export interface TabbedContentProps {
   tabs: ContentTab[];
   basePath: string;
   orientation?: TabOrientation;
+  className?: string;
   renderTab?: (props: TabRenderProps) => void;
 }

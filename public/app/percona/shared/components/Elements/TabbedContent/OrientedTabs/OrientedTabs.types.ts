@@ -4,6 +4,7 @@ export interface OrientedTabsProps {
   orientation?: TabOrientation;
   tabs: ContentTab[];
   activeTabKey?: string;
+  className?: string;
   tabClick?: (key: string) => void;
 }
 
