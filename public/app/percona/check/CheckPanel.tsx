@@ -38,8 +38,8 @@ export const CheckPanel: FC = () => {
 
   if (hasNoAccess) {
     return (
-      <PageWrapper pageModel={PAGE_MODEL}>
-        <div className={styles.panel} data-qa="db-check-panel">
+      <PageWrapper pageModel={PAGE_MODEL} dataQa="db-check-panel">
+        <div className={styles.panel}>
           <div className={styles.empty} data-qa="db-check-panel-unauthorized">
             {Messages.unauthorized}
           </div>
@@ -49,7 +49,7 @@ export const CheckPanel: FC = () => {
   }
 
   return (
-    <PageWrapper pageModel={PAGE_MODEL}>
+    <PageWrapper pageModel={PAGE_MODEL} dataQa="db-check-panel">
       <TabbedContent
         tabs={tabs}
         basePath={basePath}
