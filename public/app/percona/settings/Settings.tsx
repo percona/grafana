@@ -134,6 +134,8 @@ export const SettingsPanel: FC = () => {
             tabs={tabs}
             basePath={basePath}
             orientation={TabOrientation.Vertical}
+            tabsDataQa="settings-tabs"
+            contentDataQa="settings-tab-content"
             renderTab={({ Content }) => <Content className={styles.tabContentWrapper} />}
           ></TabbedContent>
         )}

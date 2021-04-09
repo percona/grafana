@@ -31,5 +31,7 @@ export interface TabbedContentProps {
   basePath: string;
   orientation?: TabOrientation;
   className?: string;
+  tabsDataQa?: string;
+  contentDataQa?: string;
   renderTab?: (props: TabRenderProps) => void;
 }
