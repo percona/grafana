@@ -57,19 +57,15 @@ describe('TabbedContent', () => {
     expect(wrapper.find(TabContent).exists()).toBeTruthy();
   });
 
-  it('changes location when clicking on a tab', async () => {
+  fit('changes location when clicking on a tab', async () => {
     let wrapper: ReactWrapper;
 
     await act(async () => {
       wrapper = mount(<TabbedContent tabs={contentTabs} basePath="integrated-alerting" />);
     });
     wrapper.update();
-    const tabs = wrapper.find('ul');
-
-    tabs
-      .children()
-      .at(1)
-      .simulate('click');
+    const tabs = wrapper.find('li');
+    tabs.at(1).simulate('click');
 
     // The first time we render, getLocationSrv is called with the default tab
     expect(getLocationSrv).toBeCalledTimes(2);
@@ -90,7 +86,7 @@ describe('TabbedContent', () => {
 
     expect(getLocationSrv).toBeCalledTimes(1);
     expect(fakeLocationUpdate).toBeCalledTimes(1);
-    expect(fakeLocationUpdate).toBeCalledWith({ path: `integrated-alerting/${contentTabs[0].key}` });
+    expect(fakeLocationUpdate).toBeCalledWith({ path: `/integrated-alerting/${contentTabs[0].key}` });
   });
 
   it('should return Content when renderTab prop is passed', async () => {
