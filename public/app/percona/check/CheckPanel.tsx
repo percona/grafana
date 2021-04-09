@@ -56,7 +56,12 @@ export const CheckPanel: FC = () => {
         tabsDataQa="db-check-tabs-bar"
         contentDataQa="db-check-tab-content"
         renderTab={({ Content }) => (
-          <FeatureLoader featureName={Messages.stt} featureFlag="sttEnabled" onError={handleError}>
+          <FeatureLoader
+            messageDataQa="db-check-panel-settings-link"
+            featureName={Messages.stt}
+            featureFlag="sttEnabled"
+            onError={handleError}
+          >
             <Content />
           </FeatureLoader>
         )}
