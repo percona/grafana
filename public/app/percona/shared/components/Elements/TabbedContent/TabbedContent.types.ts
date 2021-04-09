@@ -1,3 +1,7 @@
+export enum TabOrientation {
+  Vertical = 'vertical',
+  Horizontal = 'horizontal',
+}
 export interface ContentTab {
   label: string;
   key: string;
@@ -18,5 +22,6 @@ export interface TabRenderProps {
 export interface TabbedContentProps {
   tabs: ContentTab[];
   basePath: string;
+  orientation?: TabOrientation;
   renderTab?: (props: TabRenderProps) => void;
 }

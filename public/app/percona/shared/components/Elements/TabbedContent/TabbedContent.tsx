@@ -1,13 +1,17 @@
 import React, { FC, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { getLocationSrv } from '@grafana/runtime';
-import { Tab, TabContent, TabsBar, useStyles } from '@grafana/ui';
+import { TabContent } from '@grafana/ui';
 import { StoreState } from 'app/types';
-import { ContentTab, TabbedContentProps } from './TabbedContent.types';
-import { getStyles } from './TabbedContent.styles';
+import { OrientedTabs } from './OrientedTabs/OrientedTabs';
+import { ContentTab, TabbedContentProps, TabOrientation } from './TabbedContent.types';
 
-export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, renderTab }) => {
-  const styles = useStyles(getStyles);
+export const TabbedContent: FC<TabbedContentProps> = ({
+  tabs = [],
+  basePath,
+  orientation = TabOrientation.Horizontal,
+  renderTab,
+}) => {
   const routeUpdated = useRef(false);
   const defaultTab = tabs[0].key;
   const tabKeys = tabs.map(tab => tab.key);
@@ -29,17 +33,12 @@ export const TabbedContent: FC<TabbedContentProps> = ({ tabs = [], basePath, ren
 
   return (
     <>
-      <TabsBar>
-        {tabs.map((tab, index) => (
-          <Tab
-            key={index}
-            label={tab.label}
-            active={tab.key === activeTab?.key}
-            style={tab.disabled ? styles.disabled : undefined}
-            onChangeTab={() => selectTab(tab.key)}
-          />
-        ))}
-      </TabsBar>
+      <OrientedTabs
+        orientation={orientation}
+        tabs={tabs}
+        activeTabKey={activeTab?.key}
+        tabClick={selectTab}
+      ></OrientedTabs>
       {routeUpdated.current ? null : renderTab ? (
         renderTab({ Content: () => <TabContent>{activeTab?.component}</TabContent>, tab: activeTab })
       ) : (
