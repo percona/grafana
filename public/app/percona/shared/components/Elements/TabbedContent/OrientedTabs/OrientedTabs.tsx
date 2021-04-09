@@ -10,15 +10,17 @@ const OrientedTabContent: FC<OrientedTabContentProps> = ({ tabs, activeTabKey, t
 
   return (
     <>
-      {tabs.map((tab, index) => (
-        <Tab
-          key={index}
-          label={tab.label}
-          active={tab.key === activeTabKey}
-          style={tab.disabled ? styles.disabled : undefined}
-          onChangeTab={() => tabClick(tab.key)}
-        />
-      ))}
+      {tabs
+        .filter(tab => !tab.hidden)
+        .map((tab, index) => (
+          <Tab
+            key={index}
+            label={tab.label}
+            active={tab.key === activeTabKey}
+            style={tab.disabled ? styles.disabled : undefined}
+            onChangeTab={() => tabClick(tab.key)}
+          />
+        ))}
     </>
   );
 };

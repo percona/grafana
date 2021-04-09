@@ -6,6 +6,7 @@ export interface ContentTab {
   label: string;
   key: string;
   disabled?: boolean;
+  hidden?: boolean;
   component: JSX.Element;
 }
 
