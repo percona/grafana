@@ -21,7 +21,7 @@ export const SettingsPanel: FC = () => {
   const [settings, setSettings] = useState<Settings>();
 
   const updateSettings = async (body: SettingsAPIChangePayload, callback: LoadingCallback, refresh?: boolean) => {
-    const response: Settings = await SettingsService.setSettings(body, callback);
+    const response = await SettingsService.setSettings(body, callback);
     const { email_alerting_settings: { password = '' } = {} } = body;
 
     if (refresh) {
@@ -66,6 +66,7 @@ export const SettingsPanel: FC = () => {
                   azureDiscoverEnabled={!!settings.azureDiscoverEnabled}
                   publicAddress={settings.publicAddress}
                   updateSettings={updateSettings}
+                  sttCheckIntervals={settings.sttCheckIntervals}
                 />
               ),
             },
