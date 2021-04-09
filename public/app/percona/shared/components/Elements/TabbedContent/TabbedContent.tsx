@@ -47,7 +47,7 @@ export const TabbedContent: FC<TabbedContentProps> = ({
           tab: activeTab,
         })
       ) : (
-        <TabContent>{activeTab?.component}</TabContent>
+        <TabContent className={className}>{activeTab?.component}</TabContent>
       )}
     </>
   );
