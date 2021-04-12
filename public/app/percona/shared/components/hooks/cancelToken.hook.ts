@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import axios, { CancelTokenSource } from 'axios';
 
 export const useCancelToken = () => {
-  const [tokens, setTokens] = useState<Record<string, CancelTokenSource>>({});
+  const tokens = useRef<Record<string, CancelTokenSource>>({});
 
   const generateToken = (sourceName: string) => {
-    tokens[sourceName] && tokens[sourceName].cancel();
+    tokens.current[sourceName] && tokens.current[sourceName].cancel();
     const tokenSource = axios.CancelToken.source();
-    setTokens(tokens => ({ ...tokens, [sourceName]: tokenSource }));
+    tokens.current = { ...tokens.current, [sourceName]: tokenSource };
     return tokenSource.token;
   };
 
   useEffect(() => {
     return function cleanup() {
-      for (let source in tokens) {
-        tokens[source].cancel();
+      for (let source in tokens.current) {
+        tokens.current[source].cancel();
       }
     };
-  }, [tokens]);
+  }, []);
 
   return [generateToken] as const;
 };
