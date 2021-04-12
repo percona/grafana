@@ -7,13 +7,23 @@ import { SelectableService } from './AddBackupModal.types';
 export const AddBackupModalService = {
   async loadServiceOptions(): Promise<Array<SelectableValue<SelectableService>>> {
     let result: Array<SelectableValue<SelectableService>> = [];
+    const supportedServices: Databases[] = [Databases.mysql, Databases.mongodb];
     const services = await InventoryService.getDbServices();
 
-    // TODO remove this constraint when more DB types are supported
-    if (services.mysql) {
-      result = services.mysql.map(
-        ({ id, name }): SelectableValue<SelectableService> => ({ label: name, value: { id, vendor: Databases.mysql } })
-      );
+    let serviceName: Databases;
+    for (serviceName in services) {
+      if (supportedServices.includes(serviceName) && services[serviceName]) {
+        const newServices = services[serviceName] || [];
+
+        result.push(
+          ...newServices.map(
+            ({ id, name }): SelectableValue<SelectableService> => ({
+              label: name,
+              value: { id, vendor: Databases.mysql },
+            })
+          )
+        );
+      }
     }
 
     return result;
