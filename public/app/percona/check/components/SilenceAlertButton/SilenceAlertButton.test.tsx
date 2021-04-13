@@ -70,7 +70,7 @@ describe('SilenceAlertButton::', () => {
 
     expect(mockedMakeSilencePayload).toBeCalledTimes(1);
     expect(spy).toBeCalledTimes(1);
-    expect(spy).toBeCalledWith('testPayload', undefined);
+    expect(spy).toBeCalledWith('testPayload');
     expect(fakeFetchAlerts).toBeCalledTimes(1);
 
     spy.mockClear();
