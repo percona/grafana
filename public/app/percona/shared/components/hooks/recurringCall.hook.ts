@@ -8,16 +8,17 @@ export const useRecurringCall = () => {
   const interval = useRef<number>();
 
   const triggerTimeout = async (cb: hookRecurringCallback, defaultInterval = 10000, callImmediate = false) => {
-    callImmediate && (await cb());
     interval.current = defaultInterval;
-    timer.current = window.setTimeout(async () => {
-      try {
+    try {
+      callImmediate && (await cb());
+      timer.current = window.setTimeout(async () => {
         await cb();
-      } catch (e) {
-        logger.error(e);
-      }
+        triggerTimeout(cb, interval.current);
+      }, interval.current);
+    } catch (e) {
+      logger.error(e);
       triggerTimeout(cb, interval.current);
-    }, interval.current);
+    }
   };
 
   const changeInterval = (newInterval: number) => {
