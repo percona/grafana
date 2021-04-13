@@ -15,6 +15,7 @@ import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
+import { useRecurringCall } from 'app/percona/shared/components/hooks/recurringCall.hook';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
@@ -24,6 +25,7 @@ export const BackupInventory: FC = () => {
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
+  const [triggerTimeout] = useRecurringCall();
   const columns = useMemo(
     (): Column[] => [
       {
@@ -63,8 +65,8 @@ export const BackupInventory: FC = () => {
   );
   const styles = useStyles(getStyles);
 
-  const getData = async () => {
-    setPending(true);
+  const getData = async (showLoading = false) => {
+    showLoading && setPending(true);
 
     try {
       const backups = await BackupInventoryService.list();
@@ -72,7 +74,7 @@ export const BackupInventory: FC = () => {
     } catch (e) {
       logger.error(e);
     } finally {
-      setPending(false);
+      showLoading && setPending(false);
     }
   };
 
@@ -102,14 +104,14 @@ export const BackupInventory: FC = () => {
       await BackupInventoryService.backup(service.value?.id || '', location.value || '', backupName, description);
       setBackupModalVisible(false);
       setSelectedBackup(null);
-      getData();
+      getData(true);
     } catch (e) {
       logger.error(e);
     }
   };
 
   useEffect(() => {
-    getData();
+    getData(true).then(() => triggerTimeout(getData));
   }, []);
 
   return (
