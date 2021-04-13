@@ -16,6 +16,7 @@ import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
 import { useRecurringCall } from 'app/percona/shared/components/hooks/recurringCall.hook';
+import { DATA_INTERVAL } from './BackupInventory.constants';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
@@ -111,7 +112,7 @@ export const BackupInventory: FC = () => {
   };
 
   useEffect(() => {
-    getData(true).then(() => triggerTimeout(getData));
+    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
   }, []);
 
   return (
