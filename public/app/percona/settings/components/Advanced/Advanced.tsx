@@ -23,7 +23,7 @@ import { AdvancedProps, AdvancedFormProps } from './Advanced.types';
 import { SwitchRow } from './SwitchRow';
 import { AdvancedChangePayload } from '../../Settings.types';
 
-const refreshingFeatureKeys: Array<keyof AdvancedFormProps> = ['alerting', 'backup', 'stt'];
+const refreshingFeatureKeys: Array<keyof AdvancedFormProps> = ['alerting', 'backup', 'dbaas', 'stt'];
 
 const {
   advanced: { sttCheckIntervalsLabel, sttCheckIntervalTooltip, sttCheckIntervalUnit },
@@ -63,6 +63,7 @@ export const Advanced: FC<AdvancedProps> = ({
       sttTooltip,
       dbaasLabel,
       dbaasTooltip,
+      dbaasLink,
       publicAddressLabel,
       publicAddressTooltip,
       publicAddressButton,
@@ -101,6 +102,7 @@ export const Advanced: FC<AdvancedProps> = ({
       telemetry,
       stt,
       publicAddress,
+      dbaas,
       alerting,
       backup,
       azureDiscover,
@@ -129,6 +131,8 @@ export const Advanced: FC<AdvancedProps> = ({
       stt_check_intervals: !!stt ? sttCheckIntervals : undefined,
       enable_backup_management: backup,
       disable_backup_management: !backup,
+      enable_dbaas: dbaas,
+      disable_dbaas: !dbaas,
     };
 
     updateSettings(body, setLoading, refresh);
@@ -186,18 +190,6 @@ export const Advanced: FC<AdvancedProps> = ({
               dataQa="advanced-updates"
               component={SwitchRow}
             />
-            {dbaasEnabled && (
-              <Field
-                name="dbaas"
-                type="checkbox"
-                label={dbaasLabel}
-                tooltip={dbaasTooltip}
-                className={styles.switchDisabled}
-                disabled
-                dataQa="advanced-dbaas"
-                component={SwitchRow}
-              />
-            )}
             <Field
               name="stt"
               type="checkbox"
@@ -281,18 +273,16 @@ export const Advanced: FC<AdvancedProps> = ({
                   </a>
                 </p>
               </p>
-              {dbaasEnabled && (
-                <Field
-                  name="dbaas"
-                  type="checkbox"
-                  label={dbaasLabel}
-                  tooltip={dbaasTooltip}
-                  className={styles.switchDisabled}
-                  disabled
-                  dataQa="advanced-dbaas"
-                  component={SwitchRow}
-                />
-              )}
+              <Field
+                name="dbaas"
+                type="checkbox"
+                label={dbaasLabel}
+                tooltip={dbaasTooltip}
+                tooltipLinkText={tooltipLinkText}
+                link={dbaasLink}
+                dataQa="advanced-dbaas"
+                component={SwitchRow}
+              />
               <Field
                 name="alerting"
                 type="checkbox"
