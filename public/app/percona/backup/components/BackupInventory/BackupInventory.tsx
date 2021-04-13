@@ -133,6 +133,7 @@ export const BackupInventory: FC = () => {
         columns={columns}
         emptyMessage={noData}
         pendingRequest={pending}
+        autoResetExpanded={false}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
       <AddBackupModal
