@@ -15,7 +15,7 @@ import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
-import { useRecurringCall } from 'app/percona/shared/components/hooks/recurringCall.hook';
+import { useRecurringCall } from '../../hooks/recurringCall.hook';
 import { DATA_INTERVAL } from './BackupInventory.constants';
 
 const { columns, noData } = Messages;
