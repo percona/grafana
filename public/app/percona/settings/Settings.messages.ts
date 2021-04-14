@@ -1,4 +1,8 @@
-import { GUI_DOC_URL, HOW_TO_DOC_URL } from './Settings.constants';
+export const GUI_DOC_URL =
+  'https://www.percona.com/doc/percona-monitoring-and-management/2.x/manage/server-admin-gui.html';
+export const DATA_RETENTION_URL =
+  'https://www.percona.com/doc/percona-monitoring-and-management/2.x/faq.html#how-to-control-data-retention-for-pmm';
+export const HOW_TO_DOC_URL = 'https://www.percona.com/doc/percona-monitoring-and-management/2.x/how-to';
 
 export const Messages = {
   advanced: {
@@ -13,6 +17,12 @@ export const Messages = {
     updatesLink: `${GUI_DOC_URL}#check-for-updates`,
     updatesTooltip: 'Option to check new versions and ability to update PMM from UI.',
     sttLabel: 'Security Threat Tool',
+    sttRareIntervalLabel: 'Rare interval',
+    sttStandardIntervalLabel: 'Standard interval',
+    sttFrequentIntervalLabel: 'Frequent interval',
+    sttCheckIntervalsLabel: 'Execution Intervals',
+    sttCheckIntervalTooltip: 'Interval between check runs',
+    sttCheckIntervalUnit: 'hours',
     sttLink: `${GUI_DOC_URL}#security-threat-tool`,
     sttTooltip: 'Enable Security Threat Tool and get updated checks from Percona.',
     dbaasLabel: 'DBaaS',
