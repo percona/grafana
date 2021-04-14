@@ -15,7 +15,7 @@ import { loadShowSilencedValue, saveShowSilencedValue } from './FailedChecksTab.
 import { LoaderButton } from '@percona/platform-core';
 import { appEvents } from '../../../../core/app_events';
 import { AppEvents } from '@grafana/data';
-import { GET_ACTIVE_ALERTS_TOKEN } from './FailedChecksTab.constants';
+import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 
 export const FailedChecksTab: FC<FailedChecksTabProps> = ({ hasNoAccess }) => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
@@ -29,7 +29,10 @@ export const FailedChecksTab: FC<FailedChecksTabProps> = ({ hasNoAccess }) => {
     setFetchAlertsPending(true);
 
     try {
-      const dataSource = await CheckService.getActiveAlerts(showSilenced, generateToken(GET_ACTIVE_ALERTS_TOKEN));
+      const dataSource = await CheckService.getActiveAlerts(
+        showSilenced,
+        generateToken(GET_ACTIVE_ALERTS_CANCEL_TOKEN)
+      );
       setDataSource(dataSource);
     } catch (e) {
       if (isApiCancelError(e)) {

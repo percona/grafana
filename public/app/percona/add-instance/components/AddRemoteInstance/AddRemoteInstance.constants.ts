@@ -8,5 +8,5 @@ export const DEFAULT_PORTS = {
   [InstanceTypes.haproxy]: '8404',
 };
 
-export const ADD_RDS_TOKEN = 'addRds';
-export const ADD_AZURE_TOKEN = 'addAzure';
+export const ADD_RDS_CANCEL_TOKEN = 'addRds';
+export const ADD_AZURE_CANCEL_TOKEN = 'addAzure';

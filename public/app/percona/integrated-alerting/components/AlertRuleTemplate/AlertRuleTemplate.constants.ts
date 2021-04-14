@@ -6,4 +6,4 @@ export const UNIT_MAP: Record<TemplateParamUnit, string> = {
   [TemplateParamUnit.SECONDS]: 'seconds',
 };
 
-export const GET_TEMPLATES_TOKEN = 'getTemplates';
+export const GET_TEMPLATES_CANCEL_TOKEN = 'getTemplates';

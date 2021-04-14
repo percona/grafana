@@ -15,7 +15,7 @@ import {
   AddKubernetesAction,
 } from './Kubernetes.types';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
-import { ADD_KUBERNETES_TOKEN, GET_KUBERNETES_TOKEN } from './Kubernetes.hooks.constants';
+import { ADD_KUBERNETES_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from './Kubernetes.hooks.constants';
 
 export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKubernetesAction, boolean] => {
   const [kubernetes, setKubernetes] = useState<Kubernetes[]>([]);
@@ -29,7 +29,9 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
     setLoading(true);
 
     try {
-      const results = (await KubernetesService.getKubernetes(generateToken(GET_KUBERNETES_TOKEN))) as KubernetesListAPI;
+      const results = (await KubernetesService.getKubernetes(
+        generateToken(GET_KUBERNETES_CANCEL_TOKEN)
+      )) as KubernetesListAPI;
 
       setKubernetes(toModelList(results));
     } catch (e) {
@@ -60,7 +62,7 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
     try {
       setLoading(true);
 
-      await KubernetesService.addKubernetes(kubernetesToAdd, generateToken(ADD_KUBERNETES_TOKEN));
+      await KubernetesService.addKubernetes(kubernetesToAdd, generateToken(ADD_KUBERNETES_CANCEL_TOKEN));
       appEvents.emit(AppEvents.alertSuccess, [Messages.kubernetes.messages.clusterAdded]);
     } catch (e) {
       if (isApiCancelError(e)) {

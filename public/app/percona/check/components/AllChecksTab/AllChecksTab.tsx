@@ -11,7 +11,7 @@ import { getStyles as getTableStyles } from 'app/percona/check/components/Table/
 import { getStyles as getCheckPanelStyles } from 'app/percona/check/CheckPanel.styles';
 import { Messages } from './AllChecksTab.messages';
 import * as styles from './AllChecksTab.styles';
-import { GET_ALL_CHECKS_TOKEN } from './AllChecksTab.constants';
+import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { FetchChecks } from './types';
 import { CheckTableRow } from './CheckTableRow';
 import { ChecksReloadContext } from './AllChecks.context';
@@ -42,7 +42,7 @@ export const AllChecksTab: FC = () => {
     setFetchChecksPending(true);
 
     try {
-      const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_TOKEN));
+      const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
 
       setChecks(checks);
     } catch (e) {

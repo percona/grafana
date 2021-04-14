@@ -1,1 +1,1 @@
-export const TOGGLE_ALERT_TOKEN = 'toggleAlert';
+export const TOGGLE_ALERT_CANCEL_TOKEN = 'toggleAlert';

@@ -7,7 +7,7 @@ import Instances from './components/Instances/Instances';
 import { getStyles } from './Discovery.styles';
 import { DiscoverySearchPanelProps } from './Discovery.types';
 import { logger } from '@percona/platform-core';
-import { DISCOVERY_RDS_TOKEN } from './Discovery.constants';
+import { DISCOVERY_RDS_CANCEL_TOKEN } from './Discovery.constants';
 
 const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   const styles = getStyles();
@@ -20,7 +20,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   useEffect(() => {
     const updateInstances = async () => {
       try {
-        const result = await DiscoveryService.discoveryRDS(credentials, generateToken(DISCOVERY_RDS_TOKEN));
+        const result = await DiscoveryService.discoveryRDS(credentials, generateToken(DISCOVERY_RDS_CANCEL_TOKEN));
 
         if (result) {
           setInstances(result.rds_instances);

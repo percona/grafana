@@ -1,1 +1,1 @@
-export const DISCOVERY_RDS_TOKEN = 'discoveryRds';
+export const DISCOVERY_RDS_CANCEL_TOKEN = 'discoveryRds';

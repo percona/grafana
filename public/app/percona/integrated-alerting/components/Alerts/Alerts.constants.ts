@@ -1,1 +1,1 @@
-export const GET_ALERTS_TOKEN = 'getAlerts';
+export const GET_ALERTS_CANCEL_TOKEN = 'getAlerts';

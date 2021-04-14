@@ -13,7 +13,7 @@ import { Messages } from '../../IntegratedAlerting.messages';
 import { formatRules } from './AlertRules.utils';
 import { AlertRule } from './AlertRules.types';
 import { AlertRulesActions } from './AlertRulesActions';
-import { ALERT_RULES_TABLE_ID, GET_ALERT_RULES_TOKEN } from './AlertRules.constants';
+import { ALERT_RULES_TABLE_ID, GET_ALERT_RULES_CANCEL_TOKEN } from './AlertRules.constants';
 import { useStoredTablePageSize } from '../Table/Pagination';
 import { AlertRulesParamsDetails } from './AlertRulesParamsDetails';
 
@@ -51,7 +51,7 @@ export const AlertRules: FC = () => {
             page_size: pageSize as number,
           },
         },
-        generateToken(GET_ALERT_RULES_TOKEN)
+        generateToken(GET_ALERT_RULES_CANCEL_TOKEN)
       );
       setData(formatRules(rules));
       setTotalItems(totals.total_items || 0);

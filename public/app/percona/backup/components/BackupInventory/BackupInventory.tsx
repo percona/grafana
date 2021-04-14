@@ -17,7 +17,7 @@ import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
-import { BACKUP_TOKEN, LIST_ARTIFACTS_TOKEN } from './BackupInventory.constants';
+import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN } from './BackupInventory.constants';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
@@ -71,7 +71,7 @@ export const BackupInventory: FC = () => {
     setPending(true);
 
     try {
-      const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_TOKEN));
+      const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
       setData(backups);
     } catch (e) {
       if (isApiCancelError(e)) {
@@ -110,7 +110,7 @@ export const BackupInventory: FC = () => {
         location.value || '',
         backupName,
         description,
-        generateToken(BACKUP_TOKEN)
+        generateToken(BACKUP_CANCEL_TOKEN)
       );
       setBackupModalVisible(false);
       setSelectedBackup(null);

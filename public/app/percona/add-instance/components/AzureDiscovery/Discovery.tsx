@@ -8,7 +8,7 @@ import { getStyles } from './Discovery.styles';
 import { DiscoverySearchPanelProps, Instance } from './Discovery.types';
 import { AzureCredentialsForm } from './components/Credentials/Credentials.types';
 import { logger } from '@percona/platform-core';
-import { DISCOVERY_AZURE_TOKEN } from './Discovery.constants';
+import { DISCOVERY_AZURE_CANCEL_TOKEN } from './Discovery.constants';
 
 const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   const styles = getStyles();
@@ -21,7 +21,7 @@ const Discovery: FC<DiscoverySearchPanelProps> = ({ selectInstance }) => {
   useEffect(() => {
     const updateInstances = async () => {
       try {
-        const result = await DiscoveryService.discoveryAzure(credentials, generateToken(DISCOVERY_AZURE_TOKEN));
+        const result = await DiscoveryService.discoveryAzure(credentials, generateToken(DISCOVERY_AZURE_CANCEL_TOKEN));
         if (result) {
           setInstances(result.azure_database_instance);
         }

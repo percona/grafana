@@ -9,7 +9,7 @@ import { useStoredTablePageSize } from '../Table/Pagination';
 import { NotificationChannel as Channel } from './NotificationChannel.types';
 import { Messages } from './NotificationChannel.messages';
 import { NotificationChannelProvider } from './NotificationChannel.provider';
-import { GET_CHANNELS_TOKEN, NOTIFICATION_CHANNEL_TABLE_ID } from './NotificationChannel.constants';
+import { GET_CHANNELS_CANCEL_TOKEN, NOTIFICATION_CHANNEL_TABLE_ID } from './NotificationChannel.constants';
 import { getStyles } from './NotificationChannel.styles';
 import { AddNotificationChannelModal } from './AddNotificationChannelModal';
 import { NotificationChannelActions } from './NotificationChannelActions/NotificationChannelActions';
@@ -62,7 +62,7 @@ export const NotificationChannel: FC = () => {
             page_size: pageSize as number,
           },
         },
-        generateToken(GET_CHANNELS_TOKEN)
+        generateToken(GET_CHANNELS_CANCEL_TOKEN)
       );
       setData(channels);
       setTotalItems(totals.total_items || 0);

@@ -10,7 +10,7 @@ import { ViewKubernetesClusterModalProps } from './ViewClusterConfigModal.types'
 import { KubernetesService } from '../Kubernetes.service';
 import { Messages } from '../../../DBaaS.messages';
 import { getStyles } from './ViewClusterConfigModal.styles';
-import { GET_KUBERNETES_CONFIG_TOKEN } from './ViewClusterConfigModal.constants';
+import { GET_KUBERNETES_CONFIG_CANCEL_TOKEN } from './ViewClusterConfigModal.constants';
 
 export const ViewClusterConfigModal: FC<ViewKubernetesClusterModalProps> = ({
   isVisible,
@@ -43,7 +43,7 @@ export const ViewClusterConfigModal: FC<ViewKubernetesClusterModalProps> = ({
       try {
         const config = await KubernetesService.getKubernetesConfig(
           selectedCluster,
-          generateToken(GET_KUBERNETES_CONFIG_TOKEN)
+          generateToken(GET_KUBERNETES_CONFIG_CANCEL_TOKEN)
         );
 
         setKubeconfig(config.kube_auth.kubeconfig);

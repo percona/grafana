@@ -1,1 +1,1 @@
-export const DISCOVERY_AZURE_TOKEN = 'discoveryAzure';
+export const DISCOVERY_AZURE_CANCEL_TOKEN = 'discoveryAzure';

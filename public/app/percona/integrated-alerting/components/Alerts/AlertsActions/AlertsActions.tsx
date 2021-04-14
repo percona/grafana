@@ -11,7 +11,7 @@ import { AlertStatus } from '../Alerts.types';
 import { AlertsService } from '../Alerts.service';
 import { Messages } from './AlertsActions.messages';
 import { Bell, BellBarred } from './icons';
-import { TOGGLE_ALERT_TOKEN } from './AlertsActions.constants';
+import { TOGGLE_ALERT_CANCEL_TOKEN } from './AlertsActions.constants';
 
 export const AlertsActions: FC<AlertsActionsProps> = ({ alert, getAlerts }) => {
   const styles = useStyles(getStyles);
@@ -30,7 +30,7 @@ export const AlertsActions: FC<AlertsActionsProps> = ({ alert, getAlerts }) => {
           alert_id: alert.alertId,
           silenced: isSilenced ? 'FALSE' : 'TRUE',
         },
-        generateToken(TOGGLE_ALERT_TOKEN)
+        generateToken(TOGGLE_ALERT_CANCEL_TOKEN)
       );
       appEvents.emit(AppEvents.alertSuccess, [isSilenced ? Messages.activateSuccess : Messages.silenceSuccess]);
       getAlerts();

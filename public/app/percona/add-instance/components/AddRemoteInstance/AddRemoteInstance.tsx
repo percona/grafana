@@ -15,7 +15,7 @@ import { InstanceTypes } from '../../panel.types';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
 import { FormApi } from 'final-form';
 import { logger } from '@percona/platform-core';
-import { ADD_AZURE_TOKEN, ADD_RDS_TOKEN } from './AddRemoteInstance.constants';
+import { ADD_AZURE_CANCEL_TOKEN, ADD_RDS_CANCEL_TOKEN } from './AddRemoteInstance.constants';
 
 const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, credentials }, selectInstance }) => {
   const theme = useTheme();
@@ -40,9 +40,12 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
         setLoading(true);
 
         if (values.isRDS) {
-          await AddRemoteInstanceService.addRDS(toPayload(values, discoverName), generateToken(ADD_RDS_TOKEN));
+          await AddRemoteInstanceService.addRDS(toPayload(values, discoverName), generateToken(ADD_RDS_CANCEL_TOKEN));
         } else if (values.isAzure) {
-          await AddRemoteInstanceService.addAzure(toPayload(values, discoverName), generateToken(ADD_AZURE_TOKEN));
+          await AddRemoteInstanceService.addAzure(
+            toPayload(values, discoverName),
+            generateToken(ADD_AZURE_CANCEL_TOKEN)
+          );
         } else {
           await AddRemoteInstanceService.addRemote(type, values, generateToken(remoteToken(type)));
         }

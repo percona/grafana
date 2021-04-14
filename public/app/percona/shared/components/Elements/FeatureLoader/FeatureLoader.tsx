@@ -7,7 +7,7 @@ import { useCancelToken } from '../../hooks/cancelToken.hook';
 import { EmptyBlock } from '../EmptyBlock';
 import { FeatureLoaderProps } from './FeatureLoader.types';
 import { Messages } from './FeatureLoader.messages';
-import { GET_SETTINGS_TOKEN, PMM_SETTINGS_URL } from './FeatureLoader.constants';
+import { GET_SETTINGS_CANCEL_TOKEN, PMM_SETTINGS_URL } from './FeatureLoader.constants';
 import { getStyles } from './FeatureLoader.styles';
 
 export const FeatureLoader: FC<FeatureLoaderProps> = ({
@@ -25,7 +25,7 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({
   const getSettings = async () => {
     setLoadingSettings(true);
     try {
-      const settings = await SettingsService.getSettings(generateToken(GET_SETTINGS_TOKEN));
+      const settings = await SettingsService.getSettings(generateToken(GET_SETTINGS_CANCEL_TOKEN));
       setFeatureEnabled(!!settings[featureFlag]);
     } catch (e) {
       if (isApiCancelError(e)) {

@@ -13,7 +13,7 @@ import { formatAlerts, getSeverityColors } from './Alerts.utils';
 import { AlertsService } from './Alerts.service';
 import { AlertRuleSeverity } from '../AlertRules/AlertRules.types';
 import { AlertsActions } from './AlertsActions';
-import { GET_ALERTS_TOKEN } from './Alerts.constants';
+import { GET_ALERTS_CANCEL_TOKEN } from './Alerts.constants';
 
 const { noData, columns } = Messages.alerts.table;
 const {
@@ -92,7 +92,7 @@ export const Alerts: FC = () => {
   const getAlerts = async () => {
     setPendingRequest(true);
     try {
-      const { alerts } = await AlertsService.list(generateToken(GET_ALERTS_TOKEN));
+      const { alerts } = await AlertsService.list(generateToken(GET_ALERTS_CANCEL_TOKEN));
       setData(formatAlerts(alerts));
     } catch (e) {
       if (isApiCancelError(e)) {

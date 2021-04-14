@@ -11,7 +11,7 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { AgentsList } from 'app/percona/inventory/Inventory.types';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { InventoryService } from '../Inventory.service';
-import { AGENTS_COLUMNS, GET_AGENTS_TOKEN } from '../Inventory.constants';
+import { AGENTS_COLUMNS, GET_AGENTS_CANCEL_TOKEN } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
 import { CheckboxField } from '@percona/platform-core';
 import { appEvents } from '../../../core/app_events';
@@ -32,7 +32,7 @@ export const Agents = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const result: AgentsList = await InventoryService.getAgents(generateToken(GET_AGENTS_TOKEN));
+      const result: AgentsList = await InventoryService.getAgents(generateToken(GET_AGENTS_CANCEL_TOKEN));
 
       setData(InventoryDataService.getAgentModel(result));
     } catch (e) {

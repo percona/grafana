@@ -1,2 +1,2 @@
-export const LIST_ARTIFACTS_TOKEN = 'listArtifacts';
-export const BACKUP_TOKEN = 'backup';
+export const LIST_ARTIFACTS_CANCEL_TOKEN = 'listArtifacts';
+export const BACKUP_CANCEL_TOKEN = 'backup';

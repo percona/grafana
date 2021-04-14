@@ -2,8 +2,8 @@ import { PageModel } from 'app/core/components/Breadcrumb';
 import { Messages } from './Settings.messages';
 import { TabKeys } from './Settings.types';
 
-export const GET_SETTINGS_TOKEN = 'getSettings';
-export const SET_SETTINGS_TOKEN = 'setSettings';
+export const GET_SETTINGS_CANCEL_TOKEN = 'getSettings';
+export const SET_SETTINGS_CANCEL_TOKEN = 'setSettings';
 
 export const DEFAULT_TAB = TabKeys.metrics;
 

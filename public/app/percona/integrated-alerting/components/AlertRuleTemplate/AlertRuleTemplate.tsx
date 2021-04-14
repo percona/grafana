@@ -12,7 +12,7 @@ import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
 import { Column } from 'react-table';
 import { AlertRuleTemplateActions } from './AlertRuleTemplateActions/AlertRuleTemplateActions';
 import { FormattedTemplate } from './AlertRuleTemplate.types';
-import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_TEMPLATES_TOKEN } from './AlertRuleTemplate.constants';
+import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_TEMPLATES_CANCEL_TOKEN } from './AlertRuleTemplate.constants';
 import { useStoredTablePageSize } from '../Table/Pagination';
 
 const { noData, columns } = Messages.alertRuleTemplate.table;
@@ -67,7 +67,7 @@ export const AlertRuleTemplate: FC = () => {
             page_size: pageSize as number,
           },
         },
-        generateToken(GET_TEMPLATES_TOKEN)
+        generateToken(GET_TEMPLATES_CANCEL_TOKEN)
       );
       setData(formatTemplates(templates));
       setTotalItems(totals.total_items || 0);

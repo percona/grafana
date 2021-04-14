@@ -11,7 +11,7 @@ import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { InventoryService } from '../Inventory.service';
 import { ServicesList } from '../Inventory.types';
-import { GET_SERVICES_TOKEN, SERVICES_COLUMNS } from '../Inventory.constants';
+import { GET_SERVICES_CANCEL_TOKEN, SERVICES_COLUMNS } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
 import { CheckboxField } from '@percona/platform-core';
 import { appEvents } from '../../../core/app_events';
@@ -36,7 +36,7 @@ export const Services = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const result: ServicesList = await InventoryService.getServices(generateToken(GET_SERVICES_TOKEN));
+      const result: ServicesList = await InventoryService.getServices(generateToken(GET_SERVICES_CANCEL_TOKEN));
 
       setData(InventoryDataService.getServiceModel(result));
     } catch (e) {

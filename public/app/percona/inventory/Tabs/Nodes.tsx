@@ -11,7 +11,7 @@ import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { InventoryService } from '../Inventory.service';
 import { NodesList } from '../Inventory.types';
-import { GET_NODES_TOKEN, NODES_COLUMNS } from '../Inventory.constants';
+import { GET_NODES_CANCEL_TOKEN, NODES_COLUMNS } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
 import { CheckboxField } from '@percona/platform-core';
 import { appEvents } from '../../../core/app_events';
@@ -34,7 +34,7 @@ export const NodesTab = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const result: NodesList = await InventoryService.getNodes(generateToken(GET_NODES_TOKEN));
+      const result: NodesList = await InventoryService.getNodes(generateToken(GET_NODES_CANCEL_TOKEN));
 
       setData(InventoryDataService.getNodeModel(result));
     } catch (e) {
