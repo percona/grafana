@@ -4,14 +4,14 @@ import { useRef, useEffect } from 'react';
 type hookRecurringCallback = () => void;
 
 export const useRecurringCall = () => {
-  const timer = useRef<number>();
+  const timer = useRef<ReturnType<typeof setTimeout>>();
   const interval = useRef<number>();
 
   const triggerTimeout = async (cb: hookRecurringCallback, defaultInterval = 10000, callImmediate = false) => {
     interval.current = defaultInterval;
     try {
       callImmediate && (await cb());
-      timer.current = window.setTimeout(async () => {
+      timer.current = setTimeout(async () => {
         await cb();
         triggerTimeout(cb, interval.current);
       }, interval.current);
@@ -26,7 +26,7 @@ export const useRecurringCall = () => {
   };
 
   const stopTimeout = () => {
-    window.clearTimeout(timer.current);
+    timer.current && clearTimeout(timer.current);
   };
 
   useEffect(() => {
