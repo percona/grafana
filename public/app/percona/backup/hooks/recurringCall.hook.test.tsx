@@ -4,15 +4,17 @@ import { useRecurringCall } from './recurringCall.hook';
 
 let fakeCallback: jest.Mock;
 const runAllPromises = () => new Promise(resolve => setImmediate(resolve));
+const TIMEOUT_TIME = 5000;
+const CHANGED_TIMEOUT_TIME = 20000;
 
 const Dummy = () => {
   const [triggerTimeout, changeInterval, stopTimeout] = useRecurringCall();
 
   return (
     <>
-      <button onClick={() => triggerTimeout(fakeCallback, 5000, true)}></button>
+      <button onClick={() => triggerTimeout(fakeCallback, TIMEOUT_TIME, true)}></button>
       <button onClick={() => stopTimeout()}></button>
-      <button onClick={() => changeInterval(20000)}></button>
+      <button onClick={() => changeInterval(CHANGED_TIMEOUT_TIME)}></button>
     </>
   );
 };
