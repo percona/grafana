@@ -11,13 +11,14 @@ export const useCancelToken = () => {
     return tokenSource.token;
   };
 
-  useEffect(() => {
-    return function cleanup() {
+  useEffect(
+    () => () => {
       for (const source in tokens.current) {
         tokens.current[source].cancel();
       }
-    };
-  }, []);
+    },
+    []
+  );
 
   return [generateToken] as const;
 };
