@@ -21,9 +21,13 @@ const SideMenuDropDown: FC<Props> = props => {
           <span className="sidemenu-item-text">{link.text}</span>
         </a>
       </li>
-      {childrenLinks.map((child, index) => (
-        <DropDownChild child={child} key={`${child.url}-${index}`} />
-      ))}
+      {childrenLinks.map((child, index) => {
+        return (
+          <>
+            <DropDownChild child={child} key={`${child.url}-${index}`} />
+          </>
+        );
+      })}
     </ul>
   );
 };
