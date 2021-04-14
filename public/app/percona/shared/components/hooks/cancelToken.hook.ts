@@ -13,7 +13,7 @@ export const useCancelToken = () => {
 
   useEffect(() => {
     return function cleanup() {
-      for (let source in tokens.current) {
+      for (const source in tokens.current) {
         tokens.current[source].cancel();
       }
     };
