@@ -4,8 +4,12 @@ import axios, { CancelTokenSource } from 'axios';
 export const useCancelToken = () => {
   const tokens = useRef<Record<string, CancelTokenSource>>({});
 
-  const generateToken = (sourceName: string) => {
+  const cancelToken = (sourceName: string) => {
     tokens.current[sourceName] && tokens.current[sourceName].cancel();
+  };
+
+  const generateToken = (sourceName: string) => {
+    cancelToken(sourceName);
     const tokenSource = axios.CancelToken.source();
     tokens.current = { ...tokens.current, [sourceName]: tokenSource };
     return tokenSource.token;
@@ -13,12 +17,12 @@ export const useCancelToken = () => {
 
   useEffect(
     () => () => {
-      for (const source in tokens.current) {
-        tokens.current[source].cancel();
-      }
+      Object.keys(tokens.current).forEach(sourceName => {
+        cancelToken(sourceName);
+      });
     },
     []
   );
 
-  return [generateToken] as const;
+  return [generateToken, cancelToken] as const;
 };
