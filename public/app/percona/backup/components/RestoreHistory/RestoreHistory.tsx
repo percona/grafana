@@ -1,4 +1,4 @@
-import React, { FC, useState, useMemo } from 'react';
+import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column } from 'react-table';
 import { Messages as BackupMessages } from '../BackupInventory/BackupInventory.messages';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -6,12 +6,15 @@ import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { BackupCreation } from '../BackupInventory/BackupCreation';
 import { Restore } from './RestoreHistory.types';
+import { RestoreHistoryService } from './RestoreHistory.service';
+import { logger } from '@percona/platform-core';
 
 const { columns, noData } = BackupMessages;
 const { name, created, location, vendor } = columns;
 
 export const RestoreHistory: FC = () => {
-  const [data] = useState<Restore[]>([]);
+  const [pending, setPending] = useState(false);
+  const [data, setData] = useState<Restore[]>([]);
   const columns = useMemo(
     (): Column[] => [
       {
@@ -38,5 +41,23 @@ export const RestoreHistory: FC = () => {
     ],
     []
   );
-  return <Table columns={columns} data={data} totalItems={data.length} emptyMessage={noData} />;
+
+  const getData = async () => {
+    setPending(true);
+
+    try {
+      const restores = await RestoreHistoryService.list();
+      setData(restores);
+    } catch (e) {
+      logger.error(e);
+    }
+    setPending(false);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+  return (
+    <Table columns={columns} data={data} totalItems={data.length} emptyMessage={noData} pendingRequest={pending} />
+  );
 };
