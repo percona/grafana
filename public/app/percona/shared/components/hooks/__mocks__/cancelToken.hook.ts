@@ -1,1 +1,1 @@
-export const useCancelToken = () => [() => undefined];
+export const useCancelToken = () => [jest.fn(), jest.fn()];

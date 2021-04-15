@@ -3,6 +3,9 @@ import { mount } from 'enzyme';
 import { useCancelToken } from './cancelToken.hook';
 import axios from 'axios';
 
+const FIRST_CANCEL_TOKEN = 'firstRequest';
+const SECOND_CANCEL_TOKEN = 'secondRequest';
+
 jest.mock('axios', () => ({
   __esModule: true,
   default: {
@@ -17,12 +20,13 @@ const sourceSpy = jest.fn().mockImplementation(() => ({ cancel: cancelSpy }));
 jest.spyOn(axios.CancelToken, 'source').mockImplementation(sourceSpy);
 
 const Dummy = () => {
-  const [generateToken] = useCancelToken();
+  const [generateToken, cancelToken] = useCancelToken();
 
   return (
     <>
-      <button onClick={() => generateToken('firstToken')}></button>
-      <button onClick={() => generateToken('secondToken')}></button>
+      <button onClick={() => generateToken(FIRST_CANCEL_TOKEN)}></button>
+      <button onClick={() => generateToken(SECOND_CANCEL_TOKEN)}></button>
+      <button onClick={() => cancelToken(FIRST_CANCEL_TOKEN)}></button>
     </>
   );
 };
@@ -52,8 +56,8 @@ describe('useCancelToken', () => {
     button.first().simulate('click');
     button.first().simulate('click');
 
-    button.last().simulate('click');
-    button.last().simulate('click');
+    button.at(1).simulate('click');
+    button.at(1).simulate('click');
 
     expect(sourceSpy).toHaveBeenCalledTimes(5);
     expect(cancelSpy).toHaveBeenCalledTimes(3);
@@ -67,11 +71,21 @@ describe('useCancelToken', () => {
     button.first().simulate('click');
     button.first().simulate('click');
 
-    button.last().simulate('click');
-    button.last().simulate('click');
+    button.at(1).simulate('click');
+    button.at(1).simulate('click');
 
     wrapper.unmount();
 
     expect(cancelSpy).toHaveBeenCalledTimes(5);
+  });
+
+  it('should explicitly cancel a token', () => {
+    const wrapper = mount(<Dummy />);
+    const button = wrapper.find('button');
+
+    button.first().simulate('click');
+    button.last().simulate('click');
+
+    expect(cancelSpy).toHaveBeenCalledTimes(1);
   });
 });
