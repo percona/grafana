@@ -21,5 +21,6 @@ export const Messages = {
     physical: 'Physical',
     logical: 'Logical',
   },
+  actions: 'Actions',
   add: 'Add',
 };

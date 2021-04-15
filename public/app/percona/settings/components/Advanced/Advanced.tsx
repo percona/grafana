@@ -75,6 +75,9 @@ export const Advanced: FC<AdvancedProps> = ({
       technicalPreviewLegend,
       technicalPreviewDescription,
       technicalPreviewLinkText,
+      backupLabel,
+      backupLink,
+      backupTooltip,
     },
     tooltipLinkText,
   } = Messages;
@@ -237,7 +240,7 @@ export const Advanced: FC<AdvancedProps> = ({
               </div>
             ))}
             {/* TODO remove comment when feature is ready to come out */}
-            {/* <Field
+            <Field
               name="backup"
               type="checkbox"
               label={backupLabel}
@@ -248,7 +251,7 @@ export const Advanced: FC<AdvancedProps> = ({
               disabled={!values.telemetry}
               dataQa="advanced-backup"
               component={SwitchRow}
-            /> */}
+            />
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">
