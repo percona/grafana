@@ -3,6 +3,7 @@ export const Messages = {
     inventory: 'Backup Inventory',
     scheduled: 'Scheduled Backups',
     locations: 'Storage Locations',
+    restore: 'Restore History',
   },
   backupManagement: 'Backup Management',
 };
