@@ -75,7 +75,7 @@ export const BackupInventory: FC = () => {
     } catch (e) {
       logger.error(e);
     } finally {
-      showLoading && setPending(false);
+      setPending(false);
     }
   };
 
