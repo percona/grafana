@@ -1,8 +1,7 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column } from 'react-table';
-import { Messages as BackupMessages } from '../BackupInventory/BackupInventory.messages';
 import { Status } from '../BackupInventory/Status';
-import { Messages as RestoreMessages } from './RestoreHistory.messages';
+import { Messages } from '../../Backup.messages';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
@@ -11,39 +10,34 @@ import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { logger } from '@percona/platform-core';
 
-const { columns: backupColumns } = BackupMessages;
-const { columns: restoreColumns, noData } = RestoreMessages;
-const { name, location, vendor } = backupColumns;
-const { started } = restoreColumns;
-
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(false);
   const [data, setData] = useState<Restore[]>([]);
   const columns = useMemo(
     (): Column[] => [
       {
-        Header: name,
+        Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
         id: 'name',
         width: '250px',
         Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
-        Header: vendor,
+        Header: Messages.backupInventory.table.columns.vendor,
         accessor: ({ vendor }: Restore) => DATABASE_LABELS[vendor],
         width: '150px',
       },
       {
-        Header: started,
+        Header: Messages.restoreHistory.table.columns.started,
         accessor: 'started',
         Cell: ({ value }) => <BackupCreation date={value} />,
       },
       {
-        Header: location,
+        Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
       },
       {
-        Header: status,
+        Header: Messages.backupInventory.table.columns.status,
         accessor: 'status',
         Cell: ({ value }) => <Status status={value} />,
       },
@@ -67,6 +61,12 @@ export const RestoreHistory: FC = () => {
     getData();
   }, []);
   return (
-    <Table columns={columns} data={data} totalItems={data.length} emptyMessage={noData} pendingRequest={pending} />
+    <Table
+      columns={columns}
+      data={data}
+      totalItems={data.length}
+      emptyMessage={Messages.restoreHistory.table.noData}
+      pendingRequest={pending}
+    />
   );
 };

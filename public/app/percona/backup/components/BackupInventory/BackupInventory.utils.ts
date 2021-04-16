@@ -1,5 +1,5 @@
 import { DataModel, Status } from './BackupInventory.types';
-import { Messages } from './BackupInventory.messages';
+import { Messages } from '../../Backup.messages';
 
 const { status: statusMsg, dataModel: dataModelMsg } = Messages;
 
