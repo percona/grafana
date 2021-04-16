@@ -1,4 +1,4 @@
-import { Status } from '../BackupInventory.types';
+import { Status } from '../../Backup.types';
 
 export interface StatusProps {
   status: Status;

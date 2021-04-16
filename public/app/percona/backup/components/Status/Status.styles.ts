@@ -1,6 +1,6 @@
 import { GrafanaTheme } from '@grafana/data';
 import { stylesFactory } from '@grafana/ui';
-import { Status } from '../BackupInventory.types';
+import { Status } from '../../Backup.types';
 import { css } from 'emotion';
 
 export const getStyles = stylesFactory((theme: GrafanaTheme, status: Status) => {

@@ -8,7 +8,7 @@ import { ExpandableCell } from 'app/percona/shared/components/Elements/Expandabl
 import { BackupInventoryDetails } from './BackupInventoryDetails';
 import { AddBackupModal } from './AddBackupModal';
 import { AddBackupFormProps } from './AddBackupModal/AddBackupModal.types';
-import { Status } from './Status';
+import { Status } from '../Status';
 import { BackupInventoryActions } from './BackupInventoryActions';
 import { BackupCreation } from './BackupCreation';
 import { Messages } from '../../Backup.messages';

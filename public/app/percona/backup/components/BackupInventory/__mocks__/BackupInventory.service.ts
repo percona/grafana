@@ -1,4 +1,5 @@
-import { Backup, DataModel, Status } from '../BackupInventory.types';
+import { Backup } from '../BackupInventory.types';
+import { DataModel, Status } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import * as service from '../BackupInventory.service';
 

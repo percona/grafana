@@ -1,6 +1,6 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column } from 'react-table';
-import { Status } from '../BackupInventory/Status';
+import { Status } from '../Status';
 import { Messages } from '../../Backup.messages';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
