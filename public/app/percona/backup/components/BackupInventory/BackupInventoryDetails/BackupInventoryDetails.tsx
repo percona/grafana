@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { useStyles } from '@grafana/ui';
 import { BackupInventoryDetailsProps } from './BackupInventoryDetails.types';
 import { Status } from '../../Status';
-import { formatDataModel } from '../BackupInventory.utils';
+import { formatDataModel } from 'app/percona/backup/Backup.utils';
 import { Messages } from './BackupInventoryDetails.messages';
 import { getStyles } from './BackupInventoryDetails.styles';
 

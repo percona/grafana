@@ -1,5 +1,5 @@
-import { DataModel, Status } from '../../Backup.types';
-import { Messages } from '../../Backup.messages';
+import { Messages } from './Backup.messages';
+import { DataModel, Status } from './Backup.types';
 
 const { status: statusMsg, dataModel: dataModelMsg } = Messages;
 

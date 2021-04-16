@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import { useStyles } from '@grafana/ui';
 import moment from 'moment/moment';
+import { formatDataModel } from 'app/percona/backup/Backup.utils';
 import { RestoreHistoryDetailsProps } from './RestoreHistoryDetails.types';
 import { Messages } from './RestoreHistoryDetails.Messages';
 import { getStyles } from './RestoreHistoryDetails.styles';
-import { formatDataModel } from '../../BackupInventory/BackupInventory.utils';
 import { DAY_FORMAT, HOUR_FORMAT } from '../../BackupInventory/BackupCreation/BackupCreation.constants';
 
 export const BackupInventoryDetails: FC<RestoreHistoryDetailsProps> = ({ name, finished, dataModel }) => {

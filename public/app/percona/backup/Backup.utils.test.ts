@@ -1,6 +1,6 @@
-import { DataModel, Status } from './BackupInventory.types';
-import { formatStatus, formatDataModel } from './BackupInventory.utils';
-import { Messages } from './BackupInventory.messages';
+import { DataModel, Status } from './Backup.types';
+import { formatStatus, formatDataModel } from './Backup.utils';
+import { Messages } from './Backup.messages';
 
 const { status: statusMsg, dataModel: dataModelMsg } = Messages;
 
