@@ -1,34 +1,37 @@
-import { Databases } from 'app/percona/shared/core';
-import { DataModel, Status } from '../BackupInventory/BackupInventory.types';
-import { Restore } from './RestoreHistory.types';
+import { api } from 'app/percona/shared/helpers/api';
+import { Restore, RestoreResponse } from './RestoreHistory.types';
+
+const BASE_URL = '/v1/management/backup';
 
 export const RestoreHistoryService = {
   async list(): Promise<Restore[]> {
-    return [
-      {
-        id: 'restore_1',
-        name: 'Restore 1',
-        locationId: 'location_1',
-        locationName: 'Location 1',
-        created: 1615912580244,
-        serviceId: 'service_1',
-        serviceName: 'Service 1',
-        dataModel: DataModel.LOGICAL,
-        status: Status.SUCCESS,
-        vendor: Databases.mysql,
-      },
-      {
-        id: 'restore_2',
-        name: 'Restore 2',
-        locationId: 'location_2',
-        locationName: 'Location 2',
-        created: 1615912580244,
-        serviceId: 'service_2',
-        serviceName: 'Service 2',
-        dataModel: DataModel.PHYSICAL,
-        status: Status.IN_PROGRESS,
-        vendor: Databases.mysql,
-      },
-    ];
+    const { items = [] } = await api.post<RestoreResponse, any>(`${BASE_URL}/RestoreHistory/List`, {});
+    return items.map(
+      ({
+        restore_id,
+        name,
+        vendor,
+        service_id,
+        service_name,
+        location_id,
+        location_name,
+        status,
+        started_at,
+        finished_at,
+        data_model,
+      }): Restore => ({
+        id: restore_id,
+        name,
+        vendor,
+        status,
+        started: new Date(started_at).getTime(),
+        finished: new Date(finished_at).getTime(),
+        locationId: location_id,
+        locationName: location_name,
+        serviceId: service_id,
+        serviceName: service_name,
+        dataModel: data_model,
+      })
+    );
   },
 };
