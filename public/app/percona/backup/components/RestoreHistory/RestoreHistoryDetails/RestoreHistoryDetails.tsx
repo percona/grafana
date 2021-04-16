@@ -7,7 +7,7 @@ import { Messages } from './RestoreHistoryDetails.Messages';
 import { getStyles } from './RestoreHistoryDetails.styles';
 import { DAY_FORMAT, HOUR_FORMAT } from '../../BackupInventory/BackupCreation/BackupCreation.constants';
 
-export const BackupInventoryDetails: FC<RestoreHistoryDetailsProps> = ({ name, finished, dataModel }) => {
+export const RestoreHistoryDetails: FC<RestoreHistoryDetailsProps> = ({ name, finished, dataModel }) => {
   const styles = useStyles(getStyles);
   const dataModelMsg = formatDataModel(dataModel);
   const momentObj = moment(finished);

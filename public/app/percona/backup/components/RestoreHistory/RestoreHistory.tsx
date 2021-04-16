@@ -9,7 +9,7 @@ import { BackupCreation } from '../BackupInventory/BackupCreation';
 import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { logger } from '@percona/platform-core';
-import { BackupInventoryDetails } from './RestoreHistoryDetails';
+import { RestoreHistoryDetails } from './RestoreHistoryDetails';
 
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(false);
@@ -48,7 +48,7 @@ export const RestoreHistory: FC = () => {
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<Restore>) => (
-      <BackupInventoryDetails
+      <RestoreHistoryDetails
         name={row.original.name}
         finished={row.original.finished}
         dataModel={row.original.dataModel}
