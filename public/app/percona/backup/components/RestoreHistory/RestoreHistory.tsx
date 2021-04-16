@@ -1,6 +1,8 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column } from 'react-table';
 import { Messages as BackupMessages } from '../BackupInventory/BackupInventory.messages';
+import { Status } from '../BackupInventory/Status';
+import { Messages as RestoreMessages } from './RestoreHistory.messages';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
@@ -9,8 +11,10 @@ import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { logger } from '@percona/platform-core';
 
-const { columns, noData } = BackupMessages;
-const { name, created, location, vendor } = columns;
+const { columns: backupColumns } = BackupMessages;
+const { columns: restoreColumns, noData } = RestoreMessages;
+const { name, location, vendor } = backupColumns;
+const { started } = restoreColumns;
 
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(false);
@@ -30,13 +34,18 @@ export const RestoreHistory: FC = () => {
         width: '150px',
       },
       {
-        Header: created,
-        accessor: 'created',
+        Header: started,
+        accessor: 'started',
         Cell: ({ value }) => <BackupCreation date={value} />,
       },
       {
         Header: location,
         accessor: 'locationName',
+      },
+      {
+        Header: status,
+        accessor: 'status',
+        Cell: ({ value }) => <Status status={value} />,
       },
     ],
     []
