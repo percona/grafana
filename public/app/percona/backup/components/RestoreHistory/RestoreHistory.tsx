@@ -1,5 +1,5 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
-import { Column } from 'react-table';
+import { Column, Row } from 'react-table';
 import { Status } from '../Status';
 import { Messages } from '../../Backup.messages';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -9,6 +9,7 @@ import { BackupCreation } from '../BackupInventory/BackupCreation';
 import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { logger } from '@percona/platform-core';
+import { BackupInventoryDetails } from './RestoreHistoryDetails';
 
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(false);
@@ -45,6 +46,17 @@ export const RestoreHistory: FC = () => {
     []
   );
 
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<Restore>) => (
+      <BackupInventoryDetails
+        name={row.original.name}
+        finished={row.original.finished}
+        dataModel={row.original.dataModel}
+      />
+    ),
+    []
+  );
+
   const getData = async () => {
     setPending(true);
 
@@ -67,6 +79,7 @@ export const RestoreHistory: FC = () => {
       totalItems={data.length}
       emptyMessage={Messages.restoreHistory.table.noData}
       pendingRequest={pending}
+      renderExpandedRow={renderSelectedSubRow}
     />
   );
 };
