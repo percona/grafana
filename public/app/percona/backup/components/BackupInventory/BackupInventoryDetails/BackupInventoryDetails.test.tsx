@@ -1,8 +1,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { BackupInventoryDetails } from './BackupInventoryDetails';
-import { DataModel, Status } from '../BackupInventory.types';
 import { dataQa } from '@percona/platform-core';
+import { DataModel, Status } from 'app/percona/backup/Backup.types';
 
 describe('BackupInventoryDetails', () => {
   it('should have all fields', () => {
