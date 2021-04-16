@@ -8,14 +8,12 @@ import { BackupCreation } from '../BackupInventory/BackupCreation';
 import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { logger } from '@percona/platform-core';
-import { RestoreHistoryActions } from './RestoreHistoryActions';
 
 const { columns, noData } = BackupMessages;
-const { name, created, location, vendor, actions } = columns;
+const { name, created, location, vendor } = columns;
 
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(false);
-  const [, setSelectedRestore] = useState<Restore | null>(null);
   const [data, setData] = useState<Restore[]>([]);
   const columns = useMemo(
     (): Column[] => [
@@ -40,34 +38,9 @@ export const RestoreHistory: FC = () => {
         Header: location,
         accessor: 'locationName',
       },
-      {
-        Header: actions,
-        accessor: 'id',
-        Cell: ({ row }) => (
-          <RestoreHistoryActions
-            restore={row.original as Restore}
-            onCancel={onCancelClick}
-            onRestore={onRestoreClick}
-            onDelete={onDeleteClick}
-          />
-        ),
-        width: '150px',
-      },
     ],
     []
   );
-
-  const onCancelClick = (restore: Restore) => {
-    setSelectedRestore(restore);
-  };
-
-  const onRestoreClick = (restore: Restore) => {
-    setSelectedRestore(restore);
-  };
-
-  const onDeleteClick = (restore: Restore) => {
-    setSelectedRestore(restore);
-  };
 
   const getData = async () => {
     setPending(true);
