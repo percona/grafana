@@ -18,7 +18,7 @@ import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
 import { RestoreBackupModal } from './RestoreBackupModal';
 import { getStyles } from './BackupInventory.styles';
-import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN } from './BackupInventory.constants';
+import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN } from './BackupInventory.constants';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
@@ -84,7 +84,7 @@ export const BackupInventory: FC = () => {
 
   const handleRestore = async (serviceId: string, locationId: string, artifactId: string) => {
     try {
-      await BackupInventoryService.restore(serviceId, locationId, artifactId);
+      await BackupInventoryService.restore(serviceId, locationId, artifactId, generateToken(RESTORE_CANCEL_TOKEN));
       setRestoreModalVisible(false);
     } catch (e) {
       logger.error(e);
