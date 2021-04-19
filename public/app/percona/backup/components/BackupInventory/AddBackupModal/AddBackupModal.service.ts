@@ -6,26 +6,26 @@ import { SelectableService } from './AddBackupModal.types';
 
 export const AddBackupModalService = {
   async loadServiceOptions(): Promise<Array<SelectableValue<SelectableService>>> {
-    let result: Array<SelectableValue<SelectableService>> = [];
     const supportedServices: Databases[] = [Databases.mysql, Databases.mongodb];
     const services = await InventoryService.getDbServices();
 
-    Object.keys(services).forEach((serviceName: Databases) => {
-      if (supportedServices.includes(serviceName) && services[serviceName]) {
-        const newServices = services[serviceName] || [];
+    return Object.keys(services).reduce((acc, serviceName: Databases) => {
+      const newServices = services[serviceName] ?? [];
 
-        result.push(
+      if (supportedServices.includes(serviceName)) {
+        return [
+          ...acc,
           ...newServices.map(
             ({ id, name }): SelectableValue<SelectableService> => ({
               label: name,
-              value: { id, vendor: Databases.mysql },
+              value: { id, vendor: serviceName },
             })
-          )
-        );
+          ),
+        ];
       }
-    });
 
-    return result;
+      return acc;
+    }, [] as Array<SelectableValue<SelectableService>>);
   },
   async loadLocationOptions(): Promise<Array<SelectableValue<string>>> {
     const { locations = [] } = await StorageLocationsService.list();
