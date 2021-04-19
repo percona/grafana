@@ -10,8 +10,7 @@ export const AddBackupModalService = {
     const supportedServices: Databases[] = [Databases.mysql, Databases.mongodb];
     const services = await InventoryService.getDbServices();
 
-    let serviceName: Databases;
-    for (serviceName in services) {
+    Object.keys(services).forEach((serviceName: Databases) => {
       if (supportedServices.includes(serviceName) && services[serviceName]) {
         const newServices = services[serviceName] || [];
 
@@ -24,7 +23,7 @@ export const AddBackupModalService = {
           )
         );
       }
-    }
+    });
 
     return result;
   },
