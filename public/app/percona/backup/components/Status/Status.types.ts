@@ -1,5 +1,5 @@
-import { Status } from '../../Backup.types';
+import { RestoreStatus, BackupStatus } from '../../Backup.types';
 
 export interface StatusProps {
-  status: Status;
+  status: BackupStatus | RestoreStatus;
 }

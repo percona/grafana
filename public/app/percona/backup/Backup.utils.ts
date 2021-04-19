@@ -1,16 +1,20 @@
 import { Messages } from './Backup.messages';
-import { DataModel, Status } from './Backup.types';
+import { DataModel, RestoreStatus, BackupStatus } from './Backup.types';
 
 const { status: statusMsg, dataModel: dataModelMsg } = Messages;
 
-export const formatStatus = (status: Status): string => {
-  const map: Record<Status, string> = {
-    [Status.STATUS_INVALID]: statusMsg.invalid,
-    [Status.PENDING]: statusMsg.pending,
-    [Status.IN_PROGRESS]: statusMsg.inProgress,
-    [Status.PAUSED]: statusMsg.paused,
-    [Status.SUCCESS]: statusMsg.success,
-    [Status.ERROR]: statusMsg.error,
+export const formatStatus = (status: BackupStatus | RestoreStatus): string => {
+  const map: Record<BackupStatus | RestoreStatus, string> = {
+    [BackupStatus.BACKUP_STATUS_INVALID]: statusMsg.invalid,
+    [RestoreStatus.RESTORE_STATUS_INVALID]: statusMsg.invalid,
+    [BackupStatus.BACKUP_STATUS_PENDING]: statusMsg.pending,
+    [BackupStatus.BACKUP_STATUS_IN_PROGRESS]: statusMsg.inProgress,
+    [RestoreStatus.RESTORE_STATUS_IN_PROGRESS]: statusMsg.inProgress,
+    [BackupStatus.BACKUP_STATUS_PAUSED]: statusMsg.paused,
+    [BackupStatus.BACKUP_STATUS_SUCCESS]: statusMsg.success,
+    [RestoreStatus.RESTORE_STATUS_SUCCESS]: statusMsg.success,
+    [BackupStatus.BACKUP_STATUS_ERROR]: statusMsg.error,
+    [RestoreStatus.RESTORE_STATUS_ERROR]: statusMsg.error,
   };
 
   return map[status] ?? '';
