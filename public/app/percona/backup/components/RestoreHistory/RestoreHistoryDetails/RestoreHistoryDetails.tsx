@@ -5,7 +5,7 @@ import { formatDataModel } from 'app/percona/backup/Backup.utils';
 import { RestoreHistoryDetailsProps } from './RestoreHistoryDetails.types';
 import { Messages } from './RestoreHistoryDetails.Messages';
 import { getStyles } from './RestoreHistoryDetails.styles';
-import { DAY_FORMAT, HOUR_FORMAT } from '../../BackupInventory/BackupCreation/BackupCreation.constants';
+import { DAY_FORMAT, HOUR_FORMAT } from '../../DetailedDate/DetailedDate.constants';
 
 export const RestoreHistoryDetails: FC<RestoreHistoryDetailsProps> = ({ name, finished, dataModel }) => {
   const styles = useStyles(getStyles);

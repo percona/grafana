@@ -10,7 +10,7 @@ import { AddBackupModal } from './AddBackupModal';
 import { AddBackupFormProps } from './AddBackupModal/AddBackupModal.types';
 import { Status } from '../Status';
 import { BackupInventoryActions } from './BackupInventoryActions';
-import { BackupCreation } from './BackupCreation';
+import { DetailedDate } from '../DetailedDate';
 import { Messages } from '../../Backup.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
@@ -38,7 +38,7 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.created,
         accessor: 'created',
-        Cell: ({ value }) => <BackupCreation date={value} />,
+        Cell: ({ value }) => <DetailedDate date={value} />,
       },
       {
         Header: Messages.backupInventory.table.columns.location,

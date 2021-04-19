@@ -5,7 +5,7 @@ import { Messages } from '../../Backup.messages';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
-import { BackupCreation } from '../BackupInventory/BackupCreation';
+import { DetailedDate } from '../DetailedDate';
 import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { logger } from '@percona/platform-core';
@@ -31,7 +31,7 @@ export const RestoreHistory: FC = () => {
       {
         Header: Messages.restoreHistory.table.columns.started,
         accessor: 'started',
-        Cell: ({ value }) => <BackupCreation date={value} />,
+        Cell: ({ value }) => <DetailedDate date={value} />,
       },
       {
         Header: Messages.backupInventory.table.columns.location,
