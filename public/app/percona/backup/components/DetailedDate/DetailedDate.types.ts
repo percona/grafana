@@ -3,4 +3,5 @@ export interface DetailedDateProps {
   dayFormat?: string;
   hourFormat?: string;
   dataQa?: string;
+  className?: string;
 }
