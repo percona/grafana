@@ -2,6 +2,8 @@ import React, { FC, useMemo, useState, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
@@ -14,19 +16,27 @@ import { BackupCreation } from './BackupCreation';
 import { Messages } from './BackupInventory.messages';
 import { Backup } from './BackupInventory.types';
 import { BackupInventoryService } from './BackupInventory.service';
+import { RestoreBackupModal } from './RestoreBackupModal';
 import { getStyles } from './BackupInventory.styles';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
-import { DATA_INTERVAL } from './BackupInventory.constants';
+import {
+  BACKUP_CANCEL_TOKEN,
+  LIST_ARTIFACTS_CANCEL_TOKEN,
+  RESTORE_CANCEL_TOKEN,
+  DATA_INTERVAL,
+} from './BackupInventory.constants';
 
 const { columns, noData } = Messages;
 const { name, created, location, vendor, status, actions } = columns;
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(false);
+  const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
   const [triggerTimeout] = useRecurringCall();
+  const [generateToken] = useCancelToken();
   const columns = useMemo(
     (): Column[] => [
       {
@@ -58,25 +68,49 @@ export const BackupInventory: FC = () => {
       {
         Header: actions,
         accessor: 'id',
-        Cell: ({ row }) => <BackupInventoryActions onBackup={onBackupClick} backup={row.original as Backup} />,
-        width: '80px',
+        Cell: ({ row }) => (
+          <BackupInventoryActions onRestore={onRestoreClick} onBackup={onBackupClick} backup={row.original as Backup} />
+        ),
+        width: '110px',
       },
     ],
     []
   );
   const styles = useStyles(getStyles);
 
+  const onRestoreClick = (backup: Backup) => {
+    setSelectedBackup(backup);
+    setRestoreModalVisible(true);
+  };
+
+  const handleClose = () => {
+    setSelectedBackup(null);
+    setRestoreModalVisible(false);
+    setBackupModalVisible(false);
+  };
+
+  const handleRestore = async (serviceId: string, locationId: string, artifactId: string) => {
+    try {
+      await BackupInventoryService.restore(serviceId, locationId, artifactId, generateToken(RESTORE_CANCEL_TOKEN));
+      setRestoreModalVisible(false);
+    } catch (e) {
+      logger.error(e);
+    }
+  };
+
   const getData = async (showLoading = false) => {
     showLoading && setPending(true);
 
     try {
-      const backups = await BackupInventoryService.list();
+      const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
       setData(backups);
     } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
       logger.error(e);
-    } finally {
-      setPending(false);
     }
+    setPending(false);
   };
 
   const renderSelectedSubRow = React.useCallback(
@@ -95,18 +129,22 @@ export const BackupInventory: FC = () => {
     setBackupModalVisible(true);
   };
 
-  const handleClose = () => {
-    setSelectedBackup(null);
-    setBackupModalVisible(false);
-  };
-
   const handleBackup = async ({ service, location, backupName, description }: AddBackupFormProps) => {
     try {
-      await BackupInventoryService.backup(service.value?.id || '', location.value || '', backupName, description);
+      await BackupInventoryService.backup(
+        service.value?.id || '',
+        location.value || '',
+        backupName,
+        description,
+        generateToken(BACKUP_CANCEL_TOKEN)
+      );
       setBackupModalVisible(false);
       setSelectedBackup(null);
       getData(true);
     } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
       logger.error(e);
     }
   };
@@ -137,6 +175,12 @@ export const BackupInventory: FC = () => {
         autoResetExpanded={false}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
+      <RestoreBackupModal
+        backup={selectedBackup}
+        isVisible={restoreModalVisible}
+        onClose={handleClose}
+        onRestore={handleRestore}
+      />
       <AddBackupModal
         backup={selectedBackup}
         isVisible={backupModalVisible}
