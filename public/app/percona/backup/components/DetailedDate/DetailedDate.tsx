@@ -5,14 +5,19 @@ import { DetailedDateProps } from './DetailedDate.types';
 import { getStyles } from './DetailedDate.styles';
 import { DAY_FORMAT, HOUR_FORMAT } from './DetailedDate.constants';
 
-export const DetailedDate: FC<DetailedDateProps> = ({ date }) => {
+export const DetailedDate: FC<DetailedDateProps> = ({
+  date,
+  dayFormat = DAY_FORMAT,
+  hourFormat = HOUR_FORMAT,
+  dataQa = 'detailed-date',
+}) => {
   const styles = useStyles(getStyles);
   const momentObj = moment(date);
-  const dayTime = momentObj.format(DAY_FORMAT);
-  const hourTime = momentObj.format(HOUR_FORMAT);
+  const dayTime = momentObj.format(dayFormat);
+  const hourTime = momentObj.format(hourFormat);
 
   return (
-    <div data-qa="detailed-date">
+    <div data-qa={dataQa}>
       <span>{dayTime}</span>
       <span className={styles.hourWrapper}>{hourTime}</span>
     </div>
