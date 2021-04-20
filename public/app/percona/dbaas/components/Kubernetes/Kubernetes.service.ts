@@ -3,8 +3,6 @@ import { CancelToken } from 'axios';
 import { Kubernetes, KubernetesListAPI, NewKubernetesCluster, NewKubernetesClusterAPI } from './Kubernetes.types';
 
 export const KubernetesService = {
-  getKubernetes() {
-    return apiManagement.post<KubernetesListAPI, any>('/DBaaS/Kubernetes/List', {}, true);
   getKubernetes(token?: CancelToken) {
     return apiManagement.post<KubernetesListAPI, any>('/DBaaS/Kubernetes/List', {}, true, token);
   },
