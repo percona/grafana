@@ -12,6 +12,7 @@ import {
 } from '@percona/platform-core';
 import { SelectableValue } from '@grafana/data';
 import { AppEvents } from '@grafana/data';
+import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
 import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
@@ -141,9 +142,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="template" validate={required}>
               {({ input }) => (
                 <>
-                  <label className={styles.label} data-qa="template-select-label">
-                    {Messages.templateField}
-                  </label>
+                  <LabelWrapper label={Messages.templateField} dataQa="template-select-label" />
                   <Select
                     disabled={!!alertRule}
                     className={styles.select}
@@ -171,9 +170,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="severity" validate={required}>
               {({ input }) => (
                 <>
-                  <label className={styles.label} data-qa="severity-select-label">
-                    {Messages.severityField}
-                  </label>
+                  <LabelWrapper label={Messages.severityField} dataQa="severity-select-label" />
                   <Select
                     className={styles.select}
                     options={SEVERITY_OPTIONS}
@@ -189,9 +186,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="notificationChannels">
               {({ input }) => (
                 <>
-                  <label className={styles.label} data-qa="notification-channel-select-label">
-                    {Messages.channelField}
-                  </label>
+                  <LabelWrapper label={Messages.channelField} dataQa="notification-channel-select-label" />
                   <MultiSelect
                     className={styles.select}
                     options={channelsOptions}
@@ -205,12 +200,12 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             {currentTemplate && (
               <>
                 <div data-qa="template-expression" className={styles.templateParsedField}>
-                  <label className={styles.label}>{Messages.templateExpression}</label>
+                  <LabelWrapper label={Messages.templateExpression} />
                   <pre>{currentTemplate.expr}</pre>
                 </div>
                 {currentTemplate.annotations?.summary && (
                   <div data-qa="template-alert" className={styles.templateParsedField}>
-                    <label className={styles.label}>{Messages.ruleAlert}</label>
+                    <LabelWrapper label={Messages.ruleAlert} />
                     <pre>{currentTemplate.annotations?.summary}</pre>
                   </div>
                 )}
@@ -220,9 +215,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="enabled" type="checkbox" defaultValue={true}>
               {({ input }) => (
                 <>
-                  <label className={styles.label} data-qa="enabled-toggle-label">
-                    {Messages.activateSwitch}
-                  </label>
+                  <LabelWrapper label={Messages.activateSwitch} dataQa="enabled-toggle-label" />
                   <Switch {...input} value={input.checked} data-qa="enabled-toggle-input" />
                 </>
               )}
