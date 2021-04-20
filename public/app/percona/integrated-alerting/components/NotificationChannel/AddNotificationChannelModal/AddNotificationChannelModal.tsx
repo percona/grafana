@@ -4,6 +4,7 @@ import { HorizontalGroup, Select, Button, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextInputField, validators, logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/core';
+import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
 import {
   NotificationChannelRenderProps,
@@ -82,9 +83,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
               <Field name="type">
                 {({ input }) => (
                   <>
-                    <label className={styles.label} data-qa="type-field-label">
-                      {Messages.fields.type}
-                    </label>
+                    <LabelWrapper label={Messages.fields.type} dataQa="type-field-label" />
                     <Select className={styles.select} options={TYPE_OPTIONS} {...input} />
                   </>
                 )}
