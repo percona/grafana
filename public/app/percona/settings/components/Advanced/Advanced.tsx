@@ -75,9 +75,6 @@ export const Advanced: FC<AdvancedProps> = ({
       technicalPreviewLegend,
       technicalPreviewDescription,
       technicalPreviewLinkText,
-      backupLabel,
-      backupLink,
-      backupTooltip,
     },
     tooltipLinkText,
   } = Messages;
@@ -239,19 +236,6 @@ export const Advanced: FC<AdvancedProps> = ({
                 <span className={styles.unitsLabel}>{sttCheckIntervalUnit}</span>
               </div>
             ))}
-            {/* TODO remove comment when feature is ready to come out */}
-            <Field
-              name="backup"
-              type="checkbox"
-              label={backupLabel}
-              tooltip={backupTooltip}
-              tooltipLinkText={tooltipLinkText}
-              link={backupLink}
-              className={cx({ [styles.switchDisabled]: !values.backup })}
-              disabled={!values.telemetry}
-              dataQa="advanced-backup"
-              component={SwitchRow}
-            />
             <div className={styles.advancedRow}>
               <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                 <div className={settingsStyles.labelWrapper} data-qa="public-address-label">
@@ -284,6 +268,19 @@ export const Advanced: FC<AdvancedProps> = ({
                   </a>
                 </p>
               </p>
+              {/* TODO remove comment when feature is ready to come out */}
+              {/* <Field
+                name="backup"
+                type="checkbox"
+                label={backupLabel}
+                tooltip={backupTooltip}
+                tooltipLinkText={tooltipLinkText}
+                link={backupLink}
+                className={cx({ [styles.switchDisabled]: !values.backup })}
+                disabled={!values.telemetry}
+                dataQa="advanced-backup"
+                component={SwitchRow}
+              /> */}
               {dbaasEnabled && (
                 <Field
                   name="dbaas"
