@@ -1,11 +1,12 @@
 import { api } from 'app/percona/shared/helpers/api';
+import { CancelToken } from 'axios';
 import { Restore, RestoreResponse } from './RestoreHistory.types';
 
 const BASE_URL = '/v1/management/backup';
 
 export const RestoreHistoryService = {
-  async list(): Promise<Restore[]> {
-    const { items = [] } = await api.post<RestoreResponse, any>(`${BASE_URL}/RestoreHistory/List`, {});
+  async list(token?: CancelToken): Promise<Restore[]> {
+    const { items = [] } = await api.post<RestoreResponse, any>(`${BASE_URL}/RestoreHistory/List`, {}, false, token);
     return items.map(
       ({
         restore_id,
