@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Button, HorizontalGroup, AsyncSelect, useStyles } from '@grafana/ui';
 import { LoaderButton, Modal, TextareaInputField, TextInputField, validators } from '@percona/platform-core';
 import { Field, withTypes } from 'react-final-form';
+import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
 import { AddBackupFormProps, AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { getStyles } from './AddBackupModal.styles';
@@ -27,9 +28,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
             <Field name="service" validate={validators.required}>
               {({ input }) => (
                 <div>
-                  <label className={styles.label} data-qa="service-select-label">
-                    {Messages.serviceName}
-                  </label>
+                  <LabelWrapper label={Messages.serviceName} dataQa="service-select-label" />
                   <AsyncSelect
                     isSearchable={false}
                     loadOptions={AddBackupModalService.loadServiceOptions}
@@ -53,9 +52,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
             <Field name="location" validate={validators.required}>
               {({ input }) => (
                 <div>
-                  <label className={styles.label} data-qa="location-select-label">
-                    {Messages.location}
-                  </label>
+                  <LabelWrapper label={Messages.location} dataQa="location-select-label" />
                   <AsyncSelect
                     className={styles.select}
                     isSearchable={false}
