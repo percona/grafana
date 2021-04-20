@@ -1,5 +1,5 @@
 import { Databases } from 'app/percona/shared/core';
-import { DataModel, Status } from '../../Backup.types';
+import { DataModel, BackupStatus } from '../../Backup.types';
 export interface Backup {
   id: string;
   name: string;
@@ -9,7 +9,7 @@ export interface Backup {
   serviceId: string;
   serviceName: string;
   dataModel: DataModel;
-  status: Status;
+  status: BackupStatus;
   vendor: Databases;
 }
 
@@ -22,7 +22,7 @@ export interface RawBackup {
   service_id: string;
   service_name: string;
   data_model: DataModel;
-  status: Status;
+  status: BackupStatus;
   vendor: Databases;
 }
 
