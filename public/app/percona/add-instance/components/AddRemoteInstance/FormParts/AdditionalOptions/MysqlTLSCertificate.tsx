@@ -1,4 +1,4 @@
-import { TextareaInputField, validators } from '@percona/platform-core';
+import { TextareaInputField } from '@percona/platform-core';
 import { Messages } from '../FormParts.messages';
 import React, { FC } from 'react';
 import { FormPartProps } from '../FormParts.types';
