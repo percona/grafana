@@ -22,7 +22,6 @@ export const RestoreHistoryActions: FC<BackupInventoryActionsProps> = ({ restore
       />
       <DBIcon
         tooltipText={Messages.repeatRestore}
-        //@ts-ignore
         type="restore"
         data-qa="restore-button"
         role="button"
