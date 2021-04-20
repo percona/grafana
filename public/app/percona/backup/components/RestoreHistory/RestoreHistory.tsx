@@ -79,6 +79,7 @@ export const RestoreHistory: FC = () => {
   useEffect(() => {
     getData();
   }, []);
+
   return (
     <Table
       columns={columns}
