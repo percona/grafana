@@ -9,6 +9,8 @@ import { tablestatOptions } from './AdditionalOptions.constants';
 import { TablestatOptionsInterface } from './AdditionalOptions.types';
 import { FormApi } from 'final-form';
 import { InstanceTypes } from '../../../../panel.types';
+import { MongodbTLSCertificate } from './MongodbTLSCertificate';
+import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -115,6 +117,7 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
       return (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
+          <MysqlTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
           <MySQLOptions form={form} />
           <CheckboxField
@@ -145,6 +148,7 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
       return (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
+          <MongodbTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
           <CheckboxField
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
