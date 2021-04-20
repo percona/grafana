@@ -15,7 +15,7 @@ import { RestoreHistoryDetails } from './RestoreHistoryDetails';
 import { LIST_RESTORES_CANCEL_TOKEN } from './RestoreHistory.constants';
 
 export const RestoreHistory: FC = () => {
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState(true);
   const [data, setData] = useState<Restore[]>([]);
   const [generateToken] = useCancelToken();
   const columns = useMemo(

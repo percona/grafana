@@ -21,7 +21,7 @@ import { getStyles } from './BackupInventory.styles';
 import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN } from './BackupInventory.constants';
 
 export const BackupInventory: FC = () => {
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState(true);
   const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
