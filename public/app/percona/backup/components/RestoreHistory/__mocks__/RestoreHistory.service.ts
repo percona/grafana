@@ -1,4 +1,4 @@
-import { DataModel, Status } from 'app/percona/backup/Backup.types';
+import { DataModel, RestoreStatus } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import * as service from '../RestoreHistory.service';
 import { Restore } from '../RestoreHistory.types';
@@ -6,6 +6,7 @@ import { Restore } from '../RestoreHistory.types';
 export const stubs: Restore[] = [
   {
     id: 'restore_1',
+    artifactId: 'backup_1',
     name: 'Restore 1',
     locationId: 'location_1',
     locationName: 'Location 1',
@@ -14,11 +15,12 @@ export const stubs: Restore[] = [
     serviceId: 'service_1',
     serviceName: 'Service 1',
     dataModel: DataModel.LOGICAL,
-    status: Status.SUCCESS,
+    status: RestoreStatus.RESTORE_STATUS_SUCCESS,
     vendor: Databases.mysql,
   },
   {
     id: 'restore_2',
+    artifactId: 'backup_2',
     name: 'Restore 2',
     locationId: 'location_2',
     locationName: 'Location 2',
@@ -27,7 +29,7 @@ export const stubs: Restore[] = [
     serviceId: 'service_2',
     serviceName: 'Service 2',
     dataModel: DataModel.PHYSICAL,
-    status: Status.IN_PROGRESS,
+    status: RestoreStatus.RESTORE_STATUS_IN_PROGRESS,
     vendor: Databases.mysql,
   },
 ];
