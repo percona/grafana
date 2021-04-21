@@ -1,6 +1,6 @@
 import React, { FC, useContext } from 'react';
 import { withTypes, Field } from 'react-final-form';
-import { HorizontalGroup, Button, useStyles } from '@grafana/ui';
+import { HorizontalGroup, Button } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextInputField, validators, logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/core';
@@ -12,7 +12,6 @@ import {
   PagerDutyKeyType,
 } from '../NotificationChannel.types';
 import { AddNotificationChannelModalProps } from './AddNotificationChannelModal.types';
-import { getStyles } from './AddNotificationChannelModal.styles';
 import { Messages } from './AddNotificationChannelModal.messages';
 import { TYPE_OPTIONS } from './AddNotificationChannel.constants';
 import { NotificationChannelService } from '../NotificationChannel.service';
@@ -45,7 +44,6 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
   notificationChannel,
   setVisible,
 }) => {
-  const styles = useStyles(getStyles);
   const initialValues = getInitialValues(notificationChannel);
   const { getNotificationChannels } = useContext(NotificationChannelProvider);
   const onSubmit = async (values: NotificationChannelRenderProps) => {
@@ -81,14 +79,7 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
             <>
               <TextInputField name="name" label={Messages.fields.name} validators={[required]} />
               <Field name="type">
-                {({ input }) => (
-                  <SelectField
-                    label={Messages.fields.type}
-                    className={styles.select}
-                    options={TYPE_OPTIONS}
-                    {...input}
-                  />
-                )}
+                {({ input }) => <SelectField label={Messages.fields.type} options={TYPE_OPTIONS} {...input} />}
               </Field>
               <TypeField values={values} />
               <HorizontalGroup justify="center" spacing="md">

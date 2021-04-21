@@ -59,7 +59,6 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisi
                       <SelectField
                         label={Messages.serviceName}
                         disabled={values.serviceType === ServiceTypeSelect.SAME}
-                        className={styles.select}
                         options={[]}
                         {...input}
                         data-qa="service-select-input"

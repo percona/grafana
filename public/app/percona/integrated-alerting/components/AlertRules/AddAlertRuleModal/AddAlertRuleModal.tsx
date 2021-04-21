@@ -146,7 +146,6 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 <SelectField
                   label={Messages.templateField}
                   disabled={!!alertRule}
-                  className={styles.select}
                   options={templateOptions}
                   {...input}
                   onChange={name => {
@@ -171,7 +170,6 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               {({ input }) => (
                 <SelectField
                   label={Messages.severityField}
-                  className={styles.select}
                   options={SEVERITY_OPTIONS}
                   {...input}
                   data-qa="severity-select-input"
@@ -185,7 +183,6 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               {({ input }) => (
                 <MultiSelectField
                   label={Messages.channelField}
-                  className={styles.select}
                   options={channelsOptions}
                   {...input}
                   data-qa="notificationChannels-multiselect-input"
