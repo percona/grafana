@@ -3,7 +3,7 @@ import { MultiSelect } from '@grafana/ui';
 import { MultiSelectCommonProps } from '@grafana/ui/src/components/Select/types';
 import { withSelectStyles } from '../withSelectStyles/withSelectStyles';
 import { LabelWrapper } from '../LabelWrapper';
-import { MultiSelectFieldProps } from './MultiSelect.types';
+import { MultiSelectFieldProps } from './MultiSelectField.types';
 
 const MultiSelectFieldWrapper: FC<MultiSelectFieldProps & MultiSelectCommonProps<any>> = ({
   label,

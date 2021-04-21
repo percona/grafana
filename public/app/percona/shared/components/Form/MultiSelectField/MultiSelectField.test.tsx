@@ -2,7 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { MultiSelect } from '@grafana/ui';
 import { LabelWrapper } from '../LabelWrapper';
-import { MultiSelectField } from './MultiSelect';
+import { MultiSelectField } from './MultiSelectField';
 
 describe('MultiSelectField', () => {
   it('should render', () => {

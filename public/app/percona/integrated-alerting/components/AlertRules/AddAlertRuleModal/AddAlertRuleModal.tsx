@@ -14,7 +14,7 @@ import { SelectableValue } from '@grafana/data';
 import { AppEvents } from '@grafana/data';
 import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
-import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelect';
+import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
