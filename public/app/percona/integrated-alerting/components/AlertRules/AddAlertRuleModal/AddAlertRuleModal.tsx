@@ -1,6 +1,6 @@
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import { Form, Field } from 'react-final-form';
-import { Button, HorizontalGroup, Switch, MultiSelect, useStyles } from '@grafana/ui';
+import { Button, HorizontalGroup, Switch, useStyles } from '@grafana/ui';
 import {
   Modal,
   LoaderButton,
@@ -14,6 +14,7 @@ import { SelectableValue } from '@grafana/data';
 import { AppEvents } from '@grafana/data';
 import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelect';
 import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
@@ -182,15 +183,13 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
             <Field name="notificationChannels">
               {({ input }) => (
-                <>
-                  <LabelWrapper label={Messages.channelField} dataQa="notification-channel-select-label" />
-                  <MultiSelect
-                    className={styles.select}
-                    options={channelsOptions}
-                    {...input}
-                    data-qa="notificationChannels-multiselect-input"
-                  />
-                </>
+                <MultiSelectField
+                  label={Messages.channelField}
+                  className={styles.select}
+                  options={channelsOptions}
+                  {...input}
+                  data-qa="notificationChannels-multiselect-input"
+                />
               )}
             </Field>
 
