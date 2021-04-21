@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
-import { Button, HorizontalGroup, Select, useStyles } from '@grafana/ui';
+import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { Field, withTypes } from 'react-final-form';
 import { Modal, LoaderButton, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
-import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
+import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { RestoreBackupModalProps, RestoreBackupFormProps, ServiceTypeSelect } from './RestoreBackupModal.types';
 import { Messages } from './RestoreBackupModal.messages';
 import { getStyles } from './RestoreBackupModal.styles';
@@ -56,8 +56,8 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({ backup, isVisi
                 <Field name="service" validate={validators.required}>
                   {({ input }) => (
                     <div>
-                      <LabelWrapper label={Messages.serviceName} dataQa="service-select-label" />
-                      <Select
+                      <SelectField
+                        label={Messages.serviceName}
                         disabled={values.serviceType === ServiceTypeSelect.SAME}
                         className={styles.select}
                         options={[]}

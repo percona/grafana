@@ -1,10 +1,10 @@
 import React, { FC, useContext } from 'react';
 import { withTypes, Field } from 'react-final-form';
-import { HorizontalGroup, Select, Button, useStyles } from '@grafana/ui';
+import { HorizontalGroup, Button, useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Modal, LoaderButton, TextInputField, validators, logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/core';
-import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
+import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { NotificationChannelProvider } from '../NotificationChannel.provider';
 import {
   NotificationChannelRenderProps,
@@ -82,10 +82,12 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
               <TextInputField name="name" label={Messages.fields.name} validators={[required]} />
               <Field name="type">
                 {({ input }) => (
-                  <>
-                    <LabelWrapper label={Messages.fields.type} dataQa="type-field-label" />
-                    <Select className={styles.select} options={TYPE_OPTIONS} {...input} />
-                  </>
+                  <SelectField
+                    label={Messages.fields.type}
+                    className={styles.select}
+                    options={TYPE_OPTIONS}
+                    {...input}
+                  />
                 )}
               </Field>
               <TypeField values={values} />

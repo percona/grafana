@@ -1,6 +1,6 @@
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import { Form, Field } from 'react-final-form';
-import { Button, HorizontalGroup, Switch, Select, MultiSelect, useStyles } from '@grafana/ui';
+import { Button, HorizontalGroup, Switch, MultiSelect, useStyles } from '@grafana/ui';
 import {
   Modal,
   LoaderButton,
@@ -13,6 +13,7 @@ import {
 import { SelectableValue } from '@grafana/data';
 import { AppEvents } from '@grafana/data';
 import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
+import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
@@ -141,22 +142,20 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
           <form className={styles.form} onSubmit={handleSubmit} data-qa="add-alert-rule-modal-form">
             <Field name="template" validate={required}>
               {({ input }) => (
-                <>
-                  <LabelWrapper label={Messages.templateField} dataQa="template-select-label" />
-                  <Select
-                    disabled={!!alertRule}
-                    className={styles.select}
-                    options={templateOptions}
-                    {...input}
-                    onChange={name => {
-                      input.onChange(name);
-                      form.mutators.changeSeverity(name.value);
-                      form.mutators.changeDuration(name.value);
-                      handleTemplateChange(name.value);
-                    }}
-                    data-qa="template-select-input"
-                  />
-                </>
+                <SelectField
+                  label={Messages.templateField}
+                  disabled={!!alertRule}
+                  className={styles.select}
+                  options={templateOptions}
+                  {...input}
+                  onChange={name => {
+                    input.onChange(name);
+                    form.mutators.changeSeverity(name.value);
+                    form.mutators.changeDuration(name.value);
+                    handleTemplateChange(name.value);
+                  }}
+                  data-qa="template-select-input"
+                />
               )}
             </Field>
 
@@ -169,15 +168,13 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
             <Field name="severity" validate={required}>
               {({ input }) => (
-                <>
-                  <LabelWrapper label={Messages.severityField} dataQa="severity-select-label" />
-                  <Select
-                    className={styles.select}
-                    options={SEVERITY_OPTIONS}
-                    {...input}
-                    data-qa="severity-multiselect-input"
-                  />
-                </>
+                <SelectField
+                  label={Messages.severityField}
+                  className={styles.select}
+                  options={SEVERITY_OPTIONS}
+                  {...input}
+                  data-qa="severity-multiselect-input"
+                />
               )}
             </Field>
 
