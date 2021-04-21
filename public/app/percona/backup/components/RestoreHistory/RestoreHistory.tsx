@@ -1,23 +1,25 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column, Row } from 'react-table';
-import { Status } from '../Status';
-import { Messages } from '../../Backup.messages';
-import { Table } from 'app/percona/integrated-alerting/components/Table';
+import { logger } from '@percona/platform-core';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
+import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { useRecurringCall } from '../../hooks/recurringCall.hook';
+import { Status } from '../Status';
+import { Messages } from '../../Backup.messages';
 import { DetailedDate } from '../DetailedDate';
 import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryService } from './RestoreHistory.service';
-import { logger } from '@percona/platform-core';
 import { RestoreHistoryDetails } from './RestoreHistoryDetails';
-import { LIST_RESTORES_CANCEL_TOKEN } from './RestoreHistory.constants';
+import { DATA_INTERVAL, LIST_RESTORES_CANCEL_TOKEN } from './RestoreHistory.constants';
 
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Restore[]>([]);
   const [generateToken] = useCancelToken();
+  const [triggerTimeout] = useRecurringCall();
   const columns = useMemo(
     (): Column[] => [
       {
@@ -61,8 +63,8 @@ export const RestoreHistory: FC = () => {
     []
   );
 
-  const getData = async () => {
-    setPending(true);
+  const getData = async (showLoading = false) => {
+    showLoading && setPending(true);
 
     try {
       const restores = await RestoreHistoryService.list(generateToken(LIST_RESTORES_CANCEL_TOKEN));
@@ -77,7 +79,7 @@ export const RestoreHistory: FC = () => {
   };
 
   useEffect(() => {
-    getData();
+    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
   }, []);
 
   return (
