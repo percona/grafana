@@ -2,6 +2,7 @@ import React from 'react';
 import { mount, ReactWrapper } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import { dataQa } from '@percona/platform-core';
+import { Select } from '@grafana/ui';
 import { AddAlertRuleModal } from './AddAlertRuleModal';
 import { AlertRule } from '../AlertRules.types';
 import { templateStubs } from '../../AlertRuleTemplate/__mocks__/alertRuleTemplateStubs';
@@ -213,7 +214,7 @@ describe('AddAlertRuleModal', () => {
     expect(
       wrapper
         .find(dataQa('severity-multiselect-input'))
-        .first()
+        .find(Select)
         .text()
     ).toBe('Choose');
 
@@ -223,7 +224,7 @@ describe('AddAlertRuleModal', () => {
     expect(
       wrapper
         .find(dataQa('severity-multiselect-input'))
-        .first()
+        .find(Select)
         .text()
     ).toBe(SEVERITY_OPTIONS.find(severity => severity.value === templateStubs[0].severity)?.label);
   });
