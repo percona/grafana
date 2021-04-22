@@ -3,7 +3,7 @@ import { activeCheckStub } from 'app/percona/check/__mocks__/stubs';
 import { makeSilencePayload } from './SilenceAlertButton.utils';
 
 const TEST_USER = 'testUser';
-
+//@ts-ignore
 window.grafanaBootData = {
   user: {
     name: TEST_USER,

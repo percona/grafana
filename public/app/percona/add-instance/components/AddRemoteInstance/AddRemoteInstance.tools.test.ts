@@ -1,8 +1,9 @@
+import { InstanceTypes } from '../../panel.types';
 import { getInstanceData } from './AddRemoteInstance.tools';
 
 describe('Get instance data:: ', () => {
   it('should return correct one when isRDS is false', () => {
-    const instanceType = 'postgresql';
+    const instanceType = InstanceTypes.postgresql;
     const credentials = {
       isRDS: false,
       address: 'test address',
@@ -33,7 +34,7 @@ describe('Get instance data:: ', () => {
   });
 
   it('get instance data should return correct one when isRDS is true', () => {
-    const instanceType = 'postgresql';
+    const instanceType = InstanceTypes.postgresql;
     const credentials = {
       isRDS: true,
       address: 'test address',
@@ -64,7 +65,7 @@ describe('Get instance data:: ', () => {
   });
 
   it('get instance data should return correct data for MongoDB', () => {
-    const instanceType = 'mongodb';
+    const instanceType = InstanceTypes.mongodb;
     const credentials = {
       isRDS: false,
       address: 'test address',
@@ -93,7 +94,7 @@ describe('Get instance data:: ', () => {
   });
 
   it('get instance data should return correct data for MySQL', () => {
-    const instanceType = 'mysql';
+    const instanceType = InstanceTypes.mysql;
     const credentials = {
       isRDS: false,
       address: 'test address',
@@ -123,7 +124,7 @@ describe('Get instance data:: ', () => {
   });
 
   it('get instance data should return correct data for ProxySQL', () => {
-    const instanceType = 'proxysql';
+    const instanceType = InstanceTypes.proxysql;
     const credentials = {
       isRDS: false,
       address: 'test address',
