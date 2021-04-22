@@ -34,6 +34,7 @@ const notificationChannelsServiceList = jest.spyOn(NotificationChannelService, '
 const alertRuleTemplateServiceList = jest.spyOn(AlertRuleTemplateService, 'list').mockImplementation(() =>
   Promise.resolve({
     templates: templateStubs,
+    totals: { total_items: 4, total_pages: 1 },
   })
 );
 
