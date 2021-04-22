@@ -26,7 +26,7 @@ jobs:
       - name: Run tests
         run: |
           yarn install --pure-lockfile --no-progress
-          yarn run ci:test-frontend
+          yarn run ci:test-percona-frontend
 
       - name: Print useful info on failure
         if: ${{ failure() }}
