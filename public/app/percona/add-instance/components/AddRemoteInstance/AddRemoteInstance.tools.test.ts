@@ -16,17 +16,8 @@ describe('Get instance data:: ', () => {
     };
     const testInstance = {
       instanceType: 'PostgreSQL',
-      discoverName: 'DISCOVER_RDS_POSTGRESQL',
       remoteInstanceCredentials: {
-        isRDS: false,
-        address: 'test address',
-        instance_id: 'test instance id',
-        serviceName: 'test address',
         port: '5432',
-        region: 'us-west1',
-        aws_access_key: 'aws-secret-key-example',
-        aws_secret_key: 'aws-secret-key-example',
-        az: 'test az',
       },
     };
 
@@ -78,15 +69,7 @@ describe('Get instance data:: ', () => {
     const testInstance = {
       instanceType: 'MongoDB',
       remoteInstanceCredentials: {
-        isRDS: false,
-        address: 'test address',
-        instance_id: 'test instance id',
-        serviceName: 'test address',
-        port: 27017,
-        region: 'us-west1',
-        aws_access_key: 'aws-secret-key-example',
-        aws_secret_key: 'aws-secret-key-example',
-        az: 'test az',
+        port: '27017',
       },
     };
 
@@ -105,18 +88,9 @@ describe('Get instance data:: ', () => {
       az: 'test az',
     };
     const testInstance = {
-      discoverName: 'DISCOVER_RDS_MYSQL',
       instanceType: 'MySQL',
       remoteInstanceCredentials: {
-        isRDS: false,
-        address: 'test address',
-        instance_id: 'test instance id',
-        serviceName: 'test address',
-        port: 3306,
-        region: 'us-west1',
-        aws_access_key: 'aws-secret-key-example',
-        aws_secret_key: 'aws-secret-key-example',
-        az: 'test az',
+        port: '3306',
       },
     };
 
@@ -137,15 +111,7 @@ describe('Get instance data:: ', () => {
     const testInstance = {
       instanceType: 'ProxySQL',
       remoteInstanceCredentials: {
-        isRDS: false,
-        address: 'test address',
-        instance_id: 'test instance id',
-        serviceName: 'test address',
-        port: 6032,
-        region: 'us-west1',
-        aws_access_key: 'aws-secret-key-example',
-        aws_secret_key: 'aws-secret-key-example',
-        az: 'test az',
+        port: '6032',
       },
     };
 
