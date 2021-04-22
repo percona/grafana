@@ -3,7 +3,7 @@ import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 
 export const generateMountWrapper = async (node: ReactElement): Promise<ReactWrapper> => {
-  let wrapper: ReactWrapper = null as any;
+  let wrapper: ReactWrapper = {} as ReactWrapper;
 
   //@ts-ignore
   await act(async () => {
@@ -14,7 +14,7 @@ export const generateMountWrapper = async (node: ReactElement): Promise<ReactWra
 };
 
 export const generateShallowWrapper = async (node: ReactElement): Promise<ShallowWrapper> => {
-  let wrapper: ShallowWrapper = null as any;
+  let wrapper: ShallowWrapper = {} as ShallowWrapper;
 
   //@ts-ignore
   await act(async () => {
