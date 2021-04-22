@@ -1,8 +1,7 @@
 import React from 'react';
-import { mount, ReactWrapper } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
+import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
 import { AlertRules } from './AlertRules';
-import { act } from 'react-dom/test-utils';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate/AlertRuleTemplate.service';
 import { NotificationChannelService } from '../NotificationChannel/NotificationChannel.service';
 import { NotificationChannelType } from '../NotificationChannel/NotificationChannel.types';
@@ -42,14 +41,10 @@ jest.mock('./AlertRules.service');
 
 describe('AlertRules', () => {
   it('gets the templates when mounted', async () => {
-    let wrapper: ReactWrapper<{}, {}, any>;
-
     expect(alertRuleTemplateServiceList).toBeCalledTimes(0);
     expect(notificationChannelsServiceList).toBeCalledTimes(0);
 
-    await act(async () => {
-      wrapper = await mount(<AlertRules />);
-    });
+    const wrapper = await generateMountWrapper(<AlertRules />);
 
     expect(alertRuleTemplateServiceList).toBeCalledTimes(1);
     expect(notificationChannelsServiceList).toBeCalledTimes(1);
@@ -58,11 +53,7 @@ describe('AlertRules', () => {
   });
 
   it('should toggle selected alert rule details', async () => {
-    let wrapper: ReactWrapper<{}, {}, any>;
-
-    await act(async () => {
-      wrapper = await mount(<AlertRules />);
-    });
+    const wrapper = await generateMountWrapper(<AlertRules />);
 
     wrapper.update();
     wrapper
@@ -83,22 +74,14 @@ describe('AlertRules', () => {
   });
 
   it('should have table initially loading', async () => {
-    let wrapper: ReactWrapper;
-
-    await act(async () => {
-      wrapper = await mount(<AlertRules />);
-    });
+    const wrapper = await generateMountWrapper(<AlertRules />);
 
     expect(wrapper.find(dataQa('table-loading'))).toHaveLength(1);
     expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(1);
   });
 
   it('should render table content', async () => {
-    let wrapper: ReactWrapper;
-
-    await act(async () => {
-      wrapper = await mount(<AlertRules />);
-    });
+    const wrapper = await generateMountWrapper(<AlertRules />);
 
     wrapper.update();
 
@@ -112,11 +95,7 @@ describe('AlertRules', () => {
       .spyOn(AlertRulesService, 'list')
       .mockReturnValueOnce(Promise.resolve({ rules: [], totals: { total_items: 0, total_pages: 0 } }));
 
-    let wrapper: ReactWrapper;
-
-    await act(async () => {
-      wrapper = await mount(<AlertRules />);
-    });
+    const wrapper = await generateMountWrapper(<AlertRules />);
 
     wrapper.update();
 
