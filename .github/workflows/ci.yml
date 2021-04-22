@@ -12,12 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Use Node.js 12
-        uses: actions/setup-node@v1
+      - uses: percona-platform/checkout@v2
+      - name: Run with Node 12
+        uses: percona-platform/setup-node@v2
         with:
-          node-version: '12'
-      - name: Check out code
-        uses: percona-platform/checkout@v2
+          node-version: 12
 
       - name: Run tests
         run: |
