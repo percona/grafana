@@ -23,3 +23,8 @@ export const generateShallowWrapper = async (node: ReactElement): Promise<Shallo
 
   return wrapper;
 };
+
+export const asyncAct = (cb: () => any): Promise<any> => {
+  //@ts-ignore
+  return act(async () => cb());
+};
