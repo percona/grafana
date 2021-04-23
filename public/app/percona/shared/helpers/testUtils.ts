@@ -13,7 +13,7 @@ export const getMount = async (node: ReactElement): Promise<ReactWrapper> => {
   return wrapper;
 };
 
-export const generateShallowWrapper = async (node: ReactElement): Promise<ShallowWrapper> => {
+export const getShallow = async (node: ReactElement): Promise<ShallowWrapper> => {
   let wrapper: ShallowWrapper = {} as ShallowWrapper;
 
   //@ts-ignore
