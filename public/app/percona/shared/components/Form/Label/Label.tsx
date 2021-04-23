@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
-import { FieldWrapperProps } from './LabelWrapper.types';
-import { getStyles } from './LabelWrapper.styles';
+import { LabelProps } from './Label.types';
+import { getStyles } from './Label.styles';
 import { useStyles } from '@grafana/ui';
 
-export const LabelWrapper: FC<FieldWrapperProps> = ({ label, dataQa }) => {
+export const Label: FC<LabelProps> = ({ label, dataQa }) => {
   const styles = useStyles(getStyles);
 
   return (

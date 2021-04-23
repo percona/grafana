@@ -12,7 +12,7 @@ import {
 } from '@percona/platform-core';
 import { SelectableValue } from '@grafana/data';
 import { AppEvents } from '@grafana/data';
-import { LabelWrapper } from 'app/percona/shared/components/Form/LabelWrapper';
+import { Label } from 'app/percona/shared/components/Form/Label';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { Messages } from './AddAlertRuleModal.messages';
@@ -193,12 +193,12 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             {currentTemplate && (
               <>
                 <div data-qa="template-expression" className={styles.templateParsedField}>
-                  <LabelWrapper label={Messages.templateExpression} />
+                  <Label label={Messages.templateExpression} />
                   <pre>{currentTemplate.expr}</pre>
                 </div>
                 {currentTemplate.annotations?.summary && (
                   <div data-qa="template-alert" className={styles.templateParsedField}>
-                    <LabelWrapper label={Messages.ruleAlert} />
+                    <Label label={Messages.ruleAlert} />
                     <pre>{currentTemplate.annotations?.summary}</pre>
                   </div>
                 )}
@@ -208,7 +208,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             <Field name="enabled" type="checkbox" defaultValue={true}>
               {({ input }) => (
                 <>
-                  <LabelWrapper label={Messages.activateSwitch} dataQa="enabled-toggle-label" />
+                  <Label label={Messages.activateSwitch} dataQa="enabled-toggle-label" />
                   <Switch {...input} value={input.checked} data-qa="enabled-toggle-input" />
                 </>
               )}

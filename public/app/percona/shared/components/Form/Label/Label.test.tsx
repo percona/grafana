@@ -1,10 +1,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { LabelWrapper } from './LabelWrapper';
+import { Label } from './Label';
 
-describe('LabelWrapper', () => {
+describe('Label', () => {
   it('should render', () => {
-    const wrapper = shallow(<LabelWrapper label="label" />);
+    const wrapper = shallow(<Label label="label" />);
     expect(wrapper.find('label').exists()).toBeTruthy();
   });
 });

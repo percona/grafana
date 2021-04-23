@@ -3,7 +3,7 @@ import { Field, FieldInputProps } from 'react-final-form';
 import { cx } from 'emotion';
 import { useStyles } from '@grafana/ui';
 import { CheckboxField, validators } from '@percona/platform-core';
-import { LabelWrapper } from '../LabelWrapper';
+import { Label } from '../Label';
 import { getStyles } from './MultiCheckboxField.styles';
 import { MultiCheckboxFieldProps, MultiCheckboxRenderProps } from './MultiCheckboxField.types';
 
@@ -51,7 +51,7 @@ export const MultiCheckboxField: FC<MultiCheckboxFieldProps> = React.memo(
 
           return (
             <div className={styles.field} data-qa={`${name}-field-container`}>
-              {label && <LabelWrapper label={`${label}${required ? ' *' : ''}`} dataQa={`${name}-field-label`} />}
+              {label && <Label label={`${label}${required ? ' *' : ''}`} dataQa={`${name}-field-label`} />}
               <div
                 className={cx(styles.getOptionsWrapperStyles(!!validationError), className)}
                 data-qa={`${name}-options`}
