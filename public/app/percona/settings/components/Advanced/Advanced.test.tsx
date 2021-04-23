@@ -101,10 +101,14 @@ describe('Advanced::', () => {
   });
 
   it('Sets correct URL from browser', () => {
-    const oldLocation = window.location;
-
-    delete (window as any).location;
-    window.location = Object.create({ ...oldLocation, hostname: 'pmmtest.percona.com' });
+    const location = {
+      ...window.location,
+      hostname: 'pmmtest.percona.com',
+    };
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: location,
+    });
 
     const root = mount(
       <Advanced
