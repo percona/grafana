@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { Form } from 'react-final-form';
-import { FormApi } from 'final-form';
+import { FormApi, FormState } from 'final-form';
 import { trackingOptions } from './FormParts.constants';
 import { AdditionalOptionsFormPart, getAdditionalOptions } from './AdditionalOptions/AdditionalOptions';
 import { LabelsFormPart } from './Labels/Labels';
@@ -10,9 +10,9 @@ import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDet
 import { getMount } from 'app/percona/shared/helpers/testUtils';
 import { InstanceTypes } from 'app/percona/add-instance/panel.types';
 
-const form: any = {
+const form: Partial<FormApi> = {
   change: jest.fn(),
-  getState: () => ({}),
+  getState: () => ({} as FormState<any>),
 };
 
 describe('MainDetailsFormPart ::', () => {
@@ -109,7 +109,10 @@ describe('getAdditionalOptions ::', () => {
     };
 
     const root = await getMount(
-      <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
+      <Form
+        onSubmit={jest.fn()}
+        render={() => getAdditionalOptions(type, remoteInstanceCredentials, form as FormApi)}
+      />
     );
     const fields = root.find('input');
 
@@ -124,7 +127,10 @@ describe('getAdditionalOptions ::', () => {
     };
 
     const root = await getMount(
-      <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
+      <Form
+        onSubmit={jest.fn()}
+        render={() => getAdditionalOptions(type, remoteInstanceCredentials, form as FormApi)}
+      />
     );
     const fields = root.find('input');
 
@@ -139,7 +145,10 @@ describe('getAdditionalOptions ::', () => {
     };
 
     const root = await getMount(
-      <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
+      <Form
+        onSubmit={jest.fn()}
+        render={() => getAdditionalOptions(type, remoteInstanceCredentials, form as FormApi)}
+      />
     );
     const fields = root.find('input');
 
@@ -156,7 +165,10 @@ describe('getAdditionalOptions ::', () => {
     };
 
     const root = await getMount(
-      <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
+      <Form
+        onSubmit={jest.fn()}
+        render={() => getAdditionalOptions(type, remoteInstanceCredentials, form as FormApi)}
+      />
     );
     const fields = root.find('input');
 
