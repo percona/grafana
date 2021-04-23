@@ -9,7 +9,7 @@ export const Messages = {
   backupManagement: 'Backup Management',
   backupInventory: {
     table: {
-      noData: 'No Backups found',
+      noData: 'No backups found',
       columns: {
         name: 'Backup name',
         created: 'Created',
@@ -36,9 +36,9 @@ export const Messages = {
   },
   restoreHistory: {
     table: {
-      noData: 'No Restores found',
+      noData: 'No restores found',
       columns: {
-        started: 'Started At',
+        started: 'Started at',
       },
     },
   },
