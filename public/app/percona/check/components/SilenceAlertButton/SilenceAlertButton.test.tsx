@@ -41,8 +41,7 @@ describe('SilenceAlertButton::', () => {
   it('should call functions to buind the payload and to call the API to silence an alert on click', async () => {
     const { labels } = activeCheckStub[0].details[0];
 
-    //@ts-ignore
-    window.grafanaBootData = {
+    (window as any).grafanaBootData = {
       user: {
         name: 'test_user',
       },
@@ -79,8 +78,8 @@ describe('SilenceAlertButton::', () => {
 
   it('should call functions to buind the payload and to call the API to silence an alert on click', async () => {
     const { labels } = activeCheckStub[0].details[0];
-    //@ts-ignore
-    window.grafanaBootData = {
+
+    (window as any).grafanaBootData = {
       user: {
         name: 'test_user',
       },
