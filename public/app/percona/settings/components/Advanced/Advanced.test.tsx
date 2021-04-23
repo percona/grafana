@@ -103,8 +103,7 @@ describe('Advanced::', () => {
   it('Sets correct URL from browser', () => {
     const oldLocation = window.location;
 
-    //@ts-ignore
-    delete window.location;
+    delete (window as any).location;
     window.location = Object.create({ ...oldLocation, hostname: 'pmmtest.percona.com' });
 
     const root = mount(
