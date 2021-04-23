@@ -3,23 +3,19 @@ import { dataQa } from '@percona/platform-core';
 import { DBClusterLogsModal } from './DBClusterLogsModal';
 import { dbClustersStub } from '../__mocks__/dbClustersStubs';
 import { DBClusterService } from '../__mocks__/DBCluster.service';
-import { generateMountWrapper, asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { getMount, asyncAct } from 'app/percona/shared/helpers/testUtils';
 
 jest.mock('../DBCluster.service');
 
 describe('DBClusterLogsModal::', () => {
   it('should render logs', async () => {
-    const root = await generateMountWrapper(
-      <DBClusterLogsModal isVisible setVisible={jest.fn()} dbCluster={dbClustersStub[0]} />
-    );
+    const root = await getMount(<DBClusterLogsModal isVisible setVisible={jest.fn()} dbCluster={dbClustersStub[0]} />);
 
     root.update();
     expect(root.find(dataQa('dbcluster-pod-logs')).length).toBeGreaterThan(0);
   });
   it('should expand logs', async () => {
-    const root = await generateMountWrapper(
-      <DBClusterLogsModal isVisible setVisible={jest.fn()} dbCluster={dbClustersStub[0]} />
-    );
+    const root = await getMount(<DBClusterLogsModal isVisible setVisible={jest.fn()} dbCluster={dbClustersStub[0]} />);
 
     root.update();
 
@@ -39,9 +35,7 @@ describe('DBClusterLogsModal::', () => {
   });
   it('should refresh logs', async () => {
     const getLogs = jest.fn();
-    const root = await generateMountWrapper(
-      <DBClusterLogsModal isVisible setVisible={jest.fn()} dbCluster={dbClustersStub[0]} />
-    );
+    const root = await getMount(<DBClusterLogsModal isVisible setVisible={jest.fn()} dbCluster={dbClustersStub[0]} />);
 
     root.update();
 

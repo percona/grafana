@@ -7,7 +7,7 @@ import { AdditionalOptionsFormPart, getAdditionalOptions } from './AdditionalOpt
 import { LabelsFormPart } from './Labels/Labels';
 import { MainDetailsFormPart } from './MainDetails/MainDetails';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 import { InstanceTypes } from 'app/percona/add-instance/panel.types';
 
 const form: any = {
@@ -81,7 +81,7 @@ describe('AdditionalOptionsFormPart ::', () => {
       isRDS: false,
     };
 
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         onSubmit={jest.fn()}
         render={() => (
@@ -108,7 +108,7 @@ describe('getAdditionalOptions ::', () => {
       isRDS: false,
     };
 
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
     );
     const fields = root.find('input');
@@ -123,7 +123,7 @@ describe('getAdditionalOptions ::', () => {
       isRDS: false,
     };
 
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
     );
     const fields = root.find('input');
@@ -138,7 +138,7 @@ describe('getAdditionalOptions ::', () => {
       isRDS: true,
     };
 
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
     );
     const fields = root.find('input');
@@ -155,7 +155,7 @@ describe('getAdditionalOptions ::', () => {
       isRDS: true,
     };
 
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form onSubmit={jest.fn()} render={() => getAdditionalOptions(type, remoteInstanceCredentials, form)} />
     );
     const fields = root.find('input');

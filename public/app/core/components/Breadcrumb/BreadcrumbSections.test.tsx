@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { dataQa } from '@percona/platform-core';
 import { BreadcrumbSections } from './BreadcrumbSections';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 
 jest.mock('react-redux', () => {
   const original = jest.requireActual('react-redux');
@@ -58,9 +58,7 @@ describe('BreadcrumbSections', () => {
   });
 
   it('renders breadcrumb sections with correct URLs', async () => {
-    const wrapper = await generateMountWrapper(
-      <BreadcrumbSections pageModel={pageModel} currentLocation="root/child-one" />
-    );
+    const wrapper = await getMount(<BreadcrumbSections pageModel={pageModel} currentLocation="root/child-one" />);
 
     expect(wrapper.find(dataQa('breadcrumb-section'))).toHaveLength(2);
     expect(
@@ -76,7 +74,7 @@ describe('BreadcrumbSections', () => {
       return callback({ location: { path: '/root/child-two/leaf-one' } });
     });
 
-    const wrapper = await generateMountWrapper(
+    const wrapper = await getMount(
       <BreadcrumbSections pageModel={pageModel} currentLocation="root/child-two/leaf-one" />
     );
 
@@ -94,7 +92,7 @@ describe('BreadcrumbSections', () => {
       return callback({ location: { path: '/root/wrong-one/leaf-two' } });
     });
 
-    const wrapper = await generateMountWrapper(
+    const wrapper = await getMount(
       <BreadcrumbSections pageModel={pageModel} currentLocation="root/wrong-one/leaf-two" />
     );
 

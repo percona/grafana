@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 import { Databases } from 'app/percona/shared/core';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions';
 import { EditDBClusterFields } from '../EditDBClusterModal.types';
 import { DBClusterResources } from './DBClusterAdvancedOptions.types';
@@ -13,7 +13,7 @@ jest.mock('../../XtraDB.service');
 
 describe('DBClusterAdvancedOptions::', () => {
   it('renders correctly', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         onSubmit={jest.fn()}
         render={renderProps => (
@@ -32,7 +32,7 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should disable memory, cpu and disk when resources are not custom', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         initialValues={{
           [EditDBClusterFields.resources]: DBClusterResources.small,
@@ -53,7 +53,7 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should enable memory and cpu when resources are custom, disk should be disabled', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         initialValues={{
           [EditDBClusterFields.resources]: DBClusterResources.small,
@@ -76,7 +76,7 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should disable button when invalid', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         onSubmit={jest.fn()}
         render={renderProps => (
@@ -90,7 +90,7 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should enable button when valid', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         onSubmit={jest.fn()}
         render={renderProps => (
@@ -107,7 +107,7 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should disabled single node topology when database is MongoDB', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         initialValues={{
           [EditDBClusterFields.databaseType]: {
@@ -127,7 +127,7 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should enable single node topology when database is MySQL', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <Form
         initialValues={{
           [EditDBClusterFields.databaseType]: {

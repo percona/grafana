@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { dataQa } from '@percona/platform-core';
 import { Breadcrumb } from './Breadcrumb';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 
 jest.mock('react-redux', () => {
   const original = jest.requireActual('react-redux');
@@ -29,7 +29,7 @@ describe('Breadcrumb', () => {
   });
 
   it('renders the breadcrumb', async () => {
-    const wrapper = await generateMountWrapper(<Breadcrumb pageModel={pageModel} currentLocation="root/child-one" />);
+    const wrapper = await getMount(<Breadcrumb pageModel={pageModel} currentLocation="root/child-one" />);
 
     expect(wrapper.find(dataQa('breadcrumb'))).toHaveLength(1);
   });

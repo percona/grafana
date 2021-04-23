@@ -4,7 +4,7 @@ import { Tab } from '@grafana/ui';
 import { stub as settingsStub } from './__mocks__/Settings.service';
 import { SettingsService } from './Settings.service';
 import { SettingsPanel } from './Settings';
-import { generateMountWrapper } from '../shared/helpers/testUtils';
+import { getMount } from '../shared/helpers/testUtils';
 
 const fakeLocationUpdate = jest.fn();
 
@@ -37,7 +37,7 @@ describe('SettingsPanel::', () => {
     jest
       .spyOn(SettingsService, 'getSettings')
       .mockImplementationOnce(() => Promise.resolve({ ...settingsStub, alertingEnabled: false }));
-    const root = await generateMountWrapper(<SettingsPanel />);
+    const root = await getMount(<SettingsPanel />);
     root.update();
 
     const tabs = root.find(Tab);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { dataQa } from '@percona/platform-core';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 import { Alerts } from './Alerts';
 import { alertsStubs } from './__mocks__/alertsStubs';
 import { AlertsService } from './Alerts.service';
@@ -19,7 +19,7 @@ describe('AlertsTable', () => {
   });
 
   it('should render the table correctly', async () => {
-    const wrapper = await generateMountWrapper(<Alerts />);
+    const wrapper = await getMount(<Alerts />);
 
     wrapper.update();
 
@@ -29,14 +29,14 @@ describe('AlertsTable', () => {
   });
 
   it('should have table initially loading', async () => {
-    const wrapper = await generateMountWrapper(<Alerts />);
+    const wrapper = await getMount(<Alerts />);
 
     expect(wrapper.find(dataQa('table-loading')).exists()).toBeTruthy();
   });
 
   it('should render correctly without data', async () => {
     jest.spyOn(AlertsService, 'list').mockReturnValueOnce(Promise.resolve({ alerts: [] }));
-    const wrapper = await generateMountWrapper(<Alerts />);
+    const wrapper = await getMount(<Alerts />);
 
     wrapper.update();
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { FeatureLoader } from './FeatureLoader';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { EmptyBlock } from '../EmptyBlock';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 
 jest.mock('app/percona/settings/Settings.service');
 jest.mock('@percona/platform-core', () => {
@@ -18,7 +18,7 @@ jest.mock('@percona/platform-core', () => {
 describe('FeatureLoader', () => {
   it('should not have children initially', async () => {
     const Dummy = () => <></>;
-    const wrapper = await generateMountWrapper(
+    const wrapper = await getMount(
       <FeatureLoader featureName="IA" featureFlag="alertingEnabled">
         <Dummy />
       </FeatureLoader>
@@ -29,7 +29,7 @@ describe('FeatureLoader', () => {
 
   it('should show children after loading settings', async () => {
     const Dummy = () => <></>;
-    const wrapper = await generateMountWrapper(
+    const wrapper = await getMount(
       <FeatureLoader featureName="IA" featureFlag="alertingEnabled">
         <Dummy />
       </FeatureLoader>
@@ -46,9 +46,7 @@ describe('FeatureLoader', () => {
     });
     const spy = jest.fn();
 
-    const wrapper = await generateMountWrapper(
-      <FeatureLoader featureName="IA" featureFlag="alertingEnabled" onError={spy} />
-    );
+    const wrapper = await getMount(<FeatureLoader featureName="IA" featureFlag="alertingEnabled" onError={spy} />);
     wrapper.update();
     expect(spy).toHaveBeenCalledWith(errorObj);
   });

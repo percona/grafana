@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 import { mount, ReactWrapper, shallow, ShallowWrapper } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 
-export const generateMountWrapper = async (node: ReactElement): Promise<ReactWrapper> => {
+export const getMount = async (node: ReactElement): Promise<ReactWrapper> => {
   let wrapper: ReactWrapper = {} as ReactWrapper;
 
   //@ts-ignore

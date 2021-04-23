@@ -1,6 +1,6 @@
 import React from 'react';
 import { dataQa } from '@percona/platform-core';
-import { generateMountWrapper, asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { getMount, asyncAct } from 'app/percona/shared/helpers/testUtils';
 import { AlertsActions } from './AlertsActions';
 import { alertsStubs } from '../__mocks__/alertsStubs';
 import { formatAlert } from '../Alerts.utils';
@@ -25,9 +25,7 @@ describe('AlertActions', () => {
   });
 
   it('renders a barred bell for an active alert', async () => {
-    const wrapper = await generateMountWrapper(
-      <AlertsActions alert={formatAlert(alertsStubs[0])} getAlerts={fakeGetAlerts} />
-    );
+    const wrapper = await getMount(<AlertsActions alert={formatAlert(alertsStubs[0])} getAlerts={fakeGetAlerts} />);
 
     wrapper.update();
 
@@ -35,9 +33,7 @@ describe('AlertActions', () => {
   });
 
   it('renders a bell for an silenced alert', async () => {
-    const wrapper = await generateMountWrapper(
-      <AlertsActions alert={formatAlert(alertsStubs[3])} getAlerts={fakeGetAlerts} />
-    );
+    const wrapper = await getMount(<AlertsActions alert={formatAlert(alertsStubs[3])} getAlerts={fakeGetAlerts} />);
 
     wrapper.update();
 
@@ -45,9 +41,7 @@ describe('AlertActions', () => {
   });
 
   it('calls the API to activate a silenced alert', async () => {
-    const wrapper = await generateMountWrapper(
-      <AlertsActions alert={formatAlert(alertsStubs[3])} getAlerts={fakeGetAlerts} />
-    );
+    const wrapper = await getMount(<AlertsActions alert={formatAlert(alertsStubs[3])} getAlerts={fakeGetAlerts} />);
 
     await asyncAct(() =>
       wrapper
@@ -61,9 +55,7 @@ describe('AlertActions', () => {
   });
 
   it('calls the API to silence an active alert', async () => {
-    const wrapper = await generateMountWrapper(
-      <AlertsActions alert={formatAlert(alertsStubs[1])} getAlerts={fakeGetAlerts} />
-    );
+    const wrapper = await getMount(<AlertsActions alert={formatAlert(alertsStubs[1])} getAlerts={fakeGetAlerts} />);
     await asyncAct(() =>
       wrapper
         .find(dataQa('silence-alert-button'))

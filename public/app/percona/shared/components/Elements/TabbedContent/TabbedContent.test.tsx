@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { TabbedContent } from './TabbedContent';
 import { ContentTab } from './TabbedContent.types';
 import { Tab, TabContent } from '@grafana/ui';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 
 const fakeLocationUpdate = jest.fn();
 
@@ -52,14 +52,14 @@ describe('TabbedContent', () => {
   });
 
   it('should show all tabs', async () => {
-    const wrapper = await generateMountWrapper(<TabbedContent tabs={contentTabs} basePath="" />);
+    const wrapper = await getMount(<TabbedContent tabs={contentTabs} basePath="" />);
 
     expect(wrapper.find(Tab)).toHaveLength(2);
     expect(wrapper.find(TabContent).exists()).toBeTruthy();
   });
 
   fit('changes location when clicking on a tab', async () => {
-    const wrapper = await generateMountWrapper(<TabbedContent tabs={contentTabs} basePath="integrated-alerting" />);
+    const wrapper = await getMount(<TabbedContent tabs={contentTabs} basePath="integrated-alerting" />);
     wrapper.update();
     const tabs = wrapper.find('li');
     tabs.at(1).simulate('click');
@@ -74,7 +74,7 @@ describe('TabbedContent', () => {
       return callback({ location: { routeParams: { tab: 'test' }, path: '/integrated-alerting/test' } });
     });
 
-    const wrapper = await generateMountWrapper(<TabbedContent tabs={contentTabs} basePath="integrated-alerting" />);
+    const wrapper = await getMount(<TabbedContent tabs={contentTabs} basePath="integrated-alerting" />);
     wrapper.update();
 
     expect(getLocationSrv).toBeCalledTimes(1);
@@ -84,7 +84,7 @@ describe('TabbedContent', () => {
 
   it('should return Content when renderTab prop is passed', async () => {
     const DummyWrapper: FC<any> = ({ children }) => <>{children}</>;
-    const wrapper = await generateMountWrapper(
+    const wrapper = await getMount(
       <TabbedContent
         tabs={contentTabs}
         basePath=""

@@ -3,7 +3,7 @@ import { dataQa } from '@percona/platform-core';
 import { EditDBClusterModal } from './EditDBClusterModal';
 import { setVisibleStub, onDBClusterAddedStub } from './__mocks__/addDBClusterModalStubs';
 import { dbClustersStub } from '../__mocks__/dbClustersStubs';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 
 jest.mock('app/core/app_events');
 jest.mock('../DBCluster.service');
@@ -12,7 +12,7 @@ jest.mock('../XtraDB.service');
 
 describe('EditDBClusterModal::', () => {
   it('should render advanced options', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <EditDBClusterModal
         isVisible
         setVisible={setVisibleStub}

@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { dataQa, LoaderButton } from '@percona/platform-core';
 import { Table } from 'app/percona/integrated-alerting/components/Table/Table';
-import { generateMountWrapper, asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { getMount, asyncAct } from 'app/percona/shared/helpers/testUtils';
 import { StorageLocationsService } from './StorageLocations.service';
 import { stubLocations } from './__mocks__/StorageLocations.service';
 import { RemoveStorageLocationModal } from './RemoveStorageLocationModal';
@@ -15,14 +15,14 @@ jest.mock('app/core/app_events');
 
 describe('StorageLocations', () => {
   it('should render table with data', async () => {
-    const wrapper = await generateMountWrapper(<StorageLocations />);
+    const wrapper = await getMount(<StorageLocations />);
     wrapper.update();
 
     expect(wrapper.find(Table).prop('data')).toEqual(formatLocationList(stubLocations));
   });
 
   it('should show delete modal when icon is clicked', async () => {
-    const wrapper = await generateMountWrapper(<StorageLocations />);
+    const wrapper = await getMount(<StorageLocations />);
     wrapper.update();
 
     expect(wrapper.find(RemoveStorageLocationModal).prop('isVisible')).toBe(false);
@@ -35,7 +35,7 @@ describe('StorageLocations', () => {
 
   it('should close delete modal after deletion confirmation', async () => {
     const spy = spyOn(StorageLocationsService, 'delete').and.callThrough();
-    const wrapper = await generateMountWrapper(<StorageLocations />);
+    const wrapper = await getMount(<StorageLocations />);
 
     wrapper.update();
     wrapper

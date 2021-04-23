@@ -3,11 +3,11 @@ import { dataQa } from '@percona/platform-core';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
 import { KubernetesClusterActions } from './KubernetesClusterActions';
 import { kubernetesStub } from '../__mocks__/kubernetesStubs';
-import { generateMountWrapper, asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { getMount, asyncAct } from 'app/percona/shared/helpers/testUtils';
 
 describe('KubernetesClusterActions::', () => {
   it('renders correctly', async () => {
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <KubernetesClusterActions
         kubernetesCluster={kubernetesStub[0]}
         setSelectedCluster={jest.fn()}
@@ -24,7 +24,7 @@ describe('KubernetesClusterActions::', () => {
   it('Select delete actions', async () => {
     const setSelectedCluster = jest.fn();
     const setDeleteModalVisible = jest.fn();
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <KubernetesClusterActions
         kubernetesCluster={kubernetesStub[1]}
         setSelectedCluster={setSelectedCluster}
@@ -55,7 +55,7 @@ describe('KubernetesClusterActions::', () => {
     const setSelectedCluster = jest.fn();
     const setDeleteModalVisible = jest.fn();
     const setViewConfigModalVisible = jest.fn();
-    const root = await generateMountWrapper(
+    const root = await getMount(
       <KubernetesClusterActions
         kubernetesCluster={kubernetesStub[1]}
         setSelectedCluster={setSelectedCluster}

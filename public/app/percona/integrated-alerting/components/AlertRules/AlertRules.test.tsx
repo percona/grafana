@@ -1,6 +1,6 @@
 import React from 'react';
 import { dataQa } from '@percona/platform-core';
-import { generateMountWrapper } from 'app/percona/shared/helpers/testUtils';
+import { getMount } from 'app/percona/shared/helpers/testUtils';
 import { AlertRules } from './AlertRules';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate/AlertRuleTemplate.service';
 import { NotificationChannelService } from '../NotificationChannel/NotificationChannel.service';
@@ -45,7 +45,7 @@ describe('AlertRules', () => {
     expect(alertRuleTemplateServiceList).toBeCalledTimes(0);
     expect(notificationChannelsServiceList).toBeCalledTimes(0);
 
-    const wrapper = await generateMountWrapper(<AlertRules />);
+    const wrapper = await getMount(<AlertRules />);
 
     expect(alertRuleTemplateServiceList).toBeCalledTimes(1);
     expect(notificationChannelsServiceList).toBeCalledTimes(1);
@@ -54,7 +54,7 @@ describe('AlertRules', () => {
   });
 
   it('should toggle selected alert rule details', async () => {
-    const wrapper = await generateMountWrapper(<AlertRules />);
+    const wrapper = await getMount(<AlertRules />);
 
     wrapper.update();
     wrapper
@@ -75,14 +75,14 @@ describe('AlertRules', () => {
   });
 
   it('should have table initially loading', async () => {
-    const wrapper = await generateMountWrapper(<AlertRules />);
+    const wrapper = await getMount(<AlertRules />);
 
     expect(wrapper.find(dataQa('table-loading'))).toHaveLength(1);
     expect(wrapper.find(dataQa('table-no-data'))).toHaveLength(1);
   });
 
   it('should render table content', async () => {
-    const wrapper = await generateMountWrapper(<AlertRules />);
+    const wrapper = await getMount(<AlertRules />);
 
     wrapper.update();
 
@@ -96,7 +96,7 @@ describe('AlertRules', () => {
       .spyOn(AlertRulesService, 'list')
       .mockReturnValueOnce(Promise.resolve({ rules: [], totals: { total_items: 0, total_pages: 0 } }));
 
-    const wrapper = await generateMountWrapper(<AlertRules />);
+    const wrapper = await getMount(<AlertRules />);
 
     wrapper.update();
 
