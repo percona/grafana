@@ -12,6 +12,7 @@ module.exports = function(config, grunt) {
       command: 'yarn typecheck',
     },
     jest: 'yarn jest-ci',
+    jestPercona: 'yarn jest-percona-ci',
     webpack: 'node ./node_modules/webpack/bin/webpack.js --config scripts/webpack/webpack.prod.js',
   };
 };
