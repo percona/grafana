@@ -18,6 +18,16 @@ module.exports = function(grunt) {
   ]);
 
   // prettier-ignore
+  grunt.registerTask('test-percona', [
+    'sasslint',
+    'eslint',
+    'typecheck',
+    'exec:jestPercona',
+    'no-only-tests',
+    'no-focus-convey-tests'
+  ]);
+
+  // prettier-ignore
   grunt.registerTask('eslint', [
     'newer:exec:eslint'
   ]);
