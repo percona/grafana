@@ -33,9 +33,8 @@ const findFormButton = (wrapper: ReactWrapper) =>
 
 describe('AddNotificationChannelModal', () => {
   it('should render modal with correct fields', async () => {
-    let wrapper = {} as ReactWrapper;
+    let wrapper: ReactWrapper;
 
-    //@ts-ignore
     await act(async () => {
       wrapper = await mount(withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />));
     });
@@ -48,9 +47,8 @@ describe('AddNotificationChannelModal', () => {
   });
 
   it('should not render modal when visible is set to false', async () => {
-    let wrapper = {} as ReactWrapper;
+    let wrapper: ReactWrapper;
 
-    //@ts-ignore
     await act(async () => {
       wrapper = await mount(withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible={false} />));
     });
@@ -60,9 +58,8 @@ describe('AddNotificationChannelModal', () => {
 
   it('should call setVisible on close', async () => {
     const setVisible = jest.fn();
-    let wrapper = {} as ReactWrapper;
+    let wrapper: ReactWrapper;
 
-    //@ts-ignore
     await act(async () => {
       wrapper = await mount(withContext(<AddNotificationChannelModal setVisible={setVisible} isVisible />));
     });
@@ -74,9 +71,8 @@ describe('AddNotificationChannelModal', () => {
 
   it('should call setVisible on submit', async () => {
     const setVisible = jest.fn();
-    let wrapper = {} as ReactWrapper;
+    let wrapper: ReactWrapper;
 
-    //@ts-ignore
     await act(async () => {
       wrapper = await mount(withContext(<AddNotificationChannelModal setVisible={setVisible} isVisible />));
     });
@@ -84,7 +80,6 @@ describe('AddNotificationChannelModal', () => {
     wrapper.find(dataQa('name-text-input')).simulate('change', { target: { value: 'Email test' } });
     wrapper.find('textarea').simulate('change', { target: { value: 'test1@percona.com' } });
 
-    //@ts-ignore
     await act(async () => {
       wrapper.find('form').simulate('submit');
     });
@@ -94,9 +89,8 @@ describe('AddNotificationChannelModal', () => {
 
   it('should render with notification channel', async () => {
     const setVisible = jest.fn();
-    let wrapper = {} as ReactWrapper;
+    let wrapper: ReactWrapper;
 
-    //@ts-ignore
     await act(async () => {
       wrapper = await mount(
         withContext(
@@ -113,9 +107,8 @@ describe('AddNotificationChannelModal', () => {
   });
 
   it('should have the submit button initially disabled', async () => {
-    let wrapper = {} as ReactWrapper;
+    let wrapper: ReactWrapper;
 
-    //@ts-ignore
     await act(async () => {
       wrapper = await mount(withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />));
     });
@@ -138,17 +131,16 @@ describe('AddNotificationChannelModal', () => {
 
     it('should only send one of the keys', async () => {
       const serviceAddMock = jest.fn();
-      let wrapper = {} as ReactWrapper;
+      let wrapper: ReactWrapper;
       spyOn(NotificationChannelService, 'change').and.callFake(serviceAddMock);
 
-      //@ts-ignore
       await act(async () => {
         wrapper = await mount(
           withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible notificationChannel={channel} />)
         );
       });
-      //@ts-ignore
-      await act(async () => {
+
+      act(() => {
         wrapper
           .find(dataQa('keyType-radio-button'))
           .at(1)
@@ -157,13 +149,11 @@ describe('AddNotificationChannelModal', () => {
 
       wrapper.update();
 
-      //@ts-ignore
-      await act(async () => {
+      act(() => {
         wrapper.find(dataQa('service-text-input')).simulate('change', { target: { value: 'new_service_key' } });
       });
 
-      //@ts-ignore
-      await act(async () => {
+      act(() => {
         wrapper.find('form').simulate('submit');
       });
 

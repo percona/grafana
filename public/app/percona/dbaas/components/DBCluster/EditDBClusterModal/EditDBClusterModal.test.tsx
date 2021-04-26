@@ -1,6 +1,5 @@
 import React from 'react';
-import { mount, ReactWrapper } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+import { mount } from 'enzyme';
 import { dataQa } from '@percona/platform-core';
 import { EditDBClusterModal } from './EditDBClusterModal';
 import { setVisibleStub, onDBClusterAddedStub } from './__mocks__/addDBClusterModalStubs';
@@ -12,20 +11,15 @@ jest.mock('../PSMDB.service');
 jest.mock('../XtraDB.service');
 
 describe('EditDBClusterModal::', () => {
-  it('should render advanced options', async () => {
-    let root = {} as ReactWrapper;
-
-    //@ts-ignore
-    await act(async () => {
-      root = mount(
-        <EditDBClusterModal
-          isVisible
-          setVisible={setVisibleStub}
-          onDBClusterChanged={onDBClusterAddedStub}
-          selectedCluster={dbClustersStub[0]}
-        />
-      );
-    });
+  it('should render advanced options', () => {
+    const root = mount(
+      <EditDBClusterModal
+        isVisible
+        setVisible={setVisibleStub}
+        onDBClusterChanged={onDBClusterAddedStub}
+        selectedCluster={dbClustersStub[0]}
+      />
+    );
 
     expect(root.find(dataQa('resources-radio-button'))).toBeTruthy();
     expect(root.find(dataQa('memory-field-container'))).toBeTruthy();
