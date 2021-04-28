@@ -9,7 +9,6 @@ import { tablestatOptions } from './AdditionalOptions.constants';
 import { TablestatOptionsInterface } from './AdditionalOptions.types';
 import { FormApi } from 'final-form';
 import { InstanceTypes } from '../../../../panel.types';
-import { MongodbTLSCertificate } from './MongodbTLSCertificate';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
