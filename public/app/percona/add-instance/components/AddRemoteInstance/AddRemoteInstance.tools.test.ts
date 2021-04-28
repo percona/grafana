@@ -51,8 +51,6 @@ describe('Get instance data:: ', () => {
         aws_access_key: 'aws-secret-key-example',
         aws_secret_key: 'aws-secret-key-example',
         az: 'test az',
-        metricsParameters: 'manually',
-        schema: 'https',
       },
     };
 

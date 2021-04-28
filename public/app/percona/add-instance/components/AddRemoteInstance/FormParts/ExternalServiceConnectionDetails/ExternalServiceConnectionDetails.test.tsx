@@ -20,16 +20,17 @@ describe('Add remote instance:: ', () => {
       />
     );
 
-    root
-      .find('label')
-      .findWhere((n) => {
-        return n.text() === 'Parse from URL string';
-      })
-      .simulate('click');
+    root.find(dataQa('metricsParameters-radio-state')).simulate('change', { target: { value: 'parsed' } });
+
+    root.update();
 
     root
       .find(dataQa('url-text-input'))
       .simulate('change', { target: { value: 'https://admin:admin@localhost/metrics' } });
+
+    root.update();
+
+    root.find(dataQa('metricsParameters-radio-state')).simulate('change', { target: { value: 'manually' } });
 
     root.update();
 

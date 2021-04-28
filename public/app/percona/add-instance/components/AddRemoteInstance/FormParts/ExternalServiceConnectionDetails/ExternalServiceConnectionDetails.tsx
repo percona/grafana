@@ -13,7 +13,7 @@ export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetai
   const styles = getStyles(theme);
 
   const selectedOption = form.getState().values && form.getState().values['metricsParameters'];
-  const urlValue = form.getState().values.url;
+  const urlValue = form.getState().values && form.getState().values.url;
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
 
   const trim = useCallback(value => (value ? value.trim() : value), []);
@@ -22,19 +22,19 @@ export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetai
       const url = new URL(form.getState().values.url);
       const protocol = url.protocol.replace(':', '');
 
-      form.mutators.setValue('schema', protocol);
-      form.mutators.setValue('address', url.hostname);
-      form.mutators.setValue('port', url.port || (protocol === 'https' ? '443' : '80'));
-      form.mutators.setValue('metrics_path', url.pathname);
-      form.mutators.setValue('username', url.username);
-      form.mutators.setValue('password', url.password);
+      form.mutators?.setValue('schema', protocol);
+      form.mutators?.setValue('address', url.hostname);
+      form.mutators?.setValue('port', url.port || (protocol === 'https' ? '443' : '80'));
+      form.mutators?.setValue('metrics_path', url.pathname);
+      form.mutators?.setValue('username', url.username);
+      form.mutators?.setValue('password', url.password);
     } catch (e) {
-      form.mutators.setValue('schema', Schema.HTTPS);
-      form.mutators.setValue('address', '');
-      form.mutators.setValue('port', '443');
-      form.mutators.setValue('metrics_path', '');
-      form.mutators.setValue('username', '');
-      form.mutators.setValue('password', '');
+      form.mutators?.setValue('schema', Schema.HTTPS);
+      form.mutators?.setValue('address', '');
+      form.mutators?.setValue('port', '443');
+      form.mutators?.setValue('metrics_path', '');
+      form.mutators?.setValue('username', '');
+      form.mutators?.setValue('password', '');
     }
   };
 
