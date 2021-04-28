@@ -1,9 +1,10 @@
-import { mount } from 'enzyme';
+import { mount, ShallowWrapper } from 'enzyme';
 import React from 'react';
 import { dataQa } from '@percona/platform-core';
 import { Form } from 'react-final-form';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails';
 import { asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { Button } from '@grafana/ui/compiled/src';
 
 describe('Add remote instance:: ', () => {
   it('should render correct for mysql and highlight empty mandatory fields on submit', async () => {
@@ -20,10 +21,15 @@ describe('Add remote instance:: ', () => {
     );
 
     root
+      .find('label')
+      .findWhere((n) => {
+        return n.text() === 'Parse from URL string';
+      })
+      .simulate('click');
+
+    root
       .find(dataQa('url-text-input'))
       .simulate('change', { target: { value: 'https://admin:admin@localhost/metrics' } });
-
-    await asyncAct(() => root.find('button#parseUrl').simulate('click'));
 
     root.update();
 

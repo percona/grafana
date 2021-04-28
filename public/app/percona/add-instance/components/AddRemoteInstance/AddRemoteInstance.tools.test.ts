@@ -18,6 +18,8 @@ describe('Get instance data:: ', () => {
       instanceType: 'PostgreSQL',
       remoteInstanceCredentials: {
         port: '5432',
+        metricsParameters: 'manually',
+        schema: 'https',
       },
     };
 
@@ -49,6 +51,8 @@ describe('Get instance data:: ', () => {
         aws_access_key: 'aws-secret-key-example',
         aws_secret_key: 'aws-secret-key-example',
         az: 'test az',
+        metricsParameters: 'manually',
+        schema: 'https',
       },
     };
 
@@ -70,6 +74,8 @@ describe('Get instance data:: ', () => {
       instanceType: 'MongoDB',
       remoteInstanceCredentials: {
         port: '27017',
+        metricsParameters: 'manually',
+        schema: 'https',
       },
     };
 
@@ -91,6 +97,8 @@ describe('Get instance data:: ', () => {
       instanceType: 'MySQL',
       remoteInstanceCredentials: {
         port: '3306',
+        metricsParameters: 'manually',
+        schema: 'https',
       },
     };
 
@@ -112,6 +120,8 @@ describe('Get instance data:: ', () => {
       instanceType: 'ProxySQL',
       remoteInstanceCredentials: {
         port: '6032',
+        metricsParameters: 'manually',
+        schema: 'https',
       },
     };
 
