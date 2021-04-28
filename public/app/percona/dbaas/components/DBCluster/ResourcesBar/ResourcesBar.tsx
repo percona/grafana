@@ -19,6 +19,7 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
   const requiredResources = allocated && expected ? allocated.original + expected.original : undefined;
   const allocatedWidth = getResourcesWidth(allocated?.original, total?.original);
   const expectedWidth = getResourcesWidth(requiredResources, total?.original);
+  const expectedDownsizeWidth = Math.min(Math.abs(getResourcesWidth(expected?.original, allocated?.original)), 100);
   const isResourceInsufficient = requiredResources && total ? requiredResources > total.original : false;
 
   return (
@@ -31,12 +32,24 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
           {isResourceInsufficient ? (
             <div className={cx(styles.filled, styles.filledInsufficient, styles.getFilledStyles(100))} />
           ) : (
-            expected && (
+            expected &&
+            expected.value > 0 && (
               <div className={cx(styles.filled, styles.filledExpected, styles.getFilledStyles(expectedWidth))} />
             )
           )}
           {allocated && (
-            <div className={cx(styles.filled, styles.filledAllocated, styles.getFilledStyles(allocatedWidth))} />
+            <div className={cx(styles.filled, styles.filledAllocated, styles.getFilledStyles(allocatedWidth))}>
+              {expected && expected.value < 0 && (
+                <div
+                  className={cx(
+                    styles.filled,
+                    styles.filledExpected,
+                    styles.filledExpectedDownsize,
+                    styles.getFilledStyles(expectedDownsizeWidth)
+                  )}
+                />
+              )}
+            </div>
           )}
         </div>
         {allocated && total && (
@@ -52,7 +65,7 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
             </span>
           </div>
         )}
-        {expected && !isResourceInsufficient && (
+        {expected && expected.value !== 0 && !isResourceInsufficient && (
           <div className={styles.captionWrapper}>
             <div className={cx(styles.captionSquare, styles.expectedSquare)}></div>
             <span data-qa="resources-bar-expected-caption" className={styles.captionLabel}>

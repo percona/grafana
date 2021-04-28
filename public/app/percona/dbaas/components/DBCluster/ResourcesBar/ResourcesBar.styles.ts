@@ -61,6 +61,9 @@ export const getStyles = ({ colors, palette, spacing, typography }: GrafanaTheme
   filledExpected: css`
     background-color: ${expectedColor};
   `,
+  filledExpectedDownsize: css`
+    right: 0;
+  `,
   filledInsufficient: css`
     background-color: ${palette.brandDanger};
   `,

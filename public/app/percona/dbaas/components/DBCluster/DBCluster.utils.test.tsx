@@ -1,4 +1,11 @@
-import { isClusterChanging, getClusterStatus, formatResources, isOptionEmpty } from './DBCluster.utils';
+import {
+  isClusterChanging,
+  getClusterStatus,
+  formatResources,
+  isOptionEmpty,
+  getResourcesDifference,
+  getExpectedResourcesDifference,
+} from './DBCluster.utils';
 import { dbClustersStub } from './__mocks__/dbClustersStubs';
 import { DBClusterStatus, ResourcesUnits } from './DBCluster.types';
 
@@ -97,5 +104,77 @@ describe('DBCluster.utils::', () => {
     expect(isOptionEmpty({})).toBeTruthy();
     expect(isOptionEmpty({ label: 'test label' })).toBeTruthy();
     expect(isOptionEmpty({ value: 'test value' })).toBeFalsy();
+  });
+  it('calculates resources difference correctly', () => {
+    const resourcesA = {
+      value: 10,
+      original: 10,
+      units: ResourcesUnits.BYTES,
+    };
+    const resourcesB = {
+      value: 20,
+      original: 20,
+      units: ResourcesUnits.BYTES,
+    };
+    const resourcesC = {
+      value: 20,
+      original: 20,
+      units: ResourcesUnits.GB,
+    };
+    const expectedResourcesA = {
+      expected: {
+        cpu: resourcesA,
+        memory: resourcesA,
+        disk: resourcesA,
+      },
+    };
+    const expectedResourcesB = {
+      expected: {
+        cpu: resourcesB,
+        memory: resourcesB,
+        disk: resourcesB,
+      },
+    };
+    const resultA = {
+      value: 0,
+      original: 0,
+      units: ResourcesUnits.BYTES,
+    };
+    const resultB = {
+      value: -10,
+      original: -10,
+      units: ResourcesUnits.BYTES,
+    };
+    const resultC = {
+      value: 10,
+      original: 10,
+      units: ResourcesUnits.BYTES,
+    };
+
+    expect(getResourcesDifference(resourcesA, resourcesA)).toEqual(resultA);
+    expect(getResourcesDifference(resourcesA, resourcesB)).toEqual(resultB);
+    expect(getResourcesDifference(resourcesB, resourcesA)).toEqual(resultC);
+    expect(getResourcesDifference(resourcesB, resourcesC)).toBeNull();
+    expect(getExpectedResourcesDifference(expectedResourcesA, expectedResourcesA)).toEqual({
+      expected: {
+        cpu: resultA,
+        memory: resultA,
+        disk: resultA,
+      },
+    });
+    expect(getExpectedResourcesDifference(expectedResourcesA, expectedResourcesB)).toEqual({
+      expected: {
+        cpu: resultB,
+        memory: resultB,
+        disk: resultB,
+      },
+    });
+    expect(getExpectedResourcesDifference(expectedResourcesB, expectedResourcesA)).toEqual({
+      expected: {
+        cpu: resultC,
+        memory: resultC,
+        disk: resultC,
+      },
+    });
   });
 });
