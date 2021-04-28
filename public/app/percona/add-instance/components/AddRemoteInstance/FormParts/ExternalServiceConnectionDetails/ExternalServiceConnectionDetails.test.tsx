@@ -1,10 +1,8 @@
-import { mount, ShallowWrapper } from 'enzyme';
+import { mount } from 'enzyme';
 import React from 'react';
 import { dataQa } from '@percona/platform-core';
 import { Form } from 'react-final-form';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails';
-import { asyncAct } from 'app/percona/shared/helpers/testUtils';
-import { Button } from '@grafana/ui/compiled/src';
 
 describe('Add remote instance:: ', () => {
   it('should render correct for mysql and highlight empty mandatory fields on submit', async () => {
