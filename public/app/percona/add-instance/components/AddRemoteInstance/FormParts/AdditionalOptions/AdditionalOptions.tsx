@@ -148,7 +148,8 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
       return (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
-          <MongodbTLSCertificate form={form} />
+          {/*TODO: return when backend part will be merged*/}
+          {/*<MongodbTLSCertificate form={form} />*/}
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
           <CheckboxField
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
