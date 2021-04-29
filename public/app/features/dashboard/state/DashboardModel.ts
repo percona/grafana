@@ -260,7 +260,7 @@ export class DashboardModel {
     dispatch(onTimeRangeUpdated(timeRange));
   }
 
-  startRefresh(forceRefresh: boolean) {
+  startRefresh(forceRefresh?: boolean) {
     this.events.emit(PanelEvents.refresh);
 
     if (this.panelInEdit) {
