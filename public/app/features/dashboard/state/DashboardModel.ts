@@ -260,7 +260,7 @@ export class DashboardModel {
     dispatch(onTimeRangeUpdated(timeRange));
   }
 
-  startRefresh() {
+  startRefresh(forceRefresh: boolean) {
     this.events.emit(PanelEvents.refresh);
 
     if (this.panelInEdit) {
@@ -269,7 +269,7 @@ export class DashboardModel {
     }
 
     for (const panel of this.panels) {
-      if (!this.otherPanelInFullscreen(panel)) {
+      if (!this.otherPanelInFullscreen(panel) || forceRefresh) {
         panel.refresh();
       }
     }
