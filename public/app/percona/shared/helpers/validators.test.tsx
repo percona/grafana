@@ -159,7 +159,7 @@ describe('Validate containNumbers', () => {
 });
 
 describe('Validate max length', () => {
-  it('returns an error if the length of the input to validate is greater than the specified max', () => {
+  it('returns an error if the length of the input to be validated is greater than the specified max', () => {
     const testedLength = 8;
 
     expect(validators.maxLength(testedLength)('abcdefghijklmno')).toEqual(
@@ -169,7 +169,7 @@ describe('Validate max length', () => {
     expect(validators.maxLength(testedLength)('abcde1234')).toEqual(`Must contain at most ${testedLength} characters`);
   });
 
-  it('returns undefined if the length of the input to validate is less than or equal to the specified max', () => {
+  it('returns undefined if the length of the input to be validated is less than or equal to the specified max', () => {
     const testedLength = 8;
 
     expect(validators.maxLength(testedLength)('')).toBeUndefined();
