@@ -5,8 +5,9 @@ import {
   isOptionEmpty,
   getResourcesDifference,
   getExpectedResourcesDifference,
+  getResourcesSum,
 } from './DBCluster.utils';
-import { dbClustersStub } from './__mocks__/dbClustersStubs';
+import { dbClustersStub, resourcesA, resourcesB, resourcesC } from './__mocks__/dbClustersStubs';
 import { DBClusterExpectedResources, DBClusterStatus, ResourcesUnits, ResourcesWithUnits } from './DBCluster.types';
 
 const DBCLUSTER_STATUS_MAP = {
@@ -106,21 +107,6 @@ describe('DBCluster.utils::', () => {
     expect(isOptionEmpty({ value: 'test value' })).toBeFalsy();
   });
   it('calculates resources difference correctly', () => {
-    const resourcesA: ResourcesWithUnits = {
-      value: 10,
-      original: 10,
-      units: ResourcesUnits.BYTES,
-    };
-    const resourcesB: ResourcesWithUnits = {
-      value: 20,
-      original: 20,
-      units: ResourcesUnits.BYTES,
-    };
-    const resourcesC: ResourcesWithUnits = {
-      value: 20,
-      original: 20,
-      units: ResourcesUnits.GB,
-    };
     const expectedResourcesA: DBClusterExpectedResources = {
       expected: {
         cpu: resourcesA,
@@ -176,5 +162,22 @@ describe('DBCluster.utils::', () => {
         disk: resultC,
       },
     });
+  });
+  it('calculates resources sum correctly', () => {
+    const resultA: ResourcesWithUnits = {
+      value: 20,
+      original: 20,
+      units: ResourcesUnits.BYTES,
+    };
+    const resultB: ResourcesWithUnits = {
+      value: 30,
+      original: 30,
+      units: ResourcesUnits.BYTES,
+    };
+
+    expect(getResourcesSum(resourcesA, resourcesA)).toEqual<ResourcesWithUnits>(resultA);
+    expect(getResourcesSum(resourcesA, resourcesB)).toEqual<ResourcesWithUnits>(resultB);
+    expect(getResourcesSum(resourcesB, resourcesA)).toEqual<ResourcesWithUnits>(resultB);
+    expect(getResourcesSum(resourcesB, resourcesC)).toBeNull();
   });
 });

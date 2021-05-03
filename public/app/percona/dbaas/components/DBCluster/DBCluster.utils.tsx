@@ -67,6 +67,21 @@ export const getResourcesDifference = (
   };
 };
 
+export const getResourcesSum = (
+  { value: valueA, original: originalA, units: unitsA }: ResourcesWithUnits,
+  { value: valueB, original: originalB, units: unitsB }: ResourcesWithUnits
+): ResourcesWithUnits | null => {
+  if (unitsA !== unitsB) {
+    return null;
+  }
+
+  return {
+    original: originalA + originalB,
+    value: valueA + valueB,
+    units: unitsA,
+  };
+};
+
 export const getExpectedResourcesDifference = (
   { expected: { cpu: cpuA, memory: memoryA, disk: diskA } }: DBClusterExpectedResources,
   { expected: { cpu: cpuB, memory: memoryB, disk: diskB } }: DBClusterExpectedResources

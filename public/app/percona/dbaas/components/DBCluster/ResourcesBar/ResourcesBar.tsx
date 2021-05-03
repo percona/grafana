@@ -3,7 +3,12 @@ import { cx } from 'emotion';
 import { Icon, useStyles } from '@grafana/ui';
 import { getStyles } from './ResourcesBar.styles';
 import { ResourcesBarProps } from './ResourcesBar.types';
-import { formatResources, getResourcesWidth } from './ResourcesBar.utils';
+import {
+  formatResources,
+  getExpectedAllocated,
+  getExpectedAllocatedWidth,
+  getResourcesWidth,
+} from './ResourcesBar.utils';
 import { Messages } from './ResourcesBar.messages';
 
 export const ResourcesBar: FC<ResourcesBarProps> = ({
@@ -19,8 +24,14 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
   const requiredResources = allocated && expected ? allocated.original + expected.original : undefined;
   const allocatedWidth = getResourcesWidth(allocated?.original, total?.original);
   const expectedWidth = getResourcesWidth(requiredResources, total?.original);
-  const expectedDownsizeWidth = Math.min(Math.abs(getResourcesWidth(expected?.original, allocated?.original)), 100);
+  const expectedAllocatedWidth = getExpectedAllocatedWidth(expected, allocated);
+  const expectedAllocated = getExpectedAllocated(expected, allocated);
+  const isDownsize = expected && expected.value < 0;
   const isResourceInsufficient = requiredResources && total ? requiredResources > total.original : false;
+  const expectedSquareStyles = {
+    [styles.expectedSquare]: !isDownsize,
+    [styles.expectedAllocatedSquare]: isDownsize,
+  };
 
   return (
     <div data-qa={dataQa} className={cx(styles.resourcesBarWrapper, className)}>
@@ -32,20 +43,18 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
           {isResourceInsufficient ? (
             <div className={cx(styles.filled, styles.filledInsufficient, styles.getFilledStyles(100))} />
           ) : (
-            expected &&
-            expected.value > 0 && (
+            !isDownsize && (
               <div className={cx(styles.filled, styles.filledExpected, styles.getFilledStyles(expectedWidth))} />
             )
           )}
           {allocated && (
             <div className={cx(styles.filled, styles.filledAllocated, styles.getFilledStyles(allocatedWidth))}>
-              {expected && expected.value < 0 && (
+              {isDownsize && (
                 <div
                   className={cx(
                     styles.filled,
-                    styles.filledExpected,
-                    styles.filledExpectedDownsize,
-                    styles.getFilledStyles(expectedDownsizeWidth)
+                    styles.filledExpectedAllocated,
+                    styles.getFilledStyles(expectedAllocatedWidth)
                   )}
                 />
               )}
@@ -67,9 +76,11 @@ export const ResourcesBar: FC<ResourcesBarProps> = ({
         )}
         {expected && expected.value !== 0 && !isResourceInsufficient && (
           <div className={styles.captionWrapper}>
-            <div className={cx(styles.captionSquare, styles.expectedSquare)}></div>
+            <div className={cx(styles.captionSquare, expectedSquareStyles)}></div>
             <span data-qa="resources-bar-expected-caption" className={styles.captionLabel}>
-              {Messages.buildExpectedLabel(formatResources(expected), resourceLabel)}
+              {isDownsize
+                ? Messages.buildExpectedAllocatedLabel(formatResources(expectedAllocated), resourceLabel)
+                : Messages.buildExpectedLabel(formatResources(expected), resourceLabel)}
             </span>
           </div>
         )}
