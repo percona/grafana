@@ -28,7 +28,6 @@ import { CoreEvents } from '../../../types';
 
 export const panelAdded = eventFactory<PanelModel | undefined>('panel-added');
 export const panelRemoved = eventFactory<PanelModel | undefined>('panel-removed');
-export const snapshotCreated = eventFactory('snapshot-created');
 
 export interface GridPos {
   x: number;
