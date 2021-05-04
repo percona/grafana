@@ -201,8 +201,7 @@ export class DashboardGrid extends PureComponent<Props> {
   };
 
   isInView = (panel: PanelModel): boolean => {
-    // Need forceRefresh to ignore lazyLoading for snapshot creation purposes
-    if (panel.isViewing || panel.isEditing) {
+    if (panel.isViewing || panel.isEditing || panel.isInView) {
       return true;
     }
 

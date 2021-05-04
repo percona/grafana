@@ -85,17 +85,20 @@ export class ShareSnapshot extends PureComponent<Props, State> {
     /**
      * Force-refresh the dashboard panels, which is a variant of DashboardModel.startRefresh
      */
-    this.dashboard.events.emit(PanelEvents.refresh);
-    // preserve the state
+    // preserve the panels' state
     const isInViewState = this.dashboard.panels.map(panel => panel.isInView);
     for (const panel of this.dashboard.panels) {
       panel.isInView = true;
       panel.refresh();
     }
 
+    this.dashboard.expandRows();
+    this.dashboard.events.emit(PanelEvents.refresh);
+
     setTimeout(() => {
       this.saveSnapshot(external);
-      this.dashboard.panels.forEach((panel, index) => {
+      this.dashboard.forEachPanel((panel, index) => {
+        // restore the panels' state
         panel.isInView = isInViewState[index];
       });
     }, timeoutSeconds * 1000);
