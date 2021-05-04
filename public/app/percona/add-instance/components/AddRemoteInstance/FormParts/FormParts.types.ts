@@ -5,7 +5,7 @@ export interface MainDetailsFormPartProps {
   remoteInstanceCredentials: RemoteInstanceCredentials;
 }
 
-export interface ExternalServiceConnectionDetailsFormPartProps {
+export interface FormPartProps {
   form: FormApi;
 }
 
@@ -19,4 +19,14 @@ export interface AdditionalOptionsFormPartProps {
 export interface PostgreSQLAdditionalOptionsProps {
   isRDS?: boolean;
   isAzure?: boolean;
+}
+
+export enum Schema {
+  HTTP = 'http',
+  HTTPS = 'https',
+}
+
+export enum MetricsParameters {
+  manually = 'manually',
+  parsed = 'parsed',
 }
