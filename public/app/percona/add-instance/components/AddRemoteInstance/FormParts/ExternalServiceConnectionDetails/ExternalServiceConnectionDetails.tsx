@@ -3,7 +3,7 @@ import { PasswordInputField, RadioButtonGroupField, TextInputField, validators }
 import Validators from 'app/percona/shared/helpers/validators';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { useTheme } from '@grafana/ui';
-import { ExternalServiceConnectionDetailsFormPartProps, MetricsParameters, Schema } from '../FormParts.types';
+import { FormPartProps, MetricsParameters, Schema } from '../FormParts.types';
 import { getStyles } from '../FormParts.styles';
 import { Messages } from '../FormParts.messages';
 import { metricsParametersOptions, schemaOptions } from '../FormParts.constants';
