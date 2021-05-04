@@ -13,7 +13,7 @@ export const validators = {
     return 'Port should be a number and between 0 and 65535';
   },
   validateUrl: (value: string) => {
-    const urlRe = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    const urlRe = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
 
     return urlRe.test(value) ? undefined : 'Invalid URL string';
   },

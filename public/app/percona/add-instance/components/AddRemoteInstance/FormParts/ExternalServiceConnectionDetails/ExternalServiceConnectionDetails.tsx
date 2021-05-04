@@ -11,9 +11,9 @@ import { metricsParametersOptions, schemaOptions } from '../FormParts.constants'
 export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetailsFormPartProps> = ({ form }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-
-  const selectedOption = form.getState().values && form.getState().values['metricsParameters'];
-  const urlValue = form.getState().values && form.getState().values.url;
+  const formValues = form.getState().values;
+  const selectedOption = formValues?.metricsParameters;
+  const urlValue = formValues?.url;
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
 
   const trim = useCallback(value => (value ? value.trim() : value), []);
