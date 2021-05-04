@@ -8,7 +8,7 @@ import { getStyles } from '../FormParts.styles';
 import { Messages } from '../FormParts.messages';
 import { metricsParametersOptions, schemaOptions } from '../FormParts.constants';
 
-export const ExternalServiceConnectionDetails: FC<ExternalServiceConnectionDetailsFormPartProps> = ({ form }) => {
+export const ExternalServiceConnectionDetails: FC<FormPartProps> = ({ form }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
   const formValues = form.getState().values;
