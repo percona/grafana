@@ -6,6 +6,7 @@ import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 import { appEvents } from 'app/core/core';
 import { VariableRefresh } from '../../../variables/types';
+import { snapshotCreated } from '../../state/PanelModel';
 
 const { Select, Input } = LegacyForms;
 
@@ -89,11 +90,9 @@ export class ShareSnapshot extends PureComponent<Props, State> {
     const isInViewState = this.dashboard.panels.map(panel => panel.isInView);
     for (const panel of this.dashboard.panels) {
       panel.isInView = true;
-      panel.refresh();
     }
 
-    this.dashboard.expandRows();
-    this.dashboard.events.emit(PanelEvents.refresh);
+    this.dashboard.events.emit(snapshotCreated);
 
     setTimeout(() => {
       this.saveSnapshot(external);
