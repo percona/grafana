@@ -83,6 +83,8 @@ export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
     [addModalVisible, settings]
   );
 
+  const getRowKey = useCallback(({ original }) => `${original.kubernetesClusterName}${original.clusterName}`, []);
+
   const getSettings = async () => {
     try {
       setSettingsLoading(true);
@@ -98,6 +100,12 @@ export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
   useEffect(() => {
     getSettings();
   }, []);
+
+  useEffect(() => {
+    if (!deleteModalVisible && !editModalVisible && !logsModalVisible) {
+      setSelectedCluster(undefined);
+    }
+  }, [deleteModalVisible, editModalVisible, logsModalVisible]);
 
   return (
     <div>
@@ -117,14 +125,24 @@ export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
         onClusterDeleted={getDBClusters}
         selectedCluster={selectedCluster}
       />
-      <EditDBClusterModal
-        isVisible={editModalVisible}
-        setVisible={setEditModalVisible}
-        onDBClusterChanged={getDBClusters}
-        selectedCluster={selectedCluster}
+      {selectedCluster && (
+        <EditDBClusterModal
+          isVisible={editModalVisible}
+          setVisible={setEditModalVisible}
+          onDBClusterChanged={getDBClusters}
+          selectedCluster={selectedCluster}
+        />
+      )}
+      {logsModalVisible && (
+        <DBClusterLogsModal isVisible={logsModalVisible} setVisible={setLogsModalVisible} dbCluster={selectedCluster} />
+      )}
+      <Table
+        columns={columns}
+        data={dbClusters}
+        loading={loading}
+        noData={<AddNewClusterButton />}
+        rowKey={getRowKey}
       />
-      <DBClusterLogsModal isVisible={logsModalVisible} setVisible={setLogsModalVisible} dbCluster={selectedCluster} />
-      <Table columns={columns} data={dbClusters} loading={loading} noData={<AddNewClusterButton />} />
     </div>
   );
 };
