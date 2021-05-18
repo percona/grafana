@@ -103,6 +103,7 @@ export const saveDashboard = eventFactory<SaveDashboardPayload>('save-dashboard'
 export const dashboardFetchStart = eventFactory('dashboard-fetch-start');
 export const dashboardSaved = eventFactory<DashboardModel>('dashboard-saved');
 export const removePanel = eventFactory<number>('remove-panel');
+export const snapshotCreated = eventFactory('snapshot-created');
 
 export const searchQuery = eventFactory('search-query');
 
