@@ -8,7 +8,7 @@ import { Emitter } from 'app/core/utils/emitter';
 import { contextSrv } from 'app/core/services/context_srv';
 import sortByKeys from 'app/core/utils/sort_by_keys';
 // Types
-import { GridPos, panelAdded, PanelModel, panelRemoved, snapshotCreated } from './PanelModel';
+import { GridPos, panelAdded, PanelModel, panelRemoved } from './PanelModel';
 import { DashboardMigrator } from './DashboardMigrator';
 import {
   AppEvent,
@@ -260,12 +260,8 @@ export class DashboardModel {
     dispatch(onTimeRangeUpdated(timeRange));
   }
 
-  startRefresh(forceRefresh?: boolean) {
+  startRefresh() {
     this.events.emit(PanelEvents.refresh);
-
-    if (forceRefresh) {
-      this.events.emit(snapshotCreated);
-    }
 
     if (this.panelInEdit) {
       this.panelInEdit.refresh();
@@ -273,7 +269,7 @@ export class DashboardModel {
     }
 
     for (const panel of this.panels) {
-      if (!this.otherPanelInFullscreen(panel) || forceRefresh) {
+      if (!this.otherPanelInFullscreen(panel)) {
         panel.refresh();
       }
     }
