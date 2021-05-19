@@ -135,6 +135,14 @@ func AdminOrFeatureEnabled(enabled bool) macaron.Handler {
 	}
 }
 
+func PmmAdmin(c *models.ReqContext) {
+	if c.OrgRole == models.ROLE_ADMIN || c.IsGrafanaAdmin {
+		return
+	}
+
+	accessForbidden(c)
+}
+
 func SnapshotPublicModeOrSignedIn() macaron.Handler {
 	return func(c *models.ReqContext) {
 		if setting.SnapshotPublicMode {
