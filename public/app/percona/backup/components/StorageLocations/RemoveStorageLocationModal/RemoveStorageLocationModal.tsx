@@ -1,5 +1,7 @@
+import React, { FC, useState } from 'react';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
-import React, { FC } from 'react';
+import { CheckboxField } from '@percona/platform-core';
+import { Form } from 'react-final-form';
 import { WarningBlock } from '../../../../shared/components/Elements/WarningBlock/WarningBlock';
 import { Messages } from './RemoveStorageLocationModal.messages';
 import { RemoveStorageLocationModalProps } from './RemoveStorageLocationModal.types';
@@ -11,7 +13,9 @@ export const RemoveStorageLocationModal: FC<RemoveStorageLocationModalProps> = (
   onDelete,
   setVisible,
 }) => {
-  const handleDelete = () => onDelete(location);
+  const [force, setForce] = useState(false);
+  const handleDelete = () => onDelete(location, force);
+
   return (
     <DeleteModal
       title={Messages.title}
@@ -21,6 +25,18 @@ export const RemoveStorageLocationModal: FC<RemoveStorageLocationModalProps> = (
       message={Messages.getDeleteMessage(location?.name || '')}
       onDelete={handleDelete}
     >
+      <Form
+        onSubmit={() => {}}
+        render={() => (
+          <form>
+            <CheckboxField
+              name="force"
+              label="Force"
+              inputProps={{ onInput: e => setForce((e.target as HTMLInputElement).checked) }}
+            />
+          </form>
+        )}
+      />
       <WarningBlock message={Messages.deleteLocationWarning} />
     </DeleteModal>
   );
