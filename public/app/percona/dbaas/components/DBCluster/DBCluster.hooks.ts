@@ -3,7 +3,13 @@ import { logger } from '@percona/platform-core';
 import { FulfilledPromiseResult, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { Databases } from 'app/percona/shared/core';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
-import { DBCluster, GetDBClustersAction, DBClusterPayload, OperatorDatabasesMap } from './DBCluster.types';
+import {
+  DBCluster,
+  GetDBClustersAction,
+  DBClusterPayload,
+  OperatorDatabasesMap,
+  SetDBClustersLoadingAction,
+} from './DBCluster.types';
 import { Operators } from './AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { KubernetesOperatorStatus } from '../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { newDBClusterService } from './DBCluster.utils';
@@ -16,7 +22,9 @@ const OPERATORS: Partial<OperatorDatabasesMap> = {
   [Databases.mongodb]: Operators.psmdb,
 };
 
-export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClustersAction, boolean] => {
+export const useDBClusters = (
+  kubernetes: Kubernetes[]
+): [DBCluster[], GetDBClustersAction, SetDBClustersLoadingAction, boolean] => {
   const [dbClusters, setDBClusters] = useState<DBCluster[]>([]);
   const [loading, setLoading] = useState(true);
   let timer: NodeJS.Timeout;
@@ -51,7 +59,7 @@ export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClus
     return () => clearTimeout(timer);
   }, [kubernetes]);
 
-  return [dbClusters, getDBClusters, loading];
+  return [dbClusters, getDBClusters, setLoading, loading];
 };
 
 const getClusters = async (kubernetes: Kubernetes[], databaseType: Databases): Promise<DBCluster[]> => {
