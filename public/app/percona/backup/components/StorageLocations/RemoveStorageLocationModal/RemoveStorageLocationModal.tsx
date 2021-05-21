@@ -31,7 +31,7 @@ export const RemoveStorageLocationModal: FC<RemoveStorageLocationModalProps> = (
           <form>
             <CheckboxField
               name="force"
-              label="Force"
+              label={Messages.force}
               inputProps={{ onInput: e => setForce((e.target as HTMLInputElement).checked) }}
             />
           </form>
