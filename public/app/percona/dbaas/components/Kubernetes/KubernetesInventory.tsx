@@ -135,6 +135,8 @@ export const KubernetesInventory: FC<KubernetesProps> = ({ kubernetes, deleteKub
         onDelete={deleteKubernetesCluster}
         showForce
         forceLabel={Messages.kubernetes.deleteModal.labels.force}
+        cancelButtonDataQa="cancel-delete-kubernetes-button"
+        confirmButtonDataQa="delete-kubernetes-button"
       />
       {selectedCluster && manageComponentsModalVisible && (
         <ManageComponentsVersionsModal

@@ -19,6 +19,8 @@ export const DeleteModal: FC<DeleteModalProps> = ({
   showForce,
   forceLabel = Messages.force,
   initialForceValue = false,
+  cancelButtonDataQa = 'cancel-delete-modal-button',
+  confirmButtonDataQa = 'confirm-delete-modal-button',
   children,
   setVisible,
   onDelete,
@@ -35,12 +37,7 @@ export const DeleteModal: FC<DeleteModalProps> = ({
           <form onSubmit={handleSubmit}>
             {showForce && <CheckboxField name="force" label={forceLabel} initialValue={initialForceValue} />}
             <HorizontalGroup justify="space-between" spacing="md">
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={() => setVisible(false)}
-                data-qa="cancel-delete-modal-button"
-              >
+              <Button variant="secondary" size="md" onClick={() => setVisible(false)} data-qa={cancelButtonDataQa}>
                 {cancel || defaultCancel}
               </Button>
               <LoaderButton
@@ -49,7 +46,7 @@ export const DeleteModal: FC<DeleteModalProps> = ({
                 // @ts-ignore
                 variant="destructive"
                 size="md"
-                data-qa="confirm-delete-modal-button"
+                data-qa={confirmButtonDataQa}
               >
                 {confirm || defaultConfirm}
               </LoaderButton>
