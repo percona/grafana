@@ -5,6 +5,13 @@ export interface DeleteModalProps {
   cancel?: string;
   isVisible: boolean;
   loading?: boolean;
+  showForce?: boolean;
+  forceLabel?: string;
+  initialForceValue?: boolean;
   setVisible: (value: boolean) => void;
-  onDelete: () => void;
+  onDelete: (force?: boolean) => void;
+}
+
+export interface DeleteModalFormProps {
+  force: boolean;
 }
