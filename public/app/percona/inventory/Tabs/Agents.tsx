@@ -91,6 +91,7 @@ export const Agents = () => {
       <DeleteModal
         title="Confirm action"
         message={Messages.removeAgents(selected.length)}
+        confirm={Messages.removeAgentConfirmation}
         isVisible={modalVisible}
         setVisible={setModalVisible}
         onDelete={force => removeAgents(selected, force)}
