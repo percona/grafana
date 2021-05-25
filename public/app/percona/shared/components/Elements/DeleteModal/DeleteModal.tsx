@@ -40,14 +40,7 @@ export const DeleteModal: FC<DeleteModalProps> = ({
               <Button variant="secondary" size="md" onClick={() => setVisible(false)} data-qa={cancelButtonDataQa}>
                 {cancel || defaultCancel}
               </Button>
-              <LoaderButton
-                loading={loading}
-                // TODO: fix LoaderButton types
-                // @ts-ignore
-                variant="destructive"
-                size="md"
-                data-qa={confirmButtonDataQa}
-              >
+              <LoaderButton loading={loading} variant="destructive" size="md" data-qa={confirmButtonDataQa}>
                 {confirm || defaultConfirm}
               </LoaderButton>
             </HorizontalGroup>
