@@ -4,8 +4,7 @@ import { TextInputField, TextareaInputField, validators } from '@percona/platfor
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { Form, FormRenderProps } from 'react-final-form';
-import { Modal } from '@percona/platform-core';
-import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
+import { Modal, CheckboxField } from '@percona/platform-core';
 import { Databases } from 'app/percona/shared/core';
 import { getStyles } from './Kubernetes.styles';
 import { NewKubernetesCluster, KubernetesProps, Kubernetes } from './Kubernetes.types';
@@ -127,17 +126,41 @@ export const KubernetesInventory: FC<KubernetesProps> = ({ kubernetes, deleteKub
           )}
         />
       </Modal>
-      <DeleteModal
+      <Modal
         title={Messages.kubernetes.deleteModal.title}
-        message={Messages.kubernetes.deleteModal.confirmMessage}
         isVisible={deleteModalVisible}
-        setVisible={setDeleteModalVisible}
-        onDelete={deleteKubernetesCluster}
-        showForce
-        forceLabel={Messages.kubernetes.deleteModal.labels.force}
-        cancelButtonDataQa="cancel-delete-kubernetes-button"
-        confirmButtonDataQa="delete-kubernetes-button"
-      />
+        onClose={() => setDeleteModalVisible(false)}
+      >
+        <Form
+          onSubmit={() => {}}
+          render={({ form, handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <>
+                <h4 className={styles.deleteModalContent}>{Messages.kubernetes.deleteModal.confirmMessage}</h4>
+                <CheckboxField name="force" label={Messages.kubernetes.deleteModal.labels.force} />
+                <HorizontalGroup justify="space-between" spacing="md">
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    onClick={() => setDeleteModalVisible(false)}
+                    data-qa="cancel-delete-kubernetes-button"
+                  >
+                    {Messages.kubernetes.deleteModal.cancel}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="md"
+                    onClick={() => deleteKubernetesCluster(Boolean(form.getState().values.force))}
+                    data-qa="delete-kubernetes-button"
+                  >
+                    {Messages.kubernetes.deleteModal.confirm}
+                  </Button>
+                </HorizontalGroup>
+              </>
+            </form>
+          )}
+        />
+      </Modal>
       {selectedCluster && manageComponentsModalVisible && (
         <ManageComponentsVersionsModal
           selectedKubernetes={selectedCluster}
