@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button } from '@grafana/ui';
+import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { Form } from 'react-final-form';
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
-import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
+import { FormElement } from 'app/percona/shared/components/Form';
 import { AgentsList } from 'app/percona/inventory/Inventory.types';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { InventoryService } from '../Inventory.service';
 import { AGENTS_COLUMNS, GET_AGENTS_CANCEL_TOKEN } from '../Inventory.constants';
 import { styles } from './Tabs.styles';
+import { CheckboxField } from '@percona/platform-core';
 import { appEvents } from '../../../core/app_events';
-import { Messages } from '../Inventory.messages';
 import { AppEvents } from '@grafana/data';
 
 interface Agent {
@@ -61,7 +62,6 @@ export const Agents = () => {
       appEvents.emit(AppEvents.alertSuccess, [
         `${successfullyDeleted} of ${agents.length} agents successfully deleted`,
       ]);
-      setModalVisible(false);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -88,16 +88,51 @@ export const Agents = () => {
           Delete
         </Button>
       </div>
-      <DeleteModal
-        title="Confirm action"
-        message={Messages.removeAgents(selected.length)}
-        confirm={Messages.removeAgentConfirmation}
-        isVisible={modalVisible}
-        setVisible={setModalVisible}
-        onDelete={force => removeAgents(selected, force)}
-        showForce
-        forceLabel="Force mode is going to delete all associated agents"
-      />
+      <Modal
+        title={
+          <div className="modal-header-title">
+            <span className="p-l-1">Confirm action</span>
+          </div>
+        }
+        isOpen={modalVisible}
+        onDismiss={() => setModalVisible(false)}
+      >
+        <Form
+          onSubmit={() => {}}
+          render={({ form, handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <>
+                <h4 className={styles.confirmationText}>
+                  Are you sure that you want to permanently delete {selected.length}{' '}
+                  {selected.length === 1 ? 'agent' : 'agents'}?
+                </h4>
+                <FormElement
+                  dataQa="form-field-force"
+                  label="Force mode"
+                  element={<CheckboxField name="force" label="Force mode is going to delete all associated agents" />}
+                />
+
+                <HorizontalGroup justify="space-between" spacing="md">
+                  <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    size="md"
+                    onClick={() => {
+                      removeAgents(selected, form.getState().values.force);
+                      setModalVisible(false);
+                    }}
+                    variant="destructive"
+                    className={styles.destructiveButton}
+                  >
+                    Proceed
+                  </Button>
+                </HorizontalGroup>
+              </>
+            </form>
+          )}
+        />
+      </Modal>
       <div className={styles.tableInnerWrapper} data-qa="table-inner-wrapper">
         <Table
           className={styles.table}
