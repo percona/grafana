@@ -88,7 +88,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                 {Messages.close}
               </Button>
             </HorizontalGroup>
-            <div className={styles.errorLine}>
+            <div className={styles.errorLine} data-qa="backup-modal-error">
               {values.serviceType === ServiceTypeSelect.SAME && noService && Messages.noService}
             </div>
           </form>
