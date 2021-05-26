@@ -367,10 +367,29 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 	}
 	navTree = append(navTree, appLinks...)
 
-	configNodes := []*dtos.NavLink{
-		{Text: "PMM Inventory", Id: "home", Url: setting.AppSubUrl + "/inventory", Icon: "percona-inventory", HideFromTabs: true, Children: inventoryChildNavs},
-		{Text: "Settings", Id: "home", Url: setting.AppSubUrl + "/settings", Icon: "percona-setting", HideFromTabs: true},
-		{Divider: true},
+	configNodes := []*dtos.NavLink{}
+
+	if c.OrgRole == models.ROLE_ADMIN || c.IsGrafanaAdmin {
+		configNodes = append(configNodes, &dtos.NavLink{
+			Text:         "PMM Inventory",
+			Icon:         "percona-inventory",
+			Id:           "home",
+			Url:          setting.AppSubUrl + "/inventory",
+			HideFromTabs: true,
+			Children:     inventoryChildNavs,
+		})
+
+		configNodes = append(configNodes, &dtos.NavLink{
+			Text:         "Settings",
+			Icon:         "percona-setting",
+			Id:           "home",
+			Url:          setting.AppSubUrl + "/settings",
+			HideFromTabs: true,
+		})
+
+		configNodes = append(configNodes, &dtos.NavLink{
+			Divider: true,
+		})
 	}
 
 	if c.OrgRole == models.ROLE_ADMIN {
@@ -478,16 +497,6 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		SortWeight:   dtos.WeightHelp,
 		Children:     []*dtos.NavLink{},
 	})
-
-	// 	if c.OrgRole == models.ROLE_ADMIN {
-	// 		navTree = append(navTree, &dtos.NavLink{
-	// 			Text:       "Backup Management",
-	// 			Id:         "backup",
-	// 			Url:        setting.AppSubUrl + "/backup",
-	// 			Icon:       "history",
-	// 			SortWeight: dtos.WeightBackup,
-	// 		})
-	// 	}
 
 	return navTree, nil
 }
