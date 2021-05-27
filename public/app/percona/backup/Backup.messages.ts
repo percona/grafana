@@ -58,6 +58,19 @@ export const Messages = {
     editSuccess: (name: string) => `Backup location "${name}" was successfully updated`,
     getDeleteSuccess: (name: string) => `Backup location "${name}" successfully deleted.`,
   },
+  scheduledBackups: {
+    table: {
+      noData: 'No scheduled backups found',
+      columns: {
+        name: 'Name',
+        vendor: 'Vendor',
+        start: 'Start at',
+        retention: 'Retention',
+        frequency: 'Frequency',
+        location: 'Location',
+      },
+    },
+  },
   status: {
     invalid: 'Invalid',
     pending: 'Pending',
