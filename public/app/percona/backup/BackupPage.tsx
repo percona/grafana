@@ -7,6 +7,7 @@ import { TabKeys } from './Backup.types';
 import { StorageLocations } from './components/StorageLocations';
 import { BackupInventory } from './components/BackupInventory';
 import { RestoreHistory } from './components/RestoreHistory';
+import { ScheduledBackups } from './components/ScheduledBackups';
 import { PAGE_MODEL } from './BackupPage.constants';
 import { Messages } from './Backup.messages';
 
@@ -26,7 +27,7 @@ const BackupPage: FC = () => {
       {
         key: TabKeys.scheduled,
         label: Messages.tabs.scheduled,
-        component: <span />,
+        component: <ScheduledBackups />,
       },
       {
         key: TabKeys.locations,
