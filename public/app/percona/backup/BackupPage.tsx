@@ -24,6 +24,11 @@ const BackupPage: FC = () => {
         component: <RestoreHistory />,
       },
       {
+        key: TabKeys.scheduled,
+        label: Messages.tabs.scheduled,
+        component: <span />,
+      },
+      {
         key: TabKeys.locations,
         label: Messages.tabs.locations,
         component: <StorageLocations />,
