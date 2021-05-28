@@ -45,7 +45,7 @@ jobs:
         uses: percona-platform/checkout@v2
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
-          ref: main
+          ref: SAAS-554-tests-for-grafana-prs
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
@@ -55,7 +55,7 @@ jobs:
 
       - name: Run UI tests
         working-directory: ./pmm-ui-tests
-        run: npx codeceptjs run -c pr.codecept.js --grep '@platform'
+        run: npx codeceptjs run -c pr.codecept.js --grep '@grafana-pr'
         
       - name: Attaching artifacts
         if: ${{ always() }}
