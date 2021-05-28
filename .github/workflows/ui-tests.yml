@@ -14,7 +14,8 @@ jobs:
     steps:
       - name: Checkout Grafana code
         uses: percona-platform/checkout@v2
-        path: ./grafana
+        with:
+          path: ./grafana
 
       - name: Run with Node 12
         uses: percona-platform/setup-node@v2
@@ -28,8 +29,8 @@ jobs:
 
       - name: Use Yarn cache
         uses: percona-platform/cache@v2
-        working-directory: ./grafana
         with:
+          working-directory: ./grafana
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
 
