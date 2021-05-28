@@ -10,7 +10,7 @@ import { Messages } from '../../Backup.messages';
 import { DetailedDate } from '../DetailedDate';
 import { ScheduledBackup } from './ScheduledBackups.types';
 import { ScheduledBackupsService } from './ScheduledBackups.service';
-import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
+import { BACKUP_START_DATE_FORMAT, LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
@@ -30,7 +30,7 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.start,
         accessor: 'start',
-        Cell: ({ value }) => moment(value).format('HH[:]mm[:]ss'),
+        Cell: ({ value }) => moment(value).format(BACKUP_START_DATE_FORMAT),
       },
       {
         Header: Messages.scheduledBackups.table.columns.retention,
