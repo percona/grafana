@@ -47,7 +47,7 @@ jobs:
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
           ref: main
-          repository: percona-platform/pmm-ui-tests
+          repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
       - name: Install dependencies for UI tests
