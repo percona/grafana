@@ -30,7 +30,6 @@ jobs:
       - name: Use Yarn cache
         uses: percona-platform/cache@v2
         with:
-          working-directory: ./grafana
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
 
@@ -56,4 +55,4 @@ jobs:
 
       - name: Run UI tests
         working-directory: ./pmm-ui-tests
-        run: npx codeceptjs run --reporter mocha-multi -c pr.codecept.js --grep '@platform'
+        run: npx codeceptjs run -c pr.codecept.js --grep '@platform'
