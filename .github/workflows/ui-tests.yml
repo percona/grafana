@@ -56,3 +56,10 @@ jobs:
       - name: Run UI tests
         working-directory: ./pmm-ui-tests
         run: npx codeceptjs run -c pr.codecept.js --grep '@platform'
+        
+      - name: Attaching artifacts
+        if: ${{ always() }}
+        uses: percona-platform/upload-artifact@v2
+        with:
+          name: ui-tests-output
+          path: ./pmm-ui-tests/tests/output
