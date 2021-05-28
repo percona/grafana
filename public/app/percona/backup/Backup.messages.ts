@@ -68,6 +68,7 @@ export const Messages = {
         retention: 'Retention',
         frequency: 'Frequency',
         location: 'Location',
+        lastBackup: 'Last backup',
       },
     },
   },
