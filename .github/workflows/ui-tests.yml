@@ -1,0 +1,58 @@
+---
+name: UI Tests
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: Run UI tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - name: Checkout Grafana code
+        uses: percona-platform/checkout@v2
+        path: ./grafana
+
+      - name: Run with Node 12
+        uses: percona-platform/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Get Yarn cache directory
+        id: yarn-cache-dir-path
+        working-directory: ./grafana
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Use Yarn cache
+        uses: percona-platform/cache@v2
+        working-directory: ./grafana
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies for Grafana
+        working-directory: ./grafana
+        run: yarn install --prefer-offline --frozen-lockfile --no-progress
+
+      - name: Start Environment
+        working-directory: ./grafana
+        run: make run-local-env
+
+      - name: Checkout UI tests
+        uses: percona-platform/checkout@v2
+        with:
+          token: ${{ secrets.ROBOT_TOKEN }}
+          ref: main
+          repository: percona-platform/pmm-ui-tests
+          path: ./pmm-ui-tests
+
+      - name: Install dependencies for UI tests
+        working-directory: ./pmm-ui-tests
+        run: npm install
+
+      - name: Run UI tests
+        working-directory: ./pmm-ui-tests
+        run: npx codeceptjs run --reporter mocha-multi -c pr.codecept.js --grep '@platform'

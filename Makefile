@@ -56,6 +56,10 @@ run: scripts/go/bin/bra ## Build and run web server on filesystem changes.
 run-frontend: deps-js ## Fetch js dependencies and watch frontend for rebuild
 	yarn start
 
+run-local-env:               ## Start local frontend with dev-latest server
+	yarn dev
+	docker-compose up -d
+
 ##@ Testing
 
 test-go: ## Run tests for backend.
