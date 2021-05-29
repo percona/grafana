@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react';
 import { Button, ClipboardButton, Icon, LegacyForms } from '@grafana/ui';
-import { AppEvents, SelectableValue } from '@grafana/data';
+import { AppEvents, PanelEvents, SelectableValue } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 import { appEvents } from 'app/core/core';
 import { VariableRefresh } from '../../../variables/types';
-import { CoreEvents } from 'app/types';
+import { snapshotCreated } from '../../state/PanelModel';
 
 const { Select, Input } = LegacyForms;
 
@@ -92,7 +92,7 @@ export class ShareSnapshot extends PureComponent<Props, State> {
       panel.isInView = true;
     }
 
-    appEvents.emit(CoreEvents.snapshotCreated);
+    this.dashboard.events.emit(snapshotCreated);
 
     setTimeout(() => {
       this.saveSnapshot(external);
