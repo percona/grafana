@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react';
 import { Button, ClipboardButton, Icon, LegacyForms } from '@grafana/ui';
-import { AppEvents, PanelEvents, SelectableValue } from '@grafana/data';
+import { AppEvents, SelectableValue } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 import { appEvents } from 'app/core/core';
 import { VariableRefresh } from '../../../variables/types';
-import { snapshotCreated } from '../../state/PanelModel';
 
 const { Select, Input } = LegacyForms;
 
@@ -81,29 +80,19 @@ export class ShareSnapshot extends PureComponent<Props, State> {
       this.dashboard.snapshot.originalUrl = window.location.href;
     }
 
+    // @ts-ignore
+    window.forceRefresh = true;
     this.setState({ isLoading: true });
-
-    /**
-     * Force-refresh the dashboard panels, which is a variant of DashboardModel.startRefresh
-     */
-    // preserve the panels' state
-    const isInViewState = this.dashboard.panels.map(panel => panel.isInView);
-    for (const panel of this.dashboard.panels) {
-      panel.isInView = true;
-    }
-
-    this.dashboard.events.emit(snapshotCreated);
+    this.dashboard.startRefresh(true);
 
     setTimeout(() => {
-      this.saveSnapshot(external);
-      this.dashboard.forEachPanel((panel, index) => {
-        // restore the panels' state
-        panel.isInView = isInViewState[index];
-      });
+      this.saveSnapshot(this.dashboard, external);
+      // @ts-ignore
+      window.forceRefresh = false;
     }, timeoutSeconds * 1000);
   };
 
-  saveSnapshot = async (external?: boolean) => {
+  saveSnapshot = async (dashboard: DashboardModel, external?: boolean) => {
     const { snapshotExpires } = this.state;
     const dash = this.dashboard.getSaveModelClone();
     this.scrubDashboard(dash);
