@@ -1,16 +1,18 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
-import { Column } from 'react-table';
+import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import moment from 'moment/moment';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { Messages } from '../../Backup.messages';
 import { DetailedDate } from '../DetailedDate';
 import { ScheduledBackup } from './ScheduledBackups.types';
 import { ScheduledBackupsService } from './ScheduledBackups.service';
 import { BACKUP_START_DATE_FORMAT, LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
+import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
@@ -21,6 +23,8 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.name,
         accessor: 'name',
+        id: 'name',
+        Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
         Header: Messages.scheduledBackups.table.columns.vendor,
@@ -62,6 +66,17 @@ export const ScheduledBackups: FC = () => {
     }
   };
 
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<ScheduledBackup>) => (
+      <ScheduledBackupDetails
+        name={row.original.name}
+        dataModel={row.original.dataModel}
+        description={row.original.description}
+      />
+    ),
+    []
+  );
+
   useEffect(() => {
     getData();
   }, []);
@@ -73,6 +88,7 @@ export const ScheduledBackups: FC = () => {
       totalItems={data.length}
       emptyMessage={Messages.scheduledBackups.table.noData}
       pendingRequest={pending}
+      renderExpandedRow={renderSelectedSubRow}
     />
   );
 };
