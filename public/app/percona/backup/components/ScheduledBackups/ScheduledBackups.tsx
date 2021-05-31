@@ -33,11 +33,6 @@ export const ScheduledBackups: FC = () => {
         Cell: ({ value }) => moment(value).format(BACKUP_START_DATE_FORMAT),
       },
       {
-        Header: Messages.scheduledBackups.table.columns.retention,
-        accessor: 'retention',
-        Cell: ({ value }) => `${value.daily} / ${value.weekly}`,
-      },
-      {
         Header: Messages.scheduledBackups.table.columns.frequency,
         accessor: 'frequency',
         Cell: ({ value }) => `${value.value} ${value.unit}`,
