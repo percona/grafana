@@ -1,4 +1,5 @@
 import { Databases } from 'app/percona/shared/core';
+import { DataModel } from '../../Backup.types';
 
 export interface ScheduledBackupRetention {
   daily: number;
@@ -23,4 +24,6 @@ export interface ScheduledBackup {
   frequency: ScheduledBackupFrequency;
   location: string;
   lastBackup: number;
+  dataModel: DataModel;
+  description: string;
 }

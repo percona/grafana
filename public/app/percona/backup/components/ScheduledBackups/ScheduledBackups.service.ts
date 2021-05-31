@@ -1,6 +1,7 @@
 import { CancelToken } from 'axios';
 import { Databases } from 'app/percona/shared/core';
 import { Frequency, ScheduledBackup } from './ScheduledBackups.types';
+import { DataModel } from '../../Backup.types';
 
 export const ScheduledBackupsService = {
   async list(token?: CancelToken): Promise<ScheduledBackup[]> {
@@ -19,6 +20,8 @@ export const ScheduledBackupsService = {
         },
         location: 'bucket 1',
         lastBackup: Date.now(),
+        dataModel: DataModel.PHYSICAL,
+        description: 'Just a bare description',
       },
     ];
   },
