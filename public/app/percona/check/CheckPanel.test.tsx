@@ -1,8 +1,7 @@
 import React from 'react';
-import { ReactWrapper, mount } from 'enzyme';
 import { CheckPanel } from './CheckPanel';
 import { useSelector } from 'react-redux';
-import { asyncAct } from '../shared/helpers/testUtils';
+import { getMount } from '../shared/helpers/testUtils';
 
 const fakeLocationUpdate = jest.fn();
 
@@ -46,11 +45,7 @@ describe('CheckPanel::', () => {
   });
 
   it('should show tabs for all checks and for failed checks', async () => {
-    let wrapper: ReactWrapper = {} as ReactWrapper;
-
-    await asyncAct(() => {
-      wrapper = mount(<CheckPanel />);
-    });
+    const wrapper = await getMount(<CheckPanel />);
 
     expect(
       wrapper
