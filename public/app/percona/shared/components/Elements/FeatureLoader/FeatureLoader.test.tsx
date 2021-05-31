@@ -53,7 +53,7 @@ describe('FeatureLoader', () => {
     expect(spy).toHaveBeenCalledWith(errorObj);
   });
 
-  it('should show insufficient access rights message', async () => {
+  it('should show insufficient access permissions message', async () => {
     const errorObj = { response: { status: 401 } };
     jest.spyOn(SettingsService, 'getSettings').mockImplementationOnce(() => {
       throw errorObj;
