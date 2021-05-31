@@ -4,9 +4,18 @@ import { css } from 'emotion';
 export const getStyles = ({ spacing, typography }: GrafanaTheme) => ({
   detailsWrapper: css`
     display: flex;
+    align-items: center;
 
-    & > span {
-      flex: 0 1 33.33%;
+    & > * {
+      flex: 1 0 calc(100% / 3);
+
+      &:not(:last-child) {
+        padding-right: ${spacing.md};
+      }
+
+      &:not(:first-child) {
+        padding-left: ${spacing.md};
+      }
     }
   `,
   detailLabel: css`
