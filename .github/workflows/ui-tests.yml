@@ -12,9 +12,6 @@ jobs:
       matrix:
         node-version: [12.x]
     
-    env:
-     NODE_ENV: 'production'
-    
     steps:
       - name: Checkout Grafana code
         uses: percona-platform/checkout@v2
