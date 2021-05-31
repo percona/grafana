@@ -8,9 +8,6 @@ jobs:
     name: Run UI tests
     runs-on: ubuntu-20.04
     timeout-minutes: 25
-    strategy:
-      matrix:
-        node-version: [12.x]
     
     steps:
       - name: Checkout Grafana code
@@ -21,7 +18,7 @@ jobs:
       - name: Run with Node 12
         uses: percona-platform/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 12
 
       - name: Get Yarn cache directory
         id: yarn-cache-dir-path
@@ -32,7 +29,7 @@ jobs:
         uses: percona-platform/cache@v2
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-12-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies for Grafana
         working-directory: ./grafana
@@ -42,11 +39,22 @@ jobs:
         working-directory: ./grafana
         run: make run-local-env
 
-      - name: Checkout UI tests
+      - name: Checkout UI tests in ${{ github.head_ref }} branch
         uses: percona-platform/checkout@v2
+        continue-on-error: true
+        id: branch_checkout
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
-          ref: SAAS-554-tests-for-grafana-prs
+          ref: ${{ github.head_ref }}
+          repository: percona/pmm-ui-tests
+          path: ./pmm-ui-tests
+          
+      - name: Checkout UI tests in main branch
+        uses: percona-platform/checkout@v2
+        if: ${{ steps.branch_checkout.outcome != 'success' }}
+        with:
+          token: ${{ secrets.ROBOT_TOKEN }}
+          ref: main
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
