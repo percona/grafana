@@ -16,4 +16,19 @@ export const getStyles = ({ colors, typography, spacing }: GrafanaTheme) => ({
       padding-left: ${spacing.sm};
     }
   `,
+  formContainer: css`
+    display: flex;
+    flex-wrap: wrap;
+  `,
+  formHalf: css`
+    flex: 0 0 50%;
+
+    &:first-child {
+      padding-right: ${spacing.md};
+    }
+
+    &:last-child {
+      padding-left: ${spacing.md};
+    }
+  `,
 });
