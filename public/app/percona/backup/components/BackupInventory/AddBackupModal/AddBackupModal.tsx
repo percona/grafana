@@ -1,6 +1,13 @@
 import React, { FC } from 'react';
 import { Button, HorizontalGroup } from '@grafana/ui';
-import { LoaderButton, Modal, TextareaInputField, TextInputField, validators } from '@percona/platform-core';
+import {
+  LoaderButton,
+  Modal,
+  RadioButtonGroupField,
+  TextareaInputField,
+  TextInputField,
+  validators,
+} from '@percona/platform-core';
 import { Field, withTypes } from 'react-final-form';
 import { AddBackupFormProps, AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
@@ -8,6 +15,7 @@ import { toFormBackup } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
+import { DATA_MODEL_OPTIONS, RETRY_MODE_OPTIONS } from './AddBackupModal.constants';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose, onBackup }) => {
   const initialValues = toFormBackup(backup);
@@ -43,7 +51,13 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
               disabled
               defaultValue={values.service ? DATABASE_LABELS[values.service.value?.vendor as Databases] : ''}
             />
-            {/* <RadioButtonGroupField options={dataModelOptions} name="dataModel" label={Messages.dataModel} fullWidth /> */}
+            <RadioButtonGroupField
+              disabled
+              options={DATA_MODEL_OPTIONS}
+              name="dataModel"
+              label={Messages.dataModel}
+              fullWidth
+            />
             <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
             <TextareaInputField name="description" label={Messages.description} />
             <Field name="location" validate={validators.required}>
@@ -60,8 +74,14 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
                 </div>
               )}
             </Field>
-            {/* <RadioButtonGroupField options={retryModeOptions} name="retryMode" label={Messages.retryMode} fullWidth />
-            <div className={styles.retryFields}>
+            <RadioButtonGroupField
+              disabled
+              options={RETRY_MODE_OPTIONS}
+              name="retryMode"
+              label={Messages.retryMode}
+              fullWidth
+            />
+            {/* <div className={styles.retryFields}>
               <NumberInputField fieldClassName={styles.retrySelect} name="retryTimes" label={Messages.retryTimes} />
               <NumberInputField
                 fieldClassName={styles.retrySelect}
