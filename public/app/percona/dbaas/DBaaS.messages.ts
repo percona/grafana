@@ -88,7 +88,7 @@ export const Messages = {
         custom: 'Custom',
       },
       validationMessages: {
-        clusterName: 'Cluster name should start with a letter, be alphanumeric, and may contain a dash',
+        clusterName: 'Should start with a letter, may only contain lower case, number, dash and end with alphanumeric',
         notInstalledOperator: 'Operators must be installed to use database type',
         requiredField: 'Required field',
       },
@@ -106,7 +106,7 @@ export const Messages = {
       title: 'Confirm action',
     },
     editModal: {
-      confirm: 'Save changes',
+      confirm: 'Save',
     },
     table: {
       nameColumn: 'Name',

@@ -8,6 +8,7 @@ import {
   ResourcesUnits,
   DBClusterComponentVersionStatus,
   DBClusterAllocatedResources,
+  ResourcesWithUnits,
 } from '../DBCluster.types';
 
 export const dbClustersStub: DBCluster[] = [
@@ -48,7 +49,7 @@ export const dbClustersStub: DBCluster[] = [
   },
   {
     kubernetesClusterName: 'Kubernetes Cluster 2',
-    clusterName: 'dbcluster2',
+    clusterName: 'dbcluster3',
     databaseType: Databases.mysql,
     clusterSize: 7,
     memory: 2048,
@@ -61,7 +62,7 @@ export const dbClustersStub: DBCluster[] = [
   },
   {
     kubernetesClusterName: 'Kubernetes Cluster 1',
-    clusterName: 'dbcluster1',
+    clusterName: 'dbcluster4',
     databaseType: Databases.mysql,
     clusterSize: 3,
     memory: 1024,
@@ -183,4 +184,22 @@ export const psmdbComponentsVersionsStubs = {
       },
     },
   ],
+};
+
+export const resourcesA: ResourcesWithUnits = {
+  value: 10,
+  original: 10,
+  units: ResourcesUnits.BYTES,
+};
+
+export const resourcesB: ResourcesWithUnits = {
+  value: 20,
+  original: 20,
+  units: ResourcesUnits.BYTES,
+};
+
+export const resourcesC: ResourcesWithUnits = {
+  value: 20,
+  original: 20,
+  units: ResourcesUnits.GB,
 };

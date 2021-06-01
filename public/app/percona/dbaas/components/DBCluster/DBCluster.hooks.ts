@@ -3,7 +3,7 @@ import { logger } from '@percona/platform-core';
 import { FulfilledPromiseResult, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { Databases } from 'app/percona/shared/core';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
-import { DBCluster, GetDBClustersAction, DBClusterPayload, OperatorDatabasesMap } from './DBCluster.types';
+import { DBCluster, DBClusterPayload, OperatorDatabasesMap, ManageDBClusters } from './DBCluster.types';
 import { Operators } from './AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { KubernetesOperatorStatus } from '../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { newDBClusterService } from './DBCluster.utils';
@@ -16,7 +16,7 @@ const OPERATORS: Partial<OperatorDatabasesMap> = {
   [Databases.mongodb]: Operators.psmdb,
 };
 
-export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClustersAction, boolean] => {
+export const useDBClusters = (kubernetes: Kubernetes[]): ManageDBClusters => {
   const [dbClusters, setDBClusters] = useState<DBCluster[]>([]);
   const [loading, setLoading] = useState(true);
   let timer: NodeJS.Timeout;
@@ -51,15 +51,16 @@ export const useDBClusters = (kubernetes: Kubernetes[]): [DBCluster[], GetDBClus
     return () => clearTimeout(timer);
   }, [kubernetes]);
 
-  return [dbClusters, getDBClusters, loading];
+  return [dbClusters, getDBClusters, setLoading, loading];
 };
 
 const getClusters = async (kubernetes: Kubernetes[], databaseType: Databases): Promise<DBCluster[]> => {
   const dbClusterService = newDBClusterService(databaseType);
   const kubernetesByOperator = kubernetes.filter(kubernetesCluster => {
     const operator = OPERATORS[databaseType] as Operators;
+    const operatorStatus = kubernetesCluster.operators[operator].status;
 
-    return kubernetesCluster.operators[operator].status === KubernetesOperatorStatus.ok;
+    return operatorStatus === KubernetesOperatorStatus.ok || operatorStatus === KubernetesOperatorStatus.unsupported;
   });
   const requests = kubernetesByOperator.map(dbClusterService.getDBClusters);
   const results = await processPromiseResults(requests);
