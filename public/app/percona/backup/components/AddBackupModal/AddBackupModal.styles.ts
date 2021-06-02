@@ -52,7 +52,7 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
     margin: 0 auto;
 
     & > * {
-      flex: 0 0 50%;
+      flex: 1 0 50%;
 
       &:first-child {
         padding-right: ${spacing.sm};
@@ -60,6 +60,11 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
 
       &:last-child {
         padding-left: ${spacing.sm};
+      }
+
+      &:first-child:last-child {
+        padding-right: 0;
+        padding-left: 0;
       }
     }
   `,

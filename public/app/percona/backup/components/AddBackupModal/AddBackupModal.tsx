@@ -17,9 +17,10 @@ import { toFormBackup } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
-import { DATA_MODEL_OPTIONS, RETRY_MODE_OPTIONS } from './AddBackupModal.constants';
+import { DATA_MODEL_OPTIONS } from './AddBackupModal.constants';
 import { getStyles } from './AddBackupModal.styles';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+import { RetryModeSelector } from './RetryModeSelector';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
@@ -88,21 +89,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                     </div>
                   )}
                 </Field>
-                <RadioButtonGroupField
-                  disabled
-                  options={RETRY_MODE_OPTIONS}
-                  name="retryMode"
-                  label={Messages.retryMode}
-                  fullWidth
-                />
-                {/* <div className={styles.retryFields}>
-              <NumberInputField fieldClassName={styles.retrySelect} name="retryTimes" label={Messages.retryTimes} />
-              <NumberInputField
-                fieldClassName={styles.retrySelect}
-                name="retryInterval"
-                label={Messages.retryInterval}
-              />
-            </div> */}
+                {!scheduleMode && <RetryModeSelector />}
               </div>
             </div>
             <TextareaInputField name="description" label={Messages.description} />
@@ -124,6 +111,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                     <NumberInputField label="Start at" name="startHour" />
                     <NumberInputField label="&nbsp;" name="startMinut" />
                   </div>
+                  <div className={styles.advancedRow}>{scheduleMode && <RetryModeSelector />}</div>
                   <div className={styles.advancedRow}>
                     <CheckboxField fieldClassName={styles.checkbox} name="logs" label="Full logs" />
                     <CheckboxField fieldClassName={styles.checkbox} name="enable" label="Enabled" />
