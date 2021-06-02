@@ -8,7 +8,7 @@ jobs:
     name: Run UI tests
     runs-on: ubuntu-20.04
     timeout-minutes: 25
-    
+
     steps:
       - name: Checkout Grafana code
         uses: percona-platform/checkout@v2
@@ -48,7 +48,7 @@ jobs:
           ref: ${{ github.head_ref }}
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
-          
+
       - name: Checkout UI tests in main branch
         uses: percona-platform/checkout@v2
         if: ${{ steps.branch_checkout.outcome != 'success' }}
@@ -64,8 +64,8 @@ jobs:
 
       - name: Run UI tests
         working-directory: ./pmm-ui-tests
-        run: npx codeceptjs run -c pr.codecept.js --grep '@grafana-pr'
-        
+        run: npm run e2e:grafana-pr
+
       - name: Attaching artifacts
         if: ${{ always() }}
         uses: percona-platform/upload-artifact@v2
