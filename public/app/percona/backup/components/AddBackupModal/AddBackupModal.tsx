@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import {
+  CheckboxField,
   LoaderButton,
   Modal,
+  NumberInputField,
   RadioButtonGroupField,
   TextareaInputField,
   TextInputField,
@@ -17,8 +19,15 @@ import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { DATA_MODEL_OPTIONS, RETRY_MODE_OPTIONS } from './AddBackupModal.constants';
 import { getStyles } from './AddBackupModal.styles';
+import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 
-export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onClose, onBackup }) => {
+export const AddBackupModal: FC<AddBackupModalProps> = ({
+  backup,
+  isVisible,
+  scheduleMode = false,
+  onClose,
+  onBackup,
+}) => {
   const styles = useStyles(getStyles);
   const initialValues = toFormBackup(backup);
   const { Form } = withTypes<AddBackupFormProps>();
@@ -97,6 +106,29 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({ backup, isVisible, onC
               </div>
             </div>
             <TextareaInputField name="description" label={Messages.description} />
+            <div className={styles.advancedGroup}>
+              <h6 className={styles.advancedTitle}>Schedule</h6>
+              <div>
+                <div className={styles.advancedRow}>
+                  <NumberInputField label="Frequency: every" name="frequencyValue" />
+                  <Field name="location" validate={validators.required}>
+                    {({ input }) => (
+                      <div>
+                        <SelectField {...input} label="&nbsp;" name="frequencyUnit" onChange={() => {}} />
+                      </div>
+                    )}
+                  </Field>
+                </div>
+                <div className={styles.advancedRow}>
+                  <NumberInputField label="Start at" name="startHour" />
+                  <NumberInputField label="&nbsp;" name="startMinut" />
+                </div>
+                <div className={styles.advancedRow}>
+                  <CheckboxField fieldClassName={styles.checkbox} name="logs" label="Full logs" />
+                  <CheckboxField fieldClassName={styles.checkbox} name="enable" label="Enabled" />
+                </div>
+              </div>
+            </div>
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
                 data-qa="backup-add-button"

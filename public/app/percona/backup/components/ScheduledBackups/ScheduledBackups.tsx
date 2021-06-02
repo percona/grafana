@@ -1,6 +1,7 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
+import { Button, useStyles } from '@grafana/ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -8,15 +9,19 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { Messages } from '../../Backup.messages';
 import { DetailedDate } from '../DetailedDate';
+import { AddBackupModal } from '../AddBackupModal';
 import { ScheduledBackup } from './ScheduledBackups.types';
 import { ScheduledBackupsService } from './ScheduledBackups.service';
 import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
 import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
+import { getStyles } from './ScheduledBackups.styles';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
   const [pending, setPending] = useState(false);
+  const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [generateToken] = useCancelToken();
+  const styles = useStyles(getStyles);
   const columns = useMemo(
     (): Array<Column<ScheduledBackup>> => [
       {
@@ -76,18 +81,36 @@ export const ScheduledBackups: FC = () => {
     []
   );
 
+  const handleClose = () => {
+    setBackupModalVisible(false);
+  };
+
   useEffect(() => {
     getData();
   }, []);
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      totalItems={data.length}
-      emptyMessage={Messages.scheduledBackups.table.noData}
-      pendingRequest={pending}
-      renderExpandedRow={renderSelectedSubRow}
-    />
+    <>
+      <div className={styles.addWrapper}>
+        <Button
+          size="md"
+          icon="plus-square"
+          variant="link"
+          data-qa="scheduled-backup-add-modal-button"
+          onClick={() => setBackupModalVisible(true)}
+        >
+          {Messages.add}
+        </Button>
+      </div>
+      <Table
+        columns={columns}
+        data={data}
+        totalItems={data.length}
+        emptyMessage={Messages.scheduledBackups.table.noData}
+        pendingRequest={pending}
+        renderExpandedRow={renderSelectedSubRow}
+      />
+      <AddBackupModal backup={null} isVisible={backupModalVisible} onClose={handleClose} onBackup={() => {}} />
+    </>
   );
 };
