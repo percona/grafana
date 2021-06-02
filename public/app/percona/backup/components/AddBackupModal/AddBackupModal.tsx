@@ -65,13 +65,6 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                   disabled
                   defaultValue={values.service ? DATABASE_LABELS[values.service.value?.vendor as Databases] : ''}
                 />
-                <RadioButtonGroupField
-                  disabled
-                  options={DATA_MODEL_OPTIONS}
-                  name="dataModel"
-                  label={Messages.dataModel}
-                  fullWidth
-                />
               </div>
               <div className={styles.formHalf}>
                 <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
@@ -89,9 +82,16 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                     </div>
                   )}
                 </Field>
-                {!scheduleMode && <RetryModeSelector />}
               </div>
             </div>
+            <RadioButtonGroupField
+              disabled
+              options={DATA_MODEL_OPTIONS}
+              name="dataModel"
+              label={Messages.dataModel}
+              fullWidth
+            />
+            {!scheduleMode && <RetryModeSelector />}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
               <div className={styles.advancedGroup}>
