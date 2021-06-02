@@ -1,5 +1,6 @@
 export const Messages = {
-  title: 'Backup On Demand',
+  title: 'Backup on demand',
+  scheduleTitle: 'Schedule backup',
   serviceName: 'Service name',
   vendor: 'Vendor',
   dataModel: 'Data model',
@@ -9,6 +10,7 @@ export const Messages = {
   location: 'Location',
   retryMode: 'Retry mode',
   backupAction: 'Backup',
+  scheduleAction: 'Schedule',
   cancelAction: 'Cancel',
   retryTimes: 'Retry, times',
   retryInterval: 'Retry interval, seconds',

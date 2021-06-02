@@ -36,7 +36,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
 
   // TODO uncomment remaining fields when we support them
   return (
-    <Modal title={Messages.title} isVisible={isVisible} onClose={onClose}>
+    <Modal title={scheduleMode ? Messages.scheduleTitle : Messages.title} isVisible={isVisible} onClose={onClose}>
       <Form
         initialValues={initialValues}
         onSubmit={handleSubmit}
@@ -106,29 +106,31 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               </div>
             </div>
             <TextareaInputField name="description" label={Messages.description} />
-            <div className={styles.advancedGroup}>
-              <h6 className={styles.advancedTitle}>Schedule</h6>
-              <div>
-                <div className={styles.advancedRow}>
-                  <NumberInputField label="Frequency: every" name="frequencyValue" />
-                  <Field name="location" validate={validators.required}>
-                    {({ input }) => (
-                      <div>
-                        <SelectField {...input} label="&nbsp;" name="frequencyUnit" onChange={() => {}} />
-                      </div>
-                    )}
-                  </Field>
-                </div>
-                <div className={styles.advancedRow}>
-                  <NumberInputField label="Start at" name="startHour" />
-                  <NumberInputField label="&nbsp;" name="startMinut" />
-                </div>
-                <div className={styles.advancedRow}>
-                  <CheckboxField fieldClassName={styles.checkbox} name="logs" label="Full logs" />
-                  <CheckboxField fieldClassName={styles.checkbox} name="enable" label="Enabled" />
+            {scheduleMode && (
+              <div className={styles.advancedGroup}>
+                <h6 className={styles.advancedTitle}>Schedule</h6>
+                <div>
+                  <div className={styles.advancedRow}>
+                    <NumberInputField label="Frequency: every" name="frequencyValue" />
+                    <Field name="location" validate={validators.required}>
+                      {({ input }) => (
+                        <div>
+                          <SelectField {...input} label="&nbsp;" name="frequencyUnit" onChange={() => {}} />
+                        </div>
+                      )}
+                    </Field>
+                  </div>
+                  <div className={styles.advancedRow}>
+                    <NumberInputField label="Start at" name="startHour" />
+                    <NumberInputField label="&nbsp;" name="startMinut" />
+                  </div>
+                  <div className={styles.advancedRow}>
+                    <CheckboxField fieldClassName={styles.checkbox} name="logs" label="Full logs" />
+                    <CheckboxField fieldClassName={styles.checkbox} name="enable" label="Enabled" />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
                 data-qa="backup-add-button"
@@ -137,7 +139,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 disabled={!valid || pristine}
                 loading={submitting}
               >
-                {Messages.backupAction}
+                {scheduleMode ? Messages.scheduleAction : Messages.backupAction}
               </LoaderButton>
               <Button data-qa="storage-location-cancel-button" variant="secondary" onClick={onClose}>
                 {Messages.cancelAction}

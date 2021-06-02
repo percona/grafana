@@ -110,7 +110,13 @@ export const ScheduledBackups: FC = () => {
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
       />
-      <AddBackupModal backup={null} isVisible={backupModalVisible} onClose={handleClose} onBackup={() => {}} />
+      <AddBackupModal
+        scheduleMode
+        backup={null}
+        isVisible={backupModalVisible}
+        onClose={handleClose}
+        onBackup={() => {}}
+      />
     </>
   );
 };
