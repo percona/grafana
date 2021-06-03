@@ -14,6 +14,14 @@ export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
       retryMode: RetryMode.AUTO,
       retryTimes: 0,
       retryInterval: 0,
+      period: { value: 'year', label: 'Year' },
+      month: [],
+      day: [],
+      weekDay: [],
+      startHour: [],
+      startMinute: [],
+      logs: false,
+      active: false,
     };
   }
 
@@ -28,5 +36,13 @@ export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
     retryMode: RetryMode.AUTO,
     retryTimes: 0,
     retryInterval: 0,
+    period: { value: 'year', label: 'Year' },
+    month: [],
+    day: [],
+    weekDay: [],
+    startHour: [],
+    startMinute: [],
+    logs: false,
+    active: false,
   };
 };

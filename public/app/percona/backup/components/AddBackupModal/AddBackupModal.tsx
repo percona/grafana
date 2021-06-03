@@ -4,7 +4,6 @@ import {
   CheckboxField,
   LoaderButton,
   Modal,
-  NumberInputField,
   RadioButtonGroupField,
   TextareaInputField,
   TextInputField,
@@ -17,10 +16,19 @@ import { toFormBackup } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
-import { DATA_MODEL_OPTIONS } from './AddBackupModal.constants';
+import {
+  DATA_MODEL_OPTIONS,
+  DAY_OPTIONS,
+  HOUR_OPTIONS,
+  MINUTE_OPTIONS,
+  MONTH_OPTIONS,
+  PERIOD_OPTIONS,
+  WEEKDAY_OPTIONS,
+} from './AddBackupModal.constants';
 import { getStyles } from './AddBackupModal.styles';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { RetryModeSelector } from './RetryModeSelector';
+import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
@@ -98,23 +106,82 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 <h6 className={styles.advancedTitle}>Schedule</h6>
                 <div>
                   <div className={styles.advancedRow}>
-                    <NumberInputField label="Frequency: every" name="frequencyValue" />
-                    <Field name="location" validate={validators.required}>
+                    <Field name="period" validate={validators.required}>
                       {({ input }) => (
                         <div>
-                          <SelectField {...input} label="&nbsp;" name="frequencyUnit" onChange={() => {}} />
+                          <SelectField {...input} options={PERIOD_OPTIONS} label={Messages.every} />
+                        </div>
+                      )}
+                    </Field>
+                    <Field name="month" validate={validators.minLength(1)}>
+                      {({ input }) => (
+                        <div>
+                          <MultiSelectField
+                            {...input}
+                            closeMenuOnSelect={false}
+                            options={MONTH_OPTIONS}
+                            label={Messages.month}
+                          />
                         </div>
                       )}
                     </Field>
                   </div>
                   <div className={styles.advancedRow}>
-                    <NumberInputField label="Start at" name="startHour" />
-                    <NumberInputField label="&nbsp;" name="startMinut" />
+                    <Field name="day" validate={validators.minLength(1)}>
+                      {({ input }) => (
+                        <div>
+                          <MultiSelectField
+                            {...input}
+                            closeMenuOnSelect={false}
+                            options={DAY_OPTIONS}
+                            label={Messages.day}
+                          />
+                        </div>
+                      )}
+                    </Field>
+                    <Field name="weekDay" validate={validators.minLength(1)}>
+                      {({ input }) => (
+                        <div>
+                          <MultiSelectField
+                            {...input}
+                            closeMenuOnSelect={false}
+                            options={WEEKDAY_OPTIONS}
+                            label={Messages.weekDay}
+                          />
+                        </div>
+                      )}
+                    </Field>
+                  </div>
+                  <div className={styles.advancedRow}>
+                    <Field name="startHour" validate={validators.minLength(1)}>
+                      {({ input }) => (
+                        <div>
+                          <MultiSelectField
+                            {...input}
+                            closeMenuOnSelect={false}
+                            options={HOUR_OPTIONS}
+                            label={Messages.startTime}
+                          />
+                        </div>
+                      )}
+                    </Field>
+                    <Field name="startMinute" validate={validators.minLength(1)}>
+                      {({ input }) => (
+                        <div>
+                          <MultiSelectField
+                            {...input}
+                            closeMenuOnSelect={false}
+                            options={MINUTE_OPTIONS}
+                            label="&nbsp;"
+                          />
+                        </div>
+                      )}
+                    </Field>
                   </div>
                   <div className={styles.advancedRow}>{scheduleMode && <RetryModeSelector />}</div>
                   <div className={styles.advancedRow}>
-                    <CheckboxField fieldClassName={styles.checkbox} name="logs" label="Full logs" />
-                    <CheckboxField fieldClassName={styles.checkbox} name="enable" label="Enabled" />
+                    <CheckboxField fieldClassName={styles.checkbox} name="logs" label={Messages.fullLogs} />
+                    <CheckboxField fieldClassName={styles.checkbox} name="active" label={Messages.enabled} />
                   </div>
                 </div>
               </div>

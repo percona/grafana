@@ -14,4 +14,11 @@ export const Messages = {
   cancelAction: 'Cancel',
   retryTimes: 'Retry, times',
   retryInterval: 'Retry interval, seconds',
+  every: 'Every',
+  month: 'Month',
+  day: 'Day',
+  weekDay: 'Weekday',
+  startTime: 'Start time, h/m',
+  fullLogs: 'Full logs',
+  enabled: 'Enabled',
 };

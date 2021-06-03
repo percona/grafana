@@ -15,6 +15,8 @@ import { ScheduledBackupsService } from './ScheduledBackups.service';
 import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
 import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 import { getStyles } from './ScheduledBackups.styles';
+import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
+import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
@@ -85,6 +87,20 @@ export const ScheduledBackups: FC = () => {
     setBackupModalVisible(false);
   };
 
+  const handleBackup = (backup: AddBackupFormProps) => {
+    const { period, month, day, weekDay, startHour, startMinute } = backup;
+    console.log(
+      getCronStringFromValues(
+        period.value!,
+        month.map(m => m.value!),
+        day.map(m => m.value!),
+        weekDay.map(m => m.value!),
+        startHour.map(m => m.value!),
+        startMinute.map(m => m.value!)
+      )
+    );
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -115,7 +131,7 @@ export const ScheduledBackups: FC = () => {
         backup={null}
         isVisible={backupModalVisible}
         onClose={handleClose}
-        onBackup={() => {}}
+        onBackup={handleBackup}
       />
     </>
   );

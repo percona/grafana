@@ -48,7 +48,7 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
   `,
   advancedRow: css`
     display: flex;
-    max-width: 300px;
+    max-width: 400px;
     margin: 0 auto;
 
     & > * {
