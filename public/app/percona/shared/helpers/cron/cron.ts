@@ -15,7 +15,6 @@ export const getCronStringFromValues = (
   const newWeekDays = (period === 'year' || period === 'month' || period === 'week') && weekDays ? weekDays : [];
   const newHours = period !== 'minute' && period !== 'hour' && hours ? hours : [];
   const newMinutes = period !== 'minute' && minutes ? minutes : [];
-  console.log(newMonths, newMonthDays, newWeekDays, newHours, newMinutes);
   const parsedArray = parseCronArray([newMinutes, newHours, newMonthDays, newMonths, newWeekDays], humanizeValue);
 
   return parsedArray.join(' ');

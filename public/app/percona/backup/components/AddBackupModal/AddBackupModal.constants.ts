@@ -76,7 +76,7 @@ export const MONTH_OPTIONS: Array<SelectableValue<number>> = MONTHS.map((month, 
 
 export const DAY_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(31).keys()).map(value => ({
   value: value + 1,
-  label: (value + 1).toString(),
+  label: value < 10 ? `0${(value + 1).toString()}` : (value + 1).toString(),
 }));
 
 export const WEEKDAY_OPTIONS: Array<SelectableValue<number>> = WEEKDAYS.map((day, idx) => ({
@@ -86,10 +86,12 @@ export const WEEKDAY_OPTIONS: Array<SelectableValue<number>> = WEEKDAYS.map((day
 
 export const HOUR_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(24).keys()).map(value => ({
   value,
-  label: value.toString(),
+  label: value < 10 ? `0${value.toString()}` : value.toString(),
 }));
 
 export const MINUTE_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(60).keys()).map(value => ({
   value,
-  label: value.toString(),
+  label: value < 10 ? `0${value.toString()}` : value.toString(),
 }));
+
+export const MAX_VISIBLE_OPTIONS = 4;

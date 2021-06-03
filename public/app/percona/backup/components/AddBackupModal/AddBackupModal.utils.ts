@@ -18,8 +18,8 @@ export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
       month: [],
       day: [],
       weekDay: [],
-      startHour: [],
-      startMinute: [],
+      startHour: [{ value: 0, label: '00' }],
+      startMinute: [{ value: 0, label: '00' }],
       logs: false,
       active: false,
     };

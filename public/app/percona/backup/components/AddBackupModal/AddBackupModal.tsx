@@ -20,6 +20,7 @@ import {
   DATA_MODEL_OPTIONS,
   DAY_OPTIONS,
   HOUR_OPTIONS,
+  MAX_VISIBLE_OPTIONS,
   MINUTE_OPTIONS,
   MONTH_OPTIONS,
   PERIOD_OPTIONS,
@@ -113,7 +114,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                         </div>
                       )}
                     </Field>
-                    <Field name="month" validate={validators.minLength(1)}>
+                    <Field name="month">
                       {({ input }) => (
                         <div>
                           <MultiSelectField
@@ -121,13 +122,16 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             closeMenuOnSelect={false}
                             options={MONTH_OPTIONS}
                             label={Messages.month}
+                            isClearable
+                            placeholder={Messages.every}
+                            maxVisibleValues={MAX_VISIBLE_OPTIONS}
                           />
                         </div>
                       )}
                     </Field>
                   </div>
                   <div className={styles.advancedRow}>
-                    <Field name="day" validate={validators.minLength(1)}>
+                    <Field name="day">
                       {({ input }) => (
                         <div>
                           <MultiSelectField
@@ -135,11 +139,14 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             closeMenuOnSelect={false}
                             options={DAY_OPTIONS}
                             label={Messages.day}
+                            isClearable
+                            placeholder={Messages.every}
+                            maxVisibleValues={MAX_VISIBLE_OPTIONS}
                           />
                         </div>
                       )}
                     </Field>
-                    <Field name="weekDay" validate={validators.minLength(1)}>
+                    <Field name="weekDay">
                       {({ input }) => (
                         <div>
                           <MultiSelectField
@@ -147,13 +154,16 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             closeMenuOnSelect={false}
                             options={WEEKDAY_OPTIONS}
                             label={Messages.weekDay}
+                            isClearable
+                            placeholder={Messages.every}
+                            maxVisibleValues={MAX_VISIBLE_OPTIONS}
                           />
                         </div>
                       )}
                     </Field>
                   </div>
                   <div className={styles.advancedRow}>
-                    <Field name="startHour" validate={validators.minLength(1)}>
+                    <Field name="startHour">
                       {({ input }) => (
                         <div>
                           <MultiSelectField
@@ -161,11 +171,14 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             closeMenuOnSelect={false}
                             options={HOUR_OPTIONS}
                             label={Messages.startTime}
+                            isClearable
+                            placeholder={Messages.every}
+                            maxVisibleValues={MAX_VISIBLE_OPTIONS}
                           />
                         </div>
                       )}
                     </Field>
-                    <Field name="startMinute" validate={validators.minLength(1)}>
+                    <Field name="startMinute">
                       {({ input }) => (
                         <div>
                           <MultiSelectField
@@ -173,6 +186,9 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             closeMenuOnSelect={false}
                             options={MINUTE_OPTIONS}
                             label="&nbsp;"
+                            isClearable
+                            placeholder={Messages.every}
+                            maxVisibleValues={MAX_VISIBLE_OPTIONS}
                           />
                         </div>
                       )}
