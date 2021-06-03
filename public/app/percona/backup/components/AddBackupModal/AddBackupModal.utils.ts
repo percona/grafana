@@ -1,5 +1,6 @@
 import { SelectableValue } from '@grafana/data';
 import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { PeriodType } from 'app/percona/shared/helpers/cron/types';
 import { Backup } from '../BackupInventory.types';
 import { AddBackupFormProps, SelectableService } from './AddBackupModal.types';
 
@@ -45,4 +46,17 @@ export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
     logs: false,
     active: false,
   };
+};
+
+export const isCronFieldDisabled = (period: PeriodType, field: keyof AddBackupFormProps) => {
+  const map: Record<PeriodType, Array<Partial<keyof AddBackupFormProps>>> = {
+    year: [],
+    month: ['month'],
+    week: ['month', 'day'],
+    day: ['month', 'day', 'weekDay'],
+    hour: ['month', 'day', 'weekDay', 'startHour'],
+    minute: ['month', 'day', 'weekDay', 'startHour', 'startMinute'],
+  };
+
+  return map[period].includes(field);
 };

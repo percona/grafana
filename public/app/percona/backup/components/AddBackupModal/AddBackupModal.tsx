@@ -12,7 +12,7 @@ import {
 import { Field, withTypes } from 'react-final-form';
 import { AddBackupFormProps, AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
-import { toFormBackup } from './AddBackupModal.utils';
+import { toFormBackup, isCronFieldDisabled } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
@@ -125,6 +125,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
+                            disabled={isCronFieldDisabled(values.period.value!, 'month')}
                           />
                         </div>
                       )}
@@ -142,6 +143,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
+                            disabled={isCronFieldDisabled(values.period.value!, 'day')}
                           />
                         </div>
                       )}
@@ -157,6 +159,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
+                            disabled={isCronFieldDisabled(values.period.value!, 'weekDay')}
                           />
                         </div>
                       )}
@@ -174,6 +177,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
+                            disabled={isCronFieldDisabled(values.period.value!, 'startHour')}
                           />
                         </div>
                       )}
@@ -189,6 +193,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
+                            disabled={isCronFieldDisabled(values.period.value!, 'startMinute')}
                           />
                         </div>
                       )}
