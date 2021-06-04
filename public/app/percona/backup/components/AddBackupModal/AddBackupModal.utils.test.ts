@@ -15,6 +15,14 @@ describe('AddBackupModal::utils', () => {
         retryMode: RetryMode.AUTO,
         retryTimes: 0,
         retryInterval: 0,
+        period: { value: 'year', label: 'Year' },
+        month: [],
+        day: [],
+        weekDay: [],
+        startHour: [{ value: 0, label: '00' }],
+        startMinute: [{ value: 0, label: '00' }],
+        logs: false,
+        active: false,
       });
     });
 
@@ -31,6 +39,14 @@ describe('AddBackupModal::utils', () => {
         retryMode: RetryMode.AUTO,
         retryTimes: 0,
         retryInterval: 0,
+        period: { value: 'year', label: 'Year' },
+        month: [],
+        day: [],
+        weekDay: [],
+        startHour: [],
+        startMinute: [],
+        logs: false,
+        active: false,
       });
     });
   });
