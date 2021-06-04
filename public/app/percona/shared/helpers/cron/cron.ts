@@ -212,3 +212,140 @@ const parseCronArray = (cronArr: number[][], humanize?: boolean) => {
 
   throw new Error('Invalid cron array');
 };
+
+const replaceAlternatives = (str: string, min: number, alt?: string[]) => {
+  if (alt) {
+    str = str.toUpperCase();
+
+    for (let i = 0; i < alt.length; i++) {
+      str = str.replace(alt[i], `${i + min}`);
+    }
+  }
+  return str;
+};
+
+const parseStep = (step: string, unit: Unit) => {
+  if (typeof step !== 'undefined') {
+    const parsedStep = parseInt(step, 10);
+
+    if (isNaN(parsedStep) || parsedStep < 1) {
+      throw new Error(`Invalid interval step value "${step}" for ${unit.type}`);
+    }
+
+    return parsedStep;
+  }
+
+  return;
+};
+
+const range = (start: number, end: number) => {
+  const array: number[] = [];
+
+  for (let i = start; i <= end; i++) {
+    array.push(i);
+  }
+
+  return array;
+};
+
+const parseRange = (rangeStr: string, context: string, unit: Unit) => {
+  const subparts = rangeStr.split('-');
+
+  if (subparts.length === 1) {
+    const value = parseInt(subparts[0], 10);
+
+    if (isNaN(value)) {
+      throw new Error(`Invalid value "${context}" for ${unit.type}`);
+    }
+
+    return [value];
+  } else if (subparts.length === 2) {
+    const minValue = parseInt(subparts[0], 10);
+    const maxValue = parseInt(subparts[1], 10);
+
+    if (maxValue <= minValue) {
+      throw new Error(`Max range is less than min range in "${rangeStr}" for ${unit.type}`);
+    }
+
+    return range(minValue, maxValue);
+  } else {
+    throw new Error(`Invalid value "${rangeStr}" for ${unit.type}`);
+  }
+};
+
+const applyInterval = (values: number[], step?: number) => {
+  if (step) {
+    const minVal = values[0];
+
+    values = values.filter(value => {
+      return value % step === minVal % step || value === minVal;
+    });
+  }
+
+  return values;
+};
+
+const parsePartString = (str: string, unit: Unit) => {
+  if (str === '*' || str === '*/1') {
+    return [];
+  }
+
+  const stringParts = str.split('/');
+
+  if (stringParts.length > 2) {
+    throw new Error(`Invalid value "${unit.type}"`);
+  }
+
+  const rangeString = replaceAlternatives(stringParts[0], unit.min, unit.alt);
+  let parsedValues: number[];
+
+  if (rangeString === '*') {
+    parsedValues = range(unit.min, unit.max);
+  } else {
+    parsedValues = [
+      ...new Set(
+        fixSunday(
+          rangeString
+            .split(',')
+            .map(range => {
+              return parseRange(range, str, unit);
+            })
+            .flat(),
+          unit
+        )
+      ),
+    ].sort();
+
+    const value = outOfRange(parsedValues, unit);
+
+    if (typeof value !== 'undefined') {
+      throw new Error(`Value "${value}" out of range for ${unit.type}`);
+    }
+  }
+
+  const step = parseStep(stringParts[1], unit);
+  const intervalValues = applyInterval(parsedValues, step);
+
+  if (intervalValues.length === unit.total) {
+    return [];
+  } else if (intervalValues.length === 0) {
+    throw new Error(`Empty interval value "${str}" for ${unit.type}`);
+  }
+
+  return intervalValues;
+};
+
+export const parseCronString = (str: string) => {
+  const parts = str
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ');
+
+  if (parts.length === 5) {
+    return parts.map((partStr, idx) => {
+      return parsePartString(partStr, UNITS[idx]);
+    });
+  }
+
+  throw new Error('Invalid cron string format');
+};
