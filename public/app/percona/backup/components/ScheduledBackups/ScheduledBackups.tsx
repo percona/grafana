@@ -1,7 +1,6 @@
 import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
-import moment from 'moment/moment';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -11,7 +10,7 @@ import { Messages } from '../../Backup.messages';
 import { DetailedDate } from '../DetailedDate';
 import { ScheduledBackup } from './ScheduledBackups.types';
 import { ScheduledBackupsService } from './ScheduledBackups.service';
-import { BACKUP_START_DATE_FORMAT, LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
+import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
 import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 
 export const ScheduledBackups: FC = () => {
@@ -30,11 +29,6 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.vendor,
         accessor: 'vendor',
         Cell: ({ value }) => DATABASE_LABELS[value],
-      },
-      {
-        Header: Messages.scheduledBackups.table.columns.start,
-        accessor: 'start',
-        Cell: ({ value }) => moment(value).format(BACKUP_START_DATE_FORMAT),
       },
       {
         Header: Messages.scheduledBackups.table.columns.frequency,
