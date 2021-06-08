@@ -1,9 +1,8 @@
 import { SelectableValue } from '@grafana/data';
-import { DataModel } from 'app/percona/backup/Backup.types';
+import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { MONTHS, WEEKDAYS } from 'app/percona/shared/helpers/cron/constants';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
-import { RetryMode } from './AddBackupModal.types';
 
 export const VENDOR_OPTIONS: Array<SelectableValue<Databases>> = [
   {
