@@ -31,3 +31,8 @@ export enum RetryMode {
   AUTO = 'AUTO',
   MANUAL = 'MANUAL',
 }
+
+export enum BackupType {
+  FULL = 'Full',
+  INCREMENTAL = 'Incremental',
+}
