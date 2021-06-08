@@ -100,7 +100,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               label={Messages.dataModel}
               fullWidth
             />
-            {!scheduleMode && <RetryModeSelector />}
+            {!scheduleMode && <RetryModeSelector retryMode={values.retryMode} />}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
               <div className={styles.advancedGroup}>
@@ -199,7 +199,9 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                       )}
                     </Field>
                   </div>
-                  <div className={styles.advancedRow}>{scheduleMode && <RetryModeSelector />}</div>
+                  <div className={styles.advancedRow}>
+                    <RetryModeSelector retryMode={values.retryMode} />
+                  </div>
                   <div className={styles.advancedRow}>
                     {/* <CheckboxField fieldClassName={styles.checkbox} name="logs" label={Messages.fullLogs} /> */}
                     <CheckboxField fieldClassName={styles.checkbox} name="active" label={Messages.enabled} />
