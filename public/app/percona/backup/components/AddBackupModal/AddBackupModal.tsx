@@ -201,7 +201,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                   </div>
                   <div className={styles.advancedRow}>{scheduleMode && <RetryModeSelector />}</div>
                   <div className={styles.advancedRow}>
-                    <CheckboxField fieldClassName={styles.checkbox} name="logs" label={Messages.fullLogs} />
+                    {/* <CheckboxField fieldClassName={styles.checkbox} name="logs" label={Messages.fullLogs} /> */}
                     <CheckboxField fieldClassName={styles.checkbox} name="active" label={Messages.enabled} />
                   </div>
                 </div>
