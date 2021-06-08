@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { DataModel } from 'app/percona/backup/Backup.types';
+import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import { Backup } from '../BackupInventory.types';
 
@@ -8,11 +8,6 @@ export interface AddBackupModalProps {
   isVisible: boolean;
   onClose: () => void;
   onBackup: (values: AddBackupFormProps) => void;
-}
-
-export enum RetryMode {
-  AUTO = 'AUTO',
-  MANUAL = 'MANUAL',
 }
 
 export interface SelectableService {

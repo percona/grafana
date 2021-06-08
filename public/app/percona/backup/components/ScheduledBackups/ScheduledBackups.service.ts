@@ -1,24 +1,22 @@
 import { CancelToken } from 'axios';
 import { Databases } from 'app/percona/shared/core';
-import { Frequency, ScheduledBackup } from './ScheduledBackups.types';
+import { ScheduledBackup } from './ScheduledBackups.types';
 import { DataModel } from '../../Backup.types';
 
 export const ScheduledBackupsService = {
   async list(token?: CancelToken): Promise<ScheduledBackup[]> {
     return [
       {
+        id: 'backup_1',
         name: 'Backup 1',
         vendor: Databases.postgresql,
         start: Date.now(),
-        retention: {
-          daily: 10,
-          weekly: 10,
-        },
-        frequency: {
-          value: 1,
-          unit: Frequency.DAY,
-        },
-        location: 'bucket 1',
+        retention: 10,
+        cronExpression: '30 * * * *',
+        locationId: 'bucket_1',
+        locationName: 'Bucker 1',
+        serviceId: 'service_1',
+        serviceName: 'Service 1',
         lastBackup: Date.now(),
         dataModel: DataModel.PHYSICAL,
         description: 'Just a bare description',

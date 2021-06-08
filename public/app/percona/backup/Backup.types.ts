@@ -26,3 +26,8 @@ export enum RestoreStatus {
   RESTORE_STATUS_SUCCESS = 'RESTORE_STATUS_SUCCESS',
   RESTORE_STATUS_ERROR = 'RESTORE_STATUS_ERROR',
 }
+
+export enum RetryMode {
+  AUTO = 'AUTO',
+  MANUAL = 'MANUAL',
+}
