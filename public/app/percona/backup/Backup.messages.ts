@@ -69,6 +69,7 @@ export const Messages = {
         frequency: 'Frequency',
         location: 'Location',
         lastBackup: 'Last backup',
+        type: 'Type',
       },
     },
   },

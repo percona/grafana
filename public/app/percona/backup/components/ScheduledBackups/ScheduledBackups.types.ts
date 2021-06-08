@@ -1,5 +1,5 @@
 import { Databases } from 'app/percona/shared/core';
-import { DataModel, RetryMode } from '../../Backup.types';
+import { BackupType, DataModel, RetryMode } from '../../Backup.types';
 
 export interface RawScheduledBackup {
   scheduled_backup_id: string;
@@ -34,4 +34,5 @@ export interface ScheduledBackup {
   lastBackup: number;
   dataModel: DataModel;
   description: string;
+  type: BackupType;
 }

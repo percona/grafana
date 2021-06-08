@@ -35,6 +35,15 @@ export const ScheduledBackups: FC = () => {
         accessor: 'cronExpression',
       },
       {
+        Header: Messages.scheduledBackups.table.columns.retention,
+        accessor: 'retention',
+        Cell: ({ value }) => `${value} bckp`,
+      },
+      {
+        Header: Messages.scheduledBackups.table.columns.type,
+        accessor: 'type',
+      },
+      {
         Header: Messages.scheduledBackups.table.columns.location,
         accessor: 'locationName',
       },
