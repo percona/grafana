@@ -1,28 +1,36 @@
 import { Databases } from 'app/percona/shared/core';
-import { DataModel } from '../../Backup.types';
+import { DataModel, RetryMode } from '../../Backup.types';
 
-export interface ScheduledBackupRetention {
-  daily: number;
-  weekly: number;
+export interface RawScheduledBackup {
+  scheduled_backup_id: string;
+  service_id: string;
+  service_name: string;
+  location_id: string;
+  location_name: string;
+  cron_expression: string;
+  start_time: string;
+  name: string;
+  description: string;
+  retry_mode: RetryMode;
+  retry_interval: string;
+  retry_times: string;
 }
 
-export enum Frequency {
-  DAY = 'Day',
-  WEEK = 'Week',
-}
-
-export interface ScheduledBackupFrequency {
-  value: number;
-  unit: Frequency;
+export interface ScheduledBackupResponse {
+  scheduled_backups: RawScheduledBackup[];
 }
 
 export interface ScheduledBackup {
+  id: string;
   name: string;
+  locationId: string;
+  locationName: string;
+  serviceId: string;
+  serviceName: string;
   vendor: Databases;
   start: number;
-  retention: ScheduledBackupRetention;
-  frequency: ScheduledBackupFrequency;
-  location: string;
+  retention: number;
+  cronExpression: string;
   lastBackup: number;
   dataModel: DataModel;
   description: string;

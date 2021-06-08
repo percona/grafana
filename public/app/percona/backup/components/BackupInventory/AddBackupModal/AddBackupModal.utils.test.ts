@@ -1,6 +1,6 @@
 import { stubs as backupStubs } from '../__mocks__/BackupInventory.service';
-import { DataModel } from 'app/percona/backup/Backup.types';
-import { AddBackupFormProps, RetryMode } from './AddBackupModal.types';
+import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { AddBackupFormProps } from './AddBackupModal.types';
 import { toFormBackup } from './AddBackupModal.utils';
 
 describe('AddBackupModal::utils', () => {

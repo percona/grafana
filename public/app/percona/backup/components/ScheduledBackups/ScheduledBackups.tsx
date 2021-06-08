@@ -38,12 +38,11 @@ export const ScheduledBackups: FC = () => {
       },
       {
         Header: Messages.scheduledBackups.table.columns.frequency,
-        accessor: 'frequency',
-        Cell: ({ value }) => `${value.value} ${value.unit}`,
+        accessor: 'cronExpression',
       },
       {
         Header: Messages.scheduledBackups.table.columns.location,
-        accessor: 'location',
+        accessor: 'locationName',
       },
       {
         Header: Messages.scheduledBackups.table.columns.lastBackup,
