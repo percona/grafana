@@ -23,6 +23,7 @@ export const ScheduledBackupsService = {
           vendor: Databases.mysql,
           last_run: '2021-06-09T12:58:19.401Z',
           data_model: DataModel.PHYSICAL,
+          enabled: true,
         },
       ],
     };
@@ -44,6 +45,7 @@ export const ScheduledBackupsService = {
         retry_mode,
         retry_times,
         retry_interval,
+        enabled,
       }) => ({
         id: scheduled_backup_id,
         name,
@@ -62,6 +64,7 @@ export const ScheduledBackupsService = {
         retryMode: retry_mode,
         retryTimes: retry_times,
         retryInterval: retry_interval,
+        enabled,
       })
     );
   },
