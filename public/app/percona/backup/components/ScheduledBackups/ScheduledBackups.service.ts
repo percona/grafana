@@ -1,33 +1,19 @@
 import { CancelToken } from 'axios';
-import { Databases } from 'app/percona/shared/core';
+import { api } from 'app/percona/shared/helpers/api';
 import { ScheduledBackup, ScheduledBackupResponse } from './ScheduledBackups.types';
-import { BackupType, DataModel, RetryMode } from '../../Backup.types';
+import { BackupType } from '../../Backup.types';
+
+const BASE_URL = '/v1/management/backup/Backups';
 
 export const ScheduledBackupsService = {
   async list(token?: CancelToken): Promise<ScheduledBackup[]> {
-    const response: ScheduledBackupResponse = {
-      scheduled_backups: [
-        {
-          scheduled_backup_id: 'backup_1',
-          service_id: 'service_1',
-          service_name: 'Service 1',
-          location_id: 'location 1',
-          location_name: 'Location 1',
-          cron_expression: '30 * * * *',
-          start_time: '2021-06-09T12:58:19.401Z',
-          name: 'Backup 1',
-          description: 'Description',
-          retry_mode: RetryMode.MANUAL,
-          retry_interval: '10s',
-          retry_times: 1,
-          vendor: Databases.mysql,
-          last_run: '2021-06-09T12:58:19.401Z',
-          data_model: DataModel.PHYSICAL,
-          enabled: true,
-        },
-      ],
-    };
-    const { scheduled_backups = [] } = response;
+    const { scheduled_backups = [] } = await api.post<ScheduledBackupResponse, any>(
+      `${BASE_URL}/ListScheduled`,
+      {},
+      false,
+      token
+    );
+
     return scheduled_backups.map(
       ({
         scheduled_backup_id,
