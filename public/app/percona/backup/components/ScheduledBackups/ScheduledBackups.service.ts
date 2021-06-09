@@ -41,6 +41,9 @@ export const ScheduledBackupsService = {
         last_run,
         data_model,
         description,
+        retry_mode,
+        retry_times,
+        retry_interval,
       }) => ({
         id: scheduled_backup_id,
         name,
@@ -56,6 +59,9 @@ export const ScheduledBackupsService = {
         dataModel: data_model,
         description,
         type: BackupType.FULL,
+        retryMode: retry_mode,
+        retryTimes: retry_times,
+        retryInterval: retry_interval,
       })
     );
   },

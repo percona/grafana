@@ -38,4 +38,7 @@ export interface ScheduledBackup {
   dataModel: DataModel;
   description: string;
   type: BackupType;
+  retryMode: RetryMode;
+  retryInterval: string;
+  retryTimes: number;
 }
