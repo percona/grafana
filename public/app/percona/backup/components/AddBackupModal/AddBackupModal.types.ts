@@ -3,9 +3,10 @@ import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
 import { Backup } from '../BackupInventory/BackupInventory.types';
+import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 
 export interface AddBackupModalProps {
-  backup: Backup | null;
+  backup: Backup | ScheduledBackup | null;
   isVisible: boolean;
   scheduleMode?: boolean;
   onClose: () => void;
@@ -23,9 +24,9 @@ export interface AddBackupFormProps {
   backupName: string;
   description: string;
   location: SelectableValue<string>;
-  retryMode: RetryMode;
-  retryTimes: number;
-  retryInterval: number;
+  retryMode?: RetryMode;
+  retryTimes?: number;
+  retryInterval?: number;
   period: SelectableValue<PeriodType>;
   month: Array<SelectableValue<number>>;
   day: Array<SelectableValue<number>>;

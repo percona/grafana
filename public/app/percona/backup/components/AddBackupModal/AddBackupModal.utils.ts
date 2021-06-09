@@ -1,10 +1,38 @@
 import { SelectableValue } from '@grafana/data';
 import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
 import { Backup } from '../BackupInventory/BackupInventory.types';
+import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { AddBackupFormProps, SelectableService } from './AddBackupModal.types';
 
-export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
+export const PERIOD_OPTIONS: Array<SelectableValue<PeriodType>> = [
+  {
+    value: 'year',
+    label: 'Year',
+  },
+  {
+    value: 'month',
+    label: 'Month',
+  },
+  {
+    value: 'week',
+    label: 'Week',
+  },
+  {
+    value: 'day',
+    label: 'Day',
+  },
+  {
+    value: 'hour',
+    label: 'Hour',
+  },
+];
+
+const isScheduledBackup = (backup: Backup | ScheduledBackup): backup is ScheduledBackup =>
+  (backup as ScheduledBackup).cronExpression !== undefined;
+
+export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackupFormProps => {
   if (!backup) {
     return {
       service: (null as unknown) as SelectableValue<SelectableService>,
@@ -26,25 +54,60 @@ export const toFormBackup = (backup: Backup | null): AddBackupFormProps => {
     };
   }
 
-  const { serviceName, serviceId, vendor, dataModel, locationName, locationId } = backup;
+  const {
+    name,
+    serviceName,
+    serviceId,
+    vendor,
+    dataModel,
+    locationName,
+    locationId,
+    retryMode,
+    retryTimes,
+    retryInterval,
+  } = backup;
+
+  let month: Array<SelectableValue<number>> = [];
+  let day: Array<SelectableValue<number>> = [];
+  let weekDay: Array<SelectableValue<number>> = [];
+  let startHour: Array<SelectableValue<number>> = [];
+  let startMinute: Array<SelectableValue<number>> = [];
+  let period: SelectableValue<PeriodType> = PERIOD_OPTIONS[0];
+  let active = false;
+  let description = '';
+
+  if (isScheduledBackup(backup)) {
+    const { cronExpression, enabled, description: backupDescription } = backup;
+    const cronParts = parseCronString(cronExpression);
+    const periodType = getPeriodFromCronparts(cronParts);
+    const [minutePart, hourPart, dayPart, monthPart, weekDayPary] = cronParts;
+    active = enabled;
+    description = backupDescription;
+    startMinute = minutePart.map(v => getOptionFromDigit(v));
+    startHour = hourPart.map(v => getOptionFromDigit(v));
+    day = dayPart.map(v => getOptionFromDigit(v));
+    month = monthPart.map(v => getOptionFromDigit(v));
+    weekDay = weekDayPary.map(v => getOptionFromDigit(v));
+    period = getOptionFromPeriodType(periodType);
+  }
 
   return {
     service: { label: serviceName, value: { id: serviceId, vendor } },
     dataModel,
-    backupName: '',
-    description: '',
+    backupName: name,
+    description,
     location: { label: locationName, value: locationId },
-    retryMode: RetryMode.AUTO,
-    retryTimes: 1,
-    retryInterval: 1,
-    period: { value: 'year', label: 'Year' },
-    month: [],
-    day: [],
-    weekDay: [],
-    startHour: [],
-    startMinute: [],
+    retryMode,
+    retryTimes,
+    retryInterval: parseInt(retryInterval || '0', 10),
+    period,
+    month,
+    day,
+    weekDay,
+    startHour,
+    startMinute,
     logs: false,
-    active: false,
+    active,
   };
 };
 
@@ -60,3 +123,11 @@ export const isCronFieldDisabled = (period: PeriodType, field: keyof AddBackupFo
 
   return map[period].includes(field);
 };
+
+export const getOptionFromPeriodType = (period: PeriodType): SelectableValue<PeriodType> =>
+  PERIOD_OPTIONS.find(p => p.value === period)!;
+
+export const getOptionFromDigit = (value: number): SelectableValue<number> => ({
+  value,
+  label: value < 10 ? `0${value.toString()}` : value.toString(),
+});

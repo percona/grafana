@@ -2,7 +2,7 @@ import { SelectableValue } from '@grafana/data';
 import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { MONTHS, WEEKDAYS } from 'app/percona/shared/helpers/cron/constants';
-import { PeriodType } from 'app/percona/shared/helpers/cron/types';
+import { getOptionFromDigit } from './AddBackupModal.utils';
 
 export const VENDOR_OPTIONS: Array<SelectableValue<Databases>> = [
   {
@@ -45,52 +45,26 @@ export const RETRY_MODE_OPTIONS: Array<SelectableValue<RetryMode>> = [
   },
 ];
 
-export const PERIOD_OPTIONS: Array<SelectableValue<PeriodType>> = [
-  {
-    value: 'year',
-    label: 'Year',
-  },
-  {
-    value: 'month',
-    label: 'Month',
-  },
-  {
-    value: 'week',
-    label: 'Week',
-  },
-  {
-    value: 'day',
-    label: 'Day',
-  },
-  {
-    value: 'hour',
-    label: 'Hour',
-  },
-];
-
 export const MONTH_OPTIONS: Array<SelectableValue<number>> = MONTHS.map((month, idx) => ({
   value: idx + 1,
   label: `${month[0].toUpperCase()}${month.substr(1).toLowerCase()}`,
 }));
 
-export const DAY_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(31).keys()).map(value => ({
-  value: value + 1,
-  label: value < 10 ? `0${(value + 1).toString()}` : (value + 1).toString(),
-}));
+export const DAY_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(31).keys()).map(value =>
+  getOptionFromDigit(value + 1)
+);
 
 export const WEEKDAY_OPTIONS: Array<SelectableValue<number>> = WEEKDAYS.map((day, idx) => ({
   value: idx,
   label: `${day[0].toUpperCase()}${day.substr(1).toLowerCase()}`,
 }));
 
-export const HOUR_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(24).keys()).map(value => ({
-  value,
-  label: value < 10 ? `0${value.toString()}` : value.toString(),
-}));
+export const HOUR_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(24).keys()).map(value =>
+  getOptionFromDigit(value)
+);
 
-export const MINUTE_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(60).keys()).map(value => ({
-  value,
-  label: value < 10 ? `0${value.toString()}` : value.toString(),
-}));
+export const MINUTE_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(60).keys()).map(value =>
+  getOptionFromDigit(value)
+);
 
 export const MAX_VISIBLE_OPTIONS = 4;

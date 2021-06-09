@@ -12,7 +12,7 @@ import {
 import { Field, withTypes } from 'react-final-form';
 import { AddBackupFormProps, AddBackupModalProps } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
-import { toFormBackup, isCronFieldDisabled } from './AddBackupModal.utils';
+import { toFormBackup, isCronFieldDisabled, PERIOD_OPTIONS } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
@@ -23,7 +23,6 @@ import {
   MAX_VISIBLE_OPTIONS,
   MINUTE_OPTIONS,
   MONTH_OPTIONS,
-  PERIOD_OPTIONS,
   WEEKDAY_OPTIONS,
 } from './AddBackupModal.constants';
 import { getStyles } from './AddBackupModal.styles';

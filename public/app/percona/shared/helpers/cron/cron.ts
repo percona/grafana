@@ -349,3 +349,18 @@ export const parseCronString = (str: string) => {
 
   throw new Error('Invalid cron string format');
 };
+
+export const getPeriodFromCronparts = (cronParts: number[][]): PeriodType => {
+  if (cronParts[3].length > 0) {
+    return 'year';
+  } else if (cronParts[2].length > 0) {
+    return 'month';
+  } else if (cronParts[4].length > 0) {
+    return 'week';
+  } else if (cronParts[1].length > 0) {
+    return 'day';
+  } else if (cronParts[0].length > 0) {
+    return 'hour';
+  }
+  return 'minute';
+};
