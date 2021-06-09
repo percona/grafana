@@ -13,7 +13,10 @@ export interface RawScheduledBackup {
   description: string;
   retry_mode: RetryMode;
   retry_interval: string;
-  retry_times: string;
+  retry_times: number;
+  vendor: Databases;
+  last_run: string;
+  data_model: DataModel;
 }
 
 export interface ScheduledBackupResponse {
