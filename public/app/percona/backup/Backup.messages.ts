@@ -70,6 +70,7 @@ export const Messages = {
         location: 'Location',
         lastBackup: 'Last backup',
         type: 'Type',
+        actions: 'Actions',
       },
     },
   },

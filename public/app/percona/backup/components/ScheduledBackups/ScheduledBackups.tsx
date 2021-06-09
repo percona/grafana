@@ -17,6 +17,7 @@ import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 import { getStyles } from './ScheduledBackups.styles';
 import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
+import { ScheduledBackupsActions } from './ScheduledBackupsActions';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
@@ -53,6 +54,12 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.lastBackup,
         accessor: 'lastBackup',
         Cell: ({ value }) => <DetailedDate date={value} />,
+      },
+      {
+        Header: Messages.scheduledBackups.table.columns.actions,
+        accessor: 'id',
+        width: '150px',
+        Cell: ({ row }) => <ScheduledBackupsActions backup={row.original} />,
       },
     ],
     []
