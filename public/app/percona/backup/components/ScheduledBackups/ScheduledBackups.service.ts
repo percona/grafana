@@ -54,4 +54,15 @@ export const ScheduledBackupsService = {
       })
     );
   },
+  async schedule(
+    serviceId: string,
+    locationId: string,
+    cronExpression: string,
+    name: string,
+    description: string,
+    retryMode: RetryMode,
+    retryInterval: string,
+    retryTimes: number,
+    enabled: boolean
+  ): Promise<void> {},
 };

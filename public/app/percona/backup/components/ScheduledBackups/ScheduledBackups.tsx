@@ -94,17 +94,42 @@ export const ScheduledBackups: FC = () => {
     setBackupModalVisible(false);
   };
 
-  const handleBackup = (backup: AddBackupFormProps) => {
-    const { period, month, day, weekDay, startHour, startMinute } = backup;
-    console.log(
-      getCronStringFromValues(
-        period.value!,
-        month.map(m => m.value!),
-        day.map(m => m.value!),
-        weekDay.map(m => m.value!),
-        startHour.map(m => m.value!),
-        startMinute.map(m => m.value!)
-      )
+  const handleBackup = async (backup: AddBackupFormProps) => {
+    const {
+      service,
+      location,
+      period,
+      month,
+      day,
+      weekDay,
+      startHour,
+      startMinute,
+      backupName,
+      description,
+      retryMode,
+      retryInterval,
+      retryTimes,
+      active,
+    } = backup;
+    const cronExpression = getCronStringFromValues(
+      period.value!,
+      month.map(m => m.value!),
+      day.map(m => m.value!),
+      weekDay.map(m => m.value!),
+      startHour.map(m => m.value!),
+      startMinute.map(m => m.value!)
+    );
+
+    await ScheduledBackupsService.schedule(
+      service.value?.id!,
+      location.value!,
+      cronExpression,
+      backupName,
+      description,
+      retryMode!,
+      `${retryInterval}s`,
+      retryTimes!,
+      active
     );
   };
 
