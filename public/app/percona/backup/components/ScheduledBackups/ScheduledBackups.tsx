@@ -189,11 +189,12 @@ export const ScheduledBackups: FC = () => {
         onBackup={handleBackup}
       />
       <DeleteModal
-        title="Delete scheduled backup"
+        title={Messages.scheduledBackups.deleteModalTitle}
         isVisible={deleteModalVisible}
         setVisible={setDeleteModalVisible}
         onDelete={handleDelete}
         loading={deletePending}
+        message={Messages.scheduledBackups.getDeleteMessage(selectedBackup?.name!)}
       />
     </>
   );
