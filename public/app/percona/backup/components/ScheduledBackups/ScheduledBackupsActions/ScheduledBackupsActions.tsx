@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { IconButton, Switch, useStyles } from '@grafana/ui';
+import { IconButton, Spinner, Switch, useStyles } from '@grafana/ui';
 import { getStyles } from './ScheduledBackupsActions.styles';
 import { ScheduledBackupsActionsProps } from './ScheduledBackupsActions.types';
 
@@ -9,6 +9,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
   onCopy = () => {},
   onDelete = () => {},
   onToggle = () => {},
+  pending,
 }) => {
   const styles = useStyles(getStyles);
   const handleEdit = () => onEdit(backup);
@@ -18,10 +19,16 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
 
   return (
     <div className={styles.actionsWrapper}>
-      <Switch value={backup.enabled} onClick={handleToggle} data-qa="toggle-scheduled-backpup" />
-      <IconButton data-qa="edit-scheduled-backpup-button" name="pen" onClick={handleEdit} />
-      <IconButton data-qa="delete-scheduled-backpup-button" name="times" onClick={handleDelete} />
-      <IconButton data-qa="copy-alert-scheduled-backup-button" name="copy" onClick={handleCopy} />
+      {pending ? (
+        <Spinner />
+      ) : (
+        <>
+          <Switch value={backup.enabled} onClick={handleToggle} data-qa="toggle-scheduled-backpup" />
+          <IconButton data-qa="edit-scheduled-backpup-button" name="pen" onClick={handleEdit} />
+          <IconButton data-qa="delete-scheduled-backpup-button" name="times" onClick={handleDelete} />
+          <IconButton data-qa="copy-alert-scheduled-backup-button" name="copy" onClick={handleCopy} />
+        </>
+      )}
     </div>
   );
 };
