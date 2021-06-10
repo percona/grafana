@@ -15,7 +15,7 @@ import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
-  const [pending] = useState(false);
+  const [pending, setPending] = useState(false);
   const [generateToken] = useCancelToken();
   const columns = useMemo(
     (): Array<Column<ScheduledBackup>> => [
@@ -52,6 +52,7 @@ export const ScheduledBackups: FC = () => {
   );
 
   const getData = async () => {
+    setPending(true);
     try {
       const backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
       setData(backups);
@@ -61,6 +62,7 @@ export const ScheduledBackups: FC = () => {
       }
       logger.error(e);
     }
+    setPending(false);
   };
 
   const renderSelectedSubRow = React.useCallback(
