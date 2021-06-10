@@ -19,6 +19,7 @@ export interface SelectableService {
 }
 
 export interface AddBackupFormProps {
+  id: string;
   service: SelectableValue<SelectableService>;
   dataModel: DataModel;
   backupName: string;
