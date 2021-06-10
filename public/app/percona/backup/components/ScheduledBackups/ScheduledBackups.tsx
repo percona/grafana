@@ -22,6 +22,7 @@ import { ScheduledBackupsActions } from './ScheduledBackupsActions';
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
   const [pending, setPending] = useState(false);
+  const [actionPending, setActionPending] = useState(false);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
@@ -59,7 +60,9 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.actions,
         accessor: 'id',
         width: '150px',
-        Cell: ({ row }) => <ScheduledBackupsActions backup={row.original} />,
+        Cell: ({ row }) => (
+          <ScheduledBackupsActions pending={actionPending} backup={row.original} onToggle={handleToggle} />
+        ),
       },
     ],
     []
@@ -131,6 +134,17 @@ export const ScheduledBackups: FC = () => {
       retryTimes!,
       active
     );
+  };
+
+  const handleToggle = async ({ id, enabled }: ScheduledBackup) => {
+    setActionPending(true);
+    try {
+      await ScheduledBackupsService.toggle(id, !enabled);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setActionPending(false);
+    }
   };
 
   useEffect(() => {
