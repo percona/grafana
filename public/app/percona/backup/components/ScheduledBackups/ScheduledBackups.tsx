@@ -22,6 +22,7 @@ import { ScheduledBackupsActions } from './ScheduledBackupsActions';
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
   const [pending, setPending] = useState(false);
+  const [actionPending, setActionPending] = useState(false);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
@@ -59,7 +60,9 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.actions,
         accessor: 'id',
         width: '150px',
-        Cell: ({ row }) => <ScheduledBackupsActions backup={row.original} />,
+        Cell: ({ row }) => (
+          <ScheduledBackupsActions pending={actionPending} backup={row.original} onCopy={handleCopy} />
+        ),
       },
     ],
     []
@@ -131,6 +134,39 @@ export const ScheduledBackups: FC = () => {
       retryTimes!,
       active
     );
+  };
+
+  const handleCopy = async (backup: ScheduledBackup) => {
+    setActionPending(true);
+    try {
+      const {
+        serviceId,
+        locationId,
+        cronExpression,
+        name,
+        description,
+        retryMode,
+        retryInterval,
+        retryTimes,
+        enabled,
+      } = backup;
+      await ScheduledBackupsService.schedule(
+        serviceId,
+        locationId,
+        cronExpression,
+        name,
+        description,
+        retryMode,
+        retryInterval,
+        retryTimes,
+        enabled
+      );
+      getData();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setActionPending(false);
+    }
   };
 
   useEffect(() => {
