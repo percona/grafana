@@ -102,7 +102,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
             {!scheduleMode && <RetryModeSelector retryMode={values.retryMode} />}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
-              <div className={styles.advancedGroup}>
+              <div className={styles.advancedGroup} data-qa="advanced-backup-fields">
                 <h6 className={styles.advancedTitle}>Schedule</h6>
                 <div>
                   <div className={styles.advancedRow}>
