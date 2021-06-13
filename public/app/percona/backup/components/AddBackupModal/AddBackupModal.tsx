@@ -124,7 +124,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
-                            disabled={isCronFieldDisabled(values.period.value!, 'month')}
+                            disabled={isCronFieldDisabled(values.period!.value!, 'month')}
                           />
                         </div>
                       )}
@@ -142,7 +142,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
-                            disabled={isCronFieldDisabled(values.period.value!, 'day')}
+                            disabled={isCronFieldDisabled(values.period!.value!, 'day')}
                           />
                         </div>
                       )}
@@ -158,7 +158,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
-                            disabled={isCronFieldDisabled(values.period.value!, 'weekDay')}
+                            disabled={isCronFieldDisabled(values.period!.value!, 'weekDay')}
                           />
                         </div>
                       )}
@@ -176,7 +176,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
-                            disabled={isCronFieldDisabled(values.period.value!, 'startHour')}
+                            disabled={isCronFieldDisabled(values.period!.value!, 'startHour')}
                           />
                         </div>
                       )}
@@ -192,7 +192,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                             isClearable
                             placeholder={Messages.every}
                             maxVisibleValues={MAX_VISIBLE_OPTIONS}
-                            disabled={isCronFieldDisabled(values.period.value!, 'startMinute')}
+                            disabled={isCronFieldDisabled(values.period!.value!, 'startMinute')}
                           />
                         </div>
                       )}

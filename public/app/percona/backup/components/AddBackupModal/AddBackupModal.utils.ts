@@ -89,26 +89,34 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     month = monthPart.map(v => getOptionFromDigit(v));
     weekDay = weekDayPary.map(v => getOptionFromDigit(v));
     period = getOptionFromPeriodType(periodType);
-  }
 
-  return {
-    service: { label: serviceName, value: { id: serviceId, vendor } },
-    dataModel,
-    backupName: name,
-    description,
-    location: { label: locationName, value: locationId },
-    retryMode,
-    retryTimes,
-    retryInterval: parseInt(retryInterval || '0', 10),
-    period,
-    month,
-    day,
-    weekDay,
-    startHour,
-    startMinute,
-    logs: false,
-    active,
-  };
+    return {
+      service: { label: serviceName, value: { id: serviceId, vendor } },
+      dataModel,
+      backupName: name,
+      description,
+      location: { label: locationName, value: locationId },
+      retryMode: retryMode!,
+      retryTimes: retryTimes!,
+      retryInterval: parseInt(retryInterval || '0', 10),
+      period,
+      month,
+      day,
+      weekDay,
+      startHour,
+      startMinute,
+      logs: false,
+      active,
+    };
+  } else {
+    return {
+      service: { label: serviceName, value: { id: serviceId, vendor } },
+      dataModel,
+      backupName: name,
+      description,
+      location: { label: locationName, value: locationId },
+    };
+  }
 };
 
 export const isCronFieldDisabled = (period: PeriodType, field: keyof AddBackupFormProps) => {
