@@ -29,6 +29,7 @@ import { getStyles } from './AddBackupModal.styles';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { RetryModeSelector } from './RetryModeSelector';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
+import { RetryMode } from '../../Backup.types';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
@@ -99,7 +100,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               label={Messages.dataModel}
               fullWidth
             />
-            {!scheduleMode && <RetryModeSelector retryMode={values.retryMode} />}
+            {!scheduleMode && <RetryModeSelector disabled retryMode={RetryMode.AUTO} />}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
               <div className={styles.advancedGroup} data-qa="advanced-backup-fields">

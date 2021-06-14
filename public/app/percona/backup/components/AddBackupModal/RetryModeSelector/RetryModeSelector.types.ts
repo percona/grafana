@@ -1,3 +1,4 @@
 import { AddBackupFormProps } from '../AddBackupModal.types';
-
-export type RetryModeSelectorProps = Pick<AddBackupFormProps, 'retryMode'>;
+export interface RetryModeSelectorProps extends Pick<AddBackupFormProps, 'retryMode'> {
+  disabled?: boolean;
+}
