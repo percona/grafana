@@ -74,7 +74,7 @@ export const ScheduledBackupsService = {
       retry_mode: retryMode,
       retry_interval: retryInterval,
       retry_times: retryTimes,
-      enabled,
+      enabled: !!enabled,
     });
   },
   async delete(id: string) {

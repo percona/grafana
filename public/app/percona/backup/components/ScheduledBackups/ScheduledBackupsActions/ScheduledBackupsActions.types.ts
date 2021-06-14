@@ -6,4 +6,5 @@ export interface ScheduledBackupsActionsProps {
   onDelete?: (backup: ScheduledBackup) => void;
   onCopy?: (backup: ScheduledBackup) => void;
   onToggle?: (backup: ScheduledBackup) => void;
+  pending?: boolean;
 }
