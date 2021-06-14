@@ -9,6 +9,7 @@ describe('AddBackupModal::utils', () => {
   describe('toFormBackup', () => {
     it('should return default values if a null Backup is passed', () => {
       expect(toFormBackup(null)).toEqual<AddBackupFormProps>({
+        id: '',
         service: null as any,
         dataModel: DataModel.PHYSICAL,
         backupName: '',
@@ -30,9 +31,10 @@ describe('AddBackupModal::utils', () => {
 
     it('should convert to form props', () => {
       const backup = backupStubs[0];
-      const { serviceName, serviceId, vendor, dataModel, locationName, locationId } = backup;
+      const { id, serviceName, serviceId, vendor, dataModel, locationName, locationId } = backup;
 
       expect(toFormBackup(backup)).toEqual<AddBackupFormProps>({
+        id,
         service: { label: serviceName, value: { id: serviceId, vendor } },
         dataModel,
         backupName: 'Backup 1',
@@ -64,6 +66,7 @@ describe('AddBackupModal::utils', () => {
       };
 
       expect(toFormBackup(backup)).toEqual<AddBackupFormProps>({
+        id: backup.id,
         service: { label: 'Service 1', value: { id: 'service_1', vendor: Databases.mongodb } },
         dataModel: DataModel.PHYSICAL,
         backupName: 'Backup 1',
