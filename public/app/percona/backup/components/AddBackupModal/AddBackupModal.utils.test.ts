@@ -2,7 +2,7 @@ import { stubs as backupStubs } from '../BackupInventory/__mocks__/BackupInvento
 import { BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { AddBackupFormProps } from './AddBackupModal.types';
-import { toFormBackup } from './AddBackupModal.utils';
+import { toFormBackup, isCronFieldDisabled, getOptionFromPeriodType, getOptionFromDigit } from './AddBackupModal.utils';
 import { Databases } from 'app/percona/shared/core';
 
 describe('AddBackupModal::utils', () => {
@@ -81,6 +81,68 @@ describe('AddBackupModal::utils', () => {
         logs: false,
         active: true,
       });
+    });
+  });
+
+  describe('isCronFieldDisabled', () => {
+    it('should not disabled any fiels for period = year', () => {
+      expect(isCronFieldDisabled('year', 'month')).toBeFalsy();
+      expect(isCronFieldDisabled('year', 'day')).toBeFalsy();
+      expect(isCronFieldDisabled('year', 'weekDay')).toBeFalsy();
+      expect(isCronFieldDisabled('year', 'startHour')).toBeFalsy();
+      expect(isCronFieldDisabled('year', 'startMinute')).toBeFalsy();
+    });
+
+    it('should disable month for period = month', () => {
+      expect(isCronFieldDisabled('month', 'month')).toBeTruthy();
+      expect(isCronFieldDisabled('month', 'day')).toBeFalsy();
+      expect(isCronFieldDisabled('month', 'weekDay')).toBeFalsy();
+      expect(isCronFieldDisabled('month', 'startHour')).toBeFalsy();
+      expect(isCronFieldDisabled('month', 'startMinute')).toBeFalsy();
+    });
+
+    it('should disable month, day for period = week', () => {
+      expect(isCronFieldDisabled('week', 'month')).toBeTruthy();
+      expect(isCronFieldDisabled('week', 'day')).toBeTruthy();
+      expect(isCronFieldDisabled('week', 'weekDay')).toBeFalsy();
+      expect(isCronFieldDisabled('week', 'startHour')).toBeFalsy();
+      expect(isCronFieldDisabled('week', 'startMinute')).toBeFalsy();
+    });
+
+    it('should disable month, day, weekDay for period = day', () => {
+      expect(isCronFieldDisabled('day', 'month')).toBeTruthy();
+      expect(isCronFieldDisabled('day', 'day')).toBeTruthy();
+      expect(isCronFieldDisabled('day', 'weekDay')).toBeTruthy();
+      expect(isCronFieldDisabled('day', 'startHour')).toBeFalsy();
+      expect(isCronFieldDisabled('day', 'startMinute')).toBeFalsy();
+    });
+
+    it('should disable month, day, weekDay, minute for period = hour', () => {
+      expect(isCronFieldDisabled('hour', 'month')).toBeTruthy();
+      expect(isCronFieldDisabled('hour', 'day')).toBeTruthy();
+      expect(isCronFieldDisabled('hour', 'weekDay')).toBeTruthy();
+      expect(isCronFieldDisabled('hour', 'startHour')).toBeTruthy();
+      expect(isCronFieldDisabled('hour', 'startMinute')).toBeFalsy();
+    });
+  });
+
+  describe('getOptionFromPeriodType', () => {
+    it('should get the right option for a period type', () => {
+      expect(getOptionFromPeriodType('year')).toEqual({ value: 'year', label: 'Year' });
+      expect(getOptionFromPeriodType('month')).toEqual({ value: 'month', label: 'Month' });
+      expect(getOptionFromPeriodType('week')).toEqual({ value: 'week', label: 'Week' });
+      expect(getOptionFromPeriodType('day')).toEqual({ value: 'day', label: 'Day' });
+      expect(getOptionFromPeriodType('hour')).toEqual({ value: 'hour', label: 'Hour' });
+    });
+  });
+
+  describe('getOptionFromDigit', () => {
+    it('should return an option with the correct number of digits', () => {
+      expect(getOptionFromDigit(0)).toEqual({ value: 0, label: '00' });
+      expect(getOptionFromDigit(5)).toEqual({ value: 5, label: '05' });
+      expect(getOptionFromDigit(8)).toEqual({ value: 8, label: '08' });
+      expect(getOptionFromDigit(10)).toEqual({ value: 10, label: '10' });
+      expect(getOptionFromDigit(54)).toEqual({ value: 54, label: '54' });
     });
   });
 });

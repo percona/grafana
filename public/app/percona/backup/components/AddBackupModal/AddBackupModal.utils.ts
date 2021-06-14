@@ -119,8 +119,9 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
   }
 };
 
-export const isCronFieldDisabled = (period: PeriodType, field: keyof AddBackupFormProps) => {
-  const map: Record<PeriodType, Array<Partial<keyof AddBackupFormProps>>> = {
+type BackupFormTimeProps = keyof Pick<AddBackupFormProps, 'month' | 'day' | 'weekDay' | 'startHour' | 'startMinute'>;
+export const isCronFieldDisabled = (period: PeriodType, field: BackupFormTimeProps) => {
+  const map: Record<PeriodType, BackupFormTimeProps[]> = {
     year: [],
     month: ['month'],
     week: ['month', 'day'],
