@@ -16,6 +16,7 @@ describe('DBClusterParameters::', () => {
     const memory = root.find('[data-qa="cluster-parameters-memory"]');
     const cpu = root.find('[data-qa="cluster-parameters-cpu"]');
     const disk = root.find('[data-qa="cluster-parameters-disk"]');
+    const expose = root.find('[data-qa="cluster-parameters-expose"]');
 
     expect(memory).toBeTruthy();
     expect(memory.text()).toContain('Memory:1024 GB');
@@ -23,6 +24,8 @@ describe('DBClusterParameters::', () => {
     expect(cpu.text()).toContain('CPU:1');
     expect(disk).toBeTruthy();
     expect(disk.text()).toContain('Disk:25 GB');
+    expect(expose).toBeTruthy();
+    expect(expose.text()).toContain('External Access:Enabled');
   });
 
   it('renders parameters items correctly with MongoDB cluster', async () => {
@@ -35,6 +38,7 @@ describe('DBClusterParameters::', () => {
     const memory = root.find('[data-qa="cluster-parameters-memory"]');
     const cpu = root.find('[data-qa="cluster-parameters-cpu"]');
     const disk = root.find('[data-qa="cluster-parameters-disk"]');
+    const expose = root.find('[data-qa="cluster-parameters-expose"]');
 
     expect(memory).toBeTruthy();
     expect(memory.text()).toContain('Memory:0 GB');
@@ -42,5 +46,7 @@ describe('DBClusterParameters::', () => {
     expect(cpu.text()).toContain('CPU:0');
     expect(disk).toBeTruthy();
     expect(disk.text()).toContain('Disk:25 GB');
+    expect(expose).toBeTruthy();
+    expect(expose.text()).toContain('External Access:Disabled');
   });
 });
