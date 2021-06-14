@@ -161,6 +161,11 @@ export const ScheduledBackups: FC = () => {
     setBackupModalVisible(true);
   };
 
+  const onAddClick = () => {
+    setSelectedBackup(null);
+    setBackupModalVisible(true);
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -173,7 +178,7 @@ export const ScheduledBackups: FC = () => {
           icon="plus-square"
           variant="link"
           data-qa="scheduled-backup-add-modal-button"
-          onClick={() => setBackupModalVisible(true)}
+          onClick={onAddClick}
         >
           {Messages.add}
         </Button>
