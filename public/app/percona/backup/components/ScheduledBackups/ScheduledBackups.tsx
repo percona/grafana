@@ -153,11 +153,11 @@ export const ScheduledBackups: FC = () => {
     try {
       await ScheduledBackupsService.delete(selectedBackup?.id!);
       setDeleteModalVisible(false);
+      setSelectedBackup(null);
       getData();
     } catch (e) {
       logger.error(e);
     } finally {
-      setSelectedBackup(null);
       setDeletePending(false);
     }
   };
