@@ -91,31 +91,41 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     month = monthPart.map(v => getOptionFromDigit(v));
     weekDay = weekDayPary.map(v => getOptionFromDigit(v));
     period = getOptionFromPeriodType(periodType);
-  }
 
-  return {
-    id,
-    service: { label: serviceName, value: { id: serviceId, vendor } },
-    dataModel,
-    backupName: name,
-    description,
-    location: { label: locationName, value: locationId },
-    retryMode,
-    retryTimes,
-    retryInterval: parseInt(retryInterval || '0', 10),
-    period,
-    month,
-    day,
-    weekDay,
-    startHour,
-    startMinute,
-    logs: false,
-    active,
-  };
+    return {
+      id,
+      service: { label: serviceName, value: { id: serviceId, vendor } },
+      dataModel,
+      backupName: name,
+      description,
+      location: { label: locationName, value: locationId },
+      retryMode: retryMode!,
+      retryTimes: retryTimes!,
+      retryInterval: parseInt(retryInterval || '0', 10),
+      period,
+      month,
+      day,
+      weekDay,
+      startHour,
+      startMinute,
+      logs: false,
+      active,
+    };
+  } else {
+    return {
+      id,
+      service: { label: serviceName, value: { id: serviceId, vendor } },
+      dataModel,
+      backupName: name,
+      description,
+      location: { label: locationName, value: locationId },
+    };
+  }
 };
 
-export const isCronFieldDisabled = (period: PeriodType, field: keyof AddBackupFormProps) => {
-  const map: Record<PeriodType, Array<Partial<keyof AddBackupFormProps>>> = {
+type BackupFormTimeProps = keyof Pick<AddBackupFormProps, 'month' | 'day' | 'weekDay' | 'startHour' | 'startMinute'>;
+export const isCronFieldDisabled = (period: PeriodType, field: BackupFormTimeProps) => {
+  const map: Record<PeriodType, BackupFormTimeProps[]> = {
     year: [],
     month: ['month'],
     week: ['month', 'day'],

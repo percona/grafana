@@ -13,7 +13,7 @@ export const RetryModeSelector = ({ retryMode }: RetryModeSelectorProps) => {
   const styles = useStyles(getStyles);
 
   return (
-    <div>
+    <div data-qa="retry-mode-selector">
       <RadioButtonGroupField options={RETRY_MODE_OPTIONS} name="retryMode" label={Messages.retryMode} fullWidth />
       <div className={styles.retryFields}>
         <NumberInputField

@@ -28,12 +28,12 @@ export interface AddBackupFormProps {
   retryMode?: RetryMode;
   retryTimes?: number;
   retryInterval?: number;
-  period: SelectableValue<PeriodType>;
-  month: Array<SelectableValue<number>>;
-  day: Array<SelectableValue<number>>;
-  weekDay: Array<SelectableValue<number>>;
-  startHour: Array<SelectableValue<number>>;
-  startMinute: Array<SelectableValue<number>>;
-  logs: boolean;
-  active: boolean;
+  period?: SelectableValue<PeriodType>;
+  month?: Array<SelectableValue<number>>;
+  day?: Array<SelectableValue<number>>;
+  weekDay?: Array<SelectableValue<number>>;
+  startHour?: Array<SelectableValue<number>>;
+  startMinute?: Array<SelectableValue<number>>;
+  logs?: boolean;
+  active?: boolean;
 }

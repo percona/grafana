@@ -115,19 +115,19 @@ export const ScheduledBackups: FC = () => {
         active,
       } = backup;
       const cronExpression = getCronStringFromValues(
-        period.value!,
-        month.map(m => m.value!),
-        day.map(m => m.value!),
-        weekDay.map(m => m.value!),
-        startHour.map(m => m.value!),
-        startMinute.map(m => m.value!)
+        period!.value!,
+        month!.map(m => m.value!),
+        day!.map(m => m.value!),
+        weekDay!.map(m => m.value!),
+        startHour!.map(m => m.value!),
+        startMinute!.map(m => m.value!)
       );
       const strRetryInterval = `${retryInterval}s`;
 
       if (id) {
         await ScheduledBackupsService.change(
           id,
-          active,
+          active!,
           cronExpression,
           backupName,
           description,
@@ -145,7 +145,7 @@ export const ScheduledBackups: FC = () => {
           retryMode!,
           strRetryInterval,
           retryTimes!,
-          active
+          active!
         );
       }
       setBackupModalVisible(false);
