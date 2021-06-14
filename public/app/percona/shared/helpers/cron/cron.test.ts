@@ -1,4 +1,4 @@
-import { getCronStringFromValues, parseCronString } from './cron';
+import { getCronStringFromValues, parseCronString, getPeriodFromCronparts } from './cron';
 
 describe('cron', () => {
   describe('getCronStringFromValues', () => {
@@ -47,6 +47,16 @@ describe('cron', () => {
       expect(parseCronString('0,5-7 * * * *')).toEqual([[0, 5, 6, 7], [], [], [], []]);
       expect(parseCronString('25,50 * * * 1-3,6')).toEqual([[25, 50], [], [], [], [1, 2, 3, 6]]);
       expect(parseCronString('25 * * * *')).toEqual([[25], [], [], [], []]);
+    });
+  });
+
+  describe('getPeriodFromCronparts', () => {
+    it('should return the correct period', () => {
+      expect(getPeriodFromCronparts([[10], [5, 10], [], [1, 10], []])).toBe('year');
+      expect(getPeriodFromCronparts([[10], [5, 10], [5, 25, 30], [], []])).toBe('month');
+      expect(getPeriodFromCronparts([[10], [5, 10], [], [], [0, 4]])).toBe('week');
+      expect(getPeriodFromCronparts([[0], [5, 10, 23], [], [], []])).toBe('day');
+      expect(getPeriodFromCronparts([[], [], [], [], []])).toBe('minute');
     });
   });
 });
