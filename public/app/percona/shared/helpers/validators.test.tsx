@@ -57,7 +57,6 @@ describe('Validate email', () => {
   // NOTE (nicolalamacchia): some of these tests were taken from Chromium's source code
   test('email validator should return undefined if the passed email is valid', () => {
     expect(validators.validateEmail('test@example.org')).toBeUndefined();
-    expect(validators.validateEmail('test@example')).toBeUndefined();
     expect(validators.validateEmail('someone@127.0.0.1')).toBeUndefined();
     expect(validators.validateEmail("!#$%&'*+/=?^_`{|}~.-@com.com")).toBeUndefined();
     expect(validators.validateEmail('te..st@example.com')).toBeUndefined();
@@ -65,6 +64,7 @@ describe('Validate email', () => {
 
   test('email validator should return an error string if the passed email is invalid', () => {
     expect(validators.validateEmail('test')).toEqual('Invalid email address');
+    expect(validators.validateEmail('test@example')).toEqual('Invalid email address');
     expect(validators.validateEmail('invalid:email@example.com')).toEqual('Invalid email address');
     expect(validators.validateEmail('someone@somewhere.com.')).toEqual('Invalid email address');
     expect(validators.validateEmail('""test\blah""@example.com')).toEqual('Invalid email address');
@@ -155,6 +155,28 @@ describe('Validate containNumbers', () => {
   it('Validator should return undefined if the passed value is invalid', () => {
     expect(validators.containNumbers('test')).toEqual('Must include numbers');
     expect(validators.containNumbers('')).toEqual('Must include numbers');
+  });
+});
+
+describe('Validate max length', () => {
+  it('returns an error if the length of the input to be validated is greater than the specified max', () => {
+    const testedLength = 8;
+
+    expect(validators.maxLength(testedLength)('abcdefghijklmno')).toEqual(
+      `Must contain at most ${testedLength} characters`
+    );
+    expect(validators.maxLength(testedLength)('123456789')).toEqual(`Must contain at most ${testedLength} characters`);
+    expect(validators.maxLength(testedLength)('abcde1234')).toEqual(`Must contain at most ${testedLength} characters`);
+  });
+
+  it('returns undefined if the length of the input to be validated is less than or equal to the specified max', () => {
+    const testedLength = 8;
+
+    expect(validators.maxLength(testedLength)('')).toBeUndefined();
+    expect(validators.maxLength(testedLength)('a')).toBeUndefined();
+    expect(validators.maxLength(testedLength)('a1')).toBeUndefined();
+    expect(validators.maxLength(testedLength)('1')).toBeUndefined();
+    expect(validators.maxLength(testedLength)('12345678')).toBeUndefined();
   });
 });
 
