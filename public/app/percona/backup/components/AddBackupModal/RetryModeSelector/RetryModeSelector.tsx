@@ -9,7 +9,7 @@ import { getStyles } from './RetryModeSelector.styles';
 import { retryValidator } from './RetryModeSelector.utils';
 
 export const RetryModeSelector = ({ retryMode, disabled = false }: RetryModeSelectorProps) => {
-  const disabledNumberInputs = retryMode === RetryMode.AUTO || disabled;
+  const disabledNumberInputs = retryMode === RetryMode.MANUAL || disabled;
   const styles = useStyles(getStyles);
 
   return (
