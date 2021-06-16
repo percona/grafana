@@ -40,7 +40,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       backupName: '',
       description: '',
       location: (null as unknown) as SelectableValue<string>,
-      retryMode: RetryMode.AUTO,
+      retryMode: RetryMode.MANUAL,
       retryTimes: 2,
       retryInterval: 30,
       period: { value: 'year', label: 'Year' },
