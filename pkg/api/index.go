@@ -289,7 +289,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 	// 	}
 
 	pmmChildNavs := []*dtos.NavLink{
-		{Text: "Query Analyics", Id: "home", Url: setting.AppSubUrl + "/d/pmm-qan/pmm-query-analytics", Icon: "percona-analytics", HideFromTabs: true},
+		{Text: "Query Analytics", Id: "home", Url: setting.AppSubUrl + "/d/pmm-qan/pmm-query-analytics", Icon: "percona-analytics", HideFromTabs: true},
 		{Text: "System (Node)", Id: "home", Url: setting.AppSubUrl + "/d/node-instance-overview/nodes-overview", Icon: "percona-cluster-network", HideFromTabs: true, Children: nodeChildNavs},
 		{Text: "MySQL", Id: "home", Url: setting.AppSubUrl + "/d/mysql-instance-overview/mysql-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: mysqlChildNavs},
 		{Text: "MongoDB", Id: "home", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "percona-database", HideFromTabs: true, Children: mongodbChildNavs},
@@ -497,16 +497,6 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		SortWeight:   dtos.WeightHelp,
 		Children:     []*dtos.NavLink{},
 	})
-
-	// 	if c.OrgRole == models.ROLE_ADMIN {
-	// 		navTree = append(navTree, &dtos.NavLink{
-	// 			Text:       "Backup Management",
-	// 			Id:         "backup",
-	// 			Url:        setting.AppSubUrl + "/backup",
-	// 			Icon:       "history",
-	// 			SortWeight: dtos.WeightBackup,
-	// 		})
-	// 	}
 
 	return navTree, nil
 }

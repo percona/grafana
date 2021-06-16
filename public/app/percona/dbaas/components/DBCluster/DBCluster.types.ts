@@ -6,6 +6,8 @@ import { DBClusterService } from './DBCluster.service';
 
 export type AddDBClusterAction = (dbCluster: DBCluster) => void;
 export type GetDBClustersAction = () => void;
+export type SetDBClustersLoadingAction = (loading: boolean) => void;
+export type ManageDBClusters = [DBCluster[], GetDBClustersAction, SetDBClustersLoadingAction, boolean];
 
 export interface DBClusterProps {
   kubernetes: Kubernetes[];
@@ -26,6 +28,7 @@ export interface DBCluster {
   finishedSteps?: number;
   totalSteps?: number;
   databaseImage?: string;
+  expose?: boolean;
 }
 
 export enum DBClusterStatus {
@@ -52,6 +55,10 @@ export type OperatorDatabasesMap = {
 
 export type DatabaseOperatorsMap = {
   [key in Operators]: Databases;
+};
+
+export type ActiveOperatorsMap = {
+  [key in Operators]?: boolean;
 };
 
 export interface DBClusterConnection {
@@ -126,6 +133,8 @@ export interface DBClusterPayload {
   params: DBClusterParamsAPI;
   suspend?: boolean;
   resume?: boolean;
+  expose?: boolean;
+  exposed?: boolean;
 }
 
 export interface DBClusterActionAPI {
