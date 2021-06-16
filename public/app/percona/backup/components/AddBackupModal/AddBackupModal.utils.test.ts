@@ -14,7 +14,7 @@ describe('AddBackupModal::utils', () => {
         backupName: '',
         description: '',
         location: null as any,
-        retryMode: RetryMode.AUTO,
+        retryMode: RetryMode.MANUAL,
         retryTimes: 2,
         retryInterval: 30,
         period: { value: 'year', label: 'Year' },
