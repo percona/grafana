@@ -276,6 +276,10 @@ export class DashboardModel {
       this.events.emit(snapshotCreated);
     }
 
+    if (forceRefresh) {
+      this.events.emit(snapshotCreated);
+    }
+
     if (this.panelInEdit) {
       this.panelInEdit.refresh();
       return;
