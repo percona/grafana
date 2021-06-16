@@ -146,6 +146,7 @@ export const ScheduledBackups: FC = () => {
     setActionPending(true);
     try {
       await ScheduledBackupsService.toggle(id, !enabled);
+      getData();
     } catch (e) {
       logger.error(e);
     } finally {
