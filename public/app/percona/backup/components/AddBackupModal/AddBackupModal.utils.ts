@@ -101,7 +101,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       location: { label: locationName, value: locationId },
       retryMode: retryMode || RetryMode.MANUAL,
       retryTimes: retryTimes || 2,
-      retryInterval: parseInt(retryInterval || '0', 10),
+      retryInterval: parseInt(retryInterval || '30', 10),
       period,
       month,
       day,
