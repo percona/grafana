@@ -3,11 +3,12 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { Field, withTypes } from 'react-final-form';
 import { Modal, LoaderButton, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
-import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { RestoreBackupModalProps, RestoreBackupFormProps, ServiceTypeSelect } from './RestoreBackupModal.types';
 import { Messages } from './RestoreBackupModal.messages';
 import { getStyles } from './RestoreBackupModal.styles';
 import { toFormProps } from './RestoreBackupModal.utils';
+import { RestoreBackupModalService } from './RestoreBackupModal.service';
 
 const { Form } = withTypes<RestoreBackupFormProps>();
 
@@ -48,7 +49,6 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
             <div className={styles.formHalvesContainer}>
               <div>
                 <RadioButtonGroupField
-                  disabled
                   className={styles.radioGroup}
                   options={serviceTypeOptions}
                   name="serviceType"
@@ -61,10 +61,11 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                 <Field name="service" validate={validators.required}>
                   {({ input }) => (
                     <div>
-                      <SelectField
+                      <AsyncSelectField
                         label={Messages.serviceName}
                         disabled={values.serviceType === ServiceTypeSelect.SAME}
-                        options={[]}
+                        loadOptions={() => RestoreBackupModalService.loadLocationOptions(backup!.id)}
+                        defaultOptions
                         {...input}
                         data-qa="service-select-input"
                       />
