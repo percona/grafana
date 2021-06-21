@@ -43,7 +43,7 @@ export const ScheduledBackupsService = {
         locationName: location_name,
         serviceId: service_id,
         serviceName: service_name,
-        lastBackup: new Date(last_run).getTime(),
+        lastBackup: last_run ? new Date(last_run).getTime() : undefined,
         dataModel: data_model,
         description,
         type: BackupType.FULL,

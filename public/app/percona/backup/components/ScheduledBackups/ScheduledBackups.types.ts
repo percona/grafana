@@ -15,7 +15,7 @@ export interface RawScheduledBackup {
   retry_interval: string;
   retry_times: number;
   vendor: Databases;
-  last_run: string;
+  last_run?: string;
   data_model: DataModel;
   enabled: boolean;
 }
@@ -35,7 +35,7 @@ export interface ScheduledBackup {
   start: number;
   retention: number;
   cronExpression: string;
-  lastBackup: number;
+  lastBackup?: number;
   dataModel: DataModel;
   description: string;
   type: BackupType;

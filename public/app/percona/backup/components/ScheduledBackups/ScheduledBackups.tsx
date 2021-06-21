@@ -45,7 +45,7 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.lastBackup,
         accessor: 'lastBackup',
-        Cell: ({ value }) => <DetailedDate date={value} />,
+        Cell: ({ value }) => (value ? <DetailedDate date={value} /> : ''),
       },
     ],
     []
