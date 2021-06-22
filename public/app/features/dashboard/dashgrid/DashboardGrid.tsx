@@ -15,7 +15,7 @@ import { GRID_CELL_HEIGHT, GRID_CELL_VMARGIN, GRID_COLUMN_COUNT } from 'app/core
 import { DashboardPanel } from './DashboardPanel';
 import { DashboardModel, PanelModel } from '../state';
 import { CoreEvents } from 'app/types';
-import { panelAdded, panelRemoved } from '../state/PanelModel';
+import { panelAdded, panelRemoved, snapshotCreated } from '../state/PanelModel';
 
 let lastGridWidth = 1200;
 let ignoreNextWidthChange = false;
@@ -110,6 +110,7 @@ export class DashboardGrid extends PureComponent<Props> {
 
     dashboard.on(panelAdded, this.triggerForceUpdate);
     dashboard.on(panelRemoved, this.triggerForceUpdate);
+    dashboard.on(snapshotCreated, this.triggerForceUpdate);
     dashboard.on(CoreEvents.repeatsProcessed, this.triggerForceUpdate);
     dashboard.on(CoreEvents.rowCollapsed, this.triggerForceUpdate);
     dashboard.on(CoreEvents.rowExpanded, this.triggerForceUpdate);
@@ -119,6 +120,7 @@ export class DashboardGrid extends PureComponent<Props> {
     const { dashboard } = this.props;
     dashboard.off(panelAdded, this.triggerForceUpdate);
     dashboard.off(panelRemoved, this.triggerForceUpdate);
+    dashboard.on(snapshotCreated, this.triggerForceUpdate);
     dashboard.off(CoreEvents.repeatsProcessed, this.triggerForceUpdate);
     dashboard.off(CoreEvents.rowCollapsed, this.triggerForceUpdate);
     dashboard.off(CoreEvents.rowExpanded, this.triggerForceUpdate);
@@ -201,7 +203,9 @@ export class DashboardGrid extends PureComponent<Props> {
   };
 
   isInView = (panel: PanelModel): boolean => {
-    if (panel.isViewing || panel.isEditing) {
+    // @ts-ignore
+    // Need forceRefresh to ignore lazyLoading for snapshot creation purposes
+    if (panel.isViewing || panel.isEditing || window.forceRefresh) {
       return true;
     }
 
