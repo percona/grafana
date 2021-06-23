@@ -1,7 +1,7 @@
 import { CancelToken } from 'axios';
 import { api } from 'app/percona/shared/helpers/api';
 import { ScheduledBackup, ScheduledBackupResponse } from './ScheduledBackups.types';
-import { BackupType } from '../../Backup.types';
+import { BackupType, RetryMode } from '../../Backup.types';
 
 const BASE_URL = '/v1/management/backup/Backups';
 
@@ -53,5 +53,55 @@ export const ScheduledBackupsService = {
         enabled,
       })
     );
+  },
+  async schedule(
+    serviceId: string,
+    locationId: string,
+    cronExpression: string,
+    name: string,
+    description: string,
+    retryMode: RetryMode,
+    retryInterval: string,
+    retryTimes: number,
+    enabled: boolean
+  ) {
+    return api.post(`${BASE_URL}/Schedule`, {
+      service_id: serviceId,
+      location_id: locationId,
+      cron_expression: cronExpression,
+      name,
+      description,
+      retry_mode: retryMode,
+      retry_interval: retryInterval,
+      retry_times: retryTimes,
+      enabled: !!enabled,
+    });
+  },
+  async toggle(id: string, enabled: boolean) {
+    return api.post(`${BASE_URL}/ChangeScheduled`, { scheduled_backup_id: id, enabled });
+  },
+  async delete(id: string) {
+    return api.post(`${BASE_URL}/RemoveScheduled`, { scheduled_backup_id: id });
+  },
+  async change(
+    id: string,
+    enabled: boolean,
+    cronExpression: string,
+    name: string,
+    description: string,
+    retryMode: RetryMode,
+    retryInterval: string,
+    retryTimes: number
+  ) {
+    return api.post(`${BASE_URL}/ChangeScheduled`, {
+      scheduled_backup_id: id,
+      enabled,
+      cron_expression: cronExpression,
+      name,
+      description,
+      retry_mode: retryMode,
+      retry_interval: retryInterval,
+      retry_times: retryTimes,
+    });
   },
 };
