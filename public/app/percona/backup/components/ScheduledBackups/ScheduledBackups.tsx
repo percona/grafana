@@ -18,12 +18,16 @@ import { getStyles } from './ScheduledBackups.styles';
 import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 import { ScheduledBackupsActions } from './ScheduledBackupsActions';
+import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
   const [pending, setPending] = useState(false);
   const [actionPending, setActionPending] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
+  const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
   const columns = useMemo(
@@ -61,7 +65,14 @@ export const ScheduledBackups: FC = () => {
         accessor: 'id',
         width: '150px',
         Cell: ({ row }) => (
-          <ScheduledBackupsActions pending={actionPending} backup={row.original} onCopy={handleCopy} />
+          <ScheduledBackupsActions
+            pending={actionPending}
+            backup={row.original}
+            onToggle={handleToggle}
+            onDelete={onDeleteClick}
+            onEdit={onEditClick}
+            onCopy={handleCopy}
+          />
         ),
       },
     ],
@@ -100,6 +111,7 @@ export const ScheduledBackups: FC = () => {
   const handleBackup = async (backup: AddBackupFormProps) => {
     try {
       const {
+        id,
         service,
         location,
         period,
@@ -123,19 +135,34 @@ export const ScheduledBackups: FC = () => {
         startHour!.map(m => m.value!),
         startMinute!.map(m => m.value!)
       );
+      const strRetryInterval = `${retryInterval}s`;
 
-      await ScheduledBackupsService.schedule(
-        service.value?.id!,
-        location.value!,
-        cronExpression,
-        backupName,
-        description,
-        retryMode!,
-        `${retryInterval}s`,
-        retryTimes!,
-        active!
-      );
+      if (id) {
+        await ScheduledBackupsService.change(
+          id,
+          active!,
+          cronExpression,
+          backupName,
+          description,
+          retryMode!,
+          strRetryInterval,
+          retryTimes!
+        );
+      } else {
+        await ScheduledBackupsService.schedule(
+          service.value?.id!,
+          location.value!,
+          cronExpression,
+          backupName,
+          description,
+          retryMode!,
+          strRetryInterval,
+          retryTimes!,
+          active!
+        );
+      }
       setBackupModalVisible(false);
+      setSelectedBackup(null);
       getData();
     } catch (e) {
       logger.error(e);
@@ -175,6 +202,47 @@ export const ScheduledBackups: FC = () => {
     }
   };
 
+  const handleToggle = async ({ id, enabled }: ScheduledBackup) => {
+    setActionPending(true);
+    try {
+      await ScheduledBackupsService.toggle(id, !enabled);
+      getData();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setActionPending(false);
+    }
+  };
+
+  const onDeleteClick = (backup: ScheduledBackup) => {
+    setDeleteModalVisible(true);
+    setSelectedBackup(backup);
+  };
+
+  const handleDelete = async () => {
+    setDeletePending(true);
+    try {
+      await ScheduledBackupsService.delete(selectedBackup?.id!);
+      setDeleteModalVisible(false);
+      setSelectedBackup(null);
+      getData();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setDeletePending(false);
+    }
+  };
+
+  const onEditClick = (backup: ScheduledBackup) => {
+    setSelectedBackup(backup);
+    setBackupModalVisible(true);
+  };
+
+  const onAddClick = () => {
+    setSelectedBackup(null);
+    setBackupModalVisible(true);
+  };
+
   useEffect(() => {
     getData();
   }, []);
@@ -187,7 +255,7 @@ export const ScheduledBackups: FC = () => {
           icon="plus-square"
           variant="link"
           data-qa="scheduled-backup-add-modal-button"
-          onClick={() => setBackupModalVisible(true)}
+          onClick={onAddClick}
         >
           {Messages.add}
         </Button>
@@ -202,10 +270,18 @@ export const ScheduledBackups: FC = () => {
       />
       <AddBackupModal
         scheduleMode
-        backup={null}
+        backup={selectedBackup}
         isVisible={backupModalVisible}
         onClose={handleClose}
         onBackup={handleBackup}
+      />
+      <DeleteModal
+        title={Messages.scheduledBackups.deleteModalTitle}
+        isVisible={deleteModalVisible}
+        setVisible={setDeleteModalVisible}
+        onDelete={handleDelete}
+        loading={deletePending}
+        message={Messages.scheduledBackups.getDeleteMessage(selectedBackup?.name!)}
       />
     </>
   );

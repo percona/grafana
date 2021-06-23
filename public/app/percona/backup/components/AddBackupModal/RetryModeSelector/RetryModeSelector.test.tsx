@@ -1,12 +1,16 @@
 import React from 'react';
+import { mount } from 'enzyme';
 import { RetryModeSelector } from './RetryModeSelector';
-import { NumberInputField, RadioButtonGroupField } from '@percona/platform-core';
+import { FormWrapper, NumberInputField, RadioButtonGroupField } from '@percona/platform-core';
 import { RetryMode } from 'app/percona/backup/Backup.types';
-import { getFormWrapper } from 'app/percona/shared/helpers/testUtils';
 
 describe('RetryModeSelector', () => {
   it('should render', () => {
-    const wrapper = getFormWrapper(<RetryModeSelector retryMode={RetryMode.MANUAL} />);
+    const wrapper = mount(
+      <FormWrapper>
+        <RetryModeSelector retryMode={RetryMode.AUTO} />
+      </FormWrapper>
+    );
     expect(wrapper.find(RadioButtonGroupField)).toHaveLength(1);
     expect(wrapper.find(NumberInputField)).toHaveLength(2);
     expect(
@@ -16,14 +20,38 @@ describe('RetryModeSelector', () => {
         .prop('disabled')
     ).toBeFalsy();
   });
-});
 
-it('should disable number inputs when retry mode is AUTO', () => {
-  const wrapper = getFormWrapper(<RetryModeSelector retryMode={RetryMode.AUTO} />);
-  expect(
-    wrapper
-      .find(NumberInputField)
-      .at(0)
-      .prop('disabled')
-  ).toBeTruthy();
+  it('should disable number inputs when retry mode is MANUAL', () => {
+    const wrapper = mount(
+      <FormWrapper>
+        <RetryModeSelector retryMode={RetryMode.MANUAL} />
+      </FormWrapper>
+    );
+    expect(
+      wrapper
+        .find(NumberInputField)
+        .at(0)
+        .prop('disabled')
+    ).toBeTruthy();
+  });
+
+  it('should disable all fields when disabled is passed, even if retry mode is AUTO', () => {
+    const wrapper = mount(
+      <FormWrapper>
+        <RetryModeSelector disabled retryMode={RetryMode.AUTO} />
+      </FormWrapper>
+    );
+    expect(
+      wrapper
+        .find(RadioButtonGroupField)
+        .at(0)
+        .prop('disabled')
+    ).toBeTruthy();
+    expect(
+      wrapper
+        .find(NumberInputField)
+        .at(0)
+        .prop('disabled')
+    ).toBeTruthy();
+  });
 });

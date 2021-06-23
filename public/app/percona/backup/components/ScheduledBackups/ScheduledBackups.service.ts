@@ -77,4 +77,31 @@ export const ScheduledBackupsService = {
       enabled: !!enabled,
     });
   },
+  async toggle(id: string, enabled: boolean) {
+    return api.post(`${BASE_URL}/ChangeScheduled`, { scheduled_backup_id: id, enabled });
+  },
+  async delete(id: string) {
+    return api.post(`${BASE_URL}/RemoveScheduled`, { scheduled_backup_id: id });
+  },
+  async change(
+    id: string,
+    enabled: boolean,
+    cronExpression: string,
+    name: string,
+    description: string,
+    retryMode: RetryMode,
+    retryInterval: string,
+    retryTimes: number
+  ) {
+    return api.post(`${BASE_URL}/ChangeScheduled`, {
+      scheduled_backup_id: id,
+      enabled,
+      cron_expression: cronExpression,
+      name,
+      description,
+      retry_mode: retryMode,
+      retry_interval: retryInterval,
+      retry_times: retryTimes,
+    });
+  },
 };
