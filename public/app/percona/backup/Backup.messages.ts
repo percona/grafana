@@ -73,6 +73,8 @@ export const Messages = {
         actions: 'Actions',
       },
     },
+    deleteModalTitle: 'Delete scheduled backup',
+    getDeleteMessage: (name: string) => `Are you sure you want to delete the scheduled backup "${name}"?`,
   },
   status: {
     invalid: 'Invalid',

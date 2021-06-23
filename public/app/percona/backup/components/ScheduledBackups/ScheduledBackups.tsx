@@ -18,12 +18,15 @@ import { getStyles } from './ScheduledBackups.styles';
 import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 import { ScheduledBackupsActions } from './ScheduledBackupsActions';
+import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
   const [pending, setPending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
   const columns = useMemo(
@@ -60,7 +63,9 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.actions,
         accessor: 'id',
         width: '150px',
-        Cell: ({ row }) => <ScheduledBackupsActions backup={row.original} onEdit={onEditClick} />,
+        Cell: ({ row }) => (
+          <ScheduledBackupsActions backup={row.original} onDelete={onDeleteClick} onEdit={onEditClick} />
+        ),
       },
     ],
     []
@@ -156,6 +161,24 @@ export const ScheduledBackups: FC = () => {
     }
   };
 
+  const onDeleteClick = (backup: ScheduledBackup) => {
+    setDeleteModalVisible(true);
+    setSelectedBackup(backup);
+  };
+
+  const handleDelete = async () => {
+    setDeletePending(true);
+    try {
+      await ScheduledBackupsService.delete(selectedBackup?.id!);
+      setDeleteModalVisible(false);
+      setSelectedBackup(null);
+      getData();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setDeletePending(false);
+    }
+  };
   const onEditClick = (backup: ScheduledBackup) => {
     setSelectedBackup(backup);
     setBackupModalVisible(true);
@@ -197,6 +220,14 @@ export const ScheduledBackups: FC = () => {
         isVisible={backupModalVisible}
         onClose={handleClose}
         onBackup={handleBackup}
+      />
+      <DeleteModal
+        title={Messages.scheduledBackups.deleteModalTitle}
+        isVisible={deleteModalVisible}
+        setVisible={setDeleteModalVisible}
+        onDelete={handleDelete}
+        loading={deletePending}
+        message={Messages.scheduledBackups.getDeleteMessage(selectedBackup?.name!)}
       />
     </>
   );
