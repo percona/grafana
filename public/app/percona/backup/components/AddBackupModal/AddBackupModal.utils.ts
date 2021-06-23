@@ -35,14 +35,15 @@ const isScheduledBackup = (backup: Backup | ScheduledBackup): backup is Schedule
 export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackupFormProps => {
   if (!backup) {
     return {
+      id: '',
       service: (null as unknown) as SelectableValue<SelectableService>,
       dataModel: DataModel.PHYSICAL,
       backupName: '',
       description: '',
       location: (null as unknown) as SelectableValue<string>,
-      retryMode: RetryMode.AUTO,
-      retryTimes: 1,
-      retryInterval: 1,
+      retryMode: RetryMode.MANUAL,
+      retryTimes: 2,
+      retryInterval: 30,
       period: { value: 'year', label: 'Year' },
       month: [],
       day: [],
@@ -65,6 +66,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     retryMode,
     retryTimes,
     retryInterval,
+    id,
   } = backup;
 
   let month: Array<SelectableValue<number>> = [];
@@ -91,14 +93,15 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     period = getOptionFromPeriodType(periodType);
 
     return {
+      id,
       service: { label: serviceName, value: { id: serviceId, vendor } },
       dataModel,
       backupName: name,
       description,
       location: { label: locationName, value: locationId },
-      retryMode: retryMode!,
-      retryTimes: retryTimes!,
-      retryInterval: parseInt(retryInterval || '0', 10),
+      retryMode: retryMode || RetryMode.MANUAL,
+      retryTimes: retryTimes || 2,
+      retryInterval: parseInt(retryInterval || '30', 10),
       period,
       month,
       day,
@@ -110,6 +113,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     };
   } else {
     return {
+      id,
       service: { label: serviceName, value: { id: serviceId, vendor } },
       dataModel,
       backupName: name,
