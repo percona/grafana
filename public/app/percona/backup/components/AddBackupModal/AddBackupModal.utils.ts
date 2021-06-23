@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { DataModel } from 'app/percona/backup/Backup.types';
 import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
 import { Backup } from '../BackupInventory/BackupInventory.types';
@@ -41,9 +41,6 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       backupName: '',
       description: '',
       location: (null as unknown) as SelectableValue<string>,
-      retryMode: RetryMode.MANUAL,
-      retryTimes: 2,
-      retryInterval: 30,
       period: { value: 'year', label: 'Year' },
       month: [],
       day: [],
@@ -55,19 +52,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     };
   }
 
-  const {
-    name,
-    serviceName,
-    serviceId,
-    vendor,
-    dataModel,
-    locationName,
-    locationId,
-    retryMode,
-    retryTimes,
-    retryInterval,
-    id,
-  } = backup;
+  const { name, serviceName, serviceId, vendor, dataModel, locationName, locationId, id } = backup;
 
   let month: Array<SelectableValue<number>> = [];
   let day: Array<SelectableValue<number>> = [];
@@ -99,9 +84,6 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       backupName: name,
       description,
       location: { label: locationName, value: locationId },
-      retryMode: retryMode || RetryMode.MANUAL,
-      retryTimes: retryTimes || 2,
-      retryInterval: parseInt(retryInterval || '30', 10),
       period,
       month,
       day,

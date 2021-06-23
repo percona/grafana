@@ -1,5 +1,5 @@
 import { Databases } from 'app/percona/shared/core';
-import { DataModel, BackupStatus, RetryMode } from '../../Backup.types';
+import { DataModel, BackupStatus } from '../../Backup.types';
 export interface Backup {
   id: string;
   name: string;
@@ -11,9 +11,6 @@ export interface Backup {
   dataModel: DataModel;
   status: BackupStatus;
   vendor: Databases;
-  retryMode?: RetryMode;
-  retryInterval?: string;
-  retryTimes?: number;
 }
 
 export interface RawBackup {

@@ -27,9 +27,7 @@ import {
 } from './AddBackupModal.constants';
 import { getStyles } from './AddBackupModal.styles';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
-import { RetryModeSelector } from './RetryModeSelector';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
-import { RetryMode } from '../../Backup.types';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
@@ -100,7 +98,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               label={Messages.dataModel}
               fullWidth
             />
-            {!scheduleMode && <RetryModeSelector disabled retryMode={RetryMode.MANUAL} />}
+            {/* {!scheduleMode && <RetryModeSelector disabled retryMode={RetryMode.MANUAL} />} */}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
               <div className={styles.advancedGroup} data-qa="advanced-backup-fields">
@@ -199,9 +197,9 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                       )}
                     </Field>
                   </div>
-                  <div className={styles.advancedRow}>
+                  {/* <div className={styles.advancedRow}>
                     <RetryModeSelector retryMode={values.retryMode} />
-                  </div>
+                  </div> */}
                   <div className={styles.advancedRow}>
                     {/* <CheckboxField fieldClassName={styles.checkbox} name="logs" label={Messages.fullLogs} /> */}
                     <CheckboxField fieldClassName={styles.checkbox} name="active" label={Messages.enabled} />
