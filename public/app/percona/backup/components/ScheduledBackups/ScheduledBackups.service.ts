@@ -77,6 +77,9 @@ export const ScheduledBackupsService = {
       enabled: !!enabled,
     });
   },
+  async toggle(id: string, enabled: boolean) {
+    return api.post(`${BASE_URL}/ChangeScheduled`, { scheduled_backup_id: id, enabled });
+  },
   async delete(id: string) {
     return api.post(`${BASE_URL}/RemoveScheduled`, { scheduled_backup_id: id });
   },

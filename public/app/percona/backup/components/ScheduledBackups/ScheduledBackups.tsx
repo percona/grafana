@@ -23,10 +23,11 @@ import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal'
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
   const [pending, setPending] = useState(false);
+  const [actionPending, setActionPending] = useState(false);
+  const [deletePending, setDeletePending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [deletePending, setDeletePending] = useState(false);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
   const columns = useMemo(
@@ -64,7 +65,13 @@ export const ScheduledBackups: FC = () => {
         accessor: 'id',
         width: '150px',
         Cell: ({ row }) => (
-          <ScheduledBackupsActions backup={row.original} onDelete={onDeleteClick} onEdit={onEditClick} />
+          <ScheduledBackupsActions
+            pending={actionPending}
+            backup={row.original}
+            onToggle={handleToggle}
+            onDelete={onDeleteClick}
+            onEdit={onEditClick}
+          />
         ),
       },
     ],
@@ -161,6 +168,18 @@ export const ScheduledBackups: FC = () => {
     }
   };
 
+  const handleToggle = async ({ id, enabled }: ScheduledBackup) => {
+    setActionPending(true);
+    try {
+      await ScheduledBackupsService.toggle(id, !enabled);
+      getData();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setActionPending(false);
+    }
+  };
+
   const onDeleteClick = (backup: ScheduledBackup) => {
     setDeleteModalVisible(true);
     setSelectedBackup(backup);
@@ -179,6 +198,7 @@ export const ScheduledBackups: FC = () => {
       setDeletePending(false);
     }
   };
+
   const onEditClick = (backup: ScheduledBackup) => {
     setSelectedBackup(backup);
     setBackupModalVisible(true);
