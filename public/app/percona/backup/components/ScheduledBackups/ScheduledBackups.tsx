@@ -71,6 +71,7 @@ export const ScheduledBackups: FC = () => {
             onToggle={handleToggle}
             onDelete={onDeleteClick}
             onEdit={onEditClick}
+            onCopy={handleCopy}
           />
         ),
       },
@@ -165,6 +166,39 @@ export const ScheduledBackups: FC = () => {
       getData();
     } catch (e) {
       logger.error(e);
+    }
+  };
+
+  const handleCopy = async (backup: ScheduledBackup) => {
+    setActionPending(true);
+    try {
+      const {
+        serviceId,
+        locationId,
+        cronExpression,
+        name,
+        description,
+        retryMode,
+        retryInterval,
+        retryTimes,
+        enabled,
+      } = backup;
+      await ScheduledBackupsService.schedule(
+        serviceId,
+        locationId,
+        cronExpression,
+        name,
+        description,
+        retryMode,
+        retryInterval,
+        retryTimes,
+        enabled
+      );
+      getData();
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setActionPending(false);
     }
   };
 
