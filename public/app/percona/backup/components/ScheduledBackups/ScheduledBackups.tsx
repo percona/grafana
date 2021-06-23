@@ -63,7 +63,9 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.actions,
         accessor: 'id',
         width: '150px',
-        Cell: ({ row }) => <ScheduledBackupsActions backup={row.original} onDelete={onDeleteClick} />,
+        Cell: ({ row }) => (
+          <ScheduledBackupsActions backup={row.original} onDelete={onDeleteClick} onEdit={onEditClick} />
+        ),
       },
     ],
     []
@@ -101,6 +103,7 @@ export const ScheduledBackups: FC = () => {
   const handleBackup = async (backup: AddBackupFormProps) => {
     try {
       const {
+        id,
         service,
         location,
         period,
@@ -124,19 +127,34 @@ export const ScheduledBackups: FC = () => {
         startHour!.map(m => m.value!),
         startMinute!.map(m => m.value!)
       );
+      const strRetryInterval = `${retryInterval}s`;
 
-      await ScheduledBackupsService.schedule(
-        service.value?.id!,
-        location.value!,
-        cronExpression,
-        backupName,
-        description,
-        retryMode!,
-        `${retryInterval}s`,
-        retryTimes!,
-        active!
-      );
+      if (id) {
+        await ScheduledBackupsService.change(
+          id,
+          active!,
+          cronExpression,
+          backupName,
+          description,
+          retryMode!,
+          strRetryInterval,
+          retryTimes!
+        );
+      } else {
+        await ScheduledBackupsService.schedule(
+          service.value?.id!,
+          location.value!,
+          cronExpression,
+          backupName,
+          description,
+          retryMode!,
+          strRetryInterval,
+          retryTimes!,
+          active!
+        );
+      }
       setBackupModalVisible(false);
+      setSelectedBackup(null);
       getData();
     } catch (e) {
       logger.error(e);
@@ -161,6 +179,15 @@ export const ScheduledBackups: FC = () => {
       setDeletePending(false);
     }
   };
+  const onEditClick = (backup: ScheduledBackup) => {
+    setSelectedBackup(backup);
+    setBackupModalVisible(true);
+  };
+
+  const onAddClick = () => {
+    setSelectedBackup(null);
+    setBackupModalVisible(true);
+  };
 
   useEffect(() => {
     getData();
@@ -174,7 +201,7 @@ export const ScheduledBackups: FC = () => {
           icon="plus-square"
           variant="link"
           data-qa="scheduled-backup-add-modal-button"
-          onClick={() => setBackupModalVisible(true)}
+          onClick={onAddClick}
         >
           {Messages.add}
         </Button>
@@ -189,7 +216,7 @@ export const ScheduledBackups: FC = () => {
       />
       <AddBackupModal
         scheduleMode
-        backup={null}
+        backup={selectedBackup}
         isVisible={backupModalVisible}
         onClose={handleClose}
         onBackup={handleBackup}

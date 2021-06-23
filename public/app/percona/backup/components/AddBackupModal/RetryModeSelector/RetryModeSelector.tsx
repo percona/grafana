@@ -8,24 +8,30 @@ import { RetryModeSelectorProps } from './RetryModeSelector.types';
 import { getStyles } from './RetryModeSelector.styles';
 import { retryValidator } from './RetryModeSelector.utils';
 
-export const RetryModeSelector = ({ retryMode }: RetryModeSelectorProps) => {
-  const disabledFields = retryMode === RetryMode.AUTO;
+export const RetryModeSelector = ({ retryMode, disabled = false }: RetryModeSelectorProps) => {
+  const disabledNumberInputs = retryMode === RetryMode.MANUAL || disabled;
   const styles = useStyles(getStyles);
 
   return (
     <div data-qa="retry-mode-selector">
-      <RadioButtonGroupField options={RETRY_MODE_OPTIONS} name="retryMode" label={Messages.retryMode} fullWidth />
+      <RadioButtonGroupField
+        options={RETRY_MODE_OPTIONS}
+        name="retryMode"
+        label={Messages.retryMode}
+        disabled={disabled}
+        fullWidth
+      />
       <div className={styles.retryFields}>
         <NumberInputField
           validators={[retryValidator]}
-          disabled={disabledFields}
+          disabled={disabledNumberInputs}
           fieldClassName={styles.retrySelect}
           name="retryTimes"
           label={Messages.retryTimes}
         />
         <NumberInputField
           validators={[retryValidator]}
-          disabled={disabledFields}
+          disabled={disabledNumberInputs}
           fieldClassName={styles.retrySelect}
           name="retryInterval"
           label={Messages.retryInterval}
