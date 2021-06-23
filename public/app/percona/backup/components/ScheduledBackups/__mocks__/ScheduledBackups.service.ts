@@ -1,4 +1,4 @@
-import { BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupType, DataModel } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import * as service from '../ScheduledBackups.service';
 import { ScheduledBackup } from '../ScheduledBackups.types';
@@ -19,9 +19,6 @@ export const stubs: ScheduledBackup[] = [
     dataModel: DataModel.PHYSICAL,
     description: 'Description',
     type: BackupType.FULL,
-    retryMode: RetryMode.MANUAL,
-    retryInterval: '10s',
-    retryTimes: 1,
     enabled: true,
   },
   {
@@ -39,9 +36,6 @@ export const stubs: ScheduledBackup[] = [
     dataModel: DataModel.LOGICAL,
     description: 'Description',
     type: BackupType.FULL,
-    retryMode: RetryMode.AUTO,
-    retryInterval: '0s',
-    retryTimes: 1,
     enabled: true,
   },
 ];

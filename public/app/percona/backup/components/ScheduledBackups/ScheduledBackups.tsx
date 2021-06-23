@@ -122,9 +122,6 @@ export const ScheduledBackups: FC = () => {
         startMinute,
         backupName,
         description,
-        retryMode,
-        retryInterval,
-        retryTimes,
         active,
       } = backup;
       const cronExpression = getCronStringFromValues(
@@ -135,19 +132,9 @@ export const ScheduledBackups: FC = () => {
         startHour!.map(m => m.value!),
         startMinute!.map(m => m.value!)
       );
-      const strRetryInterval = `${retryInterval}s`;
 
       if (id) {
-        await ScheduledBackupsService.change(
-          id,
-          active!,
-          cronExpression,
-          backupName,
-          description,
-          retryMode!,
-          strRetryInterval,
-          retryTimes!
-        );
+        await ScheduledBackupsService.change(id, active!, cronExpression, backupName, description);
       } else {
         await ScheduledBackupsService.schedule(
           service.value?.id!,
@@ -155,9 +142,6 @@ export const ScheduledBackups: FC = () => {
           cronExpression,
           backupName,
           description,
-          retryMode!,
-          strRetryInterval,
-          retryTimes!,
           active!
         );
       }
@@ -172,28 +156,8 @@ export const ScheduledBackups: FC = () => {
   const handleCopy = async (backup: ScheduledBackup) => {
     setActionPending(true);
     try {
-      const {
-        serviceId,
-        locationId,
-        cronExpression,
-        name,
-        description,
-        retryMode,
-        retryInterval,
-        retryTimes,
-        enabled,
-      } = backup;
-      await ScheduledBackupsService.schedule(
-        serviceId,
-        locationId,
-        cronExpression,
-        name,
-        description,
-        retryMode,
-        retryInterval,
-        retryTimes,
-        enabled
-      );
+      const { serviceId, locationId, cronExpression, name, description, enabled } = backup;
+      await ScheduledBackupsService.schedule(serviceId, locationId, cronExpression, name, description, enabled);
       getData();
     } catch (e) {
       logger.error(e);
