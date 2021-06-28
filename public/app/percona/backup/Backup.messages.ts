@@ -74,6 +74,7 @@ export const Messages = {
       },
     },
     deleteModalTitle: 'Delete scheduled backup',
+    copyOf: 'Copy of',
     getDeleteMessage: (name: string) => `Are you sure you want to delete the scheduled backup "${name}"?`,
   },
   status: {
