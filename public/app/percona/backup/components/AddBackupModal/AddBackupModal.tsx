@@ -42,7 +42,6 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
 
   const handleSubmit = (values: AddBackupFormProps) => onBackup(values);
 
-  // TODO uncomment remaining fields when we support them
   return (
     <Modal title={scheduleMode ? Messages.scheduleTitle : Messages.title} isVisible={isVisible} onClose={onClose}>
       <Form
@@ -98,7 +97,6 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               label={Messages.dataModel}
               fullWidth
             />
-            {/* {!scheduleMode && <RetryModeSelector disabled retryMode={RetryMode.MANUAL} />} */}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
               <div className={styles.advancedGroup} data-qa="advanced-backup-fields">
@@ -197,11 +195,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                       )}
                     </Field>
                   </div>
-                  {/* <div className={styles.advancedRow}>
-                    <RetryModeSelector retryMode={values.retryMode} />
-                  </div> */}
                   <div className={styles.advancedRow}>
-                    {/* <CheckboxField fieldClassName={styles.checkbox} name="logs" label={Messages.fullLogs} /> */}
                     <CheckboxField fieldClassName={styles.checkbox} name="active" label={Messages.enabled} />
                   </div>
                 </div>
