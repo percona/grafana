@@ -155,9 +155,10 @@ export const ScheduledBackups: FC = () => {
 
   const handleCopy = async (backup: ScheduledBackup) => {
     const { serviceId, locationId, cronExpression, name, description, enabled } = backup;
+    const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
     setActionPending(true);
     try {
-      await ScheduledBackupsService.schedule(serviceId, locationId, cronExpression, name, description, enabled);
+      await ScheduledBackupsService.schedule(serviceId, locationId, cronExpression, newName, description, enabled);
       getData();
     } catch (e) {
       logger.error(e);
