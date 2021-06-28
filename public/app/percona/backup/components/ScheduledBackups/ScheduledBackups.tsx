@@ -109,21 +109,21 @@ export const ScheduledBackups: FC = () => {
   };
 
   const handleBackup = async (backup: AddBackupFormProps) => {
+    const {
+      id,
+      service,
+      location,
+      period,
+      month,
+      day,
+      weekDay,
+      startHour,
+      startMinute,
+      backupName,
+      description,
+      active,
+    } = backup;
     try {
-      const {
-        id,
-        service,
-        location,
-        period,
-        month,
-        day,
-        weekDay,
-        startHour,
-        startMinute,
-        backupName,
-        description,
-        active,
-      } = backup;
       const cronExpression = getCronStringFromValues(
         period!.value!,
         month!.map(m => m.value!),
@@ -154,9 +154,9 @@ export const ScheduledBackups: FC = () => {
   };
 
   const handleCopy = async (backup: ScheduledBackup) => {
+    const { serviceId, locationId, cronExpression, name, description, enabled } = backup;
     setActionPending(true);
     try {
-      const { serviceId, locationId, cronExpression, name, description, enabled } = backup;
       await ScheduledBackupsService.schedule(serviceId, locationId, cronExpression, name, description, enabled);
       getData();
     } catch (e) {
