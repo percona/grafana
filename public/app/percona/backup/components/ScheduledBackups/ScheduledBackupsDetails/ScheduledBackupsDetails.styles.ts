@@ -5,16 +5,14 @@ export const getStyles = ({ spacing, typography }: GrafanaTheme) => ({
   detailsWrapper: css`
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    margin-top: -${spacing.md};
 
     & > * {
-      flex: 1 0 calc(100% / 3);
+      flex: 1 0 50%;
 
       &:not(:last-child) {
-        padding-right: ${spacing.md};
-      }
-
-      &:not(:first-child) {
-        padding-left: ${spacing.md};
+        margin-top: ${spacing.md};
       }
     }
   `,
