@@ -47,8 +47,18 @@ describe('CheckPanel::', () => {
   it('should show tabs for all checks and for failed checks', async () => {
     const wrapper = await getMount(<CheckPanel />);
 
-    expect(wrapper.find('li').at(0).text()).toBe('Failed Checks');
-    expect(wrapper.find('li').at(1).text()).toBe('All Checks');
+    expect(
+      wrapper
+        .find('li')
+        .at(0)
+        .text()
+    ).toBe('Failed Checks');
+    expect(
+      wrapper
+        .find('li')
+        .at(1)
+        .text()
+    ).toBe('All Checks');
     wrapper.unmount();
   });
 });
