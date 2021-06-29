@@ -48,7 +48,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       startHour: [{ value: 0, label: '00' }],
       startMinute: [{ value: 0, label: '00' }],
       logs: false,
-      active: false,
+      active: true,
     };
   }
 
