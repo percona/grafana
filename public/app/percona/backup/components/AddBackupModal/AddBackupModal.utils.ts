@@ -27,6 +27,10 @@ export const PERIOD_OPTIONS: Array<SelectableValue<PeriodType>> = [
     value: 'hour',
     label: 'Hour',
   },
+  {
+    value: 'minute',
+    label: 'Minute',
+  },
 ];
 
 const isScheduledBackup = (backup: Backup | ScheduledBackup): backup is ScheduledBackup =>
