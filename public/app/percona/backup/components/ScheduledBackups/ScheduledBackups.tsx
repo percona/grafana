@@ -2,6 +2,7 @@ import React, { FC, useState, useMemo, useEffect } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Button, useStyles } from '@grafana/ui';
+import cronstrue from 'cronstrue';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -46,6 +47,7 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.frequency,
         accessor: 'cronExpression',
+        Cell: ({ value }) => cronstrue.toString(value),
       },
       {
         Header: Messages.scheduledBackups.table.columns.type,
@@ -99,6 +101,7 @@ export const ScheduledBackups: FC = () => {
         name={row.original.name}
         dataModel={row.original.dataModel}
         description={row.original.description}
+        cronExpression={row.original.cronExpression}
       />
     ),
     []

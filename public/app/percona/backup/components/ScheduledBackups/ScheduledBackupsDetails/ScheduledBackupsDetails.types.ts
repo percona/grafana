@@ -4,4 +4,5 @@ export interface ScheduledBackupDetailsProps {
   name: string;
   description: string;
   dataModel: DataModel;
+  cronExpression: string;
 }
