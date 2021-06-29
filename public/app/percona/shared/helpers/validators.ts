@@ -34,7 +34,7 @@ export const validators = {
   },
 
   validateEmail: (value: string) => {
-    const emailRe = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    const emailRe = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
 
     return emailRe.test(value) ? undefined : 'Invalid email address';
   },
@@ -71,6 +71,14 @@ export const validators = {
     }
 
     return 'Must include numbers';
+  },
+
+  maxLength: (numberOfCharacters: number) => (value: string) => {
+    if (value.length <= numberOfCharacters) {
+      return undefined;
+    }
+
+    return `Must contain at most ${numberOfCharacters} characters`;
   },
 
   minLength: (numberOfCharacters: number) => (value: string) => {
