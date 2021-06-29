@@ -44,7 +44,7 @@ export const ScheduledBackupsService = {
         dataModel: data_model,
         description,
         type: BackupType.FULL,
-        enabled,
+        enabled: !!enabled,
       })
     );
   },
