@@ -11,6 +11,7 @@ import { DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedO
 import { buildWarningMessage, newDBClusterService } from '../DBCluster.utils';
 import { getStyles } from './AddDBClusterModal.styles';
 import { FormRenderProps } from 'react-final-form';
+import { getActiveOperators, getDatabaseOptionFromOperator } from '../../Kubernetes/Kubernetes.utils';
 
 export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   kubernetes,
@@ -21,6 +22,17 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
 }) => {
   const styles = useStyles(getStyles);
 
+  const initialValues = useMemo(() => {
+    const activeOperators = getActiveOperators(kubernetes);
+
+    return {
+      ...INITIAL_VALUES,
+      [AddDBClusterFields.databaseType]:
+        activeOperators.length === 1
+          ? getDatabaseOptionFromOperator(activeOperators[0])
+          : { value: undefined, label: undefined },
+    };
+  }, [kubernetes]);
   const steps = useMemo(
     () => [
       {
@@ -55,6 +67,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
     memory,
     cpu,
     disk,
+    expose,
   }: Record<string, any>) => {
     try {
       const dbClusterService = newDBClusterService(databaseType.value);
@@ -68,6 +81,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
         memory,
         disk,
         databaseImage: databaseVersion.value,
+        expose,
       });
       setVisible(false);
       onDBClusterAdded();
@@ -88,7 +102,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
           )}
           <StepProgress
             steps={steps}
-            initialValues={INITIAL_VALUES}
+            initialValues={initialValues}
             submitButtonMessage={Messages.dbcluster.addModal.confirm}
             onSubmit={onSubmit}
           />
