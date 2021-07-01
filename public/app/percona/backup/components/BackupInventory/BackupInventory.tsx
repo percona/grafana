@@ -25,12 +25,14 @@ import {
   RESTORE_CANCEL_TOKEN,
   DATA_INTERVAL,
 } from './BackupInventory.constants';
+import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
   const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
@@ -66,7 +68,12 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.actions,
         accessor: 'id',
         Cell: ({ row }) => (
-          <BackupInventoryActions onRestore={onRestoreClick} onBackup={onBackupClick} backup={row.original as Backup} />
+          <BackupInventoryActions
+            onRestore={onRestoreClick}
+            onBackup={onBackupClick}
+            backup={row.original as Backup}
+            onDelete={onDeleteClick}
+          />
         ),
         width: '110px',
       },
@@ -76,6 +83,11 @@ export const BackupInventory: FC = () => {
   const styles = useStyles(getStyles);
 
   const onRestoreClick = (backup: Backup) => {
+    setSelectedBackup(backup);
+    setRestoreModalVisible(true);
+  };
+
+  const onDeleteClick = (backup: Backup) => {
     setSelectedBackup(backup);
     setRestoreModalVisible(true);
   };
@@ -94,6 +106,8 @@ export const BackupInventory: FC = () => {
       logger.error(e);
     }
   };
+
+  const handleDelete = async () => {};
 
   const getData = async (showLoading = false) => {
     showLoading && setPending(true);
@@ -184,6 +198,15 @@ export const BackupInventory: FC = () => {
         isVisible={backupModalVisible}
         onClose={handleClose}
         onBackup={handleBackup}
+      />
+      <DeleteModal
+        title={Messages.backupInventory.deleteModalTitle}
+        message={Messages.backupInventory.getDeleteMessage(selectedBackup!.name)}
+        isVisible={deleteModalVisible}
+        setVisible={setDeleteModalVisible}
+        forceLabel={Messages.backupInventory.deleteFromStorage}
+        onDelete={handleDelete}
+        showForce
       />
     </>
   );
