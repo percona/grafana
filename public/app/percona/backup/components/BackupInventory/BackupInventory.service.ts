@@ -57,4 +57,7 @@ export const BackupInventoryService = {
       token
     );
   },
+  async delete(artifactId: string, removeFiles: boolean) {
+    return api.post(`${BASE_URL}/Artifacts/Remove`, { artifact_id: artifactId, remove_files: removeFiles });
+  },
 };
