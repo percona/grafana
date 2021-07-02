@@ -13,9 +13,17 @@ import {
   DeleteKubernetesAction,
   NewKubernetesCluster,
   AddKubernetesAction,
+  CheckOperatorUpdateAPI,
+  OperatorsList,
+  Operator,
 } from './Kubernetes.types';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
-import { ADD_KUBERNETES_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from './Kubernetes.hooks.constants';
+import {
+  ADD_KUBERNETES_CANCEL_TOKEN,
+  CHECK_OPERATOR_UPDATE_CANCEL_TOKEN,
+  GET_KUBERNETES_CANCEL_TOKEN,
+} from './Kubernetes.hooks.constants';
+import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from './Kubernetes.constants';
 
 export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKubernetesAction, boolean] => {
   const [kubernetes, setKubernetes] = useState<Kubernetes[]>([]);
@@ -32,8 +40,11 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
       const results = (await KubernetesService.getKubernetes(
         generateToken(GET_KUBERNETES_CANCEL_TOKEN)
       )) as KubernetesListAPI;
+      const checkUpdateResults = await KubernetesService.checkForOperatorUpdate(
+        generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN)
+      );
 
-      setKubernetes(toModelList(results));
+      setKubernetes(toModelList(results, checkUpdateResults));
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -81,10 +92,37 @@ export const useKubernetes = (): [Kubernetes[], DeleteKubernetesAction, AddKuber
   return [kubernetes, deleteKubernetes, addKubernetes, loading];
 };
 
-const toModelList = (response: KubernetesListAPI): Kubernetes[] => (response.kubernetes_clusters ?? []).map(toModel);
+const toModelList = (response: KubernetesListAPI, checkUpdateResponse: CheckOperatorUpdateAPI): Kubernetes[] =>
+  (response.kubernetes_clusters ?? []).map(toModel(checkUpdateResponse));
 
-const toModel = (response: KubernetesAPI): Kubernetes => ({
-  kubernetesClusterName: response.kubernetes_cluster_name,
-  operators: response.operators,
-  status: response.status as KubernetesClusterStatus,
+const toModel = (checkUpdateResponse: CheckOperatorUpdateAPI) => ({
+  kubernetes_cluster_name,
+  operators,
+  status,
+}: KubernetesAPI): Kubernetes => ({
+  kubernetesClusterName: kubernetes_cluster_name,
+  operators: toModelOperators(kubernetes_cluster_name, operators, checkUpdateResponse),
+  status: status as KubernetesClusterStatus,
 });
+
+// adds avaiableVersion to operators dynamically
+const toModelOperators = (
+  kubernetesClusterName: string,
+  operators: OperatorsList,
+  { cluster_to_components }: CheckOperatorUpdateAPI
+): OperatorsList => {
+  const modelOperators = {} as OperatorsList;
+  const componentToUpdate = cluster_to_components[kubernetesClusterName].component_to_update_information;
+
+  Object.entries(operators).map(([operatorKey, operator]: [keyof OperatorsList, Operator]) => {
+    const component = OPERATOR_COMPONENT_TO_UPDATE_MAP[operatorKey];
+
+    modelOperators[operatorKey] = {
+      availableVersion:
+        componentToUpdate && componentToUpdate[component] ? componentToUpdate[component].available_version : undefined,
+      ...operator,
+    };
+  });
+
+  return modelOperators;
+};

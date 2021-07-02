@@ -1,3 +1,4 @@
+import { Operators } from '../DBCluster/AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from './OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 
@@ -7,6 +8,7 @@ export interface KubernetesListAPI {
 
 export interface Operator {
   status: KubernetesOperatorStatus;
+  availableVersion?: string;
 }
 
 export interface OperatorsList {
@@ -36,6 +38,30 @@ interface KubeAuth {
 export interface NewKubernetesClusterAPI {
   kubernetes_cluster_name: string;
   kube_auth: KubeAuth;
+}
+
+export interface CheckOperatorUpdateAPI {
+  cluster_to_components: {
+    [cluster: string]: ComponentToUpdateAPI;
+  };
+}
+
+export interface ComponentToUpdateAPI {
+  component_to_update_information: OperatorToUpdateAPI;
+}
+
+export interface OperatorToUpdateAPI {
+  [ComponentToUpdate.psmdb]: ComponentVersionAPI;
+  [ComponentToUpdate.pxc]: ComponentVersionAPI;
+}
+
+export interface ComponentVersionAPI {
+  available_version?: string;
+}
+
+export enum ComponentToUpdate {
+  psmdb = 'psmdb-operator',
+  pxc = 'pxc-operator',
 }
 
 export interface NewKubernetesCluster {
