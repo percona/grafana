@@ -75,7 +75,7 @@ export const BackupInventory: FC = () => {
             onDelete={onDeleteClick}
           />
         ),
-        width: '110px',
+        width: '150px',
       },
     ],
     []
@@ -89,7 +89,7 @@ export const BackupInventory: FC = () => {
 
   const onDeleteClick = (backup: Backup) => {
     setSelectedBackup(backup);
-    setRestoreModalVisible(true);
+    setDeleteModalVisible(true);
   };
 
   const handleClose = () => {
@@ -107,7 +107,15 @@ export const BackupInventory: FC = () => {
     }
   };
 
-  const handleDelete = async () => {};
+  const handleDelete = async (force = false) => {
+    try {
+      await BackupInventoryService.delete(selectedBackup!.id, force);
+      setDeleteModalVisible(false);
+      setSelectedBackup(null);
+    } catch (e) {
+      logger.error(e);
+    }
+  };
 
   const getData = async (showLoading = false) => {
     showLoading && setPending(true);
@@ -201,7 +209,7 @@ export const BackupInventory: FC = () => {
       />
       <DeleteModal
         title={Messages.backupInventory.deleteModalTitle}
-        message={Messages.backupInventory.getDeleteMessage(selectedBackup!.name)}
+        message={Messages.backupInventory.getDeleteMessage(selectedBackup?.name || '')}
         isVisible={deleteModalVisible}
         setVisible={setDeleteModalVisible}
         forceLabel={Messages.backupInventory.deleteFromStorage}
