@@ -7,6 +7,7 @@ export interface KubernetesListAPI {
 
 export interface Operator {
   status: KubernetesOperatorStatus;
+  version?: string;
   availableVersion?: string;
 }
 
