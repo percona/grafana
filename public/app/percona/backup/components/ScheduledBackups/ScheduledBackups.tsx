@@ -3,6 +3,8 @@ import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Button, useStyles } from '@grafana/ui';
 import cronstrue from 'cronstrue';
+import { AppEvents } from '@grafana/data';
+import { appEvents } from 'app/core/app_events';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -138,6 +140,7 @@ export const ScheduledBackups: FC = () => {
 
       if (id) {
         await ScheduledBackupsService.change(id, active!, cronExpression, backupName, description);
+        appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.getEditSuccess(backupName)]);
       } else {
         await ScheduledBackupsService.schedule(
           service.value?.id!,
@@ -147,6 +150,7 @@ export const ScheduledBackups: FC = () => {
           description,
           active!
         );
+        appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.addSuccess]);
       }
       setBackupModalVisible(false);
       setSelectedBackup(null);
@@ -191,6 +195,7 @@ export const ScheduledBackups: FC = () => {
     setDeletePending(true);
     try {
       await ScheduledBackupsService.delete(selectedBackup?.id!);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.storageLocations.getDeleteSuccess(selectedBackup!.name)]);
       setDeleteModalVisible(false);
       setSelectedBackup(null);
       getData();
