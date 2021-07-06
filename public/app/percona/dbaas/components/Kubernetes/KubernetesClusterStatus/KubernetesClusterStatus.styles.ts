@@ -35,7 +35,7 @@ export const getStyles = ({ colors, palette, spacing, typography }: GrafanaTheme
   statusUnavailable: css`
     background-color: ${colors.formSwitchBgActive};
   `,
-  InstallLinkIcon: css`
+  installLinkIcon: css`
     margin-left: ${spacing.xs};
   `,
 });
