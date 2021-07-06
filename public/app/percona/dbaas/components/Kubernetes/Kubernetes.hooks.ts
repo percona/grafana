@@ -96,12 +96,12 @@ const toModelList = (response: KubernetesListAPI, checkUpdateResponse: CheckOper
   (response.kubernetes_clusters ?? []).map(toModel(checkUpdateResponse));
 
 const toModel = (checkUpdateResponse: CheckOperatorUpdateAPI) => ({
-  kubernetes_cluster_name,
+  kubernetes_cluster_name: kubernetesClusterName,
   operators,
   status,
 }: KubernetesAPI): Kubernetes => ({
-  kubernetesClusterName: kubernetes_cluster_name,
-  operators: toModelOperators(kubernetes_cluster_name, operators, checkUpdateResponse),
+  kubernetesClusterName,
+  operators: toModelOperators(kubernetesClusterName, operators, checkUpdateResponse),
   status: status as KubernetesClusterStatus,
 });
 

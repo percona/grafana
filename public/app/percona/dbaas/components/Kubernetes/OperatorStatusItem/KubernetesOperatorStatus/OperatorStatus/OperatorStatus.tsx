@@ -33,7 +33,7 @@ export const OperatorStatus: FC<OperatorStatusProps> = ({ operator }) => {
         </span>
       )}
       {(status === Status.unavailable || showVersionAvailable) && (
-        <Icon name="external-link-alt" className={styles.InstallLinkIcon} />
+        <Icon name="external-link-alt" className={styles.installLinkIcon} />
       )}
     </span>
   );
