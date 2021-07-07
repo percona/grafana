@@ -195,7 +195,7 @@ export const ScheduledBackups: FC = () => {
     setDeletePending(true);
     try {
       await ScheduledBackupsService.delete(selectedBackup?.id!);
-      appEvents.emit(AppEvents.alertSuccess, [Messages.storageLocations.getDeleteSuccess(selectedBackup!.name)]);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.getDeleteSuccess(selectedBackup!.name)]);
       setDeleteModalVisible(false);
       setSelectedBackup(null);
       getData();
