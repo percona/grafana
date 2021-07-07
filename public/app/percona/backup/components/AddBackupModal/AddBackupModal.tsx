@@ -57,6 +57,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                       <AsyncSelectField
                         label={Messages.serviceName}
                         isSearchable={false}
+                        disabled={!!backup}
                         loadOptions={AddBackupModalService.loadServiceOptions}
                         defaultOptions
                         {...input}
@@ -80,6 +81,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                       <AsyncSelectField
                         label={Messages.location}
                         isSearchable={false}
+                        disabled={!!backup}
                         loadOptions={AddBackupModalService.loadLocationOptions}
                         defaultOptions
                         {...input}
