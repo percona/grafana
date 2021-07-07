@@ -112,6 +112,7 @@ export const BackupInventory: FC = () => {
       await BackupInventoryService.delete(selectedBackup!.id, force);
       setDeleteModalVisible(false);
       setSelectedBackup(null);
+      getData(true);
     } catch (e) {
       logger.error(e);
     }
