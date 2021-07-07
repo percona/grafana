@@ -32,6 +32,10 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({ backup
       <DBIcon
         tooltipText={Messages.deleteBackup}
         type="delete"
+        disabled={
+          backup.status === BackupStatus.BACKUP_STATUS_IN_PROGRESS ||
+          backup.status === BackupStatus.BACKUP_STATUS_PENDING
+        }
         data-qa="delete-backup-artifact-button"
         role="button"
         onClick={handleDelete}
