@@ -1,5 +1,5 @@
-import React, { FC, useState, useMemo, useEffect } from 'react';
-import { Column, Row } from 'react-table';
+import React, { FC, useState, useMemo, useEffect, useCallback } from 'react';
+import { Cell, Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { Button, useStyles } from '@grafana/ui';
 import cronstrue from 'cronstrue';
@@ -216,6 +216,14 @@ export const ScheduledBackups: FC = () => {
     setBackupModalVisible(true);
   };
 
+  const getCellProps = useCallback(
+    (cell: Cell<ScheduledBackup>) => ({
+      className: !cell.row.original.enabled ? styles.disabledRow : '',
+      key: cell.row.original.id,
+    }),
+    []
+  );
+
   useEffect(() => {
     getData();
   }, []);
@@ -240,6 +248,7 @@ export const ScheduledBackups: FC = () => {
         emptyMessage={Messages.scheduledBackups.table.noData}
         pendingRequest={pending}
         renderExpandedRow={renderSelectedSubRow}
+        getCellProps={getCellProps}
       />
       <AddBackupModal
         scheduleMode
