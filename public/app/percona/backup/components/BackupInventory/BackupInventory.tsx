@@ -215,6 +215,7 @@ export const BackupInventory: FC = () => {
         setVisible={setDeleteModalVisible}
         forceLabel={Messages.backupInventory.deleteFromStorage}
         onDelete={handleDelete}
+        initialForceValue={true}
         showForce
       />
     </>
