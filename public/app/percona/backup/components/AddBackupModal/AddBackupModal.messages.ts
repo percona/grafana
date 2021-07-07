@@ -1,6 +1,4 @@
 export const Messages = {
-  title: 'Backup on demand',
-  scheduleTitle: 'Schedule backup',
   serviceName: 'Service name',
   vendor: 'Vendor',
   dataModel: 'Data model',
@@ -9,6 +7,7 @@ export const Messages = {
   description: 'Description',
   location: 'Location',
   retryMode: 'Retry mode',
+  editAction: 'Edit',
   backupAction: 'Backup',
   scheduleAction: 'Schedule',
   cancelAction: 'Cancel',
@@ -21,4 +20,6 @@ export const Messages = {
   startTime: 'Start time, h/m',
   fullLogs: 'Full logs',
   enabled: 'Enabled',
+  getModalTitle: (scheduleMode: boolean, edit: boolean) =>
+    edit ? 'Edit backup' : scheduleMode ? 'Schedule backup' : 'Backup on demand',
 };
