@@ -43,7 +43,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
   const handleSubmit = (values: AddBackupFormProps) => onBackup(values);
 
   return (
-    <Modal title={scheduleMode ? Messages.scheduleTitle : Messages.title} isVisible={isVisible} onClose={onClose}>
+    <Modal title={Messages.getModalTitle(scheduleMode, !!backup)} isVisible={isVisible} onClose={onClose}>
       <Form
         initialValues={initialValues}
         onSubmit={handleSubmit}
@@ -211,7 +211,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 disabled={!valid || pristine}
                 loading={submitting}
               >
-                {scheduleMode ? Messages.scheduleAction : Messages.backupAction}
+                {!!backup ? Messages.editAction : scheduleMode ? Messages.scheduleAction : Messages.backupAction}
               </LoaderButton>
               <Button data-qa="storage-location-cancel-button" variant="secondary" onClick={onClose}>
                 {Messages.cancelAction}
