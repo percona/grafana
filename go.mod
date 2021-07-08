@@ -43,7 +43,6 @@ require (
 	github.com/google/go-cmp v0.5.4
 	github.com/google/uuid v1.2.0
 	github.com/gosimple/slug v1.9.0
-	github.com/grafana/grafana-aws-sdk v0.3.0
 	github.com/grafana/grafana-aws-sdk v0.4.0
 	github.com/grafana/grafana-plugin-model v0.0.0-20190930120109-1fc953a61fb4
 	github.com/grafana/grafana-plugin-sdk-go v0.88.0
@@ -59,7 +58,7 @@ require (
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.10
 	github.com/jung-kurt/gofpdf v1.16.2
-	github.com/lib/pq v1.9.0
+	github.com/lib/pq v1.10.2
 	github.com/linkedin/goavro/v2 v2.10.0
 	github.com/magefile/mage v1.11.0
 	github.com/mattn/go-isatty v0.0.12
