@@ -58,6 +58,6 @@ export const BackupInventoryService = {
     );
   },
   async delete(artifactId: string, removeFiles: boolean) {
-    return api.post(`${BASE_URL}/Artifacts/Remove`, { artifact_id: artifactId, remove_files: removeFiles });
+    return api.post(`${BASE_URL}/Artifacts/Delete`, { artifact_id: artifactId, remove_files: removeFiles });
   },
 };
