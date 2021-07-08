@@ -61,21 +61,11 @@ describe('SwitchField::', () => {
       </FormWrapper>
     );
 
-    expect(
-      wrapper
-        .find(dataQa('test-switch'))
-        .at(0)
-        .props()
-    ).toHaveProperty('value', false);
+    expect(wrapper.find(dataQa('test-switch')).at(0).props()).toHaveProperty('value', false);
     wrapper.find('input').simulate('change', { target: { value: true } });
     wrapper.update();
 
-    expect(
-      wrapper
-        .find(dataQa('test-switch'))
-        .at(0)
-        .props()
-    ).toHaveProperty('value', true);
+    expect(wrapper.find(dataQa('test-switch')).at(0).props()).toHaveProperty('value', true);
   });
 
   it('should disable switch when `disabled` is passed via props', () => {

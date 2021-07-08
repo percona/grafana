@@ -131,11 +131,11 @@ export const ScheduledBackups: FC = () => {
     try {
       const cronExpression = getCronStringFromValues(
         period!.value!,
-        month!.map(m => m.value!),
-        day!.map(m => m.value!),
-        weekDay!.map(m => m.value!),
-        startHour!.map(m => m.value!),
-        startMinute!.map(m => m.value!)
+        month!.map((m) => m.value!),
+        day!.map((m) => m.value!),
+        weekDay!.map((m) => m.value!),
+        startHour!.map((m) => m.value!),
+        startMinute!.map((m) => m.value!)
       );
 
       if (id) {

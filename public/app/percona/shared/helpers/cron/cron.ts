@@ -22,7 +22,7 @@ export const getCronStringFromValues = (
 
 const fixSunday = (values: number[], unit: Unit) => {
   if (unit.type === 'week-days') {
-    values = values.map(value => {
+    values = values.map((value) => {
       if (value === 7) {
         return 0;
       }
@@ -277,7 +277,7 @@ const applyInterval = (values: number[], step?: number) => {
   if (step) {
     const minVal = values[0];
 
-    values = values.filter(value => {
+    values = values.filter((value) => {
       return value % step === minVal % step || value === minVal;
     });
   }
@@ -307,7 +307,7 @@ const parsePartString = (str: string, unit: Unit) => {
         fixSunday(
           rangeString
             .split(',')
-            .map(range => {
+            .map((range) => {
               return parseRange(range, str, unit);
             })
             .flat(),
@@ -336,10 +336,7 @@ const parsePartString = (str: string, unit: Unit) => {
 };
 
 export const parseCronString = (str: string) => {
-  const parts = str
-    .replace(/\s+/g, ' ')
-    .trim()
-    .split(' ');
+  const parts = str.replace(/\s+/g, ' ').trim().split(' ');
 
   if (parts.length === 5) {
     return parts.map((partStr, idx) => {

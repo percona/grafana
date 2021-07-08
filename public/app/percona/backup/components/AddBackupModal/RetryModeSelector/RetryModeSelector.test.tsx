@@ -13,12 +13,7 @@ describe('RetryModeSelector', () => {
     );
     expect(wrapper.find(RadioButtonGroupField)).toHaveLength(1);
     expect(wrapper.find(NumberInputField)).toHaveLength(2);
-    expect(
-      wrapper
-        .find(NumberInputField)
-        .at(0)
-        .prop('disabled')
-    ).toBeFalsy();
+    expect(wrapper.find(NumberInputField).at(0).prop('disabled')).toBeFalsy();
   });
 
   it('should disable number inputs when retry mode is MANUAL', () => {
@@ -27,12 +22,7 @@ describe('RetryModeSelector', () => {
         <RetryModeSelector retryMode={RetryMode.MANUAL} />
       </FormWrapper>
     );
-    expect(
-      wrapper
-        .find(NumberInputField)
-        .at(0)
-        .prop('disabled')
-    ).toBeTruthy();
+    expect(wrapper.find(NumberInputField).at(0).prop('disabled')).toBeTruthy();
   });
 
   it('should disable all fields when disabled is passed, even if retry mode is AUTO', () => {
@@ -41,17 +31,7 @@ describe('RetryModeSelector', () => {
         <RetryModeSelector disabled retryMode={RetryMode.AUTO} />
       </FormWrapper>
     );
-    expect(
-      wrapper
-        .find(RadioButtonGroupField)
-        .at(0)
-        .prop('disabled')
-    ).toBeTruthy();
-    expect(
-      wrapper
-        .find(NumberInputField)
-        .at(0)
-        .prop('disabled')
-    ).toBeTruthy();
+    expect(wrapper.find(RadioButtonGroupField).at(0).prop('disabled')).toBeTruthy();
+    expect(wrapper.find(NumberInputField).at(0).prop('disabled')).toBeTruthy();
   });
 });

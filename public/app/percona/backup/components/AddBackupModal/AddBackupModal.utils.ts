@@ -74,11 +74,11 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     const [minutePart, hourPart, dayPart, monthPart, weekDayPary] = cronParts;
     active = enabled;
     description = backupDescription;
-    startMinute = minutePart.map(v => getOptionFromDigit(v));
-    startHour = hourPart.map(v => getOptionFromDigit(v));
-    day = dayPart.map(v => getOptionFromDigit(v));
-    month = monthPart.map(v => getOptionFromDigit(v));
-    weekDay = weekDayPary.map(v => getOptionFromDigit(v));
+    startMinute = minutePart.map((v) => getOptionFromDigit(v));
+    startHour = hourPart.map((v) => getOptionFromDigit(v));
+    day = dayPart.map((v) => getOptionFromDigit(v));
+    month = monthPart.map((v) => getOptionFromDigit(v));
+    weekDay = weekDayPary.map((v) => getOptionFromDigit(v));
     period = getOptionFromPeriodType(periodType);
 
     return {
@@ -124,7 +124,7 @@ export const isCronFieldDisabled = (period: PeriodType, field: BackupFormTimePro
 };
 
 export const getOptionFromPeriodType = (period: PeriodType): SelectableValue<PeriodType> =>
-  PERIOD_OPTIONS.find(p => p.value === period)!;
+  PERIOD_OPTIONS.find((p) => p.value === period)!;
 
 export const getOptionFromDigit = (value: number): SelectableValue<number> => ({
   value,

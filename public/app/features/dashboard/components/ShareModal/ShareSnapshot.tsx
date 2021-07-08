@@ -81,7 +81,7 @@ export class ShareSnapshot extends PureComponent<Props, State> {
     // @ts-ignore
     window.forceRefresh = true;
     this.setState({ isLoading: true });
-    this.dashboard.startRefresh(true);
+    this.dashboard.startRefresh();
 
     setTimeout(() => {
       this.saveSnapshot(this.dashboard, external);

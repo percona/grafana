@@ -50,7 +50,7 @@ export const MONTH_OPTIONS: Array<SelectableValue<number>> = MONTHS.map((month, 
   label: `${month[0].toUpperCase()}${month.substr(1).toLowerCase()}`,
 }));
 
-export const DAY_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(31).keys()).map(value =>
+export const DAY_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(31).keys()).map((value) =>
   getOptionFromDigit(value + 1)
 );
 
@@ -59,11 +59,11 @@ export const WEEKDAY_OPTIONS: Array<SelectableValue<number>> = WEEKDAYS.map((day
   label: `${day[0].toUpperCase()}${day.substr(1).toLowerCase()}`,
 }));
 
-export const HOUR_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(24).keys()).map(value =>
+export const HOUR_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(24).keys()).map((value) =>
   getOptionFromDigit(value)
 );
 
-export const MINUTE_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(60).keys()).map(value =>
+export const MINUTE_OPTIONS: Array<SelectableValue<number>> = Array.from(Array(60).keys()).map((value) =>
   getOptionFromDigit(value)
 );
 

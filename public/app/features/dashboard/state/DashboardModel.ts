@@ -272,21 +272,13 @@ export class DashboardModel {
   startRefresh() {
     this.events.publish(new RefreshEvent());
 
-    if (forceRefresh) {
-      this.events.emit(snapshotCreated);
-    }
-
-    if (forceRefresh) {
-      this.events.emit(snapshotCreated);
-    }
-
     if (this.panelInEdit) {
       this.panelInEdit.refresh();
       return;
     }
 
     for (const panel of this.panels) {
-      if (!this.otherPanelInFullscreen(panel) || forceRefresh) {
+      if (!this.otherPanelInFullscreen(panel)) {
         panel.refresh();
       }
     }
