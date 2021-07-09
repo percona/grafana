@@ -10,7 +10,8 @@ import { Messages } from '../FormParts.messages';
 export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const tlsFlag = form && form.getState().values && form.getState().values['tls'];
+  const formValues = form && form.getState().values;
+  const tlsFlag = formValues && formValues['tls'];
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
   const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
