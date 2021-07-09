@@ -52,6 +52,11 @@ export const ScheduledBackups: FC = () => {
         Cell: ({ value }) => cronstrue.toString(value),
       },
       {
+        Header: Messages.scheduledBackups.table.columns.retention,
+        accessor: 'retention',
+        Cell: ({ value }) => `${value} backup${value > 1 ? 's' : ''}`,
+      },
+      {
         Header: Messages.scheduledBackups.table.columns.type,
         accessor: 'type',
       },
