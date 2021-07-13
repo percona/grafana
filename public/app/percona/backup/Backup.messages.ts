@@ -65,9 +65,11 @@ export const Messages = {
     invalid: 'Invalid',
     pending: 'Pending',
     inProgress: 'In progress',
+    deleting: 'Deletinng',
     paused: 'Paused',
     success: 'Success',
     error: 'Error',
+    failedToDelete: 'Failed to delete',
   },
   dataModel: {
     invalid: 'Invalid',
