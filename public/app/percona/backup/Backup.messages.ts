@@ -65,7 +65,7 @@ export const Messages = {
     invalid: 'Invalid',
     pending: 'Pending',
     inProgress: 'In progress',
-    deleting: 'Deletinng',
+    deleting: 'Deleting',
     paused: 'Paused',
     success: 'Success',
     error: 'Error',
