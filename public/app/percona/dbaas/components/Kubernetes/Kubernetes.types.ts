@@ -1,3 +1,4 @@
+import { Databases } from 'app/percona/shared/core';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from './OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 
@@ -9,6 +10,11 @@ export interface Operator {
   status: KubernetesOperatorStatus;
   version?: string;
   availableVersion?: string;
+}
+
+export interface OperatorToUpdate extends Operator {
+  operatorType: ComponentToUpdate;
+  operatorTypeLabel: string;
 }
 
 export interface OperatorsList {
@@ -30,6 +36,16 @@ export interface Kubernetes {
 
 export type DeleteKubernetesAction = (kubernetesToDelete: Kubernetes, force?: boolean) => void;
 export type AddKubernetesAction = (kubernetesToAdd: NewKubernetesCluster) => void;
+export type GetKubernetesAction = () => void;
+export type SetKubernetesLoadingAction = (loading: boolean) => void;
+export type ManageKubernetes = [
+  Kubernetes[],
+  DeleteKubernetesAction,
+  AddKubernetesAction,
+  GetKubernetesAction,
+  SetKubernetesLoadingAction,
+  boolean
+];
 
 interface KubeAuth {
   kubeconfig: string;
@@ -64,6 +80,18 @@ export enum ComponentToUpdate {
   pxc = 'pxc-operator',
 }
 
+export type DatabaseComponentToUpdateMap = { [key in Databases]: ComponentToUpdate };
+
+export interface InstallOperatorRequest {
+  kubernetes_cluster_name: string;
+  operator_type: ComponentToUpdate;
+  version: string;
+}
+
+export interface InstallOperatorResponse {
+  status: KubernetesOperatorStatus;
+}
+
 export interface NewKubernetesCluster {
   name: string;
   kubeConfig: string;
@@ -73,5 +101,7 @@ export interface KubernetesProps {
   kubernetes: Kubernetes[];
   deleteKubernetes: DeleteKubernetesAction;
   addKubernetes: AddKubernetesAction;
+  getKubernetes: GetKubernetesAction;
+  setLoading: SetKubernetesLoadingAction;
   loading: boolean;
 }
