@@ -44,7 +44,11 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
   const initialValues = toFormBackup(backup);
   const { Form } = withTypes<AddBackupFormProps>();
 
-  const handleSubmit = (values: AddBackupFormProps) => onBackup(values);
+  const handleSubmit = (values: AddBackupFormProps) =>
+    onBackup({
+      ...values,
+      retention: parseInt(`${values.retention}`, 10),
+    });
 
   return (
     <Modal title={Messages.getModalTitle(scheduleMode, !!backup)} isVisible={isVisible} onClose={onClose}>
