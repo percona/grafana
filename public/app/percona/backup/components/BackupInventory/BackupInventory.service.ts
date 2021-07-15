@@ -46,7 +46,7 @@ export const BackupInventoryService = {
   },
   async backup(serviceId: string, locationId: string, name: string, description: string, token?: CancelToken) {
     return api.post(
-      `${BASE_URL}/Backups/StartBackup`,
+      `${BASE_URL}/Backups/Start`,
       {
         service_id: serviceId,
         location_id: locationId,
@@ -56,5 +56,8 @@ export const BackupInventoryService = {
       false,
       token
     );
+  },
+  async delete(artifactId: string, removeFiles: boolean) {
+    return api.post(`${BASE_URL}/Artifacts/Delete`, { artifact_id: artifactId, remove_files: removeFiles });
   },
 };

@@ -36,12 +36,10 @@ export const useKubernetes = (): ManageKubernetes => {
     setLoading(true);
 
     try {
-      const results = (await KubernetesService.getKubernetes(
-        generateToken(GET_KUBERNETES_CANCEL_TOKEN)
-      )) as KubernetesListAPI;
-      const checkUpdateResults = await KubernetesService.checkForOperatorUpdate(
-        generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN)
-      );
+      const [results, checkUpdateResults] = await Promise.all([
+        KubernetesService.getKubernetes(generateToken(GET_KUBERNETES_CANCEL_TOKEN)),
+        KubernetesService.checkForOperatorUpdate(generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN)),
+      ]);
 
       setKubernetes(toModelList(results, checkUpdateResults));
     } catch (e) {
@@ -113,7 +111,7 @@ const toModelOperators = (
   const modelOperators = {} as OperatorsList;
   const componentToUpdate = cluster_to_components[kubernetesClusterName].component_to_update_information;
 
-  Object.entries(operators).map(([operatorKey, operator]: [keyof OperatorsList, Operator]) => {
+  Object.entries(operators).forEach(([operatorKey, operator]: [keyof OperatorsList, Operator]) => {
     const component = OPERATOR_COMPONENT_TO_UPDATE_MAP[operatorKey];
 
     modelOperators[operatorKey] = {
