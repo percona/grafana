@@ -33,6 +33,9 @@ export const Messages = {
       },
       actions: 'Actions',
     },
+    deleteModalTitle: 'Delete backup artifact',
+    deleteFromStorage: 'Delete from storage',
+    getDeleteMessage: (name: string) => `Are you sure you want to delete "${name}"?`,
   },
   restoreHistory: {
     table: {
@@ -84,9 +87,11 @@ export const Messages = {
     invalid: 'Invalid',
     pending: 'Pending',
     inProgress: 'In progress',
+    deleting: 'Deleting',
     paused: 'Paused',
     success: 'Success',
     error: 'Error',
+    failedToDelete: 'Failed to delete',
   },
   dataModel: {
     invalid: 'Invalid',
