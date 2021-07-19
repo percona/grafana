@@ -10,7 +10,7 @@ import {
   validators,
 } from '@percona/platform-core';
 import { Field, withTypes } from 'react-final-form';
-import { SelectableValue } from '../../../../../../packages/grafana-data/src';
+import { SelectableValue } from '@grafana/data';
 import { AddBackupFormProps, AddBackupModalProps, SelectableService } from './AddBackupModal.types';
 import { Messages } from './AddBackupModal.messages';
 import { toFormBackup, isCronFieldDisabled, PERIOD_OPTIONS } from './AddBackupModal.utils';
