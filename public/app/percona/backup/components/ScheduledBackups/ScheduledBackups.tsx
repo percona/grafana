@@ -33,6 +33,18 @@ export const ScheduledBackups: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
+
+  const retentionValue = useCallback((n: number) => {
+    if (n < 0) {
+      return '';
+    }
+
+    if (n === 0) {
+      return Messages.scheduledBackups.unlimited;
+    }
+
+    return `${n} ${n > 1 ? 'backups' : 'backup'}`;
+  }, []);
   const columns = useMemo(
     (): Array<Column<ScheduledBackup>> => [
       {
@@ -54,7 +66,7 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.retention,
         accessor: 'retention',
-        Cell: ({ value }) => `${value} backup${value > 1 ? 's' : ''}`,
+        Cell: ({ value }) => retentionValue(value),
       },
       {
         Header: Messages.scheduledBackups.table.columns.type,
