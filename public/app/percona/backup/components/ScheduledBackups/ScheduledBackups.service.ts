@@ -29,7 +29,7 @@ export const ScheduledBackupsService = {
         data_model,
         description,
         enabled,
-        retention,
+        retention = 0,
       }) => ({
         id: scheduled_backup_id,
         name,
