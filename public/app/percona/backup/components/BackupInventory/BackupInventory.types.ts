@@ -24,6 +24,8 @@ export interface RawBackup {
   data_model: DataModel;
   status: BackupStatus;
   vendor: Databases;
+  retryInterval?: string;
+  retryTimes?: number;
 }
 
 export interface BackupResponse {

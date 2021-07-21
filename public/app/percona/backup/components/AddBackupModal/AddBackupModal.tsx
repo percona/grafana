@@ -11,7 +11,9 @@ import {
 } from '@percona/platform-core';
 import { Field, withTypes } from 'react-final-form';
 import { AddBackupFormProps, AddBackupModalProps } from './AddBackupModal.types';
+import { RetryModeSelector } from './RetryModeSelector';
 import { Messages } from './AddBackupModal.messages';
+import { RetryMode } from '../../Backup.types';
 import { toFormBackup, isCronFieldDisabled, PERIOD_OPTIONS } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
@@ -99,6 +101,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               label={Messages.dataModel}
               fullWidth
             />
+            {!scheduleMode && <RetryModeSelector disabled retryMode={RetryMode.MANUAL} />}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
               <div className={styles.advancedGroup} data-qa="advanced-backup-fields">
@@ -196,6 +199,9 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                         </div>
                       )}
                     </Field>
+                  </div>
+                  <div className={styles.advancedRow}>
+                    <RetryModeSelector retryMode={values.retryMode} />
                   </div>
                   <div className={styles.advancedRow}>
                     <CheckboxField fieldClassName={styles.checkbox} name="active" label={Messages.enabled} />
