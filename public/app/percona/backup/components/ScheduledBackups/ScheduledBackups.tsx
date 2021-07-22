@@ -43,7 +43,7 @@ export const ScheduledBackups: FC = () => {
       return Messages.scheduledBackups.unlimited;
     }
 
-    return `${n} ${n > 1 ? 'backups' : 'backup'}`;
+    return `${n} backup${n > 1 ? 's' : ''}`;
   }, []);
   const columns = useMemo(
     (): Array<Column<ScheduledBackup>> => [
