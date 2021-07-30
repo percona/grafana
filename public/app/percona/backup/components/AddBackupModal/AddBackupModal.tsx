@@ -68,7 +68,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                         defaultOptions
                         {...input}
                         onChange={(service: SelectableValue<SelectableService>) => {
-                          input.onChange(service.value);
+                          input.onChange(service);
                           form.mutators.changeVendor(service.value!.vendor);
                         }}
                         data-qa="service-select-input"
