@@ -13,14 +13,20 @@ export const getStyles = stylesFactory((theme: GrafanaTheme, status: BackupStatu
   ];
   const isSuccess = successfulStates.includes(status);
   const isError = errorStates.includes(status);
+  const result = {
+    ellipsisContainer: css`
+      display: table;
+      width: 20px;
+      margin: 0 auto;
+    `,
+    status: '',
+  };
 
   if (isSuccess || isError) {
-    return {
-      status: css`
-        color: ${isSuccess ? theme.palette.greenBase : theme.palette.redBase};
-      `,
-    };
+    result.status = css`
+      color: ${isSuccess ? theme.palette.greenBase : theme.palette.redBase};
+    `;
   }
 
-  return {};
+  return result;
 });
