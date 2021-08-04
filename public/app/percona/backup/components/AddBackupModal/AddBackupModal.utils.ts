@@ -48,6 +48,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       backupName: '',
       description: '',
       location: (null as unknown) as SelectableValue<string>,
+      retention: 7,
       period: { value: 'year', label: 'Year' },
       month: [],
       day: [],
@@ -71,7 +72,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
   let description = '';
 
   if (isScheduledBackup(backup)) {
-    const { cronExpression, enabled, description: backupDescription, retryInterval, retryTimes } = backup;
+    const { cronExpression, enabled, description: backupDescription, retention, retryInterval, retryTimes } = backup;
     const cronParts = parseCronString(cronExpression);
     const periodType = getPeriodFromCronparts(cronParts);
     const [minutePart, hourPart, dayPart, monthPart, weekDayPary] = cronParts;
@@ -94,6 +95,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       retryMode: retryTimes > 0 ? RetryMode.AUTO : RetryMode.MANUAL,
       retryTimes: retryTimes || 2,
       retryInterval: parseInt(retryInterval || '30', 10),
+      retention,
       period,
       month,
       day,

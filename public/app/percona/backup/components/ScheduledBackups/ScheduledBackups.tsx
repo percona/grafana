@@ -34,6 +34,18 @@ export const ScheduledBackups: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
+
+  const retentionValue = useCallback((n: number) => {
+    if (n < 0) {
+      return '';
+    }
+
+    if (n === 0) {
+      return Messages.scheduledBackups.unlimited;
+    }
+
+    return `${n} backup${n > 1 ? 's' : ''}`;
+  }, []);
   const columns = useMemo(
     (): Array<Column<ScheduledBackup>> => [
       {
@@ -51,6 +63,11 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.frequency,
         accessor: 'cronExpression',
         Cell: ({ value }) => cronstrue.toString(value),
+      },
+      {
+        Header: Messages.scheduledBackups.table.columns.retention,
+        accessor: 'retention',
+        Cell: ({ value }) => retentionValue(value),
       },
       {
         Header: Messages.scheduledBackups.table.columns.type,
@@ -131,6 +148,7 @@ export const ScheduledBackups: FC = () => {
       retryInterval,
       retryTimes,
       active,
+      retention,
     } = backup;
     try {
       const cronExpression = getCronStringFromValues(
@@ -152,7 +170,8 @@ export const ScheduledBackups: FC = () => {
           backupName,
           description,
           strRetryInterval,
-          resultRetryTimes!
+          resultRetryTimes!,
+          retention!
         );
         appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.getEditSuccess(backupName)]);
       } else {
@@ -164,6 +183,7 @@ export const ScheduledBackups: FC = () => {
           description,
           strRetryInterval,
           resultRetryTimes!,
+          retention!,
           active!
         );
         appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.addSuccess]);
@@ -177,7 +197,7 @@ export const ScheduledBackups: FC = () => {
   };
 
   const handleCopy = async (backup: ScheduledBackup) => {
-    const { serviceId, locationId, cronExpression, name, description, retryInterval, retryTimes } = backup;
+    const { serviceId, locationId, cronExpression, name, description, retention, retryInterval, retryTimes } = backup;
     const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
     setActionPending(true);
     try {
@@ -189,6 +209,7 @@ export const ScheduledBackups: FC = () => {
         description,
         retryInterval,
         retryTimes,
+        retention,
         false
       );
       getData();

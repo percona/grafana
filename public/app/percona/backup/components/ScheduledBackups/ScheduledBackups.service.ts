@@ -31,12 +31,13 @@ export const ScheduledBackupsService = {
         retry_times,
         retry_interval,
         enabled,
+        retention = 0,
       }) => ({
         id: scheduled_backup_id,
         name,
         vendor,
         start: new Date(start_time).getTime(),
-        retention: 0,
+        retention,
         cronExpression: cron_expression,
         locationId: location_id,
         locationName: location_name,
@@ -60,6 +61,7 @@ export const ScheduledBackupsService = {
     description: string,
     retryInterval: string,
     retryTimes: number,
+    retention: number,
     enabled: boolean
   ) {
     return api.post(`${BASE_URL}/Schedule`, {
@@ -71,6 +73,7 @@ export const ScheduledBackupsService = {
       retry_interval: retryInterval,
       retry_times: retryTimes,
       enabled: !!enabled,
+      retention,
     });
   },
   async toggle(id: string, enabled: boolean) {
@@ -86,7 +89,8 @@ export const ScheduledBackupsService = {
     name: string,
     description: string,
     retryInterval: string,
-    retryTimes: number
+    retryTimes: number,
+    retention: number
   ) {
     return api.post(`${BASE_URL}/ChangeScheduled`, {
       scheduled_backup_id: id,
@@ -96,6 +100,7 @@ export const ScheduledBackupsService = {
       description,
       retry_interval: retryInterval,
       retry_times: retryTimes,
+      retention,
     });
   },
 };
