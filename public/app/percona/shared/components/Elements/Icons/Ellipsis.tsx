@@ -6,7 +6,7 @@ export const Ellipsis: FC<SvgProps> = ({ className, ...rest }) => {
   const styles = getStyles();
 
   return (
-    <svg viewBox="0 0 20 15" xmlns="http://www.w3.org/2000/svg" {...rest}>
+    <svg viewBox="0 0 20 15" xmlns="http://www.w3.org/2000/svg" className={className} {...rest}>
       <g>
         <path
           stroke="null"
