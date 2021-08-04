@@ -23,6 +23,8 @@ export const Status: FC<StatusProps> = ({ status }) => {
       <Ellipsis />
     </span>
   ) : (
-    <span className={styles.status}>{statusMsg}</span>
+    <span data-qa="statusMsg" className={styles.status}>
+      {statusMsg}
+    </span>
   );
 };
