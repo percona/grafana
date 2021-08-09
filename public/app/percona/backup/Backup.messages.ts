@@ -33,6 +33,9 @@ export const Messages = {
       },
       actions: 'Actions',
     },
+    deleteModalTitle: 'Delete backup artifact',
+    deleteFromStorage: 'Delete from storage',
+    getDeleteMessage: (name: string) => `Are you sure you want to delete "${name}"?`,
   },
   restoreHistory: {
     table: {
@@ -58,13 +61,38 @@ export const Messages = {
     editSuccess: (name: string) => `Backup location "${name}" was successfully updated`,
     getDeleteSuccess: (name: string) => `Backup location "${name}" successfully deleted.`,
   },
+  scheduledBackups: {
+    table: {
+      noData: 'No scheduled backups found',
+      columns: {
+        name: 'Name',
+        vendor: 'Vendor',
+        start: 'Start at',
+        retention: 'Retention',
+        frequency: 'Frequency',
+        location: 'Location',
+        lastBackup: 'Last backup (local time)',
+        type: 'Type',
+        actions: 'Actions',
+      },
+    },
+    deleteModalTitle: 'Delete scheduled backup',
+    copyOf: 'Copy of',
+    addSuccess: 'Backup successfully scheduled',
+    unlimited: 'Unlimited',
+    getEditSuccess: (name: string) => `Scheduled backup "${name}" successfully updated`,
+    getDeleteSuccess: (name: string) => `Scheduled backup "${name}" successfully deleted.`,
+    getDeleteMessage: (name: string) => `Are you sure you want to delete the scheduled backup "${name}"?`,
+  },
   status: {
     invalid: 'Invalid',
     pending: 'Pending',
     inProgress: 'In progress',
+    deleting: 'Deleting',
     paused: 'Paused',
     success: 'Success',
     error: 'Error',
+    failedToDelete: 'Failed to delete',
   },
   dataModel: {
     invalid: 'Invalid',

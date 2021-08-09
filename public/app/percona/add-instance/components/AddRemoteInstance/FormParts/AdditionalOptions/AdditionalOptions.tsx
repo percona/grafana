@@ -11,6 +11,7 @@ import { FormApi } from 'final-form';
 import { InstanceTypes } from '../../../../panel.types';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
+import { PostgreTLSCertificate } from './PostgreTLSCertificate';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -88,6 +89,7 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
       return (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
+          <PostgreTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
           <PostgreSQLAdditionalOptions
             isRDS={remoteInstanceCredentials.isRDS}
