@@ -11,9 +11,10 @@ import {
   validators,
 } from '@percona/platform-core';
 import { Field, withTypes } from 'react-final-form';
-import { validators as customValidators } from 'app/percona/shared/helpers/validators';
-import { AddBackupFormProps, AddBackupModalProps } from './AddBackupModal.types';
+import { SelectableValue } from '@grafana/data';
+import { AddBackupFormProps, AddBackupModalProps, SelectableService } from './AddBackupModal.types';
 import { RetryModeSelector } from './RetryModeSelector';
+import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 import { Messages } from './AddBackupModal.messages';
 import { RetryMode } from '../../Backup.types';
 import { toFormBackup, isCronFieldDisabled, PERIOD_OPTIONS } from './AddBackupModal.utils';
@@ -58,7 +59,12 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
       <Form
         initialValues={initialValues}
         onSubmit={handleSubmit}
-        render={({ handleSubmit, valid, pristine, submitting, values }) => (
+        mutators={{
+          changeVendor: ([vendor]: [Databases], state, tools) => {
+            tools.changeValue(state, 'vendor', () => DATABASE_LABELS[vendor]);
+          },
+        }}
+        render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
           <form onSubmit={handleSubmit}>
             <div className={styles.formContainer}>
               <div className={styles.formHalf}>
@@ -72,17 +78,16 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                         loadOptions={AddBackupModalService.loadServiceOptions}
                         defaultOptions
                         {...input}
+                        onChange={(service: SelectableValue<SelectableService>) => {
+                          input.onChange(service);
+                          form.mutators.changeVendor(service.value!.vendor);
+                        }}
                         data-qa="service-select-input"
                       />
                     </div>
                   )}
                 </Field>
-                <TextInputField
-                  name="vendor"
-                  label={Messages.vendor}
-                  disabled
-                  defaultValue={values.service ? DATABASE_LABELS[values.service.value?.vendor as Databases] : ''}
-                />
+                <TextInputField name="vendor" label={Messages.vendor} disabled />
               </div>
               <div className={styles.formHalf}>
                 <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
@@ -114,7 +119,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
               <div className={styles.advancedGroup} data-qa="advanced-backup-fields">
-                <h6 className={styles.advancedTitle}>Schedule</h6>
+                <h6 className={styles.advancedTitle}>{Messages.scheduleSection}</h6>
                 <div>
                   <div className={styles.advancedRow}>
                     <Field name="period" validate={validators.required}>
