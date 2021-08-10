@@ -50,6 +50,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
     onBackup({
       ...values,
       retention: parseInt(`${values.retention}`, 10),
+      retryTimes: parseInt(`${values.retryTimes}`, 10),
     });
 
   return (

@@ -28,7 +28,7 @@ export const ScheduledBackupsService = {
         last_run,
         data_model,
         description,
-        retry_times,
+        retries,
         retry_interval,
         enabled,
         retention = 0,
@@ -47,7 +47,7 @@ export const ScheduledBackupsService = {
         dataModel: data_model,
         description,
         type: BackupType.FULL,
-        retryTimes: retry_times,
+        retryTimes: retries,
         retryInterval: retry_interval,
         enabled: !!enabled,
       })
@@ -71,7 +71,7 @@ export const ScheduledBackupsService = {
       name,
       description,
       retry_interval: retryInterval,
-      retry_times: retryTimes,
+      retries: retryTimes,
       enabled: !!enabled,
       retention,
     });
@@ -99,7 +99,7 @@ export const ScheduledBackupsService = {
       name,
       description,
       retry_interval: retryInterval,
-      retry_times: retryTimes,
+      retries: retryTimes,
       retention,
     });
   },
