@@ -9,7 +9,7 @@ export const RestoreBackupModalService = {
 
     Object.keys(services).forEach((db: Databases) => {
       const serviceArr = services[db] || [];
-      result.push(...serviceArr.map(service => ({ label: service.name, value: service.id })));
+      result.push(...serviceArr.map((service) => ({ label: service.name, value: service.id })));
     });
 
     return result;
