@@ -94,6 +94,42 @@ export const templateStubs: Template[] = [
     ],
     expr: '',
   },
+  {
+    name: 'template_5',
+    created_at: '2020-12-25T16:53:39.366Z',
+    source: SourceDescription.SAAS,
+    summary: 'Template',
+    yaml: 'yaml file content',
+    severity: Severity.SEVERITY_ERROR,
+    for: '20s',
+    params: [
+      {
+        name: 'template-5-from',
+        type: TemplateParamType.FLOAT,
+        unit: TemplateParamUnit.PERCENTAGE,
+        summary: 'a minimum threshold',
+        float: {
+          hasDefault: true,
+          hasMin: false,
+          hasMax: false,
+          default: 10,
+        },
+      },
+      {
+        name: 'template-5-to',
+        type: TemplateParamType.FLOAT,
+        unit: TemplateParamUnit.PERCENTAGE,
+        summary: 'a maximum threshold',
+        float: {
+          hasDefault: true,
+          hasMin: false,
+          hasMax: false,
+          default: 50,
+        },
+      },
+    ],
+    expr: '',
+  },
 ];
 
 export const formattedTemplateStubs: FormattedTemplate[] = formatTemplates(templateStubs);
