@@ -8,6 +8,8 @@ export const Messages = {
     routingKey: 'Routing key',
     serviceKey: 'Service key',
     channel: 'Channel',
+    basic: 'Basic',
+    token: 'Bearer Token',
   },
   addAction: 'Add',
   editAction: 'Save',

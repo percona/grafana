@@ -1,4 +1,4 @@
-import { NotificationChannelType, PagerDutyKeyType } from '../NotificationChannel.types';
+import { NotificationChannelType, PagerDutyKeyType, WebHookAuthType } from '../NotificationChannel.types';
 import { Messages } from './AddNotificationChannelModal.messages';
 import { EmailFields } from './EmailFields/EmailFields';
 import { PagerDutyFields } from './PagerDutyFields/PagerDutyFields';
@@ -33,5 +33,16 @@ export const PAGER_DUTY_TYPE_OPTIONS = [
   {
     value: PagerDutyKeyType.service,
     label: Messages.fields.serviceKey,
+  },
+];
+
+export const WEBHOOK_TYPE_OPTIONS = [
+  {
+    value: WebHookAuthType.basic,
+    label: Messages.fields.basic,
+  },
+  {
+    value: WebHookAuthType.token,
+    label: Messages.fields.token,
   },
 ];
