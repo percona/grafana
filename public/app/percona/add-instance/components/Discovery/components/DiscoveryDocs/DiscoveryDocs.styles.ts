@@ -10,6 +10,12 @@ export const getStyles = stylesFactory(({ colors, spacing }: GrafanaTheme) => ({
     padding: ${spacing.sm};
     margin-top: ${spacing.md};
     margin-bottom: ${spacing.md};
+    button {
+      height: 100%;
+      span {
+        white-space: break-spaces;
+      }
+    }
   `,
   infoItems: css`
     list-style-position: inside;
