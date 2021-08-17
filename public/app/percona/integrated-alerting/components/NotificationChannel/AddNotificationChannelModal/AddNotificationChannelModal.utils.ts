@@ -6,6 +6,8 @@ import {
   PagerDutylNotificationChannel,
   SlackNotificationChannel,
   PagerDutyKeyType,
+  WebHookNotificationChannel,
+  WebHookAuthType,
 } from '../NotificationChannel.types';
 import { TYPE_OPTIONS, PAGER_DUTY_TYPE_OPTIONS } from './AddNotificationChannel.constants';
 
@@ -40,6 +42,32 @@ export const INITIAL_VALUES = {
     type: getOptionFrom(type),
     channel: channel,
   }),
+  [NotificationChannelType.webhook]: ({
+    type,
+    summary,
+    url,
+    username,
+    password,
+    token,
+    ca,
+    cert,
+    key,
+    serverName,
+    skipVerify,
+  }: WebHookNotificationChannel): NotificationChannelRenderProps => ({
+    name: summary,
+    type: getOptionFrom(type),
+    url,
+    webHookType: username ? WebHookAuthType.basic : WebHookAuthType.token,
+    username,
+    password,
+    token,
+    ca,
+    cert,
+    key,
+    serverName,
+    skipVerify,
+  }),
 };
 
 export const getInitialValues = (notificationChannel?: NotificationChannel) => {
@@ -55,7 +83,10 @@ export const getInitialValues = (notificationChannel?: NotificationChannel) => {
 
   return notificationChannel
     ? INITIAL_VALUES[notificationChannel.type](
-        notificationChannel as EmailNotificationChannel & SlackNotificationChannel & PagerDutylNotificationChannel
+        notificationChannel as EmailNotificationChannel &
+          SlackNotificationChannel &
+          PagerDutylNotificationChannel &
+          WebHookNotificationChannel
       )
     : defaultValues;
 };

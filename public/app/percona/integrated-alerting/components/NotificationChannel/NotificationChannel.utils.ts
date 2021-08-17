@@ -5,6 +5,7 @@ import {
   PagerDutylNotificationChannel,
   SlackNotificationChannel,
   NotificationChannelRenderProps,
+  WebHookNotificationChannel,
 } from './NotificationChannel.types';
 import { Messages } from './NotificationChannel.messages';
 
@@ -34,6 +35,22 @@ export const TO_MODEL = {
     sendResolved: channel.slack_config?.send_resolved,
     channel: channel.slack_config?.channel,
   }),
+  [NotificationChannelType.webhook]: (channel: NotificationChannelAPI): WebHookNotificationChannel => ({
+    type: NotificationChannelType.webhook,
+    channelId: channel.channel_id,
+    summary: channel.summary,
+    disabled: channel.disabled,
+    sendResolved: channel.slack_config?.send_resolved,
+    url: channel.webhook_config?.url || '',
+    username: channel.webhook_config?.http_config.basic_auth?.username,
+    password: channel.webhook_config?.http_config.basic_auth?.password,
+    token: channel.webhook_config?.http_config.bearer,
+    ca: channel.webhook_config?.http_config.tls_config?.ca_file,
+    cert: channel.webhook_config?.http_config.tls_config?.cert_file,
+    key: channel.webhook_config?.http_config.tls_config?.key_file,
+    serverName: channel.webhook_config?.http_config.tls_config?.server_name,
+    skipVerify: channel.webhook_config?.http_config.tls_config?.insecure_skip_verify,
+  }),
 };
 
 export const TO_API = {
@@ -54,6 +71,26 @@ export const TO_API = {
     summary: values.name,
     slack_config: {
       channel: values.channel,
+    },
+  }),
+  [NotificationChannelType.webhook]: (values: NotificationChannelRenderProps): NotificationChannelAPI => ({
+    summary: values.name,
+    webhook_config: {
+      url: values.url,
+      http_config: {
+        basic_auth: {
+          username: values.username,
+          password: values.password,
+        },
+        bearer: values.token,
+        tls_config: {
+          ca_file: values.ca!,
+          cert_file: values.cert!,
+          key_file: values.key!,
+          server_name: values.serverName!,
+          insecure_skip_verify: values.skipVerify!,
+        },
+      },
     },
   }),
 };
