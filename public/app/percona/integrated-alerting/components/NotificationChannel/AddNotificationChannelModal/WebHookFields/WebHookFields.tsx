@@ -10,14 +10,18 @@ export const WebHookFields: FC<WebHookFieldsProps> = ({ values }) => {
   return (
     <>
       <TextInputField name="url" label="Url" />
-      <RadioButtonGroupField name="webHookType" options={WEBHOOK_TYPE_OPTIONS} />
+      <RadioButtonGroupField
+        fullWidth
+        name="webHookType"
+        options={WEBHOOK_TYPE_OPTIONS}
+        initialValue={values.webHookType || WEBHOOK_TYPE_OPTIONS[0].value}
+      />
       {values.webHookType === WebHookAuthType.basic && <WebHookBasicFields />}
       {values.webHookType === WebHookAuthType.token && <WebHookTokenFields />}
-      <TextareaInputField name="ca" />
-      <TextareaInputField name="cert" />
-      <TextareaInputField name="key" />
-      <TextInputField name="serverName" />
-      <TextInputField name="serverName" />
+      <TextareaInputField name="ca" label="Certificate Authority" />
+      <TextareaInputField name="cert" label="Certificate" />
+      <TextareaInputField name="key" label="Certificate Key" />
+      <TextInputField name="serverName" label="Server Name" />
     </>
   );
 };

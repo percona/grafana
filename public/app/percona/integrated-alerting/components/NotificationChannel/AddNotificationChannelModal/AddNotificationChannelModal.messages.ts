@@ -17,6 +17,7 @@ export const Messages = {
   emailOption: 'Email',
   pagerDutyOption: 'Pager Duty',
   slackOption: 'Slack',
+  webHookOption: 'Webhook',
   addSuccess: 'Notification channel was successfully added',
   editSuccess: 'Notification channel was successfully edited',
   invalidChannelName: "Channel shouldn't have # character.",

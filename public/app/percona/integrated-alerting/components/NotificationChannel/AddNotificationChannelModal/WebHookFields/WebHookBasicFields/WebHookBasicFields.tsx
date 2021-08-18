@@ -5,6 +5,6 @@ import { SecretToggler } from 'app/percona/shared/components/Elements/SecretTogg
 export const WebHookBasicFields: FC = () => (
   <>
     <TextInputField name="user" label="User" />
-    <SecretToggler fieldProps={{ name: 'password', label: 'Password' }} />
+    <SecretToggler readOnly={false} fieldProps={{ name: 'password', label: 'Password' }} />
   </>
 );

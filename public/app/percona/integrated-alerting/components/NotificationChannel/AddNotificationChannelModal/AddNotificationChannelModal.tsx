@@ -19,6 +19,7 @@ import { getInitialValues } from './AddNotificationChannelModal.utils';
 import { EmailFields } from './EmailFields/EmailFields';
 import { SlackFields } from './SlackFields/SlackFields';
 import { PagerDutyFields } from './PagerDutyFields/PagerDutyFields';
+import { WebHookFields } from './WebHookFields/WebHookFields';
 
 const { required } = validators;
 // Our "values" typings won't be right without using this
@@ -34,6 +35,8 @@ const TypeField: FC<{ values: NotificationChannelRenderProps }> = ({ values }) =
       return <PagerDutyFields values={values} />;
     case NotificationChannelType.slack:
       return <SlackFields />;
+    case NotificationChannelType.webhook:
+      return <WebHookFields values={values} />;
     default:
       return null;
   }
