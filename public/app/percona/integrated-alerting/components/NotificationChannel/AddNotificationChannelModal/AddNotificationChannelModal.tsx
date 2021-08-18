@@ -80,10 +80,10 @@ export const AddNotificationChannelModal: FC<AddNotificationChannelModalProps> =
         render={({ handleSubmit, valid, pristine, submitting, values }) => (
           <form onSubmit={handleSubmit}>
             <>
-              <TextInputField name="name" label={Messages.fields.name} validators={[required]} />
               <Field name="type">
                 {({ input }) => <SelectField label={Messages.fields.type} options={TYPE_OPTIONS} {...input} />}
               </Field>
+              <TextInputField name="name" label={Messages.fields.name} validators={[required]} />
               <TypeField values={values} />
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
