@@ -6,6 +6,7 @@ import {
   SlackNotificationChannel,
   NotificationChannelRenderProps,
   WebHookNotificationChannel,
+  WebHookAuthType,
 } from './NotificationChannel.types';
 import { Messages } from './NotificationChannel.messages';
 
@@ -44,7 +45,7 @@ export const TO_MODEL = {
     url: channel.webhook_config?.url || '',
     username: channel.webhook_config?.http_config.basic_auth?.username,
     password: channel.webhook_config?.http_config.basic_auth?.password,
-    token: channel.webhook_config?.http_config.bearer,
+    token: channel.webhook_config?.http_config.bearer_token,
     ca: channel.webhook_config?.http_config.tls_config?.ca_file,
     cert: channel.webhook_config?.http_config.tls_config?.cert_file,
     key: channel.webhook_config?.http_config.tls_config?.key_file,
@@ -78,11 +79,14 @@ export const TO_API = {
     webhook_config: {
       url: values.url,
       http_config: {
-        basic_auth: {
-          username: values.username,
-          password: values.password,
-        },
-        bearer: values.token,
+        basic_auth:
+          values.webHookType === WebHookAuthType.basic
+            ? {
+                username: values.username,
+                password: values.password,
+              }
+            : undefined,
+        bearer_token: values.webHookType === WebHookAuthType.token ? values.token : undefined,
         tls_config: {
           ca_file: values.ca!,
           cert_file: values.cert!,
@@ -106,6 +110,10 @@ export const getType = (channel: NotificationChannelAPI): NotificationChannelTyp
 
   if (channel.slack_config) {
     return NotificationChannelType.slack;
+  }
+
+  if (channel.webhook_config) {
+    return NotificationChannelType.webhook;
   }
 
   throw new Error(Messages.missingTypeError);

@@ -96,7 +96,7 @@ export interface WebHookTLSConfigAPI {
 }
 export interface WebHookHttpConfigAPI {
   basic_auth?: WebHookBasicAuthConfigAPI;
-  bearer?: string;
+  bearer_token?: string;
   tls_config?: WebHookTLSConfigAPI;
   proxy_url?: string;
 }

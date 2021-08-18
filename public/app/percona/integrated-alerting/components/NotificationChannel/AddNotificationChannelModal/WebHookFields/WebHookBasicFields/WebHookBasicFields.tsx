@@ -5,7 +5,7 @@ import { Messages } from '../../AddNotificationChannelModal.messages';
 
 export const WebHookBasicFields: FC = () => (
   <>
-    <TextInputField name="user" label={Messages.fields.username} validators={[validators.required]} />
+    <TextInputField name="username" label={Messages.fields.username} validators={[validators.required]} />
     <SecretToggler
       readOnly={false}
       fieldProps={{ name: 'password', label: Messages.fields.password, validators: [validators.required] }}
