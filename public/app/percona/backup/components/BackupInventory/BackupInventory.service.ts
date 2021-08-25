@@ -63,7 +63,7 @@ export const BackupInventoryService = {
   },
   async listCompatibleServices(artifactId: string): Promise<DBServiceList> {
     const { mysql = [], mongodb = [] } = await api.post<ServiceListPayload, any>(
-      `${BASE_URL}/Backups/ListServicesForRestore`,
+      `${BASE_URL}/Backups/ListArtifactCompatibleServices`,
       {
         artifact_id: artifactId,
       }
