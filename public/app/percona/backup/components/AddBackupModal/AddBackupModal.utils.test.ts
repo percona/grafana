@@ -24,6 +24,7 @@ describe('AddBackupModal::utils', () => {
         retention: 7,
         logs: false,
         active: true,
+        vendor: 'MySQL',
       });
     });
 
@@ -38,6 +39,7 @@ describe('AddBackupModal::utils', () => {
         backupName: 'Backup 1',
         description: '',
         location: { label: locationName, value: locationId },
+        vendor: 'MySQL',
       });
     });
 
@@ -76,6 +78,7 @@ describe('AddBackupModal::utils', () => {
         retention: 0,
         logs: false,
         active: true,
+        vendor: 'MySQL',
       });
     });
   });
