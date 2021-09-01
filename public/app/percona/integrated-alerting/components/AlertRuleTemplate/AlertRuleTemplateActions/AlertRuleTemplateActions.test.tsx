@@ -58,7 +58,7 @@ xdescribe('AlertRuleTemplateActions', () => {
     expect(deleteButton.prop('disabled')).toBeTruthy();
   });
 
-  it('should disable edit and delete buttons when template is from platform', () => {
+  it('should disable edit and delete buttons when Portal is the template source', () => {
     const wrapper = mount(
       <AlertRuleTemplateActions template={formattedTemplateStubs[4]} getAlertRuleTemplates={jest.fn()} />
     );
