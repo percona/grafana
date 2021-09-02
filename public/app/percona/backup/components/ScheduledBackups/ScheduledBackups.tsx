@@ -71,7 +71,7 @@ export const ScheduledBackups: FC = () => {
       },
       {
         Header: Messages.scheduledBackups.table.columns.type,
-        accessor: 'type',
+        accessor: 'mode',
       },
       {
         Header: Messages.scheduledBackups.table.columns.location,

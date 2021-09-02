@@ -1,7 +1,7 @@
 import { CancelToken } from 'axios';
 import { api } from 'app/percona/shared/helpers/api';
 import { ScheduledBackup, ScheduledBackupResponse } from './ScheduledBackups.types';
-import { BackupType } from '../../Backup.types';
+import { BackupMode } from '../../Backup.types';
 
 const BASE_URL = '/v1/management/backup/Backups';
 
@@ -46,7 +46,7 @@ export const ScheduledBackupsService = {
         lastBackup: last_run ? new Date(last_run).getTime() : undefined,
         dataModel: data_model,
         description,
-        type: BackupType.FULL,
+        mode: BackupMode.SNAPSHOT,
         retryTimes: retries,
         retryInterval: retry_interval,
         enabled: !!enabled,

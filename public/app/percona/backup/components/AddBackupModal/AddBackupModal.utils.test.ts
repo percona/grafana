@@ -1,5 +1,5 @@
 import { stubs as backupStubs } from '../BackupInventory/__mocks__/BackupInventory.service';
-import { BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { AddBackupFormProps } from './AddBackupModal.types';
 import { toFormBackup, isCronFieldDisabled, getOptionFromPeriodType, getOptionFromDigit } from './AddBackupModal.utils';
@@ -59,7 +59,7 @@ describe('AddBackupModal::utils', () => {
         lastBackup: 1623584353170,
         dataModel: DataModel.PHYSICAL,
         description: '',
-        type: BackupType.FULL,
+        mode: BackupMode.SNAPSHOT,
         retryInterval: '10s',
         retryTimes: 1,
         enabled: true,

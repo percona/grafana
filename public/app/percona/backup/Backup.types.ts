@@ -34,7 +34,8 @@ export enum RetryMode {
   MANUAL = 'MANUAL',
 }
 
-export enum BackupType {
-  FULL = 'Full',
-  INCREMENTAL = 'Incremental',
+export enum BackupMode {
+  INVALID = 'BACKUP_MODE_INVALID',
+  SNAPSHOT = 'SNAPSHOT',
+  INCREMENTAL = 'INCREMENTAL',
 }
