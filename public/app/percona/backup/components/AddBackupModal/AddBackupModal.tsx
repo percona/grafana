@@ -16,7 +16,7 @@ import { AddBackupFormProps, AddBackupModalProps, SelectableService } from './Ad
 import { RetryModeSelector } from './RetryModeSelector';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 import { Messages } from './AddBackupModal.messages';
-import { toFormBackup, isCronFieldDisabled, PERIOD_OPTIONS } from './AddBackupModal.utils';
+import { toFormBackup, isCronFieldDisabled, PERIOD_OPTIONS, getBackupModeOptions } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
@@ -60,7 +60,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
         onSubmit={handleSubmit}
         mutators={{
           changeVendor: ([vendor]: [Databases], state, tools) => {
-            tools.changeValue(state, 'vendor', () => DATABASE_LABELS[vendor]);
+            tools.changeValue(state, 'vendor', () => vendor);
           },
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
@@ -86,10 +86,23 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                     </div>
                   )}
                 </Field>
-                <TextInputField name="vendor" label={Messages.vendor} disabled />
+                <TextInputField
+                  name="vendor"
+                  label={Messages.vendor}
+                  disabled
+                  format={(vendor) => DATABASE_LABELS[vendor as Databases] || ''}
+                />
               </div>
               <div className={styles.formHalf}>
                 <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
+                <RadioButtonGroupField
+                  options={getBackupModeOptions(values.vendor)}
+                  name="mode"
+                  label={Messages.type}
+                  fullWidth
+                />
+              </div>
+              <div className={styles.formHalf}>
                 <Field name="location" validate={validators.required}>
                   {({ input }) => (
                     <div>
@@ -105,15 +118,15 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                     </div>
                   )}
                 </Field>
+                <RadioButtonGroupField
+                  disabled
+                  options={DATA_MODEL_OPTIONS}
+                  name="dataModel"
+                  label={Messages.dataModel}
+                  fullWidth
+                />
               </div>
             </div>
-            <RadioButtonGroupField
-              disabled
-              options={DATA_MODEL_OPTIONS}
-              name="dataModel"
-              label={Messages.dataModel}
-              fullWidth
-            />
             {!scheduleMode && <RetryModeSelector retryMode={values.retryMode} />}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (

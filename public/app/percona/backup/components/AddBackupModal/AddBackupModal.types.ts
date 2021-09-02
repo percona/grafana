@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
 import { Backup } from '../BackupInventory/BackupInventory.types';
@@ -37,4 +37,6 @@ export interface AddBackupFormProps {
   startMinute?: Array<SelectableValue<number>>;
   logs?: boolean;
   active?: boolean;
+  vendor: Databases;
+  mode: BackupMode;
 }

@@ -1,7 +1,9 @@
 import { SelectableValue } from '@grafana/data';
-import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { Databases } from 'app/percona/shared/core';
 import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
+import { formatBackupMode } from '../../Backup.utils';
 import { Backup } from '../BackupInventory/BackupInventory.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { AddBackupFormProps, SelectableService } from './AddBackupModal.types';
@@ -57,6 +59,8 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       startMinute: [{ value: 0, label: '00' }],
       logs: false,
       active: true,
+      vendor: (null as unknown) as Databases,
+      mode: BackupMode.INCREMENTAL,
     };
   }
 
@@ -72,7 +76,15 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
   let description = '';
 
   if (isScheduledBackup(backup)) {
-    const { cronExpression, enabled, description: backupDescription, retention, retryInterval, retryTimes } = backup;
+    const {
+      cronExpression,
+      enabled,
+      description: backupDescription,
+      retention,
+      retryInterval,
+      retryTimes,
+      mode,
+    } = backup;
     const cronParts = parseCronString(cronExpression);
     const periodType = getPeriodFromCronparts(cronParts);
     const [minutePart, hourPart, dayPart, monthPart, weekDayPary] = cronParts;
@@ -104,6 +116,8 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       startMinute,
       logs: false,
       active,
+      vendor,
+      mode,
     };
   } else {
     return {
@@ -113,6 +127,8 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       backupName: name,
       description,
       location: { label: locationName, value: locationId },
+      vendor,
+      mode: BackupMode.INCREMENTAL,
     };
   }
 };
@@ -138,3 +154,11 @@ export const getOptionFromDigit = (value: number): SelectableValue<number> => ({
   value,
   label: value < 10 ? `0${value.toString()}` : value.toString(),
 });
+
+export const getBackupModeOptions = (db: Databases): Array<SelectableValue<BackupMode>> => {
+  const modes = [BackupMode.INCREMENTAL, BackupMode.SNAPSHOT];
+  return modes.map((mode) => ({
+    value: mode,
+    label: formatBackupMode(db, mode),
+  }));
+};

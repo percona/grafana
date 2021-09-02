@@ -27,6 +27,8 @@ describe('AddBackupModal::utils', () => {
         retention: 7,
         logs: false,
         active: true,
+        vendor: null as any,
+        mode: null as any,
       });
     });
 
@@ -41,6 +43,8 @@ describe('AddBackupModal::utils', () => {
         backupName: 'Backup 1',
         description: '',
         location: { label: locationName, value: locationId },
+        vendor,
+        mode: BackupMode.INCREMENTAL,
       });
     });
 
@@ -84,6 +88,8 @@ describe('AddBackupModal::utils', () => {
         retention: 0,
         logs: false,
         active: true,
+        vendor: Databases.mongodb,
+        mode: BackupMode.SNAPSHOT,
       });
     });
   });
