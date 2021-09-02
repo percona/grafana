@@ -41,7 +41,7 @@ export interface TemplatesList extends Omit<TemplatesListAPI, 'templates'> {
 
 export enum SourceDescription {
   BUILT_IN = 'Built-in',
-  SAAS = 'Percona Enterprise Platform',
+  SAAS = 'Percona',
   USER_FILE = 'User-defined (file)',
   USER_API = 'User-defined (UI)',
 }
