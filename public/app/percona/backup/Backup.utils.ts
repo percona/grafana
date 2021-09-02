@@ -1,7 +1,8 @@
+import { Databases } from '../shared/core';
 import { Messages } from './Backup.messages';
-import { DataModel, RestoreStatus, BackupStatus } from './Backup.types';
+import { DataModel, RestoreStatus, BackupStatus, BackupMode } from './Backup.types';
 
-const { status: statusMsg, dataModel: dataModelMsg } = Messages;
+const { status: statusMsg, dataModel: dataModelMsg, backupMode: backupModeMsg } = Messages;
 
 export const formatStatus = (status: BackupStatus | RestoreStatus): string => {
   const map: Record<BackupStatus | RestoreStatus, string> = {
@@ -30,4 +31,19 @@ export const formatDataModel = (model: DataModel): string => {
   };
 
   return map[model] ?? '';
+};
+
+export const isPitrDb = (db: Databases) => {
+  const pitrDbs = [Databases.mongodb];
+  return pitrDbs.includes(db);
+};
+
+export const formatBackupMode = (db: Databases, mode: BackupMode): string => {
+  const map: Record<BackupMode, string> = {
+    [BackupMode.SNAPSHOT]: backupModeMsg.full,
+    [BackupMode.INCREMENTAL]: isPitrDb(db) ? backupModeMsg.pitr : backupModeMsg.incremental,
+    [BackupMode.INVALID]: backupModeMsg.invalid,
+  };
+
+  return map[mode];
 };

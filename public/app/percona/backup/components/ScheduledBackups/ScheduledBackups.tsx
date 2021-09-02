@@ -23,6 +23,7 @@ import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 import { ScheduledBackupsActions } from './ScheduledBackupsActions';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { RetryMode } from '../../Backup.types';
+import { formatBackupMode } from '../../Backup.utils';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
@@ -72,6 +73,7 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.type,
         accessor: 'mode',
+        Cell: ({ value, row }) => formatBackupMode(row.original.vendor, value),
       },
       {
         Header: Messages.scheduledBackups.table.columns.location,
