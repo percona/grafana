@@ -34,6 +34,7 @@ import {
 import { getStyles } from './AddBackupModal.styles';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
+import { BackupMode } from '../../Backup.types';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
@@ -61,6 +62,8 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
         mutators={{
           changeVendor: ([vendor]: [Databases], state, tools) => {
             tools.changeValue(state, 'vendor', () => vendor);
+            //TODO remove this when we support incremental backups for MySQL
+            tools.changeValue(state, 'mode', () => BackupMode.SNAPSHOT);
           },
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
@@ -98,6 +101,8 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 <RadioButtonGroupField
                   options={getBackupModeOptions(values.vendor)}
                   name="mode"
+                  //TODO remove this when we support incremental backups for MySQL
+                  disabled={values.vendor === Databases.mysql}
                   label={Messages.type}
                   fullWidth
                 />
