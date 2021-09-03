@@ -156,9 +156,11 @@ export const getOptionFromDigit = (value: number): SelectableValue<number> => ({
 });
 
 export const getBackupModeOptions = (db: Databases): Array<SelectableValue<BackupMode>> => {
-  const modes = [BackupMode.INCREMENTAL, BackupMode.SNAPSHOT];
+  const pitrDbs = [Databases.mongodb];
+  const isPitr = pitrDbs.includes(db);
+  const modes = [isPitr ? BackupMode.PITR : BackupMode.INCREMENTAL, BackupMode.SNAPSHOT];
   return modes.map((mode) => ({
     value: mode,
-    label: formatBackupMode(db, mode),
+    label: formatBackupMode(mode),
   }));
 };

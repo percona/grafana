@@ -38,4 +38,5 @@ export enum BackupMode {
   INVALID = 'BACKUP_MODE_INVALID',
   SNAPSHOT = 'SNAPSHOT',
   INCREMENTAL = 'INCREMENTAL',
+  PITR = 'PITR',
 }
