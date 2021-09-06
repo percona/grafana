@@ -98,16 +98,6 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               </div>
               <div className={styles.formHalf}>
                 <TextInputField name="backupName" label={Messages.backupName} validators={[validators.required]} />
-                <RadioButtonGroupField
-                  options={getBackupModeOptions(values.vendor)}
-                  name="mode"
-                  //TODO remove this when we support incremental backups for MySQL
-                  disabled={values.vendor === Databases.mysql}
-                  label={Messages.type}
-                  fullWidth
-                />
-              </div>
-              <div className={styles.formHalf}>
                 <Field name="location" validate={validators.required}>
                   {({ input }) => (
                     <div>
@@ -123,15 +113,25 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                     </div>
                   )}
                 </Field>
-                <RadioButtonGroupField
-                  disabled
-                  options={DATA_MODEL_OPTIONS}
-                  name="dataModel"
-                  label={Messages.dataModel}
-                  fullWidth
-                />
               </div>
             </div>
+            <RadioButtonGroupField
+              disabled
+              options={DATA_MODEL_OPTIONS}
+              name="dataModel"
+              label={Messages.dataModel}
+              fullWidth
+            />
+            {scheduleMode && (
+              <RadioButtonGroupField
+                options={getBackupModeOptions(values.vendor)}
+                name="mode"
+                //TODO remove this when we support incremental backups for MySQL
+                disabled={values.vendor === Databases.mysql}
+                label={Messages.type}
+                fullWidth
+              />
+            )}
             {!scheduleMode && <RetryModeSelector retryMode={values.retryMode} />}
             <TextareaInputField name="description" label={Messages.description} />
             {scheduleMode && (
