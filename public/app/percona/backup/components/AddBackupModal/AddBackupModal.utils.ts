@@ -164,3 +164,8 @@ export const getBackupModeOptions = (db: Databases): Array<SelectableValue<Backu
     label: formatBackupMode(mode),
   }));
 };
+
+export const getDataModelFromVendor = (db: Databases): DataModel => {
+  const logicalDbs = [Databases.mongodb];
+  return logicalDbs.includes(db) ? DataModel.LOGICAL : DataModel.PHYSICAL;
+};

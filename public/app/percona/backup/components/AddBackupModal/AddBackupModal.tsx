@@ -16,7 +16,13 @@ import { AddBackupFormProps, AddBackupModalProps, SelectableService } from './Ad
 import { RetryModeSelector } from './RetryModeSelector';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 import { Messages } from './AddBackupModal.messages';
-import { toFormBackup, isCronFieldDisabled, PERIOD_OPTIONS, getBackupModeOptions } from './AddBackupModal.utils';
+import {
+  toFormBackup,
+  isCronFieldDisabled,
+  PERIOD_OPTIONS,
+  getBackupModeOptions,
+  getDataModelFromVendor,
+} from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
@@ -62,6 +68,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
         mutators={{
           changeVendor: ([vendor]: [Databases], state, tools) => {
             tools.changeValue(state, 'vendor', () => vendor);
+            tools.changeValue(state, 'dataModel', () => getDataModelFromVendor(vendor));
             //TODO remove this when we support incremental backups for MySQL
             tools.changeValue(state, 'mode', () => BackupMode.SNAPSHOT);
           },
