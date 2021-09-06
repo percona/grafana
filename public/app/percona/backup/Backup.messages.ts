@@ -17,6 +17,7 @@ export const Messages = {
         vendor: 'Vendor',
         status: 'Status',
         actions: 'Actions',
+        type: 'Type',
       },
       status: {
         invalid: 'Invalid',

@@ -27,6 +27,7 @@ import {
 } from './BackupInventory.constants';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { RetryMode } from '../../Backup.types';
+import { formatBackupMode } from '../../Backup.utils';
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
@@ -56,6 +57,11 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.created,
         accessor: 'created',
         Cell: ({ value }) => <DetailedDate date={value} />,
+      },
+      {
+        Header: Messages.backupInventory.table.columns.type,
+        accessor: 'mode',
+        Cell: ({ value }) => formatBackupMode(value),
       },
       {
         Header: Messages.backupInventory.table.columns.location,

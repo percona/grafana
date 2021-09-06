@@ -40,5 +40,5 @@ export const formatBackupMode = (mode: BackupMode): string => {
     [BackupMode.INVALID]: backupModeMsg.invalid,
   };
 
-  return map[mode] || '';
+  return map[mode] || map[BackupMode.INVALID];
 };

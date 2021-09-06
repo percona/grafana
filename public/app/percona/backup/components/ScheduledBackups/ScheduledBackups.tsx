@@ -73,7 +73,7 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.type,
         accessor: 'mode',
-        Cell: ({ value, row }) => formatBackupMode(value),
+        Cell: ({ value }) => formatBackupMode(value),
       },
       {
         Header: Messages.scheduledBackups.table.columns.location,
