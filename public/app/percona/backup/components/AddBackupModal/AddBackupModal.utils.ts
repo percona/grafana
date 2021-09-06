@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { DataModel } from 'app/percona/backup/Backup.types';
+import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
@@ -44,6 +44,9 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       service: (null as unknown) as SelectableValue<SelectableService>,
       dataModel: DataModel.PHYSICAL,
       vendor: '',
+      retryMode: RetryMode.MANUAL,
+      retryTimes: 2,
+      retryInterval: 30,
       backupName: '',
       description: '',
       location: (null as unknown) as SelectableValue<string>,
@@ -72,7 +75,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
   let description = '';
 
   if (isScheduledBackup(backup)) {
-    const { cronExpression, enabled, description: backupDescription, retention } = backup;
+    const { cronExpression, enabled, description: backupDescription, retention, retryInterval, retryTimes } = backup;
     const cronParts = parseCronString(cronExpression);
     const periodType = getPeriodFromCronparts(cronParts);
     const [minutePart, hourPart, dayPart, monthPart, weekDayPary] = cronParts;
@@ -93,6 +96,9 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       backupName: name,
       description,
       location: { label: locationName, value: locationId },
+      retryMode: retryTimes > 0 ? RetryMode.AUTO : RetryMode.MANUAL,
+      retryTimes: retryTimes || 2,
+      retryInterval: parseInt(retryInterval || '30', 10),
       retention,
       period,
       month,
