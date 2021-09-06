@@ -134,7 +134,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 options={getBackupModeOptions(values.vendor)}
                 name="mode"
                 //TODO remove this when we support incremental backups for MySQL
-                disabled={values.vendor === Databases.mysql}
+                disabled={!!backup || values.vendor === Databases.mysql}
                 label={Messages.type}
                 fullWidth
               />
