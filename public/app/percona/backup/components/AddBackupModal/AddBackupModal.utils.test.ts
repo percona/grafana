@@ -3,7 +3,7 @@ import { BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.type
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { AddBackupFormProps } from './AddBackupModal.types';
 import { toFormBackup, isCronFieldDisabled, getOptionFromPeriodType, getOptionFromDigit } from './AddBackupModal.utils';
-import { Databases } from 'app/percona/shared/core';
+import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
 describe('AddBackupModal::utils', () => {
   describe('toFormBackup', () => {
@@ -27,7 +27,7 @@ describe('AddBackupModal::utils', () => {
         retention: 7,
         logs: false,
         active: true,
-        vendor: 'MySQL',
+        vendor: '',
       });
     });
 
@@ -42,7 +42,7 @@ describe('AddBackupModal::utils', () => {
         backupName: 'Backup 1',
         description: '',
         location: { label: locationName, value: locationId },
-        vendor: 'MySQL',
+        vendor: DATABASE_LABELS[Databases.mysql],
       });
     });
 
@@ -86,7 +86,7 @@ describe('AddBackupModal::utils', () => {
         retention: 0,
         logs: false,
         active: true,
-        vendor: 'MySQL',
+        vendor: DATABASE_LABELS[Databases.mongodb],
       });
     });
   });
