@@ -151,6 +151,7 @@ export const ScheduledBackups: FC = () => {
       retryTimes,
       active,
       retention,
+      mode,
     } = backup;
     try {
       const cronExpression = getCronStringFromValues(
@@ -186,7 +187,8 @@ export const ScheduledBackups: FC = () => {
           strRetryInterval,
           resultRetryTimes!,
           retention!,
-          active!
+          active!,
+          mode
         );
         appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.addSuccess]);
       }
@@ -199,7 +201,17 @@ export const ScheduledBackups: FC = () => {
   };
 
   const handleCopy = async (backup: ScheduledBackup) => {
-    const { serviceId, locationId, cronExpression, name, description, retention, retryInterval, retryTimes } = backup;
+    const {
+      serviceId,
+      locationId,
+      cronExpression,
+      name,
+      description,
+      retention,
+      retryInterval,
+      retryTimes,
+      mode,
+    } = backup;
     const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
     setActionPending(true);
     try {
@@ -212,7 +224,8 @@ export const ScheduledBackups: FC = () => {
         retryInterval,
         retryTimes,
         retention,
-        false
+        false,
+        mode
       );
       getData();
     } catch (e) {

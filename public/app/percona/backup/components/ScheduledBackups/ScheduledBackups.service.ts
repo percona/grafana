@@ -1,6 +1,7 @@
 import { CancelToken } from 'axios';
 import { api } from 'app/percona/shared/helpers/api';
 import { ScheduledBackup, ScheduledBackupResponse } from './ScheduledBackups.types';
+import { BackupMode } from '../../Backup.types';
 
 const BASE_URL = '/v1/management/backup/Backups';
 
@@ -62,7 +63,8 @@ export const ScheduledBackupsService = {
     retryInterval: string,
     retryTimes: number,
     retention: number,
-    enabled: boolean
+    enabled: boolean,
+    mode: BackupMode
   ) {
     return api.post(`${BASE_URL}/Schedule`, {
       service_id: serviceId,
@@ -74,6 +76,7 @@ export const ScheduledBackupsService = {
       retries: retryTimes,
       enabled: !!enabled,
       retention,
+      mode,
     });
   },
   async toggle(id: string, enabled: boolean) {
