@@ -2,7 +2,14 @@ import { stubs as backupStubs } from '../BackupInventory/__mocks__/BackupInvento
 import { BackupMode, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { AddBackupFormProps } from './AddBackupModal.types';
-import { toFormBackup, isCronFieldDisabled, getOptionFromPeriodType, getOptionFromDigit } from './AddBackupModal.utils';
+import {
+  toFormBackup,
+  isCronFieldDisabled,
+  getOptionFromPeriodType,
+  getOptionFromDigit,
+  getBackupModeOptions,
+  getDataModelFromVendor,
+} from './AddBackupModal.utils';
 import { Databases } from 'app/percona/shared/core';
 
 describe('AddBackupModal::utils', () => {
@@ -28,7 +35,7 @@ describe('AddBackupModal::utils', () => {
         logs: false,
         active: true,
         vendor: null as any,
-        mode: null as any,
+        mode: BackupMode.INCREMENTAL,
       });
     });
 
@@ -153,6 +160,26 @@ describe('AddBackupModal::utils', () => {
       expect(getOptionFromDigit(8)).toEqual({ value: 8, label: '08' });
       expect(getOptionFromDigit(10)).toEqual({ value: 10, label: '10' });
       expect(getOptionFromDigit(54)).toEqual({ value: 54, label: '54' });
+    });
+  });
+
+  describe('getBackupModeOptions', () => {
+    it('should return backup mode options according to vendor', () => {
+      const mongoOptions = getBackupModeOptions(Databases.mongodb);
+      const mySqlOptions = getBackupModeOptions(Databases.mysql);
+      expect(mongoOptions).toHaveLength(2);
+      expect(mySqlOptions).toHaveLength(2);
+      expect(mongoOptions[0].value).toBe(BackupMode.PITR);
+      expect(mongoOptions[1].value).toBe(BackupMode.SNAPSHOT);
+      expect(mySqlOptions[0].value).toBe(BackupMode.INCREMENTAL);
+      expect(mySqlOptions[1].value).toBe(BackupMode.SNAPSHOT);
+    });
+  });
+
+  describe('getDataModelFromVendor', () => {
+    it('should return data model according to vendor', () => {
+      expect(getDataModelFromVendor(Databases.mongodb)).toBe(DataModel.LOGICAL);
+      expect(getDataModelFromVendor(Databases.mysql)).toBe(DataModel.PHYSICAL);
     });
   });
 });
