@@ -19,6 +19,7 @@ export const BackupInventoryService = {
         data_model,
         status,
         vendor,
+        mode,
       }): Backup => ({
         id: artifact_id,
         name,
@@ -30,6 +31,7 @@ export const BackupInventoryService = {
         dataModel: data_model,
         status,
         vendor,
+        mode,
       })
     );
   },
