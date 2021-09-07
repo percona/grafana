@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
 import { Field, withTypes } from 'react-final-form';
@@ -31,7 +31,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   onRestore,
 }) => {
   const styles = useStyles(getStyles);
-  const initialValues = backup ? toFormProps(backup) : undefined;
+  const initialValues = useMemo(() => (backup ? toFormProps(backup) : undefined), [backup]);
   const handleSubmit = ({ serviceType, service }: RestoreBackupFormProps) => {
     if (backup) {
       const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
