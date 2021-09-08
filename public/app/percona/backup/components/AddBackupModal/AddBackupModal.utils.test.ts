@@ -17,11 +17,11 @@ describe('AddBackupModal::utils', () => {
     it('should return default values if a null Backup is passed', () => {
       expect(toFormBackup(null)).toEqual<AddBackupFormProps>({
         id: '',
-        service: null as any,
+        service: null,
         dataModel: DataModel.PHYSICAL,
         backupName: '',
         description: '',
-        location: null as any,
+        location: null,
         retryMode: RetryMode.MANUAL,
         retryTimes: 2,
         retryInterval: 30,
@@ -34,7 +34,7 @@ describe('AddBackupModal::utils', () => {
         retention: 7,
         logs: false,
         active: true,
-        vendor: null as any,
+        vendor: null,
         mode: BackupMode.SNAPSHOT,
       });
     });

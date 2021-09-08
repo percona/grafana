@@ -6,7 +6,7 @@ import { PeriodType } from 'app/percona/shared/helpers/cron/types';
 import { formatBackupMode } from '../../Backup.utils';
 import { Backup } from '../BackupInventory/BackupInventory.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
-import { AddBackupFormProps, SelectableService } from './AddBackupModal.types';
+import { AddBackupFormProps } from './AddBackupModal.types';
 
 export const PERIOD_OPTIONS: Array<SelectableValue<PeriodType>> = [
   {
@@ -42,14 +42,14 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
   if (!backup) {
     return {
       id: '',
-      service: (null as unknown) as SelectableValue<SelectableService>,
+      service: null,
       dataModel: DataModel.PHYSICAL,
       retryMode: RetryMode.MANUAL,
       retryTimes: 2,
       retryInterval: 30,
       backupName: '',
       description: '',
-      location: (null as unknown) as SelectableValue<string>,
+      location: null,
       retention: 7,
       period: { value: 'year', label: 'Year' },
       month: [],
@@ -59,7 +59,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       startMinute: [{ value: 0, label: '00' }],
       logs: false,
       active: true,
-      vendor: (null as unknown) as Databases,
+      vendor: null,
       mode: BackupMode.SNAPSHOT,
     };
   }
@@ -155,8 +155,8 @@ export const getOptionFromDigit = (value: number): SelectableValue<number> => ({
   label: value < 10 ? `0${value.toString()}` : value.toString(),
 });
 
-export const getBackupModeOptions = (db: Databases): Array<SelectableValue<BackupMode>> => {
-  const pitrDbs = [Databases.mongodb];
+export const getBackupModeOptions = (db: Databases | null): Array<SelectableValue<BackupMode>> => {
+  const pitrDbs: Array<Databases | null> = [Databases.mongodb];
   const isPitr = pitrDbs.includes(db);
   const modes = [isPitr ? BackupMode.PITR : BackupMode.INCREMENTAL, BackupMode.SNAPSHOT];
   return modes.map((mode) => ({

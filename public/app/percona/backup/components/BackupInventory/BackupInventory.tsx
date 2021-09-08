@@ -173,8 +173,8 @@ export const BackupInventory: FC = () => {
     let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
     try {
       await BackupInventoryService.backup(
-        service.value?.id || '',
-        location.value || '',
+        service!.value?.id || '',
+        location!.value || '',
         backupName,
         description,
         strRetryInterval,

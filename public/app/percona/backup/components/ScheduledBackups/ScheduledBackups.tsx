@@ -179,8 +179,8 @@ export const ScheduledBackups: FC = () => {
         appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.getEditSuccess(backupName)]);
       } else {
         await ScheduledBackupsService.schedule(
-          service.value?.id!,
-          location.value!,
+          service!.value?.id!,
+          location!.value!,
           cronExpression,
           backupName,
           description,
