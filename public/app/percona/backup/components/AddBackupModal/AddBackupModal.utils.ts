@@ -60,7 +60,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       logs: false,
       active: true,
       vendor: (null as unknown) as Databases,
-      mode: BackupMode.INCREMENTAL,
+      mode: BackupMode.SNAPSHOT,
     };
   }
 

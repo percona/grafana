@@ -35,7 +35,7 @@ describe('AddBackupModal::utils', () => {
         logs: false,
         active: true,
         vendor: null as any,
-        mode: BackupMode.INCREMENTAL,
+        mode: BackupMode.SNAPSHOT,
       });
     });
 

@@ -66,11 +66,13 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
         initialValues={initialValues}
         onSubmit={handleSubmit}
         mutators={{
-          changeVendor: ([vendor]: [Databases], state, tools) => {
+          changeVendor: ([vendor]: [Databases, BackupMode], state, tools) => {
             tools.changeValue(state, 'vendor', () => vendor);
             tools.changeValue(state, 'dataModel', () => getDataModelFromVendor(vendor));
             //TODO remove this when we support incremental backups for MySQL
-            tools.changeValue(state, 'mode', () => BackupMode.SNAPSHOT);
+            if (vendor === Databases.mysql) {
+              tools.changeValue(state, 'mode', () => BackupMode.SNAPSHOT);
+            }
           },
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
