@@ -14,7 +14,19 @@ export const AlertManager: FC<AlertManagerProps> = ({ alertManagerUrl, alertMana
   const styles = getStyles(theme);
   const settingsStyles = getSettingsStyles(theme);
   const {
-    alertmanager: { action, rulesLabel, rulesLink, rulesTooltip, urlLabel, urlLink, urlTooltip },
+    alertmanager: {
+      action,
+      rulesLabel,
+      rulesLink,
+      rulesTooltip,
+      urlLabel,
+      urlLink,
+      urlTooltip,
+      warningPre,
+      warningLinkContent,
+      warningLinkURL,
+      warningPost,
+    },
     tooltipLinkText,
   } = Messages;
   const [loading, setLoading] = useState(false);
@@ -48,6 +60,13 @@ export const AlertManager: FC<AlertManagerProps> = ({ alertManagerUrl, alertMana
         render={({ handleSubmit, pristine }) => (
           <form onSubmit={handleSubmit}>
             <div className={settingsStyles.labelWrapper} data-qa="alertmanager-url-label">
+              <strong className={styles.warning}>
+                {warningPre}{' '}
+                <a className={styles.warningLink} href={warningLinkURL}>
+                  {warningLinkContent}
+                </a>{' '}
+                {warningPost}
+              </strong>
               <span>{urlLabel}</span>
               <LinkTooltip tooltipText={urlTooltip} link={urlLink} linkText={tooltipLinkText} icon="info-circle" />
             </div>
