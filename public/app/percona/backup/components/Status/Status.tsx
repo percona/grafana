@@ -6,6 +6,7 @@ import { StatusProps } from './Status.types';
 import { getStyles } from './Status.styles';
 import { BackupStatus, RestoreStatus } from '../../Backup.types';
 import { Ellipsis } from 'app/percona/shared/components/Elements/Icons';
+import { Messages } from './Status.messages';
 
 const pendingStates = [
   BackupStatus.BACKUP_STATUS_PENDING,
@@ -21,7 +22,7 @@ const errorStates = [
   RestoreStatus.RESTORE_STATUS_INVALID,
 ];
 
-export const Status: FC<StatusProps> = ({ status }) => {
+export const Status: FC<StatusProps> = ({ status, onLogClick = () => null }) => {
   const statusMsg = formatStatus(status);
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -34,13 +35,20 @@ export const Status: FC<StatusProps> = ({ status }) => {
   );
   const isPending = pendingStates.includes(status);
 
-  return isPending ? (
-    <span data-qa="statusPending" className={styles.ellipsisContainer}>
-      <Ellipsis />
-    </span>
-  ) : (
-    <span data-qa="statusMsg" className={cx(statusStyles)}>
-      {statusMsg}
-    </span>
+  return (
+    <div className={styles.statusContainer}>
+      {isPending ? (
+        <span data-qa="statusPending" className={styles.ellipsisContainer}>
+          <Ellipsis />
+        </span>
+      ) : (
+        <span data-qa="statusMsg" className={cx(statusStyles)}>
+          {statusMsg}
+        </span>
+      )}
+      <span role="button" className={styles.logs} onClick={onLogClick}>
+        {Messages.logs}
+      </span>
+    </div>
   );
 };
