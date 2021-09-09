@@ -8,6 +8,7 @@ import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/
 import { getStyles } from './AlertManager.styles';
 import { AlertManagerProps } from './AlertManager.types';
 import { AlertManagerChangePayload } from '../../Settings.types';
+import { AM_WARNING_URL } from '../../Settings.constants';
 
 export const AlertManager: FC<AlertManagerProps> = ({ alertManagerUrl, alertManagerRules, updateSettings }) => {
   const theme = useTheme();
@@ -24,7 +25,6 @@ export const AlertManager: FC<AlertManagerProps> = ({ alertManagerUrl, alertMana
       urlTooltip,
       warningPre,
       warningLinkContent,
-      warningLinkURL,
       warningPost,
     },
     tooltipLinkText,
@@ -62,7 +62,7 @@ export const AlertManager: FC<AlertManagerProps> = ({ alertManagerUrl, alertMana
             <div className={settingsStyles.labelWrapper} data-qa="alertmanager-url-label">
               <strong className={styles.warning}>
                 {warningPre}{' '}
-                <a className={styles.warningLink} href={warningLinkURL}>
+                <a className={styles.warningLink} href={AM_WARNING_URL}>
                   {warningLinkContent}
                 </a>{' '}
                 {warningPost}
