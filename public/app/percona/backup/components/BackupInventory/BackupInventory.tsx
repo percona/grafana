@@ -27,19 +27,23 @@ import {
 } from './BackupInventory.constants';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { RetryMode } from '../../Backup.types';
+import { BackupLogsModal } from './BackupLogsModal/BackupLogsModal';
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
   const [deletePending, setDeletePending] = useState(false);
+  const [loadingLogs, setLoadingLogs] = useState(false);
   const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
+  const [logs, setLogs] = useState('');
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const columns = useMemo(
-    (): Column[] => [
+    (): Array<Column<Backup>> => [
       {
         Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
@@ -64,7 +68,7 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.status,
         accessor: 'status',
-        Cell: ({ value }) => <Status status={value} />,
+        Cell: ({ value, row }) => <Status status={value} onLogClick={() => onLogClick(row.original)} />,
       },
       {
         Header: Messages.backupInventory.table.columns.actions,
@@ -73,7 +77,7 @@ export const BackupInventory: FC = () => {
           <BackupInventoryActions
             onRestore={onRestoreClick}
             onBackup={onBackupClick}
-            backup={row.original as Backup}
+            backup={row.original}
             onDelete={onDeleteClick}
           />
         ),
@@ -94,10 +98,21 @@ export const BackupInventory: FC = () => {
     setDeleteModalVisible(true);
   };
 
+  const onLogClick = (backup: Backup) => {
+    setSelectedBackup(backup);
+    setLogsModalVisible(true);
+  };
+
   const handleClose = () => {
     setSelectedBackup(null);
     setRestoreModalVisible(false);
     setBackupModalVisible(false);
+  };
+
+  const handleLogsClose = () => {
+    setSelectedBackup(null);
+    setLogsModalVisible(false);
+    setLogs('');
   };
 
   const handleRestore = async (serviceId: string, artifactId: string) => {
@@ -136,6 +151,18 @@ export const BackupInventory: FC = () => {
       logger.error(e);
     }
     setPending(false);
+  };
+
+  const getLogs = async () => {
+    setLoadingLogs(true);
+    try {
+      const logs = await BackupInventoryService.getLogs(selectedBackup!.id);
+      setLogs(logs);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setLoadingLogs(false);
+    }
   };
 
   const renderSelectedSubRow = React.useCallback(
@@ -235,6 +262,14 @@ export const BackupInventory: FC = () => {
         initialForceValue={true}
         loading={deletePending}
         showForce
+      />
+      <BackupLogsModal
+        title={Messages.backupInventory.getLogsTitle(selectedBackup?.name || '')}
+        isVisible={logsModalVisible}
+        onClose={handleLogsClose}
+        onUpdateLogs={getLogs}
+        logs={logs}
+        loadingLogs={loadingLogs}
       />
     </>
   );
