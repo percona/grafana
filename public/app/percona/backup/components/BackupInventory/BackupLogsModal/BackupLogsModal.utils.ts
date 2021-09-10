@@ -5,5 +5,5 @@ export const getLogsContent = (logs: string, loading: boolean) => {
     return !!logs.length ? `${logs}\n${Messages.loading}` : Messages.loading;
   }
 
-  return logs;
+  return logs.length ? logs : Messages.noLogs;
 };
