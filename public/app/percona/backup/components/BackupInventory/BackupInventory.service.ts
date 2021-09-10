@@ -1,6 +1,7 @@
 import { api } from 'app/percona/shared/helpers/api';
 import { CancelToken } from 'axios';
-import { Backup, BackupResponse } from './BackupInventory.types';
+import { LOGS_LIMIT } from './BackupInventory.constants';
+import { Backup, BackupLogResponse, BackupResponse } from './BackupInventory.types';
 
 const BASE_URL = '/v1/management/backup';
 
@@ -69,5 +70,14 @@ export const BackupInventoryService = {
   },
   async delete(artifactId: string, removeFiles: boolean) {
     return api.post(`${BASE_URL}/Artifacts/Delete`, { artifact_id: artifactId, remove_files: removeFiles });
+  },
+  async getLogs(artifactId: string): Promise<string> {
+    const { logs = [] } = await api.post<BackupLogResponse, any>(`${BASE_URL}/Backups/GetLogs`, {
+      artifact_id: artifactId,
+      from_chunk: 0,
+      limit: LOGS_LIMIT,
+    });
+
+    return logs.map((log) => log.message).reduce((acc, message) => `${acc}\n${message}`);
   },
 };
