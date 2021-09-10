@@ -5,4 +5,7 @@ export const getStyles = () => ({
     justify-content: center;
     display: flex;
   `,
+  pre: css`
+    max-height: 250px;
+  `,
 });

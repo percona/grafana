@@ -4,5 +4,5 @@ export interface BackupLogsModalProps {
   title: string;
   loadingLogs: boolean;
   onClose: () => void;
-  onUpdateLogs: () => void;
+  onUpdateLogs: () => Promise<any>;
 }
