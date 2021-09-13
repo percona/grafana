@@ -68,7 +68,7 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.status,
         accessor: 'status',
-        Cell: ({ value, row }) => <Status status={value} onLogClick={() => onLogClick(row.original)} />,
+        Cell: ({ value, row }) => <Status showLogsAction status={value} onLogClick={() => onLogClick(row.original)} />,
       },
       {
         Header: Messages.backupInventory.table.columns.actions,

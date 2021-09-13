@@ -6,6 +6,7 @@ import { Status } from './Status';
 import { BackupStatus, RestoreStatus } from '../../Backup.types';
 import { Ellipsis } from 'app/percona/shared/components/Elements/Icons';
 import { dataQa } from '@percona/platform-core';
+import { Messages } from './Status.messages';
 
 describe('Status', () => {
   describe('pending states', () => {
@@ -35,10 +36,15 @@ describe('Status', () => {
   });
 
   describe('logs action', () => {
+    it('should have logs hidden by default', () => {
+      render(<Status status={BackupStatus.BACKUP_STATUS_IN_PROGRESS} />);
+      expect(screen.queryByText(Messages.logs)).not.toBeInTheDocument();
+    });
+
     it('should call onLogClick', () => {
       const onLogClick = jest.fn();
-      render(<Status status={BackupStatus.BACKUP_STATUS_IN_PROGRESS} onLogClick={onLogClick} />);
-      userEvent.click(screen.getByRole('button'));
+      render(<Status showLogsAction status={BackupStatus.BACKUP_STATUS_IN_PROGRESS} onLogClick={onLogClick} />);
+      userEvent.click(screen.queryByText(Messages.logs)!);
       expect(onLogClick).toHaveBeenCalled();
     });
   });

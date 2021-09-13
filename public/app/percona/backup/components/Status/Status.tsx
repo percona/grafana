@@ -22,7 +22,7 @@ const errorStates = [
   RestoreStatus.RESTORE_STATUS_INVALID,
 ];
 
-export const Status: FC<StatusProps> = ({ status, onLogClick = () => null }) => {
+export const Status: FC<StatusProps> = ({ status, showLogsAction = false, onLogClick = () => null }) => {
   const statusMsg = formatStatus(status);
   const theme = useTheme();
   const styles = getStyles(theme);
@@ -46,9 +46,11 @@ export const Status: FC<StatusProps> = ({ status, onLogClick = () => null }) => 
           {statusMsg}
         </span>
       )}
-      <span role="button" className={styles.logs} onClick={onLogClick}>
-        {Messages.logs}
-      </span>
+      {showLogsAction && (
+        <span role="button" className={styles.logs} onClick={onLogClick}>
+          {Messages.logs}
+        </span>
+      )}
     </div>
   );
 };
