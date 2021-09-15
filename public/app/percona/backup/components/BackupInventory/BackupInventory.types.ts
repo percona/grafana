@@ -29,13 +29,3 @@ export interface RawBackup {
 export interface BackupResponse {
   artifacts: RawBackup[];
 }
-
-export interface RawBackupLog {
-  chunk_id: string;
-  message: string;
-  last_chunk: string;
-}
-
-export interface BackupLogResponse {
-  logs: RawBackupLog[];
-}

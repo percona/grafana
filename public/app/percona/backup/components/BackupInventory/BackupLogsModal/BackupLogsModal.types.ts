@@ -1,8 +1,8 @@
+import { BackupLogs } from 'app/percona/backup/Backup.types';
+
 export interface BackupLogsModalProps {
   isVisible: boolean;
-  logs: string;
   title: string;
-  loadingLogs: boolean;
   onClose: () => void;
-  onUpdateLogs: () => Promise<any>;
+  getLogChunks: (startingChunk: number, offset: number) => Promise<BackupLogs>;
 }

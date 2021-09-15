@@ -32,14 +32,12 @@ import { BackupLogsModal } from './BackupLogsModal/BackupLogsModal';
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
   const [deletePending, setDeletePending] = useState(false);
-  const [loadingLogs, setLoadingLogs] = useState(false);
   const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
-  const [logs, setLogs] = useState('');
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const columns = useMemo(
@@ -112,7 +110,6 @@ export const BackupInventory: FC = () => {
   const handleLogsClose = () => {
     setSelectedBackup(null);
     setLogsModalVisible(false);
-    setLogs('');
   };
 
   const handleRestore = async (serviceId: string, artifactId: string) => {
@@ -153,16 +150,8 @@ export const BackupInventory: FC = () => {
     setPending(false);
   };
 
-  const getLogs = async () => {
-    setLoadingLogs(true);
-    try {
-      const logs = await BackupInventoryService.getLogs(selectedBackup!.id);
-      setLogs(logs);
-    } catch (e) {
-      logger.error(e);
-    } finally {
-      setLoadingLogs(false);
-    }
+  const getLogs = async (startingChunk: number, offset: number) => {
+    return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset);
   };
 
   const renderSelectedSubRow = React.useCallback(
@@ -267,9 +256,7 @@ export const BackupInventory: FC = () => {
         title={Messages.backupInventory.getLogsTitle(selectedBackup?.name || '')}
         isVisible={logsModalVisible}
         onClose={handleLogsClose}
-        onUpdateLogs={getLogs}
-        logs={logs}
-        loadingLogs={loadingLogs}
+        getLogChunks={getLogs}
       />
     </>
   );
