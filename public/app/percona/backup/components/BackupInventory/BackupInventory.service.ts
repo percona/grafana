@@ -1,10 +1,9 @@
 import { api } from 'app/percona/shared/helpers/api';
 import { CancelToken } from 'axios';
-import { BackupLogs } from '../../Backup.types';
+import { BackupLogResponse, BackupLogs } from '../../Backup.types';
 import { Backup, BackupResponse } from './BackupInventory.types';
 
 const BASE_URL = '/v1/management/backup';
-const logs: BackupLogs = { logs: [{ id: 0, message: 'One Message', time: '2021-09-14T23:04:29.613Z' }], end: true };
 
 export const BackupInventoryService = {
   async list(token?: CancelToken): Promise<Backup[]> {
@@ -73,12 +72,15 @@ export const BackupInventoryService = {
     return api.post(`${BASE_URL}/Artifacts/Delete`, { artifact_id: artifactId, remove_files: removeFiles });
   },
   async getLogs(artifactId: string, startingChunk: number, offset: number): Promise<BackupLogs> {
-    // const { logs = [] } = await api.post<BackupLogResponse, any>(`${BASE_URL}/Backups/GetLogs`, {
-    //   artifact_id: artifactId,
-    //   from_chunk: 0,
-    //   limit: LOGS_LIMIT,
-    // });
-    console.log(`GET LOGS: chunk = ${startingChunk}, offset=${offset}`);
-    return logs;
+    const { logs = [], end } = await api.post<BackupLogResponse, any>(`${BASE_URL}/Backups/GetLogs`, {
+      artifact_id: artifactId,
+      offset: startingChunk,
+      limit: offset,
+    });
+
+    return {
+      logs: logs.map(({ chunk_id = 0, message, time }) => ({ id: chunk_id, message, time })),
+      end,
+    };
   },
 };
