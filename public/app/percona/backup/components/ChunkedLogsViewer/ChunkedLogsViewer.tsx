@@ -6,6 +6,7 @@ import { useRecurringCall } from '../../hooks/recurringCall.hook';
 import { LIMIT, OFFSET, STREAM_INTERVAL } from './ChunkedLogsViewer.constants';
 import { getStyles } from './ChunkedLogsViewer.styles';
 import { ChunkedLogsViewerProps } from './ChunkedLogsViewer.types';
+import { Messages } from './ChunkedLogsViewer.messages';
 
 export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) => {
   const [endOfStream, setEndOfStream] = useState(false);
@@ -113,7 +114,7 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
                   variant="secondary"
                   disabled={loading}
                 >
-                  Load older logs
+                  {Messages.loadOlderLogs}
                 </Button>
               </div>
             )}
@@ -127,16 +128,16 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
                   variant="secondary"
                   disabled={loading}
                 >
-                  Load newer logs
+                  {Messages.loadNewerLogs}
                 </Button>
               </div>
             )}
           </>
         ) : (
-          'No Logs'
+          Messages.noLogs
         )}
       </pre>
-      <Field label="Stream logs">
+      <Field label={Messages.streamLogs}>
         <Switch value={stream} onChange={onChangeStream} />
       </Field>
       <div className={styles.btnHolder}>
