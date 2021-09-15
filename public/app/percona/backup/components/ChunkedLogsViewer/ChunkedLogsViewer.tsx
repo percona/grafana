@@ -100,6 +100,12 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
     }
   }, [stream]);
 
+  useEffect(() => {
+    if (endOfStream) {
+      setStream(false);
+    }
+  }, [endOfStream]);
+
   return (
     <>
       <pre>
@@ -137,7 +143,7 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
           Messages.noLogs
         )}
       </pre>
-      <Field label={Messages.streamLogs}>
+      <Field label={Messages.streamLogs} disabled={endOfStream}>
         <Switch value={stream} onChange={onChangeStream} />
       </Field>
       <div className={styles.btnHolder}>
