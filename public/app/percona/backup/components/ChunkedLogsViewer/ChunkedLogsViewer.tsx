@@ -31,15 +31,18 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
     setLoading(true);
     try {
       const { logs: newLogs = [], end } = await getLogChunks(logs[logs.length - 1].id + 1, OFFSET);
-      const lastId = newLogs[newLogs.length - 1].id;
-      const diff = lastId - logs[0].id + 1;
 
-      if (diff > LIMIT + OFFSET) {
-        const sliceStart = LIMIT + OFFSET - diff;
-        const subLogs = logs.slice(logs[0].id + sliceStart);
-        setLogs([...subLogs, ...newLogs]);
-      } else {
-        setLogs([...logs, ...newLogs]);
+      if (newLogs.length) {
+        const lastId = newLogs[newLogs.length - 1].id;
+        const diff = lastId - logs[0].id + 1;
+
+        if (diff > LIMIT + OFFSET) {
+          const sliceStart = LIMIT + OFFSET - diff;
+          const subLogs = logs.slice(logs[0].id + sliceStart);
+          setLogs([...subLogs, ...newLogs]);
+        } else {
+          setLogs([...logs, ...newLogs]);
+        }
       }
       setEndOfStream(!!end);
     } catch (e) {
@@ -56,14 +59,17 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
         Math.max(0, logs[0].id - OFFSET),
         Math.min(logs[0].id, OFFSET)
       );
-      const diff = logs[logs.length - 1].id - newLogs[0].id + 1;
 
-      if (diff > LIMIT + OFFSET) {
-        const sliceStart = LIMIT + OFFSET - diff;
-        const subLogs = logs.slice(logs[0].id, logs[logs.length - 1].id - sliceStart + 1);
-        setLogs([...newLogs, ...subLogs]);
-      } else {
-        setLogs([...newLogs, ...logs]);
+      if (newLogs.length) {
+        const diff = logs[logs.length - 1].id - newLogs[0].id + 1;
+
+        if (diff > LIMIT + OFFSET) {
+          const sliceStart = LIMIT + OFFSET - diff;
+          const subLogs = logs.slice(logs[0].id, logs[logs.length - 1].id - sliceStart + 1);
+          setLogs([...newLogs, ...subLogs]);
+        } else {
+          setLogs([...newLogs, ...logs]);
+        }
       }
       setEndOfStream(!!end);
     } catch (e) {
@@ -84,7 +90,7 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
           <>
             {logs[0].id !== 0 && (
               <div className={styles.btnHolder}>
-                <Button onClick={getOlderLogs} variant="secondary" disabled={loading}>
+                <Button size="sm" onClick={getOlderLogs} variant="secondary" disabled={loading}>
                   Load older logs
                 </Button>
               </div>
