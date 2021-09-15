@@ -90,7 +90,13 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
           <>
             {logs[0].id !== 0 && (
               <div className={styles.btnHolder}>
-                <Button size="sm" onClick={getOlderLogs} variant="secondary" disabled={loading}>
+                <Button
+                  className={styles.olderBtn}
+                  size="sm"
+                  onClick={getOlderLogs}
+                  variant="secondary"
+                  disabled={loading}
+                >
                   Load older logs
                 </Button>
               </div>
@@ -98,7 +104,13 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
             {logs.map((log) => log.message).reduce((acc, message) => `${acc}${acc.length ? '\n' : ''}${message}`, '')}
             {!endOfStream && (
               <div className={styles.btnHolder}>
-                <Button size="sm" onClick={getNewerLogs} variant="secondary" disabled={loading}>
+                <Button
+                  className={styles.newerBtn}
+                  size="sm"
+                  onClick={getNewerLogs}
+                  variant="secondary"
+                  disabled={loading}
+                >
                   Load newer logs
                 </Button>
               </div>
