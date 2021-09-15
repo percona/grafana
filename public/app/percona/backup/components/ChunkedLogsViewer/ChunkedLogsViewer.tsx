@@ -1,17 +1,18 @@
-import { Button, Icon, useStyles } from '@grafana/ui';
+import { Button, Field, Icon, Switch, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useCallback } from 'react';
 import { BackupLogChunk } from '../../Backup.types';
+import { useRecurringCall } from '../../hooks/recurringCall.hook';
+import { LIMIT, OFFSET, STREAM_INTERVAL } from './ChunkedLogsViewer.constants';
 import { getStyles } from './ChunkedLogsViewer.styles';
 import { ChunkedLogsViewerProps } from './ChunkedLogsViewer.types';
-
-const LIMIT = 50;
-const OFFSET = 20;
 
 export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) => {
   const [endOfStream, setEndOfStream] = useState(false);
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<BackupLogChunk[]>([]);
+  const [stream, setStream] = useState(false);
+  const [triggerTimeout, , stopTimeout] = useRecurringCall();
   const styles = useStyles(getStyles);
 
   const refreshCurrentLogs = async () => {
@@ -79,9 +80,24 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
     }
   };
 
+  const onChangeStream = useCallback(
+    (e) => {
+      setStream(e.currentTarget.checked);
+    },
+    [setStream]
+  );
+
   useEffect(() => {
     refreshCurrentLogs();
   }, []);
+
+  useEffect(() => {
+    if (stream) {
+      triggerTimeout(refreshCurrentLogs, STREAM_INTERVAL);
+    } else {
+      stopTimeout();
+    }
+  }, [stream]);
 
   return (
     <>
@@ -120,6 +136,9 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
           'No Logs'
         )}
       </pre>
+      <Field label="Stream logs">
+        <Switch value={stream} onChange={onChangeStream} />
+      </Field>
       <div className={styles.btnHolder}>
         <Button variant="secondary" onClick={refreshCurrentLogs} disabled={loading}>
           <Icon name="sync" />
