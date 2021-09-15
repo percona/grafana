@@ -39,7 +39,7 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
         const diff = lastId - logs[0].id + 1;
 
         if (diff > LIMIT + OFFSET) {
-          const sliceStart = LIMIT + OFFSET - diff;
+          const sliceStart = Math.abs(LIMIT + OFFSET - diff);
           const subLogs = logs.slice(logs[0].id + sliceStart);
           setLogs([...subLogs, ...newLogs]);
         } else {
@@ -66,8 +66,7 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
         const diff = logs[logs.length - 1].id - newLogs[0].id + 1;
 
         if (diff > LIMIT + OFFSET) {
-          const sliceStart = LIMIT + OFFSET - diff;
-          const subLogs = logs.slice(logs[0].id, logs[logs.length - 1].id - sliceStart + 1);
+          const subLogs = logs.slice(0, Math.abs(logs.length - newLogs.length));
           setLogs([...newLogs, ...subLogs]);
         } else {
           setLogs([...newLogs, ...logs]);
@@ -113,29 +112,25 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
           <>
             {logs[0]?.id !== 0 && (
               <div className={styles.btnHolder}>
-                <Button
-                  className={styles.olderBtn}
-                  size="sm"
-                  onClick={getOlderLogs}
-                  variant="secondary"
-                  disabled={loading}
-                >
-                  {Messages.loadOlderLogs}
-                </Button>
+                {loading ? (
+                  Messages.loading
+                ) : (
+                  <Button className={styles.olderBtn} size="sm" onClick={getOlderLogs} variant="secondary">
+                    {Messages.loadOlderLogs}
+                  </Button>
+                )}
               </div>
             )}
             {logs.map((log) => log.message).reduce((acc, message) => `${acc}${acc.length ? '\n' : ''}${message}`, '')}
-            {!endOfStream && logs.length >= LIMIT + OFFSET && (
+            {!endOfStream && (
               <div className={styles.btnHolder}>
-                <Button
-                  className={styles.newerBtn}
-                  size="sm"
-                  onClick={getNewerLogs}
-                  variant="secondary"
-                  disabled={loading}
-                >
-                  {Messages.loadNewerLogs}
-                </Button>
+                {loading ? (
+                  Messages.loading
+                ) : (
+                  <Button className={styles.newerBtn} size="sm" onClick={getNewerLogs} variant="secondary">
+                    {Messages.loadNewerLogs}
+                  </Button>
+                )}
               </div>
             )}
           </>
