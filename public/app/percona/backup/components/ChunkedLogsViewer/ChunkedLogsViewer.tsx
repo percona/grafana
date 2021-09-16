@@ -3,7 +3,8 @@ import { logger } from '@percona/platform-core';
 import React, { FC, useState, useEffect, useCallback } from 'react';
 import { BackupLogChunk } from '../../Backup.types';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
-import { LIMIT, BUFFER, STREAM_INTERVAL } from './ChunkedLogsViewer.constants';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { LIMIT, BUFFER, STREAM_INTERVAL, LOGS_CANCEL_TOKEN } from './ChunkedLogsViewer.constants';
 import { getStyles } from './ChunkedLogsViewer.styles';
 import { ChunkedLogsViewerProps } from './ChunkedLogsViewer.types';
 import { Messages } from './ChunkedLogsViewer.messages';
@@ -15,12 +16,13 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
   const [logs, setLogs] = useState<BackupLogChunk[]>([]);
   const [stream, setStream] = useState(false);
   const [triggerTimeout, , stopTimeout] = useRecurringCall();
+  const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
 
   const refreshCurrentLogs = async () => {
     setLoading(true);
     try {
-      const { logs: newLogs = [], end } = await getLogChunks(logs[0]?.id || 0, LIMIT);
+      const { logs: newLogs = [], end } = await getLogChunks(logs[0]?.id || 0, LIMIT, generateToken(LOGS_CANCEL_TOKEN));
       setLogs(newLogs);
       setEndOfStream(!!end);
     } catch (e) {
@@ -33,7 +35,11 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
   const getNewerLogs = async () => {
     setLoading(true);
     try {
-      const { logs: newLogs = [], end } = await getLogChunks(logs[logs.length - 1].id + 1, BUFFER);
+      const { logs: newLogs = [], end } = await getLogChunks(
+        logs[logs.length - 1].id + 1,
+        BUFFER,
+        generateToken(LOGS_CANCEL_TOKEN)
+      );
       setLogs(concatenateNewerLogs(logs, newLogs, LIMIT, BUFFER));
       setEndOfStream(!!end);
     } catch (e) {
@@ -48,7 +54,8 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
     try {
       const { logs: newLogs = [], end } = await getLogChunks(
         Math.max(0, logs[0].id - BUFFER),
-        Math.min(logs[0].id, BUFFER)
+        Math.min(logs[0].id, BUFFER),
+        generateToken(LOGS_CANCEL_TOKEN)
       );
       setLogs(concatenateOlderLogs(logs, newLogs, LIMIT, BUFFER));
       setEndOfStream(!!end);

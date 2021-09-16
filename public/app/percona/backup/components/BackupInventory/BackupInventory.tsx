@@ -28,6 +28,7 @@ import {
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { RetryMode } from '../../Backup.types';
 import { BackupLogsModal } from './BackupLogsModal/BackupLogsModal';
+import { CancelToken } from 'axios';
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
@@ -156,8 +157,8 @@ export const BackupInventory: FC = () => {
     setPending(false);
   };
 
-  const getLogs = async (startingChunk: number, offset: number) => {
-    return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset);
+  const getLogs = async (startingChunk: number, offset: number, token?: CancelToken) => {
+    return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset, token);
   };
 
   const renderSelectedSubRow = React.useCallback(
