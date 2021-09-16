@@ -5,7 +5,7 @@ import { logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
-import { DATABASE_LABELS } from 'app/percona/shared/core';
+import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { BackupInventoryDetails } from './BackupInventoryDetails';
 import { AddBackupModal } from '../AddBackupModal';
@@ -66,7 +66,13 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.status,
         accessor: 'status',
-        Cell: ({ value, row }) => <Status showLogsAction status={value} onLogClick={() => onLogClick(row.original)} />,
+        Cell: ({ value, row }) => (
+          <Status
+            showLogsAction={row.original.vendor === Databases.mongodb}
+            status={value}
+            onLogClick={() => onLogClick(row.original)}
+          />
+        ),
       },
       {
         Header: Messages.backupInventory.table.columns.actions,
