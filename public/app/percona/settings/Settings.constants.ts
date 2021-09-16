@@ -7,7 +7,7 @@ export const SET_SETTINGS_CANCEL_TOKEN = 'setSettings';
 
 export const DEFAULT_TAB = TabKeys.metrics;
 
-export const AM_WARNING_URL = '/graph/integrated-alerting';
+export const AM_WARNING_URL = '/graph/integrated-alerting/alerts';
 
 export const PAGE_TABS = [
   {
