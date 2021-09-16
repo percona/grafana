@@ -9,6 +9,7 @@ import { Messages } from './RestoreBackupModal.messages';
 import { getStyles } from './RestoreBackupModal.styles';
 import { toFormProps } from './RestoreBackupModal.utils';
 import { RestoreBackupModalService } from './RestoreBackupModal.service';
+import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
 const { Form } = withTypes<RestoreBackupFormProps>();
 
@@ -54,6 +55,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   name="serviceType"
                   label={Messages.serviceSelection}
                   fullWidth
+                  disabled={values.vendor !== DATABASE_LABELS[Databases.mysql]}
                 />
                 <TextInputField disabled name="vendor" label={Messages.vendor} />
               </div>
