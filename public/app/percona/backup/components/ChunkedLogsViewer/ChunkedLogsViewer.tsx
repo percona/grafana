@@ -3,10 +3,11 @@ import { logger } from '@percona/platform-core';
 import React, { FC, useState, useEffect, useCallback } from 'react';
 import { BackupLogChunk } from '../../Backup.types';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
-import { LIMIT, OFFSET, STREAM_INTERVAL } from './ChunkedLogsViewer.constants';
+import { LIMIT, BUFFER, STREAM_INTERVAL } from './ChunkedLogsViewer.constants';
 import { getStyles } from './ChunkedLogsViewer.styles';
 import { ChunkedLogsViewerProps } from './ChunkedLogsViewer.types';
 import { Messages } from './ChunkedLogsViewer.messages';
+import { concatenateNewerLogs, concatenateOlderLogs } from './ChunkedLogsViewer.utils';
 
 export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) => {
   const [endOfStream, setEndOfStream] = useState(false);
@@ -32,20 +33,8 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
   const getNewerLogs = async () => {
     setLoading(true);
     try {
-      const { logs: newLogs = [], end } = await getLogChunks(logs[logs.length - 1].id + 1, OFFSET);
-
-      if (newLogs.length) {
-        const lastId = newLogs[newLogs.length - 1].id;
-        const diff = lastId - logs[0].id + 1;
-
-        if (diff > LIMIT + OFFSET) {
-          const sliceStart = Math.abs(LIMIT + OFFSET - diff);
-          const subLogs = logs.slice(logs[0].id + sliceStart);
-          setLogs([...subLogs, ...newLogs]);
-        } else {
-          setLogs([...logs, ...newLogs]);
-        }
-      }
+      const { logs: newLogs = [], end } = await getLogChunks(logs[logs.length - 1].id + 1, BUFFER);
+      setLogs(concatenateNewerLogs(logs, newLogs, LIMIT, BUFFER));
       setEndOfStream(!!end);
     } catch (e) {
       logger.error(e);
@@ -58,20 +47,10 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
     setLoading(true);
     try {
       const { logs: newLogs = [], end } = await getLogChunks(
-        Math.max(0, logs[0].id - OFFSET),
-        Math.min(logs[0].id, OFFSET)
+        Math.max(0, logs[0].id - BUFFER),
+        Math.min(logs[0].id, BUFFER)
       );
-
-      if (newLogs.length) {
-        const diff = logs[logs.length - 1].id - newLogs[0].id + 1;
-
-        if (diff > LIMIT + OFFSET) {
-          const subLogs = logs.slice(0, Math.abs(logs.length - newLogs.length));
-          setLogs([...newLogs, ...subLogs]);
-        } else {
-          setLogs([...newLogs, ...logs]);
-        }
-      }
+      setLogs(concatenateOlderLogs(logs, newLogs, LIMIT, BUFFER));
       setEndOfStream(!!end);
     } catch (e) {
       logger.error(e);
