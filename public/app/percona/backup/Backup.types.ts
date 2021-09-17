@@ -41,7 +41,7 @@ export enum BackupType {
 
 export interface RawBackupLog {
   chunk_id: number;
-  message: string;
+  data: string;
   time: string;
 }
 

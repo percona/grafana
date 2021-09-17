@@ -107,7 +107,7 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
                 )}
               </div>
             )}
-            {logs.map((log) => log.message).reduce((acc, message) => `${acc}${acc.length ? '\n' : ''}${message}`, '')}
+            {logs.map((log) => log.data).reduce((acc, message) => `${acc}${acc.length ? '\n' : ''}${message}`, '')}
             {!endOfStream && (
               <div className={styles.btnHolder}>
                 {loading ? (

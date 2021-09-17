@@ -84,7 +84,7 @@ export const BackupInventoryService = {
     );
 
     return {
-      logs: logs.map(({ chunk_id = 0, message, time }) => ({ id: chunk_id, message, time })),
+      logs: logs.map(({ chunk_id = 0, data, time }) => ({ id: chunk_id, data, time })),
       end,
     };
   },
