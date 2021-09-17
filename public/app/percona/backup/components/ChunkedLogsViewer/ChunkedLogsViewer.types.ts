@@ -3,5 +3,5 @@ import { BackupLogs } from '../../Backup.types';
 
 export interface ChunkedLogsViewerProps {
   onMore?: () => void;
-  getLogChunks: (startingChunk: number, offset: number, token?: CancelToken) => Promise<BackupLogs>;
+  getLogChunks: (offset: number, limit: number, token?: CancelToken) => Promise<BackupLogs>;
 }

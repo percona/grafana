@@ -71,13 +71,13 @@ export const BackupInventoryService = {
   async delete(artifactId: string, removeFiles: boolean) {
     return api.post(`${BASE_URL}/Artifacts/Delete`, { artifact_id: artifactId, remove_files: removeFiles });
   },
-  async getLogs(artifactId: string, startingChunk: number, offset: number, token?: CancelToken): Promise<BackupLogs> {
+  async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<BackupLogs> {
     const { logs = [], end } = await api.post<BackupLogResponse, any>(
       `${BASE_URL}/Backups/GetLogs`,
       {
         artifact_id: artifactId,
-        offset: startingChunk,
-        limit: offset,
+        offset,
+        limit,
       },
       false,
       token
