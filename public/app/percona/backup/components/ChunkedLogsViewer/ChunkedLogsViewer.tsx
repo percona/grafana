@@ -9,6 +9,7 @@ import { getStyles } from './ChunkedLogsViewer.styles';
 import { ChunkedLogsViewerProps } from './ChunkedLogsViewer.types';
 import { Messages } from './ChunkedLogsViewer.messages';
 import { concatenateNewerLogs, concatenateOlderLogs } from './ChunkedLogsViewer.utils';
+import { NoChunkedLogs } from './NoChunkedLogs/NoChunkedLogs';
 
 export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) => {
   const [endOfStream, setEndOfStream] = useState(false);
@@ -121,14 +122,14 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
             )}
           </>
         ) : (
-          Messages.noLogs
+          <NoChunkedLogs endOfStream={endOfStream} />
         )}
       </pre>
       <Field label={Messages.streamLogs} disabled={endOfStream}>
         <Switch value={stream} onChange={onChangeStream} />
       </Field>
       <div className={styles.btnHolder}>
-        <Button variant="secondary" onClick={refreshCurrentLogs} disabled={loading}>
+        <Button variant="secondary" onClick={refreshCurrentLogs}>
           <Icon name="sync" />
         </Button>
       </div>
