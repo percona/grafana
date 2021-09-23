@@ -37,6 +37,7 @@ export const WebHookFields: FC<WebHookFieldsProps> = ({ values }) => {
       <TextareaInputField name="key" label={Messages.fields.certKey} validators={[validators.required]} />
       <TextInputField name="serverName" label={Messages.fields.serverName} validators={[validators.required]} />
       <CheckboxField name="skipVerify" label={Messages.fields.skipVerify} />
+      <CheckboxField name="sendResolved" label={Messages.fields.sendResolved} />
       <NumberInputField
         name="maxAlerts"
         label={Messages.fields.maxAlerts}

@@ -154,4 +154,5 @@ export interface NotificationChannelRenderProps {
   serverName?: string;
   skipVerify?: boolean;
   maxAlerts?: number;
+  sendResolved?: boolean;
 }
