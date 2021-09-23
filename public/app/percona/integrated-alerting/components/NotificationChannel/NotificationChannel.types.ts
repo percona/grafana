@@ -58,6 +58,7 @@ export interface WebHookNotificationChannel extends NotificationChannel {
   key?: string;
   serverName?: string;
   skipVerify?: boolean;
+  maxAlerts?: number;
 }
 
 export interface NotificationChannelTotals {
@@ -131,6 +132,7 @@ export interface WebHookNotificationChannelAPI {
   send_resolved?: boolean;
   url?: string;
   http_config: WebHookHttpConfigAPI;
+  max_alerts?: number;
 }
 
 export interface NotificationChannelRenderProps {
@@ -151,4 +153,5 @@ export interface NotificationChannelRenderProps {
   key?: string;
   serverName?: string;
   skipVerify?: boolean;
+  maxAlerts?: number;
 }

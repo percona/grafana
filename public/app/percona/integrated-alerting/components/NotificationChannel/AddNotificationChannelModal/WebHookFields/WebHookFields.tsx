@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import {
   CheckboxField,
+  NumberInputField,
   RadioButtonGroupField,
   TextareaInputField,
   TextInputField,
@@ -36,6 +37,11 @@ export const WebHookFields: FC<WebHookFieldsProps> = ({ values }) => {
       <TextareaInputField name="key" label={Messages.fields.certKey} validators={[validators.required]} />
       <TextInputField name="serverName" label={Messages.fields.serverName} validators={[validators.required]} />
       <CheckboxField name="skipVerify" label={Messages.fields.skipVerify} />
+      <NumberInputField
+        name="maxAlerts"
+        label={Messages.fields.maxAlerts}
+        validators={[validators.required, customValidators.min(0)]}
+      />
     </>
   );
 };

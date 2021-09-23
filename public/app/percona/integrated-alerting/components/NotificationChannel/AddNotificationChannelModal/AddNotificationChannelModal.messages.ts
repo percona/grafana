@@ -17,6 +17,7 @@ export const Messages = {
     certKey: 'Certificate Key',
     serverName: 'Server Name',
     skipVerify: 'Skip TLS certificate verification',
+    maxAlerts: 'Maximum number of alerts to include in message (0 = all)',
     username: 'Username',
     password: 'Password',
   },
