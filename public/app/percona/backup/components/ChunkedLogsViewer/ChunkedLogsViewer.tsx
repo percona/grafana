@@ -1,6 +1,7 @@
-import { useStyles } from '@grafana/ui';
+import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
-import React, { FC, useState, useEffect } from 'react';
+import { CopyToClipboard } from 'app/core/components/CopyToClipboard/CopyToClipboard';
+import React, { FC, useState, useEffect, useCallback } from 'react';
 import { BackupLogChunk } from '../../Backup.types';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -30,6 +31,11 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
     }
   };
 
+  const formatLogs = useCallback(
+    () => logs.map((log) => log.data).reduce((acc, message) => `${acc}${acc.length ? '\n' : ''}${message}`, ''),
+    [logs]
+  );
+
   useEffect(() => {
     triggerTimeout(refreshCurrentLogs, STREAM_INTERVAL, true);
   }, []);
@@ -42,8 +48,11 @@ export const ChunkedLogsViewer: FC<ChunkedLogsViewerProps> = ({ getLogChunks }) 
 
   return (
     <>
+      <CopyToClipboard text={formatLogs} elType="span" className={styles.copyBtnHolder}>
+        <Button variant="secondary">{Messages.copyToClipboard}</Button>
+      </CopyToClipboard>
       <pre>
-        {logs.map((log) => log.data).reduce((acc, message) => `${acc}${acc.length ? '\n' : ''}${message}`, '')}
+        {formatLogs()}
         {!lastLog && <div className={styles.loadingHolder}>{Messages.loading}</div>}
         {lastLog && !logs.length && Messages.noLogs}
       </pre>
