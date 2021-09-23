@@ -88,9 +88,9 @@ export interface WebHookBasicAuthConfigAPI {
 }
 
 export interface WebHookTLSConfigAPI {
-  ca_file: string;
-  cert_file: string;
-  key_file: string;
+  ca_file_content: string;
+  cert_file_content: string;
+  key_file_content: string;
   server_name: string;
   insecure_skip_verify: boolean;
 }
