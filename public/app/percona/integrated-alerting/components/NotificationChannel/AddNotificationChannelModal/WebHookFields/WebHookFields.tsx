@@ -1,5 +1,11 @@
 import React, { FC } from 'react';
-import { RadioButtonGroupField, TextareaInputField, TextInputField, validators } from '@percona/platform-core';
+import {
+  CheckboxField,
+  RadioButtonGroupField,
+  TextareaInputField,
+  TextInputField,
+  validators,
+} from '@percona/platform-core';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 import { WebHookAuthType } from '../../NotificationChannel.types';
 import { WEBHOOK_TYPE_OPTIONS } from '../AddNotificationChannel.constants';
@@ -29,6 +35,7 @@ export const WebHookFields: FC<WebHookFieldsProps> = ({ values }) => {
       <TextareaInputField name="cert" label={Messages.fields.certificate} validators={[validators.required]} />
       <TextareaInputField name="key" label={Messages.fields.certKey} validators={[validators.required]} />
       <TextInputField name="serverName" label={Messages.fields.serverName} validators={[validators.required]} />
+      <CheckboxField name="skipVerify" label={Messages.fields.skipVerify} />
     </>
   );
 };
