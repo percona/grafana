@@ -1,3 +1,4 @@
+import { DBServiceList, ServiceListPayload } from 'app/percona/inventory/Inventory.types';
 import { api } from 'app/percona/shared/helpers/api';
 import { CancelToken } from 'axios';
 import { BackupLogResponse, BackupLogs } from '../../Backup.types';
@@ -87,5 +88,20 @@ export const BackupInventoryService = {
       logs: logs.map(({ chunk_id = 0, data, time }) => ({ id: chunk_id, data, time })),
       end,
     };
+  },
+  async listCompatibleServices(artifactId: string): Promise<DBServiceList> {
+    const { mysql = [], mongodb = [] } = await api.post<ServiceListPayload, any>(
+      `${BASE_URL}/Backups/ListArtifactCompatibleServices`,
+      {
+        artifact_id: artifactId,
+      }
+    );
+
+    const result: DBServiceList = {
+      mysql: mysql.map(({ service_id, service_name }) => ({ id: service_id, name: service_name })),
+      mongodb: mongodb.map(({ service_id, service_name }) => ({ id: service_id, name: service_name })),
+    };
+
+    return result;
   },
 };
