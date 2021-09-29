@@ -25,6 +25,7 @@ func (hs *HTTPServer) registerRoutes() {
 	reqGrafanaAdmin := middleware.ReqGrafanaAdmin
 	reqEditorRole := middleware.ReqEditorRole
 	reqOrgAdmin := middleware.ReqOrgAdmin
+	reqPmmAdmin := middleware.PmmAdmin
 	reqCanAccessTeams := middleware.AdminOrFeatureEnabled(hs.Cfg.EditorsCanAdmin)
 	reqSnapshotPublicModeOrSignedIn := middleware.SnapshotPublicModeOrSignedIn(hs.Cfg)
 	redirectFromLegacyDashboardURL := middleware.RedirectFromLegacyDashboardURL()
@@ -99,7 +100,8 @@ func (hs *HTTPServer) registerRoutes() {
 	r.Get("/playlists/", reqSignedIn, hs.Index)
 	r.Get("/playlists/*", reqSignedIn, hs.Index)
 	r.Get("/alerting/", reqEditorRole, hs.Index)
-	r.Get("/alerting/*", reqEditorRole, hs.Index)
+	r.Get("/graph/integrated-alerting", reqPmmAdmin, hs.Index)
+	r.Get("/graph/integrated-alerting/*", reqPmmAdmin, hs.Index)
 
 	// sign up
 	r.Get("/verify", hs.Index)
