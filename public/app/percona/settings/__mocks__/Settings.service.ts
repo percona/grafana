@@ -17,7 +17,6 @@ export const stub: Settings = {
   alertManagerUrl: 'alert.foo.com',
   alertManagerRules: '',
   sttEnabled: true,
-  alertingEnabled: true,
   alertingSettings: {
     email: {
       from: 'from',

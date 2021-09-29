@@ -36,7 +36,6 @@ export const Advanced: FC<AdvancedProps> = ({
   updatesDisabled,
   sttEnabled,
   dbaasEnabled,
-  alertingEnabled,
   azureDiscoverEnabled,
   publicAddress,
   updateSettings,
@@ -67,9 +66,6 @@ export const Advanced: FC<AdvancedProps> = ({
       publicAddressLabel,
       publicAddressTooltip,
       publicAddressButton,
-      alertingLabel,
-      alertingTooltip,
-      alertingLink,
       azureDiscoverLabel,
       azureDiscoverTooltip,
       azureDiscoverLink,
@@ -92,7 +88,6 @@ export const Advanced: FC<AdvancedProps> = ({
     dbaas: dbaasEnabled,
     azureDiscover: azureDiscoverEnabled,
     publicAddress,
-    alerting: alertingEnabled,
     rareInterval,
     standardInterval,
     frequentInterval,
@@ -106,7 +101,6 @@ export const Advanced: FC<AdvancedProps> = ({
       stt,
       publicAddress,
       dbaas,
-      alerting,
       backup,
       azureDiscover,
       rareInterval,
@@ -130,8 +124,6 @@ export const Advanced: FC<AdvancedProps> = ({
       enable_azurediscover: azureDiscover,
       pmm_public_address: publicAddress,
       remove_pmm_public_address: !publicAddress,
-      enable_alerting: alerting ? true : undefined,
-      disable_alerting: !alerting ? true : undefined,
       stt_check_intervals: !!stt ? sttCheckIntervals : undefined,
       enable_backup_management: backup,
       disable_backup_management: !backup,
@@ -180,8 +172,8 @@ export const Advanced: FC<AdvancedProps> = ({
               tooltip={telemetryTooltip}
               tooltipLinkText={tooltipLinkText}
               link={telemetryLink}
-              className={cx({ [styles.switchDisabled]: values.stt || values.alerting })}
-              disabled={values.stt || values.alerting}
+              className={cx({ [styles.switchDisabled]: values.stt })}
+              disabled={values.stt}
               dataTestId="advanced-telemetry"
               component={SwitchRow}
             />
@@ -284,18 +276,6 @@ export const Advanced: FC<AdvancedProps> = ({
                 link={backupLink}
                 className={cx({ [styles.switchDisabled]: !values.backup })}
                 dataTestId="advanced-backup"
-                component={SwitchRow}
-              />
-              <Field
-                name="alerting"
-                type="checkbox"
-                label={alertingLabel}
-                tooltip={alertingTooltip}
-                tooltipLinkText={tooltipLinkText}
-                link={alertingLink}
-                className={cx({ [styles.switchDisabled]: !values.telemetry })}
-                disabled={!values.telemetry}
-                dataTestId="advanced-alerting"
                 component={SwitchRow}
               />
               <Field

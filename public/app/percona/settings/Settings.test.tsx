@@ -33,15 +33,13 @@ describe('SettingsPanel::', () => {
       return callback({ location: { routeParams: { tab: 'alerts' }, path: '/integrated-alerting/alerts' } });
     });
   });
-  it('Renders correctly without rendering hidden tab', async () => {
-    jest
-      .spyOn(SettingsService, 'getSettings')
-      .mockImplementationOnce(() => Promise.resolve({ ...settingsStub, alertingEnabled: false }));
+  it('Renders correctly', async () => {
+    jest.spyOn(SettingsService, 'getSettings').mockImplementationOnce(() => Promise.resolve({ ...settingsStub }));
     const root = await getMount(<SettingsPanel />);
     root.update();
 
     const tabs = root.find(Tab);
-    expect(tabs).toHaveLength(5);
+    expect(tabs).toHaveLength(6);
     expect(root.childAt(0).children().length).toBe(1);
   });
 });

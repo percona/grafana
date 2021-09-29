@@ -131,7 +131,6 @@ export interface Settings {
   azureDiscoverEnabled?: boolean;
   platformEmail?: string;
   dbaasEnabled?: boolean;
-  alertingEnabled?: boolean;
   publicAddress?: string;
   alertingSettings: AlertingSettings;
   sttCheckIntervals: SttCheckIntervalsSettings;

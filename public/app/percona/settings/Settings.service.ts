@@ -48,7 +48,6 @@ const toModel = (response: SettingsPayload): Settings => ({
   platformEmail: response.platform_email,
   azureDiscoverEnabled: response.azurediscover_enabled,
   dbaasEnabled: response.dbaas_enabled,
-  alertingEnabled: response.alerting_enabled,
   alertingSettings: {
     email: response.email_alerting_settings || {},
     slack: response.slack_alerting_settings || {},

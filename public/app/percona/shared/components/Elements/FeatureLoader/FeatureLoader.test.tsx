@@ -21,7 +21,7 @@ describe('FeatureLoader', () => {
   it('should not have children initially', async () => {
     const Dummy = () => <></>;
     const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureFlag="alertingEnabled">
+      <FeatureLoader featureName="Telemetry" featureFlag="telemetryEnabled">
         <Dummy />
       </FeatureLoader>
     );
@@ -32,7 +32,7 @@ describe('FeatureLoader', () => {
   it('should show children after loading settings', async () => {
     const Dummy = () => <></>;
     const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureFlag="alertingEnabled">
+      <FeatureLoader featureName="Telemetry" featureFlag="telemetryEnabled">
         <Dummy />
       </FeatureLoader>
     );
@@ -48,7 +48,9 @@ describe('FeatureLoader', () => {
     });
     const spy = jest.fn();
 
-    const wrapper = await getMount(<FeatureLoader featureName="IA" featureFlag="alertingEnabled" onError={spy} />);
+    const wrapper = await getMount(
+      <FeatureLoader featureName="Telemetry" featureFlag="telemetryEnabled" onError={spy} />
+    );
     wrapper.update();
     expect(spy).toHaveBeenCalledWith(errorObj);
   });
@@ -59,7 +61,7 @@ describe('FeatureLoader', () => {
       throw errorObj;
     });
 
-    const wrapper = await getMount(<FeatureLoader featureName="IA" featureFlag="alertingEnabled" onError={() => {}} />);
+    const wrapper = await getMount(<FeatureLoader featureName="BM" featureFlag="backupEnabled" onError={() => {}} />);
     wrapper.update();
 
     expect(wrapper.find(dataTestId('unauthorized')).text()).toBe(Messages.unauthorized);

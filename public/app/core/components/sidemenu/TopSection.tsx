@@ -64,10 +64,7 @@ const TopSection: FC<any> = () => {
       setShowDBaaS(!!settings.dbaasEnabled);
       setShowSTT(settings.sttEnabled);
       setShowBackup(settings.backupEnabled);
-
-      if (settings.alertingEnabled) {
-        setMainLinks([...buildIntegratedAlertingMenuItem(mainLinks)]);
-      }
+      setMainLinks([...buildIntegratedAlertingMenuItem(mainLinks)]);
     } catch (e) {
       logger.error(e);
     }

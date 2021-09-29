@@ -87,7 +87,6 @@ export const SettingsPanel: FC = () => {
                   updatesDisabled={!!settings.updatesDisabled}
                   sttEnabled={!!settings.sttEnabled}
                   dbaasEnabled={!!settings.dbaasEnabled}
-                  alertingEnabled={!!settings.alertingEnabled}
                   backupEnabled={!!settings.backupEnabled}
                   azureDiscoverEnabled={!!settings.azureDiscoverEnabled}
                   publicAddress={settings.publicAddress}
@@ -120,14 +119,7 @@ export const SettingsPanel: FC = () => {
             {
               label: communication,
               key: TabKeys.communication,
-              hidden: !settings?.alertingEnabled,
-              component: (
-                <Communication
-                  alertingSettings={settings.alertingSettings}
-                  alertingEnabled={!!settings.alertingEnabled}
-                  updateSettings={updateSettings}
-                />
-              ),
+              component: <Communication alertingSettings={settings.alertingSettings} updateSettings={updateSettings} />,
             },
           ]
         : [],

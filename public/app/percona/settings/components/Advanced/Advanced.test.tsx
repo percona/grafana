@@ -66,7 +66,6 @@ xdescribe('Advanced::', () => {
         telemetryEnabled={false}
         sttEnabled={false}
         backupEnabled={false}
-        alertingEnabled={false}
         updatesDisabled
         updateSettings={() => {}}
         sttCheckIntervals={sttCheckIntervalsStub}

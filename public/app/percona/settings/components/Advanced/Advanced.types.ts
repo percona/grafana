@@ -9,7 +9,6 @@ export interface AdvancedProps {
   updatesDisabled: boolean;
   dbaasEnabled?: boolean;
   backupEnabled: boolean;
-  alertingEnabled?: boolean;
   azureDiscoverEnabled?: boolean;
   publicAddress?: string;
   sttCheckIntervals: SttCheckIntervalsSettings;
@@ -29,7 +28,6 @@ export interface AdvancedFormProps {
   stt: boolean;
   dbaas?: boolean;
   publicAddress?: string;
-  alerting?: boolean;
   azureDiscover?: boolean;
   rareInterval: string;
   standardInterval: string;

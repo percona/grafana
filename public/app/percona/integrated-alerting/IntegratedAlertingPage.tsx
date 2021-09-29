@@ -6,7 +6,6 @@ import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview
 import { TabbedContent, ContentTab } from '../shared/components/Elements/TabbedContent';
 import { Messages } from './IntegratedAlerting.messages';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
-import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
 
 const IntegratedAlertingPage: FC = () => {
   const { path: basePath } = PAGE_MODEL;
@@ -40,15 +39,7 @@ const IntegratedAlertingPage: FC = () => {
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
       <TechnicalPreview />
-      <TabbedContent
-        tabs={tabs}
-        basePath={basePath}
-        renderTab={({ Content }) => (
-          <FeatureLoader featureName={Messages.integratedAlerting} featureFlag="alertingEnabled">
-            <Content />
-          </FeatureLoader>
-        )}
-      />
+      <TabbedContent tabs={tabs} basePath={basePath} renderTab={({ Content }) => <Content />} />
     </PageWrapper>
   );
 };
