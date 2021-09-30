@@ -235,36 +235,39 @@ export const BackupInventory: FC = () => {
         autoResetExpanded={false}
         renderExpandedRow={renderSelectedSubRow}
       ></Table>
-      <RestoreBackupModal
-        backup={selectedBackup}
-        isVisible={restoreModalVisible}
-        onClose={handleClose}
-        onRestore={handleRestore}
-        noService={!selectedBackup?.serviceId || !selectedBackup?.serviceName}
-      />
-      <AddBackupModal
-        backup={selectedBackup}
-        isVisible={backupModalVisible}
-        onClose={handleClose}
-        onBackup={handleBackup}
-      />
-      <DeleteModal
-        title={Messages.backupInventory.deleteModalTitle}
-        message={Messages.backupInventory.getDeleteMessage(selectedBackup?.name || '')}
-        isVisible={deleteModalVisible}
-        setVisible={setDeleteModalVisible}
-        forceLabel={Messages.backupInventory.deleteFromStorage}
-        onDelete={handleDelete}
-        initialForceValue={true}
-        loading={deletePending}
-        showForce
-      />
-      <BackupLogsModal
-        title={Messages.backupInventory.getLogsTitle(selectedBackup?.name || '')}
-        isVisible={logsModalVisible}
-        onClose={handleLogsClose}
-        getLogChunks={getLogs}
-      />
+      {restoreModalVisible && (
+        <RestoreBackupModal
+          backup={selectedBackup}
+          isVisible
+          onClose={handleClose}
+          onRestore={handleRestore}
+          noService={!selectedBackup?.serviceId || !selectedBackup?.serviceName}
+        />
+      )}
+      {backupModalVisible && (
+        <AddBackupModal backup={selectedBackup} isVisible onClose={handleClose} onBackup={handleBackup} />
+      )}
+      {deleteModalVisible && (
+        <DeleteModal
+          title={Messages.backupInventory.deleteModalTitle}
+          message={Messages.backupInventory.getDeleteMessage(selectedBackup?.name || '')}
+          isVisible
+          setVisible={setDeleteModalVisible}
+          forceLabel={Messages.backupInventory.deleteFromStorage}
+          onDelete={handleDelete}
+          initialForceValue={true}
+          loading={deletePending}
+          showForce
+        />
+      )}
+      {logsModalVisible && (
+        <BackupLogsModal
+          title={Messages.backupInventory.getLogsTitle(selectedBackup?.name || '')}
+          isVisible
+          onClose={handleLogsClose}
+          getLogChunks={getLogs}
+        />
+      )}
     </>
   );
 };
