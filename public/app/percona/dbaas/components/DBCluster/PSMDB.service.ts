@@ -137,7 +137,7 @@ export class PSMDBService extends DBClusterService {
       totalSteps: dbCluster.operation?.total_steps || 0,
       expose: dbCluster.exposed,
       installedImage: dbCluster.installed_image,
-      availableImage: dbCluster.avalable_image,
+      availableImage: dbCluster.available_image,
     };
   }
 }
