@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Button } from '@grafana/ui';
+import { Button, useStyles } from '@grafana/ui';
 import { cx } from 'emotion';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';
 import Discovery from './components/Discovery/Discovery';
@@ -7,11 +7,11 @@ import AzureDiscovery from './components/AzureDiscovery/Discovery';
 import { AddInstance } from './components/AddInstance/AddInstance';
 import { getStyles } from './panel.styles';
 import { Messages } from './components/AddRemoteInstance/AddRemoteInstance.messages';
-import { InstanceTypes } from './panel.types';
+import { InstanceTypes, InstanceAvailableType, AvailableTypes } from './panel.types';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { PAGE_MODEL } from './panel.constants';
 
-const availableInstanceTypes = [
+const availableInstanceTypes: AvailableTypes[] = [
   InstanceTypes.rds,
   InstanceTypes.azure,
   InstanceTypes.postgresql,
@@ -23,10 +23,10 @@ const availableInstanceTypes = [
 ];
 
 const AddInstancePanel = () => {
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
   const instanceType = '';
-  const [selectedInstance, selectInstance] = useState({
-    type: availableInstanceTypes.includes(instanceType as InstanceTypes) ? instanceType : '',
+  const [selectedInstance, selectInstance] = useState<InstanceAvailableType>({
+    type: availableInstanceTypes.includes(instanceType as AvailableTypes) ? instanceType : '',
   });
 
   const InstanceForm = useMemo(
