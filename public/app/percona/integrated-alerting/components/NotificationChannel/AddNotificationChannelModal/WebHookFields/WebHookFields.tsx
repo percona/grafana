@@ -32,9 +32,9 @@ export const WebHookFields: FC<WebHookFieldsProps> = ({ values }) => {
       />
       {values.webHookType === WebHookAuthType.basic && <WebHookBasicFields />}
       {values.webHookType === WebHookAuthType.token && <WebHookTokenFields />}
-      <TextareaInputField name="ca" label={Messages.fields.ca} validators={[validators.required]} />
-      <TextareaInputField name="cert" label={Messages.fields.certificate} validators={[validators.required]} />
-      <TextareaInputField name="key" label={Messages.fields.certKey} validators={[validators.required]} />
+      <TextareaInputField name="ca" label={Messages.fields.ca} />
+      <TextareaInputField name="cert" label={Messages.fields.certificate} />
+      <TextareaInputField name="key" label={Messages.fields.certKey} />
       <TextInputField name="serverName" label={Messages.fields.serverName} validators={[validators.required]} />
       <CheckboxField name="skipVerify" label={Messages.fields.skipVerify} />
       <CheckboxField name="sendResolved" label={Messages.fields.sendResolved} />
