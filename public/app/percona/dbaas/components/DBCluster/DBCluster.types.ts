@@ -139,7 +139,7 @@ export interface DBClusterPayload {
   expose?: boolean;
   exposed?: boolean;
   installed_image?: string;
-  avalable_image?: string;
+  available_image?: string;
   image?: string;
 }
 
