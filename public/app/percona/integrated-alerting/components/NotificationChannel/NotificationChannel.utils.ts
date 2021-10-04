@@ -51,7 +51,7 @@ export const TO_MODEL = {
     key: channel.webhook_config?.http_config.tls_config?.key_file_content,
     serverName: channel.webhook_config?.http_config.tls_config?.server_name,
     skipVerify: channel.webhook_config?.http_config.tls_config?.insecure_skip_verify,
-    maxAlerts: channel.webhook_config?.max_alerts || 0,
+    maxAlerts: channel.webhook_config?.max_alerts,
   }),
 };
 
