@@ -38,11 +38,11 @@ export const Status: FC<StatusProps> = ({ status, showLogsAction = false, onLogC
   return (
     <div className={styles.statusContainer}>
       {isPending ? (
-        <span data-qa="statusPending" className={styles.ellipsisContainer}>
+        <span data-testid="statusPending" className={styles.ellipsisContainer}>
           <Ellipsis />
         </span>
       ) : (
-        <span data-qa="statusMsg" className={cx(statusStyles)}>
+        <span data-testid="statusMsg" className={cx(statusStyles)}>
           {statusMsg}
         </span>
       )}
