@@ -1,16 +1,15 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { useTheme } from '@grafana/ui';
+import { useStyles } from '@grafana/ui';
 import { Database } from 'app/percona/shared/components/Elements/Icons/Database';
 import { getStyles } from './AddInstance.styles';
 import { Messages } from './AddInstance.messages';
 import { AddInstanceProps, SelectInstanceProps } from './AddInstance.types';
-import { InstanceTypes } from '../../panel.types';
+import { InstanceTypes, AvailableTypes } from '../../panel.types';
 import { Settings } from 'app/percona/settings/Settings.types';
 import { CheckPermissions } from 'app/percona/shared/components/Elements/CheckPermissions/CheckPermissions';
 
 export const SelectInstance: FC<SelectInstanceProps> = ({ type, selectInstanceType, title }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles(getStyles);
 
   return (
     <button
@@ -27,8 +26,8 @@ export const SelectInstance: FC<SelectInstanceProps> = ({ type, selectInstanceTy
 };
 
 export const AddInstance: FC<AddInstanceProps> = ({ onSelectInstanceType }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles(getStyles);
+
   const [showAzure, setShowAzure] = useState(false);
   const onSettingsLoadSuccess = useCallback((settings: Settings) => {
     setShowAzure(!!settings.azureDiscoverEnabled);
@@ -47,7 +46,7 @@ export const AddInstance: FC<AddInstanceProps> = ({ onSelectInstanceType }) => {
     [showAzure]
   );
 
-  const selectInstanceType = (type: string) => () => onSelectInstanceType({ type });
+  const selectInstanceType = (type: AvailableTypes) => () => onSelectInstanceType({ type });
 
   return (
     <CheckPermissions onSettingsLoadSuccess={onSettingsLoadSuccess}>

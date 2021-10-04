@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import { Form as FormFinal } from 'react-final-form';
-import { Button, useTheme } from '@grafana/ui';
+import { Button, useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
@@ -18,8 +18,7 @@ import { logger } from '@percona/platform-core';
 import { ADD_AZURE_CANCEL_TOKEN, ADD_RDS_CANCEL_TOKEN } from './AddRemoteInstance.constants';
 
 const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, credentials }, selectInstance }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles(getStyles);
 
   const { remoteInstanceCredentials, discoverName } = getInstanceData(type, credentials);
   const [loading, setLoading] = useState<boolean>(false);

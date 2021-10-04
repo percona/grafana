@@ -31,6 +31,7 @@ class AddRemoteInstanceService {
   static async addRDS(body: RemoteInstancePayload, token?: CancelToken) {
     return apiManagement.post<any, RemoteInstancePayload>('/RDS/Add', body, false, token);
   }
+
   static async addAzure(body: RemoteInstancePayload, token?: CancelToken) {
     return apiManagement.post<any, RemoteInstancePayload>('/azure/AzureDatabase/Add', body, false, token);
   }

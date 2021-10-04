@@ -31,6 +31,8 @@ export enum InstanceTypes {
   mariadb = 'mariadb',
 }
 
+export type AvailableTypes = Exclude<InstanceTypes, InstanceTypes.mariadb>;
+
 export const INSTANCE_TYPES_LABELS = {
   [InstanceTypes.mysql]: 'MySQL',
   [InstanceTypes.mariadb]: 'MariaDB',
@@ -39,3 +41,7 @@ export const INSTANCE_TYPES_LABELS = {
   [InstanceTypes.proxysql]: 'ProxySQL',
   [InstanceTypes.haproxy]: 'HAProxy',
 };
+
+export interface InstanceAvailableType {
+  type: AvailableTypes | '';
+}
