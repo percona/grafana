@@ -50,8 +50,11 @@ describe('AddBackupModal::utils', () => {
         backupName: 'Backup 1',
         description: '',
         location: { label: locationName, value: locationId },
-        vendor,
-        mode: BackupMode.INCREMENTAL,
+        vendor: Databases.mysql,
+        mode: BackupMode.SNAPSHOT,
+        retryInterval: 30,
+        retryMode: RetryMode.MANUAL,
+        retryTimes: 2,
       });
     });
 

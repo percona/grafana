@@ -64,7 +64,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
     };
   }
 
-  const { name, serviceName, serviceId, vendor, dataModel, locationName, locationId, id } = backup;
+  const { name, serviceName, serviceId, vendor, dataModel, locationName, locationId, id, mode } = backup;
 
   let month: Array<SelectableValue<number>> = [];
   let day: Array<SelectableValue<number>> = [];
@@ -76,15 +76,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
   let description = '';
 
   if (isScheduledBackup(backup)) {
-    const {
-      cronExpression,
-      enabled,
-      description: backupDescription,
-      retention,
-      retryInterval,
-      retryTimes,
-      mode,
-    } = backup;
+    const { cronExpression, enabled, description: backupDescription, retention, retryInterval, retryTimes } = backup;
     const cronParts = parseCronString(cronExpression);
     const periodType = getPeriodFromCronparts(cronParts);
     const [minutePart, hourPart, dayPart, monthPart, weekDayPary] = cronParts;
@@ -122,13 +114,16 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
   } else {
     return {
       id,
+      mode,
+      vendor,
       service: { label: serviceName, value: { id: serviceId, vendor } },
       dataModel,
       backupName: name,
       description,
       location: { label: locationName, value: locationId },
-      vendor,
-      mode: BackupMode.INCREMENTAL,
+      retryMode: RetryMode.MANUAL,
+      retryTimes: 2,
+      retryInterval: 30,
     };
   }
 };
