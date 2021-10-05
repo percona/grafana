@@ -20,11 +20,11 @@ export interface SelectableService {
 
 export interface AddBackupFormProps {
   id: string;
-  service: null | SelectableValue<SelectableService>;
+  service: SelectableValue<SelectableService> | null;
   dataModel: DataModel;
   backupName: string;
   description: string;
-  location: null | SelectableValue<string>;
+  location: SelectableValue<string> | null;
   retention?: number;
   retryMode?: RetryMode;
   retryTimes?: number;
@@ -37,6 +37,6 @@ export interface AddBackupFormProps {
   startMinute?: Array<SelectableValue<number>>;
   logs?: boolean;
   active?: boolean;
-  vendor: null | Databases;
+  vendor: Databases | null;
   mode: BackupMode;
 }
