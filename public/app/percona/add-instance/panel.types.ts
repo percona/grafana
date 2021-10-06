@@ -1,3 +1,4 @@
+import { Databases } from '../../percona/shared/core';
 // TODO: refactor this type to have separated interfaces for Azure and RDS types of instances
 export interface RemoteInstanceCredentials {
   serviceName?: string;
@@ -19,27 +20,35 @@ export interface RemoteInstanceCredentials {
   az?: string;
 }
 
-export enum InstanceTypes {
+// export enum InstanceTypes {
+//   rds = 'rds',
+//   azure = 'azure',
+//   postgresql = 'postgresql',
+//   mysql = 'mysql',
+//   proxysql = 'proxysql',
+//   mongodb = 'mongodb',
+//   external = 'external',
+//   haproxy = 'haproxy',
+//   mariadb = 'mariadb',
+// }
+
+export enum InstanceTypesExtra {
   rds = 'rds',
   azure = 'azure',
-  postgresql = 'postgresql',
-  mysql = 'mysql',
-  proxysql = 'proxysql',
-  mongodb = 'mongodb',
   external = 'external',
-  haproxy = 'haproxy',
-  mariadb = 'mariadb',
 }
 
-export type AvailableTypes = Exclude<InstanceTypes, InstanceTypes.mariadb>;
+export type InstanceTypes = Databases | InstanceTypesExtra;
+
+export type AvailableTypes = Exclude<InstanceTypes, Databases.mariadb>;
 
 export const INSTANCE_TYPES_LABELS = {
-  [InstanceTypes.mysql]: 'MySQL',
-  [InstanceTypes.mariadb]: 'MariaDB',
-  [InstanceTypes.mongodb]: 'MongoDB',
-  [InstanceTypes.postgresql]: 'PostgreSQL',
-  [InstanceTypes.proxysql]: 'ProxySQL',
-  [InstanceTypes.haproxy]: 'HAProxy',
+  [Databases.mysql]: 'MySQL',
+  [Databases.mariadb]: 'MariaDB',
+  [Databases.mongodb]: 'MongoDB',
+  [Databases.postgresql]: 'PostgreSQL',
+  [Databases.proxysql]: 'ProxySQL',
+  [Databases.haproxy]: 'HAProxy',
 };
 
 export interface InstanceAvailableType {

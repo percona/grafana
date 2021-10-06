@@ -4,7 +4,7 @@ import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { styles } from './Instances.styles';
 import { Instance } from '../../Discovery.types';
 import { Messages } from './Instances.messages';
-import { RemoteInstanceCredentials } from '../../../../panel.types';
+import { RemoteInstanceCredentials, AvailableTypes } from '../../../../panel.types';
 import { OnSelectInstance } from './Instances.types';
 
 const getEngineType = (type?: string) => {
@@ -22,7 +22,7 @@ const getEngineType = (type?: string) => {
   }
 };
 
-const getDatabaseType = (type?: string): Databases | string => {
+const getDatabaseType = (type?: string): AvailableTypes | '' => {
   switch (type) {
     case 'DISCOVER_AZURE_DATABASE_TYPE_MYSQL':
     case 'DISCOVER_AZURE_DATABASE_TYPE_MARIADB':
