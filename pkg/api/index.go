@@ -349,7 +349,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 
 	if setting.AlertingEnabled && (c.OrgRole == models.ROLE_ADMIN || c.OrgRole == models.ROLE_EDITOR) {
 		alertChildNavs := []*dtos.NavLink{
-			{Text: "Grafana Alerting", Id: "alert-list", Url: setting.AppSubUrl + "/alerting/list"},
+			{Text: "Grafana Alerting", Id: "alert-list", Url: setting.AppSubUrl + "/alerting/list", Icon: "list-ul"},
 		}
 
 		navTree = append(navTree, &dtos.NavLink{
