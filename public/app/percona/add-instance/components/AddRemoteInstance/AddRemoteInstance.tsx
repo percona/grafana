@@ -11,7 +11,7 @@ import { AddRemoteInstanceProps } from './AddRemoteInstance.types';
 import { AdditionalOptions, Labels, MainDetails } from './FormParts';
 import { Messages } from './AddRemoteInstance.messages';
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
-import { InstanceTypes } from '../../panel.types';
+import { InstanceTypesExtra, InstanceTypes } from '../../panel.types';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
 import { FormApi } from 'final-form';
 import { logger } from '@percona/platform-core';
@@ -63,9 +63,9 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
 
   const ConnectionDetails = ({ form, type }: { form: FormApi; type: InstanceTypes }) => {
     switch (type) {
-      case InstanceTypes.external:
+      case InstanceTypesExtra.external:
         return <ExternalServiceConnectionDetails form={form} />;
-      case InstanceTypes.haproxy:
+      case Databases.haproxy:
         return <HAProxyConnectionDetails remoteInstanceCredentials={remoteInstanceCredentials} />;
       default:
         return <MainDetails form={form} remoteInstanceCredentials={remoteInstanceCredentials} />;
@@ -76,7 +76,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
     <>
       <ConnectionDetails form={form} type={type} />
       <Labels />
-      {type !== InstanceTypes.external && (
+      {type !== InstanceTypesExtra.external && (
         <AdditionalOptions
           remoteInstanceCredentials={remoteInstanceCredentials}
           loading={loading}
@@ -88,7 +88,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
   );
 
   const getHeader = (databaseType: string) => {
-    if (databaseType === InstanceTypes.external) {
+    if (databaseType === InstanceTypesExtra.external) {
       return Messages.form.titles.addExternalService;
     }
 

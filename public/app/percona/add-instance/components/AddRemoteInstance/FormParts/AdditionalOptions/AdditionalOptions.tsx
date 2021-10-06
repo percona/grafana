@@ -12,6 +12,7 @@ import { InstanceTypes } from '../../../../panel.types';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
+import { Databases } from '../../../../../../percona/shared/core';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -84,7 +85,7 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
 
 export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredentials: any, form: FormApi) => {
   switch (type) {
-    case InstanceTypes.postgresql:
+    case Databases.postgresql:
       return (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
@@ -114,7 +115,7 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
           ) : null}
         </>
       );
-    case InstanceTypes.mysql:
+    case Databases.mysql:
       return (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
@@ -145,7 +146,7 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
           ) : null}
         </>
       );
-    case InstanceTypes.mongodb:
+    case Databases.mongodb:
       return (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
@@ -157,7 +158,7 @@ export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredenti
           />
         </>
       );
-    case InstanceTypes.haproxy:
+    case Databases.haproxy:
       return null;
     default:
       return (

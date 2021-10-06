@@ -7,19 +7,20 @@ import AzureDiscovery from './components/AzureDiscovery/Discovery';
 import { AddInstance } from './components/AddInstance/AddInstance';
 import { getStyles } from './panel.styles';
 import { Messages } from './components/AddRemoteInstance/AddRemoteInstance.messages';
-import { InstanceTypes, InstanceAvailableType, AvailableTypes } from './panel.types';
+import { InstanceTypesExtra, InstanceAvailableType, AvailableTypes } from './panel.types';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { PAGE_MODEL } from './panel.constants';
+import { Databases } from '../../percona/shared/core';
 
 const availableInstanceTypes: AvailableTypes[] = [
-  InstanceTypes.rds,
-  InstanceTypes.azure,
-  InstanceTypes.postgresql,
-  InstanceTypes.mysql,
-  InstanceTypes.proxysql,
-  InstanceTypes.mongodb,
-  InstanceTypes.external,
-  InstanceTypes.haproxy,
+  InstanceTypesExtra.rds,
+  InstanceTypesExtra.azure,
+  Databases.postgresql,
+  Databases.mysql,
+  Databases.proxysql,
+  Databases.mongodb,
+  InstanceTypesExtra.external,
+  Databases.haproxy,
 ];
 
 const AddInstancePanel = () => {
@@ -32,7 +33,7 @@ const AddInstancePanel = () => {
   const InstanceForm = useMemo(
     () => () => (
       <>
-        {selectedInstance.type !== InstanceTypes.rds && selectedInstance.type !== InstanceTypes.azure && (
+        {selectedInstance.type !== InstanceTypesExtra.rds && selectedInstance.type !== InstanceTypesExtra.azure && (
           <div className={styles.content}>
             <Button
               variant="secondary"
@@ -44,9 +45,9 @@ const AddInstancePanel = () => {
             </Button>
           </div>
         )}
-        {selectedInstance.type === InstanceTypes.rds && <Discovery selectInstance={selectInstance} />}
-        {selectedInstance.type === InstanceTypes.azure && <AzureDiscovery selectInstance={selectInstance} />}
-        {selectedInstance.type !== InstanceTypes.rds && selectedInstance.type !== InstanceTypes.azure && (
+        {selectedInstance.type === InstanceTypesExtra.rds && <Discovery selectInstance={selectInstance} />}
+        {selectedInstance.type === InstanceTypesExtra.azure && <AzureDiscovery selectInstance={selectInstance} />}
+        {selectedInstance.type !== InstanceTypesExtra.rds && selectedInstance.type !== InstanceTypesExtra.azure && (
           <AddRemoteInstance instance={selectedInstance} selectInstance={selectInstance} />
         )}
       </>

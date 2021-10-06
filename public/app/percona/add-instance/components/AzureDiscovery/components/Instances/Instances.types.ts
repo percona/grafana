@@ -1,7 +1,7 @@
 import { Instance } from '../../Discovery.types';
-import { Databases } from '../../../../../shared/core';
+import { AvailableTypes } from '../../../../panel.types';
 
-export type OnSelectInstance = ({ type, credentials }: { type: Databases | string; credentials: any }) => void;
+export type OnSelectInstance = ({ type, credentials }: { type: AvailableTypes | ''; credentials: any }) => void;
 
 export interface InstancesTableProps {
   instances: Instance[];

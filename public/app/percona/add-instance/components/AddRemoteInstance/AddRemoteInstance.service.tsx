@@ -1,58 +1,92 @@
 import { CancelToken } from 'axios';
 import { apiManagement } from 'app/percona/shared/helpers/api';
 import {
-  RemoteInstanceExternalservicePayload,
+  RemoteInstanceExternalServicePayload,
   RemoteInstancePayload,
   TrackingOptions,
+  ProxySQLInstanceResponse,
+  PostgreSQLInstanceResponse,
+  MySQLInstanceResponse,
+  AddHaProxyResponse,
+  AddMongoDbReponse,
+  AddRDSResponse,
+  AddExternalResponse,
+  ErrorResponse,
 } from './AddRemoteInstance.types';
-import { InstanceTypes } from '../../panel.types';
+import { InstanceTypesExtra, AvailableTypes } from '../../panel.types';
+import { Databases } from '../../../../percona/shared/core';
 
 class AddRemoteInstanceService {
   static async addMysql(body: RemoteInstancePayload, token?: CancelToken) {
-    return apiManagement.post<any, RemoteInstancePayload>('/MySQL/Add', body, false, token);
+    return apiManagement.post<MySQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
+      '/MySQL/Add',
+      body,
+      false,
+      token
+    );
   }
 
   static async addPostgresql(body: RemoteInstancePayload, token?: CancelToken) {
-    return apiManagement.post<any, RemoteInstancePayload>('/PostgreSQL/Add', body, false, token);
+    return apiManagement.post<PostgreSQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
+      '/PostgreSQL/Add',
+      body,
+      false,
+      token
+    );
   }
 
   static async addProxysql(body: RemoteInstancePayload, token?: CancelToken) {
-    return apiManagement.post<any, RemoteInstancePayload>('/ProxySQL/Add', body, false, token);
+    return apiManagement.post<ProxySQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
+      '/ProxySQL/Add',
+      body,
+      false,
+      token
+    );
   }
 
   static async addHaproxy(body: RemoteInstancePayload, token?: CancelToken) {
-    return apiManagement.post<any, RemoteInstancePayload>('/HAProxy/Add', body, false, token);
+    return apiManagement.post<AddHaProxyResponse | ErrorResponse, RemoteInstancePayload>(
+      '/HAProxy/Add',
+      body,
+      false,
+      token
+    );
   }
 
   static async addMongodb(body: RemoteInstancePayload, token?: CancelToken) {
-    return apiManagement.post<any, RemoteInstancePayload>('/MongoDB/Add', body, false, token);
+    return apiManagement.post<AddMongoDbReponse | ErrorResponse, RemoteInstancePayload>(
+      '/MongoDB/Add',
+      body,
+      false,
+      token
+    );
   }
 
   static async addRDS(body: RemoteInstancePayload, token?: CancelToken) {
-    return apiManagement.post<any, RemoteInstancePayload>('/RDS/Add', body, false, token);
+    return apiManagement.post<AddRDSResponse | ErrorResponse, RemoteInstancePayload>('/RDS/Add', body, false, token);
   }
 
   static async addAzure(body: RemoteInstancePayload, token?: CancelToken) {
     return apiManagement.post<any, RemoteInstancePayload>('/azure/AzureDatabase/Add', body, false, token);
   }
 
-  static async addExternal(body: any, token?: CancelToken) {
-    return apiManagement.post<any, any>('/External/Add', body, false, token);
+  static async addExternal(body: RemoteInstanceExternalServicePayload, token?: CancelToken) {
+    return apiManagement.post<AddExternalResponse, any>('/External/Add', body, false, token);
   }
 
-  static addRemote(type: InstanceTypes, data: any, token?: CancelToken) {
+  static addRemote(type: AvailableTypes | '', data: any, token?: CancelToken) {
     switch (type) {
-      case InstanceTypes.mongodb:
+      case Databases.mongodb:
         return AddRemoteInstanceService.addMongodb(toPayload(data, '', type), token);
-      case InstanceTypes.mysql:
+      case Databases.mysql:
         return AddRemoteInstanceService.addMysql(toPayload(data, '', type), token);
-      case InstanceTypes.postgresql:
+      case Databases.postgresql:
         return AddRemoteInstanceService.addPostgresql(toPayload(data, '', type), token);
-      case InstanceTypes.proxysql:
+      case Databases.proxysql:
         return AddRemoteInstanceService.addProxysql(toPayload(data, '', type), token);
-      case InstanceTypes.haproxy:
+      case Databases.haproxy:
         return AddRemoteInstanceService.addHaproxy(toExternalServicePayload(data), token);
-      case InstanceTypes.external:
+      case InstanceTypesExtra.external:
         return AddRemoteInstanceService.addExternal(toExternalServicePayload(data), token);
       default:
         throw new Error('Unknown instance type');
@@ -62,7 +96,7 @@ class AddRemoteInstanceService {
 
 export default AddRemoteInstanceService;
 
-export const toPayload = (values: any, discoverName?: string, type?: InstanceTypes): RemoteInstancePayload => {
+export const toPayload = (values: any, discoverName?: string, type?: AvailableTypes): RemoteInstancePayload => {
   const data = { ...values };
 
   if (values.custom_labels) {
@@ -126,7 +160,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceTyp
     }
   }
 
-  if (type === InstanceTypes.mongodb && values.tls) {
+  if (type === Databases.mongodb && values.tls) {
     data.authentication_mechanism = 'MONGODB-X509';
   }
 
@@ -136,7 +170,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceTyp
   return data;
 };
 
-export const toExternalServicePayload = (values: any): RemoteInstanceExternalservicePayload => {
+export const toExternalServicePayload = (values: any): RemoteInstanceExternalServicePayload => {
   const data = { ...values };
 
   if (values.custom_labels) {

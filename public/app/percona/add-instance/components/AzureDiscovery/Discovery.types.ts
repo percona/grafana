@@ -1,5 +1,7 @@
+import { InstanceAvailableType } from '../../panel.types';
+
 export interface DiscoverySearchPanelProps {
-  selectInstance: (instanceData: any) => void;
+  selectInstance: React.Dispatch<React.SetStateAction<InstanceAvailableType>>;
 }
 
 export interface Instance {
