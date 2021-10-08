@@ -24,5 +24,5 @@ export interface ApiError {
 
 export interface ApiVerboseError {
   message: string;
-  link: string;
+  link?: string;
 }

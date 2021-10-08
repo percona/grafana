@@ -14,9 +14,11 @@ export const BackupErrorSection: FC<BackupErrorSectionProps> = ({ backupErrors =
           {backupErrors.map((error) => (
             <div key={error.message}>
               {error.message}{' '}
-              <a href={error.link} rel="noreferrer" target="_blank">
-                {Messages.readMore}
-              </a>
+              {error.link && (
+                <a href={error.link} rel="noreferrer" target="_blank">
+                  {Messages.readMore}
+                </a>
+              )}
             </div>
           ))}
         </section>
