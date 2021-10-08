@@ -20,6 +20,8 @@ export const Messages = {
   enabled: 'Enabled',
   retention: 'Retention (Number of backups - 0 for unlimited)',
   scheduleSection: 'Schedule - UTC time',
+  problemOcurred: 'Some problem ocurred',
+  readMore: 'Read more',
   getModalTitle: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
       return edit ? 'Edit Scheduled backup' : 'Schedule backup';

@@ -1,5 +1,5 @@
 import React, { FC, useMemo } from 'react';
-import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
+import { Button, Card, HorizontalGroup, useStyles } from '@grafana/ui';
 import {
   CheckboxField,
   LoaderButton,
@@ -46,6 +46,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
   isVisible,
   scheduleMode = false,
+  backupErrors = [],
   onClose,
   onBackup,
 }) => {
@@ -255,6 +256,22 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                   </div>
                 </div>
               </div>
+            )}
+            {!!backupErrors.length && (
+              <Card heading={Messages.problemOcurred} className={styles.apiErrorSection}>
+                <Card.Meta separator="">
+                  <section data-testid="backup-errors">
+                    {backupErrors.map((error) => (
+                      <div key={error.message}>
+                        {error.message}{' '}
+                        <a href={error.link} rel="noreferrer" target="_blank">
+                          {Messages.readMore}
+                        </a>
+                      </div>
+                    ))}
+                  </section>
+                </Card.Meta>
+              </Card>
             )}
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton
