@@ -41,6 +41,7 @@ export const BackupInventory: FC = () => {
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
+  const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const columns = useMemo(
@@ -120,6 +121,7 @@ export const BackupInventory: FC = () => {
     setRestoreModalVisible(false);
     setBackupModalVisible(false);
     setBackupErrors([]);
+    setRestoreErrors([]);
   };
 
   const handleLogsClose = () => {
@@ -130,10 +132,10 @@ export const BackupInventory: FC = () => {
   const handleRestore = async (serviceId: string, artifactId: string) => {
     try {
       await BackupInventoryService.restore(serviceId, artifactId, generateToken(RESTORE_CANCEL_TOKEN));
-      setBackupErrors([]);
+      setRestoreErrors([]);
       setRestoreModalVisible(false);
     } catch (e) {
-      setBackupErrors(apiErrorParser(e));
+      setRestoreErrors(apiErrorParser(e));
       logger.error(e);
     }
   };
@@ -252,6 +254,7 @@ export const BackupInventory: FC = () => {
         <RestoreBackupModal
           backup={selectedBackup}
           isVisible
+          restoreErrors={restoreErrors}
           onClose={handleClose}
           onRestore={handleRestore}
           noService={!selectedBackup?.serviceId || !selectedBackup?.serviceName}
