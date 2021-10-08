@@ -63,7 +63,7 @@ export const apiInventory = new ApiRequest({ baseURL: '/v1/inventory' });
 export const apiSettings = new ApiRequest({ baseURL: '/v1/Settings' });
 export const isApiCancelError = (e: any) => axios.isCancel(e);
 
-const translateApiError = (error: ApiErrorCode): ApiVerboseError | undefined => {
+export const translateApiError = (error: ApiErrorCode): ApiVerboseError | undefined => {
   const map: Record<ApiErrorCode, ApiVerboseError> = {
     [ApiErrorCode.ERROR_CODE_INVALID_XTRABACKUP]: {
       message: 'Different versions of xtrabackup and xbcloud.',
