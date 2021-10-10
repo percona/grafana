@@ -1,0 +1,77 @@
+import React, { FC, useMemo } from 'react';
+import { PasswordInputField, TextInputField, validators } from '@percona/platform-core';
+import Validators from 'app/percona/shared/helpers/validators';
+import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
+import { useTheme } from '@grafana/ui';
+import { MainDetailsFormPartProps } from '../FormParts.types';
+import { getStyles } from '../FormParts.styles';
+import { Messages } from '../FormParts.messages';
+
+export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+  const formValues = form && form.getState().values;
+  const tlsFlag = formValues && formValues['tls'];
+
+  const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
+  const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
+
+  return (
+    <div className={styles.groupWrapper}>
+      <h4 className={styles.sectionHeader}>{Messages.form.titles.mainDetails}</h4>
+      <div className={styles.labelWrapper} data-testid="address-label">
+        <span>{Messages.form.labels.postgresqlDetails.address}</span>
+        <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.address} icon="info-circle" />
+      </div>
+      <TextInputField
+        name="address"
+        placeholder={Messages.form.placeholders.postgresqlDetails.address}
+        validators={[validators.required]}
+        disabled={remoteInstanceCredentials.isRDS}
+      />
+      <div className={styles.labelWrapper} data-testid="service-name-label">
+        <span>{Messages.form.labels.postgresqlDetails.serviceName}</span>
+        <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.serviceName} icon="info-circle" />
+      </div>
+      <TextInputField name="serviceName" placeholder={Messages.form.placeholders.postgresqlDetails.serviceName} />
+      <div className={styles.labelWrapper} data-testid="port-label">
+        <span>{Messages.form.labels.postgresqlDetails.port}</span>
+        <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.port} icon="info-circle" />
+      </div>
+      <TextInputField
+        name="port"
+        placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
+        validators={portValidators}
+      />
+      <div className={styles.labelWrapper} data-testid="username-label">
+        <span>{Messages.form.labels.postgresqlDetails.username}</span>
+        <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.username} icon="info-circle" />
+      </div>
+      <TextInputField
+        key={`username-${tlsFlag}`}
+        name="username"
+        placeholder={Messages.form.placeholders.postgresqlDetails.username}
+        validators={userPassValidators}
+      />
+      <div className={styles.labelWrapper} data-testid="password-label">
+        <span>{Messages.form.labels.postgresqlDetails.password}</span>
+        <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.password} icon="info-circle" />
+      </div>
+      <PasswordInputField
+        key={`password-${tlsFlag}`}
+        name="password"
+        placeholder={Messages.form.placeholders.postgresqlDetails.password}
+        validators={userPassValidators}
+      />
+      <div className={styles.labelWrapper} data-testid="database-label">
+        <span>{Messages.form.labels.postgresqlDetails.database}</span>
+        <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.database} icon="info-circle" />
+      </div>
+      <TextInputField
+        key="database"
+        name="database"
+        placeholder={Messages.form.placeholders.postgresqlDetails.database}
+      />
+    </div>
+  );
+};

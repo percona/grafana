@@ -26,6 +26,14 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
       },
+      postgresqlDetails: {
+        address: 'Hostname',
+        serviceName: 'Service name',
+        port: 'Port',
+        username: 'Username',
+        password: 'Password',
+        database: 'Database',
+      },
       labels: {
         environment: 'Environment',
         region: 'Region',
@@ -65,6 +73,13 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
       },
+      postgresqlDetails: {
+        address: 'Hostname',
+        serviceName: 'Service name (default: Hostname)',
+        username: 'Username',
+        password: 'Password',
+        database: 'If not specified (default: postgres)',
+      },
       labels: {
         environment: 'Environment',
         region: 'Region',
@@ -93,6 +108,14 @@ export const Messages = {
         port: 'Port your service is listening on',
         username: 'Your database user name',
         password: 'Your database password',
+      },
+      postgresqlDetails: {
+        address: 'Public DNS hostname of your instance',
+        serviceName: 'Service name to use',
+        port: 'Port your service is listening on',
+        username: 'Your database user name',
+        password: 'Your database password',
+        database: 'Database name',
       },
       haproxy: {
         port: 'HAProxy prometheus exporter port',
