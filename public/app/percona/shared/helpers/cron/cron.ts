@@ -119,7 +119,7 @@ const formatValue = (
 };
 
 const parsePartArray = (arr: number[], unit: Unit) => {
-  const values = [...new Set(fixSunday(arr, unit))].sort();
+  const values = [...new Set(fixSunday(arr, unit))].sort((a, b) => a - b);
 
   if (values.length === 0) {
     return values;
@@ -314,7 +314,7 @@ const parsePartString = (str: string, unit: Unit) => {
           unit
         )
       ),
-    ].sort();
+    ].sort((a, b) => a - b);
 
     const value = outOfRange(parsedValues, unit);
 
