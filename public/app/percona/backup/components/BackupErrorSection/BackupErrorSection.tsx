@@ -13,7 +13,7 @@ export const BackupErrorSection: FC<BackupErrorSectionProps> = ({ backupErrors =
         <section data-testid="backup-errors">
           {backupErrors.map((error) => (
             <div key={error.message}>
-              {error.message}{' '}
+              <span className={styles.errorText}>{error.message} </span>
               {error.link && (
                 <a href={error.link} rel="noreferrer" target="_blank">
                   {Messages.readMore}
