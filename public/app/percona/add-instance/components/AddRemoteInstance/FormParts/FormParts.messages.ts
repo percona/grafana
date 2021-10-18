@@ -73,7 +73,7 @@ export const Messages = {
         serviceName: 'Service name (default: Hostname)',
         username: 'Username',
         password: 'Password',
-        database: 'If not specified (default: postgres)',
+        database: 'Database (default: postgres)',
       },
       labels: {
         environment: 'Environment',
