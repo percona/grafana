@@ -20,7 +20,7 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
     <div className={styles.groupWrapper}>
       <h4 className={styles.sectionHeader}>{Messages.form.titles.mainDetails}</h4>
       <div className={styles.labelWrapper} data-testid="address-label">
-        <span>{Messages.form.labels.postgresqlDetails.address}</span>
+        <span>{Messages.form.labels.mainDetails.address}</span>
         <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.address} icon="info-circle" />
       </div>
       <TextInputField
@@ -30,12 +30,12 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
         disabled={remoteInstanceCredentials.isRDS}
       />
       <div className={styles.labelWrapper} data-testid="service-name-label">
-        <span>{Messages.form.labels.postgresqlDetails.serviceName}</span>
+        <span>{Messages.form.labels.mainDetails.serviceName}</span>
         <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.serviceName} icon="info-circle" />
       </div>
       <TextInputField name="serviceName" placeholder={Messages.form.placeholders.postgresqlDetails.serviceName} />
       <div className={styles.labelWrapper} data-testid="port-label">
-        <span>{Messages.form.labels.postgresqlDetails.port}</span>
+        <span>{Messages.form.labels.mainDetails.port}</span>
         <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.port} icon="info-circle" />
       </div>
       <TextInputField
@@ -44,7 +44,7 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
         validators={portValidators}
       />
       <div className={styles.labelWrapper} data-testid="username-label">
-        <span>{Messages.form.labels.postgresqlDetails.username}</span>
+        <span>{Messages.form.labels.mainDetails.username}</span>
         <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.username} icon="info-circle" />
       </div>
       <TextInputField
@@ -54,7 +54,7 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
         validators={userPassValidators}
       />
       <div className={styles.labelWrapper} data-testid="password-label">
-        <span>{Messages.form.labels.postgresqlDetails.password}</span>
+        <span>{Messages.form.labels.mainDetails.password}</span>
         <LinkTooltip tooltipText={Messages.form.tooltips.postgresqlDetails.password} icon="info-circle" />
       </div>
       <PasswordInputField

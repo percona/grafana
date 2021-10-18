@@ -27,11 +27,6 @@ export const Messages = {
         password: 'Password',
       },
       postgresqlDetails: {
-        address: 'Hostname',
-        serviceName: 'Service name',
-        port: 'Port',
-        username: 'Username',
-        password: 'Password',
         database: 'Database',
       },
       labels: {
