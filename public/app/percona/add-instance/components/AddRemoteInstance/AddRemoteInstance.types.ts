@@ -20,7 +20,7 @@ interface Instance {
 
 export interface AddRemoteInstanceProps {
   instance: Instance;
-  selectInstance: (intance: any) => void;
+  selectInstance: (intance: Instance) => void;
 }
 
 export interface AddNode {
@@ -74,11 +74,7 @@ interface Service {
   environment: string;
   cluster: string;
   replication_set: string;
-  custom_labels: {
-    // additionalProp1: string,
-    // additionalProp2: string,
-    // additionalProp3: string,
-  };
+  custom_labels: {};
 }
 
 interface ExtendedService extends Service {
@@ -94,7 +90,7 @@ interface BaseExporter {
   tls: boolean;
   tls_skip_verify: boolean;
   custom_labels: {};
-  status: string; //TODO enum
+  status: string; // TODO enum?
 }
 
 interface Node {

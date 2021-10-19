@@ -1,4 +1,7 @@
 import { Databases } from '../../percona/shared/core';
+import { AzureCredentials } from './components/AzureDiscovery/components/Instances/Instances.types';
+import { RDSCredentials } from './components/Discovery/components/Instances/Instances.types';
+
 // TODO: refactor this type to have separated interfaces for Azure and RDS types of instances
 export interface RemoteInstanceCredentials {
   serviceName?: string;
@@ -19,18 +22,6 @@ export interface RemoteInstanceCredentials {
   instance_id?: string;
   az?: string;
 }
-
-// export enum InstanceTypes {
-//   rds = 'rds',
-//   azure = 'azure',
-//   postgresql = 'postgresql',
-//   mysql = 'mysql',
-//   proxysql = 'proxysql',
-//   mongodb = 'mongodb',
-//   external = 'external',
-//   haproxy = 'haproxy',
-//   mariadb = 'mariadb',
-// }
 
 export enum InstanceTypesExtra {
   rds = 'rds',
@@ -53,4 +44,7 @@ export const INSTANCE_TYPES_LABELS = {
 
 export interface InstanceAvailableType {
   type: AvailableTypes | '';
+  credentials?: AzureCredentials | RDSCredentials;
 }
+
+export type SelectInstance = React.Dispatch<React.SetStateAction<InstanceAvailableType>>;

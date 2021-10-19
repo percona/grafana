@@ -4,12 +4,12 @@ import { TextInputField, PasswordInputField } from '@percona/platform-core';
 import { Button, useStyles } from '@grafana/ui';
 import { getStyles } from './Credentials.styles';
 import { Messages } from './Credentials.messages';
-import { CredentialsForm, CredentialsProps } from './Credentials.types';
+import { CredentialsProps, RDSCredentialsForm } from './Credentials.types';
 
 const Credentials: FC<CredentialsProps> = ({ discover, selectInstance }) => {
   const styles = useStyles(getStyles);
 
-  const onSubmit = useCallback((values: CredentialsForm) => {
+  const onSubmit = useCallback((values: RDSCredentialsForm) => {
     discover(values);
   }, []);
 

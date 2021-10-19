@@ -1,8 +1,14 @@
 import { Instance } from '../../Discovery.types';
+import { SelectInstance } from '../../../../panel.types';
+import { RDSCredentialsForm } from '../Credentials/Credentials.types';
+
+export type RDSCredentials = RDSCredentialsForm & {
+  isRDS?: boolean;
+};
 
 export interface InstancesTableProps {
   instances: Instance[];
-  selectInstance: (arg: any) => void;
+  selectInstance: SelectInstance;
   loading: boolean;
-  credentials: any;
+  credentials: RDSCredentialsForm;
 }

@@ -67,14 +67,28 @@ class AddRemoteInstanceService {
   }
 
   static async addAzure(body: RemoteInstancePayload, token?: CancelToken) {
-    return apiManagement.post<any, RemoteInstancePayload>('/azure/AzureDatabase/Add', body, false, token);
+    return apiManagement.post<{} | ErrorResponse, RemoteInstancePayload>(
+      '/azure/AzureDatabase/Add',
+      body,
+      false,
+      token
+    );
   }
 
   static async addExternal(body: RemoteInstanceExternalServicePayload, token?: CancelToken) {
-    return apiManagement.post<AddExternalResponse, any>('/External/Add', body, false, token);
+    return apiManagement.post<AddExternalResponse, RemoteInstanceExternalServicePayload>(
+      '/External/Add',
+      body,
+      false,
+      token
+    );
   }
 
-  static addRemote(type: AvailableTypes | '', data: any, token?: CancelToken) {
+  static addRemote(
+    type: AvailableTypes | '',
+    data: RemoteInstancePayload | RemoteInstanceExternalServicePayload,
+    token?: CancelToken
+  ) {
     switch (type) {
       case Databases.mongodb:
         return AddRemoteInstanceService.addMongodb(toPayload(data, '', type), token);

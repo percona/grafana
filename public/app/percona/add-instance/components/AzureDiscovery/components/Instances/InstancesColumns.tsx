@@ -4,8 +4,9 @@ import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { styles } from './Instances.styles';
 import { Instance } from '../../Discovery.types';
 import { Messages } from './Instances.messages';
-import { RemoteInstanceCredentials, AvailableTypes } from '../../../../panel.types';
+import { AvailableTypes } from '../../../../panel.types';
 import { OnSelectInstance } from './Instances.types';
+import { AzureCredentialsForm } from '../Credentials/Credentials.types';
 
 const getEngineType = (type?: string) => {
   switch (type) {
@@ -34,7 +35,7 @@ const getDatabaseType = (type?: string): AvailableTypes | '' => {
   }
 };
 
-export const getInstancesColumns = (credentials: RemoteInstanceCredentials, onSelectInstance: OnSelectInstance) => [
+export const getInstancesColumns = (credentials: AzureCredentialsForm, onSelectInstance: OnSelectInstance) => [
   {
     Header: 'Region',
     accessor: 'region',

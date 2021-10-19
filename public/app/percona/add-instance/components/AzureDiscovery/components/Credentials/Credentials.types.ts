@@ -1,4 +1,4 @@
-import { InstanceAvailableType } from '../../../../panel.types';
+import { SelectInstance } from '../../../../panel.types';
 
 export interface AzureCredentialsForm {
   azure_client_id?: string;
@@ -9,5 +9,5 @@ export interface AzureCredentialsForm {
 
 export interface CredentialsProps {
   onSetCredentials: (credentials: AzureCredentialsForm) => void;
-  selectInstance: React.Dispatch<React.SetStateAction<InstanceAvailableType>>;
+  selectInstance: SelectInstance;
 }
