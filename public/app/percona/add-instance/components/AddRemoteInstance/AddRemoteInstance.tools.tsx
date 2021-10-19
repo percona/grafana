@@ -1,5 +1,5 @@
 import { InstanceData } from './AddRemoteInstance.types';
-import { INSTANCE_TYPES_LABELS, InstanceTypes } from '../../panel.types';
+import { INSTANCE_TYPES_LABELS, InstanceAvailableType } from '../../panel.types';
 import { DEFAULT_PORTS } from './AddRemoteInstance.constants';
 import { logger } from '@percona/platform-core';
 import { MetricsParameters, Schema } from './FormParts/FormParts.types';
@@ -51,7 +51,7 @@ const getAzureCredentials = (credentials: any, instanceType: string) => {
   return instance;
 };
 
-const getRDSCredentials = (credentials: any, instanceType: InstanceTypes): InstanceData => {
+const getRDSCredentials = (credentials: any, instanceType: InstanceAvailableType): InstanceData => {
   const instance: InstanceData = {
     remoteInstanceCredentials: {
       serviceName: !credentials.isRDS ? credentials.address : credentials.instance_id,
@@ -101,7 +101,7 @@ const getRDSCredentials = (credentials: any, instanceType: InstanceTypes): Insta
   return instance;
 };
 
-export const getInstanceData = (instanceType: InstanceTypes, credentials: any): InstanceData => {
+export const getInstanceData = (instanceType: InstanceAvailableType, credentials: any): InstanceData => {
   const extractCredentials = (credentials?: any): InstanceData => {
     if (credentials?.isRDS) {
       return getRDSCredentials(credentials, instanceType);

@@ -8,7 +8,7 @@ import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
 import { tablestatOptions } from './AdditionalOptions.constants';
 import { TablestatOptionsInterface } from './AdditionalOptions.types';
 import { FormApi } from 'final-form';
-import { InstanceTypes } from '../../../../panel.types';
+import { InstanceAvailableType, RemoteInstanceCredentials } from '../../../../panel.types';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
@@ -83,7 +83,11 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
   );
 };
 
-export const getAdditionalOptions = (type: InstanceTypes, remoteInstanceCredentials: any, form: FormApi) => {
+export const getAdditionalOptions = (
+  type: InstanceAvailableType,
+  remoteInstanceCredentials: RemoteInstanceCredentials,
+  form: FormApi
+) => {
   switch (type) {
     case Databases.postgresql:
       return (

@@ -5,7 +5,7 @@ import { Databases } from '../../../../percona/shared/core';
 import { getStyles } from './AddInstance.styles';
 import { Messages } from './AddInstance.messages';
 import { AddInstanceProps, SelectInstanceProps } from './AddInstance.types';
-import { InstanceTypesExtra, AvailableTypes } from '../../panel.types';
+import { InstanceTypesExtra, InstanceAvailableType } from '../../panel.types';
 import { Settings } from 'app/percona/settings/Settings.types';
 import { CheckPermissions } from 'app/percona/shared/components/Elements/CheckPermissions/CheckPermissions';
 
@@ -47,7 +47,7 @@ export const AddInstance: FC<AddInstanceProps> = ({ onSelectInstanceType }) => {
     [showAzure]
   );
 
-  const selectInstanceType = (type: AvailableTypes | '') => () => onSelectInstanceType({ type });
+  const selectInstanceType = (type: InstanceAvailableType) => () => onSelectInstanceType({ type });
 
   return (
     <CheckPermissions onSettingsLoadSuccess={onSettingsLoadSuccess}>

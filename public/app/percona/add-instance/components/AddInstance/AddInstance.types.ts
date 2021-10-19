@@ -1,4 +1,4 @@
-import { InstanceAvailableType } from '../../panel.types';
+import { InstanceAvailable } from '../../panel.types';
 
 export interface SelectInstanceProps {
   type: string;
@@ -7,5 +7,5 @@ export interface SelectInstanceProps {
 }
 
 export interface AddInstanceProps {
-  onSelectInstanceType: (arg: InstanceAvailableType) => void;
+  onSelectInstanceType: (arg: InstanceAvailable) => void;
 }

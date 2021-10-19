@@ -40,11 +40,21 @@ export const INSTANCE_TYPES_LABELS = {
   [Databases.postgresql]: 'PostgreSQL',
   [Databases.proxysql]: 'ProxySQL',
   [Databases.haproxy]: 'HAProxy',
+  [InstanceTypesExtra.azure]: '',
+  [InstanceTypesExtra.rds]: '',
+  [InstanceTypesExtra.external]: '',
 };
 
-export interface InstanceAvailableType {
-  type: AvailableTypes | '';
-  credentials?: AzureCredentials | RDSCredentials;
+export type InstanceAvailableType = AvailableTypes | '';
+
+export interface InstanceAvailable {
+  type: InstanceAvailableType;
+  credentials?: AzureCredentials | RDSCredentials | RemoteInstanceCredentials;
 }
 
-export type SelectInstance = React.Dispatch<React.SetStateAction<InstanceAvailableType>>;
+export interface Instance {
+  type: InstanceTypes | '';
+  credentials?: AzureCredentials | RDSCredentials | RemoteInstanceCredentials;
+}
+
+export type SelectInstance = React.Dispatch<React.SetStateAction<InstanceAvailable>>;

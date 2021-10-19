@@ -4,8 +4,7 @@ import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { styles } from './Instances.styles';
 import { Instance } from '../../Discovery.types';
 import { Messages } from './Instances.messages';
-import { AvailableTypes } from '../../../../panel.types';
-import { OnSelectInstance } from './Instances.types';
+import { InstanceAvailableType, SelectInstance } from '../../../../panel.types';
 import { AzureCredentialsForm } from '../Credentials/Credentials.types';
 
 const getEngineType = (type?: string) => {
@@ -23,7 +22,7 @@ const getEngineType = (type?: string) => {
   }
 };
 
-const getDatabaseType = (type?: string): AvailableTypes | '' => {
+const getDatabaseType = (type?: string): InstanceAvailableType => {
   switch (type) {
     case 'DISCOVER_AZURE_DATABASE_TYPE_MYSQL':
     case 'DISCOVER_AZURE_DATABASE_TYPE_MARIADB':
@@ -35,7 +34,7 @@ const getDatabaseType = (type?: string): AvailableTypes | '' => {
   }
 };
 
-export const getInstancesColumns = (credentials: AzureCredentialsForm, onSelectInstance: OnSelectInstance) => [
+export const getInstancesColumns = (credentials: AzureCredentialsForm, onSelectInstance: SelectInstance) => [
   {
     Header: 'Region',
     accessor: 'region',

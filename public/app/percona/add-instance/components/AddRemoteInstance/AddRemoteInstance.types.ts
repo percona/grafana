@@ -1,4 +1,9 @@
-import { RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
+import { RemoteInstanceCredentials, InstanceAvailable, SelectInstance } from 'app/percona/add-instance/panel.types';
+
+export interface FormValues extends RemoteInstanceCredentials {
+  qan_mysql_perfschema?: boolean;
+  tracking?: 'qan_postgresql_pgstatements_agent';
+}
 
 export enum TrackingOptions {
   none = 'none',
@@ -13,14 +18,9 @@ export interface InstanceData {
   discoverName?: string;
 }
 
-interface Instance {
-  type: any;
-  credentials?: any;
-}
-
 export interface AddRemoteInstanceProps {
-  instance: Instance;
-  selectInstance: (intance: Instance) => void;
+  instance: InstanceAvailable;
+  selectInstance: SelectInstance;
 }
 
 export interface AddNode {

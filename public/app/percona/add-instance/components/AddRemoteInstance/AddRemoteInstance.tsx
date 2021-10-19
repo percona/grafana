@@ -3,15 +3,15 @@ import { Form as FormFinal } from 'react-final-form';
 import { Button, useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 import AddRemoteInstanceService, { toPayload } from './AddRemoteInstance.service';
 import { getInstanceData, remoteToken } from './AddRemoteInstance.tools';
 import { getStyles } from './AddRemoteInstance.styles';
-import { AddRemoteInstanceProps } from './AddRemoteInstance.types';
+import { AddRemoteInstanceProps, FormValues } from './AddRemoteInstance.types';
 import { AdditionalOptions, Labels, MainDetails } from './FormParts';
 import { Messages } from './AddRemoteInstance.messages';
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
-import { InstanceTypesExtra, InstanceTypes } from '../../panel.types';
+import { InstanceTypesExtra, InstanceTypes, INSTANCE_TYPES_LABELS, InstanceAvailableType } from '../../panel.types';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
 import { FormApi } from 'final-form';
 import { logger } from '@percona/platform-core';
@@ -23,9 +23,9 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
   const { remoteInstanceCredentials, discoverName } = getInstanceData(type, credentials);
   const [loading, setLoading] = useState<boolean>(false);
   const [generateToken] = useCancelToken();
-  const initialValues: any = { ...remoteInstanceCredentials };
+  const initialValues: FormValues = { ...remoteInstanceCredentials };
 
-  if (type === Databases.mysql || type === Databases.mariadb) {
+  if (type === Databases.mysql) {
     initialValues.qan_mysql_perfschema = true;
   }
 
@@ -61,7 +61,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
     [type, discoverName]
   );
 
-  const ConnectionDetails = ({ form, type }: { form: FormApi; type: InstanceTypes }) => {
+  const ConnectionDetails = ({ form, type }: { form: FormApi; type: InstanceTypes | '' }) => {
     switch (type) {
       case InstanceTypesExtra.external:
         return <ExternalServiceConnectionDetails form={form} />;
@@ -87,13 +87,14 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
     </>
   );
 
-  const getHeader = (databaseType: string) => {
+  const getHeader = (databaseType: InstanceAvailableType) => {
     if (databaseType === InstanceTypesExtra.external) {
       return Messages.form.titles.addExternalService;
     }
-
-    // @ts-ignore
-    return `Add remote ${DATABASE_LABELS[databaseType]} Instance`;
+    if (databaseType === '') {
+      return `Add remote Instance`;
+    }
+    return `Add remote ${INSTANCE_TYPES_LABELS[databaseType]} Instance`;
   };
 
   return (

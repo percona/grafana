@@ -13,7 +13,7 @@ import {
   AddExternalResponse,
   ErrorResponse,
 } from './AddRemoteInstance.types';
-import { InstanceTypesExtra, AvailableTypes } from '../../panel.types';
+import { InstanceTypesExtra, InstanceAvailableType } from '../../panel.types';
 import { Databases } from '../../../../percona/shared/core';
 
 class AddRemoteInstanceService {
@@ -85,7 +85,7 @@ class AddRemoteInstanceService {
   }
 
   static addRemote(
-    type: AvailableTypes | '',
+    type: InstanceAvailableType,
     data: RemoteInstancePayload | RemoteInstanceExternalServicePayload,
     token?: CancelToken
   ) {
@@ -110,7 +110,7 @@ class AddRemoteInstanceService {
 
 export default AddRemoteInstanceService;
 
-export const toPayload = (values: any, discoverName?: string, type?: AvailableTypes): RemoteInstancePayload => {
+export const toPayload = (values: any, discoverName?: string, type?: InstanceAvailableType): RemoteInstancePayload => {
   const data = { ...values };
 
   if (values.custom_labels) {

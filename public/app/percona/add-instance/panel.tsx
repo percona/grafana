@@ -7,7 +7,7 @@ import AzureDiscovery from './components/AzureDiscovery/Discovery';
 import { AddInstance } from './components/AddInstance/AddInstance';
 import { getStyles } from './panel.styles';
 import { Messages } from './components/AddRemoteInstance/AddRemoteInstance.messages';
-import { InstanceTypesExtra, InstanceAvailableType, AvailableTypes } from './panel.types';
+import { InstanceTypesExtra, InstanceAvailable, AvailableTypes } from './panel.types';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { PAGE_MODEL } from './panel.constants';
 import { Databases } from '../../percona/shared/core';
@@ -26,7 +26,7 @@ const availableInstanceTypes: AvailableTypes[] = [
 const AddInstancePanel = () => {
   const styles = useStyles(getStyles);
   const instanceType = '';
-  const [selectedInstance, selectInstance] = useState<InstanceAvailableType>({
+  const [selectedInstance, selectInstance] = useState<InstanceAvailable>({
     type: availableInstanceTypes.includes(instanceType as AvailableTypes) ? instanceType : '',
   });
 
