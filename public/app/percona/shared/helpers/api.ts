@@ -90,18 +90,15 @@ export const translateApiError = (error: ApiErrorCode): ApiVerboseError | undefi
 
 export const apiErrorParser = (e: AxiosError): ApiVerboseError[] => {
   const errorData: ApiError = e.response?.data;
-  const result: ApiVerboseError[] = [];
+  let result: ApiVerboseError[] = [];
 
   if (errorData) {
     const { details = [] } = errorData;
 
-    for (let i = 0; i < details.length; i++) {
-      const translatedError = translateApiError(details[i].code);
-
-      if (translatedError) {
-        result.push(translatedError);
-      }
-    }
+    result = details.reduce((acc, current) => {
+      const translatedError = translateApiError(current.code);
+      return translatedError ? [...acc, translatedError] : acc;
+    }, []);
   }
 
   return result;
