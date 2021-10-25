@@ -1,7 +1,7 @@
 import { CancelToken } from 'axios';
 import { apiManagement } from 'app/percona/shared/helpers/api';
 import {
-  RemoteInstanceExternalServicePayload,
+  ExternalPayload,
   RemoteInstancePayload,
   TrackingOptions,
   ProxySQLInstanceResponse,
@@ -12,12 +12,19 @@ import {
   AddRDSResponse,
   AddExternalResponse,
   ErrorResponse,
+  RDSPayload,
+  MSAzurePayload,
+  MySQLPayload,
+  PostgreSQLPayload,
+  HaProxyPayload,
+  ProxySQLPayload,
+  MongoDBPayload,
 } from './AddRemoteInstance.types';
 import { InstanceTypesExtra, InstanceAvailableType } from '../../panel.types';
 import { Databases } from '../../../../percona/shared/core';
 
 class AddRemoteInstanceService {
-  static async addMysql(body: RemoteInstancePayload, token?: CancelToken) {
+  static async addMysql(body: MySQLPayload, token?: CancelToken) {
     return apiManagement.post<MySQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
       '/MySQL/Add',
       body,
@@ -26,7 +33,7 @@ class AddRemoteInstanceService {
     );
   }
 
-  static async addPostgresql(body: RemoteInstancePayload, token?: CancelToken) {
+  static async addPostgresql(body: PostgreSQLPayload, token?: CancelToken) {
     return apiManagement.post<PostgreSQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
       '/PostgreSQL/Add',
       body,
@@ -35,7 +42,7 @@ class AddRemoteInstanceService {
     );
   }
 
-  static async addProxysql(body: RemoteInstancePayload, token?: CancelToken) {
+  static async addProxysql(body: ProxySQLPayload, token?: CancelToken) {
     return apiManagement.post<ProxySQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
       '/ProxySQL/Add',
       body,
@@ -44,7 +51,7 @@ class AddRemoteInstanceService {
     );
   }
 
-  static async addHaproxy(body: RemoteInstancePayload, token?: CancelToken) {
+  static async addHaproxy(body: HaProxyPayload, token?: CancelToken) {
     return apiManagement.post<AddHaProxyResponse | ErrorResponse, RemoteInstancePayload>(
       '/HAProxy/Add',
       body,
@@ -53,7 +60,7 @@ class AddRemoteInstanceService {
     );
   }
 
-  static async addMongodb(body: RemoteInstancePayload, token?: CancelToken) {
+  static async addMongodb(body: MongoDBPayload, token?: CancelToken) {
     return apiManagement.post<AddMongoDbReponse | ErrorResponse, RemoteInstancePayload>(
       '/MongoDB/Add',
       body,
@@ -62,11 +69,12 @@ class AddRemoteInstanceService {
     );
   }
 
-  static async addRDS(body: RemoteInstancePayload, token?: CancelToken) {
+  static async addRDS(body: RDSPayload, token?: CancelToken) {
+    console.log(body);
     return apiManagement.post<AddRDSResponse | ErrorResponse, RemoteInstancePayload>('/RDS/Add', body, false, token);
   }
 
-  static async addAzure(body: RemoteInstancePayload, token?: CancelToken) {
+  static async addAzure(body: MSAzurePayload, token?: CancelToken) {
     return apiManagement.post<{} | ErrorResponse, RemoteInstancePayload>(
       '/azure/AzureDatabase/Add',
       body,
@@ -75,29 +83,20 @@ class AddRemoteInstanceService {
     );
   }
 
-  static async addExternal(body: RemoteInstanceExternalServicePayload, token?: CancelToken) {
-    return apiManagement.post<AddExternalResponse, RemoteInstanceExternalServicePayload>(
-      '/External/Add',
-      body,
-      false,
-      token
-    );
+  static async addExternal(body: ExternalPayload, token?: CancelToken) {
+    return apiManagement.post<AddExternalResponse, ExternalPayload>('/External/Add', body, false, token);
   }
 
-  static addRemote(
-    type: InstanceAvailableType,
-    data: RemoteInstancePayload | RemoteInstanceExternalServicePayload,
-    token?: CancelToken
-  ) {
+  static addRemote(type: InstanceAvailableType, data: RemoteInstancePayload, token?: CancelToken) {
     switch (type) {
       case Databases.mongodb:
-        return AddRemoteInstanceService.addMongodb(toPayload(data, '', type), token);
+        return AddRemoteInstanceService.addMongodb(toPayload(data, '', type) as MongoDBPayload, token);
       case Databases.mysql:
-        return AddRemoteInstanceService.addMysql(toPayload(data, '', type), token);
+        return AddRemoteInstanceService.addMysql(toPayload(data, '', type) as MySQLPayload, token);
       case Databases.postgresql:
-        return AddRemoteInstanceService.addPostgresql(toPayload(data, '', type), token);
+        return AddRemoteInstanceService.addPostgresql(toPayload(data, '', type) as PostgreSQLPayload, token);
       case Databases.proxysql:
-        return AddRemoteInstanceService.addProxysql(toPayload(data, '', type), token);
+        return AddRemoteInstanceService.addProxysql(toPayload(data, '', type) as ProxySQLPayload, token);
       case Databases.haproxy:
         return AddRemoteInstanceService.addHaproxy(toExternalServicePayload(data), token);
       case InstanceTypesExtra.external:
@@ -184,7 +183,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
   return data;
 };
 
-export const toExternalServicePayload = (values: any): RemoteInstanceExternalServicePayload => {
+export const toExternalServicePayload = (values: any): ExternalPayload => {
   const data = { ...values };
 
   if (values.custom_labels) {

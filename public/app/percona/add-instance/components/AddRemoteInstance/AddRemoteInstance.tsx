@@ -7,7 +7,13 @@ import { Databases } from 'app/percona/shared/core';
 import AddRemoteInstanceService, { toPayload } from './AddRemoteInstance.service';
 import { getInstanceData, remoteToken } from './AddRemoteInstance.tools';
 import { getStyles } from './AddRemoteInstance.styles';
-import { AddRemoteInstanceProps, FormValues } from './AddRemoteInstance.types';
+import {
+  AddRemoteInstanceProps,
+  FormValues,
+  RDSPayload,
+  MSAzurePayload,
+  TrackingOptions,
+} from './AddRemoteInstance.types';
 import { AdditionalOptions, Labels, MainDetails } from './FormParts';
 import { Messages } from './AddRemoteInstance.messages';
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
@@ -30,19 +36,21 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
   }
 
   if (type === Databases.postgresql) {
-    initialValues.tracking = 'qan_postgresql_pgstatements_agent';
+    initialValues.tracking = TrackingOptions.pgStatements;
   }
 
   const onSubmit = useCallback(
-    async (values) => {
+    async (values: FormValues) => {
       try {
         setLoading(true);
-
         if (values.isRDS) {
-          await AddRemoteInstanceService.addRDS(toPayload(values, discoverName), generateToken(ADD_RDS_CANCEL_TOKEN));
+          await AddRemoteInstanceService.addRDS(
+            toPayload(values, discoverName) as RDSPayload,
+            generateToken(ADD_RDS_CANCEL_TOKEN)
+          );
         } else if (values.isAzure) {
           await AddRemoteInstanceService.addAzure(
-            toPayload(values, discoverName),
+            toPayload(values, discoverName) as MSAzurePayload,
             generateToken(ADD_AZURE_CANCEL_TOKEN)
           );
         } else {

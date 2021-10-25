@@ -23,11 +23,6 @@ export interface AddRemoteInstanceProps {
   selectInstance: SelectInstance;
 }
 
-export interface AddNode {
-  node_name: string;
-  node_type: string;
-}
-
 export enum DefaultPorts {
   small = 'small',
   medium = 'medium',
@@ -35,24 +30,185 @@ export enum DefaultPorts {
   custom = 'custom',
 }
 
-export interface RemoteInstanceExternalServicePayload {
+// export interface RemoteInstancePayload {
+//   custom_labels: {};
+//   service_name: string;
+//   address?: string;
+//   listen_port: string;
+//   metrics_mode: number;
+//   node_name?: string;
+//   qan?: string;
+// }
+
+interface AddNode {
+  node_name: string;
+  node_type: string;
+  machine_id: string;
+  distro: string;
+  container_id: string;
+  container_name: string;
+  node_model: string;
+  region: string;
+  az: string;
   custom_labels: {};
-  service_name: string;
-  address?: string;
-  add_node: AddNode;
-  listen_port: string;
-  metrics_mode: number;
 }
 
-export interface RemoteInstancePayload {
-  custom_labels: {};
-  service_name: string;
-  address?: string;
-  listen_port: string;
-  metrics_mode: number;
+interface RemoteCommonPayload {
   node_name?: string;
-  qan?: string;
+  address?: string;
+  service_name?: string;
+  username?: string;
+  password?: string;
+  environment?: string;
+  custom_labels?: any;
+  skip_connection_check?: boolean;
 }
+interface TLSCommon {
+  tls?: boolean;
+  tls_skip_verify?: boolean;
+}
+
+export interface ProxySQLPayload extends RemoteCommonPayload, TLSCommon {
+  node_id: string;
+  add_node: AddNode;
+  port: number;
+  socket: string;
+  pmm_agent_id: string;
+  cluster: string;
+  replication_set: string;
+  metrics_mode: string;
+  disable_collectors: string[];
+  agent_password: string;
+}
+
+export interface PostgreSQLPayload extends RemoteCommonPayload, TLSCommon {
+  node_id: string;
+  add_node: AddNode;
+  port: number;
+  socket: string;
+  pmm_agent_id: string;
+  cluster: string;
+  replication_set: string;
+  qan_postgresql_pgstatements_agent: boolean;
+  qan_postgresql_pgstatmonitor_agent: boolean;
+  disable_query_examples: boolean;
+  metrics_mode: string;
+  disable_collectors: string[];
+  tls_ca: string;
+  tls_cert: string;
+  tls_key: string;
+  agent_password: string;
+}
+
+export interface MySQLPayload extends RemoteCommonPayload, TLSCommon {
+  node_id: string;
+  add_node: AddNode;
+  port: number;
+  socket: string;
+  pmm_agent_id: string;
+  cluster: string;
+  replication_set: string;
+  qan_mysql_perfschema: boolean;
+  qan_mysql_slowlog: boolean;
+  disable_query_examples: boolean;
+  max_slowlog_file_size: string;
+  tablestats_group_table_limit: number;
+  metrics_mode: string;
+  disable_collectors: string[];
+  agent_password: string;
+  tls_cert: string;
+  tls_key: string;
+  tls_ca: string;
+}
+
+export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {
+  node_id: string;
+  add_node: AddNode;
+  port: number;
+  socket: string;
+  pmm_agent_id: string;
+  cluster: string;
+  replication_set: string;
+  qan_mongodb_profiler: boolean;
+  tls_certificate_key: string;
+  tls_certificate_key_file_password: string;
+  tls_ca: string;
+  metrics_mode: string;
+  disable_collectors: string[];
+  authentication_mechanism: string;
+  authentication_database: string;
+  agent_password: string;
+}
+
+export interface HaProxyPayload extends RemoteCommonPayload {
+  node_id: string;
+  add_node: AddNode;
+  scheme: string;
+  metrics_path: string;
+  listen_port: number;
+  cluster: string;
+  replication_set: string;
+  metrics_mode: string;
+}
+
+export interface ExternalPayload extends RemoteCommonPayload {
+  runs_on_node_id: string;
+  add_node: AddNode;
+  scheme: string;
+  metrics_path: string;
+  listen_port: number;
+  node_id: string;
+  cluster: string;
+  replication_set: string;
+  group: string;
+  metrics_mode: string;
+}
+
+export interface CommonRDSAzurePayload extends RemoteCommonPayload, TLSCommon {
+  region?: string;
+  az?: string;
+  instance_id?: string;
+  node_model?: string;
+  port?: string;
+  tablestats_group_table_limit?: number;
+  disable_query_examples?: boolean;
+}
+
+export interface RDSPayload extends CommonRDSAzurePayload {
+  engine: string;
+  cluster: string;
+  replication_set: string;
+  aws_access_key: string;
+  aws_secret_key: string;
+  rds_exporter: boolean;
+  qan_mysql_perfschema: boolean;
+  disable_basic_metrics: boolean;
+  disable_enhanced_metrics: boolean;
+  metrics_mode: string;
+  qan_postgresql_pgstatements: boolean;
+  agent_password: string;
+}
+
+export interface MSAzurePayload extends CommonRDSAzurePayload {
+  azure_client_id?: string;
+  azure_client_secret?: string;
+  azure_tenant_id?: string;
+  azure_subscription_id?: string;
+  azure_resource_group?: string;
+  azure_database_exporter?: boolean;
+  qan?: boolean;
+  type?: string;
+}
+
+export type RemoteInstancePayload =
+  | MSAzurePayload
+  | RDSPayload
+  | MySQLPayload
+  | HaProxyPayload
+  | ProxySQLPayload
+  | PostgreSQLPayload
+  | MongoDBPayload
+  | ExternalPayload;
 
 export interface ErrorResponse {
   error: string;

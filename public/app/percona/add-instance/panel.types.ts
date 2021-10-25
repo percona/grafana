@@ -2,7 +2,6 @@ import { Databases } from '../../percona/shared/core';
 import { AzureCredentials } from './components/AzureDiscovery/components/Instances/Instances.types';
 import { RDSCredentials } from './components/Discovery/components/Instances/Instances.types';
 
-// TODO: refactor this type to have separated interfaces for Azure and RDS types of instances
 export interface RemoteInstanceCredentials {
   serviceName?: string;
   username?: string;
@@ -18,9 +17,21 @@ export interface RemoteInstanceCredentials {
   azure_tenant_id?: string;
   azure_subscription_id?: string;
   azure_resource_group?: string;
-  azure_database_exporter?: boolean;
   instance_id?: string;
+  azure_database_exporter?: boolean;
   az?: string;
+  qan?: boolean;
+  type?: string;
+  node_model?: string;
+  tablestats_group_table_limit?: number;
+  disable_query_examples?: boolean;
+  node_name?: string;
+  password?: string;
+  environment?: string;
+  custom_labels?: {};
+  skip_connection_check?: boolean;
+  tls?: boolean;
+  tls_skip_verify?: boolean;
 }
 
 export enum InstanceTypesExtra {
