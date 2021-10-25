@@ -15,23 +15,22 @@ describe('TopSection.utils', () => {
     },
   ];
 
-  it('should return menu item with integrated alerting on top', () => {
+  it('should return menu item with alerting tabs', () => {
     const result = buildIntegratedAlertingMenuItem(testMenu)[0].children || [];
-    const integratedAlertingLink = {
-      id: 'integrated-alerting',
-      text: 'Alerting',
-      icon: 'list-ul',
-      url: `${config.appSubUrl}/integrated-alerting`,
-    };
-    const divider = {
-      id: 'divider',
-      text: 'Divider',
-      divider: true,
-      hideFromTabs: true,
+    const firstAlertingLink = {
+      id: 'integrated-alerting-alerts',
+      text: 'Alerts',
+      icon: 'fa fa-exclamation-triangle',
+      url: `${config.appSubUrl}/integrated-alerting/alerts`,
     };
 
-    expect(result.length).toBe(3);
-    expect(result[0]).toEqual(integratedAlertingLink);
-    expect(result[1]).toEqual(divider);
+    expect(result.length).toBe(6);
+    expect(result[0]).toEqual(firstAlertingLink);
+  });
+
+  it('should add the alerting section if not existent', () => {
+    const result = buildIntegratedAlertingMenuItem([]);
+
+    expect(result[0].id).toBe('alerting');
   });
 });
