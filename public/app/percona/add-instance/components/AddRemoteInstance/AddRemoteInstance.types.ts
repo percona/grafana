@@ -246,7 +246,7 @@ interface BaseExporter {
   tls: boolean;
   tls_skip_verify: boolean;
   custom_labels: {};
-  status: string; // TODO enum?
+  status: string;
 }
 
 interface Node {
