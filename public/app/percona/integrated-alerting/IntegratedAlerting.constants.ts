@@ -28,7 +28,7 @@ export const PAGE_TABS: PageModel[] = [
 ];
 
 export const PAGE_MODEL: PageModel = {
-  title: 'Integrated Alerting',
+  title: 'Alerting',
   path: 'integrated-alerting',
   id: 'integrated-alerting',
   children: PAGE_TABS.map(({ title, id, path }) => ({ title, id, path })),

@@ -19,7 +19,7 @@ describe('TopSection.utils', () => {
     const result = buildIntegratedAlertingMenuItem(testMenu)[0].children || [];
     const integratedAlertingLink = {
       id: 'integrated-alerting',
-      text: 'Integrated Alerting',
+      text: 'Alerting',
       icon: 'list-ul',
       url: `${config.appSubUrl}/integrated-alerting`,
     };
