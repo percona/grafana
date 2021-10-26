@@ -21,7 +21,7 @@ import {
   MongoDBPayload,
 } from './AddRemoteInstance.types';
 import { InstanceTypesExtra, InstanceAvailableType } from '../../panel.types';
-import { Databases } from '../../../../percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 
 class AddRemoteInstanceService {
   static async addMysql(body: MySQLPayload, token?: CancelToken) {
@@ -70,7 +70,6 @@ class AddRemoteInstanceService {
   }
 
   static async addRDS(body: RDSPayload, token?: CancelToken) {
-    console.log(body);
     return apiManagement.post<AddRDSResponse | ErrorResponse, RemoteInstancePayload>('/RDS/Add', body, false, token);
   }
 

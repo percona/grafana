@@ -1,7 +1,7 @@
 import { GrafanaTheme } from '@grafana/data';
 import { css } from 'emotion';
 
-export const getStyles = ({ border, colors, spacing }: GrafanaTheme) => ({
+export const getStyles = ({ border, colors, spacing, typography }: GrafanaTheme) => ({
   navigationButton: css`
     display: flex;
     flex-direction: column;
@@ -39,12 +39,12 @@ export const getStyles = ({ border, colors, spacing }: GrafanaTheme) => ({
   `,
   addInstance: css`
     margin-top: ${spacing.sm};
-    font-size: 13px;
+    font-size: ${typography.size.sm};
   `,
   addInstanceTitle: css`
     margin-top: ${spacing.sm};
     overflow: hidden;
-    line-height: 1.3em;
+    line-height: ${typography.lineHeight.md};
     width: 65%;
     height: 3em;
   `,

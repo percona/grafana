@@ -1,5 +1,5 @@
 import { getInstanceData } from './AddRemoteInstance.tools';
-import { Databases } from '../../../../percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 
 describe('Get instance data:: ', () => {
   it('should return correct one when isRDS is false', () => {

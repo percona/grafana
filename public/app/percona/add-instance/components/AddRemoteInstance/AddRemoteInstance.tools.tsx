@@ -3,7 +3,7 @@ import { INSTANCE_TYPES_LABELS, InstanceAvailableType } from '../../panel.types'
 import { DEFAULT_PORTS } from './AddRemoteInstance.constants';
 import { logger } from '@percona/platform-core';
 import { MetricsParameters, Schema } from './FormParts/FormParts.types';
-import { Databases } from '../../../../percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 
 const getAzureCredentials = (credentials: any, instanceType: string) => {
   const instance: InstanceData = {

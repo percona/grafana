@@ -100,7 +100,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
       return Messages.form.titles.addExternalService;
     }
     if (databaseType === '') {
-      return `Add remote Instance`;
+      return Messages.form.titles.addRemoteInstance;
     }
     return `Add remote ${INSTANCE_TYPES_LABELS[databaseType]} Instance`;
   };

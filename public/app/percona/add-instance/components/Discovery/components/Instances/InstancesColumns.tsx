@@ -1,6 +1,6 @@
 import { Button } from '@grafana/ui';
 import React from 'react';
-import { SelectInstance } from '../../../../panel.types';
+import { SelectInstance } from 'app/percona/add-instance/panel.types';
 import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { styles } from './Instances.styles';
 import { Instance } from '../../Discovery.types';

@@ -1,4 +1,4 @@
-import { SelectInstance } from '../../../../panel.types';
+import { SelectInstance } from 'app/percona/add-instance/panel.types';
 
 export interface RDSCredentialsForm {
   aws_access_key: string;

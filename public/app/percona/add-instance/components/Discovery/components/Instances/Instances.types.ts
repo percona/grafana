@@ -1,5 +1,5 @@
 import { Instance } from '../../Discovery.types';
-import { SelectInstance } from '../../../../panel.types';
+import { SelectInstance } from 'app/percona/add-instance/panel.types';
 import { RDSCredentialsForm } from '../Credentials/Credentials.types';
 
 export type RDSCredentials = RDSCredentialsForm & {

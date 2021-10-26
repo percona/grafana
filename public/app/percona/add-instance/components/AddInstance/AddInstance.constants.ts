@@ -1,6 +1,6 @@
 import { Messages } from './AddInstance.messages';
 import { InstanceTypesExtra } from '../../panel.types';
-import { Databases } from '../../../../percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 
 export const instanceList = [
   { type: InstanceTypesExtra.rds, title: Messages.titles.rds },

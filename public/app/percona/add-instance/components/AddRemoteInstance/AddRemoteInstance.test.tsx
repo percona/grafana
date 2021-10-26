@@ -2,7 +2,7 @@ import { mount } from 'enzyme';
 import React from 'react';
 import { dataTestId } from '@percona/platform-core';
 import AddRemoteInstance from './AddRemoteInstance';
-import { Databases } from '../../../../percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 import { InstanceTypesExtra } from '../../panel.types';
 
 xdescribe('Add remote instance:: ', () => {

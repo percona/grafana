@@ -8,7 +8,7 @@ import { LabelsFormPart } from './Labels/Labels';
 import { MainDetailsFormPart } from './MainDetails/MainDetails';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
 import { getMount } from 'app/percona/shared/helpers/testUtils';
-import { Databases } from '../../../../../percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 
 const form: Partial<FormApi> = {
   change: jest.fn(),

@@ -68,4 +68,4 @@ export interface Instance {
   credentials?: AzureCredentials | RDSCredentials | RemoteInstanceCredentials;
 }
 
-export type SelectInstance = React.Dispatch<React.SetStateAction<InstanceAvailable>>;
+export type SelectInstance = (instance: InstanceAvailable) => void;

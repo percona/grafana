@@ -1,4 +1,4 @@
-import { Databases } from '../../../../percona/shared/core';
+import { Databases } from 'app/percona/shared/core';
 
 export const DEFAULT_PORTS = {
   [Databases.mysql]: '3306',

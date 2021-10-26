@@ -1,6 +1,6 @@
 import { Instance } from '../../Discovery.types';
 import { AzureCredentialsForm } from '../Credentials/Credentials.types';
-import { SelectInstance } from '../../../../panel.types';
+import { SelectInstance } from 'app/percona/add-instance/panel.types';
 
 export type AzureCredentials = AzureCredentialsForm & {
   isAzure?: boolean;

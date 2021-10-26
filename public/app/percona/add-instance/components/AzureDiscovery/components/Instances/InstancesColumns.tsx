@@ -4,7 +4,7 @@ import { DATABASE_LABELS, Databases } from 'app/percona/shared/core';
 import { styles } from './Instances.styles';
 import { Instance } from '../../Discovery.types';
 import { Messages } from './Instances.messages';
-import { InstanceAvailableType, SelectInstance } from '../../../../panel.types';
+import { InstanceAvailableType, SelectInstance } from 'app/percona/add-instance/panel.types';
 import { AzureCredentialsForm } from '../Credentials/Credentials.types';
 
 const getEngineType = (type?: string) => {
