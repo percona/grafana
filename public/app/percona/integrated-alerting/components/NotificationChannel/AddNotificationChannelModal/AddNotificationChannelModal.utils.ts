@@ -60,7 +60,7 @@ export const INITIAL_VALUES = {
     name: summary,
     type: getOptionFrom(type),
     url,
-    webHookType: username ? WebHookAuthType.basic : WebHookAuthType.token,
+    webHookType: getWebhookAuthType(username, token),
     username,
     password,
     token,
@@ -95,3 +95,10 @@ export const getInitialValues = (notificationChannel?: NotificationChannel) => {
     : defaultValues;
 };
 export const getOptionFrom = (type: NotificationChannelType) => TYPE_OPTIONS.find((opt) => opt.value === type);
+export const getWebhookAuthType = (username?: string, token?: string): WebHookAuthType => {
+  if (username) {
+    return WebHookAuthType.basic;
+  }
+
+  return token ? WebHookAuthType.token : WebHookAuthType.none;
+};

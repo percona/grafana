@@ -51,4 +51,8 @@ export const WEBHOOK_TYPE_OPTIONS = [
     value: WebHookAuthType.token,
     label: Messages.fields.token,
   },
+  {
+    value: WebHookAuthType.none,
+    label: Messages.fields.noAuth,
+  },
 ];

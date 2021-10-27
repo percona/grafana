@@ -22,6 +22,7 @@ export enum PagerDutyKeyType {
 export enum WebHookAuthType {
   basic = 'basic',
   token = 'token',
+  none = 'none',
 }
 
 export interface NotificationChannel {

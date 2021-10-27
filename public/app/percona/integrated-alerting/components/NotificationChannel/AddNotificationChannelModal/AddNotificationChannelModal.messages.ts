@@ -11,6 +11,7 @@ export const Messages = {
     authType: 'Authorization Type',
     basic: 'Basic',
     token: 'Bearer Token',
+    noAuth: 'No Authorization',
     url: 'URL',
     ca: 'CA Certificate',
     certificate: 'Certificate',
