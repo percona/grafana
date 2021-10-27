@@ -8,7 +8,7 @@ export const Messages = {
     routingKey: 'Routing key',
     serviceKey: 'Service key',
     channel: 'Channel',
-    authType: 'Authentication Type',
+    authType: 'Authorization Type',
     basic: 'Basic',
     token: 'Bearer Token',
     url: 'URL',
