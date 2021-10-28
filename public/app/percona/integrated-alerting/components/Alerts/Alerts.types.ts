@@ -17,7 +17,7 @@ export interface Alert {
   activeSince: string;
   labels: string[];
   lastNotified: string;
-  severity: AlertRuleSeverity[keyof AlertRuleSeverity];
+  severity: AlertRuleSeverity;
   status: AlertStatus[keyof AlertStatus];
   summary: string;
   rule?: AlertRule;

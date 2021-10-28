@@ -16,7 +16,6 @@ import { formatAlerts } from './Alerts.utils';
 import { AlertsService } from './Alerts.service';
 import { AlertsActions } from './AlertsActions';
 import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_ALERTS_CANCEL_TOKEN } from './Alerts.constants';
-import { AlertRuleSeverity } from '../AlertRules/AlertRules.types';
 
 const { noData, columns } = Messages.alerts.table;
 const {
@@ -52,7 +51,7 @@ export const Alerts: FC = () => {
         accessor: 'severity',
         Cell: ({ row, value }) => (
           <Severity
-            severity={value as AlertRuleSeverity}
+            severity={value}
             className={cx({ [style.silencedSeverity]: (row.original as Alert).status === AlertStatus.SILENCED })}
           />
         ),
