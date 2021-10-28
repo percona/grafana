@@ -122,7 +122,7 @@ export const Alerts: FC = () => {
     setPageindex(pageIndex);
   }, []);
 
-  const renderSelectedSubRow = React.useCallback((row: Row<Alert>) => <>{row.original.rule?.expr}</>, []);
+  const renderSelectedSubRow = React.useCallback((row: Row<Alert>) => row.original.rule?.expr, []);
 
   useEffect(() => {
     getAlerts();
