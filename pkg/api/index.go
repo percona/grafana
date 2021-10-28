@@ -198,7 +198,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
         	Id:   "mysql-innodb-details",
         	Url:  setting.AppSubUrl + "/d/mysql-innodb/mysql-innodb-details",
         	Icon: "sitemap",
-        },
+		},
 		{
 			Text: "MySQL Performance Schema Details",
 			Id:   "mysql-performance-schema-details",
