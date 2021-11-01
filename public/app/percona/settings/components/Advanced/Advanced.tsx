@@ -180,8 +180,6 @@ export const Advanced: FC<AdvancedProps> = ({
               tooltip={telemetryTooltip}
               tooltipLinkText={tooltipLinkText}
               link={telemetryLink}
-              className={cx({ [styles.switchDisabled]: values.stt || values.alerting })}
-              disabled={values.stt || values.alerting}
               dataTestId="advanced-telemetry"
               component={SwitchRow}
             />
@@ -202,8 +200,6 @@ export const Advanced: FC<AdvancedProps> = ({
               tooltip={sttTooltip}
               tooltipLinkText={tooltipLinkText}
               link={sttLink}
-              className={cx({ [styles.switchDisabled]: !values.telemetry })}
-              disabled={!values.telemetry}
               dataTestId="advanced-stt"
               component={SwitchRow}
             />
@@ -293,8 +289,6 @@ export const Advanced: FC<AdvancedProps> = ({
                 tooltip={alertingTooltip}
                 tooltipLinkText={tooltipLinkText}
                 link={alertingLink}
-                className={cx({ [styles.switchDisabled]: !values.telemetry })}
-                disabled={!values.telemetry}
                 dataTestId="advanced-alerting"
                 component={SwitchRow}
               />
