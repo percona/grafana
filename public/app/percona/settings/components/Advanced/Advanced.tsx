@@ -55,6 +55,7 @@ export const Advanced: FC<AdvancedProps> = ({
       telemetryLabel,
       telemetryLink,
       telemetryTooltip,
+      telemetryDisclaimer,
       updatesLabel,
       updatesLink,
       updatesTooltip,
@@ -183,6 +184,10 @@ export const Advanced: FC<AdvancedProps> = ({
               dataTestId="advanced-telemetry"
               component={SwitchRow}
             />
+            <div className={styles.infoBox}>
+              <Icon name="info-circle" size={'xl'} className={styles.infoBoxIcon} />
+              <p>{telemetryDisclaimer}</p>
+            </div>
             <Field
               name="updates"
               type="checkbox"
@@ -252,8 +257,8 @@ export const Advanced: FC<AdvancedProps> = ({
             </div>
             <fieldset className={styles.technicalPreview}>
               <legend>{technicalPreviewLegend}</legend>
-              <div className={styles.technicalPreviewDoc}>
-                <Icon name="info-circle" size={'xl'} className={styles.technicalPreviewIcon} />
+              <div className={styles.infoBox}>
+                <Icon name="info-circle" size={'xl'} className={styles.infoBoxIcon} />
                 <p>
                   {technicalPreviewDescription}{' '}
                   <a href={TECHNICAL_PREVIEW_DOC_URL} target="_blank" rel="noreferrer">
