@@ -356,6 +356,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 			Text:       "Alerting",
 			SubTitle:   "Alert rules & notifications",
 			Id:         "alerting",
+			Url:        setting.AppSubUrl + "/integrated-alerting/alerts",
 			Icon:       "bell",
 			Children:   alertChildNavs,
 			SortWeight: dtos.WeightAlerting,
