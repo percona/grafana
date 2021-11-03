@@ -5750,14 +5750,15 @@
     "@octokit/openapi-types" "^2.3.1"
     "@types/node" ">= 8"
 
-"@percona/platform-core@^0.9.5":
-  version "0.9.5"
-  resolved "https://registry.yarnpkg.com/@percona/platform-core/-/platform-core-0.9.5.tgz#ca31dcf681b79652713da4c3f4bc2aa005ca46d9"
-  integrity sha512-kgsQ00PDxnxNvCo9oDaEms2ivtLqtyS0Inb71gx7xIMb2hCO5rLO6Na06BuRtCyEQl377qwJCaDFpX40TzWknQ==
+"@percona/platform-core@^0.10.2":
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/@percona/platform-core/-/platform-core-0.10.2.tgz#547c24e1b55e863c1b4b43c4530b7b9e12f9c03e"
+  integrity sha512-EFMR6QUltI+sQ+NViAsnd38UVCEPHoiZjTfD0PL7/636lkbXIQ57b+JTBIXnTUUYQ3vEo/0WdXLHtmQ9QncPbA==
   dependencies:
     "@popperjs/core" "^2.9.2"
     react-popper "^2.2.5"
     react-scripts "^4.0.3"
+    react-table "^7.6.2"
     typescript "4.1.2"
 
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3", "@pmmmwh/react-refresh-webpack-plugin@^0.4.2":
