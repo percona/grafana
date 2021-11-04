@@ -69,10 +69,6 @@ export const Messages = {
         password: 'Password',
       },
       postgresqlDetails: {
-        address: 'Hostname',
-        serviceName: 'Service name (default: Hostname)',
-        username: 'Username',
-        password: 'Password',
         database: 'Database (default: postgres)',
       },
       labels: {
@@ -105,11 +101,6 @@ export const Messages = {
         password: 'Your database password',
       },
       postgresqlDetails: {
-        address: 'Public DNS hostname of your instance',
-        serviceName: 'Service name to use',
-        port: 'Port your service is listening on',
-        username: 'Your database user name',
-        password: 'Your database password',
         database: 'Database name',
       },
       haproxy: {

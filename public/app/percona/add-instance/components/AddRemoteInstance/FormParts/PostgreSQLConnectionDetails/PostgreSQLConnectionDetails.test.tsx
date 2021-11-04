@@ -3,7 +3,6 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import { dataTestId } from '@percona/platform-core';
 import { PostgreSQLConnectionDetails } from './PostgreSQLConnectionDetails';
-import {expect} from "../../../../../../../test/lib/common";
 
 describe('PostgreSQL connection details:: ', () => {
   it('should have database attribute', async () => {
