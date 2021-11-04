@@ -75,7 +75,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
         return <ExternalServiceConnectionDetails form={form} />;
       case Databases.haproxy:
         return <HAProxyConnectionDetails remoteInstanceCredentials={remoteInstanceCredentials} />;
-      case InstanceTypes.postgresql:
+      case Databases.postgresql:
         return <PostgreSQLConnectionDetails remoteInstanceCredentials={remoteInstanceCredentials} />;
       default:
         return <MainDetails form={form} remoteInstanceCredentials={remoteInstanceCredentials} />;
