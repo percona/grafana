@@ -90,7 +90,7 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
         <>
           <Switch value={!disabled} onClick={toggleAlertRule} data-testid="toggle-alert-rule" />
           <IconButton data-testid="edit-alert-rule-button" name="pen" onClick={handleEditClick} />
-          <IconButton data-testid="delete-alert-rule-button" name="times" onClick={handleDeleteClick} />
+          <IconButton data-testid="delete-alert-rule-button" name="times" size="xl" onClick={handleDeleteClick} />
           <IconButton data-testid="copy-alert-rule-button" name="copy" onClick={handleCopyClick} />
         </>
       )}

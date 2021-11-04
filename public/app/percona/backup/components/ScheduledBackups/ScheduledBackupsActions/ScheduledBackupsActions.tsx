@@ -25,7 +25,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
         <>
           <Switch value={backup.enabled} onClick={handleToggle} data-testid="toggle-scheduled-backpup" />
           <IconButton data-testid="edit-scheduled-backpup-button" name="pen" onClick={handleEdit} />
-          <IconButton data-testid="delete-scheduled-backpup-button" name="times" onClick={handleDelete} />
+          <IconButton data-testid="delete-scheduled-backpup-button" name="times" size="xl" onClick={handleDelete} />
           <IconButton data-testid="copy-alert-scheduled-backup-button" name="copy" onClick={handleCopy} />
         </>
       )}

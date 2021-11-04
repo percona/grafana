@@ -23,6 +23,7 @@ export const NotificationChannelActions: FC<NotificationChannelActionsProps> = (
       <IconButton
         data-testid="delete-notification-channel-button"
         name="times"
+        size="xl"
         onClick={() => {
           setSelectedNotificationChannel(notificationChannel);
           setDeleteModalVisible(true);

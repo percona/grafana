@@ -26,6 +26,7 @@ export const AlertRuleTemplateActions: FC<AlertRuleTemplateActionsProps> = ({ te
       <IconButton
         data-testid="delete-template-button"
         name="times"
+        size="xl"
         disabled={isActionDisabled}
         onClick={() => setDeleteModalVisible(true)}
       />
