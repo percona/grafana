@@ -31,7 +31,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
             <IconButton data-testid="delete-scheduled-backpup-button" name="times" size="xl" onClick={handleDelete} />
           </Tooltip>
           <Tooltip placement="top" content="Copy">
-            <IconButton data-testid="copy-alert-scheduled-backup-button" name="copy" onClick={handleCopy} />
+            <IconButton data-testid="copy-scheduled-backup-button" name="copy" onClick={handleCopy} />
           </Tooltip>
         </>
       )}
