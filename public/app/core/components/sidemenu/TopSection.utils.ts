@@ -41,6 +41,7 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
       id: 'alerting',
       text: 'Alerting',
       icon: 'bell',
+      url: `${config.appSubUrl}/integrated-alerting/alerts`,
       subTitle: 'Alert rules & notifications',
       children: integratedAlertingLinks,
     });
