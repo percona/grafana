@@ -19,7 +19,7 @@ export interface OperatorToUpdate extends Operator {
 
 export interface OperatorsList {
   psmdb: Operator;
-  xtradb: Operator;
+  pxc: Operator;
 }
 
 export interface KubernetesAPI {
