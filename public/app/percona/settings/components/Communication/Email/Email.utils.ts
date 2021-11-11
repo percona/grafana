@@ -55,13 +55,14 @@ export const getInitialValues = (settings: EmailSettings): FormEmailSettings => 
     hello: settings.hello || 'localhost',
     password: authType === EmailAuthType.CRAM ? settings.secret : settings.password,
     authType,
+    requireTls: settings.require_tls,
   };
 
   return resultSettings;
 };
 
 export const cleanupFormValues = (values: FormEmailSettings): EmailSettings => {
-  const baseSettings: EmailSettings = { ...values };
+  const baseSettings: EmailSettings = { ...values, require_tls: values.requireTls };
 
   if (values.authType === EmailAuthType.PLAIN) {
     baseSettings.identity = btoa(`${values.username}${values.password}`);
@@ -70,7 +71,7 @@ export const cleanupFormValues = (values: FormEmailSettings): EmailSettings => {
   }
 
   Object.keys(baseSettings).forEach((field: keyof EmailSettings) => {
-    if (!isEmailFieldNeeded(field, values.authType)) {
+    if (field !== 'require_tls' && !isEmailFieldNeeded(field, values.authType)) {
       delete baseSettings[field];
     }
   });
