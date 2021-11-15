@@ -50,12 +50,13 @@ export const getInitialValues = (settings: EmailSettings): FormEmailSettings => 
   const settingsCopy = { ...settings };
   delete settingsCopy.secret;
   delete settingsCopy.identity;
+  delete settingsCopy.require_tls;
   const resultSettings: FormEmailSettings = {
     ...settingsCopy,
     hello: settings.hello || 'localhost',
     password: authType === EmailAuthType.CRAM ? settings.secret : settings.password,
     authType,
-    requireTls: settings.require_tls,
+    requireTls: !!settings.require_tls,
   };
 
   return resultSettings;
