@@ -184,7 +184,7 @@ export const Advanced: FC<AdvancedProps> = ({
               component={SwitchRow}
             />
             <div className={styles.infoBox}>
-              <Icon name="info-circle" size={'xl'} className={styles.infoBoxIcon} />
+              <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
               <p>{telemetryDisclaimer}</p>
             </div>
             <Field
@@ -257,7 +257,7 @@ export const Advanced: FC<AdvancedProps> = ({
             <fieldset className={styles.technicalPreview}>
               <legend>{technicalPreviewLegend}</legend>
               <div className={styles.infoBox}>
-                <Icon name="info-circle" size={'xl'} className={styles.infoBoxIcon} />
+                <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
                 <p>
                   {technicalPreviewDescription}{' '}
                   <a href={TECHNICAL_PREVIEW_DOC_URL} target="_blank" rel="noreferrer">
