@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { TemplateParamType, TemplateParamUnit } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { AlertRulesListResponseRule } from '../AlertRules.types';
 import { formatRules } from '../AlertRules.utils';

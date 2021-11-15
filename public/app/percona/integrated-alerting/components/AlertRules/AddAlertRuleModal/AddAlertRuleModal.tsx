@@ -44,10 +44,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
-  const { getAlertRules } = useContext(AlertRulesProvider);
+  const { getAlertRules, setSelectedAlertRule } = useContext(AlertRulesProvider);
 
   const updateAlertRuleTemplateParams = () => {
-    setCurrentTemplate(templates.current.find((template) => template.name === alertRule?.rawValues.template.name));
+    setCurrentTemplate(templates.current.find((template) => template.name === alertRule?.rawValues.template_name));
   };
 
   const getData = async () => {
@@ -93,17 +93,19 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       } else {
         await AlertRulesService.create(formatCreateAPIPayload(values, currentTemplate?.params));
       }
-      setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [alertRule ? Messages.updateSuccess : Messages.createSuccess]);
       getAlertRules();
+      setVisible(false);
+      setSelectedAlertRule(null);
     } catch (e) {
       logger.error(e);
     }
   };
 
   const handleClose = () => {
-    setVisible(false);
     setCurrentTemplate(undefined);
+    setSelectedAlertRule(null);
+    setVisible(false);
   };
 
   const handleTemplateChange = (name = '') => {
