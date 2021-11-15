@@ -15,6 +15,7 @@ import {
   DBClusterComponent,
   DBClusterChangeComponentsAPI,
   DBClusterType,
+  DBClusterStatus,
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { BILLION, THOUSAND } from './DBCluster.constants';
@@ -118,7 +119,7 @@ export class PSMDBService extends DBClusterService {
       memory: (dbCluster.params.replicaset?.compute_resources?.memory_bytes || 0) / BILLION,
       cpu: (dbCluster.params.replicaset?.compute_resources?.cpu_m || 0) / THOUSAND,
       disk: (dbCluster.params.replicaset?.disk_size || 0) / BILLION,
-      status: dbCluster.state,
+      status: dbCluster.state || DBClusterStatus.changing,
       message: dbCluster.operation?.message,
       finishedSteps: dbCluster.operation?.finished_steps || 0,
       totalSteps: dbCluster.operation?.total_steps || 0,
