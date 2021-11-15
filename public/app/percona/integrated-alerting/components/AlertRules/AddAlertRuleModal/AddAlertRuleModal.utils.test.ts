@@ -316,7 +316,7 @@ describe('AddAlertRuleModal utils', () => {
   });
 
   test('formatEditTemplate', () => {
-    expect(formatEditTemplate({ name: 'test1', summary: 'Test 1', params: [] })).toEqual({
+    expect(formatEditTemplate('test1', 'Test 1')).toEqual({
       value: 'test1',
       label: 'Test 1',
     });

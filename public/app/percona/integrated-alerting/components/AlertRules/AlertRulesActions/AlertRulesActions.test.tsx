@@ -34,7 +34,7 @@ describe('AlertRulesActions', () => {
     const expectedResult = {
       ...testRule,
       disabled: true,
-      summary: `${Messages.copyOf} ${testRule.summary}`,
+      name: `${Messages.copyOf} ${testRule.name}`,
       custom_labels: undefined as any,
       channel_ids: ['test_ch'],
       template_name: 'test 2',
