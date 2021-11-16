@@ -29,7 +29,7 @@ import {
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
-import { Template } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
+import { Template, TemplateParamType } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { appEvents } from 'app/core/core';
 import { AlertRuleParamField } from '../AlertRuleParamField';
@@ -108,9 +108,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
     setVisible(false);
   };
 
-  const handleTemplateChange = (name = '') => {
+  const handleTemplateChange = (name = ''): Template | undefined => {
     const template = templates.current.find((template) => template.name === name);
     setCurrentTemplate(template);
+
+    return template;
   };
 
   return (
@@ -139,6 +141,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             const newDuration = templates.current.find((template) => template.name === templateName)?.for;
             tools.changeValue(state, 'duration', () => (newDuration ? parseInt(newDuration, 10) : undefined));
           },
+          changeParam: ([paramName, paramValue], state, tools) => {
+            tools.changeValue(state, paramName, () => paramValue);
+          },
         }}
         render={({ handleSubmit, valid, pristine, submitting, form }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-testid="add-alert-rule-modal-form">
@@ -151,10 +156,19 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                   options={templateOptions}
                   {...input}
                   onChange={(name) => {
-                    input.onChange(name);
                     form.mutators.changeSeverity(name.value);
                     form.mutators.changeDuration(name.value);
-                    handleTemplateChange(name.value);
+                    const newTemplate = handleTemplateChange(name.value);
+
+                    if (newTemplate) {
+                      newTemplate.params?.forEach(({ type, float, name }) => {
+                        // TODO add missing types when supported
+                        if (type === TemplateParamType.FLOAT && float?.default !== undefined) {
+                          form.mutators.changeParam(name, float.default);
+                        }
+                      });
+                    }
+                    input.onChange(name);
                   }}
                   data-testid="template-select-input"
                 />
