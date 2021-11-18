@@ -1,8 +1,7 @@
 import { css } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
 
-export const getStyles = stylesFactory(({ colors, typography, spacing }: GrafanaTheme) => ({
+export const getStyles = ({ colors, typography, spacing }: GrafanaTheme) => ({
   wrapper: css`
     max-width: 500px;
   `,
@@ -13,4 +12,4 @@ export const getStyles = stylesFactory(({ colors, typography, spacing }: Grafana
     margin: ${spacing.formLabelMargin};
     margin-bottom: ${spacing.lg};
   `,
-}));
+});

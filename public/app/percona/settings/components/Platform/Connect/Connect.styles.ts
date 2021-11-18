@@ -1,8 +1,7 @@
 import { css } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
 
-export const getStyles = stylesFactory(({ breakpoints, colors, spacing, typography }: GrafanaTheme) => ({
+export const getStyles = ({ breakpoints, colors, spacing, typography }: GrafanaTheme) => ({
   legend: css`
     color: ${colors.formLabel};
     font-size: ${typography.heading.h3};
@@ -26,4 +25,4 @@ export const getStyles = stylesFactory(({ breakpoints, colors, spacing, typograp
       width: 100%;
     }
   `,
-}));
+});

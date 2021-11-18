@@ -7,7 +7,7 @@ import { Messages } from '../Platform.messages';
 import { getStyles } from './Connect.styles';
 import { INITIAL_VALUES } from '../Platform.constants';
 import { PlatformService } from '../Platform.service';
-import { LoaderButton, PasswordInputField, TextInputField } from '@percona/platform-core';
+import { logger, LoaderButton, PasswordInputField, TextInputField } from '@percona/platform-core';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
 
@@ -25,7 +25,7 @@ export const Connect: FC<ConnectProps> = ({ getSettings }) => {
       getSettings();
       appEvents.emit(AppEvents.alertSuccess, [Messages.connectSucceeded]);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   };
 
@@ -37,15 +37,17 @@ export const Connect: FC<ConnectProps> = ({ getSettings }) => {
         label={Messages.pmmServerName}
         validators={[validators.required]}
         showErrorOnBlur
+        required
       />
       <TextInputField
         name="email"
         label={Messages.emailLabel}
         validators={[validators.required, validators.validateEmail]}
         showErrorOnBlur
+        required
         parse={(value) => value.trim()}
       />
-      <PasswordInputField name="password" label={Messages.passwordLabel} validators={[validators.required]} />
+      <PasswordInputField name="password" label={Messages.passwordLabel} validators={[validators.required]} required />
       <LoaderButton
         data-testid="connect-button"
         type="submit"
