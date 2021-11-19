@@ -267,3 +267,17 @@ export interface DBClusterListResponse {
   pxc_clusters: DBClusterPayload[];
   psmdb_clusters: DBClusterPayload[];
 }
+
+export interface DBClusterSuspendResumeRequest {
+  kubernetes_cluster_name: string;
+  name: string;
+  params: DBClusterSuspendParamsRequest | DBClusterResumeParamsRequest;
+}
+
+export interface DBClusterSuspendParamsRequest {
+  suspend: boolean;
+}
+
+export interface DBClusterResumeParamsRequest {
+  resume: boolean;
+}

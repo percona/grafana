@@ -16,6 +16,7 @@ import {
   DBClusterChangeComponentsAPI,
   DBClusterType,
   DBClusterStatus,
+  DBClusterSuspendResumeRequest,
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { BILLION, THOUSAND } from './DBCluster.constants';
@@ -36,11 +37,17 @@ export class PSMDBService extends DBClusterService {
   }
 
   resumeDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiManagement.post<DBClusterPayload, any>('/DBaaS/PSMDBCluster/Update', toResumeAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, DBClusterSuspendResumeRequest>(
+      '/DBaaS/PSMDBCluster/Update',
+      toResumeAPI(dbCluster)
+    );
   }
 
   suspendDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiManagement.post<DBClusterPayload, any>('/DBaaS/PSMDBCluster/Update', toSuspendAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, DBClusterSuspendResumeRequest>(
+      '/DBaaS/PSMDBCluster/Update',
+      toSuspendAPI(dbCluster)
+    );
   }
 
   deleteDBClusters(dbCluster: DBCluster): Promise<void> {
@@ -50,7 +57,7 @@ export class PSMDBService extends DBClusterService {
       cluster_type: DBClusterType.psmdb,
     };
 
-    return apiManagement.post<any, DBClusterActionAPI>('/DBaaS/DBClusters/Delete', body);
+    return apiManagement.post<void, DBClusterActionAPI>('/DBaaS/DBClusters/Delete', body);
   }
 
   getDBClusterCredentials(dbCluster: DBCluster): Promise<void | DBClusterConnectionAPI> {
@@ -96,7 +103,10 @@ export class PSMDBService extends DBClusterService {
 
   getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources> {
     return apiManagement
-      .post<any, Partial<DBClusterPayload>>('/DBaaS/PSMDBCluster/Resources/Get', pick(toAPI(dbCluster), ['params']))
+      .post<DBClusterExpectedResourcesAPI, Partial<DBClusterPayload>>(
+        '/DBaaS/PSMDBCluster/Resources/Get',
+        pick(toAPI(dbCluster), ['params'])
+      )
       .then(({ expected }: DBClusterExpectedResourcesAPI) => ({
         expected: {
           cpu: { value: expected.cpu_m / THOUSAND, units: CpuUnits.MILLI, original: +expected.cpu_m },

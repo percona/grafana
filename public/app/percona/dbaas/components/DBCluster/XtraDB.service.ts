@@ -16,6 +16,7 @@ import {
   DBClusterChangeComponentsAPI,
   DBClusterType,
   DBClusterStatus,
+  DBClusterSuspendResumeRequest,
 } from './DBCluster.types';
 import { DBClusterService } from './DBCluster.service';
 import { BILLION, THOUSAND } from './DBCluster.constants';
@@ -36,11 +37,17 @@ export class XtraDBService extends DBClusterService {
   }
 
   resumeDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiManagement.post<DBClusterPayload, any>('/DBaaS/PXCCluster/Update', toResumeAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, DBClusterSuspendResumeRequest>(
+      '/DBaaS/PXCCluster/Update',
+      toResumeAPI(dbCluster)
+    );
   }
 
   suspendDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
-    return apiManagement.post<DBClusterPayload, any>('/DBaaS/PXCCluster/Update', toSuspendAPI(dbCluster));
+    return apiManagement.post<DBClusterPayload, DBClusterSuspendResumeRequest>(
+      '/DBaaS/PXCCluster/Update',
+      toSuspendAPI(dbCluster)
+    );
   }
 
   deleteDBClusters(dbCluster: DBCluster): Promise<void> {
@@ -50,7 +57,7 @@ export class XtraDBService extends DBClusterService {
       cluster_type: DBClusterType.pxc,
     };
 
-    return apiManagement.post<any, DBClusterActionAPI>('/DBaaS/DBClusters/Delete', body);
+    return apiManagement.post<void, DBClusterActionAPI>('/DBaaS/DBClusters/Delete', body);
   }
 
   getDBClusterCredentials(dbCluster: DBCluster): Promise<void | DBClusterConnectionAPI> {
@@ -97,7 +104,10 @@ export class XtraDBService extends DBClusterService {
 
   getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources> {
     return apiManagement
-      .post<any, Partial<DBClusterPayload>>('/DBaaS/PXCCluster/Resources/Get', pick(toAPI(dbCluster), ['params']))
+      .post<DBClusterExpectedResourcesAPI, Partial<DBClusterPayload>>(
+        '/DBaaS/PXCCluster/Resources/Get',
+        pick(toAPI(dbCluster), ['params'])
+      )
       .then(({ expected }: DBClusterExpectedResourcesAPI) => ({
         expected: {
           cpu: { value: expected.cpu_m / THOUSAND, units: CpuUnits.MILLI, original: +expected.cpu_m },
