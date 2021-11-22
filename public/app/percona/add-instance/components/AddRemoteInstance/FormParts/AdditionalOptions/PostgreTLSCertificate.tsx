@@ -1,4 +1,4 @@
-import { TextareaInputField, Label } from '@percona/platform-core';
+import { TextareaInputField } from '@percona/platform-core';
 import { Messages } from '../FormParts.messages';
 import React, { FC } from 'react';
 import { FormPartProps } from '../FormParts.types';
@@ -11,27 +11,24 @@ export const PostgreTLSCertificate: FC<FormPartProps> = ({ form }) => {
     <>
       {tlsFlag ? (
         <>
-          <Label
+          <TextareaInputField
             name="tls_ca"
             label={Messages.form.labels.additionalOptions.tlsCA}
             tooltipIcon="info-circle"
             tooltipText={Messages.form.labels.tooltips.tlsCA}
           />
-          <TextareaInputField name="tls_ca" />
-          <Label
+          <TextareaInputField
             name="tls_key"
             label={Messages.form.labels.additionalOptions.tlsCertificateKey}
             tooltipIcon="info-circle"
             tooltipText={Messages.form.labels.tooltips.tlsCertificateKey}
           />
-          <TextareaInputField name="tls_key" />
-          <Label
+          <TextareaInputField
             name="tls_cert"
             label={Messages.form.labels.additionalOptions.tlsCertificate}
             tooltipIcon="info-circle"
             tooltipText={Messages.form.labels.tooltips.tlsCertificate}
           />
-          <TextareaInputField name="tls_cert" />
         </>
       ) : null}
     </>
