@@ -37,6 +37,11 @@ export const Messages = {
         cluster: 'Cluster',
         customLabels: 'Custom labels',
       },
+      tooltips: {
+        tlsCA: 'Provide the CA certificate (example: ca.pem)',
+        tlsCertificateKey: 'Provide the client certificate key (example: client-key.pem)',
+        tlsCertificate: 'Provide the client certificate (example: client-cert.pem)',
+      },
       additionalOptions: {
         skipConnectionCheck: 'Skip connection check',
         tls: 'Use TLS for database connections',

@@ -1,4 +1,4 @@
-import { PasswordInputField, TextareaInputField } from '@percona/platform-core';
+import { PasswordInputField, TextareaInputField, Label } from '@percona/platform-core';
 import { Messages } from '../FormParts.messages';
 import React, { FC } from 'react';
 import { FormPartProps } from '../FormParts.types';
@@ -14,11 +14,20 @@ export const MongodbTLSCertificate: FC<FormPartProps> = ({ form }) => {
             name="tls_certificate_file_password"
             label={Messages.form.labels.additionalOptions.tlsCertificateFilePassword}
           />
-          <TextareaInputField
-            name="tls_certificate_key"
+          <Label
+            name="tls_key"
             label={Messages.form.labels.additionalOptions.tlsCertificateKey}
+            tooltipIcon="info-circle"
+            tooltipText={Messages.form.labels.tooltips.tlsCertificateKey}
           />
-          <TextareaInputField name="tls_ca" label={Messages.form.labels.additionalOptions.tlsCA} />
+          <TextareaInputField name="tls_certificate_key" />
+          <Label
+            name="tls_ca"
+            label={Messages.form.labels.additionalOptions.tlsCA}
+            tooltipIcon="info-circle"
+            tooltipText={Messages.form.labels.tooltips.tlsCA}
+          />
+          <TextareaInputField name="tls_ca" />
         </>
       ) : null}
     </>
