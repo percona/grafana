@@ -40,7 +40,8 @@ export const Messages = {
       tooltips: {
         tlsCA: 'Content of the trusted Certificate Authority (CA) file used to sign client certificates',
         tlsCertificateKey: 'Content of the client private key file',
-        tlsCertificate: 'Content of the trusted client certificate file signed by one of the trusted Certificate Authority (CA)',
+        tlsCertificate:
+          'Content of the trusted client certificate file signed by one of the trusted Certificate Authority (CA)',
       },
       additionalOptions: {
         skipConnectionCheck: 'Skip connection check',
