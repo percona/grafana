@@ -38,10 +38,10 @@ export const Messages = {
         customLabels: 'Custom labels',
       },
       tooltips: {
-        tlsCA: 'Content of the trusted Certificate Authority (CA) file used to sign client certificates',
+        tlsCA: 'Content of the trusted certificate authority (CA) file used to sign client certificates',
         tlsCertificateKey: 'Content of the client private key file',
         tlsCertificate:
-          'Content of the trusted client certificate file signed by one of the trusted Certificate Authority (CA)',
+          'Content of the client certificate file signed by one of the trusted certificate authorities (CAs)',
       },
       additionalOptions: {
         skipConnectionCheck: 'Skip connection check',
