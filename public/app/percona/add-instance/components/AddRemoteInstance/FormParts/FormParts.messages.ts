@@ -38,9 +38,9 @@ export const Messages = {
         customLabels: 'Custom labels',
       },
       tooltips: {
-        tlsCA: 'Provide the CA certificate (example: ca.pem)',
-        tlsCertificateKey: 'Provide the client certificate key (example: client-key.pem)',
-        tlsCertificate: 'Provide the client certificate (example: client-cert.pem)',
+        tlsCA: 'Content of the trusted Certificate Authority (CA) file used to sign client certificates',
+        tlsCertificateKey: 'Content of the client private key file',
+        tlsCertificate: 'Content of the trusted client certificate file signed by one of the trusted Certificate Authority (CA)',
       },
       additionalOptions: {
         skipConnectionCheck: 'Skip connection check',
