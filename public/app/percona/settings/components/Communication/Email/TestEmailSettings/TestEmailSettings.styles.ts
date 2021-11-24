@@ -8,6 +8,6 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
   button: css`
     height: 37px;
     margin-left: ${spacing.md};
-    margin-top: 19px;
+    margin-top: 20px;
   `,
 });
