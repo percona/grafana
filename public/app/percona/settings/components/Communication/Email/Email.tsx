@@ -1,24 +1,31 @@
 import { withTypes } from 'react-final-form';
-import React, { FC, useState } from 'react';
+import React, { FC, useRef, useState } from 'react';
 import { Button, Spinner, useTheme } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
+import { appEvents } from 'app/core/app_events';
 import {
   TextInputField,
   PasswordInputField,
   validators,
   RadioButtonGroupField,
   CheckboxField,
+  logger,
 } from '@percona/platform-core';
 import { FormApi } from 'final-form';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
+import { TestEmailSettings } from './TestEmailSettings/TestEmailSettings';
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';
 import { getInitialValues, cleanupFormValues } from './Email.utils';
 import { emailOptions } from './Email.constants';
 import { EmailProps, FormEmailSettings } from './Email.types';
 import { EmailAuthType } from 'app/percona/settings/Settings.types';
+import { createPortal } from 'react-dom';
 
-export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
+export const Email: FC<EmailProps> = ({ updateSettings, settings, testSettings }) => {
   const theme = useTheme();
+  const testRef = useRef<HTMLDivElement | null>(null);
+  const applyRef = useRef<HTMLDivElement | null>(null);
   const settingsStyles = getSettingsStyles(theme);
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +40,15 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
   const resetUsernameAndPasswordState = (form: FormApi<FormEmailSettings>) => {
     form.resetFieldState('username');
     form.resetFieldState('password');
+  };
+
+  const handleTestClick = async (values: FormEmailSettings, email: string) => {
+    try {
+      await testSettings({ email_alerting_settings: cleanupFormValues(values) }, email);
+      appEvents.emit(AppEvents.alertSuccess, ['Valid email']);
+    } catch (e) {
+      logger.error(e);
+    }
   };
 
   const initialValues = getInitialValues(settings);
@@ -128,18 +144,28 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings }) => {
             />
             <CheckboxField name="requireTls" label="Require TLS" />
 
-            <Button
-              className={settingsStyles.actionButton}
-              type="submit"
-              disabled={!valid || pristine || loading}
-              data-testid="email-settings-submit-button"
-            >
-              {loading && <Spinner />}
-              {Messages.actionButton}
-            </Button>
+            {testRef.current &&
+              createPortal(<TestEmailSettings onTest={(email) => handleTestClick(values, email)} />, testRef.current)}
+
+            {applyRef.current &&
+              createPortal(
+                <Button
+                  className={settingsStyles.actionButton}
+                  type="submit"
+                  disabled={!valid || pristine || loading}
+                  data-testid="email-settings-submit-button"
+                  onClick={handleSubmit}
+                >
+                  {loading && <Spinner />}
+                  {Messages.actionButton}
+                </Button>,
+                applyRef.current
+              )}
           </form>
         )}
       />
+      <div ref={(e) => (testRef.current = e)}></div>
+      <div ref={(e) => (applyRef.current = e)}></div>
     </>
   );
 };
