@@ -29,6 +29,7 @@ export const TestEmailSettings: FC<TestEmailSettingsProps> = ({ onTest, onInput 
         <form className={styles.form}>
           <TextInputField
             name="testEmail"
+            fieldClassName={styles.input}
             label={Messages.testEmail}
             tooltipText={Messages.tooltip}
             validators={[validators.email]}
