@@ -30,6 +30,8 @@ export const SettingsPanel: FC = () => {
     refresh?: boolean,
     onError = () => {}
   ) => {
+    const testEmail = body.email_alerting_settings.test_email || '';
+    body.email_alerting_settings.test_email = undefined;
     const response = await SettingsService.setSettings(body, callback, generateToken(SET_SETTINGS_CANCEL_TOKEN));
     const { email_alerting_settings: { password = '' } = {} } = body;
 
@@ -43,7 +45,10 @@ export const SettingsPanel: FC = () => {
       // password is not being returned by the API, hence this construction
       const newSettings: Settings = {
         ...response,
-        alertingSettings: { ...response.alertingSettings, email: { ...response.alertingSettings.email, password } },
+        alertingSettings: {
+          ...response.alertingSettings,
+          email: { ...response.alertingSettings.email, password, test_email: testEmail },
+        },
       };
       setSettings(newSettings);
     } else {

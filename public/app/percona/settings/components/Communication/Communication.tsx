@@ -14,8 +14,8 @@ export const Communication: FC<CommunicationProps> = ({ alertingSettings, update
   const settingsStyles = getSettingsStyles(theme);
   const [activeTab, setActiveTab] = useState(Messages.tabs.email.key);
 
-  const testEmailSetting = async (settings: EmailPayload): Promise<void> =>
-    CommunicationService.testEmailSettings(settings);
+  const testEmailSetting = async (settings: EmailPayload, email: string): Promise<void> =>
+    CommunicationService.testEmailSettings(settings, email);
 
   const tabs = useMemo(
     () => [

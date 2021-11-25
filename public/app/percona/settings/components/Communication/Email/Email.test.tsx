@@ -14,7 +14,7 @@ xdescribe('Email::', () => {
           hello: 'hello',
           require_tls: false,
         }}
-        updateSettings={() => {}}
+        updateSettings={() => Promise.resolve()}
         testSettings={() => Promise.resolve()}
       />
     );
@@ -32,7 +32,7 @@ xdescribe('Email::', () => {
           hello: 'hello',
           require_tls: false,
         }}
-        updateSettings={() => {}}
+        updateSettings={() => Promise.resolve()}
         testSettings={() => Promise.resolve()}
       />
     );
@@ -50,7 +50,7 @@ xdescribe('Email::', () => {
           hello: 'hello',
           require_tls: false,
         }}
-        updateSettings={() => {}}
+        updateSettings={() => Promise.resolve()}
         testSettings={() => Promise.resolve()}
       />
     );
@@ -70,7 +70,7 @@ xdescribe('Email::', () => {
           hello: 'hello',
           require_tls: false,
         }}
-        updateSettings={() => {}}
+        updateSettings={() => Promise.resolve()}
         testSettings={() => Promise.resolve()}
       />
     );

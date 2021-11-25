@@ -3,7 +3,7 @@ import { LoadingCallback } from '../../../Settings.service';
 
 export interface EmailProps {
   settings: EmailSettings;
-  updateSettings: (body: EmailPayload, callback: LoadingCallback) => void;
+  updateSettings: (body: EmailPayload, callback: LoadingCallback) => Promise<void>;
   testSettings: (body: EmailPayload, testEmail: string) => Promise<void>;
 }
 

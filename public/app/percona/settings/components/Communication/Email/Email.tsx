@@ -26,16 +26,18 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings, testSettings }
   const theme = useTheme();
   const testRef = useRef<HTMLDivElement | null>(null);
   const applyRef = useRef<HTMLDivElement | null>(null);
+  const testEmailRef = useRef(settings.test_email);
   const settingsStyles = getSettingsStyles(theme);
   const [loading, setLoading] = useState(false);
 
-  const applyChanges = (values: FormEmailSettings) =>
-    updateSettings(
+  const applyChanges = async (values: FormEmailSettings) => {
+    await updateSettings(
       {
-        email_alerting_settings: cleanupFormValues(values),
+        email_alerting_settings: { ...cleanupFormValues(values), test_email: testEmailRef.current },
       },
       setLoading
     );
+  };
 
   const resetUsernameAndPasswordState = (form: FormApi<FormEmailSettings>) => {
     form.resetFieldState('username');
@@ -145,7 +147,14 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings, testSettings }
             <CheckboxField name="requireTls" label="Require TLS" />
 
             {testRef.current &&
-              createPortal(<TestEmailSettings onTest={(email) => handleTestClick(values, email)} />, testRef.current)}
+              createPortal(
+                <TestEmailSettings
+                  onInput={(email) => (testEmailRef.current = email)}
+                  onTest={(email) => handleTestClick(values, email)}
+                  initialValue={settings.test_email}
+                />,
+                testRef.current
+              )}
 
             {applyRef.current &&
               createPortal(

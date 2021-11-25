@@ -7,9 +7,11 @@ import { Messages } from './TestEmailSettings.messages';
 
 interface TestEmailSettingsProps {
   onTest: (email: string) => Promise<void>;
+  onInput?: (email: string) => void;
+  initialValue?: string;
 }
 
-export const TestEmailSettings: FC<TestEmailSettingsProps> = ({ onTest }) => {
+export const TestEmailSettings: FC<TestEmailSettingsProps> = ({ onTest, onInput = () => null, initialValue = '' }) => {
   const [testingSettings, setTestingSettings] = useState(false);
   const styles = useStyles(getStyles);
 
@@ -22,6 +24,7 @@ export const TestEmailSettings: FC<TestEmailSettingsProps> = ({ onTest }) => {
   return (
     <Form
       onSubmit={() => {}}
+      initialValues={{ testEmail: initialValue }}
       render={({ values, valid }) => (
         <form className={styles.form}>
           <TextInputField
@@ -29,6 +32,9 @@ export const TestEmailSettings: FC<TestEmailSettingsProps> = ({ onTest }) => {
             label={Messages.testEmail}
             tooltipText={Messages.tooltip}
             validators={[validators.email]}
+            inputProps={{
+              onInput: (e) => onInput(e.currentTarget.value),
+            }}
           />
           <Button
             className={styles.button}
