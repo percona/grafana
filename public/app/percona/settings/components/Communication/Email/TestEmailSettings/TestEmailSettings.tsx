@@ -4,12 +4,7 @@ import { Form } from 'react-final-form';
 import { TextInputField, validators } from '@percona/platform-core';
 import { getStyles } from './TestEmailSettings.styles';
 import { Messages } from './TestEmailSettings.messages';
-
-interface TestEmailSettingsProps {
-  onTest: (email: string) => Promise<void>;
-  onInput?: (email: string) => void;
-  initialValue?: string;
-}
+import { TestEmailSettingsProps } from './TestEmailSettings.types';
 
 export const TestEmailSettings: FC<TestEmailSettingsProps> = ({ onTest, onInput = () => null, initialValue = '' }) => {
   const [testingSettings, setTestingSettings] = useState(false);
