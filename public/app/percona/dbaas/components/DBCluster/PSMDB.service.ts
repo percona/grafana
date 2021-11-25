@@ -74,7 +74,7 @@ export class PSMDBService extends DBClusterService {
       cluster_type: DBClusterType.psmdb,
     };
 
-    return apiManagement.post<any, DBClusterActionAPI>('/DBaaS/PXCCluster/Restart', body);
+    return apiManagement.post<any, DBClusterActionAPI>('/DBaaS/DBClusters/Restart', body);
   }
 
   getComponents(kubernetesClusterName: string): Promise<DBClusterComponents> {
