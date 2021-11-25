@@ -47,7 +47,7 @@ export const Email: FC<EmailProps> = ({ updateSettings, settings, testSettings }
   const handleTestClick = async (values: FormEmailSettings, email: string) => {
     try {
       await testSettings({ email_alerting_settings: cleanupFormValues(values) }, email);
-      appEvents.emit(AppEvents.alertSuccess, ['Valid email']);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.emailSent]);
     } catch (e) {
       logger.error(e);
     }
