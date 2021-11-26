@@ -123,6 +123,8 @@ xdescribe('getAdditionalOptions ::', () => {
     const fields = root.find('input');
 
     expect(root.find('input[name="qan_mongodb_profiler"]').length).toBe(1);
+    expect(root.find('input[name="disable_collectors"]').length).toBe(1);
+    expect(root.find('input[name="collections_limit"]').length).toBe(1);
     expect(fields.length).toBe(3);
   });
 

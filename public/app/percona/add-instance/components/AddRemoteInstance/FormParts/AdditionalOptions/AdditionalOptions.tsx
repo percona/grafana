@@ -1,5 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
-import { CheckboxField, NumberInputField, RadioButtonGroupField, validators } from '@percona/platform-core';
+import {
+  CheckboxField,
+  NumberInputField,
+  RadioButtonGroupField,
+  TextInputField,
+  validators,
+} from '@percona/platform-core';
 import { useStyles } from '@grafana/ui';
 import { AdditionalOptionsFormPartProps, PostgreSQLAdditionalOptionsProps } from '../FormParts.types';
 import { getStyles } from '../FormParts.styles';
@@ -159,6 +165,16 @@ export const getAdditionalOptions = (
           <CheckboxField
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
             name="qan_mongodb_profiler"
+          />
+          <TextInputField
+            name="disable_collectors"
+            label={Messages.form.labels.additionalOptions.disableCollectors}
+            placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
+          />
+          <NumberInputField
+            name="collections_limit"
+            label={Messages.form.labels.additionalOptions.collectionsLimit}
+            validate={validators.containsNumber}
           />
         </>
       );

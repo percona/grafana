@@ -51,6 +51,8 @@ export const Messages = {
         disableEnchancedMetrics: 'Disable Enhanced Metrics',
         tablestatOptions: 'Table statistics limit',
         azureDatabaseExporter: 'Enable Monitoring by Azure Metrics Exporter',
+        disableCollectors: 'Disable collectors',
+        collectionsLimit: 'Collections Limit',
       },
     },
     placeholders: {
@@ -79,7 +81,9 @@ export const Messages = {
         cluster: 'Cluster',
         customLabels: '"Custom labels\n Format:\n      key1:value1\n      key2:value2"',
       },
-      additionalOptions: {},
+      additionalOptions: {
+        disableCollectors: 'value1,value2,...,value3',
+      },
     },
     tooltips: {
       externalService: {
