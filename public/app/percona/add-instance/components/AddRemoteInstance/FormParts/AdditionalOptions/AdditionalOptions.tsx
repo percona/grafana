@@ -175,6 +175,7 @@ export const getAdditionalOptions = (
             name="collections_limit"
             label={Messages.form.labels.additionalOptions.collectionsLimit}
             validate={validators.containsNumber}
+            placeholder={Messages.form.placeholders.additionalOptions.collectionsLimit}
           />
         </>
       );

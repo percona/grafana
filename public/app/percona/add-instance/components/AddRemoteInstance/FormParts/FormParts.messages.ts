@@ -82,7 +82,8 @@ export const Messages = {
         customLabels: '"Custom labels\n Format:\n      key1:value1\n      key2:value2"',
       },
       additionalOptions: {
-        disableCollectors: 'value1,value2,...,value3',
+        disableCollectors: 'getdiagnosticdata,collstats,...,index stats',
+        collectionsLimit: '0 = no limit',
       },
     },
     tooltips: {
