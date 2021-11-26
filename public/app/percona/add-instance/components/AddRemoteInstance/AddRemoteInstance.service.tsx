@@ -172,11 +172,13 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
     }
   }
 
-  if (type === Databases.mongodb && values.tls) {
-    data.authentication_mechanism = 'MONGODB-X509';
-  }
-  if (type === Databases.mongodb && values.disable_collectors) {
-    data.disable_collectors = values.disable_collectors.split(',').map((item: string) => item.trim());
+  if (type === Databases.mongodb) {
+    if (values.tls) {
+      data.authentication_mechanism = 'MONGODB-X509';
+    }
+    if (values.disable_collectors) {
+      data.disable_collectors = values.disable_collectors.split(',').map((item: string) => item.trim());
+    }
   }
 
   data.metrics_mode = 1;

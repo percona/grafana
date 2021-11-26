@@ -52,7 +52,7 @@ export const Messages = {
         tablestatOptions: 'Table statistics limit',
         azureDatabaseExporter: 'Enable Monitoring by Azure Metrics Exporter',
         disableCollectors: 'Disable collectors',
-        collectionsLimit: 'Collections Limit',
+        collectionsLimit: 'Collections limit',
       },
     },
     placeholders: {
@@ -82,7 +82,7 @@ export const Messages = {
         customLabels: '"Custom labels\n Format:\n      key1:value1\n      key2:value2"',
       },
       additionalOptions: {
-        disableCollectors: 'getdiagnosticdata,collstats,...,index stats',
+        disableCollectors: 'getdiagnosticdata, collstats, ..., index stats',
         collectionsLimit: '0 = no limit',
       },
     },
