@@ -9,6 +9,7 @@ import { MainDetailsFormPart } from './MainDetails/MainDetails';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
 import { getMount } from 'app/percona/shared/helpers/testUtils';
 import { Databases } from 'app/percona/shared/core';
+import { dataTestId } from '@percona/platform-core';
 
 const form: Partial<FormApi> = {
   change: jest.fn(),
@@ -122,9 +123,9 @@ xdescribe('getAdditionalOptions ::', () => {
     );
     const fields = root.find('input');
 
-    expect(root.find('input[name="qan_mongodb_profiler"]').length).toBe(1);
-    expect(root.find('input[name="disable_collectors"]').length).toBe(1);
-    expect(root.find('input[name="collections_limit"]').length).toBe(1);
+    expect(root.find(dataTestId('qan-mongodb-profiler-checkbox')).length).toBe(1);
+    expect(root.find(dataTestId('disable-collectors-input-field')).length).toBe(1);
+    expect(root.find(dataTestId('collections-limit-input-field')).length).toBe(1);
     expect(fields.length).toBe(3);
   });
 
@@ -159,7 +160,6 @@ xdescribe('getAdditionalOptions ::', () => {
       />
     );
     const fields = root.find('input');
-
     expect(root.find('input[name="qan_mysql_perfschema"]').length).toBe(1);
     expect(root.find('input[name="disable_basic_metrics"]').length).toBe(1);
     expect(root.find('input[name="disable_enhanced_metrics"]').length).toBe(1);

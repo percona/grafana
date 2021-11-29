@@ -163,16 +163,19 @@ export const getAdditionalOptions = (
           <MongodbTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
           <CheckboxField
-            label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
             name="qan_mongodb_profiler"
+            data-testid="qan-mongodb-profiler-checkbox"
+            label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
           />
           <TextInputField
             name="disable_collectors"
+            data-testid="disable-collectors-input-field"
             label={Messages.form.labels.additionalOptions.disableCollectors}
             placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
           />
           <NumberInputField
             name="collections_limit"
+            data-testid="collections-limit-input-field"
             label={Messages.form.labels.additionalOptions.collectionsLimit}
             validate={validators.containsNumber}
             placeholder={Messages.form.placeholders.additionalOptions.collectionsLimit}
