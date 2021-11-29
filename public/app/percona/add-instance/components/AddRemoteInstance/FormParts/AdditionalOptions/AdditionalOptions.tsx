@@ -173,6 +173,12 @@ export const getAdditionalOptions = (
             label={Messages.form.labels.additionalOptions.disableCollectors}
             placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
           />
+          <TextInputField
+            name="stats_collections"
+            data-testid="stats_collections-input-field"
+            label={Messages.form.labels.additionalOptions.statsCollections}
+            placeholder={Messages.form.placeholders.additionalOptions.statsCollections}
+          />
           <NumberInputField
             name="collections_limit"
             data-testid="collections-limit-input-field"

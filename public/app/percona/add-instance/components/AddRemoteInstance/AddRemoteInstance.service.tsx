@@ -177,7 +177,10 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
       data.authentication_mechanism = 'MONGODB-X509';
     }
     if (values.disable_collectors) {
-      data.disable_collectors = values.disable_collectors.split(',').map((item: string) => item.trim());
+      data.disable_collectors = values.disable_collectors.replace(/\s/g, '').split(',');
+    }
+    if (values.stats_collections) {
+      data.stats_collections = values.disable_collectors.replace(/\s/g, '');
     }
   }
 

@@ -53,6 +53,7 @@ export const Messages = {
         azureDatabaseExporter: 'Enable Monitoring by Azure Metrics Exporter',
         disableCollectors: 'Disable collectors',
         collectionsLimit: 'Collections limit',
+        statsCollections: 'Stats collections',
       },
     },
     placeholders: {
@@ -84,6 +85,7 @@ export const Messages = {
       additionalOptions: {
         disableCollectors: 'getdiagnosticdata, collstats, ..., index stats',
         collectionsLimit: '0 = no limit',
+        statsCollections: 'col1, col2, ..., coln',
       },
     },
     tooltips: {

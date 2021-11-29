@@ -126,6 +126,7 @@ xdescribe('getAdditionalOptions ::', () => {
     expect(root.find(dataTestId('qan-mongodb-profiler-checkbox')).length).toBe(1);
     expect(root.find(dataTestId('disable-collectors-input-field')).length).toBe(1);
     expect(root.find(dataTestId('collections-limit-input-field')).length).toBe(1);
+    expect(root.find(dataTestId('stats_collections-input-field')).length).toBe(1);
     expect(fields.length).toBe(3);
   });
 
