@@ -84,7 +84,7 @@ export const Messages = {
       },
       additionalOptions: {
         disableCollectors: 'getdiagnosticdata, collstats, ..., index stats',
-        collectionsLimit: '0 = no limit',
+        collectionsLimit: '-1 = no limit',
         statsCollections: 'col1, col2, ..., coln',
       },
     },
@@ -118,6 +118,10 @@ export const Messages = {
       labels: {
         region: 'Region',
         az: 'Availability Zone',
+      },
+      additionalOptions: {
+        statsCollections:
+          'Comma separated list of database.collection names to filter collStats and indexStats metrics',
       },
     },
     titles: {
