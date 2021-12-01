@@ -83,9 +83,9 @@ export const Messages = {
         customLabels: '"Custom labels\n Format:\n      key1:value1\n      key2:value2"',
       },
       additionalOptions: {
-        disableCollectors: 'getdiagnosticdata, collstats, ..., index stats',
+        disableCollectors: 'getDiagnosticData, collStats, ..., indexStats',
         collectionsLimit: '-1 = no limit',
-        statsCollections: 'col1, col2, ..., coln',
+        statsCollections: 'db1.col1, db1.col2, ..., dbN.colM',
       },
     },
     tooltips: {
