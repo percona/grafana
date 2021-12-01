@@ -108,7 +108,7 @@ export interface SettingsPayload
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
   stt_check_intervals: SttCheckIntervalsPayload;
-  connected_to_portal: boolean;
+  connected_to_platform: boolean;
 }
 
 export type SettingsAPIChangePayload = AlertManagerChangePayload &

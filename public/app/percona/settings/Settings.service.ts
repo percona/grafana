@@ -60,5 +60,5 @@ const toModel = (response: SettingsPayload): Settings => ({
     frequentInterval: response.stt_check_intervals.frequent_interval,
   },
   backupEnabled: response.backup_management_enabled,
-  isConnectedToPortal: response.connected_to_portal,
+  isConnectedToPortal: response.connected_to_platform,
 });
