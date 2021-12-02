@@ -87,7 +87,7 @@ export const useKubernetes = ({ settings }: UseKubernetesProps): ManageKubernete
     if (settings && settings.dbaasEnabled) {
       getKubernetes();
     }
-  }, []);
+  }, [settings]);
 
   return [kubernetes, deleteKubernetes, addKubernetes, getKubernetes, setLoading, loading];
 };
