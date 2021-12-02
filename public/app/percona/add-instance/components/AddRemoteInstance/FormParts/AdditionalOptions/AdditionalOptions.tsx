@@ -1,11 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import {
-  CheckboxField,
-  NumberInputField,
-  RadioButtonGroupField,
-  TextInputField,
-  validators as platformCoreValidators,
-} from '@percona/platform-core';
+import { CheckboxField, NumberInputField, RadioButtonGroupField, validators } from '@percona/platform-core';
 import { useStyles } from '@grafana/ui';
 import { AdditionalOptionsFormPartProps, PostgreSQLAdditionalOptionsProps } from '../FormParts.types';
 import { getStyles } from '../FormParts.styles';
@@ -19,8 +13,6 @@ import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
 import { Databases } from 'app/percona/shared/core';
-import validators from 'app/percona/shared/helpers/validators';
-import { noSymbolsValidator } from './validators';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -85,7 +77,7 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
         name="tablestats_group_table_limit"
         defaultValue={-1}
         disabled={selectedValue !== TablestatOptionsInterface.custom}
-        validate={platformCoreValidators.containsNumber}
+        validate={validators.containsNumber}
       />
     </>
   );
@@ -165,33 +157,8 @@ export const getAdditionalOptions = (
           <MongodbTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
           <CheckboxField
-            name="qan_mongodb_profiler"
-            data-testid="qan-mongodb-profiler-checkbox"
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
-          />
-          <TextInputField
-            name="disable_collectors"
-            data-testid="disable-collectors-input-field"
-            label={Messages.form.labels.additionalOptions.disableCollectors}
-            placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
-            validators={[noSymbolsValidator]}
-          />
-          <TextInputField
-            name="stats_collections"
-            data-testid="stats_collections-input-field"
-            label={Messages.form.labels.additionalOptions.statsCollections}
-            placeholder={Messages.form.placeholders.additionalOptions.statsCollections}
-            tooltipText={Messages.form.tooltips.additionalOptions.statsCollections}
-            tooltipIcon={'info-circle'}
-          />
-          <NumberInputField
-            name="collections_limit"
-            data-testid="collections-limit-input-field"
-            label={Messages.form.labels.additionalOptions.collectionsLimit}
-            placeholder={Messages.form.placeholders.additionalOptions.collectionsLimit}
-            inputProps={{ min: -1 }}
-            validators={[validators.min(-1)]}
-            defaultValue={100}
+            name="qan_mongodb_profiler"
           />
         </>
       );
