@@ -343,8 +343,6 @@ export interface AddMongoDbReponse {
   service: ExtendedService;
   mongodb_exporter: MongoDbExporter;
   qan_mongodb_profiler: BaseExporter;
-  disable_collectors?: string[];
-  collections_limit?: number;
 }
 
 export interface AddRDSResponse {
