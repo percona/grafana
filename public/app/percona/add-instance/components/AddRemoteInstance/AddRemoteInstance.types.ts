@@ -339,13 +339,12 @@ export interface AddHaProxyResponse {
   };
 }
 
-export interface AddMongoDbResponse {
+export interface AddMongoDbReponse {
   service: ExtendedService;
   mongodb_exporter: MongoDbExporter;
   qan_mongodb_profiler: BaseExporter;
   disable_collectors?: string[];
   collections_limit?: number;
-  stats_collections?: string[];
 }
 
 export interface AddRDSResponse {
