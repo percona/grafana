@@ -570,13 +570,13 @@ func getCommandLineProperties(args []string) map[string]string {
 		}
 
 		trimmed := strings.TrimPrefix(arg, "cfg:")
-		parts := strings.Split(trimmed, "=")
-		if len(parts) != 2 {
+		equalsIndex := strings.Index(trimmed, "=")
+		if equalsIndex < 0 {
 			log.Fatalf(3, "Invalid command line argument. argument: %v", arg)
 			return nil
 		}
 
-		props[parts[0]] = parts[1]
+		props[trimmed[:equalsIndex]] = trimmed[equalsIndex+1:]
 	}
 	return props
 }
