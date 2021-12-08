@@ -575,8 +575,11 @@ func getCommandLineProperties(args []string) map[string]string {
 			log.Fatalf(3, "Invalid command line argument. argument: %v", arg)
 			return nil
 		}
-
-		props[trimmed[:equalsIndex]] = trimmed[equalsIndex+1:]
+		if equalsIndex != len(trimmed)-1 {
+			props[trimmed[:equalsIndex]] = trimmed[equalsIndex+1:]
+			continue
+		}
+		props[trimmed[:equalsIndex]] = ""
 	}
 	return props
 }
