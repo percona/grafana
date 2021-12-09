@@ -26,6 +26,9 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
       },
+      postgresqlDetails: {
+        database: 'Database',
+      },
       labels: {
         environment: 'Environment',
         region: 'Region',
@@ -33,6 +36,12 @@ export const Messages = {
         replicationSet: 'Replication set',
         cluster: 'Cluster',
         customLabels: 'Custom labels',
+      },
+      tooltips: {
+        tlsCA: 'Content of the trusted certificate authority (CA) file used to sign client certificates',
+        tlsCertificateKey: 'Content of the client private key file',
+        tlsCertificate:
+          'Content of the client certificate file signed by one of the trusted certificate authorities (CAs)',
       },
       additionalOptions: {
         skipConnectionCheck: 'Skip connection check',
@@ -48,6 +57,9 @@ export const Messages = {
         disableEnchancedMetrics: 'Disable Enhanced Metrics',
         tablestatOptions: 'Table statistics limit',
         azureDatabaseExporter: 'Enable Monitoring by Azure Metrics Exporter',
+        disableCollectors: 'Disable collectors',
+        collectionsLimit: 'Collections limit',
+        statsCollections: 'Stats collections',
       },
     },
     placeholders: {
@@ -65,6 +77,9 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
       },
+      postgresqlDetails: {
+        database: 'Database (default: postgres)',
+      },
       labels: {
         environment: 'Environment',
         region: 'Region',
@@ -73,7 +88,11 @@ export const Messages = {
         cluster: 'Cluster',
         customLabels: '"Custom labels\n Format:\n      key1:value1\n      key2:value2"',
       },
-      additionalOptions: {},
+      additionalOptions: {
+        disableCollectors: 'getDiagnosticData, collStats, ..., indexStats',
+        collectionsLimit: '-1 = no limit',
+        statsCollections: 'db1.col1, db1.col2, ..., dbN.colM',
+      },
     },
     tooltips: {
       externalService: {
@@ -94,6 +113,9 @@ export const Messages = {
         username: 'Your database user name',
         password: 'Your database password',
       },
+      postgresqlDetails: {
+        database: 'Database name',
+      },
       haproxy: {
         port: 'HAProxy prometheus exporter port',
         username: 'username for HAProxy prometheus exporter',
@@ -102,6 +124,10 @@ export const Messages = {
       labels: {
         region: 'Region',
         az: 'Availability Zone',
+      },
+      additionalOptions: {
+        statsCollections:
+          'Comma separated list of database.collection names to filter collStats and indexStats metrics',
       },
     },
     titles: {

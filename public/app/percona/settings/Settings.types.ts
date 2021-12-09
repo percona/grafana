@@ -6,6 +6,7 @@ export interface EmailSettings {
   password?: string;
   secret?: string;
   identity?: string;
+  require_tls?: boolean;
 }
 
 export interface SlackSettings {
@@ -108,6 +109,7 @@ export interface SettingsPayload
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
   stt_check_intervals: SttCheckIntervalsPayload;
+  connected_to_platform: boolean;
 }
 
 export type SettingsAPIChangePayload = AlertManagerChangePayload &
@@ -135,6 +137,7 @@ export interface Settings {
   publicAddress?: string;
   alertingSettings: AlertingSettings;
   sttCheckIntervals: SttCheckIntervalsSettings;
+  isConnectedToPortal?: boolean;
 }
 
 export interface MetricsResolutions {
