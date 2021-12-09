@@ -30,6 +30,8 @@ export const SettingsPanel: FC = () => {
     refresh?: boolean,
     onError = () => {}
   ) => {
+    // we save the test email here so that we can sent it all the way down to the form again after re-render
+    // the field is deleted from the payload so as not to be sent to the API
     const testEmail = body.email_alerting_settings.test_email || '';
     body.email_alerting_settings.test_email = undefined;
     const response = await SettingsService.setSettings(body, callback, generateToken(SET_SETTINGS_CANCEL_TOKEN));
