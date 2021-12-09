@@ -33,6 +33,7 @@ export const TestEmailSettings: FC<TestEmailSettingsProps> = ({ onTest, onInput 
             }}
           />
           <Button
+            type="button"
             className={styles.button}
             disabled={testingSettings || !values.testEmail || !valid}
             onClick={() => handleClick(values.testEmail)}
