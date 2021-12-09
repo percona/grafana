@@ -18,11 +18,11 @@ describe('AddInstance page::', () => {
   it('should invoke a callback with a proper instance type', async () => {
     const onSelectInstanceType = jest.fn();
 
-    await waitFor(() => render(<AddInstance onSelectInstanceType={onSelectInstanceType} />));
+    render(<AddInstance onSelectInstanceType={onSelectInstanceType} />);
 
     expect(onSelectInstanceType).toBeCalledTimes(0);
 
-    const button = screen.getByTestId('rds-instance');
+    const button = await screen.findByTestId('rds-instance');
     fireEvent.click(button);
 
     expect(onSelectInstanceType).toBeCalledTimes(1);
