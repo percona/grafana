@@ -9,11 +9,12 @@ import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { Messages } from './AlertRulesActions.messages';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
+import { createAlertRuleCopyPayload } from './AlertRulesActions.utils';
 
 export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => {
   const styles = useStyles(getStyles);
   const [pendingRequest, setPendingRequest] = useState(false);
-  const { rawValues, ruleId, name, disabled } = alertRule;
+  const { ruleId, name, disabled } = alertRule;
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const { setAddModalVisible, setSelectedAlertRule, getAlertRules } = useContext(AlertRulesProvider);
 
@@ -44,17 +45,8 @@ export const AlertRulesActions: FC<AlertRulesActionsProps> = ({ alertRule }) => 
 
     const newName = `${Messages.copyOf} ${alertRule.name}`;
 
-    const createAlertRulePayload = {
-      channel_ids: rawValues.channels?.map((channel) => channel.channel_id),
-      custom_labels: rawValues.custom_labels,
-      ...rawValues,
-      template_name: rawValues.template_name,
-      disabled: true,
-      name: newName,
-    };
-
     try {
-      await AlertRulesService.create(createAlertRulePayload);
+      await AlertRulesService.create(createAlertRuleCopyPayload(alertRule));
       appEvents.emit(AppEvents.alertSuccess, [Messages.getCreatedMessage(newName)]);
       getAlertRules();
     } catch (e) {
