@@ -87,9 +87,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const onSubmit = async (values: AddAlertRuleFormValues) => {
     try {
       if (alertRule) {
-        await AlertRulesService.update(
-          formatUpdateAPIPayload(alertRule.rawValues.rule_id, values, currentTemplate?.params)
-        );
+        await AlertRulesService.update(formatUpdateAPIPayload(alertRule.rawValues.rule_id, values, alertRule.params));
       } else {
         await AlertRulesService.create(formatCreateAPIPayload(values, currentTemplate?.params));
       }
@@ -182,8 +180,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               tooltipText={Messages.tooltips.name}
             />
 
-            {currentTemplate &&
-              currentTemplate.params?.map((param) => <AlertRuleParamField key={param.name} param={param} />)}
+            {alertRule
+              ? alertRule.params.map((param) => <AlertRuleParamField key={param.name} param={param} />)
+              : currentTemplate?.params?.map((param) => <AlertRuleParamField key={param.name} param={param} />)}
 
             <NumberInputField
               label={Messages.durationField}
