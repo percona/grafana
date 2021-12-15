@@ -12,7 +12,7 @@ describe('HAProxy connection details:: ', () => {
     const passwordInput = await screen.getByTestId('password-password-input');
     fireEvent.change(passwordInput, { target: { value: '    test    ' } });
 
-    expect(((await screen.findByTestId('username-text-input')) as HTMLInputElement).value).toEqual('test');
-    expect(((await screen.findByTestId('password-password-input')) as HTMLInputElement).value).toEqual('test');
+    expect((screen.getByTestId('username-text-input') as HTMLInputElement).value).toEqual('test');
+    expect((screen.getByTestId('password-password-input') as HTMLInputElement).value).toEqual('test');
   });
 });
