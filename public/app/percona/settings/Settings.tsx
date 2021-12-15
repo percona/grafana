@@ -33,8 +33,13 @@ export const SettingsPanel: FC = () => {
     refresh?: boolean,
     onError = () => {}
   ) => {
+    // we save the test email here so that we can sent it all the way down to the form again after re-render
+    // the field is deleted from the payload so as not to be sent to the API
+    const { email_alerting_settings: { password = '', test_email: testEmail = '' } = {} } = body;
+    if (testEmail) {
+      body.email_alerting_settings.test_email = undefined;
+    }
     const response = await SettingsService.setSettings(body, callback, generateToken(SET_SETTINGS_CANCEL_TOKEN));
-    const { email_alerting_settings: { password = '' } = {} } = body;
 
     if (refresh && response) {
       window.location.reload();
@@ -46,7 +51,10 @@ export const SettingsPanel: FC = () => {
       // password is not being returned by the API, hence this construction
       const newSettings: Settings = {
         ...response,
-        alertingSettings: { ...response.alertingSettings, email: { ...response.alertingSettings.email, password } },
+        alertingSettings: {
+          ...response.alertingSettings,
+          email: { ...response.alertingSettings.email, password, test_email: testEmail },
+        },
       };
       setSettings(newSettings);
     } else {
