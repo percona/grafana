@@ -175,6 +175,7 @@ export const getAdditionalOptions = (
             label={Messages.form.labels.additionalOptions.disableCollectors}
             placeholder={Messages.form.placeholders.additionalOptions.disableCollectors}
             validators={[noSymbolsValidator]}
+            defaultValue={'dbstats,topmetrics'}
           />
           <TextInputField
             name="stats_collections"
