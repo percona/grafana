@@ -35,4 +35,7 @@ export const Messages = {
   severityField: 'Severity',
   channelField: 'Channels',
   activateSwitch: 'Activate',
+  templateExpression: 'Template Expression',
+  ruleAlert: 'Rule Alert',
+  advanced: 'Advanced details',
 };

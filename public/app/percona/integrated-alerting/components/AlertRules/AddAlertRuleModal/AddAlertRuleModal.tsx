@@ -1,6 +1,6 @@
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import { Form, Field } from 'react-final-form';
-import { Button, HorizontalGroup, Switch, useStyles } from '@grafana/ui';
+import { Button, Collapse, HorizontalGroup, Switch, useStyles } from '@grafana/ui';
 import {
   Modal,
   LoaderButton,
@@ -44,6 +44,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
+  const [isAdvancedSectionOpen, setIsAdvancedSectionOpen] = useState(false);
   const { getAlertRules, setSelectedAlertRule } = useContext(AlertRulesProvider);
 
   const updateAlertRuleTemplateParams = () => {
@@ -217,12 +218,32 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
 
+            {currentTemplate && (
+              <Collapse
+                label={Messages.advanced}
+                collapsible
+                isOpen={isAdvancedSectionOpen}
+                onToggle={() => setIsAdvancedSectionOpen((open) => !open)}
+              >
+                <div data-testid="template-expression" className={styles.templateParsedField}>
+                  <Label label={Messages.templateExpression} />
+                  <pre>{currentTemplate.expr}</pre>
+                </div>
+                {currentTemplate.annotations?.summary && (
+                  <div data-testid="template-alert" className={styles.templateParsedField}>
+                    <Label label={Messages.ruleAlert} />
+                    <pre>{currentTemplate.annotations?.summary}</pre>
+                  </div>
+                )}
+              </Collapse>
+            )}
+
             <Field name="enabled" type="checkbox" defaultValue={true}>
               {({ input }) => (
-                <>
+                <div className={styles.toogleField}>
                   <Label label={Messages.activateSwitch} dataTestId="enabled-toggle-label" />
                   <Switch {...input} value={input.checked} data-testid="enabled-toggle-input" />
-                </>
+                </div>
               )}
             </Field>
 
