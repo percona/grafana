@@ -217,21 +217,6 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
 
-            {currentTemplate && (
-              <>
-                <div data-testid="template-expression" className={styles.templateParsedField}>
-                  <Label label={Messages.templateExpression} />
-                  <pre>{currentTemplate.expr}</pre>
-                </div>
-                {currentTemplate.annotations?.summary && (
-                  <div data-testid="template-alert" className={styles.templateParsedField}>
-                    <Label label={Messages.ruleAlert} />
-                    <pre>{currentTemplate.annotations?.summary}</pre>
-                  </div>
-                )}
-              </>
-            )}
-
             <Field name="enabled" type="checkbox" defaultValue={true}>
               {({ input }) => (
                 <>

@@ -168,18 +168,4 @@ xdescribe('AddAlertRuleModal', () => {
       SEVERITY_OPTIONS.find((severity) => severity.value === templateStubs[0].severity)?.label
     );
   });
-
-  it('should show the expression and sample alert when switching templates', async () => {
-    const wrapper = await getMount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
-
-    wrapper.update();
-
-    expect(wrapper.find(dataTestId('template-expression')).exists()).toBeFalsy();
-    expect(wrapper.find(dataTestId('template-alert')).exists()).toBeFalsy();
-
-    selectTemplateOption(wrapper);
-
-    expect(wrapper.find(dataTestId('template-expression')).find('pre').text()).toBe(templateStubs[0].expr);
-    expect(wrapper.find(dataTestId('template-alert')).find('pre').text()).toBe(templateStubs[0].annotations?.summary);
-  });
 });
