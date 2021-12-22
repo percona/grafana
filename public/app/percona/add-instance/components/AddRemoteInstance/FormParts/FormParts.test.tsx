@@ -127,6 +127,11 @@ describe('getAdditionalOptions ::', () => {
     expect(screen.getByTestId('collections_limit-number-input')).toBeInTheDocument();
     expect(screen.getByTestId('stats_collections-text-input')).toBeInTheDocument();
 
+    expect((screen.getByTestId('collections_limit-number-input') as HTMLInputElement).defaultValue).toBe('100');
+    expect((screen.getByTestId('disable_collectors-text-input') as HTMLInputElement).defaultValue).toBe(
+      'dbstats,topmetrics'
+    );
+
     expect(fields.length).toBe(6);
   });
   it('should render correct for MySQL', async () => {
