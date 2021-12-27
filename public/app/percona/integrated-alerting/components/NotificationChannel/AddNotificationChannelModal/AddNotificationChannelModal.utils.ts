@@ -61,7 +61,6 @@ export const INITIAL_VALUES = {
     type: getOptionFrom(type),
     url,
     webHookType: getWebhookAuthType(username, token),
-    useWebhookTls: isWebhookUsingTLS(ca, cert, key, serverName, skipVerify),
     username,
     password,
     token,
