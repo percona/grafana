@@ -29,9 +29,10 @@ import {
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
-import { Template } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
+import { Template, TemplateParamType } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { appEvents } from 'app/core/core';
+import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import { AlertRuleParamField } from '../AlertRuleParamField';
 
 const { required } = validators;
@@ -44,10 +45,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
-  const { getAlertRules } = useContext(AlertRulesProvider);
+  const { getAlertRules, setSelectedAlertRule } = useContext(AlertRulesProvider);
 
   const updateAlertRuleTemplateParams = () => {
-    setCurrentTemplate(templates.current.find((template) => template.name === alertRule?.rawValues.template.name));
+    setCurrentTemplate(templates.current.find((template) => template.name === alertRule?.rawValues.template_name));
   };
 
   const getData = async () => {
@@ -87,28 +88,30 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const onSubmit = async (values: AddAlertRuleFormValues) => {
     try {
       if (alertRule) {
-        await AlertRulesService.update(
-          formatUpdateAPIPayload(alertRule.rawValues.rule_id, values, currentTemplate?.params)
-        );
+        await AlertRulesService.update(formatUpdateAPIPayload(alertRule.rawValues.rule_id, values, alertRule.params));
       } else {
         await AlertRulesService.create(formatCreateAPIPayload(values, currentTemplate?.params));
       }
-      setVisible(false);
       appEvents.emit(AppEvents.alertSuccess, [alertRule ? Messages.updateSuccess : Messages.createSuccess]);
       getAlertRules();
+      setVisible(false);
+      setSelectedAlertRule(null);
     } catch (e) {
       logger.error(e);
     }
   };
 
   const handleClose = () => {
-    setVisible(false);
     setCurrentTemplate(undefined);
+    setSelectedAlertRule(null);
+    setVisible(false);
   };
 
-  const handleTemplateChange = (name = '') => {
+  const handleTemplateChange = (name = ''): Template | undefined => {
     const template = templates.current.find((template) => template.name === name);
     setCurrentTemplate(template);
+
+    return template;
   };
 
   return (
@@ -137,6 +140,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             const newDuration = templates.current.find((template) => template.name === templateName)?.for;
             tools.changeValue(state, 'duration', () => (newDuration ? parseInt(newDuration, 10) : undefined));
           },
+          changeParam: ([paramName, paramValue], state, tools) => {
+            tools.changeValue(state, paramName, () => paramValue);
+          },
         }}
         render={({ handleSubmit, valid, pristine, submitting, form }) => (
           <form className={styles.form} onSubmit={handleSubmit} data-testid="add-alert-rule-modal-form">
@@ -149,10 +155,19 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                   options={templateOptions}
                   {...input}
                   onChange={(name) => {
-                    input.onChange(name);
                     form.mutators.changeSeverity(name.value);
                     form.mutators.changeDuration(name.value);
-                    handleTemplateChange(name.value);
+                    const newTemplate = handleTemplateChange(name.value);
+
+                    if (newTemplate) {
+                      newTemplate.params?.forEach(({ type, float, name }) => {
+                        // TODO add missing types when supported
+                        if (type === TemplateParamType.FLOAT && float?.default !== undefined) {
+                          form.mutators.changeParam(name, float.default);
+                        }
+                      });
+                    }
+                    input.onChange(name);
                   }}
                   data-testid="template-select-input"
                 />
@@ -166,8 +181,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               tooltipText={Messages.tooltips.name}
             />
 
-            {currentTemplate &&
-              currentTemplate.params?.map((param) => <AlertRuleParamField key={param.name} param={param} />)}
+            {alertRule
+              ? alertRule.params.map((param) => <AlertRuleParamField key={param.name} param={param} />)
+              : currentTemplate?.params?.map((param) => <AlertRuleParamField key={param.name} param={param} />)}
 
             <NumberInputField
               label={Messages.durationField}
@@ -202,27 +218,23 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
 
-            {currentTemplate && (
-              <>
-                <div data-testid="template-expression" className={styles.templateParsedField}>
-                  <Label label={Messages.templateExpression} />
-                  <pre>{currentTemplate.expr}</pre>
-                </div>
-                {currentTemplate.annotations?.summary && (
-                  <div data-testid="template-alert" className={styles.templateParsedField}>
-                    <Label label={Messages.ruleAlert} />
-                    <pre>{currentTemplate.annotations?.summary}</pre>
-                  </div>
-                )}
-              </>
+            {alertRule ? (
+              <AdvancedRuleSection
+                expression={alertRule.rawValues.expr_template}
+                summary={alertRule.rawValues.annotations?.summary}
+              />
+            ) : (
+              currentTemplate && (
+                <AdvancedRuleSection expression={currentTemplate.expr} summary={currentTemplate.annotations?.summary} />
+              )
             )}
 
             <Field name="enabled" type="checkbox" defaultValue={true}>
               {({ input }) => (
-                <>
+                <div className={styles.toogleField}>
                   <Label label={Messages.activateSwitch} dataTestId="enabled-toggle-label" />
                   <Switch {...input} value={input.checked} data-testid="enabled-toggle-input" />
-                </>
+                </div>
               )}
             </Field>
 
