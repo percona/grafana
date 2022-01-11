@@ -16,6 +16,7 @@ import { formatAlerts } from './Alerts.utils';
 import { AlertsService } from './Alerts.service';
 import { AlertsActions } from './AlertsActions';
 import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_ALERTS_CANCEL_TOKEN } from './Alerts.constants';
+import { AlertDetails } from './AlertDetails/AlertDetails';
 
 const { noData, columns } = Messages.alerts.table;
 const {
@@ -66,7 +67,7 @@ export const Alerts: FC = () => {
         Header: labelsColumn,
         accessor: ({ labels }: Alert) => (
           <div className={style.labelsWrapper}>
-            {labels.map((label) => (
+            {labels.primary.map((label) => (
               <span key={label} className={style.label}>
                 {label}
               </span>
@@ -122,7 +123,12 @@ export const Alerts: FC = () => {
     setPageindex(pageIndex);
   }, []);
 
-  const renderSelectedSubRow = React.useCallback((row: Row<Alert>) => <pre>{row.original.rule?.expr}</pre>, []);
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<Alert>) => (
+      <AlertDetails ruleExpression={row.original.rule?.expr} labels={row.original.labels.secondary} />
+    ),
+    []
+  );
 
   useEffect(() => {
     getAlerts();
