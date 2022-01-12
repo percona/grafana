@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useStyles, useTheme } from '@grafana/ui';
-import { logger } from '@percona/platform-core';
+import { logger, Chip } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
@@ -68,9 +68,7 @@ export const Alerts: FC = () => {
         accessor: ({ labels }: Alert) => (
           <div className={style.labelsWrapper}>
             {labels.primary.map((label) => (
-              <span key={label} className={style.label}>
-                {label}
-              </span>
+              <Chip text={label} key={label} />
             ))}
           </div>
         ),

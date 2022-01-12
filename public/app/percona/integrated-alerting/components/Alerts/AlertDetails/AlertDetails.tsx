@@ -1,24 +1,26 @@
 import React, { FC } from 'react';
+import { Chip } from '@percona/platform-core';
 import { useStyles } from '@grafana/ui';
+import { getStyles as getMainStyles } from '../Alerts.styles';
 import { AlertDetailsProps } from './AlertDetails.types';
 import { getStyles } from './AlertDetails.styles';
+import { Messages } from './AlertDetails.messages';
 
 export const AlertDetails: FC<AlertDetailsProps> = ({ ruleExpression = '', labels }) => {
   const styles = useStyles(getStyles);
+  const mainStyles = useStyles(getMainStyles);
 
   return (
     <div data-testid="alert-details-wrapper" className={styles.wrapper}>
       <div>
-        <span>Rule expression</span>
+        <span>{Messages.ruleExpression}</span>
         <pre>{ruleExpression}</pre>
       </div>
       <div>
-        <span>Secondary labels</span>
-        <div className={styles.labelsWrapper}>
+        <span>{Messages.secondaryLabels}</span>
+        <div className={mainStyles.labelsWrapper}>
           {labels.map((label) => (
-            <span className={styles.label} key={label}>
-              {label}
-            </span>
+            <Chip text={label} key={label} />
           ))}
         </div>
       </div>

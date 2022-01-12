@@ -1,13 +1,13 @@
 import { GrafanaTheme } from '@grafana/data';
 import { css } from 'emotion';
 
-export const getStyles = ({ colors, spacing }: GrafanaTheme) => ({
+export const getStyles = ({ spacing }: GrafanaTheme) => ({
   wrapper: css`
     display: flex;
     align-items: center;
 
     & > * {
-      flex: 1 0 50;
+      flex: 1 0 50%;
       display: flex;
       align-items: center;
 
@@ -23,16 +23,5 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme) => ({
     pre {
       margin-bottom: 0;
     }
-  `,
-  labelsWrapper: css`
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-  `,
-  label: css`
-    background-color: ${colors.bg3};
-    border-radius: 8px;
-    padding: 6px;
-    line-height: 1;
   `,
 });

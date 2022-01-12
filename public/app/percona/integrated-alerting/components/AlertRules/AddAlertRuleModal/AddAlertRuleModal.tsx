@@ -6,9 +6,9 @@ import {
   LoaderButton,
   TextInputField,
   NumberInputField,
-  TextareaInputField,
   logger,
   validators,
+  ChipAreaInputField,
 } from '@percona/platform-core';
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { Label } from 'app/percona/shared/components/Form/Label';
@@ -204,7 +204,8 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
 
-            <TextareaInputField label={Messages.filtersField} name="filters" tooltipText={Messages.tooltips.filters} />
+            <ChipAreaInputField label={Messages.filtersField} tooltipText={Messages.tooltips.filters} name="filters" />
+            {/* <TextareaInputField label={Messages.filtersField} name="filters" tooltipText={Messages.tooltips.filters} /> */}
 
             <Field name="notificationChannels">
               {({ input }) => (
