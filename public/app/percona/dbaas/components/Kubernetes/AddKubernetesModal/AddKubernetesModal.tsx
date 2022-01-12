@@ -64,6 +64,7 @@ export const AddKubernetesModal = ({ isVisible, addKubernetes, setAddModalVisibl
                     tooltipIcon="info-circle"
                     tooltipText={awsAccessKeyIDTooltip}
                     tooltipLink={AWS_CREDENTIALS_DOC_LINK}
+                    validators={[required]}
                   />
                   <PasswordInputField
                     name="awsSecretAccessKey"
@@ -71,6 +72,7 @@ export const AddKubernetesModal = ({ isVisible, addKubernetes, setAddModalVisibl
                     tooltipIcon="info-circle"
                     tooltipText={awsSecretAccessKeyTooltip}
                     tooltipLink={AWS_CREDENTIALS_DOC_LINK}
+                    validators={[required]}
                   />
                 </>
               )}
