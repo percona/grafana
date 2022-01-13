@@ -1,7 +1,6 @@
 import React from 'react';
 import { fireEvent, screen, render } from '@testing-library/react';
 import { AddKubernetesModal } from './AddKubernetesModal';
-import { NewKubernetesCluster } from '../Kubernetes.types';
 
 describe('AddKubernetesModal::', () => {
   it('renders the modal with all the fields', () => {
