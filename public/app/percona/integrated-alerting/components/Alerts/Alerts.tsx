@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { useStyles, useTheme } from '@grafana/ui';
+import { Button, useStyles, useTheme } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -124,24 +124,50 @@ export const Alerts: FC = () => {
 
   const renderSelectedSubRow = React.useCallback((row: Row<Alert>) => <pre>{row.original.rule?.expr}</pre>, []);
 
+  const handleSilenceAll = useCallback(() => {}, []);
+
+  const handleUnsilenceAll = useCallback(() => {}, []);
+
   useEffect(() => {
     getAlerts();
   }, [pageSize, pageIndex]);
 
   return (
-    <Table
-      showPagination
-      totalItems={totalItems}
-      totalPages={totalPages}
-      pageSize={pageSize}
-      pageIndex={pageIndex}
-      onPaginationChanged={handlePaginationChanged}
-      data={data}
-      columns={columns}
-      pendingRequest={pendingRequest}
-      emptyMessage={noData}
-      getCellProps={getCellProps}
-      renderExpandedRow={renderSelectedSubRow}
-    />
+    <>
+      <div className={style.actionsWrapper}>
+        <Button
+          size="md"
+          icon="bell-slash"
+          variant="link"
+          onClick={handleSilenceAll}
+          data-testid="alert-rule-template-add-modal-button"
+        >
+          {Messages.alerts.silenceAllAction}
+        </Button>
+        <Button
+          size="md"
+          icon="bell"
+          variant="link"
+          onClick={handleUnsilenceAll}
+          data-testid="alert-rule-template-add-modal-button"
+        >
+          {Messages.alerts.unsilenceAllAction}
+        </Button>
+      </div>
+      <Table
+        showPagination
+        totalItems={totalItems}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        pageIndex={pageIndex}
+        onPaginationChanged={handlePaginationChanged}
+        data={data}
+        columns={columns}
+        pendingRequest={pendingRequest}
+        emptyMessage={noData}
+        getCellProps={getCellProps}
+        renderExpandedRow={renderSelectedSubRow}
+      />
+    </>
   );
 };

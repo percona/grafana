@@ -1,11 +1,15 @@
 import { css } from 'emotion';
 import { GrafanaTheme } from '@grafana/data';
 
-export const getStyles = (theme: GrafanaTheme) => {
-  const { colors } = theme;
+export const getStyles = ({ colors, spacing }: GrafanaTheme) => {
   const cellPadding = 16;
 
   return {
+    actionsWrapper: css`
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: ${spacing.sm};
+    `,
     labelsWrapper: css`
       padding: 5px;
       display: flex;
