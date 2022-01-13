@@ -21,15 +21,13 @@ describe('AddKubernetesModal::', () => {
     const kubeConfig = 'Test config';
     const nameEvent = { target: { value: name } };
     const configEvent = { target: { value: kubeConfig } };
-    const expected: NewKubernetesCluster = {
+    const expected = {
       name,
       kubeConfig,
-      isEKS: true,
     };
 
     fireEvent.change(screen.getByTestId('name-text-input'), nameEvent);
     fireEvent.change(screen.getByTestId('kubeConfig-textarea-input'), configEvent);
-    fireEvent.click(screen.getByTestId('isEKS-checkbox-input'));
     fireEvent.click(screen.getByTestId('kubernetes-add-cluster-button'));
 
     expect(addKubernetes).toHaveBeenCalledWith(expected);
