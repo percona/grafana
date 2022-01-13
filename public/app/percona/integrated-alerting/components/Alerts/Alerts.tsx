@@ -124,9 +124,15 @@ export const Alerts: FC = () => {
 
   const renderSelectedSubRow = React.useCallback((row: Row<Alert>) => <pre>{row.original.rule?.expr}</pre>, []);
 
-  const handleSilenceAll = useCallback(() => {}, []);
+  const handleSilenceAll = useCallback(async () => {
+    await AlertsService.toggle({ silenced: 'TRUE', alert_ids: [] });
+    getAlerts();
+  }, []);
 
-  const handleUnsilenceAll = useCallback(() => {}, []);
+  const handleUnsilenceAll = useCallback(async () => {
+    await AlertsService.toggle({ silenced: 'FALSE', alert_ids: [] });
+    getAlerts();
+  }, []);
 
   useEffect(() => {
     getAlerts();
