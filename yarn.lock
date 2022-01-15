@@ -19993,10 +19993,10 @@ markdown-to-jsx@^6.11.4:
     prop-types "^15.6.2"
     unquote "^1.1.0"
 
-marked@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-2.0.1.tgz#5e7ed7009bfa5c95182e4eb696f85e948cefcee3"
-  integrity sha512-5+/fKgMv2hARmMW7DOpykr2iLhl0NgjyELk5yn92iE7z8Se1IS9n3UsFm86hFXIkvMBmVxki8+ckcpjBeyo/hw==
+marked@4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-4.0.10.tgz#423e295385cc0c3a70fa495e0df68b007b879423"
+  integrity sha512-+QvuFj0nGgO970fySghXGmuw+Fd0gD2x3+MqCWLIPf5oxdv1Ka6b2q+z9RP01P/IaKPMEramy+7cNy/Lw8c3hw==
 
 material-colors@^1.2.1:
   version "1.2.6"
@@ -24485,6 +24485,7 @@ react-transition-group@^4.3.0:
 
 react-use-measure@2.0.1, "react-use-measure@https://github.com/mckn/react-use-measure.git#remove-cjs-export":
   version "2.0.3"
+  uid "73530149cb2810cc629f73fa680f8681a0f398ca"
   resolved "https://github.com/mckn/react-use-measure.git#73530149cb2810cc629f73fa680f8681a0f398ca"
   dependencies:
     debounce "^1.2.0"
