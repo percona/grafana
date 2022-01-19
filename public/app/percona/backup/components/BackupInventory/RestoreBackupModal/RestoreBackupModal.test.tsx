@@ -40,14 +40,7 @@ describe('RestoreBackupModal', () => {
     const rButton = screen.getAllByTestId('serviceType-radio-button')[0];
     fireEvent.change(rButton);
 
-    // migrating from enzyme
     expect(screen.getByTestId('backup-modal-error').textContent).toHaveLength(0);
     expect(screen.getAllByTestId('restore-button')[0]).not.toBeDisabled();
-
-    // enzyme old tests
-    // wrapper.find(dataTestId('serviceType-radio-button')).at(1).simulate('change');
-    //
-    // expect(wrapper.find(dataTestId('backup-modal-error')).text()).toHaveLength(0);
-    // expect(wrapper.find(dataTestId('restore-button')).first().prop('disabled')).toBeFalsy();
   });
 });
