@@ -85,7 +85,7 @@ func (hs *HTTPServer) OAuthLogin(ctx *models.ReqContext) {
 	requestURL := url.URL{
 		Scheme: scheme,
 		Host:   ctx.Req.Host,
-		Path:   path,
+		Path:   "/graph" + path,
 	}
 
 	code := ctx.Query("code")
