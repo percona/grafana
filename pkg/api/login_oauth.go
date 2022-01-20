@@ -113,9 +113,16 @@ func (hs *HTTPServer) OAuthLogin(ctx *models.ReqContext) {
 		path = uri.Path
 	}
 
+	host := ctx.Req.Host
+	// Get the URL of the current request
+	port := ctx.Req.Header.Get("X-Forwarded-Port")
+	if len(port) != 0 && port != "443" {
+		host = fmt.Sprintf("%s:%s", host, port)
+	}
+
 	requestURL := url.URL{
 		Scheme: scheme,
-		Host:   ctx.Req.Host,
+		Host:   host,
 		Path:   "/graph" + path,
 	}
 
