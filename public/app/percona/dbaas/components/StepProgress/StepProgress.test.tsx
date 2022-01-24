@@ -29,9 +29,7 @@ describe('StepProgress::', () => {
 
   const isCurrentStep = (dataTestId: string) => {
     const stepContent = screen.getByTestId(`${dataTestId}`).querySelector('[data-testid="step-content"]');
-    return stepContent
-      ? stepContent.getElementsByTagName('div')[0].className.split('-')?.includes('current')
-      : undefined;
+    return stepContent ? stepContent.getElementsByTagName('div')[0].className.split('-')?.includes('current') : false;
   };
 
   it('renders steps correctly', () => {

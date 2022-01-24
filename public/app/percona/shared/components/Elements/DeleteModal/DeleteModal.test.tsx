@@ -44,7 +44,7 @@ describe('DeleteModal', () => {
     expect(setVisible).toHaveBeenCalled();
   });
 
-  it('should call onDelete on submit', async () => {
+  it('should call onDelete on submit', () => {
     const onDelete = jest.fn();
     render(<DeleteModal setVisible={jest.fn()} onDelete={onDelete} isVisible />);
 
@@ -54,7 +54,7 @@ describe('DeleteModal', () => {
     expect(onDelete).toHaveBeenCalled();
   });
 
-  it('should call setVisible on cancel', async () => {
+  it('should call setVisible on cancel', () => {
     const setVisible = jest.fn();
     render(<DeleteModal setVisible={setVisible} onDelete={jest.fn()} isVisible />);
 
