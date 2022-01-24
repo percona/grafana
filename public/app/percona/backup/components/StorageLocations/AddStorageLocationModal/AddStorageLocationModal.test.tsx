@@ -36,7 +36,7 @@ describe('AddStorageLocationModal', () => {
     expect(screen.queryByRole('textbox', { name: /endpoint/i })).toHaveValue('/foo/bar');
   });
 
-  it('should not render unknown type fields', async () => {
+  it('should not render unknown type fields', () => {
     const location: StorageLocation = {
       locationID: 'Location_1',
       name: 'client_fs',

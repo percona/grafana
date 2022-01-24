@@ -16,7 +16,7 @@ describe('AddDBClusterModal::', () => {
 
   const isStepActive = (step: string) => {
     const stepNode = screen.getByTestId(`${step}`).querySelector('[data-testid="step-content"]');
-    return stepNode ? stepNode.getElementsByTagName('div')[0].className.split('-')?.includes('current') : undefined;
+    return stepNode ? stepNode.getElementsByTagName('div')[0].className.split('-')?.includes('current') : false;
   };
 
   it('renders correctly', () => {
