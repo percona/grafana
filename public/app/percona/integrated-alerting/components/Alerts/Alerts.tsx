@@ -11,7 +11,7 @@ import { Severity } from '../Severity';
 import { useStoredTablePageSize } from '../Table/Pagination';
 import { Messages } from '../../IntegratedAlerting.messages';
 import { getStyles } from './Alerts.styles';
-import { Alert, AlertStatus } from './Alerts.types';
+import { Alert, AlertStatus, AlertTogglePayload } from './Alerts.types';
 import { formatAlerts } from './Alerts.utils';
 import { AlertsService } from './Alerts.service';
 import { AlertsActions } from './AlertsActions';
@@ -124,13 +124,8 @@ export const Alerts: FC = () => {
 
   const renderSelectedSubRow = React.useCallback((row: Row<Alert>) => <pre>{row.original.rule?.expr}</pre>, []);
 
-  const handleSilenceAll = useCallback(async () => {
-    await AlertsService.toggle({ silenced: 'TRUE', alert_ids: [] });
-    getAlerts();
-  }, []);
-
-  const handleUnsilenceAll = useCallback(async () => {
-    await AlertsService.toggle({ silenced: 'FALSE', alert_ids: [] });
+  const handleSilenceAll = useCallback(async (silenced: AlertTogglePayload['silenced']) => {
+    await AlertsService.toggle({ silenced, alert_ids: [] });
     getAlerts();
   }, []);
 
@@ -145,7 +140,7 @@ export const Alerts: FC = () => {
           size="md"
           icon="bell-slash"
           variant="link"
-          onClick={handleSilenceAll}
+          onClick={() => handleSilenceAll('TRUE')}
           data-testid="alert-rule-template-add-modal-button"
         >
           {Messages.alerts.silenceAllAction}
@@ -154,7 +149,7 @@ export const Alerts: FC = () => {
           size="md"
           icon="bell"
           variant="link"
-          onClick={handleUnsilenceAll}
+          onClick={() => handleSilenceAll('FALSE')}
           data-testid="alert-rule-template-add-modal-button"
         >
           {Messages.alerts.unsilenceAllAction}
