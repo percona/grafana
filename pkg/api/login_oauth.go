@@ -8,10 +8,10 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"golang.org/x/oauth2"
 	"net/http"
 	"net/url"
-
-	"golang.org/x/oauth2"
+	"path"
 
 	"github.com/grafana/grafana/pkg/bus"
 	"github.com/grafana/grafana/pkg/infra/log"
@@ -74,26 +74,19 @@ func (hs *HTTPServer) OAuthLogin(ctx *models.ReqContext) {
 		scheme = string(hs.Cfg.Protocol)
 	}
 
-	path := ""
+	urlPath := ""
 	uri, err := url.ParseRequestURI(ctx.Req.RequestURI)
 	if err != nil {
-		path = "login/" + name
+		urlPath = "login/" + name
 	} else {
-		path = uri.Path
-	}
-
-	host := ctx.Req.Host
-	// Get the URL of the current request
-	port := ctx.Req.Header.Get("X-Forwarded-Port")
-	if len(port) != 0 && port != "443" {
-		host = fmt.Sprintf("%s:%s", host, port)
+		urlPath = uri.Path
 	}
 
 	requestURL := url.URL{
 		Scheme: scheme,
-		Host:   host,
-		Path:   "/graph" + path,
+		Host:   ctx.Req.Host,
 	}
+	requestURL.Path = path.Join("/graph", urlPath)
 
 	code := ctx.Query("code")
 	if code == "" {
