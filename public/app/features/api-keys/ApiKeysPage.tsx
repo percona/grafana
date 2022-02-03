@@ -20,6 +20,9 @@ import { ApiKeysForm } from './ApiKeysForm';
 import { ApiKeysActionBar } from './ApiKeysActionBar';
 import { ApiKeysTable } from './ApiKeysTable';
 import { ApiKeysController } from './ApiKeysController';
+import { WarningBlock } from 'app/percona/shared/components/Elements/WarningBlock';
+import { Messages } from './ApiKeys.messages';
+import { getStyles } from './ApiKeys.styles';
 
 const { Switch } = LegacyForms;
 
@@ -110,6 +113,7 @@ export class ApiKeysPageUnconnected extends PureComponent<Props, State> {
   render() {
     const { hasFetched, navModel, apiKeysCount, apiKeys, searchQuery, timeZone } = this.props;
     const { includeExpired } = this.state;
+    const styles = getStyles(config.theme);
 
     if (!hasFetched) {
       return (
@@ -151,6 +155,11 @@ export class ApiKeysPageUnconnected extends PureComponent<Props, State> {
                     <>
                       <h3 className="page-heading">Existing Keys</h3>
                       <Switch label="Show expired" checked={includeExpired} onChange={this.onIncludeExpiredChange} />
+                      <WarningBlock
+                        className={styles.deleteWarning}
+                        message={Messages.apiKeysDeleteWarning}
+                        type="warning"
+                      />
                       <ApiKeysTable apiKeys={apiKeys} timeZone={timeZone} onDelete={this.onDeleteApiKey} />
                     </>
                   ) : null}

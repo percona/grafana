@@ -15,7 +15,12 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme) => {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      margin: 0 -${cellPadding}px;
+      margin-bottom: -${spacing.sm};
+
+      & > * {
+        margin-right: ${spacing.sm};
+        margin-bottom: ${spacing.sm};
+      }
     `,
     label: css`
       background-color: ${colors.bg3};
