@@ -35,7 +35,12 @@ export const WebHookFields: FC<WebHookFieldsProps> = ({ values }) => {
       {values.webHookType === WebHookAuthType.basic && <WebHookBasicFields />}
       {values.webHookType === WebHookAuthType.token && <WebHookTokenFields />}
       <CheckboxField name="sendResolved" label={Messages.fields.sendResolved} />
-      <NumberInputField name="maxAlerts" label={Messages.fields.maxAlerts} validators={[customValidators.min(0)]} />
+      <NumberInputField
+        name="maxAlerts"
+        defaultValue={0}
+        label={Messages.fields.maxAlerts}
+        validators={[customValidators.min(0)]}
+      />
       <Collapse
         collapsible
         label={Messages.fields.tlsSettings}

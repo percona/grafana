@@ -54,7 +54,7 @@ export const INITIAL_VALUES = {
     key,
     serverName,
     skipVerify,
-    maxAlerts,
+    maxAlerts = 0,
     sendResolved,
   }: WebHookNotificationChannel): NotificationChannelRenderProps => ({
     name: summary,
