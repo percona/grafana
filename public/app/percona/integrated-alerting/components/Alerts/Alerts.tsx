@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { useStyles, useTheme } from '@grafana/ui';
+import { Button, useStyles, useTheme } from '@grafana/ui';
 import { logger, Chip } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -11,7 +11,7 @@ import { Severity } from '../Severity';
 import { useStoredTablePageSize } from '../Table/Pagination';
 import { Messages } from '../../IntegratedAlerting.messages';
 import { getStyles } from './Alerts.styles';
-import { Alert, AlertStatus } from './Alerts.types';
+import { Alert, AlertStatus, AlertTogglePayload } from './Alerts.types';
 import { formatAlerts } from './Alerts.utils';
 import { AlertsService } from './Alerts.service';
 import { AlertsActions } from './AlertsActions';
@@ -128,24 +128,51 @@ export const Alerts: FC = () => {
     []
   );
 
+  const handleSilenceAll = useCallback(async (silenced: AlertTogglePayload['silenced']) => {
+    await AlertsService.toggle({ silenced, alert_ids: [] });
+    getAlerts();
+  }, []);
+
   useEffect(() => {
     getAlerts();
   }, [pageSize, pageIndex]);
 
   return (
-    <Table
-      showPagination
-      totalItems={totalItems}
-      totalPages={totalPages}
-      pageSize={pageSize}
-      pageIndex={pageIndex}
-      onPaginationChanged={handlePaginationChanged}
-      data={data}
-      columns={columns}
-      pendingRequest={pendingRequest}
-      emptyMessage={noData}
-      getCellProps={getCellProps}
-      renderExpandedRow={renderSelectedSubRow}
-    />
+    <>
+      <div className={style.actionsWrapper}>
+        <Button
+          size="md"
+          icon="bell-slash"
+          variant="link"
+          onClick={() => handleSilenceAll('TRUE')}
+          data-testid="alert-rule-template-add-modal-button"
+        >
+          {Messages.alerts.silenceAllAction}
+        </Button>
+        <Button
+          size="md"
+          icon="bell"
+          variant="link"
+          onClick={() => handleSilenceAll('FALSE')}
+          data-testid="alert-rule-template-add-modal-button"
+        >
+          {Messages.alerts.unsilenceAllAction}
+        </Button>
+      </div>
+      <Table
+        showPagination
+        totalItems={totalItems}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        pageIndex={pageIndex}
+        onPaginationChanged={handlePaginationChanged}
+        data={data}
+        columns={columns}
+        pendingRequest={pendingRequest}
+        emptyMessage={noData}
+        getCellProps={getCellProps}
+        renderExpandedRow={renderSelectedSubRow}
+      />
+    </>
   );
 };
