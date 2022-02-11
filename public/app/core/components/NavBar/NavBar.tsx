@@ -96,6 +96,15 @@ export const NavBar: FC = React.memo(() => {
           });
         }
 
+        if (settings.isConnectedToPortal) {
+          newItems.push({
+            id: 'tickets',
+            icon: 'ticket',
+            text: 'Support Tickets',
+            url: `${config.appSubUrl}/tickets`,
+          });
+        }
+
         setTopItems(newItems);
       } catch (e) {
         logger.error(e);
