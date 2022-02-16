@@ -35,7 +35,7 @@ const perconaFeaturesSlice = createSlice({
   name: 'perconaFeatures',
   initialState: initialFeaturesState,
   reducers: {
-    setFeature: (state, action: PayloadAction<Partial<FeatureFlags>>): PerconaFeaturesState => {
+    setFeatures: (state, action: PayloadAction<Partial<FeatureFlags>>): PerconaFeaturesState => {
       const featuresSet: Partial<FeatureFlags> = {};
       Object.keys(action.payload).forEach((feature) => {
         const typedFeature = feature as keyof FeatureFlags;
@@ -50,7 +50,7 @@ const perconaFeaturesSlice = createSlice({
   },
 });
 
-export const { setFeature } = perconaFeaturesSlice.actions;
+export const { setFeatures } = perconaFeaturesSlice.actions;
 
 export const perconaFeaturesReducers = perconaFeaturesSlice.reducer;
 

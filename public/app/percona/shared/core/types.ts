@@ -33,3 +33,10 @@ export interface FeatureFlags {
   backupEnabled: boolean;
   alertingEnabled: boolean;
 }
+
+export const FeatureFlagsStaticProps: Array<keyof FeatureFlags> = [
+  'sttEnabled',
+  'dbaasEnabled',
+  'backupEnabled',
+  'alertingEnabled',
+];
