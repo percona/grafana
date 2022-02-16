@@ -1,9 +1,12 @@
 import React, { FC, useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { createPortal } from 'react-dom';
+import { useDispatch } from 'react-redux';
 import { Spinner, useTheme } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { Advanced, AlertManager, Diagnostics, MetricsResolution, Platform, SSHKey } from './components';
+import { FeatureFlags, FeatureFlagsStaticProps } from '../shared/core';
+import { setFeatures } from '../shared/core/reducers';
 import { LoadingCallback, SettingsService } from './Settings.service';
 import { Settings, TabKeys, SettingsAPIChangePayload } from './Settings.types';
 import { Messages } from './Settings.messages';
@@ -20,7 +23,7 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
   const { path: basePath } = PAGE_MODEL;
   const tab = match.params.tab;
   const [generateToken] = useCancelToken();
-
+  const dispatch = useDispatch();
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [hasNoAccess, setHasNoAccess] = useState(false);
@@ -30,7 +33,7 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
   const techPreviewRef = useRef<HTMLDivElement | null>(null);
 
   const updateSettings = useCallback(
-    async (body: SettingsAPIChangePayload, callback: LoadingCallback, refresh?: boolean, onError = () => {}) => {
+    async (body: SettingsAPIChangePayload, callback: LoadingCallback, onError = () => {}) => {
       // we save the test email here so that we can sent it all the way down to the form again after re-render
       // the field is deleted from the payload so as not to be sent to the API
       let password = '';
@@ -46,13 +49,16 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
       }
       const response = await SettingsService.setSettings(body, callback, generateToken(SET_SETTINGS_CANCEL_TOKEN));
 
-      if (refresh && response) {
-        window.location.reload();
-
-        return;
-      }
-
       if (response) {
+        const flags: Partial<FeatureFlags> = {};
+        FeatureFlagsStaticProps.forEach((flag) => {
+          flags[flag] = flag in response && !!response[flag];
+        });
+
+        if (Object.keys(flags).length > 0) {
+          dispatch(setFeatures(flags));
+        }
+
         // password is not being returned by the API, hence this construction
         const newSettings: Settings = {
           ...response,
