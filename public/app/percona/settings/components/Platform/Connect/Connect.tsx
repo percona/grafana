@@ -1,7 +1,9 @@
 import React, { FC, useState } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 import { useStyles } from '@grafana/ui';
 import validators from 'app/percona/shared/helpers/validators';
+import { setPortalConnected } from 'app/percona/shared/core/reducers';
 import { ConnectProps, ConnectRenderProps } from '../types';
 import { Messages } from '../Platform.messages';
 import { getStyles } from './Connect.styles';
@@ -14,6 +16,7 @@ import { appEvents } from 'app/core/app_events';
 export const Connect: FC<ConnectProps> = ({ getSettings }) => {
   const styles = useStyles(getStyles);
   const [connecting, setConnecting] = useState(false);
+  const dispatch = useDispatch();
 
   const handleConnect = async ({ pmmServerName, email, password }: ConnectRenderProps) => {
     setConnecting(true);
@@ -30,6 +33,7 @@ export const Connect: FC<ConnectProps> = ({ getSettings }) => {
         getSettings();
         appEvents.emit(AppEvents.alertSuccess, [Messages.connectSucceeded]);
         setConnecting(false);
+        dispatch(setPortalConnected(true));
       }, CONNECT_DELAY);
     } catch (e) {
       logger.error(e);
