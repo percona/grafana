@@ -26,3 +26,10 @@ export interface ApiVerboseError {
   message: string;
   link?: string;
 }
+
+export interface FeatureFlags {
+  sttEnabled: boolean;
+  dbaasEnabled: boolean;
+  backupEnabled: boolean;
+  alertingEnabled: boolean;
+}

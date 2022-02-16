@@ -1,3 +1,4 @@
+import { FeatureFlags } from 'app/percona/shared/core/types';
 export interface EmailSettings {
   from: string;
   smarthost: string;
@@ -121,21 +122,17 @@ export type SettingsAPIChangePayload =
   | SlackPayload
   | SSHPayload;
 
-export interface Settings {
+export interface Settings extends Partial<FeatureFlags> {
   updatesDisabled: boolean;
   telemetryEnabled: boolean;
-  backupEnabled: boolean;
   metricsResolutions: MetricsResolutions;
   dataRetention: string;
   sshKey: string;
   awsPartitions: string[];
   alertManagerUrl: string;
   alertManagerRules: string;
-  sttEnabled: boolean;
   azureDiscoverEnabled?: boolean;
   platformEmail?: string;
-  dbaasEnabled?: boolean;
-  alertingEnabled?: boolean;
   publicAddress?: string;
   alertingSettings: AlertingSettings;
   sttCheckIntervals: SttCheckIntervalsSettings;
