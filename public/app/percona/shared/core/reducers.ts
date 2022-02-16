@@ -54,7 +54,31 @@ export const { setFeatures } = perconaFeaturesSlice.actions;
 
 export const perconaFeaturesReducers = perconaFeaturesSlice.reducer;
 
+export interface PerconaUserState {
+  isAuthorized: boolean;
+}
+
+export const initialUserState: PerconaUserState = {
+  isAuthorized: false,
+};
+
+const perconaUserSlice = createSlice({
+  name: 'perconaUser',
+  initialState: initialUserState,
+  reducers: {
+    setAuthorized: (state, action: PayloadAction<boolean>): PerconaUserState => ({
+      ...state,
+      isAuthorized: action.payload,
+    }),
+  },
+});
+
+export const { setAuthorized } = perconaUserSlice.actions;
+
+export const perconaUserReducers = perconaUserSlice.reducer;
+
 export default {
   perconaPortal: perconaPortalReducers,
   perconaFeatures: perconaFeaturesReducers,
+  perconaUser: perconaUserReducers,
 };

@@ -1,5 +1,6 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
+import { StoreState } from 'app/types';
 import { useStyles } from '@grafana/ui';
 import { KubernetesInventory } from './components/Kubernetes/KubernetesInventory';
 import { DBCluster } from './components/DBCluster/DBCluster';
@@ -17,7 +18,7 @@ import { Settings } from '../settings/Settings.types';
 
 export const DBaaS: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }) => {
   const styles = useStyles(getStyles);
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const [settings] = useState<Settings | null>(null);
   const { path: basePath } = PAGE_MODEL;
   const tab = match.params.tab;
 
@@ -52,6 +53,8 @@ export const DBaaS: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }
     [kubernetes, kubernetesLoading]
   );
 
+  const featureSelector = useCallback((state: StoreState) => state.perconaFeatures.dbaasEnabled, []);
+
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
       <TechnicalPreview />
@@ -61,7 +64,7 @@ export const DBaaS: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }
           tabs={tabs}
           basePath={basePath}
           renderTab={({ Content }) => (
-            <FeatureLoader featureName={Messages.dbaas} featureFlag="dbaasEnabled" onSettingsLoaded={setSettings}>
+            <FeatureLoader featureName={Messages.dbaas} featureSelector={featureSelector}>
               <Content />
             </FeatureLoader>
           )}
