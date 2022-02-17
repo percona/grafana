@@ -43,7 +43,7 @@ const BackupPage: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }) 
   const { path: basePath } = PAGE_MODEL;
   const tab = match.params.tab;
 
-  const featureSelector = useCallback((state: StoreState) => state.perconaFeatures.backupEnabled, []);
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.backupEnabled, []);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL}>

@@ -49,7 +49,7 @@ export const DBaaS: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }
     [kubernetes, kubernetesLoading]
   );
 
-  const featureSelector = useCallback((state: StoreState) => state.perconaFeatures.dbaasEnabled, []);
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.dbaasEnabled, []);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL}>

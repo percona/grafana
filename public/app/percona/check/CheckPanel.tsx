@@ -28,7 +28,7 @@ export const CheckPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ ma
     []
   );
 
-  const featureSelector = useCallback((state: StoreState) => state.perconaFeatures.sttEnabled, []);
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.sttEnabled, []);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL} dataTestId="db-check-panel">

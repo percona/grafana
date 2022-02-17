@@ -1,4 +1,3 @@
-import { FeatureFlags } from 'app/percona/shared/core/types';
 export interface EmailSettings {
   from: string;
   smarthost: string;
@@ -122,7 +121,11 @@ export type SettingsAPIChangePayload =
   | SlackPayload
   | SSHPayload;
 
-export interface Settings extends Partial<FeatureFlags> {
+export interface Settings {
+  sttEnabled: boolean;
+  dbaasEnabled: boolean;
+  backupEnabled: boolean;
+  alertingEnabled: boolean;
   updatesDisabled: boolean;
   telemetryEnabled: boolean;
   metricsResolutions: MetricsResolutions;

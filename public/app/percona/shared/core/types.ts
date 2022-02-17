@@ -26,17 +26,3 @@ export interface ApiVerboseError {
   message: string;
   link?: string;
 }
-
-export interface FeatureFlags {
-  sttEnabled: boolean;
-  dbaasEnabled: boolean;
-  backupEnabled: boolean;
-  alertingEnabled: boolean;
-}
-
-export const FeatureFlagsStaticProps: Array<keyof FeatureFlags> = [
-  'sttEnabled',
-  'dbaasEnabled',
-  'backupEnabled',
-  'alertingEnabled',
-];

@@ -1,58 +1,55 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FeatureFlags } from 'app/percona/shared/core/types';
+import { Settings } from 'app/percona/settings/Settings.types';
 
-export interface PerconaPortalState {
-  connected: boolean;
-}
+export const initialSettingsState: Settings = {
+  updatesDisabled: true,
+  telemetryEnabled: false,
+  backupEnabled: false,
+  dbaasEnabled: false,
+  metricsResolutions: {
+    lr: '10s',
+    hr: '15s',
+    mr: '20s',
+  },
+  dataRetention: '',
+  sshKey: '',
+  awsPartitions: [],
+  alertManagerUrl: '',
+  alertManagerRules: '',
+  sttEnabled: false,
+  alertingEnabled: false,
+  alertingSettings: {
+    email: {
+      from: '',
+      smarthost: '',
+      hello: '',
+      require_tls: false,
+    },
+    slack: {
+      url: '',
+    },
+  },
+  sttCheckIntervals: {
+    rareInterval: '10s',
+    standardInterval: '10s',
+    frequentInterval: '10s',
+  },
+};
 
-export const initialPortalState: PerconaPortalState = { connected: false };
-
-const perconaPortalSlice = createSlice({
-  name: 'perconaPortal',
-  initialState: initialPortalState,
+const perconaSettingsSlice = createSlice({
+  name: 'perconaSettings',
+  initialState: initialSettingsState,
   reducers: {
-    setPortalConnected: (state, action: PayloadAction<boolean>): PerconaPortalState => ({
+    setSettings: (state, action: PayloadAction<Partial<Settings>>): Settings => ({
       ...state,
-      connected: action.payload,
+      ...action.payload,
     }),
   },
 });
 
-export const { setPortalConnected } = perconaPortalSlice.actions;
+export const { setSettings } = perconaSettingsSlice.actions;
 
-export const perconaPortalReducers = perconaPortalSlice.reducer;
-
-export type PerconaFeaturesState = FeatureFlags;
-
-export const initialFeaturesState: PerconaFeaturesState = {
-  sttEnabled: false,
-  dbaasEnabled: false,
-  backupEnabled: false,
-  alertingEnabled: false,
-};
-
-const perconaFeaturesSlice = createSlice({
-  name: 'perconaFeatures',
-  initialState: initialFeaturesState,
-  reducers: {
-    setFeatures: (state, action: PayloadAction<Partial<FeatureFlags>>): PerconaFeaturesState => {
-      const featuresSet: Partial<FeatureFlags> = {};
-      Object.keys(action.payload).forEach((feature) => {
-        const typedFeature = feature as keyof FeatureFlags;
-        featuresSet[typedFeature] = action.payload[typedFeature];
-      });
-
-      return {
-        ...state,
-        ...featuresSet,
-      };
-    },
-  },
-});
-
-export const { setFeatures } = perconaFeaturesSlice.actions;
-
-export const perconaFeaturesReducers = perconaFeaturesSlice.reducer;
+export const perconaSettingsReducers = perconaSettingsSlice.reducer;
 
 export interface PerconaUserState {
   isAuthorized: boolean;
@@ -78,7 +75,6 @@ export const { setAuthorized } = perconaUserSlice.actions;
 export const perconaUserReducers = perconaUserSlice.reducer;
 
 export default {
-  perconaPortal: perconaPortalReducers,
-  perconaFeatures: perconaFeaturesReducers,
+  perconaSettings: perconaSettingsReducers,
   perconaUser: perconaUserReducers,
 };

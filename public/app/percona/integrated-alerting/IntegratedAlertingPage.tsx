@@ -40,7 +40,7 @@ const IntegratedAlertingPage: FC<GrafanaRouteComponentProps<{ tab: string }>> = 
     []
   );
 
-  const featureSelector = useCallback((state: StoreState) => state.perconaFeatures.alertingEnabled, []);
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.alertingEnabled, []);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL}>

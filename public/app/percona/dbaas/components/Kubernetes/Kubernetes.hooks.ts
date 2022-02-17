@@ -29,7 +29,7 @@ import { StoreState } from 'app/types';
 export const useKubernetes = (): ManageKubernetes => {
   const [kubernetes, setKubernetes] = useState<Kubernetes[]>([]);
   const [loading, setLoading] = useState(false);
-  const dbaasEnabled = useSelector((state: StoreState) => state.perconaFeatures.dbaasEnabled);
+  const dbaasEnabled = useSelector((state: StoreState) => state.perconaSettings.dbaasEnabled);
   const [generateToken] = useCancelToken();
   const {
     kubernetes: { deleteSuccess },

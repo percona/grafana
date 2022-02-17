@@ -5,8 +5,6 @@ import { useDispatch } from 'react-redux';
 import { Spinner, useTheme } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import { Advanced, AlertManager, Diagnostics, MetricsResolution, Platform, SSHKey } from './components';
-import { FeatureFlags, FeatureFlagsStaticProps } from '../shared/core';
-import { setFeatures } from '../shared/core/reducers';
 import { LoadingCallback, SettingsService } from './Settings.service';
 import { Settings, TabKeys, SettingsAPIChangePayload } from './Settings.types';
 import { Messages } from './Settings.messages';
@@ -50,14 +48,7 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
       const response = await SettingsService.setSettings(body, callback, generateToken(SET_SETTINGS_CANCEL_TOKEN));
 
       if (response) {
-        const flags: Partial<FeatureFlags> = {};
-        FeatureFlagsStaticProps.forEach((flag) => {
-          flags[flag] = flag in response && !!response[flag];
-        });
-
-        if (Object.keys(flags).length > 0) {
-          dispatch(setFeatures(flags));
-        }
+        dispatch(setSettings(response));
 
         // password is not being returned by the API, hence this construction
         const newSettings: Settings = {

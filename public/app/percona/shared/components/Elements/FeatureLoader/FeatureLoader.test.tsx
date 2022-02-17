@@ -21,7 +21,7 @@ describe('FeatureLoader', () => {
   it('should not have children initially', async () => {
     const Dummy = () => <></>;
     const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureSelector={(state) => state.perconaFeatures.alertingEnabled}>
+      <FeatureLoader featureName="IA" featureSelector={(state) => !!state.perconaSettings.alertingEnabled}>
         <Dummy />
       </FeatureLoader>
     );
@@ -32,7 +32,7 @@ describe('FeatureLoader', () => {
   it('should show children after loading settings', async () => {
     const Dummy = () => <></>;
     const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureSelector={(state) => state.perconaFeatures.alertingEnabled}>
+      <FeatureLoader featureName="IA" featureSelector={(state) => !!state.perconaSettings.alertingEnabled}>
         <Dummy />
       </FeatureLoader>
     );
@@ -48,7 +48,7 @@ describe('FeatureLoader', () => {
     });
 
     const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureSelector={(state) => state.perconaFeatures.alertingEnabled} />
+      <FeatureLoader featureName="IA" featureSelector={(state) => !!state.perconaSettings.alertingEnabled} />
     );
     wrapper.update();
 
