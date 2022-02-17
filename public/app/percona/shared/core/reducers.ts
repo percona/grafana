@@ -1,7 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Settings } from 'app/percona/settings/Settings.types';
 
-export const initialSettingsState: Settings = {
+export interface PerconaSettingsState extends Settings {
+  isLoading: boolean;
+}
+
+export const initialSettingsState: PerconaSettingsState = {
   updatesDisabled: true,
   telemetryEnabled: false,
   backupEnabled: false,
@@ -34,20 +38,26 @@ export const initialSettingsState: Settings = {
     standardInterval: '10s',
     frequentInterval: '10s',
   },
+  isLoading: true,
 };
 
 const perconaSettingsSlice = createSlice({
   name: 'perconaSettings',
   initialState: initialSettingsState,
   reducers: {
-    setSettings: (state, action: PayloadAction<Partial<Settings>>): Settings => ({
+    setSettings: (state, action: PayloadAction<Partial<PerconaSettingsState>>): PerconaSettingsState => ({
       ...state,
       ...action.payload,
+      isLoading: false,
+    }),
+    setSettingsLoading: (state, action: PayloadAction<boolean>): PerconaSettingsState => ({
+      ...state,
+      isLoading: action.payload,
     }),
   },
 });
 
-export const { setSettings } = perconaSettingsSlice.actions;
+export const { setSettings, setSettingsLoading } = perconaSettingsSlice.actions;
 
 export const perconaSettingsReducers = perconaSettingsSlice.reducer;
 

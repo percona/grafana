@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState, useRef, useCallback } from 'react';
+import React, { FC, useMemo, useRef, useCallback } from 'react';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,11 +24,11 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
   const [generateToken] = useCancelToken();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const [loading] = useState(false);
   const styles = getSettingsStyles(theme);
   const { metrics, advanced, ssh, alertManager, perconaPlatform, communication } = Messages.tabs;
   const settings = useSelector((state: StoreState) => state.perconaSettings);
-  const hasNoAccess = useSelector((state: StoreState) => !state.perconaUser.isAuthorized);
+  const { isLoading } = settings;
+  const hasAccess = useSelector((state: StoreState) => state.perconaUser.isAuthorized);
   const techPreviewRef = useRef<HTMLDivElement | null>(null);
 
   const updateSettings = useCallback(
@@ -143,14 +143,14 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
     <PageWrapper pageModel={PAGE_MODEL}>
       <div ref={(e) => (techPreviewRef.current = e)} />
       <div className={styles.settingsWrapper}>
-        {(loading || hasNoAccess) && (
+        {(isLoading || !hasAccess) && (
           <div className={styles.emptyBlock}>
             <EmptyBlock dataTestId="empty-block">
-              {loading ? <Spinner /> : hasNoAccess && <div data-testid="unauthorized">{Messages.unauthorized}</div>}
+              {isLoading ? <Spinner /> : !hasAccess && <div data-testid="unauthorized">{Messages.unauthorized}</div>}
             </EmptyBlock>
           </div>
         )}
-        {!loading && !hasNoAccess && (
+        {!isLoading && hasAccess && (
           <>
             <TabbedContent
               activeTabName={tab}

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setSettings, setAuthorized } from 'app/percona/shared/core/reducers';
+import { setSettings, setSettingsLoading, setAuthorized } from 'app/percona/shared/core/reducers';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
 export const PerconaBootstrapper = () => {
@@ -9,14 +9,15 @@ export const PerconaBootstrapper = () => {
   useEffect(() => {
     const getSettings = async () => {
       try {
+        dispatch(setSettingsLoading(true));
         const settings = await SettingsService.getSettings(undefined, true);
         dispatch(setSettings(settings));
-
         dispatch(setAuthorized(true));
       } catch (e) {
         if (e.response?.status === 401) {
           setAuthorized(false);
         }
+        dispatch(setSettingsLoading(false));
       }
     };
 
