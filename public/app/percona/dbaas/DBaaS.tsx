@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { StoreState } from 'app/types';
 import { useStyles } from '@grafana/ui';
@@ -14,17 +14,13 @@ import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview
 import { TabbedContent, ContentTab } from '../shared/components/Elements/TabbedContent';
 import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
 import { isKubernetesListUnavailable } from './components/Kubernetes/Kubernetes.utils';
-import { Settings } from '../settings/Settings.types';
 
 export const DBaaS: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }) => {
   const styles = useStyles(getStyles);
-  const [settings] = useState<Settings | null>(null);
   const { path: basePath } = PAGE_MODEL;
   const tab = match.params.tab;
 
-  const [kubernetes, deleteKubernetes, addKubernetes, getKubernetes, setLoading, kubernetesLoading] = useKubernetes({
-    settings,
-  });
+  const [kubernetes, deleteKubernetes, addKubernetes, getKubernetes, setLoading, kubernetesLoading] = useKubernetes();
   const tabs: ContentTab[] = useMemo(
     (): ContentTab[] => [
       {
