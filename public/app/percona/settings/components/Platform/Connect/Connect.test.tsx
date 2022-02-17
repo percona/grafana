@@ -6,7 +6,7 @@ jest.mock('../Platform.service.ts');
 
 describe('Connect::', () => {
   it('renders Connect form correctly', () => {
-    render(<Connect getSettings={jest.fn()} />);
+    render(<Connect />);
 
     expect(screen.getByTestId('pmmServerName-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('email-text-input')).toBeInTheDocument();

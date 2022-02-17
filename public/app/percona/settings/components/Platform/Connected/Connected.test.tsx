@@ -5,7 +5,7 @@ import { Messages } from './Connected.messages';
 
 describe('Connected::', () => {
   it('render connected message', () => {
-    render(<Connected getSettings={() => null} />);
+    render(<Connected />);
 
     const wrapper = screen.getByTestId('connected-wrapper');
 

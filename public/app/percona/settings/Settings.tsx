@@ -1,21 +1,22 @@
-import React, { FC, useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import React, { FC, useMemo, useState, useRef, useCallback } from 'react';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { createPortal } from 'react-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Spinner, useTheme } from '@grafana/ui';
-import { logger } from '@percona/platform-core';
+import { StoreState } from 'app/types';
 import { Advanced, AlertManager, Diagnostics, MetricsResolution, Platform, SSHKey } from './components';
 import { LoadingCallback, SettingsService } from './Settings.service';
 import { Settings, TabKeys, SettingsAPIChangePayload } from './Settings.types';
 import { Messages } from './Settings.messages';
 import { getSettingsStyles } from './Settings.styles';
-import { GET_SETTINGS_CANCEL_TOKEN, SET_SETTINGS_CANCEL_TOKEN, PAGE_MODEL } from './Settings.constants';
+import { SET_SETTINGS_CANCEL_TOKEN, PAGE_MODEL } from './Settings.constants';
 import { Communication } from './components/Communication/Communication';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { ContentTab, TabbedContent, TabOrientation } from '../shared/components/Elements/TabbedContent';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { EmptyBlock } from '../shared/components/Elements/EmptyBlock';
 import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
+import { setSettings } from '../shared/core/reducers';
 
 export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }) => {
   const { path: basePath } = PAGE_MODEL;
@@ -23,11 +24,11 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
   const [generateToken] = useCancelToken();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const [loading, setLoading] = useState(true);
-  const [hasNoAccess, setHasNoAccess] = useState(false);
+  const [loading] = useState(false);
   const styles = getSettingsStyles(theme);
   const { metrics, advanced, ssh, alertManager, perconaPlatform, communication } = Messages.tabs;
-  const [settings, setSettings] = useState<Settings>();
+  const settings = useSelector((state: StoreState) => state.perconaSettings);
+  const hasNoAccess = useSelector((state: StoreState) => !state.perconaUser.isAuthorized);
   const techPreviewRef = useRef<HTMLDivElement | null>(null);
 
   const updateSettings = useCallback(
@@ -48,8 +49,6 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
       const response = await SettingsService.setSettings(body, callback, generateToken(SET_SETTINGS_CANCEL_TOKEN));
 
       if (response) {
-        dispatch(setSettings(response));
-
         // password is not being returned by the API, hence this construction
         const newSettings: Settings = {
           ...response,
@@ -58,7 +57,7 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
             email: { ...response.alertingSettings.email, password, test_email: testEmail },
           },
         };
-        setSettings(newSettings);
+        dispatch(setSettings(newSettings));
       } else {
         onError();
       }
@@ -66,22 +65,6 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
-  const getSettings = useCallback(async () => {
-    try {
-      setLoading(true);
-      const settings = await SettingsService.getSettings(generateToken(GET_SETTINGS_CANCEL_TOKEN));
-      setSettings(settings);
-    } catch (e) {
-      if (e.response?.status === 401) {
-        setHasNoAccess(true);
-      }
-      logger.error(e);
-    } finally {
-      setLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const tabs: ContentTab[] = useMemo(
     (): ContentTab[] =>
@@ -135,7 +118,7 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
               component: (
                 <>
                   {techPreviewRef.current && createPortal(<TechnicalPreview />, techPreviewRef.current)}
-                  <Platform isConnected={settings.isConnectedToPortal} getSettings={getSettings} />
+                  <Platform isConnected={settings.isConnectedToPortal} />
                 </>
               ),
             },
@@ -153,13 +136,8 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
             },
           ]
         : [],
-    [settings, advanced, alertManager, communication, metrics, perconaPlatform, ssh, getSettings, updateSettings]
+    [settings, advanced, alertManager, communication, metrics, perconaPlatform, ssh, updateSettings]
   );
-
-  useEffect(() => {
-    getSettings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
