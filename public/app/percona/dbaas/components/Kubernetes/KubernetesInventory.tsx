@@ -15,6 +15,7 @@ import { ViewClusterConfigModal } from './ViewClusterConfigModal/ViewClusterConf
 import { ManageComponentsVersionsModal } from './ManageComponentsVersionsModal/ManageComponentsVersionsModal';
 import { UpdateOperatorModal } from './OperatorStatusItem/KubernetesOperatorStatus/UpdateOperatorModal/UpdateOperatorModal';
 import { AddKubernetesModal } from './AddKubernetesModal/AddKubernetesModal';
+import { usePMMServerWarning } from '../PMMServerURLWarning/PMMServerUrlWarning.hooks';
 
 export const KubernetesInventory: FC<KubernetesProps> = ({
   kubernetes,
@@ -98,6 +99,8 @@ export const KubernetesInventory: FC<KubernetesProps> = ({
     [addModalVisible]
   );
 
+  const showMonitoringWarning = usePMMServerWarning();
+
   return (
     <div>
       <div className={styles.actionPanel}>
@@ -114,6 +117,7 @@ export const KubernetesInventory: FC<KubernetesProps> = ({
         isVisible={addModalVisible}
         addKubernetes={addKubernetes}
         setAddModalVisible={setAddModalVisible}
+        showMonitoringWarning={showMonitoringWarning}
       />
       <Modal
         title={Messages.kubernetes.deleteModal.title}
