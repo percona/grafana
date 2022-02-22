@@ -452,7 +452,9 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     {
       path: '/tickets',
-      component: SafeDynamicImport(() => import(/* webpackChunkName: "TicketsPage" */ 'app/percona/tickets/Tickets')),
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "TicketsPage" */ 'app/percona/tickets/TicketsPage')
+      ),
     },
     ...getPluginCatalogRoutes(),
     ...getLiveRoutes(),
