@@ -5,3 +5,6 @@ export const PAGE_MODEL: PageModel = {
   path: 'tickets',
   id: 'tickets',
 };
+
+export const LIST_TICKETS_CANCEL_TOKEN = 'listTickets';
+export const DATA_INTERVAL = 5000;
