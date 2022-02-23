@@ -3,7 +3,6 @@ import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Spinner, useTheme } from '@grafana/ui';
-import { StoreState } from 'app/types';
 import { Advanced, AlertManager, Diagnostics, MetricsResolution, Platform, SSHKey } from './components';
 import { LoadingCallback, SettingsService } from './Settings.service';
 import { Settings, TabKeys, SettingsAPIChangePayload } from './Settings.types';
@@ -17,6 +16,7 @@ import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { EmptyBlock } from '../shared/components/Elements/EmptyBlock';
 import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { setSettings } from '../shared/core/reducers';
+import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 
 export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }) => {
   const { path: basePath } = PAGE_MODEL;
@@ -26,9 +26,9 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
   const theme = useTheme();
   const styles = getSettingsStyles(theme);
   const { metrics, advanced, ssh, alertManager, perconaPlatform, communication } = Messages.tabs;
-  const settings = useSelector((state: StoreState) => state.perconaSettings);
+  const settings = useSelector(getPerconaSettings);
   const { isLoading } = settings;
-  const hasAccess = useSelector((state: StoreState) => state.perconaUser.isAuthorized);
+  const { isAuthorized } = useSelector(getPerconaUser);
   const techPreviewRef = useRef<HTMLDivElement | null>(null);
 
   const updateSettings = useCallback(
@@ -143,14 +143,14 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
     <PageWrapper pageModel={PAGE_MODEL}>
       <div ref={(e) => (techPreviewRef.current = e)} />
       <div className={styles.settingsWrapper}>
-        {(isLoading || !hasAccess) && (
+        {(isLoading || !isAuthorized) && (
           <div className={styles.emptyBlock}>
             <EmptyBlock dataTestId="empty-block">
-              {isLoading ? <Spinner /> : !hasAccess && <div data-testid="unauthorized">{Messages.unauthorized}</div>}
+              {isLoading ? <Spinner /> : !isAuthorized && <div data-testid="unauthorized">{Messages.unauthorized}</div>}
             </EmptyBlock>
           </div>
         )}
-        {!isLoading && hasAccess && (
+        {!isLoading && isAuthorized && (
           <>
             <TabbedContent
               activeTabName={tab}

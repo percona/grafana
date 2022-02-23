@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { Spinner, useStyles } from '@grafana/ui';
-import { StoreState } from 'app/types';
+import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { EmptyBlock } from '../EmptyBlock';
 import { FeatureLoaderProps } from './FeatureLoader.types';
 import { Messages } from './FeatureLoader.messages';
@@ -16,8 +16,8 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({
 }) => {
   const styles = useStyles(getStyles);
   const featureEnabled = useSelector(featureSelector);
-  const hasAccess = useSelector((state: StoreState) => state.perconaUser.isAuthorized);
-  const isLoading = useSelector((state: StoreState) => state.perconaSettings.isLoading);
+  const { isAuthorized } = useSelector(getPerconaUser);
+  const { isLoading } = useSelector(getPerconaSettings);
 
   if (featureEnabled) {
     return <>{children}</>;
@@ -28,7 +28,7 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({
       <EmptyBlock dataTestId="empty-block">
         {isLoading ? (
           <Spinner />
-        ) : hasAccess ? (
+        ) : isAuthorized ? (
           <>
             {Messages.featureDisabled(featureName)}&nbsp;
             <a data-testid={messagedataTestId} className={styles.link} href={PMM_SETTINGS_URL}>

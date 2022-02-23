@@ -8,7 +8,7 @@ import { Icon, IconName, useTheme2 } from '@grafana/ui';
 import { locationService } from '@grafana/runtime';
 import { Branding } from 'app/core/components/Branding/Branding';
 import config from 'app/core/config';
-import { KioskMode, StoreState } from 'app/types';
+import { KioskMode } from 'app/types';
 import {
   buildIntegratedAlertingMenuItem,
   enrichConfigItems,
@@ -23,6 +23,7 @@ import { NavBarSection } from './NavBarSection';
 import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
+import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -41,9 +42,7 @@ export const NavBar: FC = React.memo(() => {
   const theme = useTheme2();
   const styles = getStyles(theme);
   const location = useLocation();
-  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = useSelector(
-    (state: StoreState) => state.perconaSettings
-  );
+  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = useSelector(getPerconaSettings);
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);

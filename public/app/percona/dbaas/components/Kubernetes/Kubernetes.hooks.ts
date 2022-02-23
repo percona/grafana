@@ -4,6 +4,7 @@ import { AppEvents } from '@grafana/data';
 import { logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { appEvents } from 'app/core/app_events';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { KubernetesService } from './Kubernetes.service';
@@ -24,12 +25,11 @@ import {
   GET_KUBERNETES_CANCEL_TOKEN,
 } from './Kubernetes.hooks.constants';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from './Kubernetes.constants';
-import { StoreState } from 'app/types';
 
 export const useKubernetes = (): ManageKubernetes => {
   const [kubernetes, setKubernetes] = useState<Kubernetes[]>([]);
   const [loading, setLoading] = useState(false);
-  const dbaasEnabled = useSelector((state: StoreState) => state.perconaSettings.dbaasEnabled);
+  const { dbaasEnabled } = useSelector(getPerconaSettings);
   const [generateToken] = useCancelToken();
   const {
     kubernetes: { deleteSuccess },
