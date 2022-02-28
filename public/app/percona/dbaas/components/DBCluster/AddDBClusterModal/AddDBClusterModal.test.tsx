@@ -38,7 +38,7 @@ describe('AddDBClusterModal::', () => {
     expect(screen.getByTestId('dbcluster-basic-options-step')).toBeTruthy();
     expect(screen.getByTestId('dbcluster-advanced-options-step')).toBeTruthy();
     expect(screen.getByTestId('dbcluster-advanced-options-step')).toBeTruthy();
-    expect(screen.findByTestId('pmm-server-url-warning')).toBeTruthy();
+    expect(screen.findByTestId('add-cluster-monitoring-warning')).toBeTruthy();
   });
 
   it('should disable submit button when there is no values', () => {
