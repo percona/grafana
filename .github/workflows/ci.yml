@@ -36,7 +36,7 @@ jobs:
         run: yarn cache clean
 
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: YARN_CHECKSUM_BEHAVIOR=update yarn install --immutable
 
       - name: Run tests 
         run: yarn run ci:test-percona-frontend
