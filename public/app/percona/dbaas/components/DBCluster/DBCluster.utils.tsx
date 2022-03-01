@@ -1,4 +1,3 @@
-import React from 'react';
 import { SelectableValue } from '@grafana/data';
 import { Databases } from 'app/percona/shared/core';
 import {

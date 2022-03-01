@@ -1,4 +1,5 @@
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useStyles } from '@grafana/ui';
 import { Table } from 'app/percona/shared/components/Elements/Table';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
@@ -19,7 +20,7 @@ import {
 } from './ColumnRenderers/ColumnRenderers';
 import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModal';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
-import { usePMMServerWarning } from '../PMMServerURLWarning/PMMServerUrlWarning.hooks';
+import { getPerconaSettings } from '../../../shared/core/selectors';
 
 export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
   const styles = useStyles(getStyles);
@@ -30,6 +31,7 @@ export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<Cluster>();
   const [dbClusters, getDBClusters, setLoading, loading] = useDBClusters(kubernetes);
+  const { isLoading, publicAddress } = useSelector(getPerconaSettings);
 
   const columns = useMemo(
     () => [
@@ -90,7 +92,7 @@ export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
     }
   }, [deleteModalVisible, editModalVisible, logsModalVisible, updateModalVisible]);
 
-  const showMonitoringWarning = usePMMServerWarning();
+  const showMonitoringWarning = useMemo(() => isLoading || !publicAddress, [publicAddress, isLoading]);
 
   return (
     <div>
