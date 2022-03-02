@@ -39,6 +39,7 @@ export const initialSettingsState: PerconaSettingsState = {
     frequentInterval: '10s',
   },
   isLoading: true,
+  isConnectedToPortal: false,
 };
 
 const perconaSettingsSlice = createSlice({
