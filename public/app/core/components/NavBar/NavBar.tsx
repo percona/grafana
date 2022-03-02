@@ -1,7 +1,7 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { css, cx } from '@emotion/css';
-import { logger } from '@percona/platform-core';
 import { cloneDeep } from 'lodash';
 import { GrafanaTheme2, NavModelItem, NavSection } from '@grafana/data';
 import { Icon, IconName, useTheme2 } from '@grafana/ui';
@@ -22,8 +22,8 @@ import NavBarItem from './NavBarItem';
 import { NavBarSection } from './NavBarSection';
 import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
-import { SettingsService } from 'app/percona/settings/Settings.service';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
+import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -42,6 +42,9 @@ export const NavBar: FC = React.memo(() => {
   const theme = useTheme2();
   const styles = getStyles(theme);
   const location = useLocation();
+  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled, isConnectedToPortal } = useSelector(
+    getPerconaSettings
+  );
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
@@ -49,7 +52,7 @@ export const NavBar: FC = React.memo(() => {
     setShowSwitcherModal(!showSwitcherModal);
   };
   const navTree: NavModelItem[] = cloneDeep(config.bootData.navTree);
-  const [topItems, setTopItems] = useState(navTree.filter((item) => item.section === NavSection.Core));
+  const topItems = navTree.filter((item) => item.section === NavSection.Core);
   const bottomItems = enrichConfigItems(
     navTree.filter((item) => item.section === NavSection.Config),
     location,
@@ -59,62 +62,47 @@ export const NavBar: FC = React.memo(() => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const updateMenu = async () => {
-      try {
-        const settings = await SettingsService.getSettings(undefined, true);
-        const newItems: NavModelItem[] = [...topItems];
-
-        if (settings.alertingEnabled) {
-          buildIntegratedAlertingMenuItem(newItems);
-        }
-
-        if (settings.sttEnabled) {
-          newItems.push({
-            id: 'databsase-checks',
-            icon: 'percona-database-checks',
-            text: 'Security Checks',
-            url: `${config.appSubUrl}/pmm-database-checks`,
-          });
-        }
-
-        if (settings.dbaasEnabled) {
-          newItems.push({
-            id: 'dbaas',
-            text: 'DBaaS',
-            icon: 'database',
-            url: `${config.appSubUrl}/dbaas`,
-          });
-        }
-
-        if (settings.backupEnabled) {
-          newItems.push({
-            id: 'backup',
-            icon: 'history',
-            text: 'Backup',
-            url: `${config.appSubUrl}/backup`,
-          });
-        }
-
-        if (settings.isConnectedToPortal) {
-          newItems.push({
-            id: 'tickets',
-            icon: 'ticket',
-            text: 'Support Tickets',
-            url: `${config.appSubUrl}/tickets`,
-          });
-        }
-
-        setTopItems(newItems);
-      } catch (e) {
-        logger.error(e);
-      }
-    };
-    if (isPmmAdmin(config.bootData.user)) {
-      updateMenu();
+  if (isPmmAdmin(config.bootData.user)) {
+    if (alertingEnabled) {
+      buildIntegratedAlertingMenuItem(topItems);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    if (sttEnabled) {
+      topItems.push({
+        id: 'databsase-checks',
+        icon: 'percona-database-checks',
+        text: 'Security Checks',
+        url: `${config.appSubUrl}/pmm-database-checks`,
+      });
+    }
+
+    if (dbaasEnabled) {
+      topItems.push({
+        id: 'dbaas',
+        text: 'DBaaS',
+        icon: 'database',
+        url: `${config.appSubUrl}/dbaas`,
+      });
+    }
+
+    if (backupEnabled) {
+      topItems.push({
+        id: 'backup',
+        icon: 'history',
+        text: 'Backup',
+        url: `${config.appSubUrl}/backup`,
+      });
+    }
+
+    if (isConnectedToPortal) {
+      topItems.push({
+        id: 'tickets',
+        icon: 'ticket',
+        text: 'Support Tickets',
+        url: `${config.appSubUrl}/tickets`,
+      });
+    }
+  }
 
   if (kiosk !== null) {
     return null;
