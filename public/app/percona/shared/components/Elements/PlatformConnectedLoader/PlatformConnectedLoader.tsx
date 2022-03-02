@@ -13,15 +13,15 @@ export const PlatformConnectedLoader: FC = ({ children }) => {
   return (
     <PermissionLoader
       featureSelector={featureSelector}
-      renderSuccess={children}
-      renderError={
+      renderSuccess={() => children}
+      renderError={() => (
         <>
           {Messages.notConnected}&nbsp;
           <a data-testid="platform-link" className={styles.link} href={PLATFORM_SETTINGS_URL}>
             {Messages.portalSettings}
           </a>
         </>
-      }
+      )}
     />
   );
 };

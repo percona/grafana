@@ -14,7 +14,7 @@ export const PermissionLoader: FC<PermissionLoaderProps> = ({ featureSelector, r
   const { isLoading } = useSelector(getPerconaSettings);
 
   if (featureEnabled) {
-    return <>{renderSuccess}</>;
+    return <>{renderSuccess()}</>;
   }
 
   return (
@@ -23,7 +23,7 @@ export const PermissionLoader: FC<PermissionLoaderProps> = ({ featureSelector, r
         {isLoading ? (
           <Spinner />
         ) : isAuthorized ? (
-          renderError
+          renderError()
         ) : (
           <div data-testid="unauthorized">{Messages.unauthorized}</div>
         )}
