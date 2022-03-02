@@ -17,15 +17,15 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({
   return (
     <PermissionLoader
       featureSelector={featureSelector}
-      renderSuccess={children}
-      renderError={
+      renderSuccess={() => children}
+      renderError={() => (
         <>
           {Messages.featureDisabled(featureName)}&nbsp;
           <a data-testid={messagedataTestId} className={styles.link} href={PMM_SETTINGS_URL}>
             {Messages.pmmSettings}
           </a>
         </>
-      }
+      )}
     />
   );
 };
