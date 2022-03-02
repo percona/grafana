@@ -5,6 +5,7 @@ import { DATA_INTERVAL, LIST_TICKETS_CANCEL_TOKEN, PAGE_MODEL } from './Tickets.
 import { logger, Table } from '@percona/platform-core';
 import { isApiCancelError } from '../shared/helpers/api';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
+import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { TicketsService } from './Tickets.service';
 import { Ticket } from './Tickets.types';
 import { useRecurringCall } from '../backup/hooks/recurringCall.hook';
@@ -100,17 +101,19 @@ export const TicketsPage: FC = () => {
 
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
-      <div className={styles.pageWrapper}>
-        <Table
-          data={data}
-          columns={columns}
-          totalItems={data.length}
-          pendingRequest={pending}
-          emptyMessage={Messages.table.noData}
-          getRowProps={getRowProps}
-          getCellProps={getCellProps}
-        ></Table>
-      </div>
+      <PlatformConnectedLoader>
+        <div className={styles.pageWrapper}>
+          <Table
+            data={data}
+            columns={columns}
+            totalItems={data.length}
+            pendingRequest={pending}
+            emptyMessage={Messages.table.noData}
+            getRowProps={getRowProps}
+            getCellProps={getCellProps}
+          ></Table>
+        </div>
+      </PlatformConnectedLoader>
     </PageWrapper>
   );
 };
