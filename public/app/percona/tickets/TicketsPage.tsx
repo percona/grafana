@@ -1,8 +1,11 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Column, Row } from 'react-table';
+import { useSelector } from 'react-redux';
+import { StoreState } from 'app/types';
+import { Table } from '../integrated-alerting/components/Table';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { DATA_INTERVAL, LIST_TICKETS_CANCEL_TOKEN, PAGE_MODEL } from './Tickets.constants';
-import { logger, Table } from '@percona/platform-core';
+import { logger } from '@percona/platform-core';
 import { isApiCancelError } from '../shared/helpers/api';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
@@ -18,12 +21,13 @@ import { palette } from '@grafana/data/src/themes/palette';
 export const TicketsPage: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Ticket[]>([]);
+  const connected = useSelector((state: StoreState) => !!state.perconaSettings.isConnectedToPortal);
   const [generateToken] = useCancelToken();
   const [triggerTimeout] = useRecurringCall();
   const styles = useStyles(getStyles);
 
   const columns = useMemo(
-    (): Column[] => [
+    (): Array<Column<Ticket>> => [
       {
         Header: Messages.table.columns.number,
         accessor: 'number',
@@ -73,9 +77,11 @@ export const TicketsPage: FC = () => {
   }, []);
 
   useEffect(() => {
-    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
+    if (connected === true) {
+      getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [connected]);
 
   const redirect = (url: string) => {
     window.open(url, '_blank');
