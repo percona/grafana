@@ -12,7 +12,7 @@ export const PerconaBootstrapper = () => {
       try {
         dispatch(setSettingsLoading(true));
         const settings = await SettingsService.getSettings(undefined, true);
-        dispatch(setSettings(settings));
+        dispatch(setSettings({ ...settings, isConnectedToPortal: !!settings.isConnectedToPortal }));
         dispatch(setAuthorized(true));
       } catch (e) {
         if (e.response?.status === 401) {
