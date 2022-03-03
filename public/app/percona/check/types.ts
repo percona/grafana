@@ -113,8 +113,8 @@ export interface ChangeCheckBody {
 }
 
 export enum TabKeys {
-  allChecks = 'allChecks',
-  failedChecks = 'failedChecks',
+  allChecks = 'all-checks',
+  failedChecks = 'failed-checks',
   rootChecks = 'root-checks',
 }
 
