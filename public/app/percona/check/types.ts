@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { PaginatedPayload } from '../shared/core/types';
 
 export interface CheckPanelOptions {
   title?: string;
@@ -29,8 +30,8 @@ interface CheckResultSummary {
   notice_count: number;
 }
 
-export interface CheckResultSummaryPayload {
-  data: CheckResultSummary[];
+export interface CheckResultSummaryPayload extends PaginatedPayload {
+  checks: CheckResultSummary[];
 }
 
 export interface FailedCheckSummary {

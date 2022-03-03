@@ -26,3 +26,18 @@ export interface ApiVerboseError {
   message: string;
   link?: string;
 }
+
+export interface PaginatedPayload {
+  totals: {
+    total_items: number;
+    total_pages: number;
+  };
+}
+
+export interface PaginatedFomattedResponse<T = any> {
+  data: T;
+  totals: {
+    totalItems: number;
+    totalPages: number;
+  };
+}

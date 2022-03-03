@@ -1,4 +1,4 @@
-import { API } from 'app/percona/shared/core';
+import { API, PaginatedFomattedResponse } from 'app/percona/shared/core';
 import { api } from 'app/percona/shared/helpers/api';
 import { CancelToken } from 'axios';
 import {
@@ -35,16 +35,39 @@ export const CheckService = {
 
     return Array.isArray(data) && data.length ? processData(data as Alert[]) : undefined;
   },
-  async getAllFailedChecks(token?: CancelToken): Promise<FailedCheckSummary[]> {
-    const { data = [] } = await api.post<CheckResultSummaryPayload, Object>('', {}, false, token);
+  async getAllFailedChecks(
+    pageSize: number,
+    pageIndex: number,
+    token?: CancelToken
+  ): Promise<PaginatedFomattedResponse<FailedCheckSummary[]>> {
+    const {
+      checks = [],
+      totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
+    } = await api.post<CheckResultSummaryPayload, Object>(
+      '',
+      {
+        page_params: {
+          page_size: pageSize,
+          index: pageIndex,
+        },
+      },
+      false,
+      token
+    );
 
-    return data.map(({ service_name, service_id, error_count, warning_count, notice_count }) => ({
-      serviceName: service_name,
-      serviceId: service_id,
-      errorCount: error_count,
-      warningCount: warning_count,
-      noticeCount: notice_count,
-    }));
+    return {
+      totals: {
+        totalItems,
+        totalPages,
+      },
+      data: checks.map(({ service_name, service_id, error_count, warning_count, notice_count }) => ({
+        serviceName: service_name,
+        serviceId: service_id,
+        errorCount: error_count,
+        warningCount: warning_count,
+        noticeCount: notice_count,
+      })),
+    };
   },
   async getFailedCheckForService(token?: CancelToken): Promise<ServiceFailedCheck[]> {
     const { data = [] } = await api.post<CheckResultForServicePayload, Object>('', {}, false, token);
