@@ -1,16 +1,14 @@
-import { shallow } from 'enzyme';
 import React from 'react';
-import Credentials from './components/Credentials/Credentials';
-import { DiscoveryDocs } from './components/DiscoveryDocs/DiscoveryDocs';
-import Instances from './components/Instances/Instances';
 import Discovery from './Discovery';
+import { render, screen, waitFor } from '@testing-library/react';
 
 describe('Discovery:: ', () => {
-  it('should render credentials, instances and docs', () => {
-    const root = shallow(<Discovery selectInstance={jest.fn()} />);
+  //TODO warning: "An update to Discovery inside a test was not wrapped in act(...)."
+  it('should render credentials, instances and docs', async () => {
+    await waitFor(() => render(<Discovery selectInstance={jest.fn()} />));
 
-    expect(root.find(Credentials).exists()).toBeTruthy();
-    expect(root.find(Instances).exists()).toBeTruthy();
-    expect(root.find(DiscoveryDocs).exists()).toBeTruthy();
+    expect(screen.getByTestId('credentials-form')).toBeInTheDocument();
+    expect(screen.getByTestId('instances-table-wrapper')).toBeInTheDocument();
+    expect(screen.getByTestId('discovery-docs')).toBeInTheDocument();
   });
 });
