@@ -9,7 +9,11 @@ import {
   AllChecks,
   ChangeCheckBody,
   CheckDetails,
+  CheckResultForServicePayload,
+  CheckResultSummaryPayload,
   FailedChecks,
+  FailedCheckSummary,
+  ServiceFailedCheck,
   Settings,
   Severity,
   SilenceBody,
@@ -31,13 +35,29 @@ export const CheckService = {
 
     return Array.isArray(data) && data.length ? processData(data as Alert[]) : undefined;
   },
-  async getFailedChecks(token?: CancelToken): Promise<FailedChecks | undefined> {
-    const data = await api.get<Alert[], AlertRequestParams>(makeApiUrl('alerts'), {
-      params: { active: true, silenced: false, filter: 'stt_check=1' },
-      cancelToken: token,
-    });
+  async getAllFailedChecks(token?: CancelToken): Promise<FailedCheckSummary[]> {
+    const { data = [] } = await api.post<CheckResultSummaryPayload, Object>('', {}, false, token);
 
-    return Array.isArray(data) && data.length ? sumFailedChecks(processData(data as Alert[])) : undefined;
+    return data.map(({ service_name, service_id, error_count, warning_count, notice_count }) => ({
+      serviceName: service_name,
+      serviceId: service_id,
+      errorCount: error_count,
+      warningCount: warning_count,
+      noticeCount: notice_count,
+    }));
+  },
+  async getFailedCheckForService(token?: CancelToken): Promise<ServiceFailedCheck[]> {
+    const { data = [] } = await api.post<CheckResultForServicePayload, Object>('', {}, false, token);
+
+    return data.map(({ summary, description, severity, labels, read_more_url, service_name, check_name }) => ({
+      summary,
+      description,
+      severity,
+      labels,
+      readMoreUrl: read_more_url,
+      serviceName: service_name,
+      checkName: check_name,
+    }));
   },
   async getSettings(token?: CancelToken) {
     return api.post<Settings, {}>(API.SETTINGS, {}, true, token);

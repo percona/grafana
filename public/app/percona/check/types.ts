@@ -21,6 +21,50 @@ export enum Severity {
 
 export type FailedChecks = [number, number, number];
 
+interface CheckResultSummary {
+  service_name: string;
+  service_id: string;
+  error_count: number;
+  warning_count: number;
+  notice_count: number;
+}
+
+export interface CheckResultSummaryPayload {
+  data: CheckResultSummary[];
+}
+
+export interface FailedCheckSummary {
+  serviceName: string;
+  serviceId: string;
+  errorCount: number;
+  warningCount: number;
+  noticeCount: number;
+}
+
+interface CheckResultForService {
+  summary: string;
+  description: string;
+  severity: Severity;
+  labels: { [key: string]: string };
+  read_more_url: string;
+  service_name: string;
+  check_name: string;
+}
+
+export interface CheckResultForServicePayload {
+  data: CheckResultForService[];
+}
+
+export interface ServiceFailedCheck {
+  summary: string;
+  description: string;
+  severity: Severity;
+  labels: { [key: string]: string };
+  readMoreUrl: string;
+  serviceName: string;
+  checkName: string;
+}
+
 export interface ActiveCheck {
   key: string;
   name: string;
