@@ -156,7 +156,16 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
   };
   const alertingIndex = mainLinks.findIndex(({ id }) => id === 'alerting');
 
-  if (alertingIndex >= 0) {
+  if (alertingIndex === -1) {
+    mainLinks.push({
+      id: 'alerting',
+      text: 'Alerting',
+      icon: 'bell',
+      url: `${getConfig().appSubUrl}/integrated-alerting/alerts`,
+      subTitle: 'Alert rules & notifications',
+      children: [integratedAlertingLink],
+    });
+  } else {
     mainLinks[alertingIndex].children?.unshift(integratedAlertingLink, divider);
   }
 
