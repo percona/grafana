@@ -52,3 +52,33 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
     },
   ],
 };
+
+export const PMM_ALERTING_PAGE: NavModelItem = {
+  id: 'integrated-alerting',
+  icon: 'bell',
+  text: 'Integrated Alerting',
+  url: `${getConfig().appSubUrl}/integrated-alerting`,
+  subTitle: 'Percona Integrated Alerting',
+  children: [
+    {
+      id: 'integrated-alerting-alerts',
+      text: 'Alerts',
+      url: `${getConfig().appSubUrl}/integrated-alerting/alerts`,
+    },
+    {
+      id: 'integrated-alerting-rules',
+      text: 'Alert Rules',
+      url: `${getConfig().appSubUrl}/integrated-alerting/alert-rules`,
+    },
+    {
+      id: 'integrated-alerting-templates',
+      text: 'Alert Rule Templates',
+      url: `${getConfig().appSubUrl}/integrated-alerting/alert-rule-templates`,
+    },
+    {
+      id: 'integrated-alerting-notification-channels',
+      text: 'Notification Channels',
+      url: `${getConfig().appSubUrl}/integrated-alerting/notification-channels`,
+    },
+  ],
+};

@@ -374,19 +374,42 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     {
       path: '/integrated-alerting',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/integrated-alerting/alerts" />,
+    },
+    {
+      path: '/integrated-alerting/alerts',
       component: SafeDynamicImport(
         () =>
           import(
-            /* webpackChunkName: "IntegratedAlertingPage" */ 'app/percona/integrated-alerting/IntegratedAlertingPage'
+            /* webpackChunkName: "IntegratedAlertingAlerts" */ 'app/percona/integrated-alerting/components/Alerts/Alerts'
           )
       ),
     },
     {
-      path: '/integrated-alerting/:tab',
+      path: '/integrated-alerting/alert-rule-templates',
       component: SafeDynamicImport(
         () =>
           import(
-            /* webpackChunkName: "IntegratedAlertingPage" */ 'app/percona/integrated-alerting/IntegratedAlertingPage'
+            /* webpackChunkName: "IntegratedAlertingTemplates" */ 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate'
+          )
+      ),
+    },
+    {
+      path: '/integrated-alerting/notification-channels',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "IntegratedAlertingChannels" */ 'app/percona/integrated-alerting/components/NotificationChannel/NotificationChannel'
+          )
+      ),
+    },
+    {
+      path: '/integrated-alerting/alert-rules',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "IntegratedAlertingRules" */ 'app/percona/integrated-alerting/components/AlertRules/AlertRules'
           )
       ),
     },
