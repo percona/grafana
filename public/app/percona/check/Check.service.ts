@@ -69,18 +69,32 @@ export const CheckService = {
       })),
     };
   },
-  async getFailedCheckForService(token?: CancelToken): Promise<ServiceFailedCheck[]> {
-    const { data = [] } = await api.post<CheckResultForServicePayload, Object>('', {}, false, token);
+  async getFailedCheckForService(
+    serviceId: string,
+    pageSize: number,
+    pageIndex: number,
+    token?: CancelToken
+  ): Promise<PaginatedFomattedResponse<ServiceFailedCheck[]>> {
+    const {
+      checks = [],
+      totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
+    } = await api.post<CheckResultForServicePayload, Object>('', {}, false, token);
 
-    return data.map(({ summary, description, severity, labels, read_more_url, service_name, check_name }) => ({
-      summary,
-      description,
-      severity,
-      labels,
-      readMoreUrl: read_more_url,
-      serviceName: service_name,
-      checkName: check_name,
-    }));
+    return {
+      totals: {
+        totalItems,
+        totalPages,
+      },
+      data: checks.map(({ summary, description, severity, labels, read_more_url, service_name, check_name }) => ({
+        summary,
+        description,
+        severity,
+        labels,
+        readMoreUrl: read_more_url,
+        serviceName: service_name,
+        checkName: check_name,
+      })),
+    };
   },
   async getSettings(token?: CancelToken) {
     return api.post<Settings, {}>(API.SETTINGS, {}, true, token);

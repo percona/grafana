@@ -52,8 +52,8 @@ interface CheckResultForService {
   check_name: string;
 }
 
-export interface CheckResultForServicePayload {
-  data: CheckResultForService[];
+export interface CheckResultForServicePayload extends PaginatedPayload {
+  checks: CheckResultForService[];
 }
 
 export interface ServiceFailedCheck {
