@@ -1,10 +1,10 @@
 import { css } from '@emotion/css';
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme2 } from '@grafana/data';
 
 /**
  * NOTE: These styles may be used to create a theme for PMM
  */
-export const getStyles = ({ palette, colors, isLight }: GrafanaTheme) => {
+export const getStyles = ({ v1: { palette, colors, isLight } }: GrafanaTheme2) => {
   const backgroundColor = isLight ? 'rgb(247, 247, 249)' : 'rgb(22, 23, 25)';
   const borderColor = isLight ? palette.gray85 : palette.dark7;
   const cellPadding = '12px 8px';

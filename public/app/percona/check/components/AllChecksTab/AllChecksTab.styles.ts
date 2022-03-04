@@ -1,26 +1,30 @@
 import { css } from '@emotion/css';
 
-export const wrapper = css`
-  background-color: transparent;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  overflow-y: scroll;
-  height: 100%;
-`;
-
-export const nameColumn = css`
-  width: 250px;
-`;
-
-export const statusColumn = css`
-  width: 100px;
-`;
-
-export const actionsColumn = css`
-  width: 150px;
-`;
-
-export const intervalColumn = css`
-  width: 150px;
-`;
+export const getStyles = () => ({
+  wrapper: css`
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    overflow-y: scroll;
+    height: 100%;
+  `,
+  nameColumn: css`
+    width: 250px;
+  `,
+  statusColumn: css`
+    width: 100px;
+  `,
+  actionsColumn: css`
+    width: 150px;
+  `,
+  intervalColumn: css`
+    width: 150px;
+  `,
+  spinner: css`
+    display: flex;
+    height: 10em;
+    align-items: center;
+    justify-content: center;
+  `,
+});

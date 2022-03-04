@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
-import { useTheme } from '@grafana/ui';
 import { ActiveCheck, Column } from 'app/percona/check/types';
 import { getStyles } from './Table.styles';
 import { TableHeader } from './TableHeader';
 import { TableBody } from './TableBody';
+import { useStyles2 } from '@grafana/ui';
 
 interface TableProps {
   columns: Column[];
@@ -11,8 +11,7 @@ interface TableProps {
 }
 
 export const Table: FC<TableProps> = ({ columns, data = [] }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles2(getStyles);
   const isEmpty = !data.length;
 
   return (

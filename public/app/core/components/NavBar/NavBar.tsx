@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { css, cx } from '@emotion/css';
 import { cloneDeep } from 'lodash';
 import { GrafanaTheme2, NavModelItem, NavSection } from '@grafana/data';
@@ -24,6 +24,7 @@ import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { PMM_STT_PAGE, PMM_BACKUP_PAGE, PMM_DBAAS_PAGE } from './constants';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -42,6 +43,7 @@ export const NavBar: FC = React.memo(() => {
   const theme = useTheme2();
   const styles = getStyles(theme);
   const location = useLocation();
+  const dispatch = useDispatch();
   const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = useSelector(getPerconaSettings);
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
@@ -63,33 +65,22 @@ export const NavBar: FC = React.memo(() => {
   if (isPmmAdmin(config.bootData.user)) {
     if (alertingEnabled) {
       buildIntegratedAlertingMenuItem(topItems);
+      dispatch({ type: 'navIndex/updateNavIndex', payload: topItems.find((item) => item.id === 'alerting') });
     }
 
     if (sttEnabled) {
-      topItems.push({
-        id: 'databsase-checks',
-        icon: 'percona-database-checks',
-        text: 'Security Checks',
-        url: `${config.appSubUrl}/pmm-database-checks`,
-      });
+      topItems.push(PMM_STT_PAGE);
+      dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_STT_PAGE });
     }
 
     if (dbaasEnabled) {
-      topItems.push({
-        id: 'dbaas',
-        text: 'DBaaS',
-        icon: 'database',
-        url: `${config.appSubUrl}/dbaas`,
-      });
+      topItems.push(PMM_DBAAS_PAGE);
+      dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_DBAAS_PAGE });
     }
 
     if (backupEnabled) {
-      topItems.push({
-        id: 'backup',
-        icon: 'history',
-        text: 'Backup',
-        url: `${config.appSubUrl}/backup`,
-      });
+      topItems.push(PMM_BACKUP_PAGE);
+      dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_BACKUP_PAGE });
     }
   }
 

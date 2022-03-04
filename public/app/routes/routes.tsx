@@ -408,11 +408,23 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     {
       path: '/pmm-database-checks',
-      component: SafeDynamicImport(() => import(/* webpackChunkName: "ChecksPage" */ 'app/percona/check/CheckPanel')),
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/pmm-database-checks/failed-checks" />,
     },
     {
-      path: '/pmm-database-checks/:tab',
-      component: SafeDynamicImport(() => import(/* webpackChunkName: "ChecksPage" */ 'app/percona/check/CheckPanel')),
+      path: '/pmm-database-checks/failed-checks',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/FailedChecksTab/FailedChecksTab'
+          )
+      ),
+    },
+    {
+      path: '/pmm-database-checks/all-checks',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "AllChecksPage" */ 'app/percona/check/components/AllChecksTab/AllChecksTab')
+      ),
     },
     {
       path: '/settings',

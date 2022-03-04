@@ -2,12 +2,12 @@ import React, { FC } from 'react';
 import { SEVERITY } from 'app/percona/check/CheckPanel.constants';
 import { SilenceAlertButton } from 'app/percona/check/components';
 import { Severity, TableDataAlertDetailsProps } from 'app/percona/check/types';
-import { useStyles } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import { Messages } from '../../CheckPanel.messages';
 import { getStyles } from './Table.styles';
 
 export const TableDataAlertDetails: FC<TableDataAlertDetailsProps> = ({ detailsItem }) => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
 
   return (
     <>
