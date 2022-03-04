@@ -19,7 +19,7 @@ jobs:
           path: ./grafana
 
       - name: Run with Node ${{ matrix.node-version }}
-        uses: percona-platform/setup-node@v2
+        uses: percona-platform/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
