@@ -23,7 +23,7 @@ import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
   const [runChecksPending, setRunChecksPending] = useState(false);
-  const navModel = useNavModel('failed-checks');
+  const navModel = useNavModel('failed-checks', true);
   const [showSilenced, setShowSilenced] = useState(loadShowSilencedValue());
   const [dataSource, setDataSource] = useState<ActiveCheck[] | undefined>();
   const styles = useStyles(getStyles);

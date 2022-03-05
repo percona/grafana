@@ -7,6 +7,12 @@ export const PMM_STT_PAGE: NavModelItem = {
   text: 'Security Checks',
   subTitle: 'Percona Security Checks',
   url: `${getConfig().appSubUrl}/pmm-database-checks`,
+  breadcrumbs: [
+    {
+      title: 'Security Checks',
+      url: `${getConfig().appSubUrl}/pmm-database-checks`,
+    },
+  ],
   children: [
     {
       id: 'failed-checks',

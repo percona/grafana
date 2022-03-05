@@ -23,7 +23,7 @@ import { ChecksReloadContext } from './AllChecks.context';
 export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const [checks, setChecks] = useState<CheckDetails[] | undefined>();
-  const navModel = useNavModel('all-checks');
+  const navModel = useNavModel('all-checks', true);
   const tableStyles = useStyles2(getTableStyles);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
