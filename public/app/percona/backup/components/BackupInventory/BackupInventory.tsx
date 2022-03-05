@@ -3,6 +3,11 @@ import React, { FC, useMemo, useState, useEffect, useCallback } from 'react';
 import { Column, Row } from 'react-table';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
+import Page from 'app/core/components/Page/Page';
+import { useNavModel } from 'app/core/hooks/useNavModel';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
+import { StoreState } from 'app/types';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -43,6 +48,7 @@ export const BackupInventory: FC = () => {
   const [data, setData] = useState<Backup[]>([]);
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
+  const navModel = useNavModel('backup-inventory');
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const columns = useMemo(
@@ -228,73 +234,82 @@ export const BackupInventory: FC = () => {
     }
   };
 
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.backupEnabled, []);
+
   useEffect(() => {
     getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <>
-      <div className={styles.addWrapper}>
-        <Button
-          size="md"
-          icon="plus-square"
-          variant="link"
-          data-testid="backup-add-modal-button"
-          onClick={() => onBackupClick(null)}
-        >
-          {Messages.add}
-        </Button>
-      </div>
-      <Table
-        data={data}
-        totalItems={data.length}
-        columns={columns}
-        emptyMessage={Messages.backupInventory.table.noData}
-        pendingRequest={pending}
-        autoResetExpanded={false}
-        renderExpandedRow={renderSelectedSubRow}
-      ></Table>
-      {restoreModalVisible && (
-        <RestoreBackupModal
-          backup={selectedBackup}
-          isVisible
-          restoreErrors={restoreErrors}
-          onClose={handleClose}
-          onRestore={handleRestore}
-          noService={!selectedBackup?.serviceId || !selectedBackup?.serviceName}
-        />
-      )}
-      {backupModalVisible && (
-        <AddBackupModal
-          backup={selectedBackup}
-          isVisible
-          onClose={handleClose}
-          onBackup={handleBackup}
-          backupErrors={backupErrors}
-        />
-      )}
-      {deleteModalVisible && (
-        <DeleteModal
-          title={Messages.backupInventory.deleteModalTitle}
-          message={Messages.backupInventory.getDeleteMessage(selectedBackup?.name || '')}
-          isVisible
-          setVisible={setDeleteModalVisible}
-          forceLabel={Messages.backupInventory.deleteFromStorage}
-          onDelete={handleDelete}
-          initialForceValue={true}
-          loading={deletePending}
-          showForce
-        />
-      )}
-      {logsModalVisible && (
-        <BackupLogsModal
-          title={Messages.backupInventory.getLogsTitle(selectedBackup?.name || '')}
-          isVisible
-          onClose={handleLogsClose}
-          getLogChunks={getLogs}
-        />
-      )}
-    </>
+    <Page navModel={navModel}>
+      <Page.Contents>
+        <TechnicalPreview />
+        <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
+          <div className={styles.addWrapper}>
+            <Button
+              size="md"
+              icon="plus-square"
+              variant="link"
+              data-testid="backup-add-modal-button"
+              onClick={() => onBackupClick(null)}
+            >
+              {Messages.add}
+            </Button>
+          </div>
+          <Table
+            data={data}
+            totalItems={data.length}
+            columns={columns}
+            emptyMessage={Messages.backupInventory.table.noData}
+            pendingRequest={pending}
+            autoResetExpanded={false}
+            renderExpandedRow={renderSelectedSubRow}
+          ></Table>
+          {restoreModalVisible && (
+            <RestoreBackupModal
+              backup={selectedBackup}
+              isVisible
+              restoreErrors={restoreErrors}
+              onClose={handleClose}
+              onRestore={handleRestore}
+              noService={!selectedBackup?.serviceId || !selectedBackup?.serviceName}
+            />
+          )}
+          {backupModalVisible && (
+            <AddBackupModal
+              backup={selectedBackup}
+              isVisible
+              onClose={handleClose}
+              onBackup={handleBackup}
+              backupErrors={backupErrors}
+            />
+          )}
+          {deleteModalVisible && (
+            <DeleteModal
+              title={Messages.backupInventory.deleteModalTitle}
+              message={Messages.backupInventory.getDeleteMessage(selectedBackup?.name || '')}
+              isVisible
+              setVisible={setDeleteModalVisible}
+              forceLabel={Messages.backupInventory.deleteFromStorage}
+              onDelete={handleDelete}
+              initialForceValue={true}
+              loading={deletePending}
+              showForce
+            />
+          )}
+          {logsModalVisible && (
+            <BackupLogsModal
+              title={Messages.backupInventory.getLogsTitle(selectedBackup?.name || '')}
+              isVisible
+              onClose={handleLogsClose}
+              getLogChunks={getLogs}
+            />
+          )}
+        </FeatureLoader>
+      </Page.Contents>
+    </Page>
   );
 };
+
+export default BackupInventory;

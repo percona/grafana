@@ -42,13 +42,32 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
   id: 'backup',
   icon: 'history',
   text: 'Backup',
+  subTitle: 'Percona Backups',
   url: `${getConfig().appSubUrl}/backup`,
   children: [
     {
-      id: 'backup',
-      icon: 'history',
-      text: 'Backup',
-      url: `${getConfig().appSubUrl}/backup`,
+      id: 'backup-inventory',
+      text: 'Backup Inventory',
+      url: `${getConfig().appSubUrl}/backup/inventory`,
+      hideFromMenu: true,
+    },
+    {
+      id: 'restore-history',
+      text: 'Restore History',
+      url: `${getConfig().appSubUrl}/backup/restore`,
+      hideFromMenu: true,
+    },
+    {
+      id: 'scheduled-backups',
+      text: 'Scheduled Backups',
+      url: `${getConfig().appSubUrl}/backup/scheduled`,
+      hideFromMenu: true,
+    },
+    {
+      id: 'storage-locations',
+      text: 'Storage Locations',
+      url: `${getConfig().appSubUrl}/backup/locations`,
+      hideFromMenu: true,
     },
   ],
 };

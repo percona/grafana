@@ -423,11 +423,44 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     {
       path: '/backup',
-      component: SafeDynamicImport(() => import(/* webpackChunkName: "BackupPage" */ 'app/percona/backup/BackupPage')),
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/backup/inventory" />,
     },
     {
-      path: '/backup/:tab',
-      component: SafeDynamicImport(() => import(/* webpackChunkName: "BackupPage" */ 'app/percona/backup/BackupPage')),
+      path: '/backup/inventory',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/backup/components/BackupInventory/BackupInventory'
+          )
+      ),
+    },
+    {
+      path: '/backup/restore',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "BackupRestorePage" */ 'app/percona/backup/components/RestoreHistory/RestoreHistory'
+          )
+      ),
+    },
+    {
+      path: '/backup/scheduled',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "BackupScheduledPage" */ 'app/percona/backup/components/ScheduledBackups/ScheduledBackups'
+          )
+      ),
+    },
+    {
+      path: '/backup/locations',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "BackupLocationsPage" */ 'app/percona/backup/components/StorageLocations/StorageLocations'
+          )
+      ),
     },
     {
       path: '/pmm-database-checks',
