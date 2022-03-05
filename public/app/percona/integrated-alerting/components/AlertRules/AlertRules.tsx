@@ -41,7 +41,7 @@ export const AlertRules: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = useNavModel('integrated-alerting-rules');
+  const navModel = useNavModel('integrated-alerting-rules', true);
   const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule | null>();
   const [data, setData] = useState<AlertRule[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_ID);

@@ -38,7 +38,7 @@ const {
 export const Alerts: FC = () => {
   const style = useStyles(getStyles);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = useNavModel('integrated-alerting-alerts');
+  const navModel = useNavModel('integrated-alerting-alerts', true);
   const [data, setData] = useState<Alert[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULE_TEMPLATES_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);

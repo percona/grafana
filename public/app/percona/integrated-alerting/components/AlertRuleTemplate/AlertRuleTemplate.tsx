@@ -29,7 +29,7 @@ export const AlertRuleTemplate: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = useNavModel('integrated-alerting-templates');
+  const navModel = useNavModel('integrated-alerting-templates', true);
   const [data, setData] = useState<FormattedTemplate[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULE_TEMPLATES_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);

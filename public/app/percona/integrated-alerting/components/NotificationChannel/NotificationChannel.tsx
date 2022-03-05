@@ -29,7 +29,7 @@ export const NotificationChannel: FC = () => {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = useNavModel('integrated-alerting-notification-channels');
+  const navModel = useNavModel('integrated-alerting-notification-channels', true);
   const [data, setData] = useState<Channel[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);

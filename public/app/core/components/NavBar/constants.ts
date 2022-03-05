@@ -84,6 +84,12 @@ export const PMM_ALERTING_PAGE: NavModelItem = {
   text: 'Integrated Alerting',
   url: `${getConfig().appSubUrl}/integrated-alerting`,
   subTitle: 'Percona Integrated Alerting',
+  breadcrumbs: [
+    {
+      title: 'Integrated Alerting',
+      url: '/integrated-alerting',
+    },
+  ],
   children: [
     {
       id: 'integrated-alerting-alerts',
