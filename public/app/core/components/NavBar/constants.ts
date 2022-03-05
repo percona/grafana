@@ -53,7 +53,7 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
   breadcrumbs: [
     {
       title: 'Backup',
-      url: '/backup',
+      url: `${getConfig().appSubUrl}/backup`,
     },
   ],
   children: [
@@ -93,7 +93,7 @@ export const PMM_ALERTING_PAGE: NavModelItem = {
   breadcrumbs: [
     {
       title: 'Integrated Alerting',
-      url: '/integrated-alerting',
+      url: `${getConfig().appSubUrl}/integrated-alerting`,
     },
   ],
   children: [
