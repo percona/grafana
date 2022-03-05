@@ -30,7 +30,7 @@ export const StorageLocations: FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<StorageLocation | null>(null);
   const [data, setData] = useState<StorageLocation[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const navModel = useNavModel('storage-locations');
+  const navModel = useNavModel('storage-locations', true);
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
     (): Array<Column<StorageLocation>> => [

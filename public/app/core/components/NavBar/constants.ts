@@ -44,6 +44,12 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
   text: 'Backup',
   subTitle: 'Percona Backups',
   url: `${getConfig().appSubUrl}/backup`,
+  breadcrumbs: [
+    {
+      title: 'Backup',
+      url: '/backup',
+    },
+  ],
   children: [
     {
       id: 'backup-inventory',

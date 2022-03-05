@@ -24,7 +24,7 @@ import { DATA_INTERVAL, LIST_RESTORES_CANCEL_TOKEN } from './RestoreHistory.cons
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Restore[]>([]);
-  const navModel = useNavModel('restore-history');
+  const navModel = useNavModel('restore-history', true);
   const [generateToken] = useCancelToken();
   const [triggerTimeout] = useRecurringCall();
   const columns = useMemo(

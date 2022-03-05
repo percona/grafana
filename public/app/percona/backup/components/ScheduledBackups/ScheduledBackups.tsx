@@ -39,7 +39,7 @@ export const ScheduledBackups: FC = () => {
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const navModel = useNavModel('scheduled-backups');
+  const navModel = useNavModel('scheduled-backups', true);
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
 

@@ -48,7 +48,7 @@ export const BackupInventory: FC = () => {
   const [data, setData] = useState<Backup[]>([]);
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
-  const navModel = useNavModel('backup-inventory');
+  const navModel = useNavModel('backup-inventory', true);
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const columns = useMemo(
