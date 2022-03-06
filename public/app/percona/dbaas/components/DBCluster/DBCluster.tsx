@@ -1,10 +1,13 @@
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useStyles } from '@grafana/ui';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavModel } from 'app/core/hooks/useNavModel';
+import Page from 'app/core/components/Page/Page';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { StoreState } from 'app/types';
+import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { Table } from 'app/percona/shared/components/Elements/Table';
-import { Settings } from 'app/percona/settings/Settings.types';
-import { getKubernetes } from 'app/percona/shared/core/selectors';
-import { SettingsService } from 'app/percona/settings/Settings.service';
+import { getKubernetes, getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { getStyles } from './DBCluster.styles';
@@ -22,8 +25,12 @@ import {
   clusterActionsRender,
 } from './ColumnRenderers/ColumnRenderers';
 import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModal';
-import { logger } from '@percona/platform-core';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
+import { fetchKubernetesAction } from 'app/percona/shared/core/reducers';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
+import { EmptyBlock } from 'app/percona/shared/components/Elements/EmptyBlock';
+import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 
 export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
@@ -33,10 +40,12 @@ export const DBCluster: FC = () => {
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<Cluster>();
+  const navModel = useNavModel('dbclusters', true);
+  const dispatch = useDispatch();
+  const [generateToken] = useCancelToken();
+  const settings = useSelector(getPerconaSettings);
   const { result: kubernetes = [] } = useSelector(getKubernetes);
   const [dbClusters, getDBClusters, setLoading, loading] = useDBClusters(kubernetes);
-  const [settings, setSettings] = useState<Settings>();
-  const [settingsLoading, setSettingsLoading] = useState(true);
 
   const columns = useMemo(
     () => [
@@ -92,73 +101,88 @@ export const DBCluster: FC = () => {
   const getRowKey = useCallback(({ original }) => `${original.kubernetesClusterName}${original.clusterName}`, []);
 
   useEffect(() => {
-    const getSettings = async () => {
-      try {
-        setSettingsLoading(true);
-        const settings = await SettingsService.getSettings();
-        setSettings(settings);
-      } catch (e) {
-        logger.error(e);
-      } finally {
-        setSettingsLoading(false);
-      }
-    };
-
-    getSettings();
-  }, []);
-
-  useEffect(() => {
     if (!deleteModalVisible && !editModalVisible && !logsModalVisible && !updateModalVisible) {
       setSelectedCluster(undefined);
     }
   }, [deleteModalVisible, editModalVisible, logsModalVisible, updateModalVisible]);
 
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.dbaasEnabled, []);
+
+  useEffect(() => {
+    dispatch(
+      fetchKubernetesAction({
+        kubernetes: generateToken(GET_KUBERNETES_CANCEL_TOKEN),
+        operator: generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN),
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <div>
-      <div className={styles.actionPanel}>
-        <AddNewClusterButton />
-      </div>
-      <AddDBClusterModal
-        kubernetes={kubernetes}
-        isVisible={addModalVisible}
-        setVisible={setAddModalVisible}
-        onDBClusterAdded={getDBClusters}
-        showMonitoringWarning={settingsLoading || !settings?.publicAddress}
-      />
-      <DeleteDBClusterModal
-        isVisible={deleteModalVisible}
-        setVisible={setDeleteModalVisible}
-        setLoading={setLoading}
-        onClusterDeleted={getDBClusters}
-        selectedCluster={selectedCluster}
-      />
-      {selectedCluster && (
-        <EditDBClusterModal
-          isVisible={editModalVisible}
-          setVisible={setEditModalVisible}
-          onDBClusterChanged={getDBClusters}
-          selectedCluster={selectedCluster}
-        />
-      )}
-      {logsModalVisible && (
-        <DBClusterLogsModal isVisible={logsModalVisible} setVisible={setLogsModalVisible} dbCluster={selectedCluster} />
-      )}
-      {selectedCluster && updateModalVisible && (
-        <UpdateDBClusterModal
-          dbCluster={selectedCluster}
-          isVisible={updateModalVisible}
-          setVisible={setUpdateModalVisible}
-          setLoading={setLoading}
-          onUpdateFinished={getDBClusters}
-        />
-      )}
-      <Table
-        columns={columns}
-        data={dbClusters}
-        loading={loading}
-        noData={<AddNewClusterButton />}
-        rowKey={getRowKey}
-      />
-    </div>
+    <Page navModel={navModel}>
+      <Page.Contents>
+        <TechnicalPreview />
+        <FeatureLoader featureName={Messages.dbaas} featureSelector={featureSelector}>
+          {kubernetes.length === 0 || isKubernetesListUnavailable(kubernetes) ? (
+            <EmptyBlock>
+              <h1>{Messages.kubernetes.noClusters}</h1>
+            </EmptyBlock>
+          ) : (
+            <div>
+              <div className={styles.actionPanel}>
+                <AddNewClusterButton />
+              </div>
+              <AddDBClusterModal
+                kubernetes={kubernetes}
+                isVisible={addModalVisible}
+                setVisible={setAddModalVisible}
+                onDBClusterAdded={getDBClusters}
+                showMonitoringWarning={settings.isLoading || !settings?.publicAddress}
+              />
+              <DeleteDBClusterModal
+                isVisible={deleteModalVisible}
+                setVisible={setDeleteModalVisible}
+                setLoading={setLoading}
+                onClusterDeleted={getDBClusters}
+                selectedCluster={selectedCluster}
+              />
+              {selectedCluster && (
+                <EditDBClusterModal
+                  isVisible={editModalVisible}
+                  setVisible={setEditModalVisible}
+                  onDBClusterChanged={getDBClusters}
+                  selectedCluster={selectedCluster}
+                />
+              )}
+              {logsModalVisible && (
+                <DBClusterLogsModal
+                  isVisible={logsModalVisible}
+                  setVisible={setLogsModalVisible}
+                  dbCluster={selectedCluster}
+                />
+              )}
+              {selectedCluster && updateModalVisible && (
+                <UpdateDBClusterModal
+                  dbCluster={selectedCluster}
+                  isVisible={updateModalVisible}
+                  setVisible={setUpdateModalVisible}
+                  setLoading={setLoading}
+                  onUpdateFinished={getDBClusters}
+                />
+              )}
+              <Table
+                columns={columns}
+                data={dbClusters}
+                loading={loading}
+                noData={<AddNewClusterButton />}
+                rowKey={getRowKey}
+              />
+            </div>
+          )}
+        </FeatureLoader>
+      </Page.Contents>
+    </Page>
   );
 };
+
+export default DBCluster;

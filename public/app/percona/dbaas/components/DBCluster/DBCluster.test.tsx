@@ -1,7 +1,6 @@
 import React from 'react';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { DBCluster } from './DBCluster';
-import { kubernetesStub } from '../Kubernetes/__mocks__/kubernetesStubs';
 import { dbClustersStub } from './__mocks__/dbClustersStubs';
 import { formatDBClusterVersion } from './DBCluster.utils';
 import { render, screen } from '@testing-library/react';
@@ -22,27 +21,27 @@ jest.mock('@percona/platform-core', () => {
 
 describe('DBCluster::', () => {
   it('renders correctly without clusters', async () => {
-    render(<DBCluster kubernetes={[]} />);
+    render(<DBCluster />);
     expect(await screen.getAllByTestId('dbcluster-add-cluster-button')).toHaveLength(2);
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   it('renders correctly with clusters', async () => {
-    render(<DBCluster kubernetes={kubernetesStub} />);
+    render(<DBCluster />);
 
     expect(await screen.getAllByTestId('dbcluster-add-cluster-button')).toHaveLength(1);
     expect(screen.getAllByRole('row')).toHaveLength(6);
   });
 
   it('renders correctly with failed status', async () => {
-    render(<DBCluster kubernetes={kubernetesStub} />);
+    render(<DBCluster />);
 
     expect(await screen.getAllByTestId('cluster-progress-bar').length).toBeGreaterThan(0);
     expect(await screen.getAllByTestId('cluster-status-error-message').length).toBeGreaterThan(0);
   });
 
   it('renders database types correctly', async () => {
-    render(<DBCluster kubernetes={kubernetesStub} />);
+    render(<DBCluster />);
 
     expect(screen.getAllByRole('cell')[1].textContent).toEqual(
       `${DATABASE_LABELS[dbClustersStub[0].databaseType]} ${formatDBClusterVersion(dbClustersStub[0].installedImage)}`

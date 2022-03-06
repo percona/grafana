@@ -4,6 +4,11 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { Column } from 'react-table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal, CheckboxField } from '@percona/platform-core';
+import { useNavModel } from 'app/core/hooks/useNavModel';
+import Page from 'app/core/components/Page/Page';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { StoreState } from 'app/types';
+import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { fetchKubernetesAction, deleteKubernetesAction, addKubernetesAction } from 'app/percona/shared/core/reducers';
 import {
   getKubernetes as getKubernetesSelector,
@@ -34,6 +39,7 @@ import {
 export const KubernetesInventory: FC = () => {
   const styles = useStyles(getStyles);
   const dispatch = useDispatch();
+  const navModel = useNavModel('kubernetes', true);
   const [selectedCluster, setSelectedCluster] = useState<Kubernetes | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [viewConfigModalVisible, setViewConfigModalVisible] = useState(false);
@@ -121,6 +127,8 @@ export const KubernetesInventory: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.dbaasEnabled, []);
+
   useEffect(() => {
     dispatch(
       fetchKubernetesAction({
@@ -132,75 +140,84 @@ export const KubernetesInventory: FC = () => {
   }, []);
 
   return (
-    <div>
-      <div className={styles.actionPanel}>
-        <AddNewClusterButton />
-      </div>
-      {selectedCluster && (
-        <ViewClusterConfigModal
-          isVisible={viewConfigModalVisible}
-          setVisible={() => setViewConfigModalVisible(false)}
-          selectedCluster={selectedCluster}
-        />
-      )}
-      <AddKubernetesModal
-        isVisible={addModalVisible}
-        addKubernetes={addKubernetes}
-        setAddModalVisible={setAddModalVisible}
-      />
-      <Modal
-        title={Messages.kubernetes.deleteModal.title}
-        isVisible={deleteModalVisible}
-        onClose={() => setDeleteModalVisible(false)}
-      >
-        <Form
-          onSubmit={() => {}}
-          render={({ form, handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <>
-                <h4 className={styles.deleteModalContent}>{Messages.kubernetes.deleteModal.confirmMessage}</h4>
-                <CheckboxField name="force" label={Messages.kubernetes.deleteModal.labels.force} />
-                <HorizontalGroup justify="space-between" spacing="md">
-                  <Button
-                    variant="secondary"
-                    size="md"
-                    onClick={() => setDeleteModalVisible(false)}
-                    data-testid="cancel-delete-kubernetes-button"
-                  >
-                    {Messages.kubernetes.deleteModal.cancel}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="md"
-                    onClick={() => deleteKubernetesCluster(Boolean(form.getState().values.force))}
-                    data-testid="delete-kubernetes-button"
-                  >
-                    {Messages.kubernetes.deleteModal.confirm}
-                  </Button>
-                </HorizontalGroup>
-              </>
-            </form>
-          )}
-        />
-      </Modal>
-      {selectedCluster && manageComponentsModalVisible && (
-        <ManageComponentsVersionsModal
-          selectedKubernetes={selectedCluster}
-          isVisible={manageComponentsModalVisible}
-          setVisible={setManageComponentsModalVisible}
-        />
-      )}
-      {selectedCluster && operatorToUpdate && updateOperatorModalVisible && (
-        <UpdateOperatorModal
-          kubernetesClusterName={selectedCluster.kubernetesClusterName}
-          isVisible={updateOperatorModalVisible}
-          selectedOperator={operatorToUpdate}
-          setVisible={setUpdateOperatorModalVisible}
-          setSelectedCluster={setSelectedCluster}
-          setOperatorToUpdate={setOperatorToUpdate}
-        />
-      )}
-      <Table columns={columns} data={kubernetes} loading={loading} noData={<AddNewClusterButton />} />
-    </div>
+    <Page navModel={navModel}>
+      <Page.Contents>
+        <TechnicalPreview />
+        <FeatureLoader featureName={Messages.dbaas} featureSelector={featureSelector}>
+          <div>
+            <div className={styles.actionPanel}>
+              <AddNewClusterButton />
+            </div>
+            {selectedCluster && (
+              <ViewClusterConfigModal
+                isVisible={viewConfigModalVisible}
+                setVisible={() => setViewConfigModalVisible(false)}
+                selectedCluster={selectedCluster}
+              />
+            )}
+            <AddKubernetesModal
+              isVisible={addModalVisible}
+              addKubernetes={addKubernetes}
+              setAddModalVisible={setAddModalVisible}
+            />
+            <Modal
+              title={Messages.kubernetes.deleteModal.title}
+              isVisible={deleteModalVisible}
+              onClose={() => setDeleteModalVisible(false)}
+            >
+              <Form
+                onSubmit={() => {}}
+                render={({ form, handleSubmit }) => (
+                  <form onSubmit={handleSubmit}>
+                    <>
+                      <h4 className={styles.deleteModalContent}>{Messages.kubernetes.deleteModal.confirmMessage}</h4>
+                      <CheckboxField name="force" label={Messages.kubernetes.deleteModal.labels.force} />
+                      <HorizontalGroup justify="space-between" spacing="md">
+                        <Button
+                          variant="secondary"
+                          size="md"
+                          onClick={() => setDeleteModalVisible(false)}
+                          data-testid="cancel-delete-kubernetes-button"
+                        >
+                          {Messages.kubernetes.deleteModal.cancel}
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="md"
+                          onClick={() => deleteKubernetesCluster(Boolean(form.getState().values.force))}
+                          data-testid="delete-kubernetes-button"
+                        >
+                          {Messages.kubernetes.deleteModal.confirm}
+                        </Button>
+                      </HorizontalGroup>
+                    </>
+                  </form>
+                )}
+              />
+            </Modal>
+            {selectedCluster && manageComponentsModalVisible && (
+              <ManageComponentsVersionsModal
+                selectedKubernetes={selectedCluster}
+                isVisible={manageComponentsModalVisible}
+                setVisible={setManageComponentsModalVisible}
+              />
+            )}
+            {selectedCluster && operatorToUpdate && updateOperatorModalVisible && (
+              <UpdateOperatorModal
+                kubernetesClusterName={selectedCluster.kubernetesClusterName}
+                isVisible={updateOperatorModalVisible}
+                selectedOperator={operatorToUpdate}
+                setVisible={setUpdateOperatorModalVisible}
+                setSelectedCluster={setSelectedCluster}
+                setOperatorToUpdate={setOperatorToUpdate}
+              />
+            )}
+            <Table columns={columns} data={kubernetes} loading={loading} noData={<AddNewClusterButton />} />
+          </div>
+        </FeatureLoader>
+      </Page.Contents>
+    </Page>
   );
 };
+
+export default KubernetesInventory;

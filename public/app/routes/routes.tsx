@@ -415,11 +415,23 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     {
       path: '/dbaas',
-      component: SafeDynamicImport(() => import(/* webpackChunkName: "DbaasPage" */ 'app/percona/dbaas/DBaaS')),
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/dbaas/kubernetes" />,
     },
     {
-      path: '/dbaas/:tab',
-      component: SafeDynamicImport(() => import(/* webpackChunkName: "DbaasPage" */ 'app/percona/dbaas/DBaaS')),
+      path: '/dbaas/kubernetes',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "DbaaSKubernetesPage" */ 'app/percona/dbaas/components/Kubernetes/KubernetesInventory'
+          )
+      ),
+    },
+    {
+      path: '/dbaas/dbclusters',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "DbaaSClustersPage" */ 'app/percona/dbaas/components/DBCluster/DBCluster')
+      ),
     },
     {
       path: '/backup',

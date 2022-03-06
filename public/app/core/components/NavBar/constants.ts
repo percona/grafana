@@ -32,14 +32,27 @@ export const PMM_STT_PAGE: NavModelItem = {
 export const PMM_DBAAS_PAGE: NavModelItem = {
   id: 'dbaas',
   text: 'DBaaS',
+  subTitle: 'Percona DBaaS',
   icon: 'database',
   url: `${getConfig().appSubUrl}/dbaas`,
+  breadcrumbs: [
+    {
+      title: 'DBaaS',
+      url: `${getConfig().appSubUrl}/dbaas`,
+    },
+  ],
   children: [
     {
-      id: 'dbaas',
-      text: 'DBaaS',
-      icon: 'database',
-      url: `${getConfig().appSubUrl}/dbaas`,
+      id: 'kubernetes',
+      text: 'Kubernetes Cluster',
+      url: `${getConfig().appSubUrl}/dbaas/kubernetes`,
+      hideFromMenu: true,
+    },
+    {
+      id: 'dbclusters',
+      text: 'DB Cluster',
+      url: `${getConfig().appSubUrl}/dbaas/dbclusters`,
+      hideFromMenu: true,
     },
   ],
 };

@@ -34,8 +34,9 @@ export interface Kubernetes {
   status: KubernetesClusterStatus;
 }
 
+export type AddKubernetesAction = (kubernetesToAdd: NewKubernetesCluster) => void;
 export type SetKubernetesLoadingAction = (loading: boolean) => void;
-export type ManageKubernetes = [Kubernetes[], SetKubernetesLoadingAction];
+export type ManageKubernetes = [Kubernetes[], SetKubernetesLoadingAction, boolean];
 
 interface KubeAuth {
   kubeconfig: string;
@@ -90,4 +91,10 @@ export interface NewKubernetesCluster {
   isEKS: boolean;
   awsAccessKeyID?: string;
   awsSecretAccessKey?: string;
+}
+
+export interface KubernetesProps {
+  kubernetes: Kubernetes[];
+  setLoading: SetKubernetesLoadingAction;
+  loading: boolean;
 }

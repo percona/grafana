@@ -23,10 +23,8 @@ describe('UpdateOperatorModal::', () => {
         isVisible
         selectedOperator={operator}
         setVisible={jest.fn()}
-        setLoading={jest.fn()}
         setSelectedCluster={jest.fn()}
         setOperatorToUpdate={jest.fn()}
-        onOperatorUpdated={jest.fn()}
       />
     );
     const message = 'PXC 1.7.0 to version 1.8.0 in test_cluster';
@@ -42,10 +40,8 @@ describe('UpdateOperatorModal::', () => {
         isVisible
         selectedOperator={operator}
         setVisible={jest.fn()}
-        setLoading={jest.fn()}
         setSelectedCluster={jest.fn()}
         setOperatorToUpdate={jest.fn()}
-        onOperatorUpdated={onOperatorUpdated}
       />
     );
 
@@ -66,10 +62,8 @@ describe('UpdateOperatorModal::', () => {
         isVisible
         selectedOperator={operator}
         setVisible={setVisible}
-        setLoading={jest.fn()}
         setSelectedCluster={setSelectedCluster}
         setOperatorToUpdate={setOperatorToUpdate}
-        onOperatorUpdated={jest.fn()}
       />
     );
 
