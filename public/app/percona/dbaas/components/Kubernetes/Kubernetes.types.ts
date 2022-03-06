@@ -34,18 +34,8 @@ export interface Kubernetes {
   status: KubernetesClusterStatus;
 }
 
-export type DeleteKubernetesAction = (kubernetesToDelete: Kubernetes, force?: boolean) => void;
-export type AddKubernetesAction = (kubernetesToAdd: NewKubernetesCluster) => void;
-export type GetKubernetesAction = () => void;
 export type SetKubernetesLoadingAction = (loading: boolean) => void;
-export type ManageKubernetes = [
-  Kubernetes[],
-  DeleteKubernetesAction,
-  AddKubernetesAction,
-  GetKubernetesAction,
-  SetKubernetesLoadingAction,
-  boolean
-];
+export type ManageKubernetes = [Kubernetes[], SetKubernetesLoadingAction];
 
 interface KubeAuth {
   kubeconfig: string;
@@ -100,13 +90,4 @@ export interface NewKubernetesCluster {
   isEKS: boolean;
   awsAccessKeyID?: string;
   awsSecretAccessKey?: string;
-}
-
-export interface KubernetesProps {
-  kubernetes: Kubernetes[];
-  deleteKubernetes: DeleteKubernetesAction;
-  addKubernetes: AddKubernetesAction;
-  getKubernetes: GetKubernetesAction;
-  setLoading: SetKubernetesLoadingAction;
-  loading: boolean;
 }

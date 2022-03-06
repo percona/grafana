@@ -1,12 +1,14 @@
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useStyles } from '@grafana/ui';
+import { useSelector } from 'react-redux';
 import { Table } from 'app/percona/shared/components/Elements/Table';
 import { Settings } from 'app/percona/settings/Settings.types';
+import { getKubernetes } from 'app/percona/shared/core/selectors';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { getStyles } from './DBCluster.styles';
-import { DBCluster as Cluster, DBClusterProps } from './DBCluster.types';
+import { DBCluster as Cluster } from './DBCluster.types';
 import { AddDBClusterModal } from './AddDBClusterModal/AddDBClusterModal';
 import { EditDBClusterModal } from './EditDBClusterModal/EditDBClusterModal';
 import { DBClusterLogsModal } from './DBClusterLogsModal/DBClusterLogsModal';
@@ -23,7 +25,7 @@ import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModa
 import { logger } from '@percona/platform-core';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
 
-export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
+export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -31,6 +33,7 @@ export const DBCluster: FC<DBClusterProps> = ({ kubernetes }) => {
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<Cluster>();
+  const { result: kubernetes = [] } = useSelector(getKubernetes);
   const [dbClusters, getDBClusters, setLoading, loading] = useDBClusters(kubernetes);
   const [settings, setSettings] = useState<Settings>();
   const [settingsLoading, setSettingsLoading] = useState(true);

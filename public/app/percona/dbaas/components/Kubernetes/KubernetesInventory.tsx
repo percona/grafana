@@ -1,14 +1,22 @@
 /* eslint-disable react/display-name */
-import React, { FC, useCallback, useState, useMemo } from 'react';
+import React, { FC, useCallback, useState, useMemo, useEffect } from 'react';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { Column } from 'react-table';
+import { useDispatch, useSelector } from 'react-redux';
 import { Modal, CheckboxField } from '@percona/platform-core';
+import { fetchKubernetesAction, deleteKubernetesAction, addKubernetesAction } from 'app/percona/shared/core/reducers';
+import {
+  getKubernetes as getKubernetesSelector,
+  getDeleteKubernetes,
+  getAddKubernetes,
+} from 'app/percona/shared/core/selectors';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { Form } from 'react-final-form';
 import { Databases } from 'app/percona/shared/core';
 import { getStyles } from './Kubernetes.styles';
-import { KubernetesProps, Kubernetes, OperatorToUpdate } from './Kubernetes.types';
+import { Kubernetes, OperatorToUpdate, NewKubernetesCluster } from './Kubernetes.types';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { OperatorStatusItem } from './OperatorStatusItem/OperatorStatusItem';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus';
@@ -17,16 +25,15 @@ import { ViewClusterConfigModal } from './ViewClusterConfigModal/ViewClusterConf
 import { ManageComponentsVersionsModal } from './ManageComponentsVersionsModal/ManageComponentsVersionsModal';
 import { UpdateOperatorModal } from './OperatorStatusItem/KubernetesOperatorStatus/UpdateOperatorModal/UpdateOperatorModal';
 import { AddKubernetesModal } from './AddKubernetesModal/AddKubernetesModal';
+import {
+  GET_KUBERNETES_CANCEL_TOKEN,
+  CHECK_OPERATOR_UPDATE_CANCEL_TOKEN,
+  DELETE_KUBERNETES_CANCEL_TOKEN,
+} from './Kubernetes.constants';
 
-export const KubernetesInventory: FC<KubernetesProps> = ({
-  kubernetes,
-  deleteKubernetes,
-  addKubernetes,
-  getKubernetes,
-  setLoading,
-  loading,
-}) => {
+export const KubernetesInventory: FC = () => {
   const styles = useStyles(getStyles);
+  const dispatch = useDispatch();
   const [selectedCluster, setSelectedCluster] = useState<Kubernetes | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [viewConfigModalVisible, setViewConfigModalVisible] = useState(false);
@@ -34,11 +41,16 @@ export const KubernetesInventory: FC<KubernetesProps> = ({
   const [manageComponentsModalVisible, setManageComponentsModalVisible] = useState(false);
   const [operatorToUpdate, setOperatorToUpdate] = useState<OperatorToUpdate | null>(null);
   const [updateOperatorModalVisible, setUpdateOperatorModalVisible] = useState(false);
+  const [generateToken] = useCancelToken();
+  const { result: kubernetes = [], loading: kubernetesLoading } = useSelector(getKubernetesSelector);
+  const { loading: deleteKubernetesLoading } = useSelector(getDeleteKubernetes);
+  const { loading: addKubernetesLoading } = useSelector(getAddKubernetes);
+  const loading = kubernetesLoading || deleteKubernetesLoading || addKubernetesLoading;
 
   const deleteKubernetesCluster = useCallback(
     (force?: boolean) => {
       if (selectedCluster) {
-        deleteKubernetes(selectedCluster, force);
+        dispatch(deleteKubernetesAction({ kubernetesToDelete: selectedCluster, force }));
         setDeleteModalVisible(false);
       }
     },
@@ -103,6 +115,21 @@ export const KubernetesInventory: FC<KubernetesProps> = ({
     ),
     [addModalVisible]
   );
+
+  const addKubernetes = useCallback((cluster: NewKubernetesCluster) => {
+    dispatch(addKubernetesAction({ kubernetesToAdd: cluster, token: generateToken(DELETE_KUBERNETES_CANCEL_TOKEN) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      fetchKubernetesAction({
+        kubernetes: generateToken(GET_KUBERNETES_CANCEL_TOKEN),
+        operator: generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN),
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
@@ -169,10 +196,8 @@ export const KubernetesInventory: FC<KubernetesProps> = ({
           isVisible={updateOperatorModalVisible}
           selectedOperator={operatorToUpdate}
           setVisible={setUpdateOperatorModalVisible}
-          setLoading={setLoading}
           setSelectedCluster={setSelectedCluster}
           setOperatorToUpdate={setOperatorToUpdate}
-          onOperatorUpdated={getKubernetes}
         />
       )}
       <Table columns={columns} data={kubernetes} loading={loading} noData={<AddNewClusterButton />} />
