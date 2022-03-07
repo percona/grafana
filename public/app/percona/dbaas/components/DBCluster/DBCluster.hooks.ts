@@ -1,17 +1,20 @@
 import { useEffect, useState, useCallback } from 'react';
 import { logger } from '@percona/platform-core';
 import { processPromiseResults } from 'app/percona/shared/helpers/promises';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases } from 'app/percona/shared/core';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 import { DBCluster, DBClusterPayload, ManageDBClusters } from './DBCluster.types';
 import { newDBClusterService } from './DBCluster.utils';
 import { DBClusterService } from './DBCluster.service';
+import { GET_CLUSTERS_CANCEL_TOKEN } from './DBCluster.constants';
 
 const RECHECK_INTERVAL = 10000;
 
 export const useDBClusters = (kubernetes: Kubernetes[]): ManageDBClusters => {
   const [dbClusters, setDBClusters] = useState<DBCluster[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generateToken] = useCancelToken();
 
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
@@ -20,7 +23,12 @@ export const useDBClusters = (kubernetes: Kubernetes[]): ManageDBClusters => {
       }
 
       try {
-        const requests = kubernetes.map(DBClusterService.getDBClusters);
+        const requests = kubernetes.map((k) =>
+          DBClusterService.getDBClusters.apply(this, [
+            k,
+            generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}`),
+          ])
+        );
         const results = await processPromiseResults(requests);
         const clustersList: DBCluster[] = results.reduce((acc: DBCluster[], r, index) => {
           if (r.status !== 'fulfilled') {
@@ -44,6 +52,7 @@ export const useDBClusters = (kubernetes: Kubernetes[]): ManageDBClusters => {
         }
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [kubernetes]
   );
 
