@@ -27,6 +27,6 @@ describe('TicketsPage', () => {
 
   it('renders PageWrapper', async () => {
     await render(<TicketsPage />);
-    expect(screen.queryByText('Tickets')).toBeInTheDocument();
+    expect(screen.getByTestId('page-wrapper-tickets')).toBeInTheDocument();
   });
 });

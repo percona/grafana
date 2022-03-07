@@ -6,7 +6,7 @@ const BASE_URL = '/v1/Platform';
 
 export const TicketsService = {
   async list(token?: CancelToken): Promise<Ticket[]> {
-    const { tickets = [] } = await api.post<TicketResponse, any>(
+    const { tickets = [] } = await api.post<TicketResponse, {}>(
       `${BASE_URL}/SearchOrganizationTickets`,
       {},
       false,

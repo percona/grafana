@@ -4,26 +4,22 @@ import { useSelector } from 'react-redux';
 import { StoreState } from 'app/types';
 import { Table } from '../integrated-alerting/components/Table';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
-import { DATA_INTERVAL, LIST_TICKETS_CANCEL_TOKEN, PAGE_MODEL } from './Tickets.constants';
+import { LIST_TICKETS_CANCEL_TOKEN, PAGE_MODEL } from './Tickets.constants';
 import { logger } from '@percona/platform-core';
 import { isApiCancelError } from '../shared/helpers/api';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { TicketsService } from './Tickets.service';
 import { Ticket } from './Tickets.types';
-import { useRecurringCall } from '../backup/hooks/recurringCall.hook';
 import { useStyles } from '@grafana/ui';
 import { getStyles } from './Tickets.styles';
 import { Messages } from './Tickets.messages';
-import { css } from '@emotion/css';
-import { palette } from '@grafana/data/src/themes/palette';
 
 export const TicketsPage: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Ticket[]>([]);
   const connected = useSelector((state: StoreState) => !!state.perconaSettings.isConnectedToPortal);
   const [generateToken] = useCancelToken();
-  const [triggerTimeout] = useRecurringCall();
   const styles = useStyles(getStyles);
 
   const columns = useMemo(
@@ -78,7 +74,7 @@ export const TicketsPage: FC = () => {
 
   useEffect(() => {
     if (connected === true) {
-      getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
+      getData(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected]);
@@ -90,23 +86,16 @@ export const TicketsPage: FC = () => {
   const getRowProps = (row: Row<Ticket>) => ({
     key: 'row',
     onClick: () => redirect(row.original.url),
-    className: css`
-      cursor: pointer;
-      &:hover {
-        background-color: ${palette.gray15};
-      }
-    `,
+    className: styles.rowProps,
   });
 
   const getCellProps = () => ({
     key: 'cell',
-    className: css`
-      background-color: transparent !important;
-    `,
+    className: styles.cellProps,
   });
 
   return (
-    <PageWrapper pageModel={PAGE_MODEL}>
+    <PageWrapper pageModel={PAGE_MODEL} dataTestId={'page-wrapper-tickets'}>
       <PlatformConnectedLoader>
         <div className={styles.pageWrapper}>
           <Table
