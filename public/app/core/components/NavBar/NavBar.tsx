@@ -42,7 +42,7 @@ export const NavBar: FC = React.memo(() => {
   const theme = useTheme2();
   const styles = getStyles(theme);
   const location = useLocation();
-  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = useSelector(getPerconaSettings);
+  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled, isConnectedToPortal } = useSelector(getPerconaSettings);
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
@@ -89,6 +89,15 @@ export const NavBar: FC = React.memo(() => {
         icon: 'history',
         text: 'Backup',
         url: `${config.appSubUrl}/backup`,
+      });
+    }
+
+    if (isConnectedToPortal) {
+      topItems.push({
+        id: 'entitlements',
+        icon: 'entitlements',
+        text: 'Entitlements',
+        url: `${config.appSubUrl}/entitlements`,
       });
     }
   }

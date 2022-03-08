@@ -450,6 +450,12 @@ export function getAppRoutes(): RouteDescriptor[] {
         () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/add-instance/panel')
       ),
     },
+    {
+      path: '/entitlements',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/entitlements/EntitlementsPage')
+      ),
+    },
     ...getPluginCatalogRoutes(),
     ...getLiveRoutes(),
     ...getAlertingRoutes(),
