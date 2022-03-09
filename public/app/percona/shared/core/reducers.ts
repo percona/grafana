@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
-import { createAsyncSlice, withAppEvents } from 'app/features/alerting/unified/utils/redux';
+import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
+import { apiManagement } from 'app/percona/shared/helpers/api';
 import { KubernetesService } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.service';
 import {
   CheckOperatorUpdateAPI,
@@ -15,6 +16,8 @@ import {
 import { Settings } from 'app/percona/settings/Settings.types';
 import { KubernetesClusterStatus } from 'app/percona/dbaas/components/Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
+import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
+import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
 
 export interface PerconaSettingsState extends Settings {
   isLoading: boolean;
@@ -178,11 +181,26 @@ export const instalKuberneteslOperatorAction = createAsyncThunk(
   }
 );
 
+export const fetchDBClustersAction = createAsyncThunk(
+  'percona/fetchDBClusters',
+  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }): Promise<DBCluster[]> =>
+    withSerializedError(
+      (async () => {
+        const requests = args.kubernetes.map((k, idx) =>
+          apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', k, true, args.tokens[idx])
+        );
+        const promiseResults = await Promise.all(requests);
+        return formatDBClusters(promiseResults, args.kubernetes);
+      })()
+    )
+);
+
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
 const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOperator', instalKuberneteslOperatorAction)
   .reducer;
+const DBClusterReducer = createAsyncSlice('DBCluster', fetchDBClustersAction).reducer;
 
 export default {
   perconaSettings: perconaSettingsReducers,
@@ -191,4 +209,5 @@ export default {
   deletePerconaKubernetes: deleteKubernetesReducer,
   addPerconaKubernetes: addKubernetesReducer,
   installPerconaKubernetesOperator: installKubernetesOperatorReducer,
+  perconaDBCluster: DBClusterReducer,
 };
