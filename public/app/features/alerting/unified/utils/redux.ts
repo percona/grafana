@@ -4,6 +4,8 @@ import { FetchError } from '@grafana/runtime';
 import { AppEvents } from '@grafana/data';
 
 import { appEvents } from 'app/core/core';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { PERCONA_CANCELLED_ERROR_NAME } from 'app/percona/shared/core';
 
 export interface AsyncRequestState<T> {
   result?: T;
@@ -115,6 +117,7 @@ export function withSerializedError<T>(p: Promise<T>): Promise<T> {
     const err: SerializedError = {
       message: messageFromError(e),
       code: e.statusCode,
+      name: isApiCancelError(e) ? PERCONA_CANCELLED_ERROR_NAME : '',
     };
     throw err;
   });

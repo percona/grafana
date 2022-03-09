@@ -31,3 +31,5 @@ export const OPERATOR_FULL_LABELS = {
   [Databases.mariadb]: '',
   [Databases.haproxy]: '',
 };
+
+export const PERCONA_CANCELLED_ERROR_NAME = 'percona-cancelled-request';
