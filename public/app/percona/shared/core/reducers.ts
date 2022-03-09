@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { combineReducers, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
-import { apiManagement } from 'app/percona/shared/helpers/api';
+import { api, apiManagement } from 'app/percona/shared/helpers/api';
 import { KubernetesService } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.service';
 import {
   CheckOperatorUpdateAPI,
@@ -13,17 +13,47 @@ import {
   Operator,
   OperatorsList,
 } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.types';
-import { Settings } from 'app/percona/settings/Settings.types';
+import {
+  Settings,
+  SettingsAPIChangePayload,
+  SettingsAPIResponse,
+  SettingsPayload,
+} from 'app/percona/settings/Settings.types';
 import { KubernetesClusterStatus } from 'app/percona/dbaas/components/Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
 import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
+import { SettingsService } from 'app/percona/settings/Settings.service';
 
-export interface PerconaSettingsState extends Settings {
-  isLoading: boolean;
-}
+const toSettingsModel = (response: SettingsPayload): Settings => ({
+  awsPartitions: response.aws_partitions,
+  updatesDisabled: response.updates_disabled,
+  telemetryEnabled: response.telemetry_enabled,
+  metricsResolutions: response.metrics_resolutions,
+  dataRetention: response.data_retention,
+  sshKey: response.ssh_key,
+  alertManagerUrl: response.alert_manager_url,
+  alertManagerRules: response.alert_manager_rules,
+  sttEnabled: response.stt_enabled,
+  platformEmail: response.platform_email,
+  azureDiscoverEnabled: response.azurediscover_enabled,
+  dbaasEnabled: response.dbaas_enabled,
+  alertingEnabled: response.alerting_enabled,
+  alertingSettings: {
+    email: response.email_alerting_settings || {},
+    slack: response.slack_alerting_settings || {},
+  },
+  publicAddress: response.pmm_public_address,
+  sttCheckIntervals: {
+    rareInterval: response.stt_check_intervals.rare_interval,
+    standardInterval: response.stt_check_intervals.standard_interval,
+    frequentInterval: response.stt_check_intervals.frequent_interval,
+  },
+  backupEnabled: response.backup_management_enabled,
+  isConnectedToPortal: response.connected_to_platform,
+});
 
-export const initialSettingsState: PerconaSettingsState = {
+const initialSettingsState: Settings = {
   updatesDisabled: true,
   telemetryEnabled: false,
   backupEnabled: false,
@@ -56,35 +86,16 @@ export const initialSettingsState: PerconaSettingsState = {
     standardInterval: '10s',
     frequentInterval: '10s',
   },
-  isLoading: true,
 };
-
-const perconaSettingsSlice = createSlice({
-  name: 'perconaSettings',
-  initialState: initialSettingsState,
-  reducers: {
-    setSettings: (state, action: PayloadAction<Partial<PerconaSettingsState>>): PerconaSettingsState => ({
-      ...state,
-      ...action.payload,
-      isLoading: false,
-    }),
-    setSettingsLoading: (state, action: PayloadAction<boolean>): PerconaSettingsState => ({
-      ...state,
-      isLoading: action.payload,
-    }),
-  },
-});
-
-export const { setSettings, setSettingsLoading } = perconaSettingsSlice.actions;
-
-export const perconaSettingsReducers = perconaSettingsSlice.reducer;
 
 export interface PerconaUserState {
   isAuthorized: boolean;
+  isConnectedToPortal: boolean;
 }
 
 export const initialUserState: PerconaUserState = {
   isAuthorized: false,
+  isConnectedToPortal: false,
 };
 
 const perconaUserSlice = createSlice({
@@ -95,10 +106,61 @@ const perconaUserSlice = createSlice({
       ...state,
       isAuthorized: action.payload,
     }),
+    setPortalConnected: (state, action: PayloadAction<boolean>): PerconaUserState => ({
+      ...state,
+      isConnectedToPortal: action.payload,
+    }),
   },
 });
 
-export const { setAuthorized } = perconaUserSlice.actions;
+export const { setAuthorized, setPortalConnected } = perconaUserSlice.actions;
+
+export const fetchSettingsAction = createAsyncThunk(
+  'percona/fetchSettings',
+  (_, thunkAPI): Promise<Settings> =>
+    withSerializedError(
+      (async () => {
+        const settings = await SettingsService.getSettings(undefined, true);
+        thunkAPI.dispatch(setPortalConnected(!!settings.isConnectedToPortal));
+        return settings;
+      })()
+    )
+);
+
+export const updateSettingsAction = createAsyncThunk(
+  'percona/updateSettings',
+  (args: { body: SettingsAPIChangePayload; token?: CancelToken }, thunkAPI): Promise<Settings> =>
+    withAppEvents(
+      withSerializedError(
+        (async () => {
+          // let password = '';
+          let testEmail = '';
+
+          // we save the test email here so that we can sent it all the way down to the form again after re-render
+          // the field is deleted from the payload so as not to be sent to the API
+          if ('email_alerting_settings' in args.body) {
+            // password = args.body.email_alerting_settings.password || '';
+            testEmail = args.body.email_alerting_settings.test_email || '';
+
+            if (testEmail) {
+              args.body.email_alerting_settings.test_email = undefined;
+            }
+          }
+          const { settings }: SettingsAPIResponse = await api.post<any, SettingsAPIChangePayload>(
+            '/v1/Settings/Change',
+            args.body,
+            false,
+            args.token
+          );
+          await thunkAPI.dispatch(fetchSettingsAction());
+          return toSettingsModel(settings);
+        })()
+      ),
+      {
+        successMessage: 'Settings updated',
+      }
+    )
+);
 
 export const perconaUserReducers = perconaUserSlice.reducer;
 
@@ -201,13 +263,18 @@ const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesActi
 const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOperator', instalKuberneteslOperatorAction)
   .reducer;
 const DBClusterReducer = createAsyncSlice('DBCluster', fetchDBClustersAction).reducer;
+const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
+const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 
 export default {
-  perconaSettings: perconaSettingsReducers,
-  perconaUser: perconaUserReducers,
-  perconaKubernetes: kubernetesReducer,
-  deletePerconaKubernetes: deleteKubernetesReducer,
-  addPerconaKubernetes: addKubernetesReducer,
-  installPerconaKubernetesOperator: installKubernetesOperatorReducer,
-  perconaDBCluster: DBClusterReducer,
+  percona: combineReducers({
+    settings: settingsReducer,
+    updateSettings: updateSettingsReducer,
+    user: perconaUserReducers,
+    kubernetes: kubernetesReducer,
+    deleteKubernetes: deleteKubernetesReducer,
+    addKubernetes: addKubernetesReducer,
+    installKubernetesOperator: installKubernetesOperatorReducer,
+    dbCluster: DBClusterReducer,
+  }),
 };

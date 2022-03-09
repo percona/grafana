@@ -17,7 +17,7 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({
   const styles = useStyles(getStyles);
   const featureEnabled = useSelector(featureSelector);
   const { isAuthorized } = useSelector(getPerconaUser);
-  const { isLoading } = useSelector(getPerconaSettings);
+  const { loading } = useSelector(getPerconaSettings);
 
   if (featureEnabled) {
     return <>{children}</>;
@@ -26,7 +26,7 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({
   return (
     <div className={styles.emptyBlock}>
       <EmptyBlock dataTestId="empty-block">
-        {isLoading ? (
+        {loading ? (
           <Spinner />
         ) : isAuthorized ? (
           <>

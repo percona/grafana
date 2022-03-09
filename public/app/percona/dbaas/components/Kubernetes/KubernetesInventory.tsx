@@ -7,13 +7,13 @@ import { Modal, CheckboxField } from '@percona/platform-core';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { StoreState } from 'app/types';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { fetchKubernetesAction, deleteKubernetesAction, addKubernetesAction } from 'app/percona/shared/core/reducers';
 import {
   getKubernetes as getKubernetesSelector,
   getDeleteKubernetes,
   getAddKubernetes,
+  getPerconaSettingFlag,
 } from 'app/percona/shared/core/selectors';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
@@ -127,7 +127,8 @@ export const KubernetesInventory: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.dbaasEnabled, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('dbaasEnabled'), []);
 
   useEffect(() => {
     dispatch(

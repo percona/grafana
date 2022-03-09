@@ -4,7 +4,7 @@ import { useStyles } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { LoaderButton, logger } from '@percona/platform-core';
 import { appEvents } from 'app/core/app_events';
-import { setSettings } from 'app/percona/shared/core/reducers';
+import { setPortalConnected } from 'app/percona/shared/core/reducers';
 import { PlatformService } from '../Platform.service';
 import { Messages } from './Connected.messages';
 import { getStyles } from './Connected.styles';
@@ -19,7 +19,7 @@ export const Connected: FC = () => {
     try {
       await PlatformService.disconnect();
       appEvents.emit(AppEvents.alertSuccess, [Messages.disconnectSucceeded]);
-      dispatch(setSettings({ isConnectedToPortal: false }));
+      dispatch(setPortalConnected(false));
     } catch (e) {
       logger.error(e);
     } finally {

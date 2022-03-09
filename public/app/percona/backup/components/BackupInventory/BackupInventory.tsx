@@ -7,9 +7,9 @@ import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
-import { StoreState } from 'app/types';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
@@ -234,7 +234,8 @@ export const BackupInventory: FC = () => {
     }
   };
 
-  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.backupEnabled, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('backupEnabled'), []);
 
   useEffect(() => {
     getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));

@@ -5,7 +5,7 @@ import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
-import { StoreState } from 'app/types';
+import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/check/components';
 import { ActiveCheck } from 'app/percona/check/types';
@@ -70,7 +70,8 @@ export const FailedChecksTab: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showSilenced]);
 
-  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.sttEnabled, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
   return (
     <Page navModel={navModel}>

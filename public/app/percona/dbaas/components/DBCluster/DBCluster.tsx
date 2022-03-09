@@ -4,10 +4,14 @@ import { useSelector } from 'react-redux';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { StoreState } from 'app/types';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { Table } from 'app/percona/shared/components/Elements/Table';
-import { getKubernetes, getPerconaDBClusters, getPerconaSettings } from 'app/percona/shared/core/selectors';
+import {
+  getKubernetes,
+  getPerconaDBClusters,
+  getPerconaSettingFlag,
+  getPerconaSettings,
+} from 'app/percona/shared/core/selectors';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { getStyles } from './DBCluster.styles';
@@ -46,7 +50,7 @@ export const DBCluster: FC = () => {
   const navModel = useNavModel('dbclusters', true);
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
-  const settings = useSelector(getPerconaSettings);
+  const { result: settings, loading: settingsLoading } = useSelector(getPerconaSettings);
   const { result: kubernetes = [], loading: kubernetesLoading } = useSelector(getKubernetes);
   const { result: dbClusters = [] } = useSelector(getPerconaDBClusters);
   const [catchFromAsyncThunkAction] = useCatchCancellationError();
@@ -138,7 +142,8 @@ export const DBCluster: FC = () => {
     }
   }, [deleteModalVisible, editModalVisible, logsModalVisible, updateModalVisible]);
 
-  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.dbaasEnabled, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('dbaasEnabled'), []);
 
   useEffect(() => {
     dispatch(
@@ -178,7 +183,7 @@ export const DBCluster: FC = () => {
               isVisible={addModalVisible}
               setVisible={setAddModalVisible}
               onDBClusterAdded={getDBClusters}
-              showMonitoringWarning={settings.isLoading || !settings?.publicAddress}
+              showMonitoringWarning={settingsLoading || !settings?.publicAddress}
             />
             <DeleteDBClusterModal
               isVisible={deleteModalVisible}

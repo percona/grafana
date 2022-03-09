@@ -6,7 +6,7 @@ import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
-import { StoreState } from 'app/types';
+import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
@@ -70,7 +70,8 @@ export const RestoreHistory: FC = () => {
     []
   );
 
-  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.backupEnabled, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('backupEnabled'), []);
 
   useEffect(() => {
     const getData = async (showLoading = false) => {

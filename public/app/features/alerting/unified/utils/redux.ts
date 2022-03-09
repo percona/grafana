@@ -15,15 +15,21 @@ export interface AsyncRequestState<T> {
   requestId?: string;
 }
 
-export const initialAsyncRequestState: Pick<
-  AsyncRequestState<undefined>,
-  'loading' | 'dispatched' | 'result' | 'error'
-> = Object.freeze({
-  loading: false,
-  result: undefined,
-  error: undefined,
-  dispatched: false,
-});
+interface AsyncInitialRequestState<T> extends AsyncRequestState<T> {
+  result: T;
+}
+
+export const createInitialAsyncRequestState = <T>(
+  state: T
+): Pick<AsyncInitialRequestState<T>, 'loading' | 'dispatched' | 'result' | 'error'> =>
+  Object.freeze({
+    loading: false,
+    result: state,
+    error: undefined,
+    dispatched: false,
+  });
+
+export const initialAsyncRequestState = createInitialAsyncRequestState(undefined);
 
 export type AsyncRequestMapSlice<T> = Record<string, AsyncRequestState<T>>;
 
@@ -69,11 +75,14 @@ function requestStateReducer<T, ThunkArg = void, ThunkApiConfig = {}>(
  */
 export function createAsyncSlice<T, ThunkArg = void, ThunkApiConfig = {}>(
   name: string,
-  asyncThunk: AsyncThunk<T, ThunkArg, ThunkApiConfig>
+  asyncThunk: AsyncThunk<T, ThunkArg, ThunkApiConfig>,
+  initialState?: T
 ) {
   return createSlice({
     name,
-    initialState: initialAsyncRequestState as AsyncRequestState<T>,
+    initialState: initialState
+      ? createInitialAsyncRequestState(initialState)
+      : (initialAsyncRequestState as AsyncRequestState<T>),
     reducers: {},
     extraReducers: (builder) =>
       builder.addDefaultCase((state, action) =>

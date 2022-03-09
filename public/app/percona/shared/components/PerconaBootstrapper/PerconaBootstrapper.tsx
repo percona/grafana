@@ -1,24 +1,20 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { setSettings, setSettingsLoading, setAuthorized } from 'app/percona/shared/core/reducers';
-import { SettingsService } from 'app/percona/settings/Settings.service';
+import { useAppDispatch } from 'app/store/store';
+import { fetchSettingsAction, setAuthorized } from 'app/percona/shared/core/reducers';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const getSettings = async () => {
       try {
-        dispatch(setSettingsLoading(true));
-        const settings = await SettingsService.getSettings(undefined, true);
-        dispatch(setSettings(settings));
+        await dispatch(fetchSettingsAction()).unwrap();
         dispatch(setAuthorized(true));
       } catch (e) {
         if (e.response?.status === 401) {
           setAuthorized(false);
         }
-        dispatch(setSettingsLoading(false));
       }
     };
 

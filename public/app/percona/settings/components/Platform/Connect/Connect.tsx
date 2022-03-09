@@ -3,7 +3,7 @@ import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { useStyles } from '@grafana/ui';
 import validators from 'app/percona/shared/helpers/validators';
-import { setSettings } from 'app/percona/shared/core/reducers';
+import { setPortalConnected } from 'app/percona/shared/core/reducers';
 import { ConnectRenderProps } from '../types';
 import { Messages } from '../Platform.messages';
 import { getStyles } from './Connect.styles';
@@ -32,7 +32,7 @@ export const Connect: FC = () => {
       setTimeout(() => {
         appEvents.emit(AppEvents.alertSuccess, [Messages.connectSucceeded]);
         setConnecting(false);
-        dispatch(setSettings({ isConnectedToPortal: true }));
+        dispatch(setPortalConnected(true));
       }, CONNECT_DELAY);
     } catch (e) {
       logger.error(e);
