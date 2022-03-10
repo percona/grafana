@@ -1,10 +1,9 @@
 import { css } from '@emotion/css';
-import { GrafanaTheme } from '@grafana/data';
-import { stylesFactory } from '@grafana/ui';
+import { GrafanaTheme2 } from '@grafana/data';
 
 const headerPadding = '10px 0';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
+export const getStyles = ({ v1: { spacing, palette } }: GrafanaTheme2) => ({
   spinner: css`
     display: flex;
     height: 10em;
@@ -32,10 +31,19 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
   showAll: css`
     display: flex;
     align-items: center;
-    margin-right: ${theme.spacing.xl};
+    margin-right: ${spacing.xl};
 
     span {
-      margin-left: ${theme.spacing.sm};
+      margin-left: ${spacing.sm};
     }
   `,
-}));
+  row: css`
+    cursor: pointer;
+    &:hover {
+      background: ${palette.gray15};
+    }
+  `,
+  cell: css`
+    background: transparent !important;
+  `,
+});
