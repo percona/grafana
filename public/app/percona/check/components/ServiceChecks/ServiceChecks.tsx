@@ -40,9 +40,16 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
       {
         Header: 'Labels',
         accessor: 'labels',
+        // eslint-disable-next-line react/display-name
         Cell: ({ value }) => {
           const labels = Object.keys(value);
-          return labels.map((label) => <Chip key={label} text={`${label}:${value[label]}`} />);
+          return (
+            <div className={styles.chips}>
+              {labels.map((label) => (
+                <Chip key={label} text={`${label}:${value[label]}`} />
+              ))}
+            </div>
+          );
         },
       },
       {
@@ -63,7 +70,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
           ) : null,
       },
     ],
-    [styles.link]
+    [styles.link, styles.chips]
   );
 
   const onPaginationChanged = useCallback(
