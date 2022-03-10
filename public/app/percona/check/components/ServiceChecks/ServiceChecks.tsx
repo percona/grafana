@@ -30,10 +30,6 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   const columns = useMemo(
     (): Array<Column<ServiceFailedCheck>> => [
       {
-        Header: 'Service Name',
-        accessor: 'serviceName',
-      },
-      {
         Header: 'Check Name',
         accessor: 'checkName',
       },
@@ -108,6 +104,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
 
   return (
     <PageWrapper pageModel={PAGE_MODEL} dataTestId="db-service-checks">
+      <h3>{Messages.pageTitle(serviceName)}</h3>
       <Table
         showPagination
         data={data}
