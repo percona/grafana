@@ -54,7 +54,7 @@ export const CheckService = {
     }));
   },
   async getFailedCheckForService(
-    serviceName: string,
+    serviceId: string,
     pageSize: number,
     pageIndex: number,
     token?: CancelToken
@@ -64,7 +64,7 @@ export const CheckService = {
       page_totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
     } = await api.post<CheckResultForServicePayload, Object>(
       `${BASE_URL}/FailedChecks`,
-      { service_name: serviceName, page_params: { page_size: pageSize, index: pageIndex } },
+      { service_id: serviceId, page_params: { page_size: pageSize, index: pageIndex } },
       false,
       token
     );

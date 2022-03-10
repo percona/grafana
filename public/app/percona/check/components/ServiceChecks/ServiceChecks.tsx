@@ -15,15 +15,17 @@ import { SERVICE_CHECKS_CANCEL_TOKEN, SERVICE_CHECKS_TABLE_ID } from './ServiceC
 import { Messages } from './ServiceChecks.messages';
 import { getStyles } from './ServiceChecks.styles';
 import { Severity } from 'app/percona/integrated-alerting/components/Severity';
+import { formatServiceId } from '../FailedChecksTab/FailedChecksTab.utils';
 
 export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> = ({ match }) => {
-  const serviceName = match.params.service;
+  const serviceId = formatServiceId(match.params.service);
   const [pageSize, setPageSize] = useStoredTablePageSize(SERVICE_CHECKS_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [data, setData] = useState<ServiceFailedCheck[]>([]);
   const [pending, setPending] = useState(false);
+  const [serviceName, setServiceName] = useState('');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
@@ -89,12 +91,13 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
           data,
           totals: { totalItems, totalPages },
         } = await CheckService.getFailedCheckForService(
-          serviceName,
+          serviceId,
           pageSize,
           pageIndex,
           generateToken(SERVICE_CHECKS_CANCEL_TOKEN)
         );
         setData(data);
+        setServiceName(data[0].serviceName);
         setTotalItems(totalItems);
         setTotalPages(totalPages);
       } catch (e) {
@@ -107,7 +110,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
     };
     fetchChecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceName]);
+  }, [serviceId]);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL} dataTestId="db-service-checks">

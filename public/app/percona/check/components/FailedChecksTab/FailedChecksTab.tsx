@@ -10,7 +10,7 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { Spinner, Switch, useStyles2 } from '@grafana/ui';
 import { Messages } from './FailedChecksTab.messages';
 import { getStyles } from './FailedChecksTab.styles';
-import { loadShowSilencedValue, saveShowSilencedValue } from './FailedChecksTab.utils';
+import { loadShowSilencedValue, saveShowSilencedValue, stripServiceId } from './FailedChecksTab.utils';
 import { appEvents } from '../../../../core/app_events';
 import { AppEvents } from '@grafana/data';
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
@@ -82,7 +82,8 @@ export const FailedChecksTab: FC = () => {
     key: row.original.serviceId,
     className: styles.row,
     // @ts-ignore
-    onClick: () => locationService.push(`/pmm-database-checks/service-checks/${row.original.serviceName}`),
+    onClick: () =>
+      locationService.push(`/pmm-database-checks/service-checks/${stripServiceId(row.original.serviceId)}`),
   });
 
   const getCellProps = (cellInfo: Cell<FailedCheckSummary>): TableCellProps => ({
