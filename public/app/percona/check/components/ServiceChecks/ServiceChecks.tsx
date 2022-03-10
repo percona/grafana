@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useCallback, useState, useMemo } from 'react';
-import { logger } from '@percona/platform-core';
+import { useStyles2 } from '@grafana/ui';
+import { logger, Chip } from '@percona/platform-core';
 import { Column } from 'react-table';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import PageWrapper from 'app/percona/shared/components/PageWrapper/PageWrapper';
@@ -12,9 +13,11 @@ import { ServiceFailedCheck } from '../../types';
 import { PAGE_MODEL } from '../../CheckPanel.constants';
 import { SERVICE_CHECKS_CANCEL_TOKEN, SERVICE_CHECKS_TABLE_ID } from './ServiceChecks.constants';
 import { Messages } from './ServiceChecks.messages';
+import { getStyles } from './ServiceChecks.styles';
+import { Severity } from 'app/percona/integrated-alerting/components/Severity';
 
 export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> = ({ match }) => {
-  const serviceId = match.params.service;
+  const serviceName = match.params.service;
   const [pageSize, setPageSize] = useStoredTablePageSize(SERVICE_CHECKS_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
@@ -22,6 +25,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   const [data, setData] = useState<ServiceFailedCheck[]>([]);
   const [pending, setPending] = useState(false);
   const [generateToken] = useCancelToken();
+  const styles = useStyles2(getStyles);
 
   const columns = useMemo(
     (): Array<Column<ServiceFailedCheck>> => [
@@ -40,17 +44,30 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
       {
         Header: 'Labels',
         accessor: 'labels',
+        Cell: ({ value }) => {
+          const labels = Object.keys(value);
+          return labels.map((label) => <Chip key={label} text={`${label}:${value[label]}`} />);
+        },
       },
       {
         Header: 'Severity',
         accessor: 'severity',
+        // eslint-disable-next-line react/display-name
+        Cell: ({ value }) => <Severity severity={value} />,
       },
       {
-        Header: 'Read More',
+        Header: 'Details',
         accessor: 'readMoreUrl',
+        // eslint-disable-next-line react/display-name
+        Cell: ({ value }) =>
+          value ? (
+            <a target="_blank" rel="noreferrer" href={value} className={styles.link}>
+              {Messages.readMore}
+            </a>
+          ) : null,
       },
     ],
-    []
+    [styles.link]
   );
 
   const onPaginationChanged = useCallback(
@@ -69,7 +86,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
           data,
           totals: { totalItems, totalPages },
         } = await CheckService.getFailedCheckForService(
-          serviceId,
+          serviceName,
           pageSize,
           pageIndex,
           generateToken(SERVICE_CHECKS_CANCEL_TOKEN)
@@ -87,7 +104,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
     };
     fetchChecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceId]);
+  }, [serviceName]);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL} dataTestId="db-service-checks">

@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import { AlertRuleSeverity } from '../integrated-alerting/components/AlertRules/AlertRules.types';
 import { PaginatedPayload } from '../shared/core/types';
 
 export interface CheckPanelOptions {
@@ -25,27 +26,27 @@ export type FailedChecks = [number, number, number];
 interface CheckResultSummary {
   service_name: string;
   service_id: string;
-  error_count: number;
-  warning_count: number;
-  notice_count: number;
+  critical_count: number;
+  major_count: number;
+  trivial_count: number;
 }
 
 export interface CheckResultSummaryPayload extends PaginatedPayload {
-  checks: CheckResultSummary[];
+  result: CheckResultSummary[];
 }
 
 export interface FailedCheckSummary {
   serviceName: string;
   serviceId: string;
-  errorCount: number;
-  warningCount: number;
-  noticeCount: number;
+  criticalCount: number;
+  majorCount: number;
+  trivialCount: number;
 }
 
 interface CheckResultForService {
   summary: string;
   description: string;
-  severity: Severity;
+  severity: keyof typeof AlertRuleSeverity;
   labels: { [key: string]: string };
   read_more_url: string;
   service_name: string;
@@ -53,13 +54,13 @@ interface CheckResultForService {
 }
 
 export interface CheckResultForServicePayload extends PaginatedPayload {
-  checks: CheckResultForService[];
+  results: CheckResultForService[];
 }
 
 export interface ServiceFailedCheck {
   summary: string;
   description: string;
-  severity: Severity;
+  severity: AlertRuleSeverity;
   labels: { [key: string]: string };
   readMoreUrl: string;
   serviceName: string;

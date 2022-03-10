@@ -28,7 +28,7 @@ export interface ApiVerboseError {
 }
 
 export interface PaginatedPayload {
-  totals: {
+  page_totals: {
     total_items: number;
     total_pages: number;
   };

@@ -20,8 +20,10 @@ import {
   SilenceResponse,
 } from 'app/percona/check/types';
 import { SEVERITIES_ORDER } from 'app/percona/check/CheckPanel.constants';
+import { AlertRuleSeverity } from '../integrated-alerting/components/AlertRules/AlertRules.types';
 
 export const makeApiUrl: (segment: string) => string = (segment) => `${API.ALERTMANAGER}/${segment}`;
+const BASE_URL = '/v1/management/SecurityChecks';
 
 /**
  * A service-like object to store the API methods
@@ -35,22 +37,34 @@ export const CheckService = {
 
     return Array.isArray(data) && data.length ? processData(data as Alert[]) : undefined;
   },
-  async getAllFailedChecks(
+  async getAllFailedChecks(token?: CancelToken): Promise<FailedCheckSummary[]> {
+    const { result = [] } = await api.post<CheckResultSummaryPayload, Object>(
+      `${BASE_URL}/ListFailedServices`,
+      {},
+      false,
+      token
+    );
+
+    return result.map(({ service_name, service_id, critical_count = 0, major_count = 0, trivial_count = 0 }) => ({
+      serviceName: service_name,
+      serviceId: service_id,
+      criticalCount: critical_count,
+      majorCount: major_count,
+      trivialCount: trivial_count,
+    }));
+  },
+  async getFailedCheckForService(
+    serviceName: string,
     pageSize: number,
     pageIndex: number,
     token?: CancelToken
-  ): Promise<PaginatedFomattedResponse<FailedCheckSummary[]>> {
+  ): Promise<PaginatedFomattedResponse<ServiceFailedCheck[]>> {
     const {
-      checks = [],
-      totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
-    } = await api.post<CheckResultSummaryPayload, Object>(
-      '',
-      {
-        page_params: {
-          page_size: pageSize,
-          index: pageIndex,
-        },
-      },
+      results = [],
+      page_totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
+    } = await api.post<CheckResultForServicePayload, Object>(
+      `${BASE_URL}/FailedChecks`,
+      { service_name: serviceName, page_params: { page_size: pageSize, index: pageIndex } },
       false,
       token
     );
@@ -60,35 +74,10 @@ export const CheckService = {
         totalItems,
         totalPages,
       },
-      data: checks.map(({ service_name, service_id, error_count, warning_count, notice_count }) => ({
-        serviceName: service_name,
-        serviceId: service_id,
-        errorCount: error_count,
-        warningCount: warning_count,
-        noticeCount: notice_count,
-      })),
-    };
-  },
-  async getFailedCheckForService(
-    serviceId: string,
-    pageSize: number,
-    pageIndex: number,
-    token?: CancelToken
-  ): Promise<PaginatedFomattedResponse<ServiceFailedCheck[]>> {
-    const {
-      checks = [],
-      totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
-    } = await api.post<CheckResultForServicePayload, Object>('', {}, false, token);
-
-    return {
-      totals: {
-        totalItems,
-        totalPages,
-      },
-      data: checks.map(({ summary, description, severity, labels, read_more_url, service_name, check_name }) => ({
+      data: results.map(({ summary, description, severity, labels = {}, read_more_url, service_name, check_name }) => ({
         summary,
         description,
-        severity,
+        severity: AlertRuleSeverity[severity],
         labels,
         readMoreUrl: read_more_url,
         serviceName: service_name,

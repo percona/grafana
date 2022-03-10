@@ -5,7 +5,6 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { FailedCheckSummary } from 'app/percona/check/types';
-import { useStoredTablePageSize } from 'app/percona/integrated-alerting/components/Table/Pagination';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
 import { Spinner, Switch, useStyles } from '@grafana/ui';
@@ -14,17 +13,13 @@ import { getStyles } from './FailedChecksTab.styles';
 import { loadShowSilencedValue, saveShowSilencedValue } from './FailedChecksTab.utils';
 import { appEvents } from '../../../../core/app_events';
 import { AppEvents } from '@grafana/data';
-import { FAILED_CHECKS_TABLE_ID, GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
+import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
   const [runChecksPending, setRunChecksPending] = useState(false);
   const [showSilenced, setShowSilenced] = useState(loadShowSilencedValue());
   const [data, setData] = useState<FailedCheckSummary[]>([]);
-  const [pageSize, setPageSize] = useStoredTablePageSize(FAILED_CHECKS_TABLE_ID);
-  const [pageIndex, setPageindex] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const styles = useStyles(getStyles);
   const [generateToken] = useCancelToken();
 
@@ -35,16 +30,16 @@ export const FailedChecksTab: FC = () => {
         accessor: 'serviceName',
       },
       {
-        Header: 'Error',
-        accessor: 'errorCount',
+        Header: 'Critical',
+        accessor: 'criticalCount',
       },
       {
-        Header: 'Warning',
-        accessor: 'warningCount',
+        Header: 'Major',
+        accessor: 'majorCount',
       },
       {
-        Header: 'Notice',
-        accessor: 'noticeCount',
+        Header: 'Trivial',
+        accessor: 'trivialCount',
       },
     ],
     []
@@ -54,13 +49,8 @@ export const FailedChecksTab: FC = () => {
     setFetchAlertsPending(true);
 
     try {
-      const {
-        data,
-        totals: { totalItems, totalPages },
-      } = await CheckService.getAllFailedChecks(pageSize, pageIndex, generateToken(GET_ACTIVE_ALERTS_CANCEL_TOKEN));
-      setData(data);
-      setTotalItems(totalItems);
-      setTotalPages(totalPages);
+      const checks = await CheckService.getAllFailedChecks(generateToken(GET_ACTIVE_ALERTS_CANCEL_TOKEN));
+      setData(checks);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -86,14 +76,6 @@ export const FailedChecksTab: FC = () => {
   const toggleShowSilenced = () => {
     setShowSilenced((currentValue) => !currentValue);
   };
-
-  const onPaginationChanged = useCallback(
-    (pageSize: number, pageIndex: number) => {
-      setPageSize(pageSize);
-      setPageindex(pageIndex);
-    },
-    [setPageindex, setPageSize]
-  );
 
   useEffect(() => {
     fetchAlerts();
@@ -129,14 +111,9 @@ export const FailedChecksTab: FC = () => {
           </div>
         ) : (
           <Table
-            showPagination
+            totalItems={data.length}
             data={data}
             columns={columns}
-            totalItems={totalItems}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            pageIndex={pageIndex}
-            onPaginationChanged={onPaginationChanged}
             pendingRequest={fetchAlertsPending}
             emptyMessage={Messages.noChecks}
           />
