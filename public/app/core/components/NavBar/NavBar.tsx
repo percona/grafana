@@ -95,7 +95,7 @@ export const NavBar: FC = React.memo(() => {
     if (isConnectedToPortal) {
       topItems.push({
         id: 'entitlements',
-        icon: 'entitlements',
+        icon: 'cloud',
         text: 'Entitlements',
         url: `${config.appSubUrl}/entitlements`,
       });
