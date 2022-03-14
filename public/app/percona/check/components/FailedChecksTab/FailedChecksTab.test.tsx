@@ -1,6 +1,6 @@
 import React from 'react';
 import { logger } from '@percona/platform-core';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { CheckService } from 'app/percona/check/Check.service';
 import { FailedChecksTab } from './FailedChecksTab';
 
@@ -72,8 +72,14 @@ describe('FailedChecksTab::', () => {
     const runChecksButton = screen.getByRole('button');
 
     fireEvent.click(runChecksButton);
+    expect(screen.queryByText('Run DB checks')).not.toBeInTheDocument();
 
-    expect(loggerSpy).toBeCalledTimes(1);
+    await waitFor(() => {
+      expect(loggerSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run DB checks')).toBeInTheDocument();
+
     loggerSpy.mockClear();
   });
 
@@ -89,7 +95,14 @@ describe('FailedChecksTab::', () => {
 
     expect(runChecksSpy).toBeCalledTimes(0);
     fireEvent.click(runChecksButton);
-    expect(runChecksSpy).toBeCalledTimes(1);
+
+    expect(screen.queryByText('Run DB checks')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(runChecksSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run DB checks')).toBeInTheDocument();
 
     runChecksSpy.mockClear();
   });
@@ -103,6 +116,6 @@ describe('FailedChecksTab::', () => {
 
     await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
 
-    expect(screen.queryByTestId('db-check-panel-table-empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('table-no-data')).toBeInTheDocument();
   });
 });

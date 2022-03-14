@@ -1,4 +1,4 @@
-import { saveShowSilencedValue, loadShowSilencedValue } from './FailedChecksTab.utils';
+import { saveShowSilencedValue, loadShowSilencedValue, stripServiceId, formatServiceId } from './FailedChecksTab.utils';
 import { SHOW_SILENCED_VALUE_KEY, SHOW_SILENCED_DEFAULT } from './FailedChecksTab.constants';
 
 let getItemSpy: jest.SpyInstance;
@@ -41,5 +41,18 @@ describe('FailedChecksTab::utils', () => {
     });
 
     expect(loadShowSilencedValue()).toBe(SHOW_SILENCED_DEFAULT);
+  });
+
+  test('stripServiceId', () => {
+    expect(stripServiceId('')).toBe('');
+    expect(stripServiceId('service_id/service1')).toBe('');
+    expect(stripServiceId('/service_idservice1')).toBe('');
+    expect(stripServiceId('/service_id/')).toBe('');
+    expect(stripServiceId('/service_id/service1')).toBe('service1');
+  });
+
+  test('formatServiceId', () => {
+    expect(formatServiceId('')).toBe('/service_id/');
+    expect(formatServiceId('service1')).toBe('/service_id/service1');
   });
 });
