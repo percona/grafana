@@ -4,9 +4,9 @@ import { SilenceBellProps } from './SilenceBell.types';
 
 export const SilenceBell: FC<SilenceBellProps> = ({ silenced, tooltip = '', onClick = () => null }) => {
   const [loading, setLoading] = useState(false);
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback(async () => {
     setLoading(true);
-    onClick();
+    await onClick();
     setLoading(false);
   }, [onClick]);
 
