@@ -15,7 +15,7 @@ jest.mock('@percona/platform-core', () => {
 });
 
 describe('FailedChecksTab::', () => {
-  let getAlertsSpy = jest.spyOn(CheckService, 'getActiveAlerts').mockImplementation(() => Promise.resolve([]));
+  let getAlertsSpy = jest.spyOn(CheckService, 'getAllFailedChecks').mockImplementation(() => Promise.resolve([]));
 
   afterEach(() => getAlertsSpy.mockClear());
 
@@ -25,7 +25,7 @@ describe('FailedChecksTab::', () => {
     });
 
     await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
-    expect(CheckService.getActiveAlerts).toHaveBeenCalledTimes(1);
+    expect(CheckService.getAllFailedChecks).toHaveBeenCalledTimes(1);
   });
 
   it('should render a spinner at startup, while loading', async () => {

@@ -4,7 +4,6 @@ import { CancelToken } from 'axios';
 import {
   ActiveCheck,
   Alert,
-  AlertRequestParams,
   AlertState,
   AllChecks,
   ChangeCheckBody,
@@ -14,7 +13,6 @@ import {
   FailedChecks,
   FailedCheckSummary,
   ServiceFailedCheck,
-  Settings,
   Severity,
 } from 'app/percona/check/types';
 import { SEVERITIES_ORDER } from 'app/percona/check/CheckPanel.constants';
@@ -27,14 +25,6 @@ const BASE_URL = '/v1/management/SecurityChecks';
  * A service-like object to store the API methods
  */
 export const CheckService = {
-  async getActiveAlerts(includeSilenced = false, token?: CancelToken): Promise<ActiveCheck[] | undefined> {
-    const data = await api.get<Alert[], AlertRequestParams>(makeApiUrl('alerts'), {
-      params: { active: true, silenced: includeSilenced, filter: 'stt_check=1' },
-      cancelToken: token,
-    });
-
-    return Array.isArray(data) && data.length ? processData(data as Alert[]) : undefined;
-  },
   async getAllFailedChecks(token?: CancelToken): Promise<FailedCheckSummary[]> {
     const { result = [] } = await api.post<CheckResultSummaryPayload, Object>(
       `${BASE_URL}/ListFailedServices`,
@@ -96,9 +86,6 @@ export const CheckService = {
         })
       ),
     };
-  },
-  async getSettings(token?: CancelToken) {
-    return api.post<Settings, {}>(API.SETTINGS, {}, true, token);
   },
   silenceAlert(alertId: string, silence: boolean, token?: CancelToken) {
     return api.post<void, any>(
