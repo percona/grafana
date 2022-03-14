@@ -98,6 +98,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
       {
         Header: 'Details',
         accessor: 'readMoreUrl',
+        width: '105px',
         // eslint-disable-next-line react/display-name
         Cell: ({ value }) =>
           value ? (
