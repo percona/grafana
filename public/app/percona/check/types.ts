@@ -51,6 +51,8 @@ interface CheckResultForService {
   read_more_url: string;
   service_name: string;
   check_name: string;
+  silenced: boolean;
+  alert_id: string;
 }
 
 export interface CheckResultForServicePayload extends PaginatedPayload {
@@ -65,6 +67,8 @@ export interface ServiceFailedCheck {
   readMoreUrl: string;
   serviceName: string;
   checkName: string;
+  silenced: boolean;
+  alertId: string;
 }
 
 export interface ActiveCheck {

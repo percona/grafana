@@ -16,6 +16,7 @@ import { Messages } from './ServiceChecks.messages';
 import { getStyles } from './ServiceChecks.styles';
 import { Severity } from 'app/percona/integrated-alerting/components/Severity';
 import { formatServiceId } from '../FailedChecksTab/FailedChecksTab.utils';
+import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
 
 export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> = ({ match }) => {
   const serviceId = formatServiceId(match.params.service);
@@ -28,6 +29,40 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   const [serviceName, setServiceName] = useState('');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
+
+  const fetchChecks = useCallback(async () => {
+    try {
+      setPending(true);
+      const {
+        data,
+        totals: { totalItems, totalPages },
+      } = await CheckService.getFailedCheckForService(
+        serviceId,
+        pageSize,
+        pageIndex,
+        generateToken(SERVICE_CHECKS_CANCEL_TOKEN)
+      );
+      setData(data);
+      setServiceName(data[0].serviceName);
+      setTotalItems(totalItems);
+      setTotalPages(totalPages);
+    } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
+      logger.error(e);
+    }
+    setPending(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageIndex, pageSize, serviceId]);
+
+  const onSilenceClick = useCallback(
+    async (alertId: string, silenced: boolean) => {
+      await CheckService.silenceAlert(alertId, !silenced);
+      fetchChecks();
+    },
+    [fetchChecks]
+  );
 
   const columns = useMemo(
     (): Array<Column<ServiceFailedCheck>> => [
@@ -71,8 +106,19 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
             </a>
           ) : null,
       },
+      {
+        Header: 'Actions',
+        accessor: 'silenced',
+        width: '30px',
+        // eslint-disable-next-line react/display-name
+        Cell: ({ value, row }) => (
+          <span className={styles.actions}>
+            <SilenceBell silenced={value} onClick={() => onSilenceClick(row.original.alertId, row.original.silenced)} />
+          </span>
+        ),
+      },
     ],
-    [styles.link, styles.chips]
+    [styles.chips, styles.link, styles.actions, onSilenceClick]
   );
 
   const onPaginationChanged = useCallback(
@@ -84,33 +130,8 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   );
 
   useEffect(() => {
-    const fetchChecks = async () => {
-      try {
-        setPending(true);
-        const {
-          data,
-          totals: { totalItems, totalPages },
-        } = await CheckService.getFailedCheckForService(
-          serviceId,
-          pageSize,
-          pageIndex,
-          generateToken(SERVICE_CHECKS_CANCEL_TOKEN)
-        );
-        setData(data);
-        setServiceName(data[0].serviceName);
-        setTotalItems(totalItems);
-        setTotalPages(totalPages);
-      } catch (e) {
-        if (isApiCancelError(e)) {
-          return;
-        }
-        logger.error(e);
-      }
-      setPending(false);
-    };
     fetchChecks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceId]);
+  }, [fetchChecks]);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL} dataTestId="db-service-checks">

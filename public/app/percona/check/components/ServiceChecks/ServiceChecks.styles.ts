@@ -20,5 +20,10 @@ export const getStyles = ({ v1: { colors, spacing } }: GrafanaTheme2) => {
         margin-bottom: ${spacing.sm};
       }
     `,
+    actions: css`
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `,
   };
 };

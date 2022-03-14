@@ -16,8 +16,6 @@ import {
   ServiceFailedCheck,
   Settings,
   Severity,
-  SilenceBody,
-  SilenceResponse,
 } from 'app/percona/check/types';
 import { SEVERITIES_ORDER } from 'app/percona/check/CheckPanel.constants';
 import { AlertRuleSeverity } from '../integrated-alerting/components/AlertRules/AlertRules.types';
@@ -74,22 +72,44 @@ export const CheckService = {
         totalItems,
         totalPages,
       },
-      data: results.map(({ summary, description, severity, labels = {}, read_more_url, service_name, check_name }) => ({
-        summary,
-        description,
-        severity: AlertRuleSeverity[severity],
-        labels,
-        readMoreUrl: read_more_url,
-        serviceName: service_name,
-        checkName: check_name,
-      })),
+      data: results.map(
+        ({
+          summary,
+          description,
+          severity,
+          labels = {},
+          read_more_url,
+          service_name,
+          check_name,
+          silenced,
+          alert_id,
+        }) => ({
+          summary,
+          description,
+          severity: AlertRuleSeverity[severity],
+          labels,
+          readMoreUrl: read_more_url,
+          serviceName: service_name,
+          checkName: check_name,
+          silenced: !!silenced,
+          alertId: alert_id,
+        })
+      ),
     };
   },
   async getSettings(token?: CancelToken) {
     return api.post<Settings, {}>(API.SETTINGS, {}, true, token);
   },
-  silenceAlert(body: SilenceBody, token?: CancelToken): Promise<void | SilenceResponse> {
-    return api.post<SilenceResponse, SilenceBody>(makeApiUrl('silences'), body, false, token);
+  silenceAlert(alertId: string, silence: boolean, token?: CancelToken) {
+    return api.post<void, any>(
+      `${BASE_URL}/ToggleCheckAlert`,
+      {
+        alert_id: alertId,
+        silence,
+      },
+      false,
+      token
+    );
   },
   runDbChecks(token?: CancelToken): Promise<void | {}> {
     return api.post<{}, {}>('/v1/management/SecurityChecks/Start', {}, false, token);

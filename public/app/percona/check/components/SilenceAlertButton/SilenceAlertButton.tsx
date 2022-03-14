@@ -4,7 +4,6 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Labels } from 'app/percona/check/types';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
-import { makeSilencePayload } from './SilenceAlertButton.utils';
 
 interface SilenceAlertButtonProps {
   labels: Labels;
@@ -15,11 +14,9 @@ export const SilenceAlertButton: FC<SilenceAlertButtonProps> = ({ labels }) => {
   const [isRequestPending, setRequestPending] = useState(false);
 
   const handleClick = async () => {
-    const silencePayload = makeSilencePayload(labels);
-
     setRequestPending(true);
     try {
-      await CheckService.silenceAlert(silencePayload);
+      await CheckService.silenceAlert('', false);
       await alertsReloadContext.fetchAlerts();
     } catch (e) {
       if (isApiCancelError(e)) {
