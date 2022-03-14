@@ -42,7 +42,9 @@ export const NavBar: FC = React.memo(() => {
   const theme = useTheme2();
   const styles = getStyles(theme);
   const location = useLocation();
-  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled, isConnectedToPortal } = useSelector(getPerconaSettings);
+  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled, isConnectedToPortal } = useSelector(
+    getPerconaSettings
+  );
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
