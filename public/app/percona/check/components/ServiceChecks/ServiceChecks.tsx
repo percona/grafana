@@ -113,7 +113,11 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         // eslint-disable-next-line react/display-name
         Cell: ({ value, row }) => (
           <span className={styles.actions}>
-            <SilenceBell silenced={value} onClick={() => onSilenceClick(row.original.alertId, row.original.silenced)} />
+            <SilenceBell
+              tooltip={value ? Messages.activate : Messages.silence}
+              silenced={value}
+              onClick={() => onSilenceClick(row.original.alertId, row.original.silenced)}
+            />
           </span>
         ),
       },
