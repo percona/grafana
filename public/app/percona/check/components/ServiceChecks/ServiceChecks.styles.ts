@@ -2,6 +2,16 @@ import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 
 export const getStyles = ({ v1: { colors, spacing } }: GrafanaTheme2) => {
+  const labelStyles = `
+    margin-right: ${spacing.sm};
+    margin-bottom: ${spacing.sm};
+    word-break: break-word;
+  `;
+  const labelContainer = `
+    margin-right: -${spacing.sm};
+    margin-bottom: -${spacing.sm};
+  `;
+
   return {
     link: css`
       color: ${colors.linkExternal};
@@ -10,16 +20,13 @@ export const getStyles = ({ v1: { colors, spacing } }: GrafanaTheme2) => {
       }
     `,
     chips: css`
+      ${labelContainer};
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      margin-right: -${spacing.sm};
-      margin-bottom: -${spacing.sm};
 
       & > * {
-        margin-right: ${spacing.sm};
-        margin-bottom: ${spacing.sm};
-        word-break: break-word;
+        ${labelStyles}
       }
     `,
     actions: css`
@@ -29,6 +36,12 @@ export const getStyles = ({ v1: { colors, spacing } }: GrafanaTheme2) => {
     `,
     disabledRow: css`
       background-color: ${colors.dashboardBg} !important;
+    `,
+    secondaryLabels: css`
+      ${labelContainer};
+      & > * {
+        ${labelStyles}
+      }
     `,
   };
 };

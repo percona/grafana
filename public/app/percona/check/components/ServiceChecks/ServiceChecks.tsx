@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useCallback, useState, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { logger, Chip } from '@percona/platform-core';
-import { Cell, Column } from 'react-table';
+import { Cell, Column, Row } from 'react-table';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import PageWrapper from 'app/percona/shared/components/PageWrapper/PageWrapper';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -17,6 +17,7 @@ import { getStyles } from './ServiceChecks.styles';
 import { Severity } from 'app/percona/integrated-alerting/components/Severity';
 import { formatServiceId } from '../FailedChecksTab/FailedChecksTab.utils';
 import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
+import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 
 export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> = ({ match }) => {
   const serviceId = formatServiceId(match.params.service);
@@ -69,6 +70,8 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
       {
         Header: 'Check Name',
         accessor: 'checkName',
+        // eslint-disable-next-line react/display-name
+        Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
         Header: 'Summary',
@@ -141,6 +144,17 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
     [styles.disabledRow]
   );
 
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<ServiceFailedCheck>) => (
+      <div className={styles.secondaryLabels}>
+        {row.original.labels.secondary.map((label) => (
+          <Chip key={label} text={label} />
+        ))}
+      </div>
+    ),
+    [styles.secondaryLabels]
+  );
+
   useEffect(() => {
     fetchChecks();
   }, [fetchChecks]);
@@ -157,6 +171,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         pageSize={pageSize}
         pageIndex={pageIndex}
         onPaginationChanged={onPaginationChanged}
+        renderExpandedRow={renderSelectedSubRow}
         getCellProps={getCellProps}
         pendingRequest={pending}
         emptyMessage={Messages.noChecks}
