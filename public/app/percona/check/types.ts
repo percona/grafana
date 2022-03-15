@@ -1,5 +1,5 @@
 import { AlertRuleSeverity } from '../integrated-alerting/components/AlertRules/AlertRules.types';
-import { PaginatedPayload } from '../shared/core/types';
+import { PaginatedPayload, PrioritizedLabels } from '../shared/core/types';
 
 interface CheckResultSummary {
   service_name: string;
@@ -41,7 +41,7 @@ export interface ServiceFailedCheck {
   summary: string;
   description: string;
   severity: AlertRuleSeverity;
-  labels: { [key: string]: string };
+  labels: PrioritizedLabels;
   readMoreUrl: string;
   serviceName: string;
   checkName: string;

@@ -27,5 +27,8 @@ export const getStyles = ({ v1: { colors, spacing } }: GrafanaTheme2) => {
       align-items: center;
       justify-content: center;
     `,
+    disabledRow: css`
+      background-color: ${colors.dashboardBg} !important;
+    `,
   };
 };

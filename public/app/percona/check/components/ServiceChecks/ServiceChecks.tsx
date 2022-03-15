@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useCallback, useState, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { logger, Chip } from '@percona/platform-core';
-import { Column } from 'react-table';
+import { Cell, Column } from 'react-table';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import PageWrapper from 'app/percona/shared/components/PageWrapper/PageWrapper';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -79,11 +79,10 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         accessor: 'labels',
         // eslint-disable-next-line react/display-name
         Cell: ({ value }) => {
-          const labels = Object.keys(value);
           return (
             <div className={styles.chips}>
-              {labels.map((label) => (
-                <Chip key={label} text={`${label}:${value[label]}`} />
+              {value.primary.map((label) => (
+                <Chip key={label} text={label} />
               ))}
             </div>
           );
@@ -134,6 +133,14 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
     [setPageindex, setPageSize]
   );
 
+  const getCellProps = useCallback(
+    (cell: Cell<ServiceFailedCheck>) => ({
+      className: !!cell.row.original.silenced ? styles.disabledRow : '',
+      key: cell.row.original.alertId,
+    }),
+    [styles.disabledRow]
+  );
+
   useEffect(() => {
     fetchChecks();
   }, [fetchChecks]);
@@ -150,6 +157,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         pageSize={pageSize}
         pageIndex={pageIndex}
         onPaginationChanged={onPaginationChanged}
+        getCellProps={getCellProps}
         pendingRequest={pending}
         emptyMessage={Messages.noChecks}
       />

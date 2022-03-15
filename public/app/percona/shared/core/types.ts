@@ -41,3 +41,8 @@ export interface PaginatedFomattedResponse<T = any> {
     totalPages: number;
   };
 }
+
+export interface PrioritizedLabels {
+  primary: string[];
+  secondary: string[];
+}

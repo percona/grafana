@@ -11,6 +11,7 @@ import {
   ServiceFailedCheck,
 } from 'app/percona/check/types';
 import { AlertRuleSeverity } from '../integrated-alerting/components/AlertRules/AlertRules.types';
+import { formatLabels } from '../shared/helpers/labels';
 
 export const makeApiUrl: (segment: string) => string = (segment) => `${API.ALERTMANAGER}/${segment}`;
 const BASE_URL = '/v1/management/SecurityChecks';
@@ -71,7 +72,7 @@ export const CheckService = {
           summary,
           description,
           severity: AlertRuleSeverity[severity],
-          labels,
+          labels: formatLabels(labels),
           readMoreUrl: read_more_url,
           serviceName: service_name,
           checkName: check_name,
