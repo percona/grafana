@@ -95,7 +95,7 @@ export const TicketsPage: FC = () => {
   });
 
   return (
-    <PageWrapper pageModel={PAGE_MODEL} dataTestId={'page-wrapper-tickets'}>
+    <PageWrapper pageModel={PAGE_MODEL} dataTestId="page-wrapper-tickets">
       <PlatformConnectedLoader>
         <div className={styles.pageWrapper}>
           <Table
