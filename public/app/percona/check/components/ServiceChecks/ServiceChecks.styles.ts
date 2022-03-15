@@ -13,11 +13,13 @@ export const getStyles = ({ v1: { colors, spacing } }: GrafanaTheme2) => {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
+      margin-right: -${spacing.sm};
       margin-bottom: -${spacing.sm};
 
       & > * {
         margin-right: ${spacing.sm};
         margin-bottom: ${spacing.sm};
+        word-break: break-word;
       }
     `,
     actions: css`
