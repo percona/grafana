@@ -11,7 +11,7 @@ import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { TicketsService } from './Tickets.service';
 import { Ticket } from './Tickets.types';
-import { useStyles } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import { getStyles } from './Tickets.styles';
 import { Messages } from './Tickets.messages';
 
@@ -20,7 +20,7 @@ export const TicketsPage: FC = () => {
   const [data, setData] = useState<Ticket[]>([]);
   const connected = useSelector((state: StoreState) => !!state.perconaSettings.isConnectedToPortal);
   const [generateToken] = useCancelToken();
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
 
   const columns = useMemo(
     (): Array<Column<Ticket>> => [
