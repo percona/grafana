@@ -18,7 +18,7 @@ export const Failed: FC<FailedProps> = ({ failed }) => {
       </span>
       <Tooltip placement="top" theme="info" content={<TooltipText sum={sum} data={failed} />}>
         <span>
-          <Icon name="info-circle" className={styles.InfoIcon} />
+          <Icon name="info-circle" className={styles.InfoIcon} data-testid="failed-info-icon" />
         </span>
       </Tooltip>
     </div>

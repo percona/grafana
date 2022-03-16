@@ -1,19 +1,24 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { Icon, Tooltip } from '@grafana/ui';
+import { Tooltip } from '@grafana/ui';
 import { Failed } from './Failed';
+import { render, screen } from '@testing-library/react';
+
+jest.mock('@grafana/ui', () => ({
+  ...jest.requireActual('@grafana/ui'),
+  Tooltip: jest.fn(({ children }) => <div data-testid="tooltip">{children}</div>),
+}));
 
 describe('Failed::', () => {
-  it('should render a sum of total failed checks with severity details', () => {
-    const root = shallow(<Failed failed={[1, 0, 1]} />);
+  it('should render a sum of total failed checks with severity details', async () => {
+    const { container } = render(<Failed failed={[1, 0, 1]} />);
 
-    expect(root.find('div > span').at(0).text()).toEqual('2 (1 / 0 / 1)');
+    expect(container.querySelectorAll('div > span')[0].textContent).toEqual('2 (1 / 0 / 1)');
   });
 
   it('should render inner components', () => {
-    const root = shallow(<Failed failed={[1, 0, 1]} />);
+    render(<Failed failed={[1, 0, 1]} />);
 
-    expect(root.find(Icon).length).toEqual(1);
-    expect(root.find(Tooltip).length).toEqual(1);
+    expect(screen.getByTestId('failed-info-icon')).toBeInTheDocument();
+    expect(Tooltip).toHaveBeenCalled();
   });
 });
