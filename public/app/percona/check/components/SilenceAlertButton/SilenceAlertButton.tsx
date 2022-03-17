@@ -31,7 +31,14 @@ export const SilenceAlertButton: FC<SilenceAlertButtonProps> = ({ labels }) => {
   };
 
   return (
-    <LoaderButton type="button" size="sm" variant="secondary" loading={isRequestPending} onClick={handleClick}>
+    <LoaderButton
+      type="button"
+      size="sm"
+      variant="secondary"
+      loading={isRequestPending}
+      onClick={handleClick}
+      data-testid="silence-loader-button"
+    >
       Silence
     </LoaderButton>
   );

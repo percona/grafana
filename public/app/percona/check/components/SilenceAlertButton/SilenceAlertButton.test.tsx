@@ -1,12 +1,11 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
 import { activeCheckStub } from 'app/percona/check/__mocks__/stubs';
 import { SilenceAlertButton } from 'app/percona/check/components';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
 import { makeSilencePayload } from './SilenceAlertButton.utils';
-import { LoaderButton, logger } from '@percona/platform-core';
-import { asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { logger } from '@percona/platform-core';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 jest.mock('../../Check.service');
 jest.mock('app/percona/shared/components/hooks/cancelToken.hook');
@@ -33,9 +32,9 @@ describe('SilenceAlertButton::', () => {
   it('should contain a LoaderButton', () => {
     const { labels } = activeCheckStub[0].details[0];
 
-    const root = shallow(<SilenceAlertButton labels={labels} />);
+    render(<SilenceAlertButton labels={labels} />);
 
-    expect(root.find(LoaderButton).length).toEqual(1);
+    expect(screen.getAllByTestId('silence-loader-button')).toHaveLength(1);
   });
 
   it('should call functions to buind the payload and to call the API to silence an alert on click', async () => {
@@ -51,20 +50,18 @@ describe('SilenceAlertButton::', () => {
 
     const spy = jest.spyOn(CheckService, 'silenceAlert');
 
-    const root = mount(
+    render(
       <AlertsReloadContext.Provider value={{ fetchAlerts: fakeFetchAlerts }}>
         <SilenceAlertButton labels={labels} />
       </AlertsReloadContext.Provider>
     );
 
-    const wrapper = root.find(SilenceAlertButton);
-
     expect(mockedMakeSilencePayload).toBeCalledTimes(0);
     expect(spy).toBeCalledTimes(0);
     expect(fakeFetchAlerts).toBeCalledTimes(0);
 
-    await asyncAct(async () => wrapper.find(LoaderButton).simulate('click'));
-    wrapper.update();
+    const loaderButton = screen.getByTestId('silence-loader-button');
+    await waitFor(() => fireEvent.click(loaderButton));
 
     expect(mockedMakeSilencePayload).toBeCalledTimes(1);
     expect(spy).toBeCalledTimes(1);
@@ -72,8 +69,6 @@ describe('SilenceAlertButton::', () => {
     expect(fakeFetchAlerts).toBeCalledTimes(1);
 
     spy.mockClear();
-
-    root.unmount();
   });
 
   it('should call functions to buind the payload and to call the API to silence an alert on click', async () => {
@@ -91,15 +86,14 @@ describe('SilenceAlertButton::', () => {
       throw Error('Test error');
     });
 
-    const root = shallow(<SilenceAlertButton labels={labels} />);
+    render(<SilenceAlertButton labels={labels} />);
 
-    await asyncAct(async () => root.simulate('click'));
+    const loaderButton = screen.getByTestId('silence-loader-button');
+    fireEvent.click(loaderButton);
 
     expect(logger.error).toBeCalledTimes(1);
     expect(logger.error).toBeCalledWith(Error('Test error'));
 
     spy.mockClear();
-
-    root.unmount();
   });
 });
