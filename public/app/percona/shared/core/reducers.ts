@@ -129,24 +129,23 @@ export const fetchSettingsAction = createAsyncThunk(
 
 export const updateSettingsAction = createAsyncThunk(
   'percona/updateSettings',
-  (args: { body: SettingsAPIChangePayload; token?: CancelToken }, thunkAPI): Promise<Settings> =>
+  (args: { body: Partial<SettingsAPIChangePayload>; token?: CancelToken }, thunkAPI): Promise<Settings> =>
     withAppEvents(
       withSerializedError(
         (async () => {
           // let password = '';
-          let testEmail = '';
+          // let testEmail = '';
 
           // we save the test email here so that we can sent it all the way down to the form again after re-render
           // the field is deleted from the payload so as not to be sent to the API
           if ('email_alerting_settings' in args.body) {
             // password = args.body.email_alerting_settings.password || '';
-            testEmail = args.body.email_alerting_settings.test_email || '';
-
-            if (testEmail) {
-              args.body.email_alerting_settings.test_email = undefined;
-            }
+            // testEmail = args.body.email_alerting_settings?.test_email || '';
+            // if (testEmail) {
+            //   args.body.email_alerting_settings?.test_email = undefined;
+            // }
           }
-          const { settings }: SettingsAPIResponse = await api.post<any, SettingsAPIChangePayload>(
+          const { settings }: SettingsAPIResponse = await api.post<any, Partial<SettingsAPIChangePayload>>(
             '/v1/Settings/Change',
             args.body,
             false,

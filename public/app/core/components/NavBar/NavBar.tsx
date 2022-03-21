@@ -11,6 +11,7 @@ import config from 'app/core/config';
 import { KioskMode } from 'app/types';
 import {
   buildIntegratedAlertingMenuItem,
+  buildSettingsMenuItem,
   enrichConfigItems,
   getActiveItem,
   isMatchOrChildMatch,
@@ -24,7 +25,7 @@ import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { PMM_STT_PAGE, PMM_BACKUP_PAGE, PMM_DBAAS_PAGE, PMM_ALERTING_PAGE } from './constants';
+import { PMM_STT_PAGE, PMM_BACKUP_PAGE, PMM_DBAAS_PAGE, PMM_ALERTING_PAGE, PMM_SETTINGS_PAGE } from './constants';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -64,6 +65,9 @@ export const NavBar: FC = React.memo(() => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (isPmmAdmin(config.bootData.user)) {
+    buildSettingsMenuItem(topItems);
+    dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_SETTINGS_PAGE });
+
     if (alertingEnabled) {
       buildIntegratedAlertingMenuItem(topItems);
       dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_ALERTING_PAGE });

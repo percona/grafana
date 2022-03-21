@@ -496,14 +496,64 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     {
       path: '/settings',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/settings/metrics-resolution" />,
+    },
+    {
+      path: '/settings/metrics-resolution',
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "SettingsPage" */ 'app/percona/settings/Settings')
+        () =>
+          import(
+            /* webpackChunkName: "MetricsResolutionsSettingsPage" */ 'app/percona/settings/components/MetricsResolution/MetricsResolution'
+          )
       ),
     },
     {
-      path: '/settings/:tab',
+      path: '/settings/advanced-settings',
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "SettingsPage" */ 'app/percona/settings/Settings')
+        () => import(/* webpackChunkName: "AdvancedSettingsPage" */ 'app/percona/settings/components/Advanced/Advanced')
+      ),
+    },
+    {
+      path: '/settings/ssh-key',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "SSHKeySettingsPage" */ 'app/percona/settings/components/SSHKey/SSHKey')
+      ),
+    },
+    {
+      path: '/settings/am-integration',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "AMIntegrationSettingsPage" */ 'app/percona/settings/components/AlertManager/AlertManager'
+          )
+      ),
+    },
+    {
+      path: '/settings/percona-platform',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "PerconaPlatformSettingsPage" */ 'app/percona/settings/components/Platform/Platform'
+          )
+      ),
+    },
+    {
+      path: '/settings/communication',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "CommunicationSettingsPage" */ 'app/percona/settings/components/Communication/Communication'
+          )
+      ),
+    },
+    {
+      path: '/settings/metrics-resolution',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "MetricsResolutionsPage" */ 'app/percona/settings/components/MetricsResolution/MetricsResolution'
+          )
       ),
     },
     {

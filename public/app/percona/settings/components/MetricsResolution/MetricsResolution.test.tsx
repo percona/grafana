@@ -6,7 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 describe('MetricsResolution::', () => {
   it('Renders correctly with props for standard resolution', () => {
-    render(<MetricsResolution metricsResolutions={defaultResolutions[1]} updateSettings={() => {}} />);
+    render(<MetricsResolution />);
 
     const standardRes = removeUnits(defaultResolutions[1]);
 
@@ -16,7 +16,7 @@ describe('MetricsResolution::', () => {
   });
 
   it('Renders correctly with props for rare resolution', () => {
-    render(<MetricsResolution metricsResolutions={defaultResolutions[0]} updateSettings={() => {}} />);
+    render(<MetricsResolution />);
 
     const standardRes = removeUnits(defaultResolutions[0]);
 
@@ -26,7 +26,7 @@ describe('MetricsResolution::', () => {
   });
 
   it('Renders correctly with props for frequent resolution', () => {
-    render(<MetricsResolution metricsResolutions={defaultResolutions[2]} updateSettings={() => {}} />);
+    render(<MetricsResolution />);
 
     const standardRes = removeUnits(defaultResolutions[2]);
 
@@ -36,7 +36,7 @@ describe('MetricsResolution::', () => {
   });
 
   it('Renders correctly with props for custom resolution', () => {
-    render(<MetricsResolution metricsResolutions={{ lr: '400s', mr: '100s', hr: '50s' }} updateSettings={() => {}} />);
+    render(<MetricsResolution />);
 
     expect(screen.getByTestId('lr-number-input')).toHaveValue(400);
     expect(screen.getByTestId('mr-number-input')).toHaveValue(100);
@@ -44,7 +44,7 @@ describe('MetricsResolution::', () => {
   });
 
   it('Changes input values when changing resolution', () => {
-    render(<MetricsResolution metricsResolutions={defaultResolutions[0]} updateSettings={() => {}} />);
+    render(<MetricsResolution />);
     const radio = screen.getAllByTestId('resolutions-radio-button')[2];
 
     fireEvent.click(radio);
@@ -57,7 +57,7 @@ describe('MetricsResolution::', () => {
   });
 
   it('Disables apply changes on initial values', () => {
-    render(<MetricsResolution metricsResolutions={defaultResolutions[0]} updateSettings={() => {}} />);
+    render(<MetricsResolution />);
     const button = screen.getByTestId('metrics-resolution-button');
 
     expect(button).toBeDisabled();
@@ -65,7 +65,7 @@ describe('MetricsResolution::', () => {
 
   it('Calls apply changes', () => {
     const updateSettings = jest.fn();
-    render(<MetricsResolution metricsResolutions={defaultResolutions[0]} updateSettings={updateSettings} />);
+    render(<MetricsResolution />);
 
     const input = screen.getByTestId('lr-number-input');
     fireEvent.change(input, { target: { value: '70' } });

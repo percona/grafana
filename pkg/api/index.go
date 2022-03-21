@@ -396,14 +396,6 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 		})
 
 		configNodes = append(configNodes, &dtos.NavLink{
-			Text:         "Settings",
-			Icon:         "percona-setting",
-			Id:           "pmm-settings",
-			Url:          setting.AppSubUrl + "/settings",
-			HideFromTabs: true,
-		})
-
-		configNodes = append(configNodes, &dtos.NavLink{
 			Text: "Divider", Divider: true, Id: "divider", HideFromTabs: true,
 		})
 	}

@@ -171,3 +171,23 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
 
   return mainLinks;
 };
+
+export const buildSettingsMenuItem = (mainLinks: NavModelItem[]): NavModelItem[] => {
+  const settingsLink = {
+    id: 'settings',
+    icon: 'percona-setting',
+    text: 'Settings',
+    url: `${getConfig().appSubUrl}/settings`,
+  };
+  const configNode = mainLinks.find((link) => link.id === 'cfg');
+
+  if (configNode) {
+    const inventoryNodeIndex = configNode.children?.findIndex((link) => link.id === 'pmm-inventory');
+
+    if (inventoryNodeIndex !== undefined && inventoryNodeIndex !== -1) {
+      configNode.children?.splice(inventoryNodeIndex + 1, 0, settingsLink);
+    }
+  }
+
+  return mainLinks;
+};

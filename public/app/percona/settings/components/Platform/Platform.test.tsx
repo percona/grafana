@@ -9,7 +9,7 @@ describe('Platform::', () => {
     const store = configureStore();
     render(
       <Provider store={store}>
-        <Platform isConnected={false} />
+        <Platform />
       </Provider>
     );
 
@@ -20,7 +20,7 @@ describe('Platform::', () => {
     const store = configureStore();
     render(
       <Provider store={store}>
-        <Platform isConnected />
+        <Platform />
       </Provider>
     );
 

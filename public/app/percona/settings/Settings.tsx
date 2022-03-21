@@ -1,56 +1,29 @@
-import React, { FC, useMemo, useState, useCallback } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { createPortal } from 'react-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Spinner, useTheme } from '@grafana/ui';
 import { Advanced, AlertManager, Diagnostics, MetricsResolution, Platform, SSHKey } from './components';
-import { LoadingCallback } from './Settings.service';
-import { TabKeys, SettingsAPIChangePayload } from './Settings.types';
+import { TabKeys } from './Settings.types';
 import { Messages } from './Settings.messages';
 import { getSettingsStyles } from './Settings.styles';
-import { SET_SETTINGS_CANCEL_TOKEN, PAGE_MODEL } from './Settings.constants';
+import { PAGE_MODEL } from './Settings.constants';
 import { Communication } from './components/Communication/Communication';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { ContentTab, TabbedContent, TabOrientation } from '../shared/components/Elements/TabbedContent';
-import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { EmptyBlock } from '../shared/components/Elements/EmptyBlock';
 import { TechnicalPreview } from '../shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
-import { updateSettingsAction } from '../shared/core/reducers';
 
 export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({ match }) => {
   const { path: basePath } = PAGE_MODEL;
   const tab = match.params.tab;
-  const [generateToken] = useCancelToken();
-  const dispatch = useDispatch();
   const theme = useTheme();
   const styles = getSettingsStyles(theme);
   const { metrics, advanced, ssh, alertManager, perconaPlatform, communication } = Messages.tabs;
   const { result: settings, loading } = useSelector(getPerconaSettings);
   const { isAuthorized } = useSelector(getPerconaUser);
   const [techPreviewRef, setTechPreviewRef] = useState<HTMLDivElement | null>(null);
-
-  const updateSettings = useCallback(
-    async (body: SettingsAPIChangePayload, callback: LoadingCallback, onError = () => {}) => {
-      dispatch(updateSettingsAction({ body, token: generateToken(SET_SETTINGS_CANCEL_TOKEN) }));
-
-      // if (response) {
-      //   // password is not being returned by the API, hence this construction
-      //   const newSettings: Settings = {
-      //     ...response,
-      //     alertingSettings: {
-      //       ...response.alertingSettings,
-      //       email: { ...response.alertingSettings.email, password, test_email: testEmail },
-      //     },
-      //   };
-      //   dispatch(setSettings(newSettings));
-      // } else {
-      //   onError();
-      // }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
   const tabs: ContentTab[] = useMemo(
     (): ContentTab[] =>
@@ -59,44 +32,22 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
             {
               label: metrics,
               key: TabKeys.metrics,
-              component: (
-                <MetricsResolution metricsResolutions={settings.metricsResolutions} updateSettings={updateSettings} />
-              ),
+              component: <MetricsResolution />,
             },
             {
               label: advanced,
               key: TabKeys.advanced,
-              component: (
-                <Advanced
-                  dataRetention={settings.dataRetention}
-                  telemetryEnabled={!!settings.telemetryEnabled}
-                  updatesDisabled={!!settings.updatesDisabled}
-                  sttEnabled={!!settings.sttEnabled}
-                  dbaasEnabled={!!settings.dbaasEnabled}
-                  alertingEnabled={!!settings.alertingEnabled}
-                  backupEnabled={!!settings.backupEnabled}
-                  azureDiscoverEnabled={!!settings.azureDiscoverEnabled}
-                  publicAddress={settings.publicAddress}
-                  updateSettings={updateSettings}
-                  sttCheckIntervals={settings.sttCheckIntervals}
-                />
-              ),
+              component: <Advanced />,
             },
             {
               label: ssh,
               key: TabKeys.ssh,
-              component: <SSHKey sshKey={settings.sshKey || ''} updateSettings={updateSettings} />,
+              component: <SSHKey />,
             },
             {
               label: alertManager,
               key: TabKeys.alertManager,
-              component: (
-                <AlertManager
-                  alertManagerUrl={settings.alertManagerUrl || ''}
-                  alertManagerRules={settings.alertManagerRules || ''}
-                  updateSettings={updateSettings}
-                />
-              ),
+              component: <AlertManager />,
             },
             {
               label: perconaPlatform,
@@ -104,7 +55,7 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
               component: (
                 <>
                   {techPreviewRef && createPortal(<TechnicalPreview />, techPreviewRef)}
-                  <Platform isConnected={settings.isConnectedToPortal} />
+                  <Platform />
                 </>
               ),
             },
@@ -112,17 +63,11 @@ export const SettingsPanel: FC<GrafanaRouteComponentProps<{ tab: string }>> = ({
               label: communication,
               key: TabKeys.communication,
               hidden: !settings?.alertingEnabled,
-              component: (
-                <Communication
-                  alertingSettings={settings.alertingSettings}
-                  alertingEnabled={!!settings.alertingEnabled}
-                  updateSettings={updateSettings}
-                />
-              ),
+              component: <Communication />,
             },
           ]
         : [],
-    [settings, advanced, alertManager, communication, metrics, perconaPlatform, ssh, updateSettings, techPreviewRef]
+    [settings, advanced, alertManager, communication, metrics, perconaPlatform, ssh, techPreviewRef]
   );
 
   return (

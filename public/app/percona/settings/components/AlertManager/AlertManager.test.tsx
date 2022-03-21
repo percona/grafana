@@ -4,16 +4,14 @@ import { AlertManager } from './AlertManager';
 
 describe('AlertManager::', () => {
   it('Renders correctly with props', () => {
-    const root = mount(
-      <AlertManager alertManagerUrl="test url" alertManagerRules="test rules" updateSettings={() => {}} />
-    );
+    const root = mount(<AlertManager />);
 
     expect(root.find('[data-testid="alertmanager-url"]').find('input').prop('value')).toEqual('test url');
     expect(root.find('textarea').text()).toEqual('test rules');
   });
 
   it('Disables apply changes on initial values', () => {
-    const root = mount(<AlertManager alertManagerUrl="" alertManagerRules="" updateSettings={() => {}} />);
+    const root = mount(<AlertManager />);
     const button = root.find('button');
 
     expect(button.prop('disabled')).toBeTruthy();
@@ -21,9 +19,7 @@ describe('AlertManager::', () => {
 
   it('Calls apply changes', () => {
     const updateSettings = jest.fn();
-    const root = mount(
-      <AlertManager alertManagerUrl="test url" alertManagerRules="test rules" updateSettings={updateSettings} />
-    );
+    const root = mount(<AlertManager />);
 
     root.find('textarea').simulate('change', { target: { value: 'new key' } });
     root.find('form').simulate('submit');

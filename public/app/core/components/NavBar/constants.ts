@@ -132,3 +132,49 @@ export const PMM_ALERTING_PAGE: NavModelItem = {
     },
   ],
 };
+
+export const PMM_SETTINGS_PAGE: NavModelItem = {
+  id: 'settings',
+  icon: 'percona-setting',
+  text: 'Settings',
+  url: `${getConfig().appSubUrl}/settings`,
+  subTitle: 'Percona Settings',
+  breadcrumbs: [
+    {
+      title: 'Settings',
+      url: `${getConfig().appSubUrl}/settings`,
+    },
+  ],
+  children: [
+    {
+      id: 'settings-metrics-resolution',
+      text: 'Metrics Resolution',
+      url: `${getConfig().appSubUrl}/settings/metrics-resolution`,
+    },
+    {
+      id: 'settings-advanced',
+      text: 'Advanced',
+      url: `${getConfig().appSubUrl}/settings/advanced-settings`,
+    },
+    {
+      id: 'settings-ssh',
+      text: 'SSH',
+      url: `${getConfig().appSubUrl}/settings/ssh-key`,
+    },
+    {
+      id: 'settings-alert-manager',
+      text: 'Alert Manager',
+      url: `${getConfig().appSubUrl}/settings/am-integration`,
+    },
+    {
+      id: 'settings-percona-platform',
+      text: 'Percona Platform',
+      url: `${getConfig().appSubUrl}/settings/percona-platform`,
+    },
+    {
+      id: 'settings-communication',
+      text: 'Communication',
+      url: `${getConfig().appSubUrl}/settings/communication`,
+    },
+  ],
+};

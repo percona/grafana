@@ -1,6 +1,19 @@
 import React, { FC } from 'react';
-import { PlatformProps } from './types';
+import { useSelector } from 'react-redux';
+import Page from 'app/core/components/Page/Page';
+import { useNavModel } from 'app/core/hooks/useNavModel';
+import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { Connected } from './Connected/Connected';
 import { Connect } from './Connect/Connect';
 
-export const Platform: FC<PlatformProps> = ({ isConnected }) => (isConnected ? <Connected /> : <Connect />);
+export const Platform: FC = () => {
+  const navModel = useNavModel('settings-percona-platform', true);
+  const { isConnectedToPortal } = useSelector(getPerconaUser);
+  return (
+    <Page navModel={navModel}>
+      <Page.Contents>{isConnectedToPortal ? <Connected /> : <Connect />}</Page.Contents>
+    </Page>
+  );
+};
+
+export default Platform;

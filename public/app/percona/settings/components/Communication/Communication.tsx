@@ -1,21 +1,45 @@
-import React, { FC, useMemo, useState } from 'react';
-import { Tab, TabContent, TabsBar, useTheme } from '@grafana/ui';
-import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { cx } from '@emotion/css';
-import { CommunicationProps } from './Communication.types';
-import { EmailPayload } from '../../Settings.types';
+import { Tab, TabContent, TabsBar, useTheme } from '@grafana/ui';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from 'app/store/store';
+import { updateSettingsAction } from 'app/percona/shared/core/reducers';
+import { getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
+import Page from 'app/core/components/Page/Page';
+import { useNavModel } from 'app/core/hooks/useNavModel';
+import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
+import { EmailPayload, SettingsAPIChangePayload } from '../../Settings.types';
 import { Email } from './Email/Email';
 import { Slack } from './Slack/Slack';
 import { Messages } from './Communication.messages';
 import { CommunicationService } from './Communication.service';
 
-export const Communication: FC<CommunicationProps> = ({ alertingSettings, updateSettings }) => {
+export const Communication: FC = () => {
   const theme = useTheme();
   const settingsStyles = getSettingsStyles(theme);
   const [activeTab, setActiveTab] = useState(Messages.tabs.email.key);
+  const dispatch = useAppDispatch();
+  const [generateToken] = useCancelToken();
+  const navModel = useNavModel('settings-communication', true);
+  const { result: settings } = useSelector(getPerconaSettings);
+  const { alertingSettings } = settings!;
 
   const testEmailSetting = async (settings: EmailPayload, email: string): Promise<void> =>
     CommunicationService.testEmailSettings(settings, email);
+
+  const updateSettings = useCallback(
+    async (body: Partial<SettingsAPIChangePayload>) => {
+      await dispatch(
+        updateSettingsAction({
+          body,
+          token: generateToken(SET_SETTINGS_CANCEL_TOKEN),
+        })
+      );
+    },
+    [dispatch, generateToken]
+  );
 
   const tabs = useMemo(
     () => [
@@ -39,17 +63,28 @@ export const Communication: FC<CommunicationProps> = ({ alertingSettings, update
         component: <Slack key="slack" updateSettings={updateSettings} settings={alertingSettings.slack} />,
       },
     ],
-    [alertingSettings, activeTab, updateSettings]
+    [activeTab, updateSettings, alertingSettings.email, alertingSettings.slack]
   );
 
   return (
-    <div className={cx(settingsStyles.wrapper)}>
-      <TabsBar>
-        {tabs.map((tab, index) => (
-          <Tab key={index} label={tab.label} active={tab.key === activeTab} onChangeTab={() => setActiveTab(tab.key)} />
-        ))}
-      </TabsBar>
-      <TabContent>{tabs.map((tab) => tab.key === activeTab && tab.component)}</TabContent>
-    </div>
+    <Page navModel={navModel}>
+      <Page.Contents>
+        <div className={cx(settingsStyles.wrapper)}>
+          <TabsBar>
+            {tabs.map((tab, index) => (
+              <Tab
+                key={index}
+                label={tab.label}
+                active={tab.key === activeTab}
+                onChangeTab={() => setActiveTab(tab.key)}
+              />
+            ))}
+          </TabsBar>
+          <TabContent>{tabs.map((tab) => tab.key === activeTab && tab.component)}</TabContent>
+        </div>
+      </Page.Contents>
+    </Page>
   );
 };
+
+export default Communication;

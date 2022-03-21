@@ -2,22 +2,10 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { dataTestId } from '@percona/platform-core';
 import { Advanced } from './Advanced';
-import { sttCheckIntervalsStub } from './__mocks__/stubs';
 
 xdescribe('Advanced::', () => {
   it('Renders correctly with props', () => {
-    const root = mount(
-      <Advanced
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        backupEnabled={false}
-        updatesDisabled
-        updateSettings={() => {}}
-        publicAddress="pmmtest.percona.com"
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
     const retentionInput = root.find(dataTestId('retention-field-container')).find('input');
     const publicAddressInput = root.find(dataTestId('publicAddress-text-input')).find('input');
 
@@ -26,52 +14,21 @@ xdescribe('Advanced::', () => {
   });
 
   it("Can't change telemetry when stt is on", () => {
-    const root = mount(
-      <Advanced
-        backupEnabled={false}
-        dataRetention="1296000s"
-        telemetryEnabled
-        sttEnabled
-        updatesDisabled
-        updateSettings={() => {}}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
     const telemetrySwitch = root.find('[data-testid="advanced-telemetry"]').find('input');
 
     expect(telemetrySwitch.prop('disabled')).toBeTruthy();
   });
 
   it("Can't change stt when telemetry is off", () => {
-    const root = mount(
-      <Advanced
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        backupEnabled={false}
-        updatesDisabled
-        updateSettings={() => {}}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
     const sttSwitch = root.find('[data-testid="advanced-stt"]').find('input');
 
     expect(sttSwitch.prop('disabled')).toBeTruthy();
   });
 
   it("Can't change alerting when telemetry is off", () => {
-    const root = mount(
-      <Advanced
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        backupEnabled={false}
-        alertingEnabled={false}
-        updatesDisabled
-        updateSettings={() => {}}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
     const alertingSwitch = root.find('[data-testid="advanced-alerting"]').find('input');
 
     expect(alertingSwitch.prop('disabled')).toBeTruthy();
@@ -79,17 +36,7 @@ xdescribe('Advanced::', () => {
 
   it('Calls apply changes', () => {
     const updateSettings = jest.fn();
-    const root = mount(
-      <Advanced
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        backupEnabled={false}
-        updatesDisabled
-        updateSettings={updateSettings}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
 
     root
       .find('[data-testid="retention-field-container"]')
@@ -110,17 +57,7 @@ xdescribe('Advanced::', () => {
       value: location,
     });
 
-    const root = mount(
-      <Advanced
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        backupEnabled={false}
-        updatesDisabled
-        updateSettings={() => {}}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
     const publicAddressButton = root.find(dataTestId('public-address-button')).find('button');
 
     publicAddressButton.simulate('click');
@@ -134,17 +71,7 @@ xdescribe('Advanced::', () => {
   it('Does not include STT check intervals in the change request if STT checks are disabled', () => {
     const fakeUpdateSettings = jest.fn();
 
-    const root = mount(
-      <Advanced
-        backupEnabled={false}
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        updatesDisabled
-        updateSettings={fakeUpdateSettings}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
 
     root.find('form').simulate('submit');
 
@@ -154,17 +81,7 @@ xdescribe('Advanced::', () => {
   it('Includes STT check intervals in the change request if STT checks are enabled', () => {
     const fakeUpdateSettings = jest.fn();
 
-    const root = mount(
-      <Advanced
-        backupEnabled={false}
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={true}
-        updatesDisabled
-        updateSettings={fakeUpdateSettings}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
+    const root = mount(<Advanced />);
 
     root.find('form').simulate('submit');
 
