@@ -3,8 +3,8 @@ import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { LIST_ENTITLEMENTS_CANCEL_TOKEN, PAGE_MODEL } from './Entitlements.contants';
 import { logger } from '@percona/platform-core';
 import { useSelector } from 'react-redux';
-import { StoreState } from 'app/types';
-import { CollapsableSection } from '../../../../packages/grafana-ui/src';
+import { getPerconaSettings } from '../shared/core/selectors';
+import { CollapsableSection } from '@grafana/ui/src/components';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from '../shared/helpers/api';
 //import { getStyles } from './Entitlements.styles';
@@ -16,7 +16,7 @@ import { Label } from './components/SectionLabel/SectionLabel';
 const EntitlementsPage: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Entitlement[]>([]);
-  const connected = useSelector((state: StoreState) => !!state.perconaSettings.isConnectedToPortal);
+  const { isConnectedToPortal } = useSelector(getPerconaSettings);
   const [generateToken] = useCancelToken();
   //const styles = useStyles(getStyles);
   data.map((value: Entitlement) => {
@@ -39,11 +39,11 @@ const EntitlementsPage: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (connected === true) {
+    if (isConnectedToPortal === true) {
       getData(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected]);
+  }, [isConnectedToPortal]);
 
   return (
     <PageWrapper pageModel={PAGE_MODEL}>
