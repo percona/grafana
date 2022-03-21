@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
-import { useStyles } from '@grafana/ui';
 import { useSelector } from 'react-redux';
+import { useStyles } from '@grafana/ui';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -169,6 +169,11 @@ export const DBCluster: FC = () => {
 
   useEffect(() => setLoading((prevLoading) => prevLoading || kubernetesLoading), [kubernetesLoading]);
 
+  const showMonitoringWarning = useMemo(() => settingsLoading || !settings?.publicAddress, [
+    settings?.publicAddress,
+    settingsLoading,
+  ]);
+
   return (
     <Page navModel={navModel}>
       <Page.Contents>
@@ -183,7 +188,7 @@ export const DBCluster: FC = () => {
               isVisible={addModalVisible}
               setVisible={setAddModalVisible}
               onDBClusterAdded={getDBClusters}
-              showMonitoringWarning={settingsLoading || !settings?.publicAddress}
+              showMonitoringWarning={showMonitoringWarning}
             />
             <DeleteDBClusterModal
               isVisible={deleteModalVisible}

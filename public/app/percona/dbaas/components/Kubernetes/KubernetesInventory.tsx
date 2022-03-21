@@ -14,6 +14,7 @@ import {
   getDeleteKubernetes,
   getAddKubernetes,
   getPerconaSettingFlag,
+  getPerconaSettings,
 } from 'app/percona/shared/core/selectors';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
@@ -52,6 +53,11 @@ export const KubernetesInventory: FC = () => {
   const { loading: deleteKubernetesLoading } = useSelector(getDeleteKubernetes);
   const { loading: addKubernetesLoading } = useSelector(getAddKubernetes);
   const loading = kubernetesLoading || deleteKubernetesLoading || addKubernetesLoading;
+  const { loading: settingsLoading, result: settings } = useSelector(getPerconaSettings);
+  const showMonitoringWarning = useMemo(() => settingsLoading || !settings?.publicAddress, [
+    settings?.publicAddress,
+    settingsLoading,
+  ]);
 
   const deleteKubernetesCluster = useCallback(
     (force?: boolean) => {
@@ -160,6 +166,7 @@ export const KubernetesInventory: FC = () => {
               isVisible={addModalVisible}
               addKubernetes={addKubernetes}
               setAddModalVisible={setAddModalVisible}
+              showMonitoringWarning={showMonitoringWarning}
             />
             <Modal
               title={Messages.kubernetes.deleteModal.title}
