@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
+import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { Connected } from './Connected/Connected';
 import { Connect } from './Connect/Connect';
 
@@ -11,7 +12,10 @@ export const Platform: FC = () => {
   const { isConnectedToPortal } = useSelector(getPerconaUser);
   return (
     <Page navModel={navModel}>
-      <Page.Contents>{isConnectedToPortal ? <Connected /> : <Connect />}</Page.Contents>
+      <Page.Contents>
+        <TechnicalPreview />
+        {isConnectedToPortal ? <Connected /> : <Connect />}
+      </Page.Contents>
     </Page>
   );
 };
