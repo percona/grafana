@@ -1,14 +1,13 @@
-import { stylesFactory } from '@grafana/ui';
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 
-export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
+export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   sshKeyWrapper: css`
     display: flex;
     flex-direction: column;
   `,
   textarea: css`
-    margin: ${theme.spacing.md} 0;
+    margin: ${spacing.md} 0;
     min-height: 150px;
   `,
-}));
+});

@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { Field, Form } from 'react-final-form';
-import { Button, Input, Spinner, TextArea, useTheme } from '@grafana/ui';
+import { Button, Input, Spinner, TextArea, useStyles2 } from '@grafana/ui';
 import { cx } from '@emotion/css';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from 'app/store/store';
@@ -19,9 +19,8 @@ import { AlertManagerChangePayload } from '../../Settings.types';
 import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 
 export const AlertManager: FC = () => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
-  const settingsStyles = getSettingsStyles(theme);
+  const styles = useStyles2(getStyles);
+  const settingsStyles = useStyles2(getSettingsStyles);
   const {
     alertmanager: {
       action,

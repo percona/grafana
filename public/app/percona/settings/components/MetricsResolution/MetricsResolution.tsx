@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Button, Spinner, useTheme } from '@grafana/ui';
+import { Button, Spinner, useStyles2 } from '@grafana/ui';
 import { Form } from 'react-final-form';
 import { FormApi } from 'final-form';
 import { useSelector } from 'react-redux';
@@ -25,9 +25,8 @@ import { MAX_DAYS, MIN_DAYS } from '../Advanced/Advanced.constants';
 import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 
 export const MetricsResolution: FC = () => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
-  const settingsStyles = getSettingsStyles(theme);
+  const styles = useStyles2(getStyles);
+  const settingsStyles = useStyles2(getSettingsStyles);
   const [initialValues, setInitialValues] = useState({});
   const [loading, setLoading] = useState(false);
   const [generateToken] = useCancelToken();

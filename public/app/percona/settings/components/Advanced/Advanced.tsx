@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { FormApi } from 'final-form';
 import { cx } from '@emotion/css';
-import { Button, Spinner, useTheme, Icon } from '@grafana/ui';
+import { Button, Spinner, Icon, useStyles2 } from '@grafana/ui';
 import { TextInputField, NumberInputField } from '@percona/platform-core';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from 'app/store/store';
@@ -38,8 +38,7 @@ const {
 } = Messages;
 
 export const Advanced: FC = () => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
   const { result: settings } = useSelector(getPerconaSettings);
   const dispatch = useAppDispatch();
@@ -56,7 +55,7 @@ export const Advanced: FC = () => {
     publicAddress,
     alertingEnabled,
   } = settings!;
-  const settingsStyles = getSettingsStyles(theme);
+  const settingsStyles = useStyles2(getSettingsStyles);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
   const {
     advanced: {

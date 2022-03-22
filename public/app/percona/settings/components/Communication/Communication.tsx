@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { cx } from '@emotion/css';
-import { Tab, TabContent, TabsBar, useTheme } from '@grafana/ui';
+import { Tab, TabContent, TabsBar, useStyles2 } from '@grafana/ui';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from 'app/store/store';
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
@@ -19,8 +19,7 @@ import { CommunicationService } from './Communication.service';
 import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 
 export const Communication: FC = () => {
-  const theme = useTheme();
-  const settingsStyles = getSettingsStyles(theme);
+  const settingsStyles = useStyles2(getSettingsStyles);
   const [activeTab, setActiveTab] = useState(Messages.tabs.email.key);
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
