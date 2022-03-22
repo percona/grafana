@@ -25,7 +25,7 @@ import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { PMM_STT_PAGE, PMM_BACKUP_PAGE, PMM_DBAAS_PAGE, PMM_ALERTING_PAGE, PMM_SETTINGS_PAGE } from './constants';
+import { PMM_STT_PAGE, PMM_BACKUP_PAGE, PMM_DBAAS_PAGE, PMM_ALERTING_PAGE, getPmmSettingsPage } from './constants';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -66,7 +66,7 @@ export const NavBar: FC = React.memo(() => {
 
   if (isPmmAdmin(config.bootData.user)) {
     buildSettingsMenuItem(topItems);
-    dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_SETTINGS_PAGE });
+    dispatch({ type: 'navIndex/updateNavIndex', payload: getPmmSettingsPage(alertingEnabled) });
 
     if (alertingEnabled) {
       buildIntegratedAlertingMenuItem(topItems);

@@ -133,19 +133,8 @@ export const PMM_ALERTING_PAGE: NavModelItem = {
   ],
 };
 
-export const PMM_SETTINGS_PAGE: NavModelItem = {
-  id: 'settings',
-  icon: 'percona-setting',
-  text: 'Settings',
-  url: `${getConfig().appSubUrl}/settings`,
-  subTitle: 'Percona Settings',
-  breadcrumbs: [
-    {
-      title: 'Settings',
-      url: `${getConfig().appSubUrl}/settings`,
-    },
-  ],
-  children: [
+export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
+  const children: NavModelItem[] = [
     {
       id: 'settings-metrics-resolution',
       text: 'Metrics Resolution',
@@ -171,10 +160,29 @@ export const PMM_SETTINGS_PAGE: NavModelItem = {
       text: 'Percona Platform',
       url: `${getConfig().appSubUrl}/settings/percona-platform`,
     },
-    {
+  ];
+
+  if (alertingEnabled) {
+    children.push({
       id: 'settings-communication',
       text: 'Communication',
       url: `${getConfig().appSubUrl}/settings/communication`,
-    },
-  ],
+    });
+  }
+  const page: NavModelItem = {
+    id: 'settings',
+    icon: 'percona-setting',
+    text: 'Settings',
+    url: `${getConfig().appSubUrl}/settings`,
+    subTitle: 'Percona Settings',
+    breadcrumbs: [
+      {
+        title: 'Settings',
+        url: `${getConfig().appSubUrl}/settings`,
+      },
+    ],
+    children,
+  };
+
+  return page;
 };
