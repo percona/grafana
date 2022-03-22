@@ -117,12 +117,27 @@ export const { setAuthorized, setPortalConnected } = perconaUserSlice.actions;
 
 export const fetchSettingsAction = createAsyncThunk(
   'percona/fetchSettings',
-  (_, thunkAPI): Promise<Settings> =>
+  (
+    args: { usedPassword: string; testEmail: string } | undefined = { usedPassword: '', testEmail: '' },
+    thunkAPI
+  ): Promise<Settings> =>
     withSerializedError(
       (async () => {
         const settings = await SettingsService.getSettings(undefined, true);
         thunkAPI.dispatch(setPortalConnected(!!settings.isConnectedToPortal));
-        return settings;
+        const modifiedSettings: Settings = {
+          ...settings,
+          alertingSettings: {
+            ...settings.alertingSettings,
+            email: {
+              ...settings.alertingSettings.email,
+              password: args.usedPassword,
+              test_email: args.testEmail,
+            },
+          },
+        };
+
+        return modifiedSettings;
       })()
     )
 );
@@ -133,17 +148,17 @@ export const updateSettingsAction = createAsyncThunk(
     withAppEvents(
       withSerializedError(
         (async () => {
-          // let password = '';
-          // let testEmail = '';
+          let password = '';
+          let testEmail = '';
 
           // we save the test email here so that we can sent it all the way down to the form again after re-render
           // the field is deleted from the payload so as not to be sent to the API
           if ('email_alerting_settings' in args.body) {
-            // password = args.body.email_alerting_settings.password || '';
-            // testEmail = args.body.email_alerting_settings?.test_email || '';
-            // if (testEmail) {
-            //   args.body.email_alerting_settings?.test_email = undefined;
-            // }
+            password = args.body.email_alerting_settings!.password || '';
+            testEmail = args.body.email_alerting_settings!.test_email || '';
+            if (testEmail) {
+              args.body.email_alerting_settings!.test_email = undefined;
+            }
           }
           const { settings }: SettingsAPIResponse = await api.post<any, Partial<SettingsAPIChangePayload>>(
             '/v1/Settings/Change',
@@ -151,7 +166,7 @@ export const updateSettingsAction = createAsyncThunk(
             false,
             args.token
           );
-          await thunkAPI.dispatch(fetchSettingsAction());
+          await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
           return toSettingsModel(settings);
         })()
       ),
