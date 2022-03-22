@@ -4,6 +4,7 @@ import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
+import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { Connected } from './Connected/Connected';
 import { Connect } from './Connect/Connect';
 import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
@@ -14,8 +15,16 @@ export const Platform: FC = () => {
   return (
     <Page navModel={navModel} vertical>
       <Page.Contents>
-        <TechnicalPreview />
-        <WithDiagnostics>{isConnectedToPortal ? <Connected /> : <Connect />}</WithDiagnostics>
+        <PermissionLoader
+          featureSelector={() => true}
+          renderError={() => null}
+          renderSuccess={() => (
+            <>
+              <TechnicalPreview />
+              <WithDiagnostics>{isConnectedToPortal ? <Connected /> : <Connect />}</WithDiagnostics>
+            </>
+          )}
+        />
       </Page.Contents>
     </Page>
   );

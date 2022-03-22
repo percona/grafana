@@ -23,8 +23,7 @@ import NavBarItem from './NavBarItem';
 import { NavBarSection } from './NavBarSection';
 import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
-import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
-import { getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { PMM_STT_PAGE, PMM_BACKUP_PAGE, PMM_DBAAS_PAGE, PMM_ALERTING_PAGE, getPmmSettingsPage } from './constants';
 
 const homeUrl = config.appSubUrl || '/';
@@ -46,6 +45,7 @@ export const NavBar: FC = React.memo(() => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { result } = useSelector(getPerconaSettings);
+  const { isAuthorized } = useSelector(getPerconaUser);
   const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = result!;
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
@@ -64,28 +64,29 @@ export const NavBar: FC = React.memo(() => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  if (isPmmAdmin(config.bootData.user)) {
+  dispatch({ type: 'navIndex/updateNavIndex', payload: getPmmSettingsPage(alertingEnabled) });
+  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_ALERTING_PAGE });
+  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_STT_PAGE });
+  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_DBAAS_PAGE });
+  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_BACKUP_PAGE });
+
+  if (isAuthorized) {
     buildSettingsMenuItem(topItems);
-    dispatch({ type: 'navIndex/updateNavIndex', payload: getPmmSettingsPage(alertingEnabled) });
 
     if (alertingEnabled) {
       buildIntegratedAlertingMenuItem(topItems);
-      dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_ALERTING_PAGE });
     }
 
     if (sttEnabled) {
       topItems.push(PMM_STT_PAGE);
-      dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_STT_PAGE });
     }
 
     if (dbaasEnabled) {
       topItems.push(PMM_DBAAS_PAGE);
-      dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_DBAAS_PAGE });
     }
 
     if (backupEnabled) {
       topItems.push(PMM_BACKUP_PAGE);
-      dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_BACKUP_PAGE });
     }
   }
 

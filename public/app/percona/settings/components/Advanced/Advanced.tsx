@@ -15,6 +15,7 @@ import { useNavModel } from 'app/core/hooks/useNavModel';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages, DATA_RETENTION_URL } from 'app/percona/settings/Settings.messages';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
+import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import validators from 'app/percona/shared/helpers/validators';
 import { getStyles } from './Advanced.styles';
 import { convertSecondsToDays, convertCheckIntervalsToHours, convertHoursStringToSeconds } from './Advanced.utils';
@@ -167,180 +168,186 @@ export const Advanced: FC = () => {
   return (
     <Page navModel={navModel} vertical>
       <Page.Contents>
-        <WithDiagnostics>
-          <div className={styles.advancedWrapper}>
-            <Form
-              onSubmit={applyChanges}
-              initialValues={initialValues}
-              render={({ form: { change }, values, handleSubmit, valid, pristine }) => (
-                <form onSubmit={handleSubmit}>
-                  <div className={styles.advancedRow}>
-                    <div className={styles.advancedCol}>
-                      <div className={settingsStyles.labelWrapper} data-testid="advanced-label">
-                        <span>{retentionLabel}</span>
-                        <LinkTooltip
-                          tooltipText={retentionTooltip}
-                          link={DATA_RETENTION_URL}
-                          linkText={tooltipLinkText}
-                          icon="info-circle"
-                        />
+        <PermissionLoader
+          featureSelector={() => true}
+          renderError={() => null}
+          renderSuccess={() => (
+            <WithDiagnostics>
+              <div className={styles.advancedWrapper}>
+                <Form
+                  onSubmit={applyChanges}
+                  initialValues={initialValues}
+                  render={({ form: { change }, values, handleSubmit, valid, pristine }) => (
+                    <form onSubmit={handleSubmit}>
+                      <div className={styles.advancedRow}>
+                        <div className={styles.advancedCol}>
+                          <div className={settingsStyles.labelWrapper} data-testid="advanced-label">
+                            <span>{retentionLabel}</span>
+                            <LinkTooltip
+                              tooltipText={retentionTooltip}
+                              link={DATA_RETENTION_URL}
+                              linkText={tooltipLinkText}
+                              icon="info-circle"
+                            />
+                          </div>
+                        </div>
+                        <div className={styles.inputWrapper}>
+                          <NumberInputField
+                            name="retention"
+                            validators={[validators.required, validators.range(MIN_DAYS, MAX_DAYS)]}
+                          />
+                        </div>
+                        <span className={styles.unitsLabel}>{retentionUnits}</span>
                       </div>
-                    </div>
-                    <div className={styles.inputWrapper}>
-                      <NumberInputField
-                        name="retention"
-                        validators={[validators.required, validators.range(MIN_DAYS, MAX_DAYS)]}
+                      <Field
+                        name="telemetry"
+                        type="checkbox"
+                        label={telemetryLabel}
+                        tooltip={telemetryTooltip}
+                        tooltipLinkText={tooltipLinkText}
+                        link={telemetryLink}
+                        dataTestId="advanced-telemetry"
+                        component={SwitchRow}
                       />
-                    </div>
-                    <span className={styles.unitsLabel}>{retentionUnits}</span>
-                  </div>
-                  <Field
-                    name="telemetry"
-                    type="checkbox"
-                    label={telemetryLabel}
-                    tooltip={telemetryTooltip}
-                    tooltipLinkText={tooltipLinkText}
-                    link={telemetryLink}
-                    dataTestId="advanced-telemetry"
-                    component={SwitchRow}
-                  />
-                  <div className={styles.infoBox}>
-                    <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
-                    <p>{telemetryDisclaimer}</p>
-                  </div>
-                  <Field
-                    name="updates"
-                    type="checkbox"
-                    label={updatesLabel}
-                    tooltip={updatesTooltip}
-                    tooltipLinkText={tooltipLinkText}
-                    link={updatesLink}
-                    dataTestId="advanced-updates"
-                    component={SwitchRow}
-                  />
-                  <Field
-                    name="stt"
-                    type="checkbox"
-                    label={sttLabel}
-                    tooltip={sttTooltip}
-                    tooltipLinkText={tooltipLinkText}
-                    link={sttLink}
-                    dataTestId="advanced-stt"
-                    component={SwitchRow}
-                  />
-                  <div className={styles.advancedRow}>
-                    <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
-                      <div className={settingsStyles.labelWrapper} data-testid="public-address-label">
-                        <span>{publicAddressLabel}</span>
-                        <LinkTooltip tooltipText={publicAddressTooltip} icon="info-circle" />
+                      <div className={styles.infoBox}>
+                        <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
+                        <p>{telemetryDisclaimer}</p>
                       </div>
-                    </div>
-                    <div className={styles.publicAddressWrapper}>
-                      <TextInputField name="publicAddress" className={styles.publicAddressInput} />
-                      <Button
-                        className={styles.publicAddressButton}
-                        type="button"
-                        variant="secondary"
-                        data-testid="public-address-button"
-                        onClick={() => change('publicAddress', window.location.host)}
-                      >
-                        <Icon name="link" />
-                        {publicAddressButton}
-                      </Button>
-                    </div>
-                  </div>
-                  <div className={styles.advancedRow}>
-                    <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
-                      <div className={settingsStyles.labelWrapper} data-testid="check-intervals-label">
-                        <span>{sttCheckIntervalsLabel}</span>
-                        <LinkTooltip tooltipText={sttCheckIntervalTooltip} icon="info-circle" />
-                      </div>
-                    </div>
-                  </div>
-                  {STT_CHECK_INTERVALS.map(({ label, name }) => (
-                    <div key={name} className={styles.advancedRow}>
-                      <div className={cx(styles.advancedCol, styles.advancedChildCol)}>
-                        <div className={settingsStyles.labelWrapper} data-testid={`check-interval-${name}-label`}>
-                          <span>{label}</span>
+                      <Field
+                        name="updates"
+                        type="checkbox"
+                        label={updatesLabel}
+                        tooltip={updatesTooltip}
+                        tooltipLinkText={tooltipLinkText}
+                        link={updatesLink}
+                        dataTestId="advanced-updates"
+                        component={SwitchRow}
+                      />
+                      <Field
+                        name="stt"
+                        type="checkbox"
+                        label={sttLabel}
+                        tooltip={sttTooltip}
+                        tooltipLinkText={tooltipLinkText}
+                        link={sttLink}
+                        dataTestId="advanced-stt"
+                        component={SwitchRow}
+                      />
+                      <div className={styles.advancedRow}>
+                        <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
+                          <div className={settingsStyles.labelWrapper} data-testid="public-address-label">
+                            <span>{publicAddressLabel}</span>
+                            <LinkTooltip tooltipText={publicAddressTooltip} icon="info-circle" />
+                          </div>
+                        </div>
+                        <div className={styles.publicAddressWrapper}>
+                          <TextInputField name="publicAddress" className={styles.publicAddressInput} />
+                          <Button
+                            className={styles.publicAddressButton}
+                            type="button"
+                            variant="secondary"
+                            data-testid="public-address-button"
+                            onClick={() => change('publicAddress', window.location.host)}
+                          >
+                            <Icon name="link" />
+                            {publicAddressButton}
+                          </Button>
                         </div>
                       </div>
-                      <div className={styles.inputWrapper}>
-                        <NumberInputField
-                          inputProps={{ step: STT_CHECK_INTERVAL_STEP, min: MIN_STT_CHECK_INTERVAL }}
-                          disabled={!values.stt}
-                          name={name}
-                          validators={[validators.required, validators.min(MIN_STT_CHECK_INTERVAL)]}
-                        />
+                      <div className={styles.advancedRow}>
+                        <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
+                          <div className={settingsStyles.labelWrapper} data-testid="check-intervals-label">
+                            <span>{sttCheckIntervalsLabel}</span>
+                            <LinkTooltip tooltipText={sttCheckIntervalTooltip} icon="info-circle" />
+                          </div>
+                        </div>
                       </div>
-                      <span className={styles.unitsLabel}>{sttCheckIntervalUnit}</span>
-                    </div>
-                  ))}
-                  <fieldset className={styles.technicalPreview}>
-                    <legend>{technicalPreviewLegend}</legend>
-                    <div className={styles.infoBox}>
-                      <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
-                      <p>
-                        {technicalPreviewDescription}{' '}
-                        <a href={TECHNICAL_PREVIEW_DOC_URL} target="_blank" rel="noreferrer">
-                          {technicalPreviewLinkText}
-                        </a>
-                      </p>
-                    </div>
-                    <Field
-                      name="dbaas"
-                      type="checkbox"
-                      label={dbaasLabel}
-                      tooltip={dbaasTooltip}
-                      tooltipLinkText={tooltipLinkText}
-                      link={dbaasLink}
-                      dataTestId="advanced-dbaas"
-                      component={SwitchRow}
-                    />
-                    <Field
-                      name="backup"
-                      type="checkbox"
-                      label={backupLabel}
-                      tooltip={backupTooltip}
-                      tooltipLinkText={tooltipLinkText}
-                      link={backupLink}
-                      dataTestId="advanced-backup"
-                      component={SwitchRow}
-                    />
-                    <Field
-                      name="alerting"
-                      type="checkbox"
-                      label={alertingLabel}
-                      tooltip={alertingTooltip}
-                      tooltipLinkText={tooltipLinkText}
-                      link={alertingLink}
-                      dataTestId="advanced-alerting"
-                      component={SwitchRow}
-                    />
-                    <Field
-                      name="azureDiscover"
-                      type="checkbox"
-                      label={azureDiscoverLabel}
-                      tooltip={azureDiscoverTooltip}
-                      tooltipLinkText={tooltipLinkText}
-                      link={azureDiscoverLink}
-                      dataTestId="advanced-azure-discover"
-                      component={SwitchRow}
-                    />
-                  </fieldset>
-                  <Button
-                    className={settingsStyles.actionButton}
-                    type="submit"
-                    disabled={!valid || pristine || loading}
-                    data-testid="advanced-button"
-                  >
-                    {loading && <Spinner />}
-                    {action}
-                  </Button>
-                </form>
-              )}
-            />
-          </div>
-        </WithDiagnostics>
+                      {STT_CHECK_INTERVALS.map(({ label, name }) => (
+                        <div key={name} className={styles.advancedRow}>
+                          <div className={cx(styles.advancedCol, styles.advancedChildCol)}>
+                            <div className={settingsStyles.labelWrapper} data-testid={`check-interval-${name}-label`}>
+                              <span>{label}</span>
+                            </div>
+                          </div>
+                          <div className={styles.inputWrapper}>
+                            <NumberInputField
+                              inputProps={{ step: STT_CHECK_INTERVAL_STEP, min: MIN_STT_CHECK_INTERVAL }}
+                              disabled={!values.stt}
+                              name={name}
+                              validators={[validators.required, validators.min(MIN_STT_CHECK_INTERVAL)]}
+                            />
+                          </div>
+                          <span className={styles.unitsLabel}>{sttCheckIntervalUnit}</span>
+                        </div>
+                      ))}
+                      <fieldset className={styles.technicalPreview}>
+                        <legend>{technicalPreviewLegend}</legend>
+                        <div className={styles.infoBox}>
+                          <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
+                          <p>
+                            {technicalPreviewDescription}{' '}
+                            <a href={TECHNICAL_PREVIEW_DOC_URL} target="_blank" rel="noreferrer">
+                              {technicalPreviewLinkText}
+                            </a>
+                          </p>
+                        </div>
+                        <Field
+                          name="dbaas"
+                          type="checkbox"
+                          label={dbaasLabel}
+                          tooltip={dbaasTooltip}
+                          tooltipLinkText={tooltipLinkText}
+                          link={dbaasLink}
+                          dataTestId="advanced-dbaas"
+                          component={SwitchRow}
+                        />
+                        <Field
+                          name="backup"
+                          type="checkbox"
+                          label={backupLabel}
+                          tooltip={backupTooltip}
+                          tooltipLinkText={tooltipLinkText}
+                          link={backupLink}
+                          dataTestId="advanced-backup"
+                          component={SwitchRow}
+                        />
+                        <Field
+                          name="alerting"
+                          type="checkbox"
+                          label={alertingLabel}
+                          tooltip={alertingTooltip}
+                          tooltipLinkText={tooltipLinkText}
+                          link={alertingLink}
+                          dataTestId="advanced-alerting"
+                          component={SwitchRow}
+                        />
+                        <Field
+                          name="azureDiscover"
+                          type="checkbox"
+                          label={azureDiscoverLabel}
+                          tooltip={azureDiscoverTooltip}
+                          tooltipLinkText={tooltipLinkText}
+                          link={azureDiscoverLink}
+                          dataTestId="advanced-azure-discover"
+                          component={SwitchRow}
+                        />
+                      </fieldset>
+                      <Button
+                        className={settingsStyles.actionButton}
+                        type="submit"
+                        disabled={!valid || pristine || loading}
+                        data-testid="advanced-button"
+                      >
+                        {loading && <Spinner />}
+                        {action}
+                      </Button>
+                    </form>
+                  )}
+                />
+              </div>
+            </WithDiagnostics>
+          )}
+        />
       </Page.Contents>
     </Page>
   );

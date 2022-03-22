@@ -9,6 +9,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
+import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import { EmailPayload, SettingsAPIChangePayload } from '../../Settings.types';
 import { Email } from './Email/Email';
@@ -70,21 +71,27 @@ export const Communication: FC = () => {
   return (
     <Page navModel={navModel} vertical>
       <Page.Contents>
-        <WithDiagnostics>
-          <div className={cx(settingsStyles.wrapper)}>
-            <TabsBar>
-              {tabs.map((tab, index) => (
-                <Tab
-                  key={index}
-                  label={tab.label}
-                  active={tab.key === activeTab}
-                  onChangeTab={() => setActiveTab(tab.key)}
-                />
-              ))}
-            </TabsBar>
-            <TabContent>{tabs.map((tab) => tab.key === activeTab && tab.component)}</TabContent>
-          </div>
-        </WithDiagnostics>
+        <PermissionLoader
+          featureSelector={() => true}
+          renderError={() => null}
+          renderSuccess={() => (
+            <WithDiagnostics>
+              <div className={cx(settingsStyles.wrapper)}>
+                <TabsBar>
+                  {tabs.map((tab, index) => (
+                    <Tab
+                      key={index}
+                      label={tab.label}
+                      active={tab.key === activeTab}
+                      onChangeTab={() => setActiveTab(tab.key)}
+                    />
+                  ))}
+                </TabsBar>
+                <TabContent>{tabs.map((tab) => tab.key === activeTab && tab.component)}</TabContent>
+              </div>
+            </WithDiagnostics>
+          )}
+        />
       </Page.Contents>
     </Page>
   );
