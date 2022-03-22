@@ -4,10 +4,7 @@ import { css } from '@emotion/css';
 
 export const getStyles = stylesFactory((theme: GrafanaTheme) => ({
   diagnosticsWrapper: css`
-    align-items: flex-end;
-    display: flex;
     flex: 1;
-    flex-direction: column;
   `,
   diagnosticsLabel: css`
     display: flex;

@@ -21,6 +21,7 @@ import { addUnits, getResolutionValue, removeUnits } from './MetricsResolution.u
 import { MetricsResolutionIntervals, MetricsResolutionPresets } from './MetricsResolution.types';
 import { NumberInputField, RadioButtonGroupField } from '@percona/platform-core';
 import { MAX_DAYS, MIN_DAYS } from '../Advanced/Advanced.constants';
+import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 
 export const MetricsResolution: FC = () => {
   const theme = useTheme();
@@ -94,67 +95,69 @@ export const MetricsResolution: FC = () => {
   };
 
   return (
-    <Page navModel={navModel}>
+    <Page navModel={navModel} vertical>
       <Page.Contents>
-        <div className={styles.resolutionsWrapper}>
-          <Form
-            onSubmit={applyChanges}
-            initialValues={initialValues}
-            render={({ form, handleSubmit, valid, pristine }) => (
-              <form
-                onSubmit={handleSubmit}
-                onChange={() => updateResolutions(form)}
-                data-testid="metrics-resolution-form"
-              >
-                <div className={settingsStyles.labelWrapper} data-testid="metrics-resolution-label">
-                  <span>{label}</span>
-                  <LinkTooltip tooltipText={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
-                </div>
-                <RadioButtonGroupField
-                  name="resolutions"
-                  data-testid="metrics-resolution-radio-button-group"
-                  options={resolutionsOptions}
-                />
-                <div className={styles.numericFieldWrapper}>
-                  <NumberInputField
-                    label={low}
-                    name={MetricsResolutionIntervals.lr}
-                    disabled={resolution !== MetricsResolutionPresets.custom}
-                    data-testid="metrics-resolution-lr-input"
-                    validators={resolutionValidators}
-                  />
-                </div>
-                <div className={styles.numericFieldWrapper}>
-                  <NumberInputField
-                    label={medium}
-                    name={MetricsResolutionIntervals.mr}
-                    disabled={resolution !== MetricsResolutionPresets.custom}
-                    data-testid="metrics-resolution-mr-input"
-                    validators={resolutionValidators}
-                  />
-                </div>
-                <div className={styles.numericFieldWrapper}>
-                  <NumberInputField
-                    label={high}
-                    name={MetricsResolutionIntervals.hr}
-                    disabled={resolution !== MetricsResolutionPresets.custom}
-                    data-testid="metrics-resolution-hr-input"
-                    validators={resolutionValidators}
-                  />
-                </div>
-                <Button
-                  className={settingsStyles.actionButton}
-                  type="submit"
-                  disabled={!valid || pristine || loading}
-                  data-testid="metrics-resolution-button"
+        <WithDiagnostics>
+          <div className={styles.resolutionsWrapper}>
+            <Form
+              onSubmit={applyChanges}
+              initialValues={initialValues}
+              render={({ form, handleSubmit, valid, pristine }) => (
+                <form
+                  onSubmit={handleSubmit}
+                  onChange={() => updateResolutions(form)}
+                  data-testid="metrics-resolution-form"
                 >
-                  {loading && <Spinner />}
-                  {action}
-                </Button>
-              </form>
-            )}
-          />
-        </div>
+                  <div className={settingsStyles.labelWrapper} data-testid="metrics-resolution-label">
+                    <span>{label}</span>
+                    <LinkTooltip tooltipText={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
+                  </div>
+                  <RadioButtonGroupField
+                    name="resolutions"
+                    data-testid="metrics-resolution-radio-button-group"
+                    options={resolutionsOptions}
+                  />
+                  <div className={styles.numericFieldWrapper}>
+                    <NumberInputField
+                      label={low}
+                      name={MetricsResolutionIntervals.lr}
+                      disabled={resolution !== MetricsResolutionPresets.custom}
+                      data-testid="metrics-resolution-lr-input"
+                      validators={resolutionValidators}
+                    />
+                  </div>
+                  <div className={styles.numericFieldWrapper}>
+                    <NumberInputField
+                      label={medium}
+                      name={MetricsResolutionIntervals.mr}
+                      disabled={resolution !== MetricsResolutionPresets.custom}
+                      data-testid="metrics-resolution-mr-input"
+                      validators={resolutionValidators}
+                    />
+                  </div>
+                  <div className={styles.numericFieldWrapper}>
+                    <NumberInputField
+                      label={high}
+                      name={MetricsResolutionIntervals.hr}
+                      disabled={resolution !== MetricsResolutionPresets.custom}
+                      data-testid="metrics-resolution-hr-input"
+                      validators={resolutionValidators}
+                    />
+                  </div>
+                  <Button
+                    className={settingsStyles.actionButton}
+                    type="submit"
+                    disabled={!valid || pristine || loading}
+                    data-testid="metrics-resolution-button"
+                  >
+                    {loading && <Spinner />}
+                    {action}
+                  </Button>
+                </form>
+              )}
+            />
+          </div>
+        </WithDiagnostics>
       </Page.Contents>
     </Page>
   );

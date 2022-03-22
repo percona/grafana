@@ -15,6 +15,7 @@ import { Email } from './Email/Email';
 import { Slack } from './Slack/Slack';
 import { Messages } from './Communication.messages';
 import { CommunicationService } from './Communication.service';
+import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 
 export const Communication: FC = () => {
   const theme = useTheme();
@@ -67,21 +68,23 @@ export const Communication: FC = () => {
   );
 
   return (
-    <Page navModel={navModel}>
+    <Page navModel={navModel} vertical>
       <Page.Contents>
-        <div className={cx(settingsStyles.wrapper)}>
-          <TabsBar>
-            {tabs.map((tab, index) => (
-              <Tab
-                key={index}
-                label={tab.label}
-                active={tab.key === activeTab}
-                onChangeTab={() => setActiveTab(tab.key)}
-              />
-            ))}
-          </TabsBar>
-          <TabContent>{tabs.map((tab) => tab.key === activeTab && tab.component)}</TabContent>
-        </div>
+        <WithDiagnostics>
+          <div className={cx(settingsStyles.wrapper)}>
+            <TabsBar>
+              {tabs.map((tab, index) => (
+                <Tab
+                  key={index}
+                  label={tab.label}
+                  active={tab.key === activeTab}
+                  onChangeTab={() => setActiveTab(tab.key)}
+                />
+              ))}
+            </TabsBar>
+            <TabContent>{tabs.map((tab) => tab.key === activeTab && tab.component)}</TabContent>
+          </div>
+        </WithDiagnostics>
       </Page.Contents>
     </Page>
   );

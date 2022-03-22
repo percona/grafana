@@ -6,15 +6,16 @@ import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { Connected } from './Connected/Connected';
 import { Connect } from './Connect/Connect';
+import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 
 export const Platform: FC = () => {
   const navModel = useNavModel('settings-percona-platform', true);
   const { isConnectedToPortal } = useSelector(getPerconaUser);
   return (
-    <Page navModel={navModel}>
+    <Page navModel={navModel} vertical>
       <Page.Contents>
         <TechnicalPreview />
-        {isConnectedToPortal ? <Connected /> : <Connect />}
+        <WithDiagnostics>{isConnectedToPortal ? <Connected /> : <Connect />}</WithDiagnostics>
       </Page.Contents>
     </Page>
   );
