@@ -78,18 +78,8 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         accessor: 'summary',
       },
       {
-        Header: 'Labels',
-        accessor: 'labels',
-        // eslint-disable-next-line react/display-name
-        Cell: ({ value }) => {
-          return (
-            <div className={styles.chips}>
-              {value.primary.map((label) => (
-                <Chip key={label} text={label} />
-              ))}
-            </div>
-          );
-        },
+        Header: 'Description',
+        accessor: 'description',
       },
       {
         Header: 'Severity',
@@ -125,7 +115,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         ),
       },
     ],
-    [styles.chips, styles.link, styles.actions, onSilenceClick]
+    [styles.link, styles.actions, onSilenceClick]
   );
 
   const onPaginationChanged = useCallback(
@@ -147,7 +137,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<ServiceFailedCheck>) => (
       <div className={styles.secondaryLabels}>
-        {row.original.labels.secondary.map((label) => (
+        {[...row.original.labels.primary, ...row.original.labels.secondary].map((label) => (
           <Chip key={label} text={label} />
         ))}
       </div>
