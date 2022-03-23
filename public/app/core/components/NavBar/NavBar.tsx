@@ -11,6 +11,7 @@ import config from 'app/core/config';
 import { KioskMode } from 'app/types';
 import {
   buildIntegratedAlertingMenuItem,
+  buildInventoryMenuItem,
   buildSettingsMenuItem,
   enrichConfigItems,
   getActiveItem,
@@ -24,7 +25,14 @@ import { NavBarSection } from './NavBarSection';
 import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
-import { PMM_STT_PAGE, PMM_BACKUP_PAGE, PMM_DBAAS_PAGE, PMM_ALERTING_PAGE, getPmmSettingsPage } from './constants';
+import {
+  PMM_STT_PAGE,
+  PMM_BACKUP_PAGE,
+  PMM_DBAAS_PAGE,
+  PMM_ALERTING_PAGE,
+  PMM_INVENTORY_PAGE,
+  getPmmSettingsPage,
+} from './constants';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -69,9 +77,11 @@ export const NavBar: FC = React.memo(() => {
   dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_STT_PAGE });
   dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_DBAAS_PAGE });
   dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_BACKUP_PAGE });
+  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_INVENTORY_PAGE });
 
   if (isAuthorized) {
     buildSettingsMenuItem(topItems);
+    buildInventoryMenuItem(topItems);
 
     if (alertingEnabled) {
       buildIntegratedAlertingMenuItem(topItems);

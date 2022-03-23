@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { CheckboxField, logger } from '@percona/platform-core';
+import { useNavModel } from 'app/core/hooks/useNavModel';
+import Page from 'app/core/components/Page/Page';
+import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Form } from 'react-final-form';
@@ -30,6 +33,7 @@ export const Services = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [selected, setSelectedRows] = useState([]);
+  const navModel = useNavModel('inventory-services', true);
   const [generateToken] = useCancelToken();
 
   const loadData = useCallback(async () => {
@@ -80,76 +84,90 @@ export const Services = () => {
   );
 
   return (
-    <div className={styles.tableWrapper}>
-      <div className={styles.actionPanel}>
-        <Button
-          size="md"
-          disabled={selected.length === 0}
-          onClick={() => {
-            setModalVisible(!modalVisible);
-          }}
-          icon="trash-alt"
-          variant="destructive"
-          className={styles.destructiveButton}
-        >
-          Delete
-        </Button>
-      </div>
-      <Modal
-        title={
-          <div className="modal-header-title">
-            <span className="p-l-1">Confirm action</span>
-          </div>
-        }
-        isOpen={modalVisible}
-        onDismiss={() => setModalVisible(false)}
-      >
-        <Form
-          onSubmit={() => {}}
-          render={({ form, handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <>
-                <h4 className={styles.confirmationText}>
-                  Are you sure that you want to permanently delete {selected.length}{' '}
-                  {selected.length === 1 ? 'service' : 'services'}?
-                </h4>
-                <FormElement
-                  dataTestId="form-field-force"
-                  label="Force mode"
-                  element={<CheckboxField label="Force mode is going to delete all associated agents" name="force" />}
+    <Page navModel={navModel}>
+      <Page.Contents>
+        <PermissionLoader
+          featureSelector={() => true}
+          renderError={() => null}
+          renderSuccess={() => (
+            <div className={styles.tableWrapper}>
+              <div className={styles.actionPanel}>
+                <Button
+                  size="md"
+                  disabled={selected.length === 0}
+                  onClick={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                  icon="trash-alt"
+                  variant="destructive"
+                  className={styles.destructiveButton}
+                >
+                  Delete
+                </Button>
+              </div>
+              <Modal
+                title={
+                  <div className="modal-header-title">
+                    <span className="p-l-1">Confirm action</span>
+                  </div>
+                }
+                isOpen={modalVisible}
+                onDismiss={() => setModalVisible(false)}
+              >
+                <Form
+                  onSubmit={() => {}}
+                  render={({ form, handleSubmit }) => (
+                    <form onSubmit={handleSubmit}>
+                      <>
+                        <h4 className={styles.confirmationText}>
+                          Are you sure that you want to permanently delete {selected.length}{' '}
+                          {selected.length === 1 ? 'service' : 'services'}?
+                        </h4>
+                        <FormElement
+                          dataTestId="form-field-force"
+                          label="Force mode"
+                          element={
+                            <CheckboxField label="Force mode is going to delete all associated agents" name="force" />
+                          }
+                        />
+                        <HorizontalGroup justify="space-between" spacing="md">
+                          <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
+                            Cancel
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="md"
+                            onClick={() => {
+                              removeServices(selected, form.getState().values.force);
+                              setModalVisible(false);
+                            }}
+                            className={styles.destructiveButton}
+                          >
+                            Proceed
+                          </Button>
+                        </HorizontalGroup>
+                      </>
+                    </form>
+                  )}
                 />
-                <HorizontalGroup justify="space-between" spacing="md">
-                  <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="md"
-                    onClick={() => {
-                      removeServices(selected, form.getState().values.force);
-                      setModalVisible(false);
-                    }}
-                    className={styles.destructiveButton}
-                  >
-                    Proceed
-                  </Button>
-                </HorizontalGroup>
-              </>
-            </form>
+              </Modal>
+              <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
+                <Table
+                  className={styles.table}
+                  columns={SERVICES_COLUMNS}
+                  data={data}
+                  rowSelection
+                  onRowSelection={(selected) => setSelectedRows(selected)}
+                  noData={<h1>No services Available</h1>}
+                  loading={loading}
+                />
+              </div>
+            </div>
           )}
         />
-      </Modal>
-      <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
-        <Table
-          className={styles.table}
-          columns={SERVICES_COLUMNS}
-          data={data}
-          rowSelection
-          onRowSelection={(selected) => setSelectedRows(selected)}
-          noData={<h1>No services Available</h1>}
-          loading={loading}
-        />
-      </div>
-    </div>
+      </Page.Contents>
+    </Page>
   );
 };
+
+export default Services;

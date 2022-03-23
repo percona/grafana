@@ -9,6 +9,13 @@ import { HelpModal } from '../help/HelpModal';
 
 export const SEARCH_ITEM_ID = 'search';
 
+const DIVIDER = {
+  id: 'divider',
+  text: 'Divider',
+  divider: true,
+  hideFromTabs: true,
+};
+
 export const getForcedLoginUrl = (url: string) => {
   const queryParams = new URLSearchParams(url.split('?')[1]);
   queryParams.append('forceLogin', 'true');
@@ -145,15 +152,10 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
   const integratedAlertingLink = {
     id: 'integrated-alerting',
     text: 'Integrated Alerting',
-    icon: 'list-ul',
+    icon: 'bell',
     url: `${getConfig().appSubUrl}/integrated-alerting`,
   };
-  const divider = {
-    id: 'divider',
-    text: 'Divider',
-    divider: true,
-    hideFromTabs: true,
-  };
+
   const alertingIndex = mainLinks.findIndex(({ id }) => id === 'alerting');
 
   if (alertingIndex === -1) {
@@ -166,7 +168,7 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
       children: [integratedAlertingLink],
     });
   } else {
-    mainLinks[alertingIndex].children?.unshift(integratedAlertingLink, divider);
+    mainLinks[alertingIndex].children?.unshift(integratedAlertingLink, DIVIDER);
   }
 
   return mainLinks;
@@ -187,6 +189,39 @@ export const buildSettingsMenuItem = (mainLinks: NavModelItem[]): NavModelItem[]
     if (inventoryNodeIndex !== undefined && inventoryNodeIndex !== -1) {
       configNode.children?.splice(inventoryNodeIndex + 1, 0, settingsLink);
     }
+  }
+
+  return mainLinks;
+};
+
+export const buildInventoryMenuItem = (mainLinks: NavModelItem[]): NavModelItem[] => {
+  const inventoryLink: NavModelItem = {
+    id: 'inventory',
+    icon: 'percona-inventory',
+    text: 'PMM Inventory',
+    url: `${getConfig().appSubUrl}/inventory`,
+    children: [
+      {
+        id: 'inventory-list',
+        url: `${getConfig().appSubUrl}/inventory`,
+        icon: 'percona-inventory',
+        text: 'Inventory List',
+        hideFromTabs: true,
+      },
+      {
+        id: 'add-instance',
+        url: `${getConfig().appSubUrl}/add-instance`,
+        icon: 'percona-add',
+        text: 'Add Instance',
+        hideFromTabs: true,
+      },
+    ],
+  };
+
+  const configNode = mainLinks.find((link) => link.id === 'cfg');
+
+  if (configNode && configNode.children?.length) {
+    configNode.children.unshift(inventoryLink, DIVIDER);
   }
 
   return mainLinks;

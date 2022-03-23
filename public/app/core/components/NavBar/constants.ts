@@ -133,6 +133,37 @@ export const PMM_ALERTING_PAGE: NavModelItem = {
   ],
 };
 
+export const PMM_INVENTORY_PAGE: NavModelItem = {
+  id: 'inventory',
+  icon: 'percona-inventory',
+  text: 'PMM Inventory',
+  url: `${getConfig().appSubUrl}/inventory`,
+  subTitle: 'Percona PMM Inventory',
+  breadcrumbs: [
+    {
+      title: 'PMM Inventory',
+      url: `${getConfig().appSubUrl}/inventory`,
+    },
+  ],
+  children: [
+    {
+      id: 'inventory-services',
+      text: 'Services',
+      url: `${getConfig().appSubUrl}/inventory/services`,
+    },
+    {
+      id: 'inventory-agents',
+      text: 'Agents',
+      url: `${getConfig().appSubUrl}/inventory/agents`,
+    },
+    {
+      id: 'inventory-nodes',
+      text: 'Nodes',
+      url: `${getConfig().appSubUrl}/inventory/nodes`,
+    },
+  ],
+};
+
 export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
   const children: NavModelItem[] = [
     {

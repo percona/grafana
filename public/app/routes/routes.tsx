@@ -563,9 +563,26 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/inventory/:tab',
+      path: '/inventory',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/inventory/services" />,
+    },
+    {
+      path: '/inventory/services',
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "InventoryPage" */ 'app/percona/inventory/Inventory')
+        () => import(/* webpackChunkName: "InventoryServicesPage" */ 'app/percona/inventory/Tabs/Services')
+      ),
+    },
+    {
+      path: '/inventory/agents',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "InventoryAgentsPage" */ 'app/percona/inventory/Tabs/Agents')
+      ),
+    },
+    {
+      path: '/inventory/nodes',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "InventoryNodesPage" */ 'app/percona/inventory/Tabs/Nodes')
       ),
     },
     {
