@@ -165,8 +165,8 @@ export const Advanced: FC = () => {
   const { Form } = withTypes<AdvancedFormProps>();
 
   return (
-    <Page navModel={navModel} vertical>
-      <Page.Contents>
+    <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
+      <Page.Contents dataTestId="settings-tab-content">
         <PermissionLoader
           featureSelector={() => true}
           renderError={() => null}

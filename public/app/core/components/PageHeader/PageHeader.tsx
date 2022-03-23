@@ -7,6 +7,7 @@ import { PanelHeaderMenuItem } from 'app/features/dashboard/dashgrid/PanelHeader
 export interface Props {
   model: NavModel;
   vertical?: boolean;
+  tabsDataTestId?: string;
 }
 
 const SelectNav = ({ children, customCss }: { children: NavModelItem[]; customCss: string }) => {
@@ -45,7 +46,16 @@ const SelectNav = ({ children, customCss }: { children: NavModelItem[]; customCs
   );
 };
 
-const Navigation = ({ children, vertical = false }: { children: NavModelItem[]; vertical?: boolean }) => {
+const Navigation = ({
+  children,
+  vertical = false,
+  dataTestId = '',
+}: {
+  children: NavModelItem[];
+  vertical?: boolean;
+  dataTestId?: string;
+  tabsdataTestId?: string;
+}) => {
   const styles = useStyles2(getStyles);
 
   if (!children || children.length === 0) {
@@ -55,7 +65,7 @@ const Navigation = ({ children, vertical = false }: { children: NavModelItem[]; 
   return (
     <nav className={cx({ [styles.verticalNav]: !!vertical })}>
       <SelectNav customCss="page-header__select-nav">{children}</SelectNav>
-      <TabsBar className="page-header__tabs" hideBorder={true} vertical={vertical}>
+      <TabsBar className="page-header__tabs" hideBorder={true} vertical={vertical} dataTestId={dataTestId}>
         {children.map((child, index) => {
           return (
             !child.hideFromTabs && (
@@ -74,7 +84,7 @@ const Navigation = ({ children, vertical = false }: { children: NavModelItem[]; 
   );
 };
 
-export const PageHeader: FC<Props> = ({ model, vertical = false }) => {
+export const PageHeader: FC<Props> = ({ model, vertical = false, tabsDataTestId = '' }) => {
   const styles = useStyles2(getStyles);
 
   if (!model) {
@@ -89,7 +99,11 @@ export const PageHeader: FC<Props> = ({ model, vertical = false }) => {
       <div className="page-container">
         <div className="page-header">
           {renderHeaderTitle(main)}
-          {children && children.length && <Navigation vertical={vertical}>{children}</Navigation>}
+          {children && children.length && (
+            <Navigation vertical={vertical} dataTestId={tabsDataTestId}>
+              {children}
+            </Navigation>
+          )}
         </div>
       </div>
     </div>

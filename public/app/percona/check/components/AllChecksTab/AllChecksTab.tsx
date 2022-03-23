@@ -68,8 +68,8 @@ export const AllChecksTab: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
   return (
-    <Page navModel={navModel}>
-      <Page.Contents>
+    <Page navModel={navModel} tabsDataTestId="db-check-tabs-bar">
+      <Page.Contents dataTestId="db-check-tab-content">
         <TechnicalPreview />
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"

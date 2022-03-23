@@ -10,6 +10,7 @@ export interface Props {
   /** For hiding the bottom border (on PageHeader for example) */
   hideBorder?: boolean;
   vertical?: boolean;
+  dataTestId?: string;
 }
 
 const getTabsBarStyles = stylesFactory((theme: GrafanaTheme2, hideBorder = false, vertical = false) => {
@@ -29,13 +30,15 @@ const getTabsBarStyles = stylesFactory((theme: GrafanaTheme2, hideBorder = false
 });
 
 export const TabsBar = React.forwardRef<HTMLDivElement, Props>(
-  ({ children, className, hideBorder, vertical = false }, ref) => {
+  ({ children, className, hideBorder, vertical = false, dataTestId = '' }, ref) => {
     const theme = useTheme2();
     const tabsStyles = getTabsBarStyles(theme, hideBorder, vertical);
 
     return (
       <div className={cx(tabsStyles.tabsWrapper, className)} ref={ref}>
-        <ul className={tabsStyles.tabs}>{children}</ul>
+        <ul data-testid={dataTestId} className={tabsStyles.tabs}>
+          {children}
+        </ul>
       </div>
     );
   }

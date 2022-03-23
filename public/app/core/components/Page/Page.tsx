@@ -15,6 +15,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   navModel?: NavModel;
   vertical?: boolean;
+  tabsDataTestId?: string;
 }
 
 export interface PageType extends FC<Props> {
@@ -22,7 +23,14 @@ export interface PageType extends FC<Props> {
   Contents: typeof PageContents;
 }
 
-export const Page: PageType = ({ navModel, vertical = false, children, className, ...otherProps }) => {
+export const Page: PageType = ({
+  navModel,
+  vertical = false,
+  tabsDataTestId = '',
+  children,
+  className,
+  ...otherProps
+}) => {
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
@@ -38,7 +46,7 @@ export const Page: PageType = ({ navModel, vertical = false, children, className
     <div {...otherProps} className={cx(styles.wrapper, className)}>
       <CustomScrollbar autoHeightMin={'100%'}>
         <div className={cx('page-scrollbar-content', { 'vertical-content': !!vertical })}>
-          {navModel && <PageHeader model={navModel} vertical={vertical} />}
+          {navModel && <PageHeader tabsDataTestId={tabsDataTestId} model={navModel} vertical={vertical} />}
           {children}
           <Footer />
         </div>
