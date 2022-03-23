@@ -7,10 +7,10 @@ import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { FailedCheckSummary } from 'app/percona/check/types';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
-import { Spinner, Switch, useStyles2 } from '@grafana/ui';
+import { Spinner, useStyles2 } from '@grafana/ui';
 import { Messages } from './FailedChecksTab.messages';
 import { getStyles } from './FailedChecksTab.styles';
-import { loadShowSilencedValue, saveShowSilencedValue, stripServiceId } from './FailedChecksTab.utils';
+import { stripServiceId } from './FailedChecksTab.utils';
 import { appEvents } from '../../../../core/app_events';
 import { AppEvents } from '@grafana/data';
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
@@ -19,7 +19,6 @@ import { locationService } from '@grafana/runtime';
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
   const [runChecksPending, setRunChecksPending] = useState(false);
-  const [showSilenced, setShowSilenced] = useState(loadShowSilencedValue());
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
@@ -60,7 +59,7 @@ export const FailedChecksTab: FC = () => {
     }
     setFetchAlertsPending(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSilenced]);
+  }, []);
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
@@ -72,10 +71,6 @@ export const FailedChecksTab: FC = () => {
     } finally {
       setRunChecksPending(false);
     }
-  };
-
-  const toggleShowSilenced = () => {
-    setShowSilenced((currentValue) => !currentValue);
   };
 
   const getRowProps = (row: Row<FailedCheckSummary>): TableRowProps => ({
@@ -93,20 +88,13 @@ export const FailedChecksTab: FC = () => {
 
   useEffect(() => {
     fetchAlerts();
-    saveShowSilencedValue(showSilenced);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSilenced]);
+  }, []);
 
   return (
     <>
       <div className={styles.header}>
         <div className={styles.actionButtons} data-testid="db-check-panel-actions">
-          <span className={styles.showAll}>
-            <span data-testid="db-checks-failed-checks-toggle-silenced">
-              <Switch value={showSilenced} onChange={toggleShowSilenced} />
-            </span>
-            <span>{Messages.showAll}</span>
-          </span>
           <LoaderButton
             type="button"
             size="md"

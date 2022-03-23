@@ -28,15 +28,6 @@ export const getStyles = ({ v1: { spacing, palette } }: GrafanaTheme2) => ({
     padding: ${headerPadding};
     align-items: center;
   `,
-  showAll: css`
-    display: flex;
-    align-items: center;
-    margin-right: ${spacing.xl};
-
-    span {
-      margin-left: ${spacing.sm};
-    }
-  `,
   row: css`
     cursor: pointer;
     &:hover {
