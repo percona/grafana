@@ -558,12 +558,6 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     {
       path: '/inventory',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "InventoryPage" */ 'app/percona/inventory/Inventory')
-      ),
-    },
-    {
-      path: '/inventory',
       // eslint-disable-next-line react/display-name
       component: () => <Redirect to="/inventory/services" />,
     },
