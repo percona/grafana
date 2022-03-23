@@ -24,7 +24,7 @@ describe('FailedChecksTab::', () => {
       render(<FailedChecksTab />);
     });
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
     expect(CheckService.getAllFailedChecks).toHaveBeenCalledTimes(1);
   });
 
@@ -35,7 +35,7 @@ describe('FailedChecksTab::', () => {
 
     expect(screen.queryByTestId('db-checks-failed-checks-spinner')).toBeInTheDocument();
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     expect(screen.queryByTestId('db-checks-failed-checks-spinner')).not.toBeInTheDocument();
   });
@@ -50,7 +50,7 @@ describe('FailedChecksTab::', () => {
       render(<FailedChecksTab />);
     });
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     expect(loggerSpy).toBeCalledTimes(1);
 
@@ -67,7 +67,7 @@ describe('FailedChecksTab::', () => {
       render(<FailedChecksTab />);
     });
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     const runChecksButton = screen.getByRole('button');
 
@@ -89,7 +89,7 @@ describe('FailedChecksTab::', () => {
       render(<FailedChecksTab />);
     });
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     const runChecksButton = screen.getByRole('button');
 
@@ -114,7 +114,7 @@ describe('FailedChecksTab::', () => {
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     expect(screen.queryByTestId('table-no-data')).toBeInTheDocument();
   });
