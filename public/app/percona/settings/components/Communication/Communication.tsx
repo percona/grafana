@@ -86,7 +86,9 @@ export const Communication: FC = () => {
                     />
                   ))}
                 </TabsBar>
-                <TabContent>{tabs.map((tab) => tab.key === activeTab && tab.component)}</TabContent>
+                <TabContent className={settingsStyles.tabs}>
+                  {tabs.map((tab) => tab.key === activeTab && tab.component)}
+                </TabContent>
               </div>
             </WithDiagnostics>
           )}

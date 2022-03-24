@@ -27,5 +27,8 @@ export const getSettingsStyles = ({ v1: { breakpoints, spacing } }: GrafanaTheme
         display: flex;
       }
     `,
+    tabs: css`
+      background: transparent;
+    `,
   };
 };
