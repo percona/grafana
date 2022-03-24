@@ -14,6 +14,12 @@ import { AlertRuleSeverity } from '../integrated-alerting/components/AlertRules/
 import { formatLabels } from '../shared/helpers/labels';
 
 export const makeApiUrl: (segment: string) => string = (segment) => `${API.ALERTMANAGER}/${segment}`;
+const order = {
+  [AlertRuleSeverity.SEVERITY_CRITICAL]: 1,
+  [AlertRuleSeverity.SEVERITY_ERROR]: 2,
+  [AlertRuleSeverity.SEVERITY_WARNING]: 3,
+  [AlertRuleSeverity.SEVERITY_NOTICE]: 4,
+};
 const BASE_URL = '/v1/management/SecurityChecks';
 
 /**
@@ -57,29 +63,31 @@ export const CheckService = {
         totalItems,
         totalPages,
       },
-      data: results.map(
-        ({
-          summary,
-          description,
-          severity,
-          labels = {},
-          read_more_url,
-          service_name,
-          check_name,
-          silenced,
-          alert_id,
-        }) => ({
-          summary,
-          description,
-          severity: AlertRuleSeverity[severity],
-          labels: formatLabels(labels),
-          readMoreUrl: read_more_url,
-          serviceName: service_name,
-          checkName: check_name,
-          silenced: !!silenced,
-          alertId: alert_id,
-        })
-      ),
+      data: results
+        .map(
+          ({
+            summary,
+            description,
+            severity,
+            labels = {},
+            read_more_url,
+            service_name,
+            check_name,
+            silenced,
+            alert_id,
+          }) => ({
+            summary,
+            description,
+            severity: AlertRuleSeverity[severity],
+            labels: formatLabels(labels),
+            readMoreUrl: read_more_url,
+            serviceName: service_name,
+            checkName: check_name,
+            silenced: !!silenced,
+            alertId: alert_id,
+          })
+        )
+        .sort((a, b) => order[a.severity] - order[b.severity]),
     };
   },
   async silenceAlert(alertId: string, silence: boolean, token?: CancelToken) {
