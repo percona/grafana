@@ -73,7 +73,7 @@ export const AllChecksTab: FC = () => {
         <TechnicalPreview />
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"
-          featureName="stt"
+          featureName="Security Threat Tool"
           featureSelector={featureSelector}
         >
           <div className={cx(tableStyles.wrapper, styles.wrapper)} data-testid="db-checks-all-checks-wrapper">

@@ -79,7 +79,7 @@ export const FailedChecksTab: FC = () => {
         <TechnicalPreview />
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"
-          featureName="stt"
+          featureName="Security Threat Tool"
           featureSelector={featureSelector}
         >
           <div className={styles.header}>
