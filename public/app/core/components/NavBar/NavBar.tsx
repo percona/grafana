@@ -80,8 +80,8 @@ export const NavBar: FC = React.memo(() => {
   dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_INVENTORY_PAGE });
 
   if (isAuthorized) {
-    buildSettingsMenuItem(topItems);
     buildInventoryMenuItem(topItems);
+    buildSettingsMenuItem(topItems);
 
     if (alertingEnabled) {
       buildIntegratedAlertingMenuItem(topItems);
