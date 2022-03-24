@@ -3,7 +3,7 @@ import React, { FC, useState, useMemo, useEffect, useCallback } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -24,7 +24,7 @@ import { DATA_INTERVAL, LIST_RESTORES_CANCEL_TOKEN } from './RestoreHistory.cons
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Restore[]>([]);
-  const navModel = useNavModel('restore-history', true);
+  const navModel = usePerconaNavModel('restore-history');
   const [generateToken] = useCancelToken();
   const [triggerTimeout] = useRecurringCall();
   const columns = useMemo(

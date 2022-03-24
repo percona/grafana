@@ -3,7 +3,7 @@ import React, { FC, useState, useMemo, useEffect, useCallback } from 'react';
 import { Cell, Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -39,7 +39,7 @@ export const ScheduledBackups: FC = () => {
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
   const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const navModel = useNavModel('scheduled-backups', true);
+  const navModel = usePerconaNavModel('scheduled-backups');
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
 

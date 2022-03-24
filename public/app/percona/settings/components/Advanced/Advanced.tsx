@@ -11,7 +11,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages, DATA_RETENTION_URL } from 'app/percona/settings/Settings.messages';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
@@ -42,7 +42,7 @@ export const Advanced: FC = () => {
   const [generateToken] = useCancelToken();
   const { result: settings } = useSelector(getPerconaSettings);
   const dispatch = useAppDispatch();
-  const navModel = useNavModel('settings-advanced', true);
+  const navModel = usePerconaNavModel('settings-advanced');
   const {
     sttCheckIntervals,
     dataRetention,

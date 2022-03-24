@@ -4,7 +4,7 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { Column } from 'react-table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal, CheckboxField } from '@percona/platform-core';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
@@ -40,7 +40,7 @@ import {
 export const KubernetesInventory: FC = () => {
   const styles = useStyles(getStyles);
   const dispatch = useDispatch();
-  const navModel = useNavModel('kubernetes', true);
+  const navModel = usePerconaNavModel('kubernetes');
   const [selectedCluster, setSelectedCluster] = useState<Kubernetes | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [viewConfigModalVisible, setViewConfigModalVisible] = useState(false);

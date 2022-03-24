@@ -3,7 +3,7 @@ import React, { FC, useState, useEffect, useCallback } from 'react';
 import { Column, Row } from 'react-table';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -30,7 +30,7 @@ export const StorageLocations: FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<StorageLocation | null>(null);
   const [data, setData] = useState<StorageLocation[]>([]);
   const [addModalVisible, setAddModalVisible] = useState(false);
-  const navModel = useNavModel('storage-locations', true);
+  const navModel = usePerconaNavModel('storage-locations');
   const styles = useStyles(getStyles);
   const columns = React.useMemo(
     (): Array<Column<StorageLocation>> => [

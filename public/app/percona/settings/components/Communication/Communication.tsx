@@ -8,7 +8,7 @@ import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import { EmailPayload, SettingsAPIChangePayload } from '../../Settings.types';
@@ -23,7 +23,7 @@ export const Communication: FC = () => {
   const [activeTab, setActiveTab] = useState(Messages.tabs.email.key);
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
-  const navModel = useNavModel('settings-communication', true);
+  const navModel = usePerconaNavModel('settings-communication');
   const { result: settings } = useSelector(getPerconaSettings);
   const { alertingSettings } = settings!;
 

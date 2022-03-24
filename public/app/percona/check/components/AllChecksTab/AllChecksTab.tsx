@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState, useCallback } from 'react';
 import { cx } from '@emotion/css';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -23,7 +23,7 @@ import { ChecksReloadContext } from './AllChecks.context';
 export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const [checks, setChecks] = useState<CheckDetails[] | undefined>();
-  const navModel = useNavModel('all-checks', true);
+  const navModel = usePerconaNavModel('all-checks');
   const tableStyles = useStyles2(getTableStyles);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();

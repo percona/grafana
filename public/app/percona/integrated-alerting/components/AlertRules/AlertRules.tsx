@@ -4,7 +4,7 @@ import { Cell, Column, Row } from 'react-table';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
@@ -41,7 +41,7 @@ export const AlertRules: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = useNavModel('integrated-alerting-rules', true);
+  const navModel = usePerconaNavModel('integrated-alerting-rules');
   const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule | null>();
   const [data, setData] = useState<AlertRule[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_ID);

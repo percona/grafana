@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { CheckboxField, logger } from '@percona/platform-core';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import Page from 'app/core/components/Page/Page';
 import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -33,7 +33,7 @@ export const Services = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [selected, setSelectedRows] = useState([]);
-  const navModel = useNavModel('inventory-services', true);
+  const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
 
   const loadData = useCallback(async () => {

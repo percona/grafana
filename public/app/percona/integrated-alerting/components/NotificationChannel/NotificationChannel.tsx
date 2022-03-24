@@ -3,7 +3,7 @@ import React, { FC, useMemo, useState, useEffect, useCallback } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
@@ -29,7 +29,7 @@ export const NotificationChannel: FC = () => {
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = useNavModel('integrated-alerting-notification-channels', true);
+  const navModel = usePerconaNavModel('integrated-alerting-notification-channels');
   const [data, setData] = useState<Channel[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(NOTIFICATION_CHANNEL_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);

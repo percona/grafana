@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useSelector } from 'react-redux';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
@@ -10,7 +10,7 @@ import { Connect } from './Connect/Connect';
 import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 
 export const Platform: FC = () => {
-  const navModel = useNavModel('settings-percona-platform', true);
+  const navModel = usePerconaNavModel('settings-percona-platform');
   const { isConnectedToPortal } = useSelector(getPerconaUser);
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">

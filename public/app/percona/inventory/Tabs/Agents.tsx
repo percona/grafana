@@ -3,7 +3,7 @@ import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { CheckboxField, logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import Page from 'app/core/components/Page/Page';
 import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { Form } from 'react-final-form';
@@ -29,7 +29,7 @@ export const Agents = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<any[]>([]);
   const [selected, setSelectedRows] = useState([]);
-  const navModel = useNavModel('inventory-agents', true);
+  const navModel = usePerconaNavModel('inventory-agents');
   const [generateToken] = useCancelToken();
 
   const loadData = useCallback(async () => {

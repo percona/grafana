@@ -9,7 +9,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { MetricsResolutions } from 'app/percona/settings/Settings.types';
@@ -36,7 +36,7 @@ export const MetricsResolution: FC = () => {
   const [resolution, setResolution] = useState(getResolutionValue(metricsResolutions).value);
   const [fieldsResolutions, updateFieldsResolutions] = useState(removeUnits(metricsResolutions));
   const [customResolutions, updateCustomResolutions] = useState(fieldsResolutions);
-  const navModel = useNavModel('settings-metrics-resolution', true);
+  const navModel = usePerconaNavModel('settings-metrics-resolution');
 
   useEffect(() => {
     setInitialValues({ ...removeUnits(metricsResolutions), resolutions: getResolutionValue(metricsResolutions).value });

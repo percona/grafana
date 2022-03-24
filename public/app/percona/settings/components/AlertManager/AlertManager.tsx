@@ -9,7 +9,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { SET_SETTINGS_CANCEL_TOKEN, AM_WARNING_URL } from '../../Settings.constants';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
@@ -40,7 +40,7 @@ export const AlertManager: FC = () => {
   const [generateToken] = useCancelToken();
   const { result: settings } = useSelector(getPerconaSettings);
   const dispatch = useAppDispatch();
-  const navModel = useNavModel('settings-alert-manager', true);
+  const navModel = usePerconaNavModel('settings-alert-manager');
   const { alertManagerUrl, alertManagerRules } = settings!;
   const initialValues = {
     url: alertManagerUrl,

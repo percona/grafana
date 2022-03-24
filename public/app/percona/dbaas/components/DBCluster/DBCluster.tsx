@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useStyles } from '@grafana/ui';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
@@ -47,7 +47,7 @@ export const DBCluster: FC = () => {
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<Cluster>();
-  const navModel = useNavModel('dbclusters', true);
+  const navModel = usePerconaNavModel('dbclusters');
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
   const { result: settings, loading: settingsLoading } = useSelector(getPerconaSettings);

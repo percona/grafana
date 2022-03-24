@@ -9,7 +9,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { Messages } from 'app/percona/settings/Settings.messages';
@@ -28,7 +28,7 @@ export const SSHKey: FC = () => {
   const [generateToken] = useCancelToken();
   const { result: settings } = useSelector(getPerconaSettings);
   const dispatch = useAppDispatch();
-  const navModel = useNavModel('settings-ssh', true);
+  const navModel = usePerconaNavModel('settings-ssh');
   const { sshKey } = settings!;
   const isEqual = (a: string, b: string) => !(a && !b) || a === b;
 

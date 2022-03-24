@@ -3,7 +3,7 @@ import React, { FC, useState, useEffect, useCallback } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
@@ -29,7 +29,7 @@ export const AlertRuleTemplate: FC = () => {
   const styles = useStyles(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = useNavModel('integrated-alerting-templates', true);
+  const navModel = usePerconaNavModel('integrated-alerting-templates');
   const [data, setData] = useState<FormattedTemplate[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULE_TEMPLATES_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);

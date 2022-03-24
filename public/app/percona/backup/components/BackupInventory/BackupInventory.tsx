@@ -4,7 +4,7 @@ import { Column, Row } from 'react-table';
 import { Button, useStyles } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
-import { useNavModel } from 'app/core/hooks/useNavModel';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -48,7 +48,7 @@ export const BackupInventory: FC = () => {
   const [data, setData] = useState<Backup[]>([]);
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
-  const navModel = useNavModel('backup-inventory', true);
+  const navModel = usePerconaNavModel('backup-inventory');
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const columns = useMemo(
