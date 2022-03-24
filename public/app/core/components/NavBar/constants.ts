@@ -173,7 +173,7 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
     },
     {
       id: 'settings-advanced',
-      text: 'Advanced',
+      text: 'Advanced Settings',
       url: `${getConfig().appSubUrl}/settings/advanced-settings`,
     },
     {
