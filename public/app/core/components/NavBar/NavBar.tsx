@@ -11,8 +11,7 @@ import config from 'app/core/config';
 import { KioskMode } from 'app/types';
 import {
   buildIntegratedAlertingMenuItem,
-  buildInventoryMenuItem,
-  buildSettingsMenuItem,
+  buildInventoryAndSettings,
   enrichConfigItems,
   getActiveItem,
   isMatchOrChildMatch,
@@ -80,8 +79,7 @@ export const NavBar: FC = React.memo(() => {
   dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_INVENTORY_PAGE });
 
   if (isAuthorized) {
-    buildInventoryMenuItem(topItems);
-    buildSettingsMenuItem(topItems);
+    buildInventoryAndSettings(topItems);
 
     if (alertingEnabled) {
       buildIntegratedAlertingMenuItem(topItems);
