@@ -18,7 +18,7 @@ import { Messages } from './Tickets.messages';
 export const TicketsPage: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Ticket[]>([]);
-  const connected = useSelector((state: StoreState) => !!state.perconaSettings.isConnectedToPortal);
+  const connected = useSelector((state: StoreState) => !!state.perconaUser.isConnectedToPortal);
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
@@ -60,8 +60,8 @@ export const TicketsPage: FC = () => {
     showLoading && setPending(true);
 
     try {
-      const backups = await TicketsService.list(generateToken(LIST_TICKETS_CANCEL_TOKEN));
-      setData(backups);
+      const tickets = await TicketsService.list(generateToken(LIST_TICKETS_CANCEL_TOKEN));
+      setData(tickets);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;

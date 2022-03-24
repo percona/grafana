@@ -8,7 +8,7 @@ import { PermissionLoader } from '../PermissionLoader';
 
 export const PlatformConnectedLoader: FC = ({ children }) => {
   const styles = useStyles(getStyles);
-  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.isConnectedToPortal, []);
+  const featureSelector = useCallback((state: StoreState) => !!state.perconaUser.isConnectedToPortal, []);
 
   return (
     <PermissionLoader
