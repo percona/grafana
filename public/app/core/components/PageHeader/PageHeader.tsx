@@ -141,15 +141,25 @@ function renderTitle(title: string, breadcrumbs: NavModelBreadcrumb[]) {
   for (const bc of breadcrumbs) {
     if (bc.url) {
       breadcrumbsResult.push(
-        <a className="page-header__link" key={breadcrumbsResult.length} href={bc.url}>
+        <a data-testid="breadcrumb-section" className="page-header__link" key={breadcrumbsResult.length} href={bc.url}>
           {bc.title}
         </a>
       );
     } else {
-      breadcrumbsResult.push(<span key={breadcrumbsResult.length}> / {bc.title}</span>);
+      breadcrumbsResult.push(
+        <span data-testid="breadcrumb-section" key={breadcrumbsResult.length}>
+          {' '}
+          / {bc.title}
+        </span>
+      );
     }
   }
-  breadcrumbsResult.push(<span key={breadcrumbs.length + 1}> / {title}</span>);
+  breadcrumbsResult.push(
+    <span data-testid="breadcrumb-section" key={breadcrumbs.length + 1}>
+      {' '}
+      / {title}
+    </span>
+  );
 
   return <h1 className="page-header__title">{breadcrumbsResult}</h1>;
 }
