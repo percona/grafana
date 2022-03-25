@@ -5,7 +5,6 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   alertManagerWrapper: css`
     display: flex;
     flex-direction: column;
-    width: 600px;
   `,
   textarea: css`
     margin: ${spacing.md} 0;

@@ -14,6 +14,7 @@ export const getStyles = ({ v1: { breakpoints, spacing, typography, border, colo
       display: flex;
       align-items: baseline;
       padding-bottom: ${spacing.md};
+      flex-wrap: wrap;
     `,
     advancedCol: css`
       align-items: center;
@@ -47,6 +48,7 @@ export const getStyles = ({ v1: { breakpoints, spacing, typography, border, colo
     `,
     publicAddressWrapper: css`
       display: flex;
+      flex-wrap: wrap;
       div {
         margin-bottom: 0 !important;
       }
@@ -55,7 +57,7 @@ export const getStyles = ({ v1: { breakpoints, spacing, typography, border, colo
       }
     `,
     publicAddressInput: css`
-      width: 200px;
+      min-width: 150px;
       ${mq} {
         width: 100px;
       }

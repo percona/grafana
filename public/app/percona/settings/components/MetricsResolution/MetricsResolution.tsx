@@ -96,7 +96,7 @@ export const MetricsResolution: FC = () => {
 
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
-      <Page.Contents dataTestId="settings-tab-content">
+      <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
         <PermissionLoader
           featureSelector={() => true}
           renderError={() => null}
