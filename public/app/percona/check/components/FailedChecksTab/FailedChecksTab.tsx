@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { LoaderButton, logger } from '@percona/platform-core';
-import { Cell, Column, Row, TableCellProps, TableRowProps } from 'react-table';
+import { Cell, Column, Row } from 'react-table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { Table } from 'app/percona/integrated-alerting/components/Table';
+import { ExtendedTableCellProps, ExtendedTableRowProps, Table } from 'app/percona/integrated-alerting/components/Table';
 import { FailedCheckSummary } from 'app/percona/check/types';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
@@ -73,15 +73,14 @@ export const FailedChecksTab: FC = () => {
     }
   };
 
-  const getRowProps = (row: Row<FailedCheckSummary>): TableRowProps => ({
+  const getRowProps = (row: Row<FailedCheckSummary>): ExtendedTableRowProps => ({
     key: row.original.serviceId,
     className: styles.row,
-    // @ts-ignore
     onClick: () =>
       locationService.push(`/pmm-database-checks/service-checks/${stripServiceId(row.original.serviceId)}`),
   });
 
-  const getCellProps = (cellInfo: Cell<FailedCheckSummary>): TableCellProps => ({
+  const getCellProps = (cellInfo: Cell<FailedCheckSummary>): ExtendedTableCellProps => ({
     key: `${cellInfo.row.original.serviceId}-${cellInfo.row.id}`,
     className: styles.cell,
   });
