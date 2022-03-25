@@ -1,16 +1,26 @@
 import React from 'react';
-import { getMount } from 'app/percona/shared/helpers/testUtils';
-import { Table } from 'app/percona/integrated-alerting/components/Table';
-import { stubs } from './__mocks__/ScheduledBackups.service';
+import { render, screen } from '@testing-library/react';
+import { configureStore } from 'app/store/configureStore';
+import { Provider } from 'react-redux';
 import { ScheduledBackups } from './ScheduledBackups';
-import { ScheduledBackup } from './ScheduledBackups.types';
 
 jest.mock('./ScheduledBackups.service');
 
 describe('ScheduledBackups', () => {
   it('should send correct data to Table', async () => {
-    const wrapper = await getMount(<ScheduledBackups />);
-    wrapper.update();
-    expect(wrapper.find(Table).prop('data')).toEqual<ScheduledBackup[]>(stubs);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isConnectedToPortal: false },
+            settings: { result: { backupEnabled: true } },
+          },
+        })}
+      >
+        <ScheduledBackups />
+      </Provider>
+    );
+    await screen.findByText('Backup 1');
+    expect(screen.getByText('Location 1')).toBeTruthy();
   });
 });

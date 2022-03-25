@@ -1,55 +1,85 @@
 import React from 'react';
-import { shallow } from 'enzyme';
-import { dataTestId, LoaderButton } from '@percona/platform-core';
-import { Table } from 'app/percona/integrated-alerting/components/Table/Table';
-import { getMount, asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { configureStore } from 'app/store/configureStore';
+import { Provider } from 'react-redux';
 import { StorageLocationsService } from './StorageLocations.service';
 import { stubLocations } from './__mocks__/StorageLocations.service';
-import { RemoveStorageLocationModal } from './RemoveStorageLocationModal';
 import { StorageLocations } from './StorageLocations';
-import { AddStorageLocationModal } from './AddStorageLocationModal';
-import { formatLocationList } from './StorageLocations.utils';
 
 jest.mock('./StorageLocations.service');
 jest.mock('app/core/app_events');
 
 describe('StorageLocations', () => {
-  it('should render table with data', async () => {
-    const wrapper = await getMount(<StorageLocations />);
-    wrapper.update();
-
-    expect(wrapper.find(Table).prop('data')).toEqual(formatLocationList(stubLocations));
-  });
-
   it('should show delete modal when icon is clicked', async () => {
-    const wrapper = await getMount(<StorageLocations />);
-    wrapper.update();
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isConnectedToPortal: false },
+            settings: { result: { backupEnabled: true } },
+          },
+        })}
+      >
+        <StorageLocations />
+      </Provider>
+    );
 
-    expect(wrapper.find(RemoveStorageLocationModal).prop('isVisible')).toBe(false);
-    wrapper.find(dataTestId('delete-storage-location-button')).last().simulate('click');
-    expect(wrapper.find(RemoveStorageLocationModal).prop('isVisible')).toBe(true);
+    await screen.findByText('first location');
+    expect(screen.queryByText('Delete Storage Location')).toBeFalsy();
+
+    fireEvent.click(screen.getAllByTestId('delete-storage-location-button')[0]);
+
+    expect(screen.getByText('Delete Storage Location')).toBeTruthy();
   });
 
   it('should close delete modal after deletion confirmation', async () => {
     const spy = spyOn(StorageLocationsService, 'delete').and.callThrough();
-    const wrapper = await getMount(<StorageLocations />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isConnectedToPortal: false },
+            settings: { result: { backupEnabled: true } },
+          },
+        })}
+      >
+        <StorageLocations />
+      </Provider>
+    );
 
-    wrapper.update();
-    wrapper.find('tbody tr').first().find(dataTestId('delete-storage-location-button')).last().simulate('click');
+    await screen.findByText('first location');
 
-    expect(wrapper.find(RemoveStorageLocationModal).prop('isVisible')).toBe(true);
-    await asyncAct(() => wrapper.find(LoaderButton).simulate('submit'));
+    fireEvent.click(screen.getAllByTestId('delete-storage-location-button')[0]);
 
-    wrapper.update();
-    expect(wrapper.find(RemoveStorageLocationModal).prop('isVisible')).toBe(false);
+    expect(screen.getByText('Delete Storage Location')).toBeTruthy();
+    fireEvent.submit(screen.getByTestId('confirm-delete-modal-button'));
+
+    await screen.findByText('first location');
+
+    expect(screen.queryByText('Delete Storage Location')).toBeFalsy();
     expect(spy).toHaveBeenCalledWith(stubLocations.locations[0].location_id, false);
   });
 
-  it('should open the modal by clicking the "Add" button', () => {
-    const wrapper = shallow(<StorageLocations />);
+  it('should open the modal by clicking the "Add" button', async () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isConnectedToPortal: false },
+            settings: { result: { backupEnabled: true } },
+          },
+        })}
+      >
+        <StorageLocations />
+      </Provider>
+    );
 
-    expect(wrapper.find(AddStorageLocationModal).prop('isVisible')).toBeFalsy();
-    wrapper.find(dataTestId('storage-location-add-modal-button')).simulate('click');
-    expect(wrapper.find(AddStorageLocationModal).prop('isVisible')).toBeTruthy();
+    await screen.findByText('first location');
+
+    expect(screen.queryByText('Add Storage Location')).toBeFalsy();
+
+    fireEvent.click(screen.getAllByTestId('storage-location-add-modal-button')[0]);
+
+    expect(screen.getByText('Add Storage Location')).toBeTruthy();
   });
 });

@@ -1,19 +1,28 @@
 import React from 'react';
-import { Table } from 'app/percona/integrated-alerting/components/Table';
+import { configureStore } from 'app/store/configureStore';
+import { Provider } from 'react-redux';
 import { BackupInventory } from './BackupInventory';
-import { render, waitFor } from '@testing-library/react';
-import { stubs } from './__mocks__/BackupInventory.service';
+import { render, screen } from '@testing-library/react';
 
 jest.mock('./BackupInventory.service');
 jest.mock('../../hooks/recurringCall.hook');
-jest.mock('app/percona/integrated-alerting/components/Table', () => ({
-  Table: jest.fn(({ children }) => <div data-testid="table">{children}</div>),
-}));
 
 describe('BackupInventory', () => {
   it('should send correct data to Table', async () => {
-    await waitFor(() => render(<BackupInventory />));
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isConnectedToPortal: false },
+            settings: { result: { backupEnabled: true } },
+          },
+        })}
+      >
+        <BackupInventory />
+      </Provider>
+    );
 
-    expect(Table).toHaveBeenCalledWith(expect.objectContaining({ data: stubs }), expect.anything());
+    await screen.findByText('Backup 1');
+    expect(screen.getByText('Location 1')).toBeTruthy();
   });
 });
