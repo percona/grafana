@@ -9,6 +9,7 @@ import { locationService } from '@grafana/runtime';
 import { Branding } from 'app/core/components/Branding/Branding';
 import config from 'app/core/config';
 import { KioskMode } from 'app/types';
+import { updateNavIndex } from 'app/core/actions';
 import {
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
@@ -71,12 +72,12 @@ export const NavBar: FC = React.memo(() => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  dispatch({ type: 'navIndex/updateNavIndex', payload: getPmmSettingsPage(alertingEnabled) });
-  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_ALERTING_PAGE });
-  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_STT_PAGE });
-  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_DBAAS_PAGE });
-  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_BACKUP_PAGE });
-  dispatch({ type: 'navIndex/updateNavIndex', payload: PMM_INVENTORY_PAGE });
+  dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
+  dispatch(updateNavIndex(PMM_ALERTING_PAGE));
+  dispatch(updateNavIndex(PMM_STT_PAGE));
+  dispatch(updateNavIndex(PMM_DBAAS_PAGE));
+  dispatch(updateNavIndex(PMM_BACKUP_PAGE));
+  dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
 
   if (isAuthorized) {
     buildInventoryAndSettings(topItems);
