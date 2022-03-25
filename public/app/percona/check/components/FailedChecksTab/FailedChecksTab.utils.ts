@@ -2,7 +2,7 @@ export const stripServiceId = (serviceId: string) => {
   const regex = /\/service_id\/(.*)/gm;
   const match = regex.exec(serviceId);
 
-  if (match !== null) {
+  if (match && match.length > 0) {
     return match[1] || '';
   }
 
