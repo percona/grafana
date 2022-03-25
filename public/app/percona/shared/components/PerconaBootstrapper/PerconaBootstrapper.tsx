@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSettings, setSettingsLoading, setAuthorized, setConnectionStatus } from 'app/percona/shared/core/reducers';
 import { SettingsService } from 'app/percona/settings/Settings.service';
-import { UserService } from '../../services/user-service/User.service';
+import { UserService } from '../../services/user/User.service';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
@@ -12,7 +12,7 @@ export const PerconaBootstrapper = () => {
     const getSettings = async () => {
       try {
         dispatch(setSettingsLoading(true));
-        const isConnectedToPortal = await UserService.getConnectionStatus();
+        const isConnectedToPortal = await UserService.getConnectionStatus(undefined, true);
         dispatch(setConnectionStatus(isConnectedToPortal));
         const settings = await SettingsService.getSettings(undefined, true);
         dispatch(setSettings(settings));
