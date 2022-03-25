@@ -82,7 +82,7 @@ export const AllChecksTab: FC = () => {
                 <Spinner />
               </div>
             ) : (
-              <table className={tableStyles.table} data-testid="db-checks-all-checks-table">
+              <table className={tableStyles.table} data-testid="db-checks-all-checks-table" role="table">
                 <colgroup>
                   <col className={styles.nameColumn} />
                   <col />
@@ -91,15 +91,15 @@ export const AllChecksTab: FC = () => {
                   <col className={styles.actionsColumn} />
                 </colgroup>
                 <thead data-testid="db-checks-all-checks-thead">
-                  <tr>
-                    <th>{Messages.name}</th>
-                    <th>{Messages.description}</th>
-                    <th>{Messages.status}</th>
-                    <th>{Messages.interval}</th>
-                    <th>{Messages.actions}</th>
+                  <tr role="row">
+                    <th role="columnheader">{Messages.name}</th>
+                    <th role="columnheader">{Messages.description}</th>
+                    <th role="columnheader">{Messages.status}</th>
+                    <th role="columnheader">{Messages.interval}</th>
+                    <th role="columnheader">{Messages.actions}</th>
                   </tr>
                 </thead>
-                <tbody data-testid="db-checks-all-checks-tbody">
+                <tbody data-testid="db-checks-all-checks-tbody" role="rowgroup">
                   <ChecksReloadContext.Provider value={{ fetchChecks }}>
                     {checks?.map((check) => (
                       <CheckTableRow key={check.name} check={check} onSuccess={updateUI} />
