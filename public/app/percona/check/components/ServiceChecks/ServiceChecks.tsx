@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { FC, useEffect, useCallback, useState, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { logger, Chip } from '@percona/platform-core';
@@ -70,7 +71,6 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
       {
         Header: 'Check Name',
         accessor: 'checkName',
-        // eslint-disable-next-line react/display-name
         Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
@@ -84,14 +84,12 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
       {
         Header: 'Severity',
         accessor: 'severity',
-        // eslint-disable-next-line react/display-name
         Cell: ({ value }) => <Severity severity={value} />,
       },
       {
         Header: 'Details',
         accessor: 'readMoreUrl',
         width: '105px',
-        // eslint-disable-next-line react/display-name
         Cell: ({ value }) =>
           value ? (
             <a target="_blank" rel="noreferrer" href={value} className={styles.link}>
@@ -103,7 +101,6 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         Header: 'Actions',
         accessor: 'silenced',
         width: '30px',
-        // eslint-disable-next-line react/display-name
         Cell: ({ value, row }) => (
           <span className={styles.actions}>
             <SilenceBell
