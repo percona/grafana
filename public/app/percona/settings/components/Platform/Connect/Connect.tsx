@@ -49,13 +49,18 @@ export const Connect: FC = () => {
         showErrorOnBlur
         required
       />
-      <TextInputField
-        name="accessToken"
-        label={Messages.accessToken}
-        validators={[validators.required]}
-        showErrorOnBlur
-        required
-      />
+      <div className={styles.accessTokenRow}>
+        <TextInputField
+          name="accessToken"
+          label={Messages.accessToken}
+          validators={[validators.required]}
+          showErrorOnBlur
+          required
+        />
+        <a href="" rel="noreferrer" target="_blank">
+          Get token
+        </a>
+      </div>
       <LoaderButton
         data-testid="connect-button"
         type="submit"
