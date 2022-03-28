@@ -203,7 +203,7 @@ export const Advanced: FC<AdvancedProps> = ({
               tooltip={advisorsTooltip}
               tooltipLinkText={tooltipLinkText}
               link={sttLink}
-              dataTestId="advanced-stt"
+              dataTestId="advanced-advisors"
               component={SwitchRow}
             />
             <div className={styles.advancedRow}>
