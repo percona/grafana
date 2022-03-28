@@ -9,7 +9,7 @@ import { Messages } from '../Platform.messages';
 import { getStyles } from './Connect.styles';
 import { CONNECT_DELAY, INITIAL_VALUES } from '../Platform.constants';
 import { PlatformService } from '../Platform.service';
-import { logger, LoaderButton, PasswordInputField, TextInputField } from '@percona/platform-core';
+import { logger, LoaderButton, TextInputField } from '@percona/platform-core';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
 
@@ -18,14 +18,13 @@ export const Connect: FC = () => {
   const [connecting, setConnecting] = useState(false);
   const dispatch = useDispatch();
 
-  const handleConnect = async ({ pmmServerName, email, password }: ConnectRenderProps) => {
+  const handleConnect = async ({ pmmServerName, accessToken }: ConnectRenderProps) => {
     setConnecting(true);
 
     try {
       await PlatformService.connect({
         server_name: pmmServerName,
-        email,
-        password,
+        personal_access_token: accessToken,
       });
 
       // We need some short delay for changes to apply before immediately calling getSettings
@@ -51,14 +50,12 @@ export const Connect: FC = () => {
         required
       />
       <TextInputField
-        name="email"
-        label={Messages.emailLabel}
-        validators={[validators.required, validators.validateEmail]}
+        name="accessToken"
+        label={Messages.accessToken}
+        validators={[validators.required]}
         showErrorOnBlur
         required
-        parse={(value) => value.trim()}
       />
-      <PasswordInputField name="password" label={Messages.passwordLabel} validators={[validators.required]} required />
       <LoaderButton
         data-testid="connect-button"
         type="submit"
