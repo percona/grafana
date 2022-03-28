@@ -5,8 +5,8 @@ interface CheckResultSummary {
   service_name: string;
   service_id: string;
   critical_count: number;
-  major_count: number;
-  trivial_count: number;
+  warning_count: number;
+  notice_count: number;
 }
 
 export interface CheckResultSummaryPayload extends PaginatedPayload {
@@ -17,8 +17,8 @@ export interface FailedCheckSummary {
   serviceName: string;
   serviceId: string;
   criticalCount: number;
-  majorCount: number;
-  trivialCount: number;
+  warningCount: number;
+  noticeCount: number;
 }
 
 interface CheckResultForService {

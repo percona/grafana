@@ -34,12 +34,12 @@ export const FailedChecksTab: FC = () => {
         accessor: 'criticalCount',
       },
       {
-        Header: 'Major',
-        accessor: 'majorCount',
+        Header: 'Warning',
+        accessor: 'warningCount',
       },
       {
-        Header: 'Trivial',
-        accessor: 'trivialCount',
+        Header: 'Notice',
+        accessor: 'noticeCount',
       },
     ],
     []
