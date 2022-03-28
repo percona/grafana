@@ -93,7 +93,7 @@ export const NavBar: FC = React.memo(() => {
       });
     }
   }
-  console.log(isConnectedToPortal);
+
   if (isConnectedToPortal) {
     topItems.push({
       id: 'tickets',
