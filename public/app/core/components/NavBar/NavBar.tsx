@@ -23,7 +23,7 @@ import { NavBarSection } from './NavBarSection';
 import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
-import { getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -42,9 +42,8 @@ export const NavBar: FC = React.memo(() => {
   const theme = useTheme2();
   const styles = getStyles(theme);
   const location = useLocation();
-  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled, isConnectedToPortal } = useSelector(
-    getPerconaSettings
-  );
+  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = useSelector(getPerconaSettings);
+  const { isConnectedToPortal } = useSelector(getPerconaUser);
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
@@ -93,15 +92,15 @@ export const NavBar: FC = React.memo(() => {
         url: `${config.appSubUrl}/backup`,
       });
     }
+  }
 
-    if (isConnectedToPortal) {
-      topItems.push({
-        id: 'entitlements',
-        icon: 'cloud',
-        text: 'Entitlements',
-        url: `${config.appSubUrl}/entitlements`,
-      });
-    }
+  if (isConnectedToPortal) {
+    topItems.push({
+      id: 'entitlements',
+      icon: 'cloud',
+      text: 'Entitlements',
+      url: `${config.appSubUrl}/entitlements`,
+    });
   }
 
   if (kiosk !== null) {

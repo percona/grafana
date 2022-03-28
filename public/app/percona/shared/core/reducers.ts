@@ -63,10 +63,12 @@ export const perconaSettingsReducers = perconaSettingsSlice.reducer;
 
 export interface PerconaUserState {
   isAuthorized: boolean;
+  isConnectedToPortal: boolean;
 }
 
 export const initialUserState: PerconaUserState = {
   isAuthorized: false,
+  isConnectedToPortal: false,
 };
 
 const perconaUserSlice = createSlice({
@@ -77,10 +79,14 @@ const perconaUserSlice = createSlice({
       ...state,
       isAuthorized: action.payload,
     }),
+    setConnectionStatus: (state, action: PayloadAction<boolean>): PerconaUserState => ({
+      ...state,
+      isConnectedToPortal: action.payload,
+    }),
   },
 });
 
-export const { setAuthorized } = perconaUserSlice.actions;
+export const { setAuthorized, setConnectionStatus } = perconaUserSlice.actions;
 
 export const perconaUserReducers = perconaUserSlice.reducer;
 
