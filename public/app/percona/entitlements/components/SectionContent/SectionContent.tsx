@@ -1,8 +1,7 @@
 import React from 'react';
 import { SectionContentProps } from './SectionContent.types';
 import { Messages } from './SectionContent.messages';
-import { useStyles2 } from '@grafana/ui';
-import { getStyles } from './SectionContent.styles';
+import { Advisor } from '../Advisor/Advisor';
 export const SectionContent = ({ entitlement }: SectionContentProps) => {
   const {
     summary,
@@ -15,7 +14,7 @@ export const SectionContent = ({ entitlement }: SectionContentProps) => {
     endDate,
     platform: { securityAdvisor, configAdvisor },
   } = entitlement;
-  const styles = useStyles2(getStyles);
+
   return (
     <div>
       <p>
@@ -28,8 +27,8 @@ export const SectionContent = ({ entitlement }: SectionContentProps) => {
         <strong>{Messages.softwareFamilies}</strong>: {softwareFamilies?.join(', ')} <br />
         <strong>{Messages.supportLevel}</strong>: {supportLevel} <br />
         <strong>{Messages.platform}</strong>: <br />
-        <span className={styles.tab}>{Messages.configAdvisor}</span>: {configAdvisor} <br />
-        <span className={styles.tab}>{Messages.securityAdvisor}</span>: {securityAdvisor}
+        <Advisor label={Messages.configAdvisor} hasAdvisor={configAdvisor} />
+        <Advisor label={Messages.securityAdvisor} hasAdvisor={securityAdvisor} />
       </p>
     </div>
   );

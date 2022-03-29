@@ -13,8 +13,8 @@ export interface Entitlement {
 }
 
 export interface Platform {
-  securityAdvisor: string;
-  configAdvisor: string;
+  securityAdvisor: boolean;
+  configAdvisor: boolean;
 }
 
 interface RawEntitlement {
@@ -32,8 +32,8 @@ interface RawEntitlement {
 }
 
 interface RawPlatform {
-  security_advisor: string;
-  config_advisor: string;
+  security_advisor: boolean;
+  config_advisor: boolean;
 }
 
 export interface EntitlementsResponse {
