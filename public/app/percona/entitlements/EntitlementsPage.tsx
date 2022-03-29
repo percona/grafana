@@ -46,7 +46,7 @@ const EntitlementsPage: FC = () => {
   }, [isConnectedToPortal]);
 
   return (
-    <PageWrapper pageModel={PAGE_MODEL}>
+    <PageWrapper pageModel={PAGE_MODEL} dataTestId="page-wrapper-entitlements">
       <PlatformConnectedLoader>
         {pending && (
           <div className={styles.loader}>

@@ -4,7 +4,7 @@ export interface Entitlement {
   summary: string;
   tier: string;
   totalUnits: string;
-  unlimitedUnits: true;
+  unlimitedUnits: boolean;
   supportLevel: string;
   softwareFamilies: string[];
   startDate: string;
@@ -23,7 +23,7 @@ interface RawEntitlement {
   summary: string;
   tier: string;
   total_units: string;
-  unlimited_units: true;
+  unlimited_units: boolean;
   support_level: string;
   software_families: string[];
   start_date: string;

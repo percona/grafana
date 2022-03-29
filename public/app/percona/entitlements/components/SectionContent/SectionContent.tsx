@@ -26,10 +26,10 @@ export const SectionContent = ({ entitlement }: SectionContentProps) => {
         <br />
         <strong>{Messages.softwareFamilies}</strong>: {softwareFamilies?.join(', ')} <br />
         <strong>{Messages.supportLevel}</strong>: {supportLevel} <br />
-        <strong>{Messages.platform}</strong>: <br />
-        <Advisor label={Messages.configAdvisor} hasAdvisor={configAdvisor} />
-        <Advisor label={Messages.securityAdvisor} hasAdvisor={securityAdvisor} />
+        <strong>{Messages.platform}</strong>:
       </p>
+      <Advisor label={Messages.configAdvisor} hasAdvisor={configAdvisor} />
+      <Advisor label={Messages.securityAdvisor} hasAdvisor={securityAdvisor} />
     </div>
   );
 };
