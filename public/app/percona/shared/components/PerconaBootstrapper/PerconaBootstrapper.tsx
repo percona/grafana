@@ -12,11 +12,11 @@ export const PerconaBootstrapper = () => {
     const getSettings = async () => {
       try {
         dispatch(setSettingsLoading(true));
-        const isConnectedToPortal = await UserService.getConnectionStatus(undefined, true);
-        dispatch(setConnectionStatus(isConnectedToPortal));
         const settings = await SettingsService.getSettings(undefined, true);
         dispatch(setSettings(settings));
         dispatch(setAuthorized(true));
+        const isConnectedToPortal = await UserService.getConnectionStatus(undefined, true);
+        dispatch(setConnectionStatus(isConnectedToPortal));
       } catch (e) {
         if (e.response?.status === 401) {
           setAuthorized(false);
