@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Column, Row } from 'react-table';
+import { Cell, Column, Row } from 'react-table';
 import { useSelector } from 'react-redux';
 import { StoreState } from 'app/types';
 import { Table } from '../integrated-alerting/components/Table';
@@ -79,18 +79,14 @@ export const TicketsPage: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected]);
 
-  const redirect = (url: string) => {
-    window.open(url, '_blank');
-  };
-
   const getRowProps = (row: Row<Ticket>) => ({
-    key: 'row',
-    onClick: () => redirect(row.original.url),
+    key: row.original.url,
+    onClick: () => window.open(row.original.url, '_blank'),
     className: styles.rowProps,
   });
 
-  const getCellProps = () => ({
-    key: 'cell',
+  const getCellProps = (cell: Cell<Ticket>) => ({
+    key: cell.value,
     className: styles.cellProps,
   });
 
