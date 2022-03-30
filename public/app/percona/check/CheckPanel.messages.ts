@@ -3,7 +3,7 @@ export const Messages = {
   failedChecksTitle: 'Failed',
   allChecksTitle: 'All',
   silenced: 'Silenced',
-  advisors: 'Advisor Checks',
+  advisors: 'Advisor Checks feature',
   pmmSettings: 'PMM Settings.',
   readMore: 'Read more',
 };
