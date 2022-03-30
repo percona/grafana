@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { setSettings, setSettingsLoading, setAuthorized, setConnectionStatus } from 'app/percona/shared/core/reducers';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { UserService } from '../../services/user/User.service';
+import { logger } from '@percona/platform-core';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
@@ -15,8 +16,6 @@ export const PerconaBootstrapper = () => {
         const settings = await SettingsService.getSettings(undefined, true);
         dispatch(setSettings(settings));
         dispatch(setAuthorized(true));
-        const isConnectedToPortal = await UserService.getConnectionStatus(undefined, true);
-        dispatch(setConnectionStatus(isConnectedToPortal));
       } catch (e) {
         if (e.response?.status === 401) {
           setAuthorized(false);
@@ -25,7 +24,17 @@ export const PerconaBootstrapper = () => {
       }
     };
 
+    const checkPortalConnectionForUser = async () => {
+      try {
+        const isConnectedToPortal = await UserService.getConnectionStatus(undefined, true);
+        dispatch(setConnectionStatus(isConnectedToPortal));
+      } catch (e) {
+        logger.error(e);
+      }
+    };
+
     getSettings();
+    checkPortalConnectionForUser();
   }, [dispatch]);
 
   return <></>;

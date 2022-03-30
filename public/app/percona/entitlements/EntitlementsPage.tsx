@@ -48,21 +48,20 @@ const EntitlementsPage: FC = () => {
   return (
     <PageWrapper pageModel={PAGE_MODEL} dataTestId="page-wrapper-entitlements">
       <PlatformConnectedLoader>
-        {pending && (
-          <div className={styles.loader}>
-            <Spinner />
-          </div>
+        {pending ? (
+          <Spinner className={styles.loader} />
+        ) : (
+          data.map((entitlement: Entitlement) => {
+            const { number, name, endDate } = entitlement;
+            return (
+              <div key={number} className={styles.collapseWrapper}>
+                <CollapsableSection label={<Label name={name} endDate={endDate} />} isOpen={false}>
+                  <SectionContent entitlement={entitlement} />
+                </CollapsableSection>
+              </div>
+            );
+          })
         )}
-        {data.map((entitlement: Entitlement) => {
-          const { number, name, endDate } = entitlement;
-          return (
-            <div key={number} className={styles.collapseWrapper}>
-              <CollapsableSection label={<Label name={name} endDate={endDate} />} isOpen={false}>
-                <SectionContent entitlement={entitlement} />
-              </CollapsableSection>
-            </div>
-          );
-        })}
       </PlatformConnectedLoader>
     </PageWrapper>
   );
