@@ -1,9 +1,9 @@
 export const Messages = {
-  pageTitle: 'Advisors',
-  failedChecksTitle: 'Failed Checks',
-  allChecksTitle: 'All Checks',
+  pageTitle: 'Advisor Checks',
+  failedChecksTitle: 'Failed',
+  allChecksTitle: 'All',
   silenced: 'Silenced',
-  advisors: 'Advisors',
+  advisors: 'Advisor Checks',
   pmmSettings: 'PMM Settings.',
   readMore: 'Read more',
 };
