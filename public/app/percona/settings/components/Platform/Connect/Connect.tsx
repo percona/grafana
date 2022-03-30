@@ -1,22 +1,29 @@
 import React, { FC, useState } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useStyles } from '@grafana/ui';
 import validators from 'app/percona/shared/helpers/validators';
-import { setSettings } from 'app/percona/shared/core/reducers';
+import { setSettings, fetchServerInfoAction } from 'app/percona/shared/core/reducers';
 import { ConnectRenderProps } from '../types';
 import { Messages } from '../Platform.messages';
 import { getStyles } from './Connect.styles';
-import { CONNECT_DELAY, INITIAL_VALUES } from '../Platform.constants';
+import { CONNECT_DELAY } from '../Platform.constants';
 import { PlatformService } from '../Platform.service';
 import { logger, LoaderButton, TextInputField } from '@percona/platform-core';
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
+import { getPerconaServer } from 'app/percona/shared/core/selectors';
 
 export const Connect: FC = () => {
   const styles = useStyles(getStyles);
   const [connecting, setConnecting] = useState(false);
   const dispatch = useDispatch();
+  const { result = { serverId: '' } } = useSelector(getPerconaServer);
+  const initialValues: ConnectRenderProps = {
+    pmmServerName: '',
+    pmmServerId: result.serverId,
+    accessToken: '',
+  };
 
   const handleConnect = async ({ pmmServerName, accessToken }: ConnectRenderProps) => {
     setConnecting(true);
@@ -31,6 +38,7 @@ export const Connect: FC = () => {
       setTimeout(() => {
         appEvents.emit(AppEvents.alertSuccess, [Messages.connectSucceeded]);
         setConnecting(false);
+        dispatch(fetchServerInfoAction());
         dispatch(setSettings({ isConnectedToPortal: true }));
       }, CONNECT_DELAY);
     } catch (e) {
@@ -42,6 +50,7 @@ export const Connect: FC = () => {
   const ConnectForm: FC<FormRenderProps<ConnectRenderProps>> = ({ pristine, valid, handleSubmit }) => (
     <form data-testid="connect-form" className={styles.form} onSubmit={handleSubmit} autoComplete="off">
       <legend className={styles.legend}>{Messages.title}</legend>
+      <TextInputField name="pmmServerId" disabled label={Messages.pmmServerId} />
       <TextInputField
         name="pmmServerName"
         label={Messages.pmmServerName}
@@ -75,5 +84,5 @@ export const Connect: FC = () => {
     </form>
   );
 
-  return <Form onSubmit={handleConnect} initialValues={INITIAL_VALUES} render={ConnectForm} />;
+  return <Form onSubmit={handleConnect} initialValues={initialValues} render={ConnectForm} />;
 };

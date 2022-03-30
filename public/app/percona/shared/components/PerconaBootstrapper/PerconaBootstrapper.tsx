@@ -1,6 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setSettings, setSettingsLoading, setAuthorized } from 'app/percona/shared/core/reducers';
+import {
+  setSettings,
+  setSettingsLoading,
+  setAuthorized,
+  fetchServerInfoAction,
+} from 'app/percona/shared/core/reducers';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
 // This component is only responsible for populating the store with Percona's settings initially
@@ -23,6 +28,7 @@ export const PerconaBootstrapper = () => {
     };
 
     getSettings();
+    dispatch(fetchServerInfoAction());
   }, [dispatch]);
 
   return <></>;

@@ -4,6 +4,7 @@ export interface PlatformProps {
 
 export interface ConnectRenderProps {
   pmmServerName: string;
+  pmmServerId: string;
   accessToken: string;
 }
 
