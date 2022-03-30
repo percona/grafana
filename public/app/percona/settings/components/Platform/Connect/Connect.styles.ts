@@ -19,7 +19,7 @@ export const getStyles = ({ breakpoints, colors, spacing, typography }: GrafanaT
     align-items: center;
 
     & > div {
-      flex: 0 1 70%;
+      flex: 0 1 80%;
     }
 
     & > a {
