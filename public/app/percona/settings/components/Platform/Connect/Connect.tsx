@@ -57,7 +57,7 @@ export const Connect: FC = () => {
           showErrorOnBlur
           required
         />
-        <a href="" rel="noreferrer" target="_blank">
+        <a href={`${process.env.PERCONA_SAAS_HOST}/profile`} rel="noreferrer" target="_blank">
           Get token
         </a>
       </div>
