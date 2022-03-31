@@ -1,3 +1,3 @@
-export interface UserConnectedResponse {
-  connected: boolean;
+export interface UserStatusResponse {
+  is_platform_user: boolean;
 }

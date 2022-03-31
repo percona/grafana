@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setSettings, setSettingsLoading, setAuthorized, setConnectionStatus } from 'app/percona/shared/core/reducers';
+import { setSettings, setSettingsLoading, setAuthorized, setIsPlatformUser } from 'app/percona/shared/core/reducers';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { UserService } from '../../services/user/User.service';
 import { logger } from '@percona/platform-core';
@@ -24,17 +24,17 @@ export const PerconaBootstrapper = () => {
       }
     };
 
-    const checkPortalConnectionForUser = async () => {
+    const getUserStatus = async () => {
       try {
-        const isConnectedToPortal = await UserService.getConnectionStatus(undefined, true);
-        dispatch(setConnectionStatus(isConnectedToPortal));
+        const isPlatformUser = await UserService.getUserStatus(undefined, true);
+        dispatch(setIsPlatformUser(isPlatformUser));
       } catch (e) {
         logger.error(e);
       }
     };
 
     getSettings();
-    checkPortalConnectionForUser();
+    getUserStatus();
   }, [dispatch]);
 
   return <></>;
