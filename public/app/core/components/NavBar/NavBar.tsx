@@ -54,6 +54,7 @@ export const NavBar: FC = React.memo(() => {
   const dispatch = useDispatch();
   const { result } = useSelector(getPerconaSettings);
   const { isAuthorized } = useSelector(getPerconaUser);
+  const { isPlatformUser } = useSelector(getPerconaUser);
   const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = result!;
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
@@ -97,6 +98,21 @@ export const NavBar: FC = React.memo(() => {
     if (backupEnabled) {
       topItems.push(PMM_BACKUP_PAGE);
     }
+  }
+
+  if (isPlatformUser) {
+    topItems.push({
+      id: 'entitlements',
+      icon: 'cloud',
+      text: 'Entitlements',
+      url: `${config.appSubUrl}/entitlements`,
+    });
+    topItems.push({
+      id: 'tickets',
+      icon: 'ticket',
+      text: 'Support Tickets',
+      url: `${config.appSubUrl}/tickets`,
+    });
   }
 
   if (kiosk !== null) {

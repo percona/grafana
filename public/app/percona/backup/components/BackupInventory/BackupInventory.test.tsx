@@ -1,5 +1,6 @@
 import React from 'react';
 import { configureStore } from 'app/store/configureStore';
+import { StoreState } from 'app/types';
 import { Provider } from 'react-redux';
 import { BackupInventory } from './BackupInventory';
 import { render, screen } from '@testing-library/react';
@@ -13,10 +14,10 @@ describe('BackupInventory', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { backupEnabled: true } },
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <BackupInventory />
       </Provider>

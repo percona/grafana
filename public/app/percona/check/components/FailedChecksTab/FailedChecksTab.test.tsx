@@ -1,6 +1,7 @@
 import React from 'react';
 import { logger } from '@percona/platform-core';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { StoreState } from 'app/types';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { configureStore } from 'app/store/configureStore';
 import { Provider } from 'react-redux';
 import { CheckService } from 'app/percona/check/Check.service';
@@ -17,7 +18,7 @@ jest.mock('@percona/platform-core', () => {
 });
 
 describe('FailedChecksTab::', () => {
-  let getAlertsSpy = jest.spyOn(CheckService, 'getActiveAlerts').mockImplementation(() => Promise.resolve([]));
+  let getAlertsSpy = jest.spyOn(CheckService, 'getAllFailedChecks').mockImplementation(() => Promise.resolve([]));
 
   afterEach(() => getAlertsSpy.mockClear());
 
@@ -27,18 +28,18 @@ describe('FailedChecksTab::', () => {
         <Provider
           store={configureStore({
             percona: {
-              user: { isAuthorized: true, isConnectedToPortal: false },
-              settings: { result: { sttEnabled: true } },
+              user: { isAuthorized: true, isPlatformUser: false },
+              settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
             },
-          })}
+          } as StoreState)}
         >
           <FailedChecksTab />
         </Provider>
       );
     });
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
-    expect(CheckService.getActiveAlerts).toHaveBeenCalledTimes(1);
+    await screen.findByTestId('db-check-panel-actions');
+    expect(CheckService.getAllFailedChecks).toHaveBeenCalledTimes(1);
   });
 
   it('should render a spinner at startup, while loading', async () => {
@@ -47,10 +48,10 @@ describe('FailedChecksTab::', () => {
         <Provider
           store={configureStore({
             percona: {
-              user: { isAuthorized: true, isConnectedToPortal: false },
-              settings: { result: { sttEnabled: true } },
+              user: { isAuthorized: true, isPlatformUser: false },
+              settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
             },
-          })}
+          } as StoreState)}
         >
           <FailedChecksTab />
         </Provider>
@@ -59,7 +60,7 @@ describe('FailedChecksTab::', () => {
 
     expect(screen.queryByTestId('db-checks-failed-checks-spinner')).toBeInTheDocument();
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     expect(screen.queryByTestId('db-checks-failed-checks-spinner')).not.toBeInTheDocument();
   });
@@ -75,19 +76,45 @@ describe('FailedChecksTab::', () => {
         <Provider
           store={configureStore({
             percona: {
-              user: { isAuthorized: true, isConnectedToPortal: false },
-              settings: { result: { sttEnabled: true } },
+              user: { isAuthorized: true, isPlatformUser: false },
+              settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
             },
-          })}
+          } as StoreState)}
         >
           <FailedChecksTab />
         </Provider>
       );
     });
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     expect(loggerSpy).toBeCalledTimes(1);
+
+    loggerSpy.mockClear();
+  });
+
+  it('should log an error if the run checks API call fails', async () => {
+    getAlertsSpy.mockImplementationOnce(() => {
+      throw Error('test');
+    });
+    const loggerSpy = jest.spyOn(logger, 'error');
+
+    act(() => {
+      render(<FailedChecksTab />);
+    });
+
+    await screen.findByTestId('db-check-panel-actions');
+
+    const runChecksButton = screen.getByRole('button');
+
+    fireEvent.click(runChecksButton);
+    expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(loggerSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
 
     loggerSpy.mockClear();
   });
@@ -99,17 +126,17 @@ describe('FailedChecksTab::', () => {
         <Provider
           store={configureStore({
             percona: {
-              user: { isAuthorized: true, isConnectedToPortal: false },
-              settings: { result: { sttEnabled: true } },
+              user: { isAuthorized: true, isPlatformUser: false },
+              settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
             },
-          })}
+          } as StoreState)}
         >
           <FailedChecksTab />
         </Provider>
       );
     });
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
     const runChecksButton = screen.getByRole('button');
 
@@ -129,10 +156,10 @@ describe('FailedChecksTab::', () => {
         <Provider
           store={configureStore({
             percona: {
-              user: { isAuthorized: true, isConnectedToPortal: false },
-              settings: { result: { sttEnabled: true } },
+              user: { isAuthorized: true, isPlatformUser: false },
+              settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
             },
-          })}
+          } as StoreState)}
         >
           <FailedChecksTab />
         </Provider>
@@ -141,8 +168,8 @@ describe('FailedChecksTab::', () => {
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
 
-    await screen.findByTestId('db-checks-failed-checks-toggle-silenced');
+    await screen.findByTestId('db-check-panel-actions');
 
-    expect(screen.queryByTestId('db-check-panel-table-empty')).toBeInTheDocument();
+    expect(screen.queryByTestId('table-no-data')).toBeInTheDocument();
   });
 });

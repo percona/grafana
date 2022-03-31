@@ -12,9 +12,9 @@ import { CheckDetails } from 'app/percona/check/types';
 import { CheckService } from 'app/percona/check/Check.service';
 import { Spinner, useStyles2 } from '@grafana/ui';
 // TODO: make a shared table style
-import { getStyles as getTableStyles } from 'app/percona/check/components/Table/Table.styles';
 import { Messages } from './AllChecksTab.messages';
-import { getStyles } from './AllChecksTab.styles';
+import { getStyles as getCheckPanelStyles } from 'app/percona/check/CheckPanel.styles';
+import { getStyles as getMainStyles } from './AllChecksTab.styles';
 import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { FetchChecks } from './types';
 import { CheckTableRow } from './CheckTableRow';
@@ -24,8 +24,8 @@ export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const [checks, setChecks] = useState<CheckDetails[] | undefined>();
   const navModel = usePerconaNavModel('all-checks');
-  const tableStyles = useStyles2(getTableStyles);
-  const styles = useStyles2(getStyles);
+  const mainStyles = useStyles2(getMainStyles);
+  const checkPanelStyles = useStyles2(getCheckPanelStyles);
   const [generateToken] = useCancelToken();
 
   const updateUI = (check: CheckDetails) => {
@@ -76,30 +76,30 @@ export const AllChecksTab: FC = () => {
           featureName="Security Threat Tool"
           featureSelector={featureSelector}
         >
-          <div className={cx(tableStyles.wrapper, styles.wrapper)} data-testid="db-checks-all-checks-wrapper">
+          <div className={cx(mainStyles.tableWrapper, mainStyles.wrapper)} data-testid="db-checks-all-checks-wrapper">
             {fetchChecksPending ? (
-              <div className={styles.spinner} data-testid="db-checks-all-checks-spinner">
+              <div className={checkPanelStyles.spinner} data-testid="db-checks-all-checks-spinner">
                 <Spinner />
               </div>
             ) : (
-              <table className={tableStyles.table} data-testid="db-checks-all-checks-table" role="table">
+              <table className={mainStyles.table} data-testid="db-checks-all-checks-table">
                 <colgroup>
-                  <col className={styles.nameColumn} />
+                  <col className={mainStyles.nameColumn} />
                   <col />
-                  <col className={styles.statusColumn} />
-                  <col className={styles.intervalColumn} />
-                  <col className={styles.actionsColumn} />
+                  <col className={mainStyles.statusColumn} />
+                  <col className={mainStyles.intervalColumn} />
+                  <col className={mainStyles.actionsColumn} />
                 </colgroup>
                 <thead data-testid="db-checks-all-checks-thead">
-                  <tr role="row">
-                    <th role="columnheader">{Messages.name}</th>
-                    <th role="columnheader">{Messages.description}</th>
-                    <th role="columnheader">{Messages.status}</th>
-                    <th role="columnheader">{Messages.interval}</th>
-                    <th role="columnheader">{Messages.actions}</th>
+                  <tr>
+                    <th>{Messages.name}</th>
+                    <th>{Messages.description}</th>
+                    <th>{Messages.status}</th>
+                    <th>{Messages.interval}</th>
+                    <th>{Messages.actions}</th>
                   </tr>
                 </thead>
-                <tbody data-testid="db-checks-all-checks-tbody" role="rowgroup">
+                <tbody data-testid="db-checks-all-checks-tbody">
                   <ChecksReloadContext.Provider value={{ fetchChecks }}>
                     {checks?.map((check) => (
                       <CheckTableRow key={check.name} check={check} onSuccess={updateUI} />

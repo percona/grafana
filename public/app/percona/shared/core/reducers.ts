@@ -24,6 +24,7 @@ import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/K
 import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
 import { SettingsService } from 'app/percona/settings/Settings.service';
+import { ServerInfo } from './types';
 
 const toSettingsModel = (response: SettingsPayload): Settings => ({
   awsPartitions: response.aws_partitions,
@@ -86,16 +87,17 @@ const initialSettingsState: Settings = {
     standardInterval: '10s',
     frequentInterval: '10s',
   },
+  isConnectedToPortal: false,
 };
 
 export interface PerconaUserState {
   isAuthorized: boolean;
-  isConnectedToPortal: boolean;
+  isPlatformUser: boolean;
 }
 
 export const initialUserState: PerconaUserState = {
   isAuthorized: false,
-  isConnectedToPortal: false,
+  isPlatformUser: false,
 };
 
 const perconaUserSlice = createSlice({
@@ -106,25 +108,23 @@ const perconaUserSlice = createSlice({
       ...state,
       isAuthorized: action.payload,
     }),
-    setPortalConnected: (state, action: PayloadAction<boolean>): PerconaUserState => ({
+    setIsPlatformUser: (state, action: PayloadAction<boolean>): PerconaUserState => ({
       ...state,
-      isConnectedToPortal: action.payload,
+      isPlatformUser: action.payload,
     }),
   },
 });
 
-export const { setAuthorized, setPortalConnected } = perconaUserSlice.actions;
+export const { setAuthorized, setIsPlatformUser } = perconaUserSlice.actions;
 
 export const fetchSettingsAction = createAsyncThunk(
   'percona/fetchSettings',
   (
-    args: { usedPassword: string; testEmail: string } | undefined = { usedPassword: '', testEmail: '' },
-    thunkAPI
+    args: { usedPassword: string; testEmail: string } | undefined = { usedPassword: '', testEmail: '' }
   ): Promise<Settings> =>
     withSerializedError(
       (async () => {
         const settings = await SettingsService.getSettings(undefined, true);
-        thunkAPI.dispatch(setPortalConnected(!!settings.isConnectedToPortal));
         const modifiedSettings: Settings = {
           ...settings,
           alertingSettings: {
@@ -271,6 +271,26 @@ export const fetchDBClustersAction = createAsyncThunk(
     )
 );
 
+export const fetchServerInfoAction = createAsyncThunk(
+  'percona/fetchServerInfo',
+  (): Promise<ServerInfo> =>
+    withSerializedError(
+      (async () => {
+        const { pmm_server_id = '', pmm_server_name = '' } = await api.post<
+          { pmm_server_id: string; pmm_server_name: string },
+          Object
+        >('/v1/Platform/ServerInfo', {}, true);
+
+        return {
+          serverName: pmm_server_name,
+          serverId: pmm_server_id,
+        };
+      })()
+    )
+);
+
+const serverInfoReducer = createAsyncSlice('serverInfo', fetchServerInfoAction).reducer;
+
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
 const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesAction).reducer;
@@ -290,5 +310,6 @@ export default {
     addKubernetes: addKubernetesReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbCluster: DBClusterReducer,
+    server: serverInfoReducer,
   }),
 };

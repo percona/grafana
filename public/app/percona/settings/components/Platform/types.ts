@@ -1,11 +1,10 @@
 export interface ConnectRenderProps {
   pmmServerName: string;
-  email: string;
-  password: string;
+  pmmServerId: string;
+  accessToken: string;
 }
 
 export interface ConnectRequest {
   server_name: string;
-  email: string;
-  password: string;
+  personal_access_token: string;
 }

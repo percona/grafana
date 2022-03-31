@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { StoreState } from 'app/types';
 import { configureStore } from 'app/store/configureStore';
 import { Provider } from 'react-redux';
 import { StorageLocationsService } from './StorageLocations.service';
@@ -15,10 +16,10 @@ describe('StorageLocations', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { backupEnabled: true } },
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <StorageLocations />
       </Provider>
@@ -38,10 +39,10 @@ describe('StorageLocations', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { backupEnabled: true } },
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <StorageLocations />
       </Provider>
@@ -65,10 +66,10 @@ describe('StorageLocations', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { backupEnabled: true } },
+            user: { isAuthorized: true },
+            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <StorageLocations />
       </Provider>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { configureStore } from 'app/store/configureStore';
+import { StoreState } from 'app/types';
 import { Provider } from 'react-redux';
 import { render, screen } from '@testing-library/react';
 import { logger } from '@percona/platform-core';
@@ -25,10 +26,10 @@ describe('AllChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { sttEnabled: true } },
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <AllChecksTab />
       </Provider>
@@ -46,10 +47,10 @@ describe('AllChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { sttEnabled: true } },
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <AllChecksTab />
       </Provider>
@@ -69,10 +70,10 @@ describe('AllChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { sttEnabled: true } },
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <AllChecksTab />
       </Provider>
@@ -108,10 +109,10 @@ describe('AllChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isConnectedToPortal: false },
-            settings: { result: { sttEnabled: true } },
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
           },
-        })}
+        } as StoreState)}
       >
         <AllChecksTab />
       </Provider>

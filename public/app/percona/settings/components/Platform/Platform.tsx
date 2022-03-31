@@ -3,7 +3,7 @@ import { useStyles2 } from '@grafana/ui';
 import { useSelector } from 'react-redux';
 import Page from 'app/core/components/Page/Page';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { getPerconaUser } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
@@ -14,7 +14,7 @@ import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
 export const Platform: FC = () => {
   const navModel = usePerconaNavModel('settings-percona-platform');
   const settingsStyles = useStyles2(getSettingsStyles);
-  const { isConnectedToPortal } = useSelector(getPerconaUser);
+  const { result } = useSelector(getPerconaSettings);
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
       <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
@@ -24,7 +24,7 @@ export const Platform: FC = () => {
           renderSuccess={() => (
             <>
               <TechnicalPreview />
-              <WithDiagnostics>{isConnectedToPortal ? <Connected /> : <Connect />}</WithDiagnostics>
+              <WithDiagnostics>{result?.isConnectedToPortal ? <Connected /> : <Connect />}</WithDiagnostics>
             </>
           )}
         />

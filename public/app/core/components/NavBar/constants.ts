@@ -4,7 +4,7 @@ import { getConfig } from 'app/core/config';
 export const PMM_STT_PAGE: NavModelItem = {
   id: 'database-checks',
   icon: 'percona-database-checks',
-  text: 'Security Checks',
+  text: 'Advisor Checks',
   subTitle: 'Percona Security Checks',
   url: `${getConfig().appSubUrl}/pmm-database-checks`,
   breadcrumbs: [

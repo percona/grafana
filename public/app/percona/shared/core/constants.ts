@@ -33,3 +33,15 @@ export const OPERATOR_FULL_LABELS = {
 };
 
 export const PERCONA_CANCELLED_ERROR_NAME = 'percona-cancelled-request';
+export const PRIMARY_LABELS = [
+  'node_name',
+  'type',
+  'container_name',
+  'region',
+  'az',
+  'service_name',
+  'environment',
+  'cluster',
+  'replication_set',
+];
+export const HIDDEN_LABELS = ['alertname', 'job', 'rule_id', 'template_name', 'severity', 'ia'];

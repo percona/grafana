@@ -1,6 +1,7 @@
 /* eslint-disable react/display-name */
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Button, useStyles } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
 import { logger, Chip } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -20,11 +21,18 @@ import { getStyles } from './Alerts.styles';
 import { Alert, AlertStatus, AlertTogglePayload } from './Alerts.types';
 import { formatAlerts } from './Alerts.utils';
 import { AlertsService } from './Alerts.service';
-import { AlertsActions } from './AlertsActions';
-import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_ALERTS_CANCEL_TOKEN } from './Alerts.constants';
+import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_ALERTS_CANCEL_TOKEN, TOGGLE_ALERT_CANCEL_TOKEN } from './Alerts.constants';
 import { AlertDetails } from './AlertDetails/AlertDetails';
+import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
+import appEvents from 'app/core/app_events';
 
-const { noData, columns } = Messages.alerts.table;
+const {
+  table: { noData, columns },
+  activateSuccess,
+  silenceSuccess,
+  activateTitle,
+  silenceTitle,
+} = Messages.alerts;
 const {
   activeSince: activeSinceColumn,
   labels: labelsColumn,
@@ -62,6 +70,29 @@ export const Alerts: FC = () => {
     setPendingRequest(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, pageIndex]);
+
+  const toggleAlert = useCallback(
+    async (alertId: string, silenced: boolean) => {
+      try {
+        await AlertsService.toggle(
+          {
+            alert_ids: [alertId],
+            silenced: silenced ? 'FALSE' : 'TRUE',
+          },
+          generateToken(TOGGLE_ALERT_CANCEL_TOKEN)
+        );
+        appEvents.emit(AppEvents.alertSuccess, [silenced ? activateSuccess : silenceSuccess]);
+        getAlerts();
+      } catch (e) {
+        if (isApiCancelError(e)) {
+          return;
+        }
+        logger.error(e);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [getAlerts]
+  );
 
   const columns = React.useMemo(
     (): Array<Column<Alert>> => [
@@ -110,10 +141,19 @@ export const Alerts: FC = () => {
       },
       {
         Header: actionsColumn,
-        accessor: (alert: Alert) => <AlertsActions alert={alert} getAlerts={getAlerts} />,
+        accessor: 'alertId',
+        Cell: ({ value, row }) => (
+          <span className={style.actionsWrapper}>
+            <SilenceBell
+              onClick={() => toggleAlert(value, row.original.status === AlertStatus.SILENCED)}
+              silenced={row.original.status === AlertStatus.SILENCED}
+              tooltip={row.original.status === AlertStatus.SILENCED ? activateTitle : silenceTitle}
+            />
+          </span>
+        ),
       },
     ],
-    [style, getAlerts]
+    [style.actionsWrapper, style.labelsWrapper, style.silencedSeverity, toggleAlert]
   );
 
   const getCellProps = useCallback(
