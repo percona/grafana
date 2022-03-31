@@ -18,7 +18,7 @@ import { StoreState } from 'app/types';
 const EntitlementsPage: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Entitlement[]>([]);
-  const isConnectedToPortal = useSelector((state: StoreState) => !!state.perconaUser.isConnectedToPortal);
+  const isConnectedToPortal = useSelector((state: StoreState) => !!state.perconaUser.isPlatformUser);
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
