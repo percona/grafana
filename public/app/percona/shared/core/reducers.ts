@@ -92,7 +92,7 @@ export const fetchServerInfoAction = createAsyncThunk(
   (): Promise<ServerInfo> =>
     withSerializedError(
       (async () => {
-        const { pmm_server_id = 'FA', pmm_server_name = '' } = await api.post<
+        const { pmm_server_id = '', pmm_server_name = '' } = await api.post<
           { pmm_server_id: string; pmm_server_name: string },
           Object
         >('/v1/PlatformServerInfo', {}, false);
