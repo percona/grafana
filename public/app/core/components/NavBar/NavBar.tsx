@@ -101,6 +101,12 @@ export const NavBar: FC = React.memo(() => {
       text: 'Entitlements',
       url: `${config.appSubUrl}/entitlements`,
     });
+    topItems.push({
+      id: 'tickets',
+      icon: 'ticket',
+      text: 'Support Tickets',
+      url: `${config.appSubUrl}/tickets`,
+    });
   }
 
   if (kiosk !== null) {
