@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Cell, Column, Row } from 'react-table';
 import { useSelector } from 'react-redux';
-import { StoreState } from 'app/types';
 import { Table } from '../integrated-alerting/components/Table';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { LIST_TICKETS_CANCEL_TOKEN, PAGE_MODEL } from './Tickets.constants';
@@ -14,11 +13,12 @@ import { Ticket } from './Tickets.types';
 import { useStyles2 } from '@grafana/ui';
 import { getStyles } from './Tickets.styles';
 import { Messages } from './Tickets.messages';
+import { getPerconaUser } from '../shared/core/selectors';
 
 export const TicketsPage: FC = () => {
   const [pending, setPending] = useState(true);
   const [data, setData] = useState<Ticket[]>([]);
-  const connected = useSelector((state: StoreState) => !!state.perconaUser.isConnectedToPortal);
+  const { isPlatformUser } = useSelector(getPerconaUser);
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
@@ -58,7 +58,6 @@ export const TicketsPage: FC = () => {
 
   const getData = useCallback(async (showLoading = false) => {
     showLoading && setPending(true);
-
     try {
       const tickets = await TicketsService.list(generateToken(LIST_TICKETS_CANCEL_TOKEN));
       setData(tickets);
@@ -73,11 +72,11 @@ export const TicketsPage: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (connected === true) {
+    if (isPlatformUser === true) {
       getData(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected]);
+  }, [isPlatformUser]);
 
   const getRowProps = (row: Row<Ticket>) => ({
     key: row.original.url,

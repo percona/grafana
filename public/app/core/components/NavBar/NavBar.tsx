@@ -43,7 +43,7 @@ export const NavBar: FC = React.memo(() => {
   const styles = getStyles(theme);
   const location = useLocation();
   const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = useSelector(getPerconaSettings);
-  const { isConnectedToPortal } = useSelector(getPerconaUser);
+  const { isPlatformUser } = useSelector(getPerconaUser);
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
@@ -94,7 +94,7 @@ export const NavBar: FC = React.memo(() => {
     }
   }
 
-  if (isConnectedToPortal) {
+  if (isPlatformUser) {
     topItems.push({
       id: 'tickets',
       icon: 'ticket',
