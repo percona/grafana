@@ -102,7 +102,7 @@ export const fetchServerInfoAction = createAsyncThunk(
         const { pmm_server_id = '', pmm_server_name = '' } = await api.post<
           { pmm_server_id: string; pmm_server_name: string },
           Object
-        >('/v1/PlatformServerInfo', {}, false);
+        >('/v1/Platform/ServerInfo', {}, true);
 
         return {
           serverName: pmm_server_name,
