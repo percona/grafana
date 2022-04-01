@@ -489,16 +489,16 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/pmm-database-checks/all-checks',
+      path: '/pmm-database-checks/failed-checks/:service',
       component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AllChecksPage" */ 'app/percona/check/components/AllChecksTab/AllChecksTab')
+        () =>
+          import(/* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/ServiceChecks/ServiceChecks')
       ),
     },
     {
-      path: '/pmm-database-checks/service-checks/:service',
+      path: '/pmm-database-checks/all-checks',
       component: SafeDynamicImport(
-        () =>
-          import(/* webpackChunkName: "ServiceChecksPage" */ 'app/percona/check/components/ServiceChecks/ServiceChecks')
+        () => import(/* webpackChunkName: "AllChecksPage" */ 'app/percona/check/components/AllChecksTab/AllChecksTab')
       ),
     },
     {
