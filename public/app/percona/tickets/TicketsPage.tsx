@@ -95,17 +95,15 @@ export const TicketsPage: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents dataTestId="page-wrapper-tickets">
         <PlatformConnectedLoader>
-          <div className={styles.pageWrapper}>
-            <Table
-              data={data}
-              columns={columns}
-              totalItems={data.length}
-              pendingRequest={pending}
-              emptyMessage={Messages.table.noData}
-              getRowProps={getRowProps}
-              getCellProps={getCellProps}
-            ></Table>
-          </div>
+          <Table
+            data={data}
+            columns={columns}
+            totalItems={data.length}
+            pendingRequest={pending}
+            emptyMessage={Messages.table.noData}
+            getRowProps={getRowProps}
+            getCellProps={getCellProps}
+          ></Table>
         </PlatformConnectedLoader>
       </Page.Contents>
     </Page>

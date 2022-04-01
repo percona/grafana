@@ -25,7 +25,7 @@ describe('TicketsPage', () => {
     (useSelector as jest.Mock).mockClear();
   });
 
-  it('renders PageWrapper', async () => {
+  it('renders wrapper', async () => {
     await render(<TicketsPage />);
     expect(screen.getByTestId('page-wrapper-tickets')).toBeInTheDocument();
   });

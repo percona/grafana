@@ -25,7 +25,7 @@ describe('EntitlementsPage', () => {
     (useSelector as jest.Mock).mockClear();
   });
 
-  it('renders PageWrapper', async () => {
+  it('renders wrapper', async () => {
     await render(<EntitlementsPage />);
     expect(screen.getByTestId('page-wrapper-entitlements')).toBeInTheDocument();
   });
