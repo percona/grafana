@@ -2,6 +2,8 @@
 import React, { useMemo, useState } from 'react';
 import { Button, useStyles } from '@grafana/ui';
 import { cx } from '@emotion/css';
+import Page from 'app/core/components/Page/Page';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';
 import Discovery from './components/Discovery/Discovery';
 import AzureDiscovery from './components/AzureDiscovery/Discovery';
@@ -9,8 +11,6 @@ import { AddInstance } from './components/AddInstance/AddInstance';
 import { getStyles } from './panel.styles';
 import { Messages } from './components/AddRemoteInstance/AddRemoteInstance.messages';
 import { InstanceTypesExtra, InstanceAvailable, AvailableTypes } from './panel.types';
-import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
-import { PAGE_MODEL } from './panel.constants';
 import { Databases } from '../../percona/shared/core';
 
 const availableInstanceTypes: AvailableTypes[] = [
@@ -30,6 +30,7 @@ const AddInstancePanel = () => {
   const [selectedInstance, selectInstance] = useState<InstanceAvailable>({
     type: availableInstanceTypes.includes(instanceType as AvailableTypes) ? instanceType : '',
   });
+  const navModel = usePerconaNavModel('add-instance');
 
   const InstanceForm = useMemo(
     () => () => (
@@ -57,11 +58,13 @@ const AddInstancePanel = () => {
   );
 
   return (
-    <PageWrapper pageModel={PAGE_MODEL}>
-      <div className={cx(styles.content)}>
-        {!selectedInstance.type ? <AddInstance onSelectInstanceType={selectInstance} /> : <InstanceForm />}
-      </div>
-    </PageWrapper>
+    <Page navModel={navModel}>
+      <Page.Contents>
+        <div className={cx(styles.content)}>
+          {!selectedInstance.type ? <AddInstance onSelectInstanceType={selectInstance} /> : <InstanceForm />}
+        </div>
+      </Page.Contents>
+    </Page>
   );
 };
 

@@ -1,6 +1,6 @@
 import { Location } from 'history';
 import { NavModelItem, NavSection } from '@grafana/data';
-import { getConfig } from 'app/core/config';
+import { config } from 'app/core/config';
 import { contextSrv } from 'app/core/services/context_srv';
 import { ShowModalReactEvent } from '../../../types/events';
 import appEvents from '../../app_events';
@@ -20,7 +20,7 @@ export const getForcedLoginUrl = (url: string) => {
   const queryParams = new URLSearchParams(url.split('?')[1]);
   queryParams.append('forceLogin', 'true');
 
-  return `${getConfig().appSubUrl}${url.split('?')[0]}?${queryParams.toString()}`;
+  return `${config.appSubUrl}${url.split('?')[0]}?${queryParams.toString()}`;
 };
 
 export const enrichConfigItems = (
@@ -101,7 +101,7 @@ export const getActiveItem = (
   pathname: string,
   currentBestMatch?: NavModelItem
 ): NavModelItem | undefined => {
-  const newNavigationEnabled = getConfig().featureToggles.newNavigation;
+  const newNavigationEnabled = config.featureToggles.newNavigation;
   const dashboardLinkMatch = newNavigationEnabled ? '/dashboards' : '/';
 
   for (const link of navTree) {
@@ -153,7 +153,7 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
     id: 'integrated-alerting',
     text: 'Integrated Alerting',
     icon: 'bell',
-    url: `${getConfig().appSubUrl}/integrated-alerting`,
+    url: `${config.appSubUrl}/integrated-alerting`,
   };
 
   const alertingIndex = mainLinks.findIndex(({ id }) => id === 'alerting');
@@ -163,7 +163,7 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
       id: 'alerting',
       text: 'Alerting',
       icon: 'bell',
-      url: `${getConfig().appSubUrl}/integrated-alerting/alerts`,
+      url: `${config.appSubUrl}/integrated-alerting/alerts`,
       subTitle: 'Alert rules & notifications',
       children: [integratedAlertingLink],
     });
@@ -179,19 +179,20 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
     id: 'inventory',
     icon: 'percona-inventory',
     text: 'PMM Inventory',
-    url: `${getConfig().appSubUrl}/inventory`,
+    url: `${config.appSubUrl}/inventory`,
     children: [
       {
         id: 'inventory-list',
-        url: `${getConfig().appSubUrl}/inventory`,
+        url: `${config.appSubUrl}/inventory`,
         icon: 'percona-inventory',
         text: 'Inventory List',
         hideFromTabs: true,
       },
       {
         id: 'add-instance',
-        url: `${getConfig().appSubUrl}/add-instance`,
+        url: `${config.appSubUrl}/add-instance`,
         icon: 'percona-add',
+        subTitle: 'Add Instance to PMM',
         text: 'Add Instance',
         hideFromTabs: true,
       },
@@ -201,7 +202,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
     id: 'settings',
     icon: 'percona-setting',
     text: 'Settings',
-    url: `${getConfig().appSubUrl}/settings`,
+    url: `${config.appSubUrl}/settings`,
   };
   const configNode = mainLinks.find((link) => link.id === 'cfg');
 
@@ -210,7 +211,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
       id: 'cfg',
       text: 'Configuration',
       icon: 'cog',
-      url: `${getConfig().appSubUrl}/settings`,
+      url: `${config.appSubUrl}/settings`,
       subTitle: 'Configuration',
       children: [inventoryLink, DIVIDER, settingsLink],
     });
