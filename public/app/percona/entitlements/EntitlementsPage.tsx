@@ -1,8 +1,9 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
 import { useStyles2, Spinner } from '@grafana/ui';
-import { LIST_ENTITLEMENTS_CANCEL_TOKEN, PAGE_MODEL } from './Entitlements.contants';
 import { logger } from '@percona/platform-core';
+import Page from 'app/core/components/Page/Page';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { LIST_ENTITLEMENTS_CANCEL_TOKEN } from './Entitlements.contants';
 import { useSelector } from 'react-redux';
 import { CollapsableSection } from '@grafana/ui/src/components';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
@@ -21,6 +22,7 @@ const EntitlementsPage: FC = () => {
   const isConnectedToPortal = useSelector((state: StoreState) => !!state.percona.user.isPlatformUser);
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
+  const navModel = usePerconaNavModel('entitlements');
 
   const getData = useCallback(async (showLoading = false) => {
     showLoading && setPending(true);
@@ -46,24 +48,26 @@ const EntitlementsPage: FC = () => {
   }, [isConnectedToPortal]);
 
   return (
-    <PageWrapper pageModel={PAGE_MODEL} dataTestId="page-wrapper-entitlements">
-      <PlatformConnectedLoader>
-        {pending ? (
-          <Spinner className={styles.loader} />
-        ) : (
-          data.map((entitlement: Entitlement) => {
-            const { number, name, endDate } = entitlement;
-            return (
-              <div key={number} className={styles.collapseWrapper}>
-                <CollapsableSection label={<Label name={name} endDate={endDate} />} isOpen={false}>
-                  <SectionContent entitlement={entitlement} />
-                </CollapsableSection>
-              </div>
-            );
-          })
-        )}
-      </PlatformConnectedLoader>
-    </PageWrapper>
+    <Page navModel={navModel}>
+      <Page.Contents dataTestId="page-wrapper-entitlements">
+        <PlatformConnectedLoader>
+          {pending ? (
+            <Spinner className={styles.loader} />
+          ) : (
+            data.map((entitlement: Entitlement) => {
+              const { number, name, endDate } = entitlement;
+              return (
+                <div key={number} className={styles.collapseWrapper}>
+                  <CollapsableSection label={<Label name={name} endDate={endDate} />} isOpen={false}>
+                    <SectionContent entitlement={entitlement} />
+                  </CollapsableSection>
+                </div>
+              );
+            })
+          )}
+        </PlatformConnectedLoader>
+      </Page.Contents>
+    </Page>
   );
 };
 

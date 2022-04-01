@@ -31,6 +31,8 @@ import {
   PMM_DBAAS_PAGE,
   PMM_ALERTING_PAGE,
   PMM_INVENTORY_PAGE,
+  PMM_TICKETS_PAGE,
+  PMM_ENTITLEMENTS_PAGE,
   getPmmSettingsPage,
 } from './constants';
 
@@ -80,6 +82,13 @@ export const NavBar: FC = React.memo(() => {
   dispatch(updateNavIndex(PMM_BACKUP_PAGE));
   dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
 
+  if (isPlatformUser) {
+    dispatch(updateNavIndex(PMM_TICKETS_PAGE));
+    dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
+    topItems.push(PMM_ENTITLEMENTS_PAGE);
+    topItems.push(PMM_TICKETS_PAGE);
+  }
+
   if (isAuthorized) {
     buildInventoryAndSettings(topItems);
 
@@ -98,21 +107,6 @@ export const NavBar: FC = React.memo(() => {
     if (backupEnabled) {
       topItems.push(PMM_BACKUP_PAGE);
     }
-  }
-
-  if (isPlatformUser) {
-    topItems.push({
-      id: 'entitlements',
-      icon: 'cloud',
-      text: 'Entitlements',
-      url: `${config.appSubUrl}/entitlements`,
-    });
-    topItems.push({
-      id: 'tickets',
-      icon: 'ticket',
-      text: 'Support Tickets',
-      url: `${config.appSubUrl}/tickets`,
-    });
   }
 
   if (kiosk !== null) {
