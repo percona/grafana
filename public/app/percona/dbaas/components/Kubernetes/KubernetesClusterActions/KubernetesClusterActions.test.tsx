@@ -1,13 +1,11 @@
 import React from 'react';
-import { dataTestId } from '@percona/platform-core';
-import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
 import { KubernetesClusterActions } from './KubernetesClusterActions';
 import { kubernetesStub } from '../__mocks__/kubernetesStubs';
-import { getMount, asyncAct } from 'app/percona/shared/helpers/testUtils';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 describe('KubernetesClusterActions::', () => {
   it('renders correctly', async () => {
-    const root = await getMount(
+    render(
       <KubernetesClusterActions
         kubernetesCluster={kubernetesStub[0]}
         setSelectedCluster={jest.fn()}
@@ -18,13 +16,13 @@ describe('KubernetesClusterActions::', () => {
       />
     );
 
-    expect(root.find(MultipleActions)).toBeTruthy();
+    expect(screen.getByTestId('dropdown-menu-toggle')).toBeInTheDocument();
   });
 
   it('Select delete actions', async () => {
     const setSelectedCluster = jest.fn();
     const setDeleteModalVisible = jest.fn();
-    const root = await getMount(
+    render(
       <KubernetesClusterActions
         kubernetesCluster={kubernetesStub[1]}
         setSelectedCluster={setSelectedCluster}
@@ -34,18 +32,9 @@ describe('KubernetesClusterActions::', () => {
         getDBClusters={jest.fn()}
       />
     );
-    await asyncAct(() => {
-      const button = root.find('button');
 
-      button.simulate('click');
-    });
-
-    root.update();
-
-    const menu = root.find(dataTestId('dropdown-menu-menu'));
-    const action = menu.find('span').at(0);
-
-    action.simulate('click');
+    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByText('Unregister'));
 
     expect(setSelectedCluster).toHaveBeenCalled();
     expect(setDeleteModalVisible).toHaveBeenCalled();
@@ -55,7 +44,8 @@ describe('KubernetesClusterActions::', () => {
     const setSelectedCluster = jest.fn();
     const setDeleteModalVisible = jest.fn();
     const setViewConfigModalVisible = jest.fn();
-    const root = await getMount(
+
+    render(
       <KubernetesClusterActions
         kubernetesCluster={kubernetesStub[1]}
         setSelectedCluster={setSelectedCluster}
@@ -66,18 +56,8 @@ describe('KubernetesClusterActions::', () => {
       />
     );
 
-    await asyncAct(() => {
-      const button = root.find('button');
-
-      button.simulate('click');
-    });
-
-    root.update();
-
-    const menu = root.find(dataTestId('dropdown-menu-menu'));
-    const action = menu.find('span').at(1);
-
-    action.simulate('click');
+    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByText('Show configuration'));
 
     expect(setSelectedCluster).toHaveBeenCalled();
     expect(setViewConfigModalVisible).toHaveBeenCalled();
