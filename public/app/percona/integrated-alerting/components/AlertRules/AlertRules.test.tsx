@@ -1,6 +1,8 @@
 import React from 'react';
-import { dataTestId } from '@percona/platform-core';
-import { getMount } from 'app/percona/shared/helpers/testUtils';
+import { Provider } from 'react-redux';
+import { StoreState } from 'app/types';
+import { configureStore } from 'app/store/configureStore';
+import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { AlertRules } from './AlertRules';
 import { AlertRuleTemplateService } from '../AlertRuleTemplate/AlertRuleTemplate.service';
 import { NotificationChannelService } from '../NotificationChannel/NotificationChannel.service';
@@ -45,42 +47,63 @@ describe('AlertRules', () => {
     expect(alertRuleTemplateServiceList).toBeCalledTimes(0);
     expect(notificationChannelsServiceList).toBeCalledTimes(0);
 
-    const wrapper = await getMount(<AlertRules />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <AlertRules />
+      </Provider>
+    );
 
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
     expect(alertRuleTemplateServiceList).toBeCalledTimes(1);
     expect(notificationChannelsServiceList).toBeCalledTimes(1);
-
-    wrapper.unmount();
   });
 
   it('should toggle selected alert rule details', async () => {
-    const wrapper = await getMount(<AlertRules />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <AlertRules />
+      </Provider>
+    );
 
-    wrapper.update();
-    wrapper.find(dataTestId('show-details')).at(0).find('button').simulate('click');
-
-    expect(wrapper.find(dataTestId('alert-rules-details'))).toHaveLength(1);
-
-    wrapper.find(dataTestId('hide-details')).at(0).find('button').simulate('click');
-
-    expect(wrapper.find(dataTestId('alert-rules-details'))).toHaveLength(0);
-  });
-
-  it('should have table initially loading', async () => {
-    const wrapper = await getMount(<AlertRules />);
-
-    expect(wrapper.find(dataTestId('table-loading'))).toHaveLength(1);
-    expect(wrapper.find(dataTestId('table-no-data'))).toHaveLength(1);
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    fireEvent.click(screen.getAllByTestId('show-details')[0]);
+    expect(screen.getAllByTestId('alert-rules-details')).toHaveLength(1);
+    fireEvent.click(screen.getAllByTestId('hide-details')[0]);
+    expect(screen.queryByTestId('alert-rules-details')).not.toBeInTheDocument();
   });
 
   it('should render table content', async () => {
-    const wrapper = await getMount(<AlertRules />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <AlertRules />
+      </Provider>
+    );
 
-    wrapper.update();
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
 
-    expect(wrapper.find(dataTestId('table-thead')).find('tr')).toHaveLength(1);
-    expect(wrapper.find(dataTestId('table-tbody')).find('tr')).toHaveLength(6);
-    expect(wrapper.find(dataTestId('table-no-data'))).toHaveLength(0);
+    expect(screen.getAllByRole('row')).toHaveLength(1 + 6);
+    expect(screen.queryByTestId('table-no-data')).not.toBeInTheDocument();
   });
 
   it('should render correctly without data', async () => {
@@ -88,12 +111,22 @@ describe('AlertRules', () => {
       .spyOn(AlertRulesService, 'list')
       .mockReturnValueOnce(Promise.resolve({ rules: [], totals: { total_items: 0, total_pages: 0 } }));
 
-    const wrapper = await getMount(<AlertRules />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <AlertRules />
+      </Provider>
+    );
 
-    wrapper.update();
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
 
-    expect(wrapper.find(dataTestId('table-thead')).find('tr')).toHaveLength(0);
-    expect(wrapper.find(dataTestId('table-tbody')).find('tr')).toHaveLength(0);
-    expect(wrapper.find(dataTestId('table-no-data'))).toHaveLength(1);
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByTestId('table-no-data')).toBeInTheDocument();
   });
 });
