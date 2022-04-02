@@ -1,6 +1,8 @@
 import React from 'react';
-import { dataTestId } from '@percona/platform-core';
-import { getMount } from 'app/percona/shared/helpers/testUtils';
+import { Provider } from 'react-redux';
+import { StoreState } from 'app/types';
+import { configureStore } from 'app/store/configureStore';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { Alerts } from './Alerts';
 import { AlertsService } from './Alerts.service';
 
@@ -12,31 +14,45 @@ describe('AlertsTable', () => {
   });
 
   it('should render the table correctly', async () => {
-    const wrapper = await getMount(<Alerts />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <Alerts />
+      </Provider>
+    );
 
-    wrapper.update();
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
 
-    expect(wrapper.find(dataTestId('table-thead')).find('tr')).toHaveLength(1);
-    expect(wrapper.find(dataTestId('table-tbody')).find('tr')).toHaveLength(6);
-    expect(wrapper.find(dataTestId('table-no-data'))).toHaveLength(0);
-  });
-
-  it('should have table initially loading', async () => {
-    const wrapper = await getMount(<Alerts />);
-
-    expect(wrapper.find(dataTestId('table-loading')).exists()).toBeTruthy();
+    expect(screen.getAllByRole('row')).toHaveLength(1 + 6);
+    expect(screen.queryByTestId('table-no-data')).not.toBeInTheDocument();
   });
 
   it('should render correctly without data', async () => {
     jest
       .spyOn(AlertsService, 'list')
       .mockReturnValueOnce(Promise.resolve({ alerts: [], totals: { total_items: 0, total_pages: 1 } }));
-    const wrapper = await getMount(<Alerts />);
 
-    wrapper.update();
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <Alerts />
+      </Provider>
+    );
 
-    expect(wrapper.find(dataTestId('table-thead')).find('tr')).toHaveLength(0);
-    expect(wrapper.find(dataTestId('table-tbody')).find('tr')).toHaveLength(0);
-    expect(wrapper.find(dataTestId('table-no-data'))).toHaveLength(1);
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByTestId('table-no-data')).toBeInTheDocument();
   });
 });
