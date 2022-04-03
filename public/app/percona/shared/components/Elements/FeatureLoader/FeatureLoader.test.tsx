@@ -1,12 +1,10 @@
 import React from 'react';
-import { dataTestId } from '@percona/platform-core';
-import { useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
+import { StoreState } from 'app/types';
+import { configureStore } from 'app/store/configureStore';
+import { render, screen } from '@testing-library/react';
 import { FeatureLoader } from './FeatureLoader';
-import { Messages } from './FeatureLoader.messages';
-import { EmptyBlock } from '../EmptyBlock';
-import { getMount } from 'app/percona/shared/helpers/testUtils';
 
-jest.mock('app/percona/settings/Settings.service');
 jest.mock('@percona/platform-core', () => {
   const originalModule = jest.requireActual('@percona/platform-core');
   return {
@@ -16,71 +14,81 @@ jest.mock('@percona/platform-core', () => {
     },
   };
 });
-jest.mock('react-redux', () => {
-  const original = jest.requireActual('react-redux');
-  return {
-    ...original,
-    useSelector: jest.fn(),
-  };
-});
 
 describe('FeatureLoader', () => {
-  beforeEach(() => {
-    (useSelector as jest.Mock).mockImplementation((callback) => {
-      return callback({
-        perconaUser: { isAuthorized: true },
-        perconaSettings: { isLoading: false, alertingEnabled: true },
-      });
-    });
-  });
-
-  afterEach(() => {
-    (useSelector as jest.Mock).mockClear();
-  });
-
-  it('should not have children initially', async () => {
-    (useSelector as jest.Mock).mockImplementation((callback) => {
-      return callback({
-        perconaUser: { isAuthorized: true },
-        perconaSettings: { isLoading: false, alertingEnabled: false },
-      });
-    });
-
-    const Dummy = () => <></>;
-    const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled}>
-        <Dummy />
-      </FeatureLoader>
+  it('should not have children while loading settings', async () => {
+    const { container } = render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: true, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <FeatureLoader featureName="IA" featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled}>
+          <span>Dummy</span>
+        </FeatureLoader>
+      </Provider>
     );
-    expect(wrapper.find(Dummy).exists()).toBeFalsy();
-    expect(wrapper.find(EmptyBlock).exists()).toBeTruthy();
+    expect(container.querySelector('.fa-spin')).toBeInTheDocument();
+    expect(screen.queryByText('Dummy')).not.toBeInTheDocument();
   });
 
   it('should show children after loading settings', async () => {
-    const Dummy = () => <></>;
-    const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled}>
-        <Dummy />
-      </FeatureLoader>
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <FeatureLoader featureName="IA" featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled}>
+          <span>Dummy</span>
+        </FeatureLoader>
+      </Provider>
     );
-    wrapper.update();
-    expect(wrapper.find(Dummy).exists()).toBeTruthy();
-    expect(wrapper.find(EmptyBlock).exists()).toBeFalsy();
+
+    expect(screen.getByText('Dummy')).toBeInTheDocument();
   });
 
   it('should show insufficient access permissions message', async () => {
-    (useSelector as jest.Mock).mockImplementation((callback) => {
-      return callback({
-        perconaUser: { isAuthorized: false },
-        perconaSettings: { isLoading: false, alertingEnabled: false },
-      });
-    });
-
-    const wrapper = await getMount(
-      <FeatureLoader featureName="IA" featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled} />
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: false },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+          },
+        } as StoreState)}
+      >
+        <FeatureLoader featureName="IA" featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled}>
+          <span>Dummy</span>
+        </FeatureLoader>
+      </Provider>
     );
-    wrapper.update();
 
-    expect(wrapper.find(dataTestId('unauthorized')).text()).toBe(Messages.unauthorized);
+    expect(screen.getByTestId('unauthorized')).toBeInTheDocument();
+  });
+
+  it('should show a disabled feature message ', async () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+          },
+        } as StoreState)}
+      >
+        <FeatureLoader featureName="IA" featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled}>
+          <span>Dummy</span>
+        </FeatureLoader>
+      </Provider>
+    );
+
+    expect(screen.getByTestId('settings-link')).toBeInTheDocument();
   });
 });
