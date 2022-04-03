@@ -1,28 +1,67 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { Provider } from 'react-redux';
+import { StoreState } from 'app/types';
+import { configureStore } from 'app/store/configureStore';
+import { render, screen, fireEvent, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
+import * as reducers from 'app/percona/shared/core/reducers';
 import { SSHKey } from './SSHKey';
 
 describe('SSHKey::', () => {
-  it('Renders correctly with props', () => {
-    const root = mount(<SSHKey />);
+  it('Renders correctly', () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { sshKey: 'fake_key' } },
+          },
+        } as StoreState)}
+      >
+        <SSHKey />
+      </Provider>
+    );
 
-    expect(root.find('textarea').text()).toEqual('test key');
+    expect(screen.getByText('fake_key')).toBeInTheDocument();
   });
 
   it('Disables apply changes on initial values', () => {
-    const root = mount(<SSHKey />);
-    const button = root.find('button');
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { sshKey: 'fake_key' } },
+          },
+        } as StoreState)}
+      >
+        <SSHKey />
+      </Provider>
+    );
 
-    expect(button.prop('disabled')).toBeTruthy();
+    expect(screen.getByTestId('ssh-key-button')).toBeDisabled();
   });
 
-  it('Calls apply changes', () => {
-    const updateSettings = jest.fn();
-    const root = mount(<SSHKey />);
+  it('Calls apply changes', async () => {
+    const spy = spyOn(reducers, 'updateSettingsAction').and.callThrough();
+    const { container } = render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { sshKey: 'fake_key' } },
+          },
+        } as StoreState)}
+      >
+        <SSHKey />
+      </Provider>
+    );
 
-    root.find('textarea').simulate('change', { target: { value: 'new key' } });
-    root.find('form').simulate('submit');
+    fireEvent.change(screen.getByTestId('ssh-key'), { target: { value: 'new key' } });
+    await waitFor(() => expect(screen.getByTestId('ssh-key-button')).not.toBeDisabled());
+    fireEvent.submit(screen.getByTestId('ssh-key-button'));
 
-    expect(updateSettings).toHaveBeenCalled();
+    await waitForElementToBeRemoved(() => container.querySelector('.fa-spin'));
+
+    expect(spy).toHaveBeenCalled();
   });
 });

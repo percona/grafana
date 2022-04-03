@@ -30,7 +30,7 @@ export const SSHKey: FC = () => {
   const dispatch = useAppDispatch();
   const navModel = usePerconaNavModel('settings-ssh');
   const { sshKey } = settings!;
-  const isEqual = (a: string, b: string) => !(a && !b) || a === b;
+  const isEqual = (a: string, b: string) => (!a && !b) || a === b;
 
   const applyChanges = async ({ key }: { key: string }) => {
     setLoading(true);
