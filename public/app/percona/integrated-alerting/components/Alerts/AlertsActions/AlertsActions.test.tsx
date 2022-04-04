@@ -1,11 +1,9 @@
 import React from 'react';
-import { dataTestId } from '@percona/platform-core';
-import { getMount, asyncAct } from 'app/percona/shared/helpers/testUtils';
 import { AlertsActions } from './AlertsActions';
 import { alertsStubs } from '../__mocks__/alertsStubs';
 import { formatAlert } from '../Alerts.utils';
-import { Bell, BellBarred } from './icons';
 import { AlertsService } from '../Alerts.service';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 
 jest.mock('app/percona/shared/components/hooks/cancelToken.hook');
 jest.mock('../Alerts.service');
@@ -24,44 +22,33 @@ describe('AlertActions', () => {
     jest.clearAllMocks();
   });
 
-  it('renders a barred bell for an active alert', async () => {
-    const wrapper = await getMount(
-      <AlertsActions alert={formatAlert(alertsStubs.alerts[0])} getAlerts={fakeGetAlerts} />
-    );
+  it('renders a barred bell for an active alert', () => {
+    render(<AlertsActions alert={formatAlert(alertsStubs.alerts[0])} getAlerts={fakeGetAlerts} />);
 
-    wrapper.update();
-
-    expect(wrapper.find(BellBarred)).toHaveLength(1);
+    expect(screen.getByTestId('bell-barred-svg')).toBeInTheDocument();
   });
 
-  it('renders a bell for an silenced alert', async () => {
-    const wrapper = await getMount(
-      <AlertsActions alert={formatAlert(alertsStubs.alerts[3])} getAlerts={fakeGetAlerts} />
-    );
+  it('renders a bell for an silenced alert', () => {
+    render(<AlertsActions alert={formatAlert(alertsStubs.alerts[3])} getAlerts={fakeGetAlerts} />);
 
-    wrapper.update();
-
-    expect(wrapper.find(Bell)).toHaveLength(1);
+    expect(screen.getByTestId('bell-svg')).toBeInTheDocument();
   });
 
   it('calls the API to activate a silenced alert', async () => {
-    const wrapper = await getMount(
-      <AlertsActions alert={formatAlert(alertsStubs.alerts[3])} getAlerts={fakeGetAlerts} />
-    );
+    render(<AlertsActions alert={formatAlert(alertsStubs.alerts[3])} getAlerts={fakeGetAlerts} />);
 
-    await asyncAct(() => wrapper.find(dataTestId('silence-alert-button')).at(0).simulate('click'));
-    wrapper.update();
+    const btn = screen.getByTestId('silence-alert-button');
+    await waitFor(() => fireEvent.click(btn));
+
     expect(alertsServiceToggle).toBeCalledTimes(1);
     expect(alertsServiceToggle).toBeCalledWith({ alert_ids: ['4'], silenced: 'FALSE' }, undefined);
   });
 
   it('calls the API to silence an active alert', async () => {
-    const wrapper = await getMount(
-      <AlertsActions alert={formatAlert(alertsStubs.alerts[1])} getAlerts={fakeGetAlerts} />
-    );
-    await asyncAct(() => wrapper.find(dataTestId('silence-alert-button')).at(0).simulate('click'));
+    render(<AlertsActions alert={formatAlert(alertsStubs.alerts[1])} getAlerts={fakeGetAlerts} />);
 
-    wrapper.update();
+    const btn = screen.getByTestId('silence-alert-button');
+    await waitFor(() => fireEvent.click(btn));
 
     expect(alertsServiceToggle).toBeCalledTimes(1);
     expect(alertsServiceToggle).toBeCalledWith({ alert_ids: ['2'], silenced: 'TRUE' }, undefined);

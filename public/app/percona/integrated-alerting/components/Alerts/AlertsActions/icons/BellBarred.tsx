@@ -9,6 +9,7 @@ export const BellBarred: FC<SVGProps<SVGSVGElement>> = (props) => (
     opacity="1"
     stroke="currentColor"
     xmlns="http://www.w3.org/2000/svg"
+    data-testid="bell-barred-svg"
     {...props}
   >
     <path d="M4.1499 8.65002L0.999902 11.8H8.6499" fill="none" strokeLinecap="round" strokeLinejoin="round" />

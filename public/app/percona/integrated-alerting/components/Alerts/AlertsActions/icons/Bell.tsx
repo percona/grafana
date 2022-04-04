@@ -9,6 +9,7 @@ export const Bell: FC<SVGProps<SVGSVGElement>> = (props) => (
     opacity="1"
     stroke="currentColor"
     xmlns="http://www.w3.org/2000/svg"
+    data-testid="bell-svg"
     {...props}
   >
     <path

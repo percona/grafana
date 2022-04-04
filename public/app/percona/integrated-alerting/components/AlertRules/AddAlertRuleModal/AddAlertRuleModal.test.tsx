@@ -84,11 +84,13 @@ describe('AddAlertRuleModal', () => {
     await waitFor(() => render(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />));
 
     const thresholdInput = screen.getByTestId(`${templateParams[0].name}-number-input`);
-    fireEvent.change(thresholdInput, {
-      target: {
-        value: '2',
-      },
-    });
+    await waitFor(() =>
+      fireEvent.change(thresholdInput, {
+        target: {
+          value: '2',
+        },
+      })
+    );
 
     expect(screen.getByTestId('add-alert-rule-modal-add-button')).toHaveProperty('disabled', false);
   });
@@ -99,17 +101,21 @@ describe('AddAlertRuleModal', () => {
     const thresholdInput = screen.getByTestId(`${templateParams[0].name}-number-input`);
     const durationInput = screen.getByTestId('duration-number-input');
 
-    fireEvent.change(thresholdInput, {
-      target: {
-        value: '2',
-      },
-    });
+    await waitFor(() =>
+      fireEvent.change(thresholdInput, {
+        target: {
+          value: '2',
+        },
+      })
+    );
 
-    fireEvent.change(durationInput, {
-      target: {
-        value: '-10',
-      },
-    });
+    await waitFor(() =>
+      fireEvent.change(durationInput, {
+        target: {
+          value: '-10',
+        },
+      })
+    );
 
     expect(screen.getByTestId('add-alert-rule-modal-add-button')).toHaveProperty('disabled', true);
   });
@@ -159,17 +165,18 @@ describe('AddAlertRuleModal', () => {
     );
   });
 
-  // xit('should show the expression and sample alert when switching templates', async () => {
-  //   const wrapper = await getMount(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
-  //
-  //   wrapper.update();
-  //
-  //   expect(wrapper.find(dataTestId('template-expression')).exists()).toBeFalsy();
-  //   expect(wrapper.find(dataTestId('template-alert')).exists()).toBeFalsy();
-  //
-  //   selectTemplateOption(wrapper);
-  //
-  //   expect(wrapper.find(dataTestId('template-expression')).find('pre').text()).toBe(templateStubs[0].expr);
-  //   expect(wrapper.find(dataTestId('template-alert')).find('pre').text()).toBe(templateStubs[0].annotations?.summary);
-  // });
+  xit('should show the expression and sample alert when switching templates', async () => {
+    const { container } = await waitFor(() => render(<AddAlertRuleModal setVisible={jest.fn()} isVisible />));
+
+    expect(screen.queryByTestId('template-expression')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('template-alert')).not.toBeInTheDocument();
+
+    await waitFor(() => fireEvent.keyDown(container.querySelectorAll('input')[0], { key: 'ArrowDown' }));
+    await waitFor(() => fireEvent.click(screen.getAllByLabelText('Select option')[0]));
+
+    expect(screen.getByTestId('template-expression').querySelector('pre')).toHaveTextContent(templateStubs[0].expr);
+    expect(screen.getByTestId('template-alert').querySelector('pre')?.textContent).toEqual(
+      templateStubs[0].annotations?.summary
+    );
+  });
 });
