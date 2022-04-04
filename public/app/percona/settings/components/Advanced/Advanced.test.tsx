@@ -1,90 +1,191 @@
 import React from 'react';
-import { mount } from 'enzyme';
-import { dataTestId } from '@percona/platform-core';
+import { Provider } from 'react-redux';
+import { StoreState } from 'app/types';
+import { configureStore } from 'app/store/configureStore';
+import { render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
+import * as reducers from 'app/percona/shared/core/reducers';
 import { Advanced } from './Advanced';
 
-xdescribe('Advanced::', () => {
+describe('Advanced::', () => {
   it('Renders correctly with props', () => {
-    const root = mount(<Advanced />);
-    const retentionInput = root.find(dataTestId('retention-field-container')).find('input');
-    const publicAddressInput = root.find(dataTestId('publicAddress-text-input')).find('input');
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: {
+                sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
+                dataRetention: '2592000s',
+                telemetryEnabled: true,
+                updatesDisabled: true,
+                backupEnabled: false,
+                sttEnabled: true,
+                dbaasEnabled: false,
+                azureDiscoverEnabled: true,
+                publicAddress: 'localhost',
+                alertingEnabled: true,
+              },
+            },
+          },
+        } as StoreState)}
+      >
+        <Advanced />
+      </Provider>
+    );
 
-    expect(retentionInput.prop('value')).toEqual(15);
-    expect(publicAddressInput.prop('value')).toEqual('pmmtest.percona.com');
+    expect(screen.getByTestId('retention-number-input')).toHaveValue(30);
+    expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('localhost');
   });
 
-  it("Can't change telemetry when stt is on", () => {
-    const root = mount(<Advanced />);
-    const telemetrySwitch = root.find('[data-testid="advanced-telemetry"]').find('input');
+  it('Calls apply changes', async () => {
+    const spy = spyOn(reducers, 'updateSettingsAction').and.callThrough();
+    const { container } = render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: {
+                sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
+                dataRetention: '2592000s',
+                telemetryEnabled: true,
+                updatesDisabled: true,
+                backupEnabled: false,
+                sttEnabled: true,
+                dbaasEnabled: false,
+                azureDiscoverEnabled: true,
+                publicAddress: 'localhost',
+                alertingEnabled: true,
+              },
+            },
+          },
+        } as StoreState)}
+      >
+        <Advanced />
+      </Provider>
+    );
+    fireEvent.change(screen.getByTestId('retention-number-input'), { target: { value: 70 } });
+    fireEvent.submit(screen.getByTestId('advanced-button'));
+    await waitForElementToBeRemoved(() => container.querySelector('.fa-spin'));
 
-    expect(telemetrySwitch.prop('disabled')).toBeTruthy();
-  });
-
-  it("Can't change stt when telemetry is off", () => {
-    const root = mount(<Advanced />);
-    const sttSwitch = root.find('[data-testid="advanced-stt"]').find('input');
-
-    expect(sttSwitch.prop('disabled')).toBeTruthy();
-  });
-
-  it("Can't change alerting when telemetry is off", () => {
-    const root = mount(<Advanced />);
-    const alertingSwitch = root.find('[data-testid="advanced-alerting"]').find('input');
-
-    expect(alertingSwitch.prop('disabled')).toBeTruthy();
-  });
-
-  it('Calls apply changes', () => {
-    const updateSettings = jest.fn();
-    const root = mount(<Advanced />);
-
-    root
-      .find('[data-testid="retention-field-container"]')
-      .find('input')
-      .simulate('change', { target: { value: '70' } });
-    root.find('form').simulate('submit');
-
-    expect(updateSettings).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
   });
 
   it('Sets correct URL from browser', () => {
     const location = {
       ...window.location,
-      hostname: 'pmmtest.percona.com',
+      host: 'pmmtest.percona.com',
     };
     Object.defineProperty(window, 'location', {
       writable: true,
       value: location,
     });
 
-    const root = mount(<Advanced />);
-    const publicAddressButton = root.find(dataTestId('public-address-button')).find('button');
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: {
+                sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
+                dataRetention: '2592000s',
+                telemetryEnabled: true,
+                updatesDisabled: true,
+                backupEnabled: false,
+                sttEnabled: true,
+                dbaasEnabled: false,
+                azureDiscoverEnabled: true,
+                publicAddress: 'localhost',
+                alertingEnabled: true,
+              },
+            },
+          },
+        } as StoreState)}
+      >
+        <Advanced />
+      </Provider>
+    );
 
-    publicAddressButton.simulate('click');
-    root.update();
-
-    const publicAddressInput = root.find(dataTestId('publicAddress-text-input')).find('input');
-
-    expect(publicAddressInput.prop('value')).toEqual('pmmtest.percona.com');
+    fireEvent.click(screen.getByTestId('public-address-button'));
+    expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('pmmtest.percona.com');
   });
 
-  it('Does not include STT check intervals in the change request if STT checks are disabled', () => {
-    const fakeUpdateSettings = jest.fn();
+  it('Does not include STT check intervals in the change request if STT checks are disabled', async () => {
+    const spy = spyOn(reducers, 'updateSettingsAction').and.callThrough();
 
-    const root = mount(<Advanced />);
+    const { container } = render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: {
+                sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
+                dataRetention: '2592000s',
+                telemetryEnabled: true,
+                updatesDisabled: true,
+                backupEnabled: false,
+                sttEnabled: false,
+                dbaasEnabled: false,
+                azureDiscoverEnabled: true,
+                publicAddress: 'localhost',
+                alertingEnabled: true,
+              },
+            },
+          },
+        } as StoreState)}
+      >
+        <Advanced />
+      </Provider>
+    );
 
-    root.find('form').simulate('submit');
+    fireEvent.change(screen.getByTestId('retention-number-input'), { target: { value: 70 } });
+    fireEvent.submit(screen.getByTestId('advanced-button'));
+    await waitForElementToBeRemoved(() => container.querySelector('.fa-spin'));
 
-    expect(fakeUpdateSettings.mock.calls[0][0].stt_check_intervals).toBeUndefined();
+    expect(spy.calls.mostRecent().args[0].body.stt_check_intervals).toBeUndefined();
   });
 
-  it('Includes STT check intervals in the change request if STT checks are enabled', () => {
-    const fakeUpdateSettings = jest.fn();
+  it('Includes STT check intervals in the change request if STT checks are enabled', async () => {
+    const spy = spyOn(reducers, 'updateSettingsAction').and.callThrough();
 
-    const root = mount(<Advanced />);
+    const { container } = render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: {
+                sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
+                dataRetention: '2592000s',
+                telemetryEnabled: true,
+                updatesDisabled: true,
+                backupEnabled: false,
+                sttEnabled: true,
+                dbaasEnabled: false,
+                azureDiscoverEnabled: true,
+                publicAddress: 'localhost',
+                alertingEnabled: true,
+              },
+            },
+          },
+        } as StoreState)}
+      >
+        <Advanced />
+      </Provider>
+    );
 
-    root.find('form').simulate('submit');
+    fireEvent.change(screen.getByTestId('retention-number-input'), { target: { value: 70 } });
+    fireEvent.submit(screen.getByTestId('advanced-button'));
+    await waitForElementToBeRemoved(() => container.querySelector('.fa-spin'));
 
-    expect(fakeUpdateSettings.mock.calls[0][0].stt_check_intervals).toBeDefined();
+    expect(spy.calls.mostRecent().args[0].body.stt_check_intervals).toBeDefined();
   });
 });
