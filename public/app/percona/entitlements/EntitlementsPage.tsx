@@ -14,6 +14,7 @@ import { SectionContent } from './components/SectionContent/SectionContent';
 import { Label } from './components/SectionLabel/SectionLabel';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { StoreState } from 'app/types';
+import { Messages } from './Entitlements.messages';
 
 const EntitlementsPage: FC = () => {
   const [pending, setPending] = useState(true);
@@ -50,6 +51,8 @@ const EntitlementsPage: FC = () => {
       <PlatformConnectedLoader>
         {pending ? (
           <Spinner className={styles.loader} />
+        ) : data.length === 0 ? (
+          <div className={styles.noDataLabel}>{Messages.noData}</div>
         ) : (
           data.map((entitlement: Entitlement) => {
             const { number, name, endDate } = entitlement;
