@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
