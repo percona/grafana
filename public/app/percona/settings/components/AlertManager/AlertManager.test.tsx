@@ -1,29 +1,66 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { Provider } from 'react-redux';
+import { StoreState } from 'app/types';
+import { configureStore } from 'app/store/configureStore';
+import { render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
+import * as reducers from 'app/percona/shared/core/reducers';
 import { AlertManager } from './AlertManager';
 
 describe('AlertManager::', () => {
-  it('Renders correctly with props', () => {
-    const root = mount(<AlertManager />);
+  it('Renders correctly with props', async () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { alertManagerUrl: 'fake.url', alertManagerRules: 'rule' } },
+          },
+        } as StoreState)}
+      >
+        <AlertManager />
+      </Provider>
+    );
 
-    expect(root.find('[data-testid="alertmanager-url"]').find('input').prop('value')).toEqual('test url');
-    expect(root.find('textarea').text()).toEqual('test rules');
+    expect(screen.getByDisplayValue('fake.url')).toBeInTheDocument();
+    expect(screen.getByTestId('alertmanager-rules').textContent).toBe('rule');
   });
 
   it('Disables apply changes on initial values', () => {
-    const root = mount(<AlertManager />);
-    const button = root.find('button');
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { alertManagerUrl: 'fake.url', alertManagerRules: 'rule' } },
+          },
+        } as StoreState)}
+      >
+        <AlertManager />
+      </Provider>
+    );
 
-    expect(button.prop('disabled')).toBeTruthy();
+    expect(screen.getByTestId('alertmanager-button')).toBeDisabled();
   });
 
-  it('Calls apply changes', () => {
-    const updateSettings = jest.fn();
-    const root = mount(<AlertManager />);
+  it('Calls apply changes', async () => {
+    const spy = spyOn(reducers, 'updateSettingsAction').and.callThrough();
+    const { container } = render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { alertManagerUrl: 'fake.url', alertManagerRules: 'rule' } },
+          },
+        } as StoreState)}
+      >
+        <AlertManager />
+      </Provider>
+    );
 
-    root.find('textarea').simulate('change', { target: { value: 'new key' } });
-    root.find('form').simulate('submit');
+    fireEvent.change(screen.getByTestId('alertmanager-rules'), { target: { value: 'new key' } });
+    fireEvent.submit(screen.getByTestId('alertmanager-button'));
+    await waitForElementToBeRemoved(() => container.querySelector('.fa-spin'));
 
-    expect(updateSettings).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
   });
 });
