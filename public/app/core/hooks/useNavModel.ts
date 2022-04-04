@@ -5,7 +5,5 @@ import { NavModel } from '@grafana/data';
 
 export const useNavModel = (id: string): NavModel => {
   const navIndex = useSelector((state: StoreState) => state.navIndex);
-  const model = getNavModel(navIndex, id);
-
-  return model;
+  return getNavModel(navIndex, id);
 };
