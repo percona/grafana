@@ -93,7 +93,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
         width: '105px',
         Cell: ({ value }) =>
           value ? (
-            <a target="_blank" rel="noreferrer" href={value} className={styles.link}>
+            <a data-testid="read-more-link" target="_blank" rel="noreferrer" href={value} className={styles.link}>
               {Messages.readMore}
             </a>
           ) : null,
@@ -150,7 +150,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   return (
     <Page navModel={navModel}>
       <Page.Contents dataTestId="db-service-checks">
-        <h3>{Messages.pageTitle(serviceName)}</h3>
+        <h3 data-testid="page-service">{Messages.pageTitle(serviceName)}</h3>
         <Table
           showPagination
           data={data}
