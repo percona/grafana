@@ -17,9 +17,16 @@ jest.mock('@percona/platform-core', () => {
 });
 
 describe('PermissionLoader', () => {
-  it('should render success if feature is enabled', async () => {
+  it('should render success if feature is enabled after loading', async () => {
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
         <PermissionLoader
           featureSelector={() => true}
           renderError={() => null}
