@@ -5,6 +5,7 @@ import {
   setSettingsLoading,
   setAuthorized,
   fetchServerInfoAction,
+  fetchServerSaasHostAction,
   setIsPlatformUser,
 } from 'app/percona/shared/core/reducers';
 import { SettingsService } from 'app/percona/settings/Settings.service';
@@ -39,9 +40,14 @@ export const PerconaBootstrapper = () => {
       }
     };
 
-    getSettings();
-    getUserStatus();
-    dispatch(fetchServerInfoAction());
+    const bootstrap = async () => {
+      await getSettings();
+      await getUserStatus();
+      await dispatch(fetchServerInfoAction());
+      await dispatch(fetchServerSaasHostAction());
+    };
+
+    bootstrap();
   }, [dispatch]);
 
   return <></>;
