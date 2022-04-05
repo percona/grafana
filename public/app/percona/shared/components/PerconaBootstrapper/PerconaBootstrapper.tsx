@@ -8,6 +8,7 @@ import {
   fetchServerSaasHostAction,
   setIsPlatformUser,
 } from 'app/percona/shared/core/reducers';
+import { contextSrv } from 'app/core/services/context_srv';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { UserService } from '../../services/user/User.service';
 import { logger } from '@percona/platform-core';
@@ -47,7 +48,9 @@ export const PerconaBootstrapper = () => {
       await dispatch(fetchServerSaasHostAction());
     };
 
-    bootstrap();
+    if (contextSrv.user.isSignedIn) {
+      bootstrap();
+    }
   }, [dispatch]);
 
   return <></>;
