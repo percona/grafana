@@ -56,7 +56,7 @@ export const NodesTab = () => {
   }, []);
 
   const removeNodes = useCallback(
-    async (nodes: Array<SelectedTableRows<Node>>, forceMode) => {
+    async (nodes: Array<SelectedTableRows<Node>>, forceMode: boolean) => {
       try {
         setLoading(true);
         // eslint-disable-next-line max-len
@@ -80,6 +80,14 @@ export const NodesTab = () => {
       loadData();
     },
     [loadData]
+  );
+
+  const proceed = useCallback(
+    async (values: Record<any, any>) => {
+      await removeNodes(selected, values.force);
+      setModalVisible(false);
+    },
+    [removeNodes, selected]
   );
 
   return (
@@ -114,8 +122,8 @@ export const NodesTab = () => {
                 onDismiss={() => setModalVisible(false)}
               >
                 <Form
-                  onSubmit={() => {}}
-                  render={({ form, handleSubmit }) => (
+                  onSubmit={proceed}
+                  render={({ form, handleSubmit, values }) => (
                     <form onSubmit={handleSubmit}>
                       <>
                         <h4 className={styles.confirmationText}>
@@ -138,15 +146,7 @@ export const NodesTab = () => {
                           <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                             Cancel
                           </Button>
-                          <Button
-                            size="md"
-                            onClick={() => {
-                              removeNodes(selected, form.getState().values.force);
-                              setModalVisible(false);
-                            }}
-                            variant="destructive"
-                            className={styles.destructiveButton}
-                          >
+                          <Button size="md" variant="destructive" className={styles.destructiveButton}>
                             Proceed
                           </Button>
                         </HorizontalGroup>
