@@ -183,7 +183,7 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
     },
     {
       id: 'settings-alert-manager',
-      text: 'Alert Manager',
+      text: 'Alertmanager Integration',
       url: `${config.appSubUrl}/settings/am-integration`,
     },
     {
