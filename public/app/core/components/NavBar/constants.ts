@@ -178,7 +178,7 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
     },
     {
       id: 'settings-ssh',
-      text: 'SSH',
+      text: 'SSH Key',
       url: `${config.appSubUrl}/settings/ssh-key`,
     },
     {
