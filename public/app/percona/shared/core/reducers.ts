@@ -24,6 +24,7 @@ import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/K
 import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
 import { SettingsService } from 'app/percona/settings/Settings.service';
+import { getBackendSrv } from '@grafana/runtime';
 import { ServerInfo } from './types';
 
 const toSettingsModel = (response: SettingsPayload): Settings => ({
@@ -270,10 +271,39 @@ export const fetchDBClustersAction = createAsyncThunk(
       })()
     )
 );
+export interface PerconaServerState extends ServerInfo {
+  saasHost: string;
+}
+
+export const initialServerState: PerconaServerState = {
+  serverName: '',
+  serverId: '',
+  saasHost: 'https://portal.percona.com',
+};
+
+const perconaServerSlice = createSlice({
+  name: 'perconaServer',
+  initialState: initialServerState,
+  reducers: {
+    setServerInfo: (state, action: PayloadAction<ServerInfo>): PerconaServerState => ({
+      ...state,
+      serverName: action.payload.serverName,
+      serverId: action.payload.serverId,
+    }),
+    setServerSaasHost: (state, action: PayloadAction<string>): PerconaServerState => ({
+      ...state,
+      saasHost: action.payload,
+    }),
+  },
+});
+
+const { setServerInfo, setServerSaasHost } = perconaServerSlice.actions;
+
+export const perconaServerReducers = perconaServerSlice.reducer;
 
 export const fetchServerInfoAction = createAsyncThunk(
   'percona/fetchServerInfo',
-  (): Promise<ServerInfo> =>
+  (_, thunkAPI): Promise<void> =>
     withSerializedError(
       (async () => {
         const { pmm_server_id = '', pmm_server_name = '' } = await api.post<
@@ -281,15 +311,35 @@ export const fetchServerInfoAction = createAsyncThunk(
           Object
         >('/v1/Platform/ServerInfo', {}, true);
 
-        return {
-          serverName: pmm_server_name,
-          serverId: pmm_server_id,
-        };
+        thunkAPI.dispatch(
+          setServerInfo({
+            serverName: pmm_server_name,
+            serverId: pmm_server_id,
+          })
+        );
       })()
     )
 );
 
-const serverInfoReducer = createAsyncSlice('serverInfo', fetchServerInfoAction).reducer;
+export const fetchServerSaasHostAction = createAsyncThunk(
+  'percona/fetchServerSaasHost',
+  (_, thunkAPI): Promise<void> =>
+    withSerializedError(
+      (async () => {
+        let host = 'https://portal.percona.com';
+        // Using percona's api wrapper to call '/graph/percona-api' has a weird side effect
+        // The request would be made after login without the application/json accept header
+        // The user would be redirected to /graph/percona/api/saas-host, which is not the intended behaviour
+        // Using getBackendSrv from Grafana solves this
+        const { host: envHost = '' } = await getBackendSrv().get('/percona-api/saas-host');
+
+        if (envHost.includes('dev')) {
+          host = 'https://platform-dev.percona.com';
+        }
+        thunkAPI.dispatch(setServerSaasHost(host));
+      })()
+    )
+);
 
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
@@ -310,6 +360,6 @@ export default {
     addKubernetes: addKubernetesReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbCluster: DBClusterReducer,
-    server: serverInfoReducer,
+    server: perconaServerReducers,
   }),
 };
