@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { cx } from '@emotion/css';
 import { Field, Form } from 'react-final-form';
 import { Button, Spinner, TextArea, useStyles2 } from '@grafana/ui';
@@ -32,7 +32,7 @@ export const SSHKey: FC = () => {
   const { sshKey } = settings!;
   const isEqual = (a: string, b: string) => (!a && !b) || a === b;
 
-  const applyChanges = async ({ key }: { key: string }) => {
+  const applyChanges = useCallback(async ({ key }: { key: string }) => {
     setLoading(true);
     await dispatch(
       updateSettingsAction({
@@ -41,7 +41,8 @@ export const SSHKey: FC = () => {
       })
     );
     setLoading(false);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
