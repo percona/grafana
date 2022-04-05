@@ -415,6 +415,13 @@ export function getAppRoutes(): RouteDescriptor[] {
       component: SafeDynamicImport(() => import(/* webpackChunkName: "ChecksPage" */ 'app/percona/check/CheckPanel')),
     },
     {
+      path: '/pmm-database-checks/service-checks/:service',
+      component: SafeDynamicImport(
+        () =>
+          import(/* webpackChunkName: "ServiceChecksPage" */ 'app/percona/check/components/ServiceChecks/ServiceChecks')
+      ),
+    },
+    {
       path: '/settings',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "SettingsPage" */ 'app/percona/settings/Settings')
@@ -448,6 +455,18 @@ export function getAppRoutes(): RouteDescriptor[] {
       path: '/add-instance/:tab',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/add-instance/panel')
+      ),
+    },
+    {
+      path: '/entitlements',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/entitlements/EntitlementsPage')
+      ),
+    },
+    {
+      path: '/tickets',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "TicketsPage" */ 'app/percona/tickets/TicketsPage')
       ),
     },
     ...getPluginCatalogRoutes(),

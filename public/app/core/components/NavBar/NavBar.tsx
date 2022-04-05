@@ -23,7 +23,7 @@ import { NavBarSection } from './NavBarSection';
 import { NavBarMenu } from './NavBarMenu';
 import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
-import { getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -43,6 +43,7 @@ export const NavBar: FC = React.memo(() => {
   const styles = getStyles(theme);
   const location = useLocation();
   const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = useSelector(getPerconaSettings);
+  const { isPlatformUser } = useSelector(getPerconaUser);
   const query = new URLSearchParams(location.search);
   const kiosk = query.get('kiosk') as KioskMode;
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
@@ -67,9 +68,9 @@ export const NavBar: FC = React.memo(() => {
 
     if (sttEnabled) {
       topItems.push({
-        id: 'databsase-checks',
+        id: 'database-checks',
         icon: 'percona-database-checks',
-        text: 'Security Checks',
+        text: 'Advisor Checks',
         url: `${config.appSubUrl}/pmm-database-checks`,
       });
     }
@@ -91,6 +92,21 @@ export const NavBar: FC = React.memo(() => {
         url: `${config.appSubUrl}/backup`,
       });
     }
+  }
+
+  if (isPlatformUser) {
+    topItems.push({
+      id: 'entitlements',
+      icon: 'cloud',
+      text: 'Entitlements',
+      url: `${config.appSubUrl}/entitlements`,
+    });
+    topItems.push({
+      id: 'tickets',
+      icon: 'ticket',
+      text: 'Support Tickets',
+      url: `${config.appSubUrl}/tickets`,
+    });
   }
 
   if (kiosk !== null) {

@@ -1,5 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncSlice, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { Settings } from 'app/percona/settings/Settings.types';
+import { api } from 'app/percona/shared/helpers/api';
+import { ServerInfo } from './types';
 
 export interface PerconaSettingsState extends Settings {
   isLoading: boolean;
@@ -39,6 +42,7 @@ export const initialSettingsState: PerconaSettingsState = {
     frequentInterval: '10s',
   },
   isLoading: true,
+  isConnectedToPortal: false,
 };
 
 const perconaSettingsSlice = createSlice({
@@ -63,10 +67,12 @@ export const perconaSettingsReducers = perconaSettingsSlice.reducer;
 
 export interface PerconaUserState {
   isAuthorized: boolean;
+  isPlatformUser: boolean;
 }
 
 export const initialUserState: PerconaUserState = {
   isAuthorized: false,
+  isPlatformUser: false,
 };
 
 const perconaUserSlice = createSlice({
@@ -77,14 +83,39 @@ const perconaUserSlice = createSlice({
       ...state,
       isAuthorized: action.payload,
     }),
+    setIsPlatformUser: (state, action: PayloadAction<boolean>): PerconaUserState => ({
+      ...state,
+      isPlatformUser: action.payload,
+    }),
   },
 });
 
-export const { setAuthorized } = perconaUserSlice.actions;
+export const { setAuthorized, setIsPlatformUser } = perconaUserSlice.actions;
 
 export const perconaUserReducers = perconaUserSlice.reducer;
+
+export const fetchServerInfoAction = createAsyncThunk(
+  'percona/fetchServerInfo',
+  (): Promise<ServerInfo> =>
+    withSerializedError(
+      (async () => {
+        const { pmm_server_id = '', pmm_server_name = '' } = await api.post<
+          { pmm_server_id: string; pmm_server_name: string },
+          Object
+        >('/v1/Platform/ServerInfo', {}, true);
+
+        return {
+          serverName: pmm_server_name,
+          serverId: pmm_server_id,
+        };
+      })()
+    )
+);
+
+const serverInfoReducer = createAsyncSlice('serverInfo', fetchServerInfoAction).reducer;
 
 export default {
   perconaSettings: perconaSettingsReducers,
   perconaUser: perconaUserReducers,
+  perconaServer: serverInfoReducer,
 };
