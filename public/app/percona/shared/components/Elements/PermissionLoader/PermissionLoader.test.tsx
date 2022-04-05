@@ -69,20 +69,4 @@ describe('PermissionLoader', () => {
     );
     expect(screen.getByTestId('dummy-child')).toBeInTheDocument();
   });
-
-  it('should show unauthorized message if feature disabled', async () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            settings: { loading: false },
-            user: { isAuthorized: false },
-          },
-        } as StoreState)}
-      >
-        <PermissionLoader featureSelector={() => false} renderError={() => null} renderSuccess={() => null} />
-      </Provider>
-    );
-    expect(screen.getByTestId('unauthorized')).toBeInTheDocument();
-  });
 });
