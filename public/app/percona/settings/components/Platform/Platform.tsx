@@ -6,7 +6,7 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
-import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { Connected } from './Connected/Connected';
 import { Connect } from './Connect/Connect';
 import { WithDiagnostics } from '../WithDiagnostics/WithDiagnostics';
@@ -18,16 +18,10 @@ export const Platform: FC = () => {
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
       <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
-        <PermissionLoader
-          featureSelector={() => true}
-          renderError={() => null}
-          renderSuccess={() => (
-            <>
-              <TechnicalPreview />
-              <WithDiagnostics>{result?.isConnectedToPortal ? <Connected /> : <Connect />}</WithDiagnostics>
-            </>
-          )}
-        />
+        <FeatureLoader>
+          <TechnicalPreview />
+          <WithDiagnostics>{result?.isConnectedToPortal ? <Connected /> : <Connect />}</WithDiagnostics>
+        </FeatureLoader>
       </Page.Contents>
     </Page>
   );

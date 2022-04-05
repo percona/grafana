@@ -9,7 +9,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import Page from 'app/core/components/Page/Page';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { PermissionLoader } from 'app/percona/shared/components/Elements/PermissionLoader/PermissionLoader';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import { EmailPayload, SettingsAPIChangePayload } from '../../Settings.types';
 import { Email } from './Email/Email';
@@ -70,29 +70,25 @@ export const Communication: FC = () => {
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
       <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
-        <PermissionLoader
-          featureSelector={() => true}
-          renderError={() => null}
-          renderSuccess={() => (
-            <WithDiagnostics>
-              <div className={cx(settingsStyles.wrapper)}>
-                <TabsBar>
-                  {tabs.map((tab, index) => (
-                    <Tab
-                      key={index}
-                      label={tab.label}
-                      active={tab.key === activeTab}
-                      onChangeTab={() => setActiveTab(tab.key)}
-                    />
-                  ))}
-                </TabsBar>
-                <TabContent className={settingsStyles.tabs}>
-                  {tabs.map((tab) => tab.key === activeTab && tab.component)}
-                </TabContent>
-              </div>
-            </WithDiagnostics>
-          )}
-        />
+        <FeatureLoader>
+          <WithDiagnostics>
+            <div className={cx(settingsStyles.wrapper)}>
+              <TabsBar>
+                {tabs.map((tab, index) => (
+                  <Tab
+                    key={index}
+                    label={tab.label}
+                    active={tab.key === activeTab}
+                    onChangeTab={() => setActiveTab(tab.key)}
+                  />
+                ))}
+              </TabsBar>
+              <TabContent className={settingsStyles.tabs}>
+                {tabs.map((tab) => tab.key === activeTab && tab.component)}
+              </TabContent>
+            </div>
+          </WithDiagnostics>
+        </FeatureLoader>
       </Page.Contents>
     </Page>
   );

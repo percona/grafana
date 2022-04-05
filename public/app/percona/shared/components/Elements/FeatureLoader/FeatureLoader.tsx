@@ -9,8 +9,8 @@ import { getStyles } from './FeatureLoader.styles';
 import { PermissionLoader } from '../PermissionLoader';
 
 export const FeatureLoader: FC<FeatureLoaderProps> = ({
-  featureName,
-  featureSelector,
+  featureName = '',
+  featureSelector = () => true,
   messagedataTestId = 'settings-link',
   children,
 }) => {
@@ -29,14 +29,20 @@ export const FeatureLoader: FC<FeatureLoaderProps> = ({
     <PermissionLoader
       featureSelector={featureSelector}
       renderSuccess={() => children}
-      renderError={() => (
-        <>
-          {Messages.featureDisabled(featureName)}&nbsp;
-          <a data-testid={messagedataTestId} className={styles.link} href={PMM_SETTINGS_URL}>
-            {Messages.pmmSettings}
-          </a>
-        </>
-      )}
+      renderError={() =>
+        featureName ? (
+          <>
+            {Messages.featureDisabled(featureName)}&nbsp;
+            {featureName && (
+              <a data-testid={messagedataTestId} className={styles.link} href={PMM_SETTINGS_URL}>
+                {Messages.pmmSettings}
+              </a>
+            )}
+          </>
+        ) : (
+          Messages.genericFeatureDisabled
+        )
+      }
     />
   );
 };
