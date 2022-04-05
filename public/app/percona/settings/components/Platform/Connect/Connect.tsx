@@ -66,7 +66,7 @@ export const Connect: FC = () => {
           showErrorOnBlur
           required
         />
-        <a href={`${saasHost}/profile`} rel="noreferrer" target="_blank">
+        <a href={`${saasHost}/profile`} rel="noreferrer noopener" target="_blank">
           Get token
         </a>
       </div>
