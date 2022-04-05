@@ -81,10 +81,10 @@ export const NavBar: FC = React.memo(() => {
   dispatch(updateNavIndex(PMM_DBAAS_PAGE));
   dispatch(updateNavIndex(PMM_BACKUP_PAGE));
   dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
+  dispatch(updateNavIndex(PMM_TICKETS_PAGE));
+  dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
 
   if (isPlatformUser) {
-    dispatch(updateNavIndex(PMM_TICKETS_PAGE));
-    dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
     topItems.push(PMM_ENTITLEMENTS_PAGE);
     topItems.push(PMM_TICKETS_PAGE);
   }

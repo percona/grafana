@@ -23,6 +23,7 @@ import { KubernetesClusterStatus } from 'app/percona/dbaas/components/Kubernetes
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
 import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
+import { UserService } from '../services/user/User.service';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { getBackendSrv } from '@grafana/runtime';
 import { ServerInfo } from './types';
@@ -117,6 +118,17 @@ const perconaUserSlice = createSlice({
 });
 
 export const { setAuthorized, setIsPlatformUser } = perconaUserSlice.actions;
+
+export const fetchUserStatusAction = createAsyncThunk(
+  'percona/fetchUserStatus',
+  (_, thunkAPI): Promise<void> =>
+    withSerializedError(
+      (async () => {
+        const isPlatformUser = await UserService.getUserStatus(undefined, true);
+        thunkAPI.dispatch(setIsPlatformUser(isPlatformUser));
+      })()
+    )
+);
 
 export const fetchSettingsAction = createAsyncThunk(
   'percona/fetchSettings',
