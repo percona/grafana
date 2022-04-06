@@ -150,18 +150,30 @@ export const PMM_INVENTORY_PAGE: NavModelItem = {
       id: 'inventory-services',
       text: 'Services',
       url: `${config.appSubUrl}/inventory/services`,
+      hideFromMenu: true,
     },
     {
       id: 'inventory-agents',
       text: 'Agents',
       url: `${config.appSubUrl}/inventory/agents`,
+      hideFromMenu: true,
     },
     {
       id: 'inventory-nodes',
       text: 'Nodes',
       url: `${config.appSubUrl}/inventory/nodes`,
+      hideFromMenu: true,
     },
   ],
+};
+
+export const PMM_ADD_INSTANCE_PAGE: NavModelItem = {
+  id: 'add-instance',
+  url: `${config.appSubUrl}/add-instance`,
+  icon: 'percona-add',
+  subTitle: 'Add Instance to PMM',
+  text: 'Add Instance',
+  hideFromTabs: true,
 };
 
 export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {

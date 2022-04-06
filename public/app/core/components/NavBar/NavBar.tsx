@@ -34,6 +34,7 @@ import {
   PMM_TICKETS_PAGE,
   PMM_ENTITLEMENTS_PAGE,
   getPmmSettingsPage,
+  PMM_ADD_INSTANCE_PAGE,
 } from './constants';
 
 const homeUrl = config.appSubUrl || '/';
@@ -81,6 +82,7 @@ export const NavBar: FC = React.memo(() => {
   dispatch(updateNavIndex(PMM_DBAAS_PAGE));
   dispatch(updateNavIndex(PMM_BACKUP_PAGE));
   dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
+  dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
   dispatch(updateNavIndex(PMM_TICKETS_PAGE));
   dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
 
