@@ -91,4 +91,24 @@ describe('FeatureLoader', () => {
 
     expect(screen.getByTestId('settings-link')).toBeInTheDocument();
   });
+
+  it('should show a generic disabled message when feature name is not passed', async () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+          },
+        } as StoreState)}
+      >
+        <FeatureLoader featureSelector={(state) => !!state.percona.settings.result?.alertingEnabled}>
+          <span>Dummy</span>
+        </FeatureLoader>
+      </Provider>
+    );
+
+    expect(screen.queryByTestId('settings-link')).not.toBeInTheDocument();
+    expect(screen.getByText('Feature is disabled.')).toBeInTheDocument();
+  });
 });
