@@ -7,7 +7,7 @@ jest.mock('app/percona/settings/Settings.service');
 
 describe('AddInstance page::', () => {
   it('should render a given number of links', async () => {
-    await waitFor(() => render(<AddInstance onSelectInstanceType={() => {}} />));
+    await waitFor(() => render(<AddInstance showAzure={false} onSelectInstanceType={() => {}} />));
 
     expect(screen.getAllByRole('button').length).toEqual(instanceList.length);
     instanceList.forEach((item) => {
@@ -15,10 +15,20 @@ describe('AddInstance page::', () => {
     });
   });
 
+  it('should render azure option', async () => {
+    await waitFor(() => render(<AddInstance showAzure onSelectInstanceType={() => {}} />));
+
+    expect(screen.getAllByRole('button').length).toEqual(instanceList.length + 1);
+    instanceList.forEach((item) => {
+      expect(screen.getByTestId(`${item.type}-instance`)).toBeInTheDocument();
+    });
+    expect(screen.getByTestId('azure-instance')).toBeInTheDocument();
+  });
+
   it('should invoke a callback with a proper instance type', async () => {
     const onSelectInstanceType = jest.fn();
 
-    render(<AddInstance onSelectInstanceType={onSelectInstanceType} />);
+    render(<AddInstance showAzure onSelectInstanceType={onSelectInstanceType} />);
 
     expect(onSelectInstanceType).toBeCalledTimes(0);
 
