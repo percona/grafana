@@ -17800,7 +17800,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eventsource@npm:^1.0.7":
+"eventsource@npm:^1.1.0":
   version: 1.1.0
   resolution: "eventsource@npm:1.1.0"
   dependencies:
@@ -18237,7 +18237,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"faye-websocket@npm:^0.11.3":
+"faye-websocket@npm:^0.11.3, faye-websocket@npm:^0.11.4":
   version: 0.11.4
   resolution: "faye-websocket@npm:0.11.4"
   dependencies:
@@ -23262,13 +23262,6 @@ __metadata:
   version: 5.0.1
   resolution: "json-stringify-safe@npm:5.0.1"
   checksum: 48ec0adad5280b8a96bb93f4563aa1667fd7a36334f79149abd42446d0989f2ddc58274b479f4819f1f00617957e6344c886c55d05a4e15ebb4ab931e4a6a8ee
-  languageName: node
-  linkType: hard
-
-"json3@npm:^3.3.3":
-  version: 3.3.3
-  resolution: "json3@npm:3.3.3"
-  checksum: 55eda204a4c70d11b7d5caa5cb64c76a3aa54d5df72d07bdf446b922fd7cb8657b0732f68e0c36790f55e195e0a429c299144ff05430bbe93bc2a7c81ad3472b
   languageName: node
   linkType: hard
 
@@ -32787,16 +32780,15 @@ __metadata:
   linkType: hard
 
 "sockjs-client@npm:^1.5.0":
-  version: 1.5.2
-  resolution: "sockjs-client@npm:1.5.2"
+  version: 1.6.0
+  resolution: "sockjs-client@npm:1.6.0"
   dependencies:
-    debug: ^3.2.6
-    eventsource: ^1.0.7
-    faye-websocket: ^0.11.3
+    debug: ^3.2.7
+    eventsource: ^1.1.0
+    faye-websocket: ^0.11.4
     inherits: ^2.0.4
-    json3: ^3.3.3
-    url-parse: ^1.5.3
-  checksum: b3c3966ca8ebe72454e3bbb83b21b0f58dda1c725815f2897162104afc42b779de9a6d964fb2b164ea290cb4c0c94cb3542bd7f788f21fe5df018da963826f96
+    url-parse: ^1.5.10
+  checksum: e071eafb2a0a3e1ecd5af8b423c01e4c76be703cf13d97ee240b2af297784d57a0a3b398415cbb6506f80a256d1a16c7b4c15da9e58520bf0cc28cc316ccbda4
   languageName: node
   linkType: hard
 
@@ -35732,13 +35724,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"url-parse@npm:^1.4.3, url-parse@npm:^1.5.3":
+"url-parse@npm:^1.4.3":
   version: 1.5.4
   resolution: "url-parse@npm:1.5.4"
   dependencies:
     querystringify: ^2.1.1
     requires-port: ^1.0.0
   checksum: 4e627dca06e649e366a6e0a2becd2df36fd5d37baa9b3362bb5b29bb2e41bba9c62ed37d24d5a4cb5a642cfaf5232163ab6794c9779f85e4ed804366bb8c377e
+  languageName: node
+  linkType: hard
+
+"url-parse@npm:^1.5.10":
+  version: 1.5.10
+  resolution: "url-parse@npm:1.5.10"
+  dependencies:
+    querystringify: ^2.1.1
+    requires-port: ^1.0.0
+  checksum: fbdba6b1d83336aca2216bbdc38ba658d9cfb8fc7f665eb8b17852de638ff7d1a162c198a8e4ed66001ddbf6c9888d41e4798912c62b4fd777a31657989f7bdf
   languageName: node
   linkType: hard
 
