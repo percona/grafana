@@ -18,7 +18,7 @@ export const PlatformConnectedLoader: FC = ({ children }) => {
     if (isPlatformUser) {
       return children;
     }
-    return <EmptyBlock>{Messages.platformUser}</EmptyBlock>;
+    return <EmptyBlock dataTestId="not-platform-user">{Messages.platformUser}</EmptyBlock>;
   };
 
   const ErrorMessage = () => (
