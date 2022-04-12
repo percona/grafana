@@ -10,8 +10,10 @@ describe('PlatformConnectedLoader', () => {
     render(
       <Provider
         store={configureStore({
-          perconaSettings: { isLoading: false, isConnectedToPortal: true },
-          perconaUser: { isAuthorized: true, isPlatformUser: false },
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { loading: false, result: { isConnectedToPortal: true } },
+          },
         } as StoreState)}
       >
         <PlatformConnectedLoader></PlatformConnectedLoader>

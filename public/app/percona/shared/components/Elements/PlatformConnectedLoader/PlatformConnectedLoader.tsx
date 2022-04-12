@@ -8,7 +8,7 @@ import { EmptyBlock } from '../EmptyBlock';
 import { ErrorMessage } from './components/ErrorMessage/ErrorMessage';
 
 export const PlatformConnectedLoader: FC = ({ children }) => {
-  const featureSelector = useCallback((state: StoreState) => !!state.perconaSettings.isConnectedToPortal, []);
+  const featureSelector = useCallback((state: StoreState) => !!state.percona.settings.result?.isConnectedToPortal, []);
   const { isPlatformUser } = useSelector(getPerconaUser);
 
   const checkForPlatformUser = useCallback(() => {
