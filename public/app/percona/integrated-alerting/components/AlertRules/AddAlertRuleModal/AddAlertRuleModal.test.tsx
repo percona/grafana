@@ -77,7 +77,7 @@ describe('AddAlertRuleModal', () => {
   it('should have the submit button disabled by default when adding a new rule', async () => {
     await waitFor(() => render(<AddAlertRuleModal setVisible={jest.fn()} isVisible />));
 
-    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toBeDisabled();
   });
 
   it('should enable the submit button if all fields are valid', async () => {
@@ -117,7 +117,7 @@ describe('AddAlertRuleModal', () => {
       })
     );
 
-    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toBeDisabled();
   });
 
   it('should disable template edition', async () => {

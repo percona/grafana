@@ -89,7 +89,7 @@ describe('AddNotificationChannelModal', () => {
     render(withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />));
     const button = screen.getByTestId('notification-channel-add-button');
 
-    expect(button).toHaveProperty('disabled', true);
+    expect(button).toBeDisabled();
   });
 
   describe('Pager Duty option', () => {

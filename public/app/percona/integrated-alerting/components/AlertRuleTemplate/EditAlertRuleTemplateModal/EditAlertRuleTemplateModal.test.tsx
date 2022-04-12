@@ -25,7 +25,7 @@ describe('EditAlertRuleTemplateModal', () => {
 
     expect(container.querySelector('textarea')).toBeTruthy();
     expect(addButton).toBeInTheDocument();
-    expect(addButton).toHaveProperty('disabled', true);
+    expect(addButton).toBeDisabled();
     expect(screen.getByTestId('alert-rule-template-cancel-button')).toBeInTheDocument();
     expect(screen.getByTestId('alert-rule-name-warning')).toBeInTheDocument();
   });
@@ -76,7 +76,7 @@ describe('EditAlertRuleTemplateModal', () => {
       />
     );
     expect(container.querySelector('textarea')).toHaveTextContent('test content');
-    expect(screen.getByTestId('alert-rule-template-edit-button')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('alert-rule-template-edit-button')).toBeDisabled();
   });
 
   it('should call setVisible and getAlertRuleTemplates on submit', async () => {

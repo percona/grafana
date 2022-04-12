@@ -13,14 +13,14 @@ describe('Pagination', () => {
 
   it('should disable left navigation buttons when in first page', () => {
     render(<Pagination totalItems={30} pageCount={10} pageSizeOptions={[]} pageSize={3} nrRowsOnCurrentPage={3} />);
-    expect(screen.getByTestId('previous-page-button')).toHaveProperty('disabled', true);
-    expect(screen.getByTestId('first-page-button')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('previous-page-button')).toBeDisabled();
+    expect(screen.getByTestId('first-page-button')).toBeDisabled();
   });
 
   it('should disable right navigation buttons when in last page', () => {
     render(<Pagination totalItems={10} pageCount={1} pageSizeOptions={[]} pageSize={10} nrRowsOnCurrentPage={10} />);
-    expect(screen.getByTestId('next-page-button')).toHaveProperty('disabled', true);
-    expect(screen.getByTestId('last-page-button')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('next-page-button')).toBeDisabled();
+    expect(screen.getByTestId('last-page-button')).toBeDisabled();
   });
 
   it('should enable all navigation buttons while active page is not first or last', () => {
@@ -28,10 +28,10 @@ describe('Pagination', () => {
     const nextPageButton = screen.getByTestId('next-page-button');
     fireEvent.click(nextPageButton);
 
-    expect(screen.getByTestId('previous-page-button')).toHaveProperty('disabled', false);
-    expect(screen.getByTestId('first-page-button')).toHaveProperty('disabled', false);
-    expect(screen.getByTestId('next-page-button')).toHaveProperty('disabled', false);
-    expect(screen.getByTestId('last-page-button')).toHaveProperty('disabled', false);
+    expect(screen.getByTestId('previous-page-button')).not.toBeDisabled();
+    expect(screen.getByTestId('first-page-button')).not.toBeDisabled();
+    expect(screen.getByTestId('next-page-button')).not.toBeDisabled();
+    expect(screen.getByTestId('last-page-button')).not.toBeDisabled();
   });
 
   it('should show all pages when pagesPerView > totalPages', () => {

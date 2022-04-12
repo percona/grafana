@@ -27,6 +27,6 @@ describe('MultipleActions::', () => {
   it('renders correctly disabled', () => {
     render(<MultipleActions actions={[]} disabled />);
 
-    expect(screen.getByTestId('dropdown-menu-toggle')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('dropdown-menu-toggle')).toBeDisabled();
   });
 });

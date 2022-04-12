@@ -20,6 +20,6 @@ describe('AddClusterButton::', () => {
     fireEvent.click(btn);
 
     expect(action).not.toHaveBeenCalled();
-    expect(screen.getByRole('button')).toHaveProperty('disabled', true);
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 });

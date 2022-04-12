@@ -12,7 +12,7 @@ describe('AlertManager::', () => {
   it('Disables apply changes on initial values', () => {
     render(<AlertManager alertManagerUrl="" alertManagerRules="" updateSettings={() => {}} />);
 
-    expect(screen.getByRole('button')).toHaveProperty('disabled', true);
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 
   it('Calls apply changes', () => {

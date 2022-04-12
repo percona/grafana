@@ -12,7 +12,7 @@ describe('SSHKey::', () => {
   it('Disables apply changes on initial values', () => {
     render(<SSHKey sshKey="test key" updateSettings={() => {}} />);
 
-    expect(screen.getByRole('button')).toHaveProperty('disabled', true);
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 
   it('Calls apply changes', () => {

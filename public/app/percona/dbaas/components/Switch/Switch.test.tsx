@@ -75,6 +75,6 @@ describe('SwitchField::', () => {
       </FormWrapper>
     );
 
-    expect(screen.getByRole('checkbox')).toHaveProperty('disabled', true);
+    expect(screen.getByRole('checkbox')).toBeDisabled();
   });
 });

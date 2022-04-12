@@ -23,7 +23,7 @@ describe('RetryModeSelector', () => {
         <RetryModeSelector retryMode={RetryMode.MANUAL} />
       </FormWrapper>
     );
-    expect(screen.getByTestId('retryTimes-number-input')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('retryTimes-number-input')).toBeDisabled();
   });
 
   it('should disable all fields when disabled is passed, even if retry mode is AUTO', () => {
@@ -32,7 +32,7 @@ describe('RetryModeSelector', () => {
         <RetryModeSelector disabled retryMode={RetryMode.AUTO} />
       </FormWrapper>
     );
-    expect(screen.getByTestId('retryTimes-number-input')).toHaveProperty('disabled', true);
-    expect(screen.getAllByTestId('retryMode-radio-button')[0]).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('retryTimes-number-input')).toBeDisabled();
+    expect(screen.getAllByTestId('retryMode-radio-button')[0]).toBeDisabled();
   });
 });
