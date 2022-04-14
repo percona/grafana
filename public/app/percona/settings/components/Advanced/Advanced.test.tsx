@@ -74,11 +74,12 @@ describe('Advanced::', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('Sets correct URL from browser', () => {
+  it('Sets correct URL from browser', async () => {
     const location = {
       ...window.location,
       host: 'pmmtest.percona.com',
     };
+
     Object.defineProperty(window, 'location', {
       writable: true,
       value: location,

@@ -17,6 +17,7 @@ describe('KubernetesClusterActions::', () => {
     );
 
     expect(screen.getByTestId('dropdown-menu-toggle')).toBeInTheDocument();
+    expect(screen.getByTestId('dropdown-menu-container')).toBeInTheDocument();
   });
 
   it('Select delete actions', async () => {

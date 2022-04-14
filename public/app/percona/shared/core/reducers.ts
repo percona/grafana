@@ -25,7 +25,6 @@ import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBClust
 import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
 import { UserService } from '../services/user/User.service';
 import { SettingsService } from 'app/percona/settings/Settings.service';
-import { getBackendSrv } from '@grafana/runtime';
 import { ServerInfo } from './types';
 
 const toSettingsModel = (response: SettingsPayload): Settings => ({
@@ -339,11 +338,7 @@ export const fetchServerSaasHostAction = createAsyncThunk(
     withSerializedError(
       (async () => {
         let host = 'https://portal.percona.com';
-        // Using percona's api wrapper to call '/graph/percona-api' has a weird side effect
-        // The request would be made after login without the application/json accept header
-        // The user would be redirected to /graph/percona/api/saas-host, which is not the intended behaviour
-        // Using getBackendSrv from Grafana solves this
-        const { host: envHost = '' } = await getBackendSrv().get('/percona-api/saas-host');
+        const { host: envHost = '' } = await api.get('/graph/percona-api/saas-host');
 
         if (envHost.includes('dev')) {
           host = 'https://platform-dev.percona.com';

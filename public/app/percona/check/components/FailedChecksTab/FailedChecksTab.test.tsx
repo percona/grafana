@@ -106,6 +106,7 @@ describe('FailedChecksTab::', () => {
 
     const runChecksButton = screen.getByRole('button');
 
+    await waitFor(() => fireEvent.click(runChecksButton));
     fireEvent.click(runChecksButton);
     expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
 

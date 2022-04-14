@@ -105,7 +105,6 @@ describe('AlertRules', () => {
     expect(screen.getAllByRole('row')).toHaveLength(1 + 6);
     expect(screen.queryByTestId('table-no-data')).not.toBeInTheDocument();
   });
-
   it('should render correctly without data', async () => {
     jest
       .spyOn(AlertRulesService, 'list')

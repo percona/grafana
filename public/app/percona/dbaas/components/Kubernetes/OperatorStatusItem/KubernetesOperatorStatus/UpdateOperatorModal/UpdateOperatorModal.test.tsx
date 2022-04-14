@@ -40,7 +40,7 @@ describe('UpdateOperatorModal::', () => {
     );
     const message = 'PXC 1.7.0 to version 1.8.0 in test_cluster';
 
-    expect(screen.getByTestId('update-operator-message').textContent).toContain(message);
+    expect(screen.getByTestId('update-operator-message')).toHaveTextContent(message);
   });
 
   it('should clear selected clsuter and operator on close', async () => {
