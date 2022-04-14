@@ -24,64 +24,6 @@ describe('Advanced::', () => {
     expect(publicAddressInput).toHaveValue('pmmtest.percona.com');
   });
 
-  xit("Can't change telemetry when stt is on", () => {
-    // TODO remove after review
-    //  The current implementation does not have a mechanism for setting the disabled property depending on sttEnabled
-    //  param. I suggest deleting this test.
-    render(
-      <Advanced
-        backupEnabled={false}
-        dataRetention="1296000s"
-        telemetryEnabled
-        sttEnabled
-        updatesDisabled
-        updateSettings={() => {}}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
-    const telemetrySwitch = screen.getByTestId('advanced-telemetry');
-    expect(telemetrySwitch).toBeDisabled();
-  });
-
-  xit("Can't change stt when telemetry is off", () => {
-    // TODO remove after review
-    //  Didn't see in the current implementation a mechanism for setting the disabled property to advanced-stt input
-    //  depending on sttEnabled param. I suggest deleting this test.
-    render(
-      <Advanced
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        backupEnabled={false}
-        updatesDisabled
-        updateSettings={() => {}}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
-    const sttSwitch = screen.getByTestId('advanced-stt');
-    expect(sttSwitch).toBeDisabled();
-  });
-
-  xit("Can't change alerting when telemetry is off", () => {
-    // TODO remove after review
-    //  Didn't see in the current implementation a mechanism for setting the disabled property to advanced-alerting
-    //  Field depending on telemetryEnabled param. I suggest deleting this test.
-    render(
-      <Advanced
-        dataRetention="1296000s"
-        telemetryEnabled={false}
-        sttEnabled={false}
-        backupEnabled={false}
-        alertingEnabled={false}
-        updatesDisabled
-        updateSettings={() => {}}
-        sttCheckIntervals={sttCheckIntervalsStub}
-      />
-    );
-    const alertingSwitch = screen.getByTestId('advanced-alerting').querySelector('input');
-    expect(alertingSwitch).toBeDisabled();
-  });
-
   it('Calls apply changes', () => {
     const updateSettings = jest.fn();
     render(
@@ -110,8 +52,6 @@ describe('Advanced::', () => {
       ...window.location,
       host: 'localhost:1234',
     };
-    // TODO remove after review
-    //  Advance component works with host, changed test for current realisation
 
     Object.defineProperty(window, 'location', {
       writable: true,

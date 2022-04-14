@@ -54,9 +54,6 @@ describe('SettingsPanel::', () => {
 
     const tabs = screen.getAllByTestId('test-tab');
     expect(tabs).toHaveLength(5);
-    // TODO remove after review
-    //  The previous way of testing git wrapper component (only one),
-    //  I checked that previous tree and current tree are equal, but in RTL paradigm we will get 3 <div> in this test.
-    expect(container.children[0].children).toHaveLength(3);
+    expect(container.children[0].children).toHaveLength(2);
   });
 });

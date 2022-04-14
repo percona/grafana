@@ -3,7 +3,6 @@ import Discovery from './Discovery';
 import { render, screen, waitFor } from '@testing-library/react';
 
 describe('Discovery:: ', () => {
-  //TODO warning: "An update to Discovery inside a test was not wrapped in act(...)."
   it('should render credentials, instances and docs', async () => {
     await waitFor(() => render(<Discovery selectInstance={jest.fn()} />));
 

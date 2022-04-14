@@ -57,9 +57,6 @@ describe('SwitchField::', () => {
       </FormWrapper>
     );
 
-    // TODO Remove after review
-    //  enzyme checked value property and it's false, but on real render in RTL we get a value 'on' and then 'true'
-
     expect(screen.getByTestId('test-switch')).toHaveProperty('value', 'on');
 
     const checkbox = screen.getByRole('checkbox');

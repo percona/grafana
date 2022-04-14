@@ -44,8 +44,6 @@ describe('AlertRuleParamField', () => {
 
   it('should have validators', () => {
     render(<AlertRuleParamField param={param} />);
-    // TODO: remove this comment after review: don't find a way how to check length of property inside
-    //  haveBeenCalled function, because RTL works with ready DOM, not with components tree
     expect(screen.getByTestId('number-input-field').getAttribute('validators')?.split(',')).toHaveLength(2);
   });
 });

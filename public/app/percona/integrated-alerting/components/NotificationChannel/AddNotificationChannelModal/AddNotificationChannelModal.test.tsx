@@ -30,13 +30,6 @@ describe('AddNotificationChannelModal', () => {
   it('should render modal with correct fields', async () => {
     render(withContext(<AddNotificationChannelModal setVisible={jest.fn()} isVisible />));
 
-    // TODO Remove after review
-    //  NotificationChannelProvider doesn't trow any notificationChannel to components, so we can't find
-    //  TYPE_OPTIONS[0].label and emails-textarea-input, because values=undefined and TypeField doesn't return anything
-
-    // expect(wrapper.find('[className$="-singleValue"]').text()).toEqual(TYPE_OPTIONS[0].label);
-    // expect(wrapper.find(dataTestId('emails-textarea-input')).length).toBe(1);
-
     expect(screen.getAllByRole('textbox')).toHaveLength(2);
     expect(screen.getByTestId('notification-channel-add-button')).toBeInTheDocument();
     expect(screen.getByTestId('notification-channel-cancel-button')).toBeInTheDocument();

@@ -60,8 +60,6 @@ describe('useCancelToken', () => {
     fireEvent.click(buttons[1]);
 
     expect(sourceSpy).toHaveBeenCalledTimes(5);
-
-    // TODO remove after review (don't understand why it doesn't work previous way)
     expect(cancelSpy).toHaveBeenCalledTimes(4);
   });
 
@@ -77,8 +75,6 @@ describe('useCancelToken', () => {
     fireEvent.click(buttons[1]);
 
     unmount();
-
-    // TODO remove after review (don't understand why it doesn't work previous way)
     expect(cancelSpy).toHaveBeenCalledTimes(7);
   });
 
