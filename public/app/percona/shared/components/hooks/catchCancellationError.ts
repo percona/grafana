@@ -6,10 +6,9 @@ import { isApiCancelError } from '../../helpers/api';
 // Used to safely return from a side effect that might trigger when the component unmounted
 // and some promise resolved in the meanwhile
 export const useCatchCancellationError = () => {
-  const catchFromAsyncThunkAction = async <T>(p: Promise<T>): Promise<T | void> => {
+  const catchFromAsyncThunkAction = async <T>(p: Promise<T & { error?: SerializedError }>): Promise<T | void> => {
     const data = await p;
-    //@ts-ignore
-    const { error }: { error: SerializedError } = data;
+    const { error } = data;
 
     if (error) {
       if (error.name === PERCONA_CANCELLED_ERROR_NAME) {
