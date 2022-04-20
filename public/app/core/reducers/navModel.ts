@@ -65,13 +65,15 @@ export const navIndexReducer = (state: NavIndex = initialState, action: AnyActio
 
     if (payload.children && payload.children.length) {
       for (const node of payload.children) {
-        newPages[node.id!] = {
-          ...node,
-          parentItem: payload,
-        };
+        if (node.id) {
+          newPages[node.id] = {
+            ...node,
+            parentItem: payload,
+          };
+        }
       }
-    } else {
-      newPages[payload.id!] = {
+    } else if (payload.id) {
+      newPages[payload.id] = {
         ...payload,
       };
     }
