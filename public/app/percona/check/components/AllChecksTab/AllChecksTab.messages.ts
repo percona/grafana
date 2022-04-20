@@ -9,4 +9,14 @@ export const Messages = {
   name: 'Name',
   status: 'Status',
   changeIntervalButtonTitle: 'Change check interval',
+  table: {
+    columns: {
+      name: 'Name',
+      description: 'Description',
+      status: 'Status',
+      interval: 'Interval',
+      actions: 'Actions',
+    },
+    noData: 'No checks founds',
+  },
 };

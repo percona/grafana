@@ -1,39 +1,23 @@
-import React, { FC, useEffect, useState, useCallback } from 'react';
-import { cx } from '@emotion/css';
+import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
+import { Column } from 'react-table';
 import { logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { CheckDetails } from 'app/percona/check/types';
+import { Table } from 'app/percona/integrated-alerting/components/Table';
+import { CheckDetails, Interval } from 'app/percona/check/types';
 import { CheckService } from 'app/percona/check/Check.service';
-import { Spinner, useStyles2 } from '@grafana/ui';
-import { getStyles as getCheckPanelStyles } from 'app/percona/check/CheckPanel.styles';
-import { getStyles as getMainStyles } from './AllChecksTab.styles';
 import { Messages } from './AllChecksTab.messages';
 import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { FetchChecks } from './types';
-import { CheckTableRow } from './CheckTableRow';
-import { ChecksReloadContext } from './AllChecks.context';
+import { CheckActions } from './CheckActions/CheckActions';
+import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 
 export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
-  const [checks, setChecks] = useState<CheckDetails[] | undefined>();
-  const mainStyles = useStyles2(getMainStyles);
-  const checkPanelStyles = useStyles2(getCheckPanelStyles);
+  const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
+  const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
+  const [checks, setChecks] = useState<CheckDetails[]>([]);
   const [generateToken] = useCancelToken();
-
-  const updateUI = (check: CheckDetails) => {
-    const { name, disabled } = check;
-
-    setChecks((oldChecks) =>
-      oldChecks?.map((oldCheck) => {
-        if (oldCheck.name !== name) {
-          return oldCheck;
-        }
-
-        return { ...oldCheck, disabled };
-      })
-    );
-  };
 
   const fetchChecks: FetchChecks = useCallback(async () => {
     setFetchChecksPending(true);
@@ -52,44 +36,107 @@ export const AllChecksTab: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const updateUI = (check: CheckDetails) => {
+    const { name, disabled, interval } = check;
+
+    setChecks((oldChecks) =>
+      oldChecks?.map((oldCheck) => {
+        if (oldCheck.name !== name) {
+          return oldCheck;
+        }
+
+        return { ...oldCheck, disabled, interval };
+      })
+    );
+  };
+
+  const changeCheck = useCallback(async (check: CheckDetails) => {
+    const action = !!check.disabled ? 'enable' : 'disable';
+    try {
+      await CheckService.changeCheck({ params: [{ name: check.name, [action]: true }] });
+      updateUI({ ...check, disabled: !check.disabled });
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleIntervalChangeClick = useCallback((check: CheckDetails) => {
+    setSelectedCheck(check);
+    setCheckIntervalModalVisible(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setCheckIntervalModalVisible(false);
+    setSelectedCheck(undefined);
+  }, []);
+
+  const handleIntervalChanged = useCallback(
+    (check: CheckDetails) => {
+      updateUI({ ...check });
+      handleModalClose();
+    },
+    [handleModalClose]
+  );
+
+  const columns = useMemo(
+    (): Array<Column<CheckDetails>> => [
+      {
+        Header: Messages.table.columns.name,
+        accessor: 'name',
+      },
+      {
+        Header: Messages.table.columns.description,
+        accessor: 'description',
+      },
+      {
+        Header: Messages.table.columns.status,
+        accessor: 'disabled',
+        Cell: ({ value }) => (!!value ? Messages.disabled : Messages.enabled),
+      },
+      {
+        Header: Messages.table.columns.interval,
+        accessor: 'interval',
+        Cell: ({ value }) => Interval[value],
+      },
+      {
+        Header: Messages.table.columns.actions,
+        accessor: 'name',
+        id: 'actions',
+        // eslint-disable-next-line react/display-name
+        Cell: ({ row }) => (
+          <CheckActions
+            check={row.original}
+            onChangeCheck={changeCheck}
+            onIntervalChangeClick={handleIntervalChangeClick}
+          />
+        ),
+      },
+    ],
+    [changeCheck, handleIntervalChangeClick]
+  );
+
   useEffect(() => {
     fetchChecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className={cx(mainStyles.tableWrapper, mainStyles.wrapper)} data-testid="db-checks-all-checks-wrapper">
-      {fetchChecksPending ? (
-        <div className={checkPanelStyles.spinner} data-testid="db-checks-all-checks-spinner">
-          <Spinner />
-        </div>
-      ) : (
-        <table className={mainStyles.table} data-testid="db-checks-all-checks-table">
-          <colgroup>
-            <col className={mainStyles.nameColumn} />
-            <col />
-            <col className={mainStyles.statusColumn} />
-            <col className={mainStyles.intervalColumn} />
-            <col className={mainStyles.actionsColumn} />
-          </colgroup>
-          <thead data-testid="db-checks-all-checks-thead">
-            <tr>
-              <th>{Messages.name}</th>
-              <th>{Messages.description}</th>
-              <th>{Messages.status}</th>
-              <th>{Messages.interval}</th>
-              <th>{Messages.actions}</th>
-            </tr>
-          </thead>
-          <tbody data-testid="db-checks-all-checks-tbody">
-            <ChecksReloadContext.Provider value={{ fetchChecks }}>
-              {checks?.map((check) => (
-                <CheckTableRow key={check.name} check={check} onSuccess={updateUI} />
-              ))}
-            </ChecksReloadContext.Provider>
-          </tbody>
-        </table>
+    <>
+      <Table
+        totalItems={checks.length}
+        data={checks}
+        columns={columns}
+        pendingRequest={fetchChecksPending}
+        emptyMessage={Messages.table.noData}
+      />
+      {!!selectedCheck && checkIntervalModalVisible && (
+        <ChangeCheckIntervalModal
+          setVisible={setCheckIntervalModalVisible}
+          check={selectedCheck}
+          onClose={handleModalClose}
+          onIntervalChanged={handleIntervalChanged}
+        />
       )}
-    </div>
+    </>
   );
 };

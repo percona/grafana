@@ -5,7 +5,6 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { Messages } from './AllChecksTab.messages';
 import { CheckTableRowProps } from './types';
 import { Interval } from 'app/percona/check/types';
-import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { getStyles } from './CheckTableRow.styles';
 
 const formatInterval = (interval: keyof typeof Interval): Interval => Interval[interval];
@@ -13,7 +12,7 @@ const formatInterval = (interval: keyof typeof Interval): Interval => Interval[i
 export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
   const styles = useStyles(getStyles);
   const [changeCheckPending, setChangeCheckPending] = useState(false);
-  const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
+  const [, setCheckIntervalModalVisible] = useState(false);
   const { name, summary, description, disabled, interval } = check;
 
   const handleChangeCheckInterval = () => {
@@ -57,11 +56,6 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
           </div>
         </td>
       </tr>
-      <ChangeCheckIntervalModal
-        isVisible={checkIntervalModalVisible}
-        setVisible={setCheckIntervalModalVisible}
-        check={check}
-      />
     </>
   );
 };

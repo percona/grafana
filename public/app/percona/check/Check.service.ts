@@ -104,10 +104,10 @@ export const CheckService = {
   runDbChecks(token?: CancelToken): Promise<void | {}> {
     return api.post<{}, {}>('/v1/management/SecurityChecks/Start', {}, false, token);
   },
-  async getAllChecks(token?: CancelToken): Promise<CheckDetails[] | undefined> {
+  async getAllChecks(token?: CancelToken): Promise<CheckDetails[]> {
     const response = await api.post<AllChecks, {}>('/v1/management/SecurityChecks/List', {}, false, token);
 
-    return response ? response.checks : undefined;
+    return response ? response.checks : [];
   },
   changeCheck(body: ChangeCheckBody, token?: CancelToken): Promise<void | {}> {
     return api.post<{}, ChangeCheckBody>('/v1/management/SecurityChecks/Change', body, false, token);
