@@ -26,63 +26,31 @@ describe('ChangeCheckIntervalModal', () => {
   });
 
   it('should render modal', () => {
-    render(
-      <ChangeCheckIntervalModal
-        check={TEST_CHECK}
-        setVisible={jest.fn()}
-        onClose={jest.fn()}
-        onIntervalChanged={jest.fn()}
-      />
-    );
+    render(<ChangeCheckIntervalModal check={TEST_CHECK} onClose={jest.fn()} onIntervalChanged={jest.fn()} />);
 
     expect(screen.getByTestId('modal-wrapper')).toBeInTheDocument();
     expect(screen.getByTestId('change-check-interval-form')).toBeInTheDocument();
     expect(screen.getByTestId('change-check-interval-radio-group-wrapper')).toBeInTheDocument();
   });
 
-  it('renders the modal when visible is set to true', () => {
-    render(
-      <ChangeCheckIntervalModal
-        onIntervalChanged={jest.fn()}
-        check={TEST_CHECK}
-        setVisible={jest.fn()}
-        onClose={jest.fn()}
-      />
-    );
-    expect(screen.getByTestId('change-check-interval-form')).toBeInTheDocument();
-  });
+  it('should call onClose', () => {
+    const onClose = jest.fn();
 
-  it('should call setVisible on close', () => {
-    const setVisible = jest.fn();
-
-    render(
-      <ChangeCheckIntervalModal
-        onIntervalChanged={jest.fn()}
-        check={TEST_CHECK}
-        setVisible={setVisible}
-        onClose={jest.fn()}
-      />
-    );
+    render(<ChangeCheckIntervalModal onIntervalChanged={jest.fn()} check={TEST_CHECK} onClose={onClose} />);
 
     const modalBackground = screen.getByTestId('modal-background');
     fireEvent.click(modalBackground);
-    expect(setVisible).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('should call setVisible and getAlertRuleTemplates on submit', async () => {
-    const setVisible = jest.fn();
+  it('should call onClose and onIntervalChanged on submit', async () => {
+    const onClose = jest.fn();
+    const onIntervalChanged = jest.fn();
 
-    render(
-      <ChangeCheckIntervalModal
-        onIntervalChanged={jest.fn()}
-        check={TEST_CHECK}
-        setVisible={setVisible}
-        onClose={jest.fn()}
-      />
-    );
+    render(<ChangeCheckIntervalModal onIntervalChanged={onIntervalChanged} check={TEST_CHECK} onClose={onClose} />);
 
     const form = screen.getByTestId('change-check-interval-form');
     fireEvent.submit(form);
-    await waitFor(() => expect(setVisible).toHaveBeenCalledWith(false));
+    await waitFor(() => expect(onIntervalChanged).toHaveBeenCalled());
   });
 });

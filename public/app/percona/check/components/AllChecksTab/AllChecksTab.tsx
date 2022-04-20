@@ -82,7 +82,7 @@ export const AllChecksTab: FC = () => {
     (): Array<Column<CheckDetails>> => [
       {
         Header: Messages.table.columns.name,
-        accessor: 'name',
+        accessor: 'summary',
       },
       {
         Header: Messages.table.columns.description,
@@ -131,7 +131,6 @@ export const AllChecksTab: FC = () => {
       />
       {!!selectedCheck && checkIntervalModalVisible && (
         <ChangeCheckIntervalModal
-          setVisible={setCheckIntervalModalVisible}
           check={selectedCheck}
           onClose={handleModalClose}
           onIntervalChanged={handleIntervalChanged}

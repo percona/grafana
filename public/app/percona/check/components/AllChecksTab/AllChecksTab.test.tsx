@@ -4,7 +4,7 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { Interval } from 'app/percona/check/types';
 import { AllChecksTab } from './AllChecksTab';
 import { Messages } from './AllChecksTab.messages';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 jest.mock('@percona/platform-core', () => {
   const originalModule = jest.requireActual('@percona/platform-core');
@@ -15,76 +15,43 @@ jest.mock('@percona/platform-core', () => {
     },
   };
 });
+jest.mock('app/percona/check/Check.service');
 
 describe('AllChecksTab::', () => {
   it('should fetch checks at startup', async () => {
     const spy = jest.spyOn(CheckService, 'getAllChecks');
     render(<AllChecksTab />);
 
-    expect(spy).toBeCalledTimes(1);
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
 
-    spy.mockClear();
+    expect(spy).toBeCalledTimes(1);
   });
 
   it('should render a spinner at startup, while loading', async () => {
-    const spy = jest.spyOn(CheckService, 'getAllChecks').mockImplementation(() =>
-      Promise.resolve([
-        {
-          summary: 'Test',
-          name: 'test enabled',
-          description: 'test enabled description',
-          interval: 'STANDARD',
-          disabled: false,
-        },
-      ])
-    );
-    const component = render(<AllChecksTab />);
-    expect(screen.queryByTestId('spinner-wrapper')).toBeInTheDocument();
-    await waitFor(() => component);
+    render(<AllChecksTab />);
+
+    expect(screen.queryByTestId('table-loading')).toBeInTheDocument();
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
     expect(screen.queryByTestId('spinner-wrapper')).not.toBeInTheDocument();
-    spy.mockClear();
   });
 
   it('should log an error if the API call fails', async () => {
-    const spy = jest.spyOn(CheckService, 'getAllChecks').mockImplementation(() => {
+    jest.spyOn(CheckService, 'getAllChecks').mockImplementationOnce(() => {
       throw Error('test');
     });
     const loggerSpy = jest.spyOn(logger, 'error').mockImplementationOnce(() => null);
 
-    await waitFor(() => render(<AllChecksTab />));
+    render(<AllChecksTab />);
 
     expect(loggerSpy).toBeCalledTimes(1);
-
-    spy.mockClear();
   });
 
   it('should render a table', async () => {
-    jest.spyOn(CheckService, 'getAllChecks').mockImplementation(() =>
-      Promise.resolve([
-        {
-          summary: 'Test',
-          name: 'test enabled',
-          description: 'test enabled description',
-          interval: 'STANDARD',
-          disabled: false,
-        },
-        {
-          summary: 'Test disabled',
-          name: 'test disabled',
-          description: 'test disabled description',
-          interval: 'RARE',
-          disabled: true,
-        },
-      ])
-    );
+    render(<AllChecksTab />);
 
-    await waitFor(() => render(<AllChecksTab />));
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    const tbody = screen.getByTestId('table-tbody');
 
-    const tbody = screen.getByTestId('db-checks-all-checks-tbody');
-
-    expect(screen.getByTestId('db-checks-all-checks-table')).toBeInTheDocument();
-    expect(screen.getByTestId('db-checks-all-checks-thead')).toBeInTheDocument();
-    expect(screen.getByTestId('db-checks-all-checks-tbody')).toBeInTheDocument();
     expect(tbody.querySelectorAll('tr > td')).toHaveLength(10);
     expect(tbody.querySelectorAll('tr > td')[0]).toHaveTextContent('Test');
     expect(tbody.querySelectorAll('tr > td')[1]).toHaveTextContent('test enabled description');
@@ -96,5 +63,21 @@ describe('AllChecksTab::', () => {
     expect(tbody.querySelectorAll('tr > td')[7]).toHaveTextContent(Messages.disabled);
     expect(tbody.querySelectorAll('tr > td')[8]).toHaveTextContent(Interval.RARE);
     expect(tbody.querySelectorAll('tr > td')[9]).toHaveTextContent(Messages.enable);
+  });
+
+  it('should call an API to change the check status when the action button gets clicked', async () => {
+    const spy = jest.spyOn(CheckService, 'changeCheck');
+    render(<AllChecksTab />);
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+
+    const button = screen.getAllByTestId('check-table-loader-button')[0];
+    fireEvent.click(button);
+
+    await waitFor(() => expect(button).toHaveTextContent('Enable'));
+
+    expect(spy).toBeCalledTimes(1);
+    expect(spy).toBeCalledWith({ params: [{ name: 'test enabled', disable: true }] });
+    spy.mockClear();
   });
 });
