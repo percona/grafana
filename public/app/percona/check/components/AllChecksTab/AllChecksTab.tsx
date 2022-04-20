@@ -13,6 +13,7 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { Spinner, useStyles2 } from '@grafana/ui';
 // TODO: make a shared table style
 import { Messages } from './AllChecksTab.messages';
+import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { getStyles as getCheckPanelStyles } from 'app/percona/check/CheckPanel.styles';
 import { getStyles as getMainStyles } from './AllChecksTab.styles';
 import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
@@ -73,7 +74,7 @@ export const AllChecksTab: FC = () => {
         <TechnicalPreview />
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"
-          featureName="Security Threat Tool"
+          featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
           <div className={cx(mainStyles.tableWrapper, mainStyles.wrapper)} data-testid="db-checks-all-checks-wrapper">

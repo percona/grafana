@@ -14,6 +14,7 @@ import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
 import { Spinner, useStyles2 } from '@grafana/ui';
 import { Messages } from './FailedChecksTab.messages';
+import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { getStyles } from './FailedChecksTab.styles';
 import { stripServiceId } from './FailedChecksTab.utils';
 import { appEvents } from '../../../../core/app_events';
@@ -104,7 +105,7 @@ export const FailedChecksTab: FC = () => {
         <TechnicalPreview />
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"
-          featureName="Security Threat Tool"
+          featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
           <div className={styles.header}>
