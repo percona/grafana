@@ -83,9 +83,11 @@ export const AllChecksTab: FC = () => {
           </thead>
           <tbody data-testid="db-checks-all-checks-tbody">
             <ChecksReloadContext.Provider value={{ fetchChecks }}>
-              {checks?.map((check) => (
-                <CheckTableRow key={check.name} check={check} onSuccess={updateUI} />
-              ))}
+              {checks
+                ?.sort((a, b) => a.name.localeCompare(b.name))
+                .map((check) => (
+                  <CheckTableRow key={check.name} check={check} onSuccess={updateUI} />
+                ))}
             </ChecksReloadContext.Provider>
           </tbody>
         </table>

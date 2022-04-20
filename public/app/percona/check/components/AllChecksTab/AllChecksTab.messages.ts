@@ -9,4 +9,5 @@ export const Messages = {
   name: 'Name',
   status: 'Status',
   changeIntervalButtonTitle: 'Change check interval',
+  run: 'Run',
 };

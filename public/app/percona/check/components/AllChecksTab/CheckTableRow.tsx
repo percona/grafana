@@ -13,6 +13,7 @@ const formatInterval = (interval: keyof typeof Interval): Interval => Interval[i
 export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
   const styles = useStyles(getStyles);
   const [changeCheckPending, setChangeCheckPending] = useState(false);
+  const [runCheckPending, setRunCheckPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const { name, summary, description, disabled, interval } = check;
 
@@ -35,6 +36,17 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
     }
   };
 
+  const runIndividualCheck = async () => {
+    setRunCheckPending(true);
+    try {
+      await CheckService.runIndividualDbCheck(name);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setRunCheckPending(false);
+    }
+  };
+
   return (
     <>
       <tr key={name}>
@@ -44,6 +56,15 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
         <td>{formatInterval(interval)}</td>
         <td>
           <div className={styles.actionsWrapper}>
+            <LoaderButton
+              variant="primary"
+              size="sm"
+              loading={runCheckPending}
+              onClick={runIndividualCheck}
+              data-testid="check-table-loader-button-run"
+            >
+              {Messages.run}
+            </LoaderButton>
             <LoaderButton
               variant={disabled ? 'primary' : 'destructive'}
               size="sm"
