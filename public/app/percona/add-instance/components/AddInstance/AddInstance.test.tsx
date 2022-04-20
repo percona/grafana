@@ -9,7 +9,7 @@ describe('AddInstance page::', () => {
   it('should render a given number of links', async () => {
     await waitFor(() => render(<AddInstance showAzure={false} onSelectInstanceType={() => {}} />));
 
-    expect(screen.getAllByRole('button').length).toEqual(instanceList.length);
+    expect(screen.getAllByRole('button')).toHaveLength(instanceList.length);
     instanceList.forEach((item) => {
       expect(screen.getByTestId(`${item.type}-instance`)).toBeInTheDocument();
     });
@@ -18,7 +18,7 @@ describe('AddInstance page::', () => {
   it('should render azure option', async () => {
     await waitFor(() => render(<AddInstance showAzure onSelectInstanceType={() => {}} />));
 
-    expect(screen.getAllByRole('button').length).toEqual(instanceList.length + 1);
+    expect(screen.getAllByRole('button')).toHaveLength(instanceList.length + 1);
     instanceList.forEach((item) => {
       expect(screen.getByTestId(`${item.type}-instance`)).toBeInTheDocument();
     });

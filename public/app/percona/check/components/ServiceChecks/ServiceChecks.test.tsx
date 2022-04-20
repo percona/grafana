@@ -27,7 +27,7 @@ describe('ServiceChecks', () => {
       </Provider>
     );
     await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
-    expect(screen.getByTestId('page-service').textContent).toBe('Failed Checks for service "Service One"');
+    expect(screen.getByTestId('page-service')).toHaveTextContent('Failed Checks for service "Service One"');
   });
 
   it('should show "Read More" is a link is available', async () => {
