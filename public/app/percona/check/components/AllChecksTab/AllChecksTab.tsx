@@ -1,7 +1,8 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { Column } from 'react-table';
-import { logger, TextInputField, RadioButtonGroupField } from '@percona/platform-core';
+import { logger, TextInputField, RadioButtonGroupField, ChipAreaInputField } from '@percona/platform-core';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -13,23 +14,25 @@ import { FetchChecks } from './types';
 import { CheckActions } from './CheckActions/CheckActions';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
+import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
 import { getStyles } from './AllChecksTab.styles';
 interface FormValues {
-  category: string;
+  categories: string[];
 }
 const Filters = withFilterTypes<FormValues>();
 
 export const AllChecksTab: FC = () => {
+  const [queryParams, setQueryParams] = useQueryParams();
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
+  const { category: categories } = getValuesFromQueryParams(queryParams, 'category');
 
   const fetchChecks: FetchChecks = useCallback(async () => {
     setFetchChecksPending(true);
-
     try {
       const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
 
@@ -41,8 +44,7 @@ export const AllChecksTab: FC = () => {
       logger.error(e);
     }
     setFetchChecksPending(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [generateToken]);
 
   const updateUI = (check: CheckDetails) => {
     const { name, disabled, interval } = check;
@@ -86,6 +88,8 @@ export const AllChecksTab: FC = () => {
     [handleModalClose]
   );
 
+  const applyFilters = ({ categories }: FormValues) => setQueryParams({ category: categories });
+
   const columns = useMemo(
     (): Array<Column<CheckDetails>> => [
       {
@@ -127,8 +131,6 @@ export const AllChecksTab: FC = () => {
     [changeCheck, handleIntervalChangeClick]
   );
 
-  const applyFilters = (values: FormValues) => console.log(values);
-
   useEffect(() => {
     fetchChecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,7 +139,7 @@ export const AllChecksTab: FC = () => {
   return (
     <>
       <Filters onApply={applyFilters}>
-        <TextInputField name="category" label={Messages.table.columns.category} />
+        <ChipAreaInputField name="categories" label={Messages.table.columns.category} initialChips={categories || []} />
         <TextInputField name="name" label={Messages.table.columns.name} disabled defaultValue="*" />
         <RadioButtonGroupField
           fullWidth
