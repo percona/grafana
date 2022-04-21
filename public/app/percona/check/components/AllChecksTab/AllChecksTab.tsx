@@ -1,16 +1,21 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { Column } from 'react-table';
-import { logger } from '@percona/platform-core';
+import { logger, TextInputField, RadioButtonGroupField } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { CheckService } from 'app/percona/check/Check.service';
 import { Messages } from './AllChecksTab.messages';
-import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
+import { GET_ALL_CHECKS_CANCEL_TOKEN, INTERVAL_OPTIONS, STATUS_OPTIONS } from './AllChecksTab.constants';
 import { FetchChecks } from './types';
 import { CheckActions } from './CheckActions/CheckActions';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
+import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
+interface FormValues {
+  name: string;
+}
+const Filters = withFilterTypes<FormValues>();
 
 export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
@@ -115,6 +120,8 @@ export const AllChecksTab: FC = () => {
     [changeCheck, handleIntervalChangeClick]
   );
 
+  const applyFilters = (values: FormValues) => console.log(values);
+
   useEffect(() => {
     fetchChecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,6 +129,26 @@ export const AllChecksTab: FC = () => {
 
   return (
     <>
+      <Filters onApply={applyFilters}>
+        <TextInputField name="name" label={Messages.name} disabled defaultValue="*" />
+        <TextInputField name="description" label={Messages.description} disabled defaultValue="*" />
+        <RadioButtonGroupField
+          fullWidth
+          options={STATUS_OPTIONS}
+          name="status"
+          disabled
+          label={Messages.status}
+          defaultValue="all"
+        />
+        <RadioButtonGroupField
+          fullWidth
+          options={INTERVAL_OPTIONS}
+          name="interval"
+          disabled
+          label={Messages.interval}
+          defaultValue="all"
+        />
+      </Filters>
       <Table
         totalItems={checks.length}
         data={checks}
