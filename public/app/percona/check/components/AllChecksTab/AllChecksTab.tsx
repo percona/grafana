@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
+import { useStyles2 } from '@grafana/ui';
 import { Column } from 'react-table';
 import { logger, TextInputField, RadioButtonGroupField } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -12,8 +13,9 @@ import { FetchChecks } from './types';
 import { CheckActions } from './CheckActions/CheckActions';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
+import { getStyles } from './AllChecksTab.styles';
 interface FormValues {
-  name: string;
+  category: string;
 }
 const Filters = withFilterTypes<FormValues>();
 
@@ -22,6 +24,7 @@ export const AllChecksTab: FC = () => {
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
+  const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
 
   const fetchChecks: FetchChecks = useCallback(async () => {
@@ -94,6 +97,10 @@ export const AllChecksTab: FC = () => {
         accessor: 'description',
       },
       {
+        Header: Messages.table.columns.category,
+        accessor: 'category',
+      },
+      {
         Header: Messages.table.columns.status,
         accessor: 'disabled',
         Cell: ({ value }) => (!!value ? Messages.disabled : Messages.enabled),
@@ -130,14 +137,14 @@ export const AllChecksTab: FC = () => {
   return (
     <>
       <Filters onApply={applyFilters}>
-        <TextInputField name="name" label={Messages.name} disabled defaultValue="*" />
-        <TextInputField name="description" label={Messages.description} disabled defaultValue="*" />
+        <TextInputField name="category" label={Messages.table.columns.category} />
+        <TextInputField name="name" label={Messages.table.columns.name} disabled defaultValue="*" />
         <RadioButtonGroupField
           fullWidth
           options={STATUS_OPTIONS}
           name="status"
           disabled
-          label={Messages.status}
+          label={Messages.table.columns.status}
           defaultValue="all"
         />
         <RadioButtonGroupField
@@ -145,8 +152,15 @@ export const AllChecksTab: FC = () => {
           options={INTERVAL_OPTIONS}
           name="interval"
           disabled
-          label={Messages.interval}
+          label={Messages.table.columns.interval}
           defaultValue="all"
+        />
+        <TextInputField
+          fieldClassName={styles.descriptionFilter}
+          name="description"
+          label={Messages.table.columns.description}
+          disabled
+          defaultValue="*"
         />
       </Filters>
       <Table

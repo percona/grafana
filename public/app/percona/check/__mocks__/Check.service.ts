@@ -15,6 +15,7 @@ export const CheckService = {
         description: 'test enabled description',
         interval: 'STANDARD',
         disabled: false,
+        category: '',
       },
       {
         summary: 'Test disabled',
@@ -22,6 +23,7 @@ export const CheckService = {
         description: 'test disabled description',
         interval: 'RARE',
         disabled: true,
+        category: '',
       },
     ];
   },

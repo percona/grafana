@@ -18,6 +18,7 @@ const TEST_CHECK: CheckDetails = {
   interval: 'STANDARD',
   description: 'test description',
   disabled: false,
+  category: '',
 };
 
 describe('ChangeCheckIntervalModal', () => {
