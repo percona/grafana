@@ -10,4 +10,7 @@ export const Messages = {
   status: 'Status',
   changeIntervalButtonTitle: 'Change check interval',
   run: 'Run',
+  checksExecutionStarted: 'All checks started running in the background',
+  runDbChecks: 'Run Checks',
+  runIndividualDbCheck: 'check started running in the background',
 };

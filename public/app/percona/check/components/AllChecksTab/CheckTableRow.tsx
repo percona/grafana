@@ -7,6 +7,8 @@ import { CheckTableRowProps } from './types';
 import { Interval } from 'app/percona/check/types';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { getStyles } from './CheckTableRow.styles';
+import { appEvents } from '../../../../core/app_events';
+import { AppEvents } from '@grafana/data';
 
 const formatInterval = (interval: keyof typeof Interval): Interval => Interval[interval];
 
@@ -40,6 +42,7 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
     setRunCheckPending(true);
     try {
       await CheckService.runIndividualDbCheck(name);
+      appEvents.emit(AppEvents.alertSuccess, [`${summary} ${Messages.runIndividualDbCheck}`]);
     } catch (e) {
       console.error(e);
     } finally {
