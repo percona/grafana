@@ -48,7 +48,7 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.7
 	github.com/google/uuid v1.3.0
 	github.com/google/wire v0.5.0
 	github.com/gorilla/websocket v1.4.2
@@ -107,15 +107,15 @@ require (
 	go.opentelemetry.io/otel/trace v1.0.0
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/exp v0.0.0-20210220032938-85be41e4509f // indirect
-	golang.org/x/net v0.0.0-20210903162142-ad29c8ab022f
-	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
+	golang.org/x/net v0.0.0-20220412020605-290c469a71a5
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
 	golang.org/x/tools v0.1.5
 	gonum.org/v1/gonum v0.9.1
-	google.golang.org/api v0.57.0
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/api v0.75.0
+	google.golang.org/grpc v1.45.0
+	google.golang.org/protobuf v1.28.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.62.0
 	gopkg.in/ldap.v3 v3.1.0
@@ -130,7 +130,7 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.94.1 // indirect
+	cloud.google.com/go v0.100.2 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.7.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.15 // indirect
@@ -187,7 +187,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible // indirect
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
-	github.com/googleapis/gax-go/v2 v2.1.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.3.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/grafana/dskit v0.0.0-20211011144203-3a88ec0b675f // indirect
 	github.com/grafana/grafana-google-sdk-go v0.0.0-20211104130251-b190293eaf58
@@ -197,7 +197,7 @@ require (
 	github.com/hashicorp/go-msgpack v0.5.5 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	github.com/hashicorp/go-sockaddr v1.0.2 // indirect
-	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/hashicorp/golang-lru v0.5.4
 	github.com/hashicorp/memberlist v0.2.4 // indirect
 	github.com/hashicorp/yamux v0.0.0-20210826001029-26ff87cf9493 // indirect
 	github.com/igm/sockjs-go/v3 v3.0.1 // indirect
@@ -250,34 +250,20 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/goleak v1.1.10 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/sys v0.0.0-20210908233432-aa78b53d3365 // indirect
+	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20210921142501-181ce0d877f6 // indirect
+	google.golang.org/genproto v0.0.0-20220414192740-2d67ff6cf2b4 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 )
 
 require (
-	github.com/Microsoft/go-winio v0.4.17 // indirect
-	github.com/Microsoft/hcsshim v0.8.23 // indirect
-	github.com/bits-and-blooms/bitset v1.2.0 // indirect
-	github.com/containerd/cgroups v1.0.1 // indirect
+	cloud.google.com/go/compute v1.6.0 // indirect
+	cloud.google.com/go/iam v0.3.0 // indirect
 	github.com/containerd/containerd v1.5.10 // indirect
-	github.com/containerd/continuity v0.1.0 // indirect
-	github.com/containerd/fifo v1.0.0 // indirect
-	github.com/containerd/ttrpc v1.1.0 // indirect
-	github.com/containerd/typeurl v1.0.2 // indirect
-	github.com/docker/go-events v0.0.0-20190806004212-e31b211e4f1c // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
-	github.com/klauspost/compress v1.13.1 // indirect
-	github.com/moby/locker v1.0.1 // indirect
-	github.com/moby/sys/mountinfo v0.4.1 // indirect
-	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
-	github.com/opencontainers/runc v1.0.2 // indirect
-	github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417 // indirect
-	github.com/opencontainers/selinux v1.8.2 // indirect
 )
 
 // Use fork of crewjam/saml with fixes for some issues until changes get merged into upstream
