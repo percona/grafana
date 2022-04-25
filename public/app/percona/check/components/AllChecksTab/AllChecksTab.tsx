@@ -29,7 +29,7 @@ export const AllChecksTab: FC = () => {
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
-  const { category: categories } = getValuesFromQueryParams(queryParams, 'category');
+  const [categories] = getValuesFromQueryParams<[string[]]>(queryParams, [{ key: 'category' }]);
 
   const fetchChecks: FetchChecks = useCallback(async () => {
     setFetchChecksPending(true);

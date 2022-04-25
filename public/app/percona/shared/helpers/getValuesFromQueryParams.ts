@@ -1,19 +1,31 @@
-import { UrlQueryMap } from '@grafana/data';
+import { UrlQueryMap, UrlQueryValue } from '@grafana/data';
 
-export const getValuesFromQueryParams = (
+interface QueryParamTransform<T> {
+  key: string;
+  transform?: (param: UrlQueryValue) => T;
+}
+
+const defaultTransform = (params: UrlQueryValue): string[] => {
+  if (params && params !== undefined && params !== null) {
+    return typeof params === 'object' ? [...params.map((p) => String(p))] : [String(params)];
+  }
+  return [];
+};
+
+export const getValuesFromQueryParams = <T extends any[]>(
   queryParams: UrlQueryMap,
-  ...keys: string[]
-): Record<string, string[] | undefined> => {
-  const result: Record<string, string[]> = {};
+  keys: Array<QueryParamTransform<T>>
+): [...T] => {
+  const result = [];
 
   for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const params = queryParams[key];
+    const { key, transform = defaultTransform } = keys[i];
+    const param = queryParams[key];
 
-    if (params !== undefined && params !== null) {
-      result[key] = typeof params === 'object' ? [...params.map((p) => String(p))] : [String(params)];
+    if (param !== undefined && param !== null) {
+      result.push(transform(param));
     }
   }
 
-  return result;
+  return result as any;
 };
