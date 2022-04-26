@@ -61,6 +61,7 @@ export const CheckTableRow: FC<CheckTableRowProps> = ({ check, onSuccess }) => {
           <div className={styles.actionsWrapper}>
             <LoaderButton
               variant="primary"
+              disabled={disabled}
               size="sm"
               loading={runCheckPending}
               onClick={runIndividualCheck}
