@@ -1,8 +1,8 @@
 import { UrlQueryMap, UrlQueryValue } from '@grafana/data';
 
-interface QueryParamTransform<T> {
+interface QueryParamTransform {
   key: string;
-  transform?: (param: UrlQueryValue) => T;
+  transform?: (param: UrlQueryValue) => any;
 }
 
 const defaultTransform = (params: UrlQueryValue): string[] => {
@@ -14,7 +14,7 @@ const defaultTransform = (params: UrlQueryValue): string[] => {
 
 export const getValuesFromQueryParams = <T extends any[]>(
   queryParams: UrlQueryMap,
-  keys: Array<QueryParamTransform<T>>
+  keys: QueryParamTransform[]
 ): [...T] => {
   const result = [];
 
