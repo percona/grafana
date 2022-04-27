@@ -10,10 +10,11 @@ import { getStyles } from './FilterSection.styles';
 export const withFilterTypes = <T extends object>(): FC<FilterSectionProps<T>> => ({
   children,
   onApply,
+  isOpen,
   className = '',
 }) => {
   const styles = useStyles2(getStyles);
-  const [sectionIsOpen, setSectionIsOpen] = useState(false);
+  const [sectionIsOpen, setSectionIsOpen] = useState(!!isOpen);
   const { Form } = withTypes<T>();
 
   const changeIsOpen = useCallback(() => setSectionIsOpen((open) => !open), []);
@@ -29,11 +30,11 @@ export const withFilterTypes = <T extends object>(): FC<FilterSectionProps<T>> =
           className={styles.collapse}
           label="Filters"
         >
-          <form onSubmit={handleSubmit} className={cx(styles.form, className)}>
+          <form onSubmit={handleSubmit} className={cx(styles.form, className)} role="form">
             {children}
             <HorizontalGroup justify="flex-end" spacing="md">
               <LoaderButton
-                data-testid="backup-add-button"
+                data-testid="apply-filters-button"
                 size="md"
                 variant="primary"
                 disabled={!valid}
