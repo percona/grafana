@@ -5,24 +5,45 @@ import { Messages } from '../AllChecksTab.messages';
 import { CheckActionsProps } from './CheckActions.types';
 import { getStyles } from './CheckActions.styles';
 
-export const CheckActions: FC<CheckActionsProps> = ({ check, onChangeCheck, onIntervalChangeClick }) => {
+export const CheckActions: FC<CheckActionsProps> = ({
+  check,
+  onChangeCheck,
+  onIntervalChangeClick,
+  onIndividualRunCheckClick,
+}) => {
   const styles = useStyles2(getStyles);
-  const [loading, setLoading] = useState(false);
+  const [runCheckPending, setRunCheckPending] = useState(false);
+  const [intervalChangeLoading, setIntervalChangeLoading] = useState(false);
 
   const handleChangeCheck = useCallback(async () => {
-    setLoading(true);
+    setIntervalChangeLoading(true);
     await onChangeCheck(check);
-    setLoading(false);
+    setIntervalChangeLoading(false);
   }, [check, onChangeCheck]);
 
   const handleIntervalChangeClick = useCallback(() => onIntervalChangeClick(check), [check, onIntervalChangeClick]);
+  const handleRunIndividualCheckClick = useCallback(async () => {
+    setRunCheckPending(true);
+    await onIndividualRunCheckClick(check);
+    setRunCheckPending(false);
+  }, [check, onIndividualRunCheckClick]);
 
   return (
     <div className={styles.actionsWrapper}>
       <LoaderButton
+        variant="primary"
+        disabled={!!check.disabled}
+        size="sm"
+        loading={runCheckPending}
+        onClick={handleRunIndividualCheckClick}
+        data-testid="check-table-loader-button-run"
+      >
+        {Messages.run}
+      </LoaderButton>
+      <LoaderButton
         variant={!!check.disabled ? 'primary' : 'destructive'}
         size="sm"
-        loading={loading}
+        loading={intervalChangeLoading}
         onClick={handleChangeCheck}
         data-testid="check-table-loader-button"
       >

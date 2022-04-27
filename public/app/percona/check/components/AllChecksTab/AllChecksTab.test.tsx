@@ -22,6 +22,7 @@ jest.mock('@percona/platform-core', () => {
 jest.mock('app/percona/check/Check.service');
 
 describe('AllChecksTab::', () => {
+  beforeEach(() => jest.clearAllMocks());
   it('should fetch checks at startup', async () => {
     const spy = jest.spyOn(CheckService, 'getAllChecks');
     render(
@@ -115,5 +116,60 @@ describe('AllChecksTab::', () => {
     expect(spy).toBeCalledTimes(1);
     expect(spy).toBeCalledWith({ params: [{ name: 'test enabled', disable: true }] });
     spy.mockClear();
+  });
+
+  it('should log an error if the run checks API call fails', async () => {
+    jest.spyOn(CheckService, 'runDbChecks').mockImplementationOnce(() => {
+      throw Error('test');
+    });
+    const loggerSpy = jest.spyOn(logger, 'error');
+
+    render(
+      <Provider store={configureStore()}>
+        <Router history={locationService.getHistory()}>
+          <AllChecksTab />
+        </Router>
+      </Provider>
+    );
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+
+    const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
+
+    await waitFor(() => fireEvent.click(runChecksButton));
+    fireEvent.click(runChecksButton);
+    expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(loggerSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
+  });
+
+  it('should call the API to run checks when the "run checks" button gets clicked', async () => {
+    const runChecksSpy = jest.spyOn(CheckService, 'runDbChecks');
+    render(
+      <Provider store={configureStore()}>
+        <Router history={locationService.getHistory()}>
+          <AllChecksTab />
+        </Router>
+      </Provider>
+    );
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+
+    const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
+
+    expect(runChecksSpy).toBeCalledTimes(0);
+    fireEvent.click(runChecksButton);
+
+    expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(runChecksSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
   });
 });

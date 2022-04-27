@@ -15,4 +15,8 @@ export const Messages = {
     },
     noData: 'No checks founds',
   },
+  run: 'Run',
+  checksExecutionStarted: 'All checks started running in the background',
+  runDbChecks: 'Run Checks',
+  runIndividualDbCheck: 'check started running in the background',
 };

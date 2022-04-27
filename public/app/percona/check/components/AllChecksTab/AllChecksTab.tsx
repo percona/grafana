@@ -1,7 +1,13 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { Column } from 'react-table';
-import { logger, TextInputField, RadioButtonGroupField, ChipAreaInputField } from '@percona/platform-core';
+import {
+  LoaderButton,
+  logger,
+  TextInputField,
+  RadioButtonGroupField,
+  ChipAreaInputField,
+} from '@percona/platform-core';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -20,10 +26,13 @@ interface FormValues {
   categories: string[];
 }
 const Filters = withFilterTypes<FormValues>();
+import { appEvents } from '../../../../core/app_events';
+import { AppEvents } from '@grafana/data';
 
 export const AllChecksTab: FC = () => {
   const [queryParams, setQueryParams] = useQueryParams();
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
+  const [runChecksPending, setRunChecksPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
@@ -49,6 +58,28 @@ export const AllChecksTab: FC = () => {
     setFetchChecksPending(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories]);
+
+  const handleRunChecksClick = async () => {
+    setRunChecksPending(true);
+    try {
+      await CheckService.runDbChecks();
+      appEvents.emit(AppEvents.alertSuccess, [Messages.checksExecutionStarted]);
+    } catch (e) {
+      logger.error(e);
+    } finally {
+      setRunChecksPending(false);
+    }
+  };
+
+  const runIndividualCheck = async (check: CheckDetails) => {
+    try {
+      await CheckService.runIndividualDbCheck(check.name);
+      appEvents.emit(AppEvents.alertSuccess, [`${check.summary} ${Messages.runIndividualDbCheck}`]);
+    } catch (e) {
+      console.error(e);
+    } finally {
+    }
+  };
 
   const updateUI = (check: CheckDetails) => {
     const { name, disabled, interval } = check;
@@ -128,6 +159,7 @@ export const AllChecksTab: FC = () => {
             check={row.original}
             onChangeCheck={changeCheck}
             onIntervalChangeClick={handleIntervalChangeClick}
+            onIndividualRunCheckClick={runIndividualCheck}
           />
         ),
       },
@@ -169,6 +201,17 @@ export const AllChecksTab: FC = () => {
           defaultValue="*"
         />
       </Filters>
+      <div className={styles.actionButtons} data-testid="db-check-panel-actions">
+        <LoaderButton
+          type="button"
+          size="md"
+          loading={runChecksPending}
+          onClick={handleRunChecksClick}
+          className={styles.runChecksButton}
+        >
+          {Messages.runDbChecks}
+        </LoaderButton>
+      </div>
       <Table
         totalItems={checks.length}
         data={checks}

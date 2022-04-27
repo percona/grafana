@@ -112,7 +112,17 @@ export const CheckService = {
       token
     );
 
-    return response && response.checks ? response.checks : [];
+    return response && response.checks ? response.checks.sort((a, b) => a.summary.localeCompare(b.summary)) : [];
+  },
+  runIndividualDbCheck(checkName: string, token?: CancelToken): Promise<void | {}> {
+    return api.post<{}, {}>(
+      '/v1/management/SecurityChecks/Start',
+      {
+        names: [checkName],
+      },
+      false,
+      token
+    );
   },
   changeCheck(body: ChangeCheckBody, token?: CancelToken): Promise<void | {}> {
     return api.post<{}, ChangeCheckBody>('/v1/management/SecurityChecks/Change', body, false, token);
