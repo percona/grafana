@@ -2,7 +2,7 @@ import React from 'react';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 import { Provider } from 'react-redux';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { logger } from '@percona/platform-core';
 import { CheckService } from 'app/percona/check/Check.service';
 import { Interval } from 'app/percona/check/types';
@@ -20,6 +20,7 @@ jest.mock('@percona/platform-core', () => {
 });
 
 describe('AllChecksTab::', () => {
+  beforeEach(() => jest.clearAllMocks());
   it('should fetch checks at startup', async () => {
     const spy = jest.spyOn(CheckService, 'getAllChecks');
     render(
@@ -38,8 +39,6 @@ describe('AllChecksTab::', () => {
     await screen.findByTestId('db-checks-all-checks-wrapper');
 
     expect(spy).toBeCalledTimes(1);
-
-    spy.mockClear();
   });
 
   it('should render a spinner at startup, while loading', async () => {
@@ -61,7 +60,7 @@ describe('AllChecksTab::', () => {
   });
 
   it('should log an error if the API call fails', async () => {
-    const spy = jest.spyOn(CheckService, 'getAllChecks').mockImplementation(() => {
+    jest.spyOn(CheckService, 'getAllChecks').mockImplementation(() => {
       throw Error('test');
     });
     const loggerSpy = jest.spyOn(logger, 'error').mockImplementationOnce(() => null);
@@ -81,8 +80,6 @@ describe('AllChecksTab::', () => {
 
     await screen.findByTestId('db-checks-all-checks-wrapper');
     expect(loggerSpy).toBeCalledTimes(1);
-
-    spy.mockClear();
   });
 
   it('should render a table', async () => {
@@ -135,5 +132,70 @@ describe('AllChecksTab::', () => {
     expect(cells[7]).toHaveTextContent(Messages.disabled);
     expect(cells[8]).toHaveTextContent(Interval.RARE);
     expect(cells[9]).toHaveTextContent(Messages.enable);
+  });
+
+  it('should log an error if the run checks API call fails', async () => {
+    jest.spyOn(CheckService, 'runDbChecks').mockImplementationOnce(() => {
+      throw Error('test');
+    });
+    const loggerSpy = jest.spyOn(logger, 'error');
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
+        <AllChecksTab />
+      </Provider>
+    );
+
+    await screen.findByTestId('db-check-panel-actions');
+
+    const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
+
+    await waitFor(() => fireEvent.click(runChecksButton));
+    fireEvent.click(runChecksButton);
+    expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(loggerSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
+  });
+
+  it('should call the API to run checks when the "run checks" button gets clicked', async () => {
+    const runChecksSpy = jest.spyOn(CheckService, 'runDbChecks');
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
+        <AllChecksTab />
+      </Provider>
+    );
+
+    await screen.findByTestId('db-check-panel-actions');
+
+    const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
+
+    expect(runChecksSpy).toBeCalledTimes(0);
+    fireEvent.click(runChecksButton);
+
+    expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(runChecksSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
-import { LoaderButton, logger } from '@percona/platform-core';
+import { logger } from '@percona/platform-core';
 import { Cell, Column, Row } from 'react-table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import Page from 'app/core/components/Page/Page';
@@ -12,19 +12,17 @@ import { ExtendedTableCellProps, ExtendedTableRowProps, Table } from 'app/percon
 import { FailedCheckSummary } from 'app/percona/check/types';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
-import { Spinner, useStyles2 } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import { Messages } from './FailedChecksTab.messages';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { getStyles } from './FailedChecksTab.styles';
 import { stripServiceId } from './FailedChecksTab.utils';
-import { appEvents } from '../../../../core/app_events';
-import { AppEvents } from '@grafana/data';
+
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 import { locationService } from '@grafana/runtime';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
-  const [runChecksPending, setRunChecksPending] = useState(false);
   const navModel = usePerconaNavModel('failed-checks');
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
@@ -68,18 +66,6 @@ export const FailedChecksTab: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleRunChecksClick = async () => {
-    setRunChecksPending(true);
-    try {
-      await CheckService.runDbChecks();
-      appEvents.emit(AppEvents.alertSuccess, [Messages.checksExecutionStarted]);
-    } catch (e) {
-      logger.error(e);
-    } finally {
-      setRunChecksPending(false);
-    }
-  };
-
   const getRowProps = (row: Row<FailedCheckSummary>): ExtendedTableRowProps => ({
     key: row.original.serviceId,
     className: styles.row,
@@ -108,35 +94,16 @@ export const FailedChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          <div className={styles.header}>
-            <div className={styles.actionButtons} data-testid="db-check-panel-actions">
-              <LoaderButton
-                type="button"
-                size="md"
-                loading={runChecksPending}
-                onClick={handleRunChecksClick}
-                className={styles.runChecksButton}
-              >
-                {Messages.runDbChecks}
-              </LoaderButton>
-            </div>
-          </div>
           <AlertsReloadContext.Provider value={{ fetchAlerts }}>
-            {fetchAlertsPending ? (
-              <div className={styles.spinner} data-testid="db-checks-failed-checks-spinner">
-                <Spinner />
-              </div>
-            ) : (
-              <Table
-                totalItems={data.length}
-                data={data}
-                getRowProps={getRowProps}
-                getCellProps={getCellProps}
-                columns={columns}
-                pendingRequest={fetchAlertsPending}
-                emptyMessage={Messages.noChecks}
-              />
-            )}
+            <Table
+              totalItems={data.length}
+              data={data}
+              getRowProps={getRowProps}
+              getCellProps={getCellProps}
+              columns={columns}
+              pendingRequest={fetchAlertsPending}
+              emptyMessage={Messages.noChecks}
+            />
           </AlertsReloadContext.Provider>
         </FeatureLoader>
       </Page.Contents>
