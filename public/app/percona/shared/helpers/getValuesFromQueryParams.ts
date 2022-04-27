@@ -7,7 +7,7 @@ interface QueryParamTransform {
 
 const defaultTransform = (params: UrlQueryValue): string[] => {
   if (params && params !== undefined && params !== null) {
-    return typeof params === 'object' ? [...params.map((p) => String(p))] : [String(params)];
+    return typeof params === 'object' ? params.map((p) => String(p)) : [String(params)];
   }
   return [];
 };
