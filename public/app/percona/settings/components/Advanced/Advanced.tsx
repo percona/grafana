@@ -13,7 +13,7 @@ import { SET_SETTINGS_CANCEL_TOKEN } from '../../Settings.constants';
 import Page from 'app/core/components/Page/Page';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
-import { Messages, DATA_RETENTION_URL } from 'app/percona/settings/Settings.messages';
+import { Messages } from 'app/percona/settings/Settings.messages';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import validators from 'app/percona/shared/helpers/validators';
@@ -181,7 +181,7 @@ export const Advanced: FC = () => {
                           <span>{retentionLabel}</span>
                           <LinkTooltip
                             tooltipText={retentionTooltip}
-                            link={DATA_RETENTION_URL}
+                            link={Messages.advanced.retentionLink}
                             linkText={tooltipLinkText}
                             icon="info-circle"
                           />
