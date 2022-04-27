@@ -76,7 +76,7 @@ export const AllChecksTab: FC = () => {
       await CheckService.runIndividualDbCheck(check.name);
       appEvents.emit(AppEvents.alertSuccess, [`${check.summary} ${Messages.runIndividualDbCheck}`]);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     } finally {
     }
   };
@@ -101,7 +101,7 @@ export const AllChecksTab: FC = () => {
       await CheckService.changeCheck({ params: [{ name: check.name, [action]: true }] });
       updateUI({ ...check, disabled: !check.disabled });
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   }, []);
 
