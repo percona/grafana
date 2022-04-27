@@ -85,7 +85,7 @@ export const AllChecksTab: FC = () => {
     const { name, disabled, interval } = check;
 
     setChecks((oldChecks) =>
-      oldChecks?.map((oldCheck) => {
+      oldChecks.map((oldCheck) => {
         if (oldCheck.name !== name) {
           return oldCheck;
         }
