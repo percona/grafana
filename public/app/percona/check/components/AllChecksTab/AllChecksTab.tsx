@@ -34,7 +34,10 @@ export const AllChecksTab: FC = () => {
   const fetchChecks: FetchChecks = useCallback(async () => {
     setFetchChecksPending(true);
     try {
-      const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
+      const checks = await CheckService.getAllChecks(
+        [{ category: { stringValues: categories } }],
+        generateToken(GET_ALL_CHECKS_CANCEL_TOKEN)
+      );
 
       setChecks(checks);
     } catch (e) {
@@ -44,7 +47,8 @@ export const AllChecksTab: FC = () => {
       logger.error(e);
     }
     setFetchChecksPending(false);
-  }, [generateToken]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories]);
 
   const updateUI = (check: CheckDetails) => {
     const { name, disabled, interval } = check;
