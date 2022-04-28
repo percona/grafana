@@ -1,10 +1,9 @@
 import React, { FC, useCallback, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ConfirmModal, useStyles } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { Form } from 'react-final-form';
 import { LoaderButton, logger, TextInputField } from '@percona/platform-core';
-import { setSettings } from 'app/percona/shared/core/reducers';
 import { getPerconaServer } from 'app/percona/shared/core/selectors';
 import { PlatformService } from '../Platform.service';
 import { Messages as PlatformMessages } from '../Platform.messages';
@@ -13,7 +12,6 @@ import { getStyles } from './Connected.styles';
 
 export const Connected: FC = () => {
   const styles = useStyles(getStyles);
-  const dispatch = useDispatch();
   const [disconnecting, setDisconnecting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const { serverId = '', serverName = '' } = useSelector(getPerconaServer);
@@ -24,7 +22,6 @@ export const Connected: FC = () => {
     try {
       await PlatformService.disconnect();
       setTimeout(() => {
-        dispatch(setSettings({ isConnectedToPortal: false }));
         window.location.assign(`${config.appSubUrl}/logout`);
         return;
       }, 3000);
