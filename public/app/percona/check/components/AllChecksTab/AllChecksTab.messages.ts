@@ -15,6 +15,10 @@ export const Messages = {
     },
     noData: 'No checks founds',
   },
+  tooltips: {
+    category: 'Advisor category tags to filter the list of checks (case sensitive). E.g.: performance, security.',
+    availableSoon: 'Coming soon. This filter will be available with a future PMM release.',
+  },
   run: 'Run',
   checksExecutionStarted: 'All checks started running in the background',
   runDbChecks: 'Run Checks',
