@@ -67,12 +67,7 @@ describe('AllChecksTab::', () => {
     expect(screen.queryByTestId('spinner-wrapper')).not.toBeInTheDocument();
   });
 
-  it('should log an error if the API call fails', async () => {
-    jest.spyOn(CheckService, 'getAllChecks').mockImplementationOnce(() => {
-      throw Error('test');
-    });
-    const loggerSpy = jest.spyOn(logger, 'error').mockImplementationOnce(() => null);
-
+  it('should render a table', async () => {
     render(
       <Provider
         store={configureStore({
@@ -82,19 +77,6 @@ describe('AllChecksTab::', () => {
           },
         } as StoreState)}
       >
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab />
-        </Router>
-      </Provider>
-    );
-
-    await screen.findByTestId('db-checks-all-checks-wrapper');
-    expect(loggerSpy).toBeCalledTimes(1);
-  });
-
-  it('should render a table', async () => {
-    render(
-      <Provider store={configureStore()}>
         <Router history={locationService.getHistory()}>
           <AllChecksTab />
         </Router>
@@ -122,7 +104,14 @@ describe('AllChecksTab::', () => {
   it('should call an API to change the check status when the action button gets clicked', async () => {
     const spy = jest.spyOn(CheckService, 'changeCheck');
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
         <Router history={locationService.getHistory()}>
           <AllChecksTab />
         </Router>
