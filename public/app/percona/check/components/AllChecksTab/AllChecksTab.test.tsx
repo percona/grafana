@@ -2,13 +2,14 @@ import React from 'react';
 import { locationService } from '@grafana/runtime';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
+import { configureStore } from 'app/store/configureStore';
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { StoreState } from 'app/types';
 import { logger } from '@percona/platform-core';
 import { CheckService } from 'app/percona/check/Check.service';
 import { Interval } from 'app/percona/check/types';
 import { AllChecksTab } from './AllChecksTab';
 import { Messages } from './AllChecksTab.messages';
-import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
-import { configureStore } from 'app/store/configureStore';
 
 jest.mock('@percona/platform-core', () => {
   const originalModule = jest.requireActual('@percona/platform-core');
@@ -26,7 +27,14 @@ describe('AllChecksTab::', () => {
   it('should fetch checks at startup', async () => {
     const spy = jest.spyOn(CheckService, 'getAllChecks');
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
         <Router history={locationService.getHistory()}>
           <AllChecksTab />
         </Router>
@@ -40,7 +48,14 @@ describe('AllChecksTab::', () => {
 
   it('should render a spinner at startup, while loading', async () => {
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
         <Router history={locationService.getHistory()}>
           <AllChecksTab />
         </Router>
@@ -59,13 +74,21 @@ describe('AllChecksTab::', () => {
     const loggerSpy = jest.spyOn(logger, 'error').mockImplementationOnce(() => null);
 
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
         <Router history={locationService.getHistory()}>
           <AllChecksTab />
         </Router>
       </Provider>
     );
 
+    await screen.findByTestId('db-checks-all-checks-wrapper');
     expect(loggerSpy).toBeCalledTimes(1);
   });
 
@@ -125,7 +148,14 @@ describe('AllChecksTab::', () => {
     const loggerSpy = jest.spyOn(logger, 'error');
 
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
         <Router history={locationService.getHistory()}>
           <AllChecksTab />
         </Router>
@@ -150,7 +180,14 @@ describe('AllChecksTab::', () => {
   it('should call the API to run checks when the "run checks" button gets clicked', async () => {
     const runChecksSpy = jest.spyOn(CheckService, 'runDbChecks');
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          },
+        } as StoreState)}
+      >
         <Router history={locationService.getHistory()}>
           <AllChecksTab />
         </Router>

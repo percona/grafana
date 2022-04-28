@@ -4,6 +4,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 export const getStyles = ({ v1: { colors, spacing } }: GrafanaTheme2) => ({
   collapse: css`
     margin: ${spacing.lg} 0;
+    height: auto;
 
     & > div:first-child {
       background-color: ${colors.bg2};
