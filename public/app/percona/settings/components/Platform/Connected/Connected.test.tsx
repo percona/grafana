@@ -42,7 +42,7 @@ describe('Connected::', () => {
     );
 
     fireEvent.click(screen.getByTestId('disconnect-button'));
-    await waitFor(() => screen.getByText('Disconnect from Portal'));
+    await waitFor(() => screen.getByText('Disconnect PMM from Percona Platform'));
 
     const confirmButton = screen
       .getAllByRole('button')
