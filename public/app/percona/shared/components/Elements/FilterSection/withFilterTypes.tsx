@@ -7,7 +7,7 @@ import { withTypes } from 'react-final-form';
 import { FilterSectionProps } from './FilterSection.types';
 import { getStyles } from './FilterSection.styles';
 
-export const withFilterTypes = <T extends object>(): FC<FilterSectionProps<T>> => ({
+export const withFilterTypes = <T extends object>(initialValues?: Partial<T>): FC<FilterSectionProps<T>> => ({
   children,
   onApply,
   isOpen,
@@ -21,8 +21,9 @@ export const withFilterTypes = <T extends object>(): FC<FilterSectionProps<T>> =
 
   return (
     <Form
+      initialValues={initialValues}
       onSubmit={onApply}
-      render={({ form, handleSubmit, submitting, valid }) => (
+      render={({ form, handleSubmit, submitting, valid, pristine }) => (
         <Collapse
           collapsible
           isOpen={sectionIsOpen}
@@ -37,7 +38,7 @@ export const withFilterTypes = <T extends object>(): FC<FilterSectionProps<T>> =
                 data-testid="apply-filters-button"
                 size="md"
                 variant="primary"
-                disabled={!valid}
+                disabled={!valid || pristine}
                 loading={submitting}
               >
                 Apply

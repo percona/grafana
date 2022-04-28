@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
 import { Column } from 'react-table';
 import {
   LoaderButton,
@@ -10,6 +11,7 @@ import {
 } from '@percona/platform-core';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { sameTags } from 'app/percona/shared/helpers/tags';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { CheckDetails, Interval } from 'app/percona/check/types';
@@ -22,12 +24,15 @@ import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
 import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
 import { getStyles } from './AllChecksTab.styles';
+import { appEvents } from '../../../../core/app_events';
+
 interface FormValues {
   categories: string[];
+  name: string;
+  status: string;
+  interval: string;
+  description: string;
 }
-const Filters = withFilterTypes<FormValues>();
-import { appEvents } from '../../../../core/app_events';
-import { AppEvents } from '@grafana/data';
 
 export const AllChecksTab: FC = () => {
   const [queryParams, setQueryParams] = useQueryParams();
@@ -39,6 +44,14 @@ export const AllChecksTab: FC = () => {
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
   const [categories] = getValuesFromQueryParams<[string[]]>(queryParams, [{ key: 'category' }]);
+
+  const Filters = withFilterTypes<FormValues>({
+    categories,
+    name: '*',
+    status: 'all',
+    interval: 'all',
+    description: '*',
+  });
 
   const fetchChecks: FetchChecks = useCallback(async () => {
     setFetchChecksPending(true);
@@ -175,30 +188,41 @@ export const AllChecksTab: FC = () => {
   return (
     <>
       <Filters onApply={applyFilters}>
-        <ChipAreaInputField name="categories" label={Messages.table.columns.category} initialChips={categories || []} />
-        <TextInputField name="name" label={Messages.table.columns.name} disabled defaultValue="*" />
+        <ChipAreaInputField
+          tooltipText={Messages.tooltips.category}
+          name="categories"
+          label={Messages.table.columns.category}
+          initialChips={categories || []}
+          isEqual={sameTags}
+        />
+        <TextInputField
+          name="name"
+          label={Messages.table.columns.name}
+          disabled
+          tooltipText={Messages.tooltips.availableSoon}
+        />
         <RadioButtonGroupField
+          tooltipText={Messages.tooltips.availableSoon}
           fullWidth
           options={STATUS_OPTIONS}
           name="status"
           disabled
           label={Messages.table.columns.status}
-          defaultValue="all"
         />
         <RadioButtonGroupField
+          tooltipText={Messages.tooltips.availableSoon}
           fullWidth
           options={INTERVAL_OPTIONS}
           name="interval"
           disabled
           label={Messages.table.columns.interval}
-          defaultValue="all"
         />
         <TextInputField
+          tooltipText={Messages.tooltips.availableSoon}
           fieldClassName={styles.descriptionFilter}
           name="description"
           label={Messages.table.columns.description}
           disabled
-          defaultValue="*"
         />
       </Filters>
       <div className={styles.actionButtons} data-testid="db-check-panel-actions">
