@@ -1,0 +1,16 @@
+import { useStyles2 } from '@grafana/ui';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
+import React from 'react';
+import { getStyles } from './WidgetWrapper.styles';
+import { WidgetWrapperProps } from './WidgetWrapper.types';
+export const WidgetWrapper = ({ children, title, isPending = false }: WidgetWrapperProps) => {
+  const styles = useStyles2(getStyles);
+  return (
+    <Overlay dataTestId="contact-loading" isPending={isPending}>
+      <div className={styles.widgetWrapper}>
+        {title && <h3>{title}</h3>}
+        {!isPending && children}
+      </div>
+    </Overlay>
+  );
+};

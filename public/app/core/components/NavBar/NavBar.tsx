@@ -1,14 +1,21 @@
-import React, { FC, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { css, cx } from '@emotion/css';
-import { cloneDeep } from 'lodash';
 import { GrafanaTheme2, NavModelItem, NavSection } from '@grafana/data';
-import { Icon, IconName, useTheme2 } from '@grafana/ui';
 import { locationService } from '@grafana/runtime';
+import { Icon, IconName, useTheme2 } from '@grafana/ui';
 import { Branding } from 'app/core/components/Branding/Branding';
 import config from 'app/core/config';
+import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
+import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { KioskMode } from 'app/types';
+import { cloneDeep } from 'lodash';
+import React, { FC, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { OrgSwitcher } from '../OrgSwitcher';
+import NavBarItem from './NavBarItem';
+import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
+import { NavBarMenu } from './NavBarMenu';
+import { NavBarSection } from './NavBarSection';
 import {
   buildIntegratedAlertingMenuItem,
   enrichConfigItems,
@@ -17,13 +24,6 @@ import {
   isSearchActive,
   SEARCH_ITEM_ID,
 } from './utils';
-import { OrgSwitcher } from '../OrgSwitcher';
-import NavBarItem from './NavBarItem';
-import { NavBarSection } from './NavBarSection';
-import { NavBarMenu } from './NavBarMenu';
-import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
-import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
-import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 
 const homeUrl = config.appSubUrl || '/';
 
@@ -106,6 +106,12 @@ export const NavBar: FC = React.memo(() => {
       icon: 'ticket',
       text: 'Support Tickets',
       url: `${config.appSubUrl}/tickets`,
+    });
+    topItems.push({
+      id: 'environment-overview',
+      icon: 'clouds',
+      text: 'Environment Overview',
+      url: `${config.appSubUrl}/environment-overview`,
     });
   }
 
