@@ -28,7 +28,6 @@ import { getStyles } from './AllChecksTab.styles';
 import { appEvents } from '../../../../core/app_events';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import Page from 'app/core/components/Page/Page';
-import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 
@@ -199,7 +198,6 @@ export const AllChecksTab: FC = () => {
   return (
     <Page navModel={navModel} tabsDataTestId="db-check-tabs-bar" data-testid="db-check-panel">
       <Page.Contents dataTestId="db-check-tab-content">
-        <TechnicalPreview />
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"
           featureName={mainChecksMessages.advisors}
