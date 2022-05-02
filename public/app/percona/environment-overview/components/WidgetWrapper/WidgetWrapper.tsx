@@ -8,8 +8,12 @@ export const WidgetWrapper = ({ children, title, isPending = false }: WidgetWrap
   return (
     <Overlay dataTestId="contact-loading" isPending={isPending}>
       <div className={styles.widgetWrapper}>
-        {title && <h3>{title}</h3>}
-        {!isPending && children}
+        {title && (
+          <span className={styles.widgetTitle}>
+            <strong>{title}</strong>
+          </span>
+        )}
+        <div className={styles.childrenWrapper}>{!isPending && children}</div>
       </div>
     </Overlay>
   );

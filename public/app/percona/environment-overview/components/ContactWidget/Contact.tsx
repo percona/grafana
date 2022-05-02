@@ -1,5 +1,7 @@
-import { Icon, IconName } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
+import { Icon, IconButton, IconName, useStyles2 } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
+import appEvents from 'app/core/app_events';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -9,6 +11,7 @@ import { WidgetWrapper } from '../WidgetWrapper/WidgetWrapper';
 import { CONTACT_CANCEL_TOKEN } from './Contact.constants';
 import { Messages } from './Contact.messages';
 import { ContactService } from './Contact.service';
+import { getStyles } from './Contact.styles';
 import { CustomerSuccess } from './Contact.types';
 
 export const Contact = () => {
@@ -16,6 +19,7 @@ export const Contact = () => {
   const [data, setData] = useState<CustomerSuccess>();
   const { isPlatformUser } = useSelector(getPerconaUser);
   const [generateToken] = useCancelToken();
+  const styles = useStyles2(getStyles);
 
   const getData = useCallback(async (showLoading = false) => {
     showLoading && setPendingRequest(true);
@@ -39,12 +43,26 @@ export const Contact = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlatformUser]);
 
+  const copyToClipboard = useCallback(async () => {
+    if (data) {
+      await navigator.clipboard.writeText(data.email);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.copiedSuccessfully]);
+    }
+  }, [data]);
+
   return (
     <WidgetWrapper title={Messages.title} isPending={pendingRequest}>
-      <div>
-        <h4>{Messages.customerSuccess}</h4>
-        <Icon name={'user-square' as IconName} size="xl" /> {data?.name}{' '}
-        <Icon name={'envelope' as IconName} size="xl" /> {data?.email}
+      <span className={styles.contactTitle}>{Messages.customerSuccess}</span>
+      <div className={styles.nameWrapper}>
+        <Icon name={'user' as IconName} size="lg" /> <span className={styles.name}>{data?.name}</span>
+        <IconButton
+          data-testid="customer-contact-email-icon"
+          title={data?.email}
+          name="envelope"
+          onClick={copyToClipboard}
+          size="lg"
+          disabled={!data?.email}
+        />
       </div>
     </WidgetWrapper>
   );
