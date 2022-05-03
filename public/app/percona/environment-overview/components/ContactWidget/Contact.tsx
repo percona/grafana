@@ -53,20 +53,22 @@ const Contact = () => {
   return (
     <WidgetWrapper title={Messages.title} isPending={pendingRequest}>
       <span className={styles.contactTitle}>{Messages.customerSuccess}</span>
-      <div className={styles.nameWrapper}>
-        <Icon name={'user' as IconName} size="lg" />{' '}
-        <span className={styles.name} data-testid="contact-name">
-          {data?.name}
-        </span>
-        <IconButton
-          data-testid="contact-email-icon"
-          title={data?.email}
-          name="envelope"
-          onClick={copyToClipboard}
-          size="lg"
-          disabled={!data?.email}
-        />
-      </div>
+      {data && (
+        <div className={styles.nameWrapper}>
+          <Icon name={'user' as IconName} size="lg" />{' '}
+          <span className={styles.name} data-testid="contact-name">
+            {data?.name}
+          </span>
+          <IconButton
+            data-testid="contact-email-icon"
+            title={data?.email}
+            name="envelope"
+            onClick={copyToClipboard}
+            size="lg"
+            disabled={!data?.email}
+          />
+        </div>
+      )}
     </WidgetWrapper>
   );
 };
