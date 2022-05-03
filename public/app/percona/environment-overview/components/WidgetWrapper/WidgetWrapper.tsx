@@ -13,7 +13,7 @@ export const WidgetWrapper = ({ children, title, isPending = false }: WidgetWrap
             <strong>{title}</strong>
           </span>
         )}
-        <div className={styles.childrenWrapper}>{!isPending && children}</div>
+        {!isPending && children}
       </div>
     </Overlay>
   );

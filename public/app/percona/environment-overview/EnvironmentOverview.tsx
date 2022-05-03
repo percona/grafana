@@ -2,7 +2,7 @@ import { useStyles2 } from '@grafana/ui';
 import React from 'react';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import PageWrapper from '../shared/components/PageWrapper/PageWrapper';
-import { Contact } from './components/ContactWidget/Contact';
+import Contact from './components/ContactWidget/Contact';
 import { PAGE_MODEL } from './EnvironmentOverview.constants';
 import { getStyles } from './EnvironmentOverview.styles';
 

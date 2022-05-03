@@ -10,12 +10,6 @@ export const getStyles = ({ v1: { spacing, palette }, typography }: GrafanaTheme
     display: flex;
     flex-direction: column;
   `,
-  childrenWrapper: css`
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  `,
   widgetTitle: css`
     font-size: ${typography.h4.fontSize};
     font-weight: ${typography.h4.fontWeight};

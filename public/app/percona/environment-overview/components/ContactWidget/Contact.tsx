@@ -14,7 +14,7 @@ import { ContactService } from './Contact.service';
 import { getStyles } from './Contact.styles';
 import { CustomerSuccess } from './Contact.types';
 
-export const Contact = () => {
+const Contact = () => {
   const [pendingRequest, setPendingRequest] = useState(true);
   const [data, setData] = useState<CustomerSuccess>();
   const { isPlatformUser } = useSelector(getPerconaUser);
@@ -54,9 +54,12 @@ export const Contact = () => {
     <WidgetWrapper title={Messages.title} isPending={pendingRequest}>
       <span className={styles.contactTitle}>{Messages.customerSuccess}</span>
       <div className={styles.nameWrapper}>
-        <Icon name={'user' as IconName} size="lg" /> <span className={styles.name}>{data?.name}</span>
+        <Icon name={'user' as IconName} size="lg" />{' '}
+        <span className={styles.name} data-testid="contact-name">
+          {data?.name}
+        </span>
         <IconButton
-          data-testid="customer-contact-email-icon"
+          data-testid="contact-email-icon"
           title={data?.email}
           name="envelope"
           onClick={copyToClipboard}
@@ -67,3 +70,5 @@ export const Contact = () => {
     </WidgetWrapper>
   );
 };
+
+export default Contact;
