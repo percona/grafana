@@ -65,6 +65,7 @@ export interface CheckDetails {
   name: string;
   summary: string;
   interval: keyof typeof Interval;
+  category: string;
   description?: string;
   disabled?: boolean;
   readMoreUrl?: string;
@@ -81,12 +82,6 @@ export interface ChangeCheckBody {
     interval?: keyof typeof Interval;
     disable?: boolean;
   }>;
-}
-
-export enum TabKeys {
-  allChecks = 'all-checks',
-  failedChecks = 'failed-checks',
-  rootChecks = 'root-checks',
 }
 
 export interface AlertsReload {
