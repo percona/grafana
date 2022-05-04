@@ -2,13 +2,27 @@ import { locationService } from '@grafana/runtime';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
-import React from 'react';
+import React, { FC } from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 import Contact from './Contact';
 import { ContactService } from './Contact.service';
 
-jest.mock('app/percona/environment-overview/components/ContactWidget/Contact.service');
+const MockWrapper: FC = ({ children }) => {
+  return (
+    <Provider
+      store={configureStore({
+        percona: {
+          user: { isAuthorized: true, isPlatformUser: true },
+          settings: { result: { isConnectedToPortal: true } },
+        },
+      } as StoreState)}
+    >
+      <Router history={locationService.getHistory()}>{children}</Router>
+    </Provider>
+  );
+};
+
 describe('Contact widget', () => {
   it('render contact when data were fetched successfully', async () => {
     jest.spyOn(ContactService, 'getContact').mockImplementationOnce((undefined) => {
@@ -19,18 +33,9 @@ describe('Contact widget', () => {
       });
     });
     render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: true },
-            settings: { result: { isConnectedToPortal: true } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <Contact />
-        </Router>
-      </Provider>
+      <MockWrapper>
+        <Contact />
+      </MockWrapper>
     );
     await waitForElementToBeRemoved(() => screen.getByTestId('contact-loading'));
 
@@ -43,18 +48,9 @@ describe('Contact widget', () => {
       throw Error('test');
     });
     render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: true },
-            settings: { result: { isConnectedToPortal: true } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <Contact />
-        </Router>
-      </Provider>
+      <MockWrapper>
+        <Contact />
+      </MockWrapper>
     );
 
     expect(screen.queryByTestId('contact-name')).not.toBeInTheDocument();
