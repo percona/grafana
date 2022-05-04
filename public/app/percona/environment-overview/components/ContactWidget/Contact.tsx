@@ -58,10 +58,10 @@ const Contact = () => {
         <div className={styles.nameWrapper}>
           <Icon name={'user'} size="lg" />
           <span className={styles.name} data-testid="contact-name">
-            {data?.name}
+            {data.name}
           </span>
           <ClipboardButton
-            title={data?.email}
+            title={data.email}
             className={styles.clipboardButton}
             onClipboardCopy={onClipboardCopy}
             getText={getText}
