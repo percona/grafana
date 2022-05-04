@@ -1,6 +1,6 @@
+import React from 'react';
 import { useStyles2 } from '@grafana/ui';
 import Page from 'app/core/components/Page/Page';
-import React from 'react';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { usePerconaNavModel } from '../shared/components/hooks/perconaNavModel';
 import Contact from './components/ContactWidget/Contact';

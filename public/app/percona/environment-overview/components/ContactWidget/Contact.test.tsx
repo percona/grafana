@@ -1,8 +1,8 @@
+import React, { FC } from 'react';
 import { locationService } from '@grafana/runtime';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
-import React, { FC } from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 import Contact from './Contact';

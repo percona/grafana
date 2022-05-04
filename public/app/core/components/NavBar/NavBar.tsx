@@ -1,3 +1,4 @@
+import React, { FC, useState } from 'react';
 import { css, cx } from '@emotion/css';
 import { GrafanaTheme2, NavModelItem, NavSection } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
@@ -8,7 +9,6 @@ import config from 'app/core/config';
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { KioskMode } from 'app/types';
 import { cloneDeep } from 'lodash';
-import React, { FC, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { OrgSwitcher } from '../OrgSwitcher';

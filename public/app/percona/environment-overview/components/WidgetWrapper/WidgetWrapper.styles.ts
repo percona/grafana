@@ -14,4 +14,9 @@ export const getStyles = ({ v1: { spacing, palette }, typography }: GrafanaTheme
     font-size: ${typography.h4.fontSize};
     font-weight: ${typography.h4.fontWeight};
   `,
+  wrapper: css`
+    flex: 50%;
+    max-width: 50%;
+    padding: ${spacing.sm} ${spacing.md};
+  `,
 });

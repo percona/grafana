@@ -1,10 +1,10 @@
+import React, { useCallback, useEffect, useState } from 'react';
 import { AppEvents } from '@grafana/data';
-import { Icon, IconButton, IconName, useStyles2 } from '@grafana/ui';
+import { ClipboardButton, Icon, useStyles2 } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import appEvents from 'app/core/app_events';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useCancelToken } from '../../../shared/components/hooks/cancelToken.hook';
 import { WidgetWrapper } from '../WidgetWrapper/WidgetWrapper';
@@ -21,8 +21,8 @@ const Contact = () => {
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
-  const getData = useCallback(async (showLoading = false) => {
-    showLoading && setPendingRequest(true);
+  const getData = useCallback(async () => {
+    setPendingRequest(true);
     try {
       const contact = await ContactService.getContact(generateToken(CONTACT_CANCEL_TOKEN));
       setData(contact);
@@ -38,16 +38,17 @@ const Contact = () => {
 
   useEffect(() => {
     if (isPlatformUser === true) {
-      getData(true);
+      getData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlatformUser]);
 
-  const copyToClipboard = useCallback(async () => {
-    if (data) {
-      await navigator.clipboard.writeText(data.email);
-      appEvents.emit(AppEvents.alertSuccess, [Messages.copiedSuccessfully]);
-    }
+  const onClipboardCopy = useCallback(() => {
+    appEvents.emit(AppEvents.alertSuccess, [Messages.copiedSuccessfully]);
+  }, []);
+
+  const getText = useCallback(() => {
+    return data ? data.email : '';
   }, [data]);
 
   return (
@@ -55,18 +56,19 @@ const Contact = () => {
       <span className={styles.contactTitle}>{Messages.customerSuccess}</span>
       {data && (
         <div className={styles.nameWrapper}>
-          <Icon name={'user' as IconName} size="lg" />{' '}
+          <Icon name={'user'} size="lg" />
           <span className={styles.name} data-testid="contact-name">
             {data?.name}
           </span>
-          <IconButton
-            data-testid="contact-email-icon"
+          <ClipboardButton
             title={data?.email}
-            name="envelope"
-            onClick={copyToClipboard}
-            size="lg"
-            disabled={!data?.email}
-          />
+            className={styles.clipboardButton}
+            onClipboardCopy={onClipboardCopy}
+            getText={getText}
+            data-testid="contact-email-icon"
+          >
+            <Icon name={'envelope'} size="lg" />
+          </ClipboardButton>
         </div>
       )}
     </WidgetWrapper>
