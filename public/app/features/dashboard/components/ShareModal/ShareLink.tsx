@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { selectors as e2eSelectors } from '@grafana/e2e-selectors';
 import { Alert, ClipboardButton, Field, FieldSet, Icon, Input, RadioButtonGroup, Switch } from '@grafana/ui';
-import { AppEvents, SelectableValue } from '@grafana/data';
+import { AppEvents, NavModelItem, SelectableValue } from '@grafana/data';
 import { buildImageUrl, buildShareUrl } from './utils';
 import { appEvents } from 'app/core/core';
 import config from 'app/core/config';
@@ -86,6 +86,7 @@ export class ShareLink extends PureComponent<Props, State> {
     const { useCurrentTimeRange, useShortUrl, selectedTheme, shareUrl, imageUrl } = this.state;
     const selectors = e2eSelectors.pages.SharePanelModal;
     const isDashboardSaved = Boolean(dashboard.id);
+    const isPMM = !!((config.bootData.navTree || []) as NavModelItem[]).find((item) => item.id === 'pmm');
 
     return (
       <>
@@ -106,6 +107,17 @@ export class ShareLink extends PureComponent<Props, State> {
           <Field label="Theme">
             <RadioButtonGroup options={themeOptions} value={selectedTheme} onChange={this.onThemeChange} />
           </Field>
+          {isPMM && config.appUrl.includes('localhost') && !window.location.host.includes('localhost') && (
+            <Alert title="PMM: URL mismatch" severity="warning">
+              <p>
+                Your domain on Grafana&apos;s .ini file is localhost but you are on a different domain. The short URL
+                will point to localhost, which might be wrong.
+              </p>
+              <p>
+                Please change your .ini if you want the URL shortener to function correctly, or just use the full URL.
+              </p>
+            </Alert>
+          )}
           <Field label="Shorten URL">
             <Switch id="share-shorten-url" value={useShortUrl} onChange={this.onUrlShorten} />
           </Field>
