@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { logger } from '@percona/platform-core';
+import { locationService } from '@grafana/runtime';
 import { Cell, Column, Row } from 'react-table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import Page from 'app/core/components/Page/Page';
@@ -7,6 +8,7 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 import { ExtendedTableCellProps, ExtendedTableRowProps, Table } from 'app/percona/integrated-alerting/components/Table';
 import { FailedCheckSummary } from 'app/percona/check/types';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
@@ -15,10 +17,7 @@ import { useStyles2 } from '@grafana/ui';
 import { Messages } from './FailedChecksTab.messages';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { getStyles } from './FailedChecksTab.styles';
-import { stripServiceId } from './FailedChecksTab.utils';
-
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
-import { locationService } from '@grafana/runtime';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
@@ -68,7 +67,10 @@ export const FailedChecksTab: FC = () => {
   const getRowProps = (row: Row<FailedCheckSummary>): ExtendedTableRowProps => ({
     key: row.original.serviceId,
     className: styles.row,
-    onClick: () => locationService.push(`/pmm-database-checks/failed-checks/${stripServiceId(row.original.serviceId)}`),
+    onClick: () =>
+      locationService.push(
+        `/pmm-database-checks/failed-checks/${stripPerconaApiId(row.original.serviceId, 'service')}`
+      ),
   });
 
   const getCellProps = (cellInfo: Cell<FailedCheckSummary>): ExtendedTableCellProps => ({

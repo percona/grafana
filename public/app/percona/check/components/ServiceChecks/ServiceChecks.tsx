@@ -14,14 +14,14 @@ import { SERVICE_CHECKS_CANCEL_TOKEN, SERVICE_CHECKS_TABLE_ID } from './ServiceC
 import { Messages } from './ServiceChecks.messages';
 import { getStyles } from './ServiceChecks.styles';
 import { Severity } from 'app/percona/integrated-alerting/components/Severity';
-import { formatServiceId } from '../FailedChecksTab/FailedChecksTab.utils';
+import { formatPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import Page from 'app/core/components/Page/Page';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 
 export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> = ({ match }) => {
-  const serviceId = formatServiceId(match.params.service);
+  const serviceId = formatPerconaApiId(match.params.service, 'service');
   const [pageSize, setPageSize] = useStoredTablePageSize(SERVICE_CHECKS_TABLE_ID);
   const [pageIndex, setPageindex] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
