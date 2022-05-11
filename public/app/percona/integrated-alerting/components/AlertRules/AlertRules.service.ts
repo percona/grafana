@@ -14,7 +14,7 @@ const BASE_URL = `/v1/management/ia/Rules`;
 
 export const AlertRulesService = {
   async list(payload: AlertRuleGetPayload, token?: CancelToken): Promise<AlertRulesListResponse> {
-    return api.post(`${BASE_URL}/List`, payload, false, token);
+    return api.post(`${BASE_URL}/List`, payload, true, token);
   },
   async create(
     payload: AlertRuleCreatePayload | AlertRuleCopyPayload,

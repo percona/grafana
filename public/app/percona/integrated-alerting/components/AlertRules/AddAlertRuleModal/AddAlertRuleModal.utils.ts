@@ -8,16 +8,15 @@ import {
   AlertRuleFilterType,
   AlertRulesListResponseChannel,
 } from '../AlertRules.types';
-import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
 import { Severity, Template, TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { SelectableValue } from '@grafana/data';
 import { Messages } from './AddAlertRuleModal.messages';
 
-export const formatChannelsOptions = (channels: NotificationChannel[]): Array<SelectableValue<string>> =>
+export const formatChannelsOptions = (channels: string[]): Array<SelectableValue<string>> =>
   channels
     ? channels.map((channel) => ({
-        value: channel.channelId,
-        label: channel.summary,
+        value: channel,
+        label: channel,
       }))
     : [];
 

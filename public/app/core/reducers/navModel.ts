@@ -40,7 +40,7 @@ function buildWarningNav(text: string, subTitle?: string): NavModel {
 
 export const initialState: NavIndex = {};
 
-export const updateNavIndex = createAction<NavModelItem>('navIndex/updateNavIndex');
+export const updateNavIndex = createAction<NavModelItem | undefined>('navIndex/updateNavIndex');
 // Since the configuration subtitle includes the organization name, we include this action to update the org name if it changes.
 export const updateConfigurationSubtitle = createAction<string>('navIndex/updateConfigurationSubtitle');
 
@@ -62,20 +62,21 @@ export const navIndexReducer = (state: NavIndex = initialState, action: AnyActio
   if (updateNavIndex.match(action)) {
     const newPages: NavIndex = {};
     const payload = action.payload;
-
-    if (payload.children && payload.children.length) {
-      for (const node of payload.children) {
-        if (node.id) {
-          newPages[node.id] = {
-            ...node,
-            parentItem: payload,
-          };
+    if (payload) {
+      if (payload.children && payload.children.length) {
+        for (const node of payload.children) {
+          if (node.id) {
+            newPages[node.id] = {
+              ...node,
+              parentItem: payload,
+            };
+          }
         }
+      } else if (payload.id) {
+        newPages[payload.id] = {
+          ...payload,
+        };
       }
-    } else if (payload.id) {
-      newPages[payload.id] = {
-        ...payload,
-      };
     }
 
     return { ...state, ...newPages };

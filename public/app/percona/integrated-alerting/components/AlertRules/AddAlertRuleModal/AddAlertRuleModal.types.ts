@@ -17,3 +17,18 @@ export interface AddAlertRuleFormValues {
   enabled: boolean;
   [field: string]: any;
 }
+
+export interface NotificationListResponse {
+  alertmanager_config: AlertManagerConfig;
+}
+
+interface AlertManagerConfig {
+  route: {
+    receiver: string;
+  };
+  receivers: Receiver[];
+}
+
+interface Receiver {
+  name: string;
+}

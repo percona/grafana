@@ -29,7 +29,6 @@ import {
   PMM_STT_PAGE,
   PMM_BACKUP_PAGE,
   PMM_DBAAS_PAGE,
-  PMM_ALERTING_PAGE,
   PMM_INVENTORY_PAGE,
   PMM_TICKETS_PAGE,
   PMM_ENTITLEMENTS_PAGE,
@@ -73,11 +72,9 @@ export const NavBar: FC = React.memo(() => {
     toggleSwitcherModal
   );
   const activeItem = isSearchActive(location) ? searchItem : getActiveItem(navTree, location.pathname);
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
-  dispatch(updateNavIndex(PMM_ALERTING_PAGE));
   dispatch(updateNavIndex(PMM_STT_PAGE));
   dispatch(updateNavIndex(PMM_DBAAS_PAGE));
   dispatch(updateNavIndex(PMM_BACKUP_PAGE));
@@ -85,6 +82,7 @@ export const NavBar: FC = React.memo(() => {
   dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
   dispatch(updateNavIndex(PMM_TICKETS_PAGE));
   dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
+  dispatch(updateNavIndex(buildIntegratedAlertingMenuItem(topItems)));
 
   if (isPlatformUser) {
     topItems.push(PMM_ENTITLEMENTS_PAGE);
@@ -93,10 +91,6 @@ export const NavBar: FC = React.memo(() => {
 
   if (isAuthorized) {
     buildInventoryAndSettings(topItems);
-
-    if (alertingEnabled) {
-      buildIntegratedAlertingMenuItem(topItems);
-    }
 
     if (sttEnabled) {
       topItems.push(PMM_STT_PAGE);

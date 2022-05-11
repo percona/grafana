@@ -20,20 +20,20 @@ import { getStyles } from './AddAlertRuleModal.styles';
 import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './AddAlertRulesModal.constants';
 import {
   formatTemplateOptions,
-  formatChannelsOptions,
   formatCreateAPIPayload,
   formatUpdateAPIPayload,
   getInitialValues,
   minValidator,
+  formatChannelsOptions,
 } from './AddAlertRuleModal.utils';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
 import { Template, TemplateParamType } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
-import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { appEvents } from 'app/core/core';
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import { AlertRuleParamField } from '../AlertRuleParamField';
+import { AddAlertRuleModalService } from './AddAlertRuleModal.service';
 
 const { required } = validators;
 const durationValidators = [required, minValidator(MINIMUM_DURATION_VALUE)];
@@ -54,12 +54,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const getData = useCallback(async () => {
     try {
       const [channelsListResponse, templatesListResponse] = await Promise.all([
-        NotificationChannelService.list({
-          page_params: {
-            index: 0,
-            page_size: 100,
-          },
-        }),
+        AddAlertRuleModalService.notificationList(),
         AlertRuleTemplateService.list({
           page_params: {
             index: 0,
@@ -67,7 +62,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
           },
         }),
       ]);
-      setChannelsOptions(formatChannelsOptions(channelsListResponse.channels));
+      setChannelsOptions(formatChannelsOptions(channelsListResponse));
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
       templates.current = templatesListResponse.templates;
       updateAlertRuleTemplateParams();

@@ -8,7 +8,7 @@ const alertingRoutes = [
   {
     path: '/alerting',
     // eslint-disable-next-line react/display-name
-    component: () => <Redirect to="/alerting/list" />,
+    component: () => <Redirect to="/alerting/alerts" />,
   },
   {
     path: '/alerting/list',
