@@ -25,6 +25,7 @@ import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_ALERTS_CANCEL_TOKEN, TOGGLE_ALERT_CA
 import { AlertDetails } from './AlertDetails/AlertDetails';
 import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
 import appEvents from 'app/core/app_events';
+import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 
 const {
   table: { noData, columns },
@@ -152,8 +153,21 @@ export const Alerts: FC = () => {
           </span>
         ),
       },
+      {
+        Header: 'Triggered By',
+        accessor: 'rule',
+        Cell: ({ value }) =>
+          value ? (
+            <a
+              className={style.ruleLink}
+              href={`/integrated-alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`}
+            >
+              {value.name}
+            </a>
+          ) : null,
+      },
     ],
-    [style.actionsWrapper, style.labelsWrapper, style.silencedSeverity, toggleAlert]
+    [style.actionsWrapper, style.labelsWrapper, style.ruleLink, style.silencedSeverity, toggleAlert]
   );
 
   const getCellProps = useCallback(

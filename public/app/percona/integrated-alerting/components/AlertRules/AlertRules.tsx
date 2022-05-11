@@ -169,11 +169,20 @@ export const AlertRules: FC = () => {
     (cell: Cell<AlertRule>) => ({
       className: cx({
         [styles.disabledRow]: cell.row.original.disabled,
-        [styles.highlightedRow]: highlightRuleId === stripPerconaApiId(cell.row.original.ruleId, 'rule_id'),
       }),
       key: cell.row.original.ruleId,
     }),
-    [highlightRuleId, styles.disabledRow, styles.highlightedRow]
+    [styles.disabledRow]
+  );
+
+  const getRowProps = useCallback(
+    (row: Row<AlertRule>) => ({
+      className: cx({
+        [styles.highlightedRow]: highlightRuleId === stripPerconaApiId(row.original.ruleId, 'rule_id'),
+      }),
+      key: row.original.ruleId,
+    }),
+    [highlightRuleId, styles.highlightedRow]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,6 +228,7 @@ export const AlertRules: FC = () => {
               pendingRequest={pendingRequest}
               emptyMessage={noData}
               getCellProps={getCellProps}
+              getRowProps={getRowProps}
             />
           </AlertRulesProvider.Provider>
         </FeatureLoader>

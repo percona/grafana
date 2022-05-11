@@ -50,7 +50,7 @@ export const getStyles = ({ v1: { palette, colors, spacing }, colors: v2Colors }
       background-color: ${colors.dashboardBg} !important;
     `,
     highlightedRow: css`
-      background-color: ${v2Colors.action.selected} !important;
+      border: 2px solid ${v2Colors.primary.border};
     `,
   };
 };

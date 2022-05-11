@@ -38,5 +38,8 @@ export const getStyles = ({ colors, v1: { colors: v1Colors, spacing } }: Grafana
       display: flex;
       justify-content: flex-end;
     `,
+    ruleLink: css`
+      color: ${colors.text.link};
+    `,
   };
 };
