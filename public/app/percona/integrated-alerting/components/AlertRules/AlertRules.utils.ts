@@ -1,3 +1,4 @@
+import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 import moment from 'moment/moment';
 import {
   AlertRule,
@@ -71,3 +72,13 @@ export const formatRule = (rule: AlertRulesListResponseRule): AlertRule => {
 
 export const formatRules = (rules: AlertRulesListResponseRule[] | null | undefined): AlertRule[] =>
   rules ? rules.map(formatRule) : [];
+
+export const sortRules = (highlightRuleId: string, rules: AlertRulesListResponseRule[]) => {
+  rules.sort((a, b) =>
+    highlightRuleId === stripPerconaApiId(a.rule_id, 'rule_id')
+      ? -1
+      : highlightRuleId === stripPerconaApiId(b.rule_id, 'rule_id')
+      ? 1
+      : 0
+  );
+};

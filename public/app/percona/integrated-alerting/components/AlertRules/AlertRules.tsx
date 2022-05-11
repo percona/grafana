@@ -20,7 +20,7 @@ import { getStyles } from './AlertRules.styles';
 import { AlertRulesProvider } from './AlertRules.provider';
 import { AlertRulesService } from './AlertRules.service';
 import { Messages } from '../../IntegratedAlerting.messages';
-import { formatRules } from './AlertRules.utils';
+import { formatRules, sortRules } from './AlertRules.utils';
 import { AlertRule, AlertRuleSeverity } from './AlertRules.types';
 import { AlertRulesActions } from './AlertRulesActions';
 import { ALERT_RULES_TABLE_ID, GET_ALERT_RULES_CANCEL_TOKEN } from './AlertRules.constants';
@@ -59,7 +59,7 @@ export const AlertRules: FC = () => {
     [queryParams]
   );
   const highlightRuleId = params.length ? params[0][0] : '';
-  console.log(highlightRuleId);
+
   const getAlertRules = useCallback(async () => {
     setPendingRequest(true);
     try {
@@ -72,6 +72,9 @@ export const AlertRules: FC = () => {
         },
         generateToken(GET_ALERT_RULES_CANCEL_TOKEN)
       );
+      if (highlightRuleId) {
+        sortRules(highlightRuleId, rules);
+      }
       setData(formatRules(rules));
       setTotalItems(totals.total_items || 0);
       setTotalPages(totals.total_pages || 0);
