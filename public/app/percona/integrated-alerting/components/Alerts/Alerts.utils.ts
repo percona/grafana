@@ -15,7 +15,7 @@ export const formatAlert = (alert: AlertsListResponseAlert): Alert => {
     labels: formatLabels(labels),
     severity: AlertRuleSeverity[severity],
     status: AlertStatus[status],
-    summary: isPerconaAlert ? alertname : summary,
+    summary: isPerconaAlert ? summary : alertname,
     lastNotified: updated_at ? moment(updated_at).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
     rule: rule ? formatRule(rule) : undefined,
     ruleUid: __alert_rule_uid__,
