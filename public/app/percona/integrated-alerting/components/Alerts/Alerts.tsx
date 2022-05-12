@@ -160,7 +160,7 @@ export const Alerts: FC = () => {
           value ? (
             <a
               className={style.ruleLink}
-              href={`/integrated-alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`}
+              href={`/alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`}
             >
               {value.name}
             </a>
