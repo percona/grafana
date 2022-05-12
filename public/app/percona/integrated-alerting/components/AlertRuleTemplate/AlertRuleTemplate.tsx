@@ -13,7 +13,7 @@ import { Messages } from 'app/percona/integrated-alerting/IntegratedAlerting.mes
 import { getStyles } from './AlertRuleTemplate.styles';
 import { AddAlertRuleTemplateModal } from './AddAlertRuleTemplateModal';
 import { Table } from '../Table/Table';
-import { formatSource, formatTemplates } from './AlertRuleTemplate.utils';
+import { formatSource, formatTemplates, formatDate } from './AlertRuleTemplate.utils';
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
 import { Column } from 'react-table';
 import { AlertRuleTemplateActions } from './AlertRuleTemplateActions/AlertRuleTemplateActions';
@@ -24,7 +24,7 @@ import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 
 const { columns } = Messages.alertRuleTemplate.table;
 
-const { name: nameColumn, source: sourceColumn, createdAt: createdAtColumn, actions: actionsColumn } = columns;
+const { name: nameColumn, source: sourceColumn, actions: actionsColumn } = columns;
 
 export const AlertRuleTemplate: FC = () => {
   const styles = useStyles(getStyles);
@@ -74,12 +74,15 @@ export const AlertRuleTemplate: FC = () => {
         Header: sourceColumn,
         accessor: 'source',
         width: '20%',
-        Cell: ({ value }) => formatSource(value),
-      },
-      {
-        Header: createdAtColumn,
-        accessor: 'created_at',
-        width: '10%',
+        Cell: ({ value, row }) => {
+          return (
+            <div>
+              {formatSource(value)}
+              <br />
+              {formatDate(row.original.created_at)}
+            </div>
+          );
+        },
       },
       {
         Header: actionsColumn,
