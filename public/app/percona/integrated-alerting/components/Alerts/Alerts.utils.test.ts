@@ -17,6 +17,8 @@ const expectedAlertResult1: Alert = {
   status: 'Firing',
   summary: 'PXC cluster on [HR prod] is down',
   lastNotified: '2020-11-25 16:53:39.366',
+  ruleUid: '',
+  isPerconaAlert: false,
 };
 
 const expectedAlertResult2: Alert = {
@@ -30,6 +32,8 @@ const expectedAlertResult2: Alert = {
   status: 'Silenced',
   summary: 'Memory consumption on [Mncfg Dev] instance 1 reached 80%',
   lastNotified: '',
+  ruleUid: '',
+  isPerconaAlert: false,
 };
 
 describe('AlertRulesTable utils', () => {
