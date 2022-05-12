@@ -1,5 +1,7 @@
+import React from 'react';
+
 export interface TableContentProps {
   hasData: boolean;
-  emptyMessage: string;
+  emptyMessage: React.ReactNode;
   loading?: boolean;
 }

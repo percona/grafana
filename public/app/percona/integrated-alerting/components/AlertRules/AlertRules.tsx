@@ -4,6 +4,7 @@ import { Cell, Column, Row } from 'react-table';
 import { Button, useStyles2 } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
+import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -29,7 +30,7 @@ import { AlertRulesParamsDetails } from './AlertRulesParamsDetails';
 import { cx } from '@emotion/css';
 import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 
-const { noData, columns } = Messages.alertRules.table;
+const { columns } = Messages.alertRules.table;
 
 const {
   createdAt: createdAtColumn,
@@ -226,7 +227,14 @@ export const AlertRules: FC = () => {
               data={data}
               columns={columns}
               pendingRequest={pendingRequest}
-              emptyMessage={noData}
+              emptyMessage={
+                <EmptyListCTA
+                  title={Messages.alertRules.table.noCreated}
+                  buttonIcon="bell"
+                  buttonTitle={Messages.alertRules.table.newAlertRule}
+                  onClick={handleAddButton}
+                />
+              }
               getCellProps={getCellProps}
               getRowProps={getRowProps}
             />

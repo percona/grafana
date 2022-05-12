@@ -69,7 +69,7 @@ export const FailedChecksTab: FC = () => {
     className: styles.row,
     onClick: () =>
       locationService.push(
-        `/pmm-database-checks/failed-checks/${stripPerconaApiId(row.original.serviceId, 'service')}`
+        `/pmm-database-checks/failed-checks/${stripPerconaApiId(row.original.serviceId, 'service_id')}`
       ),
   });
 

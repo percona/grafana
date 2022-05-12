@@ -1,10 +1,8 @@
 import { css } from '@emotion/css';
-import { GrafanaTheme } from '@grafana/data';
 
-export const getStyles = ({ spacing }: GrafanaTheme) => ({
+export const getStyles = () => ({
   actionsWrapper: css`
     display: flex;
     justify-content: flex-end;
-    margin-bottom: ${spacing.sm};
   `,
 });

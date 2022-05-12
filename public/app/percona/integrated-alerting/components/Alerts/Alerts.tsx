@@ -128,7 +128,7 @@ export const Alerts: FC = () => {
             ))}
           </div>
         ),
-        width: '40%',
+        width: '20%',
       },
       {
         Header: activeSinceColumn,
@@ -160,7 +160,7 @@ export const Alerts: FC = () => {
           value ? (
             <a
               className={style.ruleLink}
-              href={`/integrated-alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`}
+              href={`/alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`}
             >
               {value.name}
             </a>
@@ -212,7 +212,7 @@ export const Alerts: FC = () => {
       <Page.Contents>
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.integratedAlerting} featureSelector={featureSelector}>
-          <div className={style.actionsWrapper}>
+          <div className={style.generalActionsWrapper}>
             <Button
               size="md"
               icon="bell-slash"
