@@ -128,7 +128,7 @@ export const Alerts: FC = () => {
             ))}
           </div>
         ),
-        width: '40%',
+        width: '20%',
       },
       {
         Header: activeSinceColumn,
