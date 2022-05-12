@@ -106,13 +106,13 @@ export const PMM_ALERTING_PERCONA_ALERTS: NavModelItem[] = [
   },
   {
     id: 'integrated-alerting-rules',
-    text: 'Simple Alert Rules',
+    text: 'Simple alert rules',
     icon: 'list-ul',
     url: `${config.appSubUrl}/alerting/alert-rules`,
   },
   {
     id: 'integrated-alerting-templates',
-    text: 'Alert Rule Templates',
+    text: 'Alert rule templates',
     icon: 'brackets-curly',
     url: `${config.appSubUrl}/alerting/alert-rule-templates`,
   },

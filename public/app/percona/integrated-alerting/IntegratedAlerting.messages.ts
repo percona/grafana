@@ -7,8 +7,8 @@ export const Messages = {
     notificationChannels: 'Notification Channels',
   },
   alerts: {
-    silenceAllAction: 'Silence All',
-    unsilenceAllAction: 'Unsilence All',
+    silenceAllAction: 'Silence all',
+    unsilenceAllAction: 'Unsilence all',
     activateSuccess: 'Alert activated',
     silenceSuccess: 'Alert silenced',
     activateTitle: 'Activate',
@@ -16,9 +16,9 @@ export const Messages = {
     table: {
       noData: 'You haven`t any alert',
       columns: {
-        activeSince: 'Active Since',
+        activeSince: 'Active since',
         labels: 'Labels',
-        lastNotified: 'Last Notified',
+        lastNotified: 'Last notified',
         severity: 'Severity',
         summary: 'Name',
         state: 'State',
@@ -34,7 +34,7 @@ export const Messages = {
         createdAt: 'Created',
         duration: 'Duration',
         filters: 'Filters',
-        lastNotified: 'Last Notified',
+        lastNotified: 'Last notified',
         severity: 'Severity',
         summary: 'Name',
         params: 'Parameters',
@@ -48,10 +48,10 @@ export const Messages = {
     addModal: {
       confirm: 'Add',
       cancel: 'Cancel',
-      title: 'Add Alert Rule Template',
+      title: 'Add alert rule template',
       upload: 'Upload',
       fields: {
-        alertRuleTemplate: 'Alert Rule Template',
+        alertRuleTemplate: 'Alert rule template',
       },
     },
     table: {
