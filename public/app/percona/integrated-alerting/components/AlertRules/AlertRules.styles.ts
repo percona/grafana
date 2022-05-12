@@ -8,7 +8,6 @@ export const getStyles = ({ v1: { palette, colors, spacing }, colors: v2Colors }
     actionsWrapper: css`
       display: flex;
       justify-content: flex-end;
-      margin-bottom: ${spacing.sm};
     `,
     filtersWrapper: css`
       padding: 5px;

@@ -20,8 +20,9 @@ import { AlertRuleTemplateActions } from './AlertRuleTemplateActions/AlertRuleTe
 import { FormattedTemplate } from './AlertRuleTemplate.types';
 import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_TEMPLATES_CANCEL_TOKEN } from './AlertRuleTemplate.constants';
 import { useStoredTablePageSize } from '../Table/Pagination';
+import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 
-const { noData, columns } = Messages.alertRuleTemplate.table;
+const { columns } = Messages.alertRuleTemplate.table;
 
 const { name: nameColumn, source: sourceColumn, createdAt: createdAtColumn, actions: actionsColumn } = columns;
 
@@ -101,6 +102,10 @@ export const AlertRuleTemplate: FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('alertingEnabled'), []);
 
+  const handleAddButton = () => {
+    setAddModalVisible((visible) => !visible);
+  };
+
   useEffect(() => {
     getAlertRuleTemplates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,7 +121,7 @@ export const AlertRuleTemplate: FC = () => {
               size="md"
               icon="plus-square"
               variant="link"
-              onClick={() => setAddModalVisible(!addModalVisible)}
+              onClick={handleAddButton}
               data-testid="alert-rule-template-add-modal-button"
             >
               {Messages.alertRuleTemplate.addAction}
@@ -137,7 +142,14 @@ export const AlertRuleTemplate: FC = () => {
             data={data}
             columns={columns}
             pendingRequest={pendingRequest}
-            emptyMessage={noData}
+            emptyMessage={
+              <EmptyListCTA
+                title={Messages.alertRuleTemplate.table.noCreated}
+                buttonIcon="bell"
+                buttonTitle={Messages.alertRuleTemplate.table.newAlertRuleTemplate}
+                onClick={handleAddButton}
+              />
+            }
           />
         </FeatureLoader>
       </Page.Contents>

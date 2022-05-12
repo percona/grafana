@@ -5,6 +5,5 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
   actionsWrapper: css`
     display: flex;
     justify-content: flex-end;
-    margin-bottom: ${spacing.sm};
   `,
 });

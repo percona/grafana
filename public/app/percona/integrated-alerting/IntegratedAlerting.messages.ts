@@ -14,7 +14,7 @@ export const Messages = {
     activateTitle: 'Activate',
     silenceTitle: 'Silence',
     table: {
-      noData: 'No alerts',
+      noData: 'You haven`t any alert',
       columns: {
         activeSince: 'Active Since',
         labels: 'Labels',
@@ -28,7 +28,8 @@ export const Messages = {
   },
   alertRules: {
     table: {
-      noData: 'No alert rules found',
+      newAlertRule: 'New alert rule',
+      noCreated: 'You haven`t created any alert rules yet',
       columns: {
         createdAt: 'Created',
         duration: 'Duration',
@@ -54,7 +55,8 @@ export const Messages = {
       },
     },
     table: {
-      noData: 'No templates found',
+      newAlertRuleTemplate: 'New alert rule template',
+      noCreated: 'You haven`t created any alert rule template yet',
       columns: {
         name: 'Name',
         source: 'Source',
