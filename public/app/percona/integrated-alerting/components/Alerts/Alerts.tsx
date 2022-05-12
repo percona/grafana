@@ -212,7 +212,7 @@ export const Alerts: FC = () => {
       <Page.Contents>
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.integratedAlerting} featureSelector={featureSelector}>
-          <div className={style.actionsWrapper}>
+          <div className={style.generalActionsWrapper}>
             <Button
               size="md"
               icon="bell-slash"
