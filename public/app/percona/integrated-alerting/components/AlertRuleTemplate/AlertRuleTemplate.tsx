@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import React, { FC, useState, useEffect, useCallback } from 'react';
-import { Button, useStyles } from '@grafana/ui';
+import { Button, useStyles2 } from '@grafana/ui';
 import { logger } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
@@ -13,13 +13,14 @@ import { Messages } from 'app/percona/integrated-alerting/IntegratedAlerting.mes
 import { getStyles } from './AlertRuleTemplate.styles';
 import { AddAlertRuleTemplateModal } from './AddAlertRuleTemplateModal';
 import { Table } from '../Table/Table';
-import { formatSource, formatTemplates, formatDate } from './AlertRuleTemplate.utils';
+import { formatSource, formatTemplates } from './AlertRuleTemplate.utils';
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
 import { Column } from 'react-table';
 import { AlertRuleTemplateActions } from './AlertRuleTemplateActions/AlertRuleTemplateActions';
 import { FormattedTemplate } from './AlertRuleTemplate.types';
 import { ALERT_RULE_TEMPLATES_TABLE_ID, GET_TEMPLATES_CANCEL_TOKEN } from './AlertRuleTemplate.constants';
 import { useStoredTablePageSize } from '../Table/Pagination';
+import moment from 'moment/moment';
 import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 
 const { columns } = Messages.alertRuleTemplate.table;
@@ -27,7 +28,7 @@ const { columns } = Messages.alertRuleTemplate.table;
 const { name: nameColumn, source: sourceColumn, actions: actionsColumn } = columns;
 
 export const AlertRuleTemplate: FC = () => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
   const navModel = useNavModel('integrated-alerting-templates');
@@ -79,7 +80,11 @@ export const AlertRuleTemplate: FC = () => {
             <div>
               {formatSource(value)}
               <br />
-              {formatDate(row.original.created_at)}
+              {row.original.created_at && (
+                <span className={styles.dateWrapper}>
+                  Created at: {moment(row.original.created_at).format('YYYY-MM-DD')}
+                </span>
+              )}
             </div>
           );
         },
@@ -91,6 +96,7 @@ export const AlertRuleTemplate: FC = () => {
         ),
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [getAlertRuleTemplates]
   );
 
