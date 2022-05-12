@@ -73,7 +73,7 @@ export const AlertRuleTemplate: FC = () => {
       {
         Header: sourceColumn,
         accessor: 'source',
-        width: '20%',
+        width: '30%',
         Cell: ({ value, row }) => {
           return (
             <div>
