@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Button, useStyles2 } from '@grafana/ui';
+import { Button, useStyles2, Icon } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { logger, Chip } from '@percona/platform-core';
 import Page from 'app/core/components/Page/Page';
@@ -28,7 +28,7 @@ import appEvents from 'app/core/app_events';
 import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 
 const {
-  table: { noData, columns },
+  table: { columns },
   activateSuccess,
   silenceSuccess,
   activateTitle,
@@ -245,7 +245,11 @@ export const Alerts: FC = () => {
             data={data}
             columns={columns}
             pendingRequest={pendingRequest}
-            emptyMessage={noData}
+            emptyMessage={
+              <h1>
+                <Icon name="check-circle" size="xxl" /> No alerts detected
+              </h1>
+            }
             getCellProps={getCellProps}
             renderExpandedRow={renderSelectedSubRow}
           />
