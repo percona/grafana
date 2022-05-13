@@ -156,19 +156,18 @@ export const Alerts: FC = () => {
       {
         Header: 'Triggered By',
         accessor: 'rule',
-        Cell: ({ value, row }) =>
-          value ? (
-            <a
-              className={style.ruleLink}
-              href={
-                row.original.isPerconaAlert
-                  ? `/alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`
-                  : `/alerting/${row.original.ruleUid}/edit`
-              }
-            >
-              {value.name}
-            </a>
-          ) : null,
+        Cell: ({ value, row }) => (
+          <a
+            className={style.ruleLink}
+            href={
+              row.original.isPerconaAlert
+                ? `/alerting/alert-rules?highlightRule=${stripPerconaApiId(value?.ruleId || '', 'rule_id')}`
+                : `/alerting/${row.original.ruleUid}/edit`
+            }
+          >
+            {value?.name}
+          </a>
+        ),
       },
     ],
     [style.actionsWrapper, style.labelsWrapper, style.ruleLink, style.silencedSeverity, toggleAlert]
