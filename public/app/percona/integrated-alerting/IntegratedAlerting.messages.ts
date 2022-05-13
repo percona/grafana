@@ -14,7 +14,6 @@ export const Messages = {
     activateTitle: 'Activate',
     silenceTitle: 'Silence',
     table: {
-      noData: 'You haven`t any alert',
       columns: {
         activeSince: 'Active since',
         labels: 'Labels',
