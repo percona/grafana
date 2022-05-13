@@ -156,11 +156,15 @@ export const Alerts: FC = () => {
       {
         Header: 'Triggered By',
         accessor: 'rule',
-        Cell: ({ value }) =>
+        Cell: ({ value, row }) =>
           value ? (
             <a
               className={style.ruleLink}
-              href={`/alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`}
+              href={
+                row.original.isPerconaAlert
+                  ? `/alerting/alert-rules?highlightRule=${stripPerconaApiId(value.ruleId, 'rule_id')}`
+                  : `/alerting/${row.original.ruleUid}/edit`
+              }
             >
               {value.name}
             </a>
