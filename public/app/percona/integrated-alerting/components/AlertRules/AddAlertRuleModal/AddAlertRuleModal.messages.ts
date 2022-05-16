@@ -16,7 +16,7 @@ export const Messages = {
     duration: 'The alert query duration, in seconds.',
     severity:
       'The severity level for the alert triggered by this rule. Either "Warning", "Notice", "High" or "Critical".',
-    channels: 'Which notification channels should be used to send the alert through.',
+    channels: 'Which contact point should be used to send the alert through.',
     filters: 'Apply rule only to required services or nodes.',
   },
   title: 'Add Alert Rule',
@@ -33,7 +33,7 @@ export const Messages = {
   durationField: 'Duration (s)',
   filtersField: 'Filters',
   severityField: 'Severity',
-  channelField: 'Channels',
+  channelField: 'Contact points',
   activateSwitch: 'Activate',
   templateExpression: 'Template Expression',
   ruleAlert: 'Rule Alert',
