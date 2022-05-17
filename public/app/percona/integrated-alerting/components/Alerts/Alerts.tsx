@@ -214,7 +214,7 @@ export const Alerts: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents>
         <TechnicalPreview />
-        <FeatureLoader featureName={Messages.integratedAlerting} featureSelector={featureSelector}>
+        <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
           <div className={style.generalActionsWrapper}>
             <Button
               size="md"

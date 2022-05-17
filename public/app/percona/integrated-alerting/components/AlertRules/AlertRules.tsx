@@ -198,7 +198,7 @@ export const AlertRules: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents>
         <TechnicalPreview />
-        <FeatureLoader featureName={Messages.integratedAlerting} featureSelector={featureSelector}>
+        <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
           <AlertRulesProvider.Provider value={{ getAlertRules, setAddModalVisible, setSelectedAlertRule }}>
             <div className={styles.actionsWrapper}>
               <Button

@@ -1,5 +1,5 @@
 export const Messages = {
-  title: 'Integrated Alerting',
+  title: 'Alerting',
   tabs: {
     alerts: 'Alerts',
     alertRules: 'Alert Rules',
@@ -64,5 +64,5 @@ export const Messages = {
       },
     },
   },
-  integratedAlerting: 'Integrated Alerting',
+  alerting: 'Alerting',
 };
