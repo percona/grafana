@@ -160,12 +160,12 @@ export const Alerts: FC = () => {
           <a
             className={style.ruleLink}
             href={
-              row.original.isPerconaAlert
-                ? `/alerting/alert-rules?highlightRule=${stripPerconaApiId(value?.ruleId || '', 'rule_id')}`
-                : `/alerting/${row.original.ruleUid}/edit`
+              row.original.ruleUid
+                ? `/alerting/${row.original.ruleUid}/edit`
+                : `/alerting/alert-rules?highlightRule=${stripPerconaApiId(value?.ruleId || '', 'rule_id')}`
             }
           >
-            {value?.name}
+            {row.original.templateName}
           </a>
         ),
       },
