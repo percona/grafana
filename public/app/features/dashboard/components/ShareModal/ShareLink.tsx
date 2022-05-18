@@ -87,6 +87,8 @@ export class ShareLink extends PureComponent<Props, State> {
     const selectors = e2eSelectors.pages.SharePanelModal;
     const isDashboardSaved = Boolean(dashboard.id);
     const isPMM = !!((config.bootData.navTree || []) as NavModelItem[]).find((item) => item.id === 'pmm');
+    const differentLocalhostDomains =
+      isPMM && config.appUrl.includes('localhost') && !window.location.host.includes('localhost');
 
     return (
       <>
@@ -107,7 +109,7 @@ export class ShareLink extends PureComponent<Props, State> {
           <Field label="Theme">
             <RadioButtonGroup options={themeOptions} value={selectedTheme} onChange={this.onThemeChange} />
           </Field>
-          {isPMM && config.appUrl.includes('localhost') && !window.location.host.includes('localhost') && (
+          {differentLocalhostDomains && (
             <Alert title="PMM: URL mismatch" severity="warning">
               <p>
                 Your domain on Grafana&apos;s .ini file is localhost but you are on a different domain. The short URL
@@ -118,7 +120,7 @@ export class ShareLink extends PureComponent<Props, State> {
               </p>
             </Alert>
           )}
-          <Field label="Shorten URL">
+          <Field label="Shorten URL" disabled={differentLocalhostDomains}>
             <Switch id="share-shorten-url" value={useShortUrl} onChange={this.onUrlShorten} />
           </Field>
 
