@@ -116,7 +116,8 @@ export class ShareLink extends PureComponent<Props, State> {
                 will point to localhost, which might be wrong.
               </p>
               <p>
-                Please change your .ini if you want the URL shortener to function correctly, or just use the full URL.
+                Please change your .ini and restart Grafana if you want the URL shortener to function correctly, or just
+                use the full URL.
               </p>
             </Alert>
           )}
