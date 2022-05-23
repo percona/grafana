@@ -2,13 +2,13 @@ import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Column } from 'react-table';
-import { LoaderButton, logger } from '@percona/platform-core';
+import { LoaderButton, logger, RadioButtonGroupField, TextInputField } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { CheckService } from 'app/percona/check/Check.service';
-import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
+import { GET_ALL_CHECKS_CANCEL_TOKEN, INTERVAL_OPTIONS, STATUS_OPTIONS } from './AllChecksTab.constants';
 import { Messages } from './AllChecksTab.messages';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { FetchChecks } from './types';
@@ -20,18 +20,20 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
+import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
+import { ALL_VALUES_VALUE, isTextIncluded, isSameOption } from 'app/percona/shared/helpers/filters';
 
-//TODO uncomment for 2.29.0
-// interface FormValues {
-//   categories: string[];
-//   name: string;
-//   status: string;
-//   interval: string;
-//   description: string;
-// }
+interface FormValues {
+  name: string;
+  status: string;
+  interval: string;
+  description: string;
+}
 
 export const AllChecksTab: FC = () => {
-  // const [queryParams, setQueryParams] = useQueryParams();
+  const [queryParams, setQueryParams] = useQueryParams();
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const navModel = usePerconaNavModel('all-checks');
   const [generateToken] = useCancelToken();
@@ -40,18 +42,28 @@ export const AllChecksTab: FC = () => {
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
-  // const categories = useMemo<string[]>(
-  //   () => getValuesFromQueryParams<[string[]]>(queryParams, [{ key: 'category' }])[0],
-  //   [queryParams]
-  // );
+  const [
+    filterName = '',
+    filterDescription = '',
+    filterStatus = ALL_VALUES_VALUE,
+    filterInterval = ALL_VALUES_VALUE,
+  ] = useMemo<[string, string, string, string]>(
+    () =>
+      getValuesFromQueryParams<[string, string, string, string]>(queryParams, [
+        { key: 'name' },
+        { key: 'description' },
+        { key: 'status' },
+        { key: 'interval' },
+      ]),
+    [queryParams]
+  );
 
-  // const Filters = withFilterTypes<FormValues>({
-  //   categories,
-  //   name: '*',
-  //   status: 'all',
-  //   interval: 'all',
-  //   description: '*',
-  // });
+  const Filters = withFilterTypes<FormValues>({
+    name: filterName,
+    description: filterDescription,
+    status: STATUS_OPTIONS.find((opt) => opt.value === filterStatus)?.value || ALL_VALUES_VALUE,
+    interval: INTERVAL_OPTIONS.find((opt) => opt.value === filterInterval)?.value || ALL_VALUES_VALUE,
+  });
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
@@ -117,7 +129,23 @@ export const AllChecksTab: FC = () => {
     [handleModalClose]
   );
 
-  // const applyFilters = ({ categories }: FormValues) => setQueryParams({ category: categories });
+  const onApplyFilters = ({ name, status, interval, description }: FormValues) => {
+    setQueryParams({ name, status: status, interval: interval, description });
+  };
+
+  const filter = useCallback(
+    (checks: CheckDetails[]) => {
+      const filteredChecks = checks.filter(
+        ({ summary, description: checkDescription, disabled, interval: checkInterval }) =>
+          isTextIncluded(filterName, summary) &&
+          isTextIncluded(filterDescription, checkDescription || '') &&
+          isSameOption(filterInterval.toLowerCase(), checkInterval.toLowerCase(), ALL_VALUES_VALUE) &&
+          isSameOption(filterStatus, disabled ? 'disabled' : 'enabled', ALL_VALUES_VALUE)
+      );
+      setChecks(filteredChecks);
+    },
+    [filterDescription, filterInterval, filterName, filterStatus]
+  );
 
   const columns = useMemo(
     (): Array<Column<CheckDetails>> => [
@@ -129,10 +157,6 @@ export const AllChecksTab: FC = () => {
         Header: Messages.table.columns.description,
         accessor: 'description',
       },
-      // {
-      //   Header: Messages.table.columns.category,
-      //   accessor: 'category',
-      // },
       {
         Header: Messages.table.columns.status,
         accessor: 'disabled',
@@ -166,8 +190,7 @@ export const AllChecksTab: FC = () => {
       setFetchChecksPending(true);
       try {
         const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
-
-        setChecks(checks);
+        filter(checks);
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
@@ -178,7 +201,7 @@ export const AllChecksTab: FC = () => {
     };
     fetchChecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [filter]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
@@ -191,44 +214,26 @@ export const AllChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          {/* <Filters onApply={applyFilters}>
-            <ChipAreaInputField
-              tooltipText={Messages.tooltips.category}
-              name="categories"
-              label={Messages.table.columns.category}
-              initialChips={categories || []}
-              isEqual={sameTags}
-            />
+          <Filters onApply={onApplyFilters}>
+            <TextInputField name="name" label={Messages.table.columns.name} />
             <TextInputField
-              name="name"
-              label={Messages.table.columns.name}
-              disabled
-              tooltipText={Messages.tooltips.availableSoon}
-            />
-            <RadioButtonGroupField
-              tooltipText={Messages.tooltips.availableSoon}
-              fullWidth
-              options={STATUS_OPTIONS}
-              name="status"
-              disabled
-              label={Messages.table.columns.status}
-            />
-            <RadioButtonGroupField
-              tooltipText={Messages.tooltips.availableSoon}
-              fullWidth
-              options={INTERVAL_OPTIONS}
-              name="interval"
-              disabled
-              label={Messages.table.columns.interval}
-            />
-            <TextInputField
-              tooltipText={Messages.tooltips.availableSoon}
               fieldClassName={styles.descriptionFilter}
               name="description"
               label={Messages.table.columns.description}
-              disabled
             />
-          </Filters> */}
+            <RadioButtonGroupField
+              fullWidth
+              options={STATUS_OPTIONS}
+              name="status"
+              label={Messages.table.columns.status}
+            />
+            <RadioButtonGroupField
+              fullWidth
+              options={INTERVAL_OPTIONS}
+              name="interval"
+              label={Messages.table.columns.interval}
+            />
+          </Filters>
           <div className={styles.actionButtons} data-testid="db-check-panel-actions">
             <LoaderButton
               type="button"
