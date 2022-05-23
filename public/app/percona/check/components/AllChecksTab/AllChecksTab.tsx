@@ -42,12 +42,7 @@ export const AllChecksTab: FC = () => {
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
-  const [
-    filterName = '',
-    filterDescription = '',
-    filterStatus = ALL_VALUES_VALUE,
-    filterInterval = ALL_VALUES_VALUE,
-  ] = useMemo<[string, string, string, string]>(
+  const params = useMemo<[string, string, string, string]>(
     () =>
       getValuesFromQueryParams<[string, string, string, string]>(queryParams, [
         { key: 'name' },
@@ -57,6 +52,9 @@ export const AllChecksTab: FC = () => {
       ]),
     [queryParams]
   );
+  const [filterName = '', filterDescription = ''] = useMemo(() => params, [params]);
+  const filterStatus = useMemo(() => params[2] || ALL_VALUES_VALUE, [params]);
+  const filterInterval = useMemo(() => params[3] || ALL_VALUES_VALUE, [params]);
 
   const Filters = withFilterTypes<FormValues>(
     {
@@ -224,11 +222,7 @@ export const AllChecksTab: FC = () => {
         >
           <Filters onApply={onApplyFilters}>
             <TextInputField name="name" label={Messages.table.columns.name} />
-            <TextInputField
-              fieldClassName={styles.descriptionFilter}
-              name="description"
-              label={Messages.table.columns.description}
-            />
+            <TextInputField name="description" label={Messages.table.columns.description} />
             <RadioButtonGroupField
               fullWidth
               options={STATUS_OPTIONS}
