@@ -1,29 +1,35 @@
 /* eslint-disable react/display-name */
 import React, { FC, useState, useCallback } from 'react';
-import { Collapse, HorizontalGroup, useStyles2 } from '@grafana/ui';
+import { Button, Collapse, HorizontalGroup, useStyles2 } from '@grafana/ui';
 import { LoaderButton } from '@percona/platform-core';
 import { cx } from '@emotion/css';
 import { withTypes } from 'react-final-form';
 import { FilterSectionProps } from './FilterSection.types';
 import { getStyles } from './FilterSection.styles';
+import { FormApi } from 'final-form';
 
-export const withFilterTypes = <T extends object>(initialValues?: Partial<T>): FC<FilterSectionProps<T>> => ({
-  children,
-  onApply,
-  isOpen,
-  className = '',
-}) => {
+export const withFilterTypes = <T extends object>(
+  emptyValues: T,
+  initialValues?: Partial<T>
+): FC<FilterSectionProps<T>> => ({ children, onApply, isOpen, className = '' }) => {
   const styles = useStyles2(getStyles);
   const [sectionIsOpen, setSectionIsOpen] = useState(!!isOpen);
   const { Form } = withTypes<T>();
 
   const changeIsOpen = useCallback(() => setSectionIsOpen((open) => !open), []);
+  const onClearAll = useCallback(
+    (form: FormApi<T, Partial<T>>) => {
+      form.initialize(emptyValues);
+      onApply(emptyValues);
+    },
+    [onApply]
+  );
 
   return (
     <Form
       initialValues={initialValues}
       onSubmit={onApply}
-      render={({ form, handleSubmit, submitting, valid, pristine }) => (
+      render={({ form, handleSubmit, submitting, valid, pristine, values }) => (
         <Collapse
           collapsible
           isOpen={sectionIsOpen}
@@ -43,6 +49,14 @@ export const withFilterTypes = <T extends object>(initialValues?: Partial<T>): F
               >
                 Apply
               </LoaderButton>
+              <Button
+                type="button"
+                data-testid="storage-location-cancel-button"
+                variant="secondary"
+                onClick={() => onClearAll(form)}
+              >
+                Clear All
+              </Button>
             </HorizontalGroup>
           </form>
         </Collapse>

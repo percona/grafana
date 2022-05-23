@@ -58,12 +58,20 @@ export const AllChecksTab: FC = () => {
     [queryParams]
   );
 
-  const Filters = withFilterTypes<FormValues>({
-    name: filterName,
-    description: filterDescription,
-    status: STATUS_OPTIONS.find((opt) => opt.value === filterStatus)?.value || ALL_VALUES_VALUE,
-    interval: INTERVAL_OPTIONS.find((opt) => opt.value === filterInterval)?.value || ALL_VALUES_VALUE,
-  });
+  const Filters = withFilterTypes<FormValues>(
+    {
+      name: '',
+      description: '',
+      status: ALL_VALUES_VALUE,
+      interval: ALL_VALUES_VALUE,
+    },
+    {
+      name: filterName,
+      description: filterDescription,
+      status: STATUS_OPTIONS.find((opt) => opt.value === filterStatus)?.value || ALL_VALUES_VALUE,
+      interval: INTERVAL_OPTIONS.find((opt) => opt.value === filterInterval)?.value || ALL_VALUES_VALUE,
+    }
+  );
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
