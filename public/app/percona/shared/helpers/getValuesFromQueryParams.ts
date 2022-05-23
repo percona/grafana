@@ -5,11 +5,11 @@ interface QueryParamTransform {
   transform?: (param: UrlQueryValue) => any;
 }
 
-const defaultTransform = (params: UrlQueryValue): string[] => {
+const defaultTransform = (params: UrlQueryValue): string => {
   if (params && params !== undefined && params !== null) {
-    return typeof params === 'object' ? params.map((p) => String(p)) : [String(params)];
+    return String(params);
   }
-  return [];
+  return '';
 };
 
 export const getValuesFromQueryParams = <T extends any[]>(
@@ -21,9 +21,7 @@ export const getValuesFromQueryParams = <T extends any[]>(
   keys.forEach(({ key, transform = defaultTransform }) => {
     const param = queryParams[key];
 
-    if (param !== undefined && param !== null) {
-      result.push(transform(param));
-    }
+    result.push(transform(param));
   });
 
   return result as any;
