@@ -10,7 +10,7 @@ interface FormValues {
 
 describe('withFilterTypes', () => {
   it('should be collapsed if isOpen is not passed', () => {
-    const Filters = withFilterTypes<FormValues>();
+    const Filters = withFilterTypes<FormValues>({ categories: [], name: '' });
 
     render(
       <Filters onApply={jest.fn()}>
@@ -33,7 +33,7 @@ describe('withFilterTypes', () => {
   });
 
   it('should render form fields when open', () => {
-    const Filters = withFilterTypes<FormValues>();
+    const Filters = withFilterTypes<FormValues>({ categories: [], name: '' });
 
     render(
       <Filters isOpen onApply={jest.fn()}>
@@ -56,7 +56,7 @@ describe('withFilterTypes', () => {
   });
 
   it('should attach class names to form', () => {
-    const Filters = withFilterTypes<FormValues>();
+    const Filters = withFilterTypes<FormValues>({ categories: [], name: '' });
 
     render(<Filters isOpen className="foo-class" onApply={jest.fn()}></Filters>);
 
@@ -64,7 +64,7 @@ describe('withFilterTypes', () => {
   });
 
   it('should call onApply with form values', () => {
-    const Filters = withFilterTypes<FormValues>();
+    const Filters = withFilterTypes<FormValues>({ categories: [], name: '' });
     const onApply = jest.fn();
 
     render(
