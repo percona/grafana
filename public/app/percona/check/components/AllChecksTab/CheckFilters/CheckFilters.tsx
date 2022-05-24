@@ -64,9 +64,15 @@ export const CheckFilters: FC = () => {
 
   const onToggle = () => setFiltersOpen((open) => !open);
 
+  const onClear = () => setQueryParams({ name: null, description: null, status: null, interval: null });
+
   return (
-    <Filters showApply={false} onSectionToogle={onToggle} isOpen={filtersOpen}>
-      <TextInputField name="name" label={Messages.table.columns.name} inputProps={{ onKeyUp: onNameChanged }} />
+    <Filters showApply={false} onSectionToogle={onToggle} isOpen={filtersOpen} onClear={onClear}>
+      <TextInputField
+        name="name"
+        label={Messages.table.columns.name}
+        inputProps={{ onKeyUp: onNameChanged, autoFocus: true }}
+      />
       <TextInputField
         name="description"
         label={Messages.table.columns.description}

@@ -18,6 +18,7 @@ export const withFilterTypes = <T extends object>(
   className = '',
   showApply = true,
   onSectionToogle = () => null,
+  onClear = () => null,
 }) => {
   const styles = useStyles2(getStyles);
   const { Form } = withTypes<T>();
@@ -25,9 +26,9 @@ export const withFilterTypes = <T extends object>(
   const onClearAll = useCallback(
     (form: FormApi<T, Partial<T>>) => {
       form.initialize(emptyValues);
-      onApply(emptyValues);
+      onClear();
     },
-    [onApply]
+    [onClear]
   );
 
   return (
