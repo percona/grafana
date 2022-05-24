@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 import { RadioButtonGroupField, TextInputField } from '@percona/platform-core';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
-import { ALL_VALUES_VALUE } from 'app/percona/shared/helpers/filters';
+import { ALL_VALUES_VALUE, INPUT_DEBOUNCE_TIME_MS } from 'app/percona/shared/helpers/filters';
 import { INTERVAL_OPTIONS, STATUS_OPTIONS } from './CheckFilters.constants';
 import { Messages } from '../AllChecksTab.messages';
 import { getFiltersFromUrlParams } from '../AllChecksTab.utils';
@@ -39,12 +39,12 @@ export const CheckFilters: FC = () => {
   const onNameChanged = debounce((e: FormEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     setQueryParams({ name: target.value || null });
-  }, 600);
+  }, INPUT_DEBOUNCE_TIME_MS);
 
   const onDescriptionChanged = debounce((e: FormEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
     setQueryParams({ description: target.value || null });
-  }, 600);
+  }, INPUT_DEBOUNCE_TIME_MS);
 
   const onStatusChanged = (e: FormEvent<HTMLInputElement>) => {
     const status = getChosenRadioOption(e, STATUS_OPTIONS);

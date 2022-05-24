@@ -9,3 +9,5 @@ export const isTextIncluded = (needle: string, haystack: string): boolean =>
 
 export const isSameOption = <T = any>(filterValue: T, value: T, anyValue?: T): boolean =>
   filterValue === anyValue || filterValue === value;
+
+export const INPUT_DEBOUNCE_TIME_MS = 600;
