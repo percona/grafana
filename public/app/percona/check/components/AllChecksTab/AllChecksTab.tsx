@@ -2,13 +2,13 @@ import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
 import { Column } from 'react-table';
-import { LoaderButton, logger, RadioButtonGroupField, TextInputField } from '@percona/platform-core';
+import { LoaderButton, logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { CheckService } from 'app/percona/check/Check.service';
-import { GET_ALL_CHECKS_CANCEL_TOKEN, INTERVAL_OPTIONS, STATUS_OPTIONS } from './AllChecksTab.constants';
+import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { Messages } from './AllChecksTab.messages';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { FetchChecks } from './types';
@@ -20,20 +20,13 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
-import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
-import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { ALL_VALUES_VALUE, isTextIncluded, isSameOption } from 'app/percona/shared/helpers/filters';
-
-interface FormValues {
-  name: string;
-  status: string;
-  interval: string;
-  description: string;
-}
+import { CheckFilters } from './CheckFilters/CheckFilters';
+import { getFiltersFromUrlParams } from './AllChecksTab.utils';
 
 export const AllChecksTab: FC = () => {
-  const [queryParams, setQueryParams] = useQueryParams();
+  const [queryParams] = useQueryParams();
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const navModel = usePerconaNavModel('all-checks');
   const [generateToken] = useCancelToken();
@@ -42,35 +35,6 @@ export const AllChecksTab: FC = () => {
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
-  const params = useMemo<[string, string, string, string]>(
-    () =>
-      getValuesFromQueryParams<[string, string, string, string]>(queryParams, [
-        { key: 'name' },
-        { key: 'description' },
-        { key: 'status' },
-        { key: 'interval' },
-      ]),
-    [queryParams]
-  );
-  const [filterName = '', filterDescription = ''] = useMemo(() => params, [params]);
-  const filterStatus = useMemo(() => params[2] || ALL_VALUES_VALUE, [params]);
-  const filterInterval = useMemo(() => params[3] || ALL_VALUES_VALUE, [params]);
-
-  const Filters = withFilterTypes<FormValues>(
-    {
-      name: '',
-      description: '',
-      status: ALL_VALUES_VALUE,
-      interval: ALL_VALUES_VALUE,
-    },
-    {
-      name: filterName,
-      description: filterDescription,
-      status: STATUS_OPTIONS.find((opt) => opt.value === filterStatus)?.value || ALL_VALUES_VALUE,
-      interval: INTERVAL_OPTIONS.find((opt) => opt.value === filterInterval)?.value || ALL_VALUES_VALUE,
-    }
-  );
-
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
     try {
@@ -135,22 +99,19 @@ export const AllChecksTab: FC = () => {
     [handleModalClose]
   );
 
-  const onApplyFilters = ({ name, status, interval, description }: FormValues) => {
-    setQueryParams({ name, status: status, interval: interval, description });
-  };
-
   const filter = useCallback(
     (checks: CheckDetails[]) => {
+      const { name, description, status, interval } = getFiltersFromUrlParams(queryParams);
       const filteredChecks = checks.filter(
         ({ summary, description: checkDescription, disabled, interval: checkInterval }) =>
-          isTextIncluded(filterName, summary) &&
-          isTextIncluded(filterDescription, checkDescription || '') &&
-          isSameOption(filterInterval.toLowerCase(), checkInterval.toLowerCase(), ALL_VALUES_VALUE) &&
-          isSameOption(filterStatus, disabled ? 'disabled' : 'enabled', ALL_VALUES_VALUE)
+          isTextIncluded(name, summary) &&
+          isTextIncluded(description, checkDescription || '') &&
+          isSameOption(interval.toLowerCase(), checkInterval.toLowerCase(), ALL_VALUES_VALUE) &&
+          isSameOption(status, disabled ? 'disabled' : 'enabled', ALL_VALUES_VALUE)
       );
       setChecks(filteredChecks);
     },
-    [filterDescription, filterInterval, filterName, filterStatus]
+    [queryParams]
   );
 
   const columns = useMemo(
@@ -220,22 +181,7 @@ export const AllChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          <Filters onApply={onApplyFilters}>
-            <TextInputField name="name" label={Messages.table.columns.name} />
-            <TextInputField name="description" label={Messages.table.columns.description} />
-            <RadioButtonGroupField
-              fullWidth
-              options={STATUS_OPTIONS}
-              name="status"
-              label={Messages.table.columns.status}
-            />
-            <RadioButtonGroupField
-              fullWidth
-              options={INTERVAL_OPTIONS}
-              name="interval"
-              label={Messages.table.columns.interval}
-            />
-          </Filters>
+          <CheckFilters />
           <div className={styles.actionButtons} data-testid="db-check-panel-actions">
             <LoaderButton
               type="button"
