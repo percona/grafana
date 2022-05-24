@@ -33,6 +33,8 @@ export const AllChecksTab: FC = () => {
   const [runChecksPending, setRunChecksPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
+  // Since there are not many checks, we can afford to save both raw and filtered data without the need to re-fetch
+  const [allChecks, setAllChecks] = useState<CheckDetails[]>([]);
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
   const handleRunChecksClick = async () => {
@@ -157,6 +159,7 @@ export const AllChecksTab: FC = () => {
       setFetchChecksPending(true);
       try {
         const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
+        setAllChecks(checks);
         filter(checks);
       } catch (e) {
         if (isApiCancelError(e)) {
@@ -168,7 +171,9 @@ export const AllChecksTab: FC = () => {
     };
     fetchChecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, []);
+
+  useEffect(() => filter(allChecks), [allChecks, filter]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
