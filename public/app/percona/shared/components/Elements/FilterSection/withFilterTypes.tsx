@@ -11,7 +11,7 @@ import { FormApi } from 'final-form';
 export const withFilterTypes = <T extends object>(
   emptyValues: T,
   initialValues?: Partial<T>
-): FC<FilterSectionProps<T>> => ({ children, onApply, isOpen, className = '' }) => {
+): FC<FilterSectionProps<T>> => ({ children, onApply = () => null, isOpen, className = '', showApply = true }) => {
   const styles = useStyles2(getStyles);
   const [sectionIsOpen, setSectionIsOpen] = useState(!!isOpen);
   const { Form } = withTypes<T>();
@@ -29,7 +29,7 @@ export const withFilterTypes = <T extends object>(
     <Form
       initialValues={initialValues}
       onSubmit={onApply}
-      render={({ form, handleSubmit, submitting, valid, pristine, values }) => (
+      render={({ form, handleSubmit, submitting, valid, pristine }) => (
         <Collapse
           collapsible
           isOpen={sectionIsOpen}
@@ -40,15 +40,17 @@ export const withFilterTypes = <T extends object>(
           <form onSubmit={handleSubmit} className={cx(styles.form, className)} role="form">
             {children}
             <HorizontalGroup justify="flex-end" spacing="md">
-              <LoaderButton
-                data-testid="apply-filters-button"
-                size="md"
-                variant="primary"
-                disabled={!valid || pristine}
-                loading={submitting}
-              >
-                Apply
-              </LoaderButton>
+              {!!showApply && (
+                <LoaderButton
+                  data-testid="apply-filters-button"
+                  size="md"
+                  variant="primary"
+                  disabled={!valid || pristine}
+                  loading={submitting}
+                >
+                  Apply
+                </LoaderButton>
+              )}
               <Button
                 type="button"
                 data-testid="storage-location-cancel-button"

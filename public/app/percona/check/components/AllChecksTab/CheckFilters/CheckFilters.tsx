@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import React, { FC, FormEvent } from 'react';
+import { debounce } from 'lodash';
 import { RadioButtonGroupField, TextInputField } from '@percona/platform-core';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { withFilterTypes } from 'app/percona/shared/components/Elements/FilterSection/withFilterTypes';
@@ -6,6 +7,7 @@ import { ALL_VALUES_VALUE } from 'app/percona/shared/helpers/filters';
 import { INTERVAL_OPTIONS, STATUS_OPTIONS } from './CheckFilters.constants';
 import { Messages } from '../AllChecksTab.messages';
 import { getFiltersFromUrlParams } from '../AllChecksTab.utils';
+import { getChosenRadioOption } from 'app/percona/shared/helpers/form';
 
 interface FormValues {
   name: string;
@@ -32,20 +34,53 @@ export const CheckFilters: FC = () => {
     }
   );
 
-  const onApplyFilters = ({ name, status, interval, description }: FormValues) => {
-    setQueryParams({ name, status: status, interval: interval, description });
+  const onNameChanged = debounce((e: FormEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    setQueryParams({ name: target.value || null });
+  }, 600);
+
+  const onDescriptionChanged = debounce((e: FormEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    setQueryParams({ description: target.value || null });
+  }, 600);
+
+  const onStatusChanged = (e: FormEvent<HTMLInputElement>) => {
+    const status = getChosenRadioOption(e, STATUS_OPTIONS);
+
+    if (status) {
+      setQueryParams({ status: status.value?.toLowerCase() });
+    }
+  };
+
+  const onIntervalChanged = (e: FormEvent<HTMLInputElement>) => {
+    const interval = getChosenRadioOption(e, INTERVAL_OPTIONS);
+
+    if (interval) {
+      setQueryParams({ interval: interval.value?.toLowerCase() });
+    }
   };
 
   return (
-    <Filters onApply={onApplyFilters}>
-      <TextInputField name="name" label={Messages.table.columns.name} />
-      <TextInputField name="description" label={Messages.table.columns.description} />
-      <RadioButtonGroupField fullWidth options={STATUS_OPTIONS} name="status" label={Messages.table.columns.status} />
+    <Filters showApply={false}>
+      <TextInputField name="name" label={Messages.table.columns.name} inputProps={{ onKeyUp: onNameChanged }} />
+      <TextInputField
+        name="description"
+        label={Messages.table.columns.description}
+        inputProps={{ onKeyUp: onDescriptionChanged }}
+      />
+      <RadioButtonGroupField
+        fullWidth
+        options={STATUS_OPTIONS}
+        name="status"
+        label={Messages.table.columns.status}
+        inputProps={{ onInput: onStatusChanged }}
+      />
       <RadioButtonGroupField
         fullWidth
         options={INTERVAL_OPTIONS}
         name="interval"
         label={Messages.table.columns.interval}
+        inputProps={{ onInput: onIntervalChanged }}
       />
     </Filters>
   );
