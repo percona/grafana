@@ -1,4 +1,4 @@
-import React, { FC, FormEvent } from 'react';
+import React, { FC, FormEvent, useState } from 'react';
 import { debounce } from 'lodash';
 import { RadioButtonGroupField, TextInputField } from '@percona/platform-core';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
@@ -18,7 +18,9 @@ interface FormValues {
 
 export const CheckFilters: FC = () => {
   const [queryParams, setQueryParams] = useQueryParams();
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const { name, description, status, interval } = getFiltersFromUrlParams(queryParams);
+
   const Filters = withFilterTypes<FormValues>(
     {
       name: '',
@@ -29,8 +31,8 @@ export const CheckFilters: FC = () => {
     {
       name,
       description,
-      status: STATUS_OPTIONS.find((opt) => opt.value === status)?.value || ALL_VALUES_VALUE,
-      interval: INTERVAL_OPTIONS.find((opt) => opt.value === interval)?.value || ALL_VALUES_VALUE,
+      status: STATUS_OPTIONS.find((opt) => opt.value?.toLowerCase() === status)?.value || ALL_VALUES_VALUE,
+      interval: INTERVAL_OPTIONS.find((opt) => opt.value?.toLowerCase() === interval)?.value || ALL_VALUES_VALUE,
     }
   );
 
@@ -60,8 +62,10 @@ export const CheckFilters: FC = () => {
     }
   };
 
+  const onToggle = () => setFiltersOpen((open) => !open);
+
   return (
-    <Filters showApply={false}>
+    <Filters showApply={false} onSectionToogle={onToggle} isOpen={filtersOpen}>
       <TextInputField name="name" label={Messages.table.columns.name} inputProps={{ onKeyUp: onNameChanged }} />
       <TextInputField
         name="description"

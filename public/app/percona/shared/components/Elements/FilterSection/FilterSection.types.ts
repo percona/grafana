@@ -3,4 +3,5 @@ export interface FilterSectionProps<T> {
   className?: string;
   isOpen?: boolean;
   showApply?: boolean;
+  onSectionToogle?: () => void;
 }
