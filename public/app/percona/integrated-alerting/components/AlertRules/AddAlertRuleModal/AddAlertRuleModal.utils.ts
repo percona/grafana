@@ -29,25 +29,6 @@ export const formatTemplateOptions = (templates: Template[]): Array<SelectableVa
       }))
     : [];
 
-// TODO: handle new types as they gets added to AlertRuleFilterType
-export const formatFilter = (filter: string): AlertRulesListPayloadFilter => {
-  if (!filter) {
-    return {
-      key: '',
-      value: '',
-      type: 'EQUAL',
-    };
-  }
-
-  const [key, value] = filter.split('=');
-
-  return {
-    key,
-    value,
-    type: 'EQUAL',
-  };
-};
-
 export const formatFilters = (filters: FiltersForm[]): AlertRulesListPayloadFilter[] => {
   return filters.map((value) => {
     let type: keyof typeof AlertRuleFilterType = 'EQUAL';
