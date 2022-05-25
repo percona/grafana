@@ -23,7 +23,7 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { ALL_VALUES_VALUE, isTextIncluded, isSameOption } from 'app/percona/shared/helpers/filters';
 import { CheckFilters } from './CheckFilters/CheckFilters';
-import { getFiltersFromUrlParams } from './AllChecksTab.utils';
+import { getFiltersFromUrlParams, updateChecksUIState } from './AllChecksTab.utils';
 import { useStoredTablePageSize } from 'app/percona/integrated-alerting/components/Table/Pagination';
 
 export const AllChecksTab: FC = () => {
@@ -61,29 +61,27 @@ export const AllChecksTab: FC = () => {
     }
   };
 
-  const updateUI = (check: CheckDetails) => {
-    const { name, disabled, interval } = check;
+  const updateUI = useCallback(
+    (check: CheckDetails) => {
+      // We have to update both what's visible (fltered) and raw values
+      setAllChecks(updateChecksUIState(check, allChecks));
+      setChecks(updateChecksUIState(check, checks));
+    },
+    [allChecks, checks]
+  );
 
-    setChecks((oldChecks) =>
-      oldChecks.map((oldCheck) => {
-        if (oldCheck.name !== name) {
-          return oldCheck;
-        }
-
-        return { ...oldCheck, disabled, interval };
-      })
-    );
-  };
-
-  const changeCheck = useCallback(async (check: CheckDetails) => {
-    const action = !!check.disabled ? 'enable' : 'disable';
-    try {
-      await CheckService.changeCheck({ params: [{ name: check.name, [action]: true }] });
-      updateUI({ ...check, disabled: !check.disabled });
-    } catch (e) {
-      logger.error(e);
-    }
-  }, []);
+  const changeCheck = useCallback(
+    async (check: CheckDetails) => {
+      const action = !!check.disabled ? 'enable' : 'disable';
+      try {
+        await CheckService.changeCheck({ params: [{ name: check.name, [action]: true }] });
+        updateUI({ ...check, disabled: !check.disabled });
+      } catch (e) {
+        logger.error(e);
+      }
+    },
+    [updateUI]
+  );
 
   const handleIntervalChangeClick = useCallback((check: CheckDetails) => {
     setSelectedCheck(check);
@@ -100,7 +98,7 @@ export const AllChecksTab: FC = () => {
       updateUI({ ...check });
       handleModalClose();
     },
-    [handleModalClose]
+    [handleModalClose, updateUI]
   );
 
   const filter = useCallback(
@@ -182,7 +180,8 @@ export const AllChecksTab: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => filter(allChecks), [allChecks, filter]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => filter(allChecks), [filter]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
