@@ -47,7 +47,6 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
       })),
     []
   );
-  console.log(filterOptions);
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const { getAlertRules, setSelectedAlertRule } = useContext(AlertRulesProvider);
@@ -232,10 +231,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 fields.map((name, index) => (
                   <div key={name} className={styles.filterWrapper}>
                     <div className={styles.filterFields}>
-                      <TextInputField label="Label" name={`${name}.label`} />
+                      <TextInputField label="Label" name={`${name}.label`} validate={required} />
                     </div>
                     <div className={styles.filterFields}>
-                      <Field name={`${name}.operators`}>
+                      <Field name={`${name}.operators`} validate={required}>
                         {({ input }) => (
                           <SelectField
                             className={styles.selectField}
@@ -247,7 +246,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                       </Field>
                     </div>
                     <div className={styles.filterFields}>
-                      <TextInputField label="Value" name={`${name}.value`} />
+                      <TextInputField label="Value" name={`${name}.value`} validate={required} />
                     </div>
                     <div className={styles.iconWrapper}>
                       <Icon className={styles.icon} onClick={() => fields.remove(index)} name="trash-alt" size="xl" />
