@@ -53,7 +53,7 @@ export const withFilterTypes = <T extends object>(
               )}
               <Button
                 type="button"
-                data-testid="storage-location-cancel-button"
+                data-testid="clear-filters-button"
                 variant="secondary"
                 onClick={() => onClearAll(form)}
               >
