@@ -8,6 +8,7 @@ export interface AlertRulesContext {
 
 export enum AlertRuleFilterType {
   EQUAL = '=',
+  REGEX = '=~',
 }
 
 export enum AlertRuleSeverity {

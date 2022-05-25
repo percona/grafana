@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ spacing }: GrafanaTheme) => ({
+export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   actionsWrapper: css`
     margin-top: 60px;
   `,
@@ -10,5 +10,16 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
   `,
   toogleField: css`
     margin-top: ${spacing.formInputMargin};
+  `,
+  filterWrapper: css`
+    display: flex;
+    gap: 10px;
+  `,
+  filterFields: css`
+    flex: 1;
+  `,
+  filterButton: css`
+    margin-top: ${spacing.sm};
+    margin-bottom: ${spacing.sm};
   `,
 });

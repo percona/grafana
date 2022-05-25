@@ -1,4 +1,4 @@
-import { AddAlertRuleFormValues } from './AddAlertRuleModal.types';
+import { AddAlertRuleFormValues, FiltersForm } from './AddAlertRuleModal.types';
 import {
   AlertRule,
   AlertRuleParamType,
@@ -48,16 +48,17 @@ export const formatFilter = (filter: string): AlertRulesListPayloadFilter => {
   };
 };
 
-export const formatFilters = (filters: string): AlertRulesListPayloadFilter[] => {
-  const trimmedFilters = filters.trim();
-
-  if (trimmedFilters === '') {
-    return [];
-  }
-
-  const filterList = trimmedFilters.split(/,\s*/);
-
-  return filterList.map(formatFilter);
+export const formatFilters = (filters: FiltersForm[]): AlertRulesListPayloadFilter[] => {
+  return filters.map((value) => {
+    let type: keyof typeof AlertRuleFilterType = 'EQUAL';
+    if (value.operators.value === '=') {
+      type = 'EQUAL';
+    }
+    if (value.operators.value === '=~') {
+      type = 'REGEX';
+    }
+    return { key: value.label, type, value: value.value };
+  });
 };
 
 export const formatCreateAPIPayload = (
@@ -112,7 +113,7 @@ export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string =>
   return `${key}${AlertRuleFilterType[type]}${value}`;
 };
 
-export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): string => {
+export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): any => {
   return filters ? filters.map(formatEditFilter).join(', ') : '';
 };
 
