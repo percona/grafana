@@ -8,7 +8,7 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { CheckService } from 'app/percona/check/Check.service';
-import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
+import { ALL_CHECKS_TABLE_ID, GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { Messages } from './AllChecksTab.messages';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { FetchChecks } from './types';
@@ -24,6 +24,7 @@ import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { ALL_VALUES_VALUE, isTextIncluded, isSameOption } from 'app/percona/shared/helpers/filters';
 import { CheckFilters } from './CheckFilters/CheckFilters';
 import { getFiltersFromUrlParams } from './AllChecksTab.utils';
+import { useStoredTablePageSize } from 'app/percona/integrated-alerting/components/Table/Pagination';
 
 export const AllChecksTab: FC = () => {
   const [queryParams] = useQueryParams();
@@ -36,6 +37,7 @@ export const AllChecksTab: FC = () => {
   // Since there are not many checks, we can afford to save both raw and filtered data without the need to re-fetch
   const [allChecks, setAllChecks] = useState<CheckDetails[]>([]);
   const [checks, setChecks] = useState<CheckDetails[]>([]);
+  const [pageSize, setPageSize] = useStoredTablePageSize(ALL_CHECKS_TABLE_ID);
   const styles = useStyles2(getStyles);
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
@@ -114,6 +116,13 @@ export const AllChecksTab: FC = () => {
       setChecks(filteredChecks);
     },
     [queryParams]
+  );
+
+  const handlePaginationChanged = useCallback(
+    (pageSize: number) => {
+      setPageSize(pageSize);
+    },
+    [setPageSize]
   );
 
   const columns = useMemo(
@@ -200,10 +209,13 @@ export const AllChecksTab: FC = () => {
           </div>
           <Table
             totalItems={checks.length}
+            pageSize={pageSize}
             data={checks}
             columns={columns}
             pendingRequest={fetchChecksPending}
             emptyMessage={Messages.table.noData}
+            showPagination
+            onPaginationChanged={handlePaginationChanged}
           />
           {!!selectedCheck && checkIntervalModalVisible && (
             <ChangeCheckIntervalModal
