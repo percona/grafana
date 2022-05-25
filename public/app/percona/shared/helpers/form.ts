@@ -11,7 +11,7 @@ export const getChosenRadioOption = <T>(
 ): SelectableValue<T> | null => {
   const target = e.target as HTMLInputElement;
 
-  if (target.labels && target.labels.length) {
+  if (target && target.labels && target.labels.length) {
     const label = target.labels[0].textContent;
     const selectedOption = options.find((opt) => opt.label === label);
 
