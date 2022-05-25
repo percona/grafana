@@ -2,7 +2,7 @@ import React, { FC, useContext, useEffect, useRef, useState, useCallback, useMem
 import { Form, Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import arrayMutators from 'final-form-arrays';
-import { Button, HorizontalGroup, Switch, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, Switch, useStyles2 } from '@grafana/ui';
 import { Modal, LoaderButton, TextInputField, NumberInputField, logger, validators } from '@percona/platform-core';
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { Label } from 'app/percona/shared/components/Form/Label';
@@ -229,15 +229,29 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             </Button>
             <FieldArray name="filters">
               {({ fields }) =>
-                fields.map((name) => (
+                fields.map((name, index) => (
                   <div key={name} className={styles.filterWrapper}>
-                    <TextInputField className={styles.filterFields} label="Label" name={`${name}.label`} />
+                    <div className={styles.filterFields}>
+                      <TextInputField label="Label" name={`${name}.label`} />
+                    </div>
                     <div className={styles.filterFields}>
                       <Field name={`${name}.operators`}>
-                        {({ input }) => <SelectField label="Operators" options={filterOptions} {...input} />}
+                        {({ input }) => (
+                          <SelectField
+                            className={styles.selectField}
+                            label="Operators"
+                            options={filterOptions}
+                            {...input}
+                          />
+                        )}
                       </Field>
                     </div>
-                    <TextInputField className={styles.filterFields} label="Value" name={`${name}.value`} />
+                    <div className={styles.filterFields}>
+                      <TextInputField label="Value" name={`${name}.value`} />
+                    </div>
+                    <div className={styles.iconWrapper}>
+                      <Icon className={styles.icon} onClick={() => fields.remove(index)} name="trash-alt" size="xl" />
+                    </div>
                   </div>
                 ))
               }

@@ -113,8 +113,18 @@ export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string =>
   return `${key}${AlertRuleFilterType[type]}${value}`;
 };
 
-export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): any => {
-  return filters ? filters.map(formatEditFilter).join(', ') : '';
+export const formatEditFilters = (
+  filters: AlertRulesListPayloadFilter[] | undefined | null
+): FiltersForm[] | undefined => {
+  return filters
+    ? filters.map((value) => {
+        return {
+          label: value.key,
+          value: value.value,
+          operators: { label: AlertRuleFilterType[value.type], value: AlertRuleFilterType[value.type] },
+        };
+      })
+    : undefined;
 };
 
 export const formatEditTemplate = (templateName: string, templateSummary: string): SelectableValue<string> => ({
@@ -152,6 +162,7 @@ export const getInitialValues = (alertRule?: AlertRule | null): AddAlertRuleForm
     template_name,
     summary,
   } = alertRule.rawValues;
+  console.log(alertRule.rawValues);
   const result: AddAlertRuleFormValues = {
     enabled: !disabled,
     duration: parseInt(duration, 10),

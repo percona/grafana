@@ -19,7 +19,19 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
     flex: 1;
   `,
   filterButton: css`
-    margin-top: ${spacing.sm};
-    margin-bottom: ${spacing.sm};
+    margin-bottom: ${spacing.lg};
+  `,
+  selectField: css`
+    padding-top: 7px;
+    padding-bottom: 7px;
+  `,
+  iconWrapper: css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `,
+  icon: css`
+    cursor: pointer;
+    margin-top: 10px;
   `,
 });
