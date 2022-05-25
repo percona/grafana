@@ -113,9 +113,7 @@ export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string =>
   return `${key}${AlertRuleFilterType[type]}${value}`;
 };
 
-export const formatEditFilters = (
-  filters: AlertRulesListPayloadFilter[] | undefined | null
-): FiltersForm[] | undefined => {
+export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): FiltersForm[] | [] => {
   return filters
     ? filters.map((value) => {
         return {
@@ -124,7 +122,7 @@ export const formatEditFilters = (
           operators: { label: AlertRuleFilterType[value.type], value: AlertRuleFilterType[value.type] },
         };
       })
-    : undefined;
+    : [];
 };
 
 export const formatEditTemplate = (templateName: string, templateSummary: string): SelectableValue<string> => ({

@@ -33,6 +33,7 @@ import { AlertRuleFilterType } from '../AlertRules.types';
 const { required } = validators;
 const durationValidators = [required, minValidator(MINIMUM_DURATION_VALUE)];
 const nameValidators = [required];
+const filterTextFieldsValidators = [required];
 
 export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVisible, alertRule }) => {
   const styles = useStyles2(getStyles);
@@ -231,8 +232,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 fields.map((name, index) => (
                   <div key={name} className={styles.filterWrapper}>
                     <div className={styles.filterFields}>
-                      <TextInputField label="Label" name={`${name}.label`} validate={required} />
+                      <TextInputField label="Label" name={`${name}.label`} validators={filterTextFieldsValidators} />
                     </div>
+
                     <div className={styles.filterFields}>
                       <Field name={`${name}.operators`} validate={required}>
                         {({ input }) => (
@@ -246,7 +248,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                       </Field>
                     </div>
                     <div className={styles.filterFields}>
-                      <TextInputField label="Value" name={`${name}.value`} validate={required} />
+                      <TextInputField label="Value" name={`${name}.value`} validators={filterTextFieldsValidators} />
                     </div>
                     <div className={styles.iconWrapper}>
                       <Icon className={styles.icon} onClick={() => fields.remove(index)} name="trash-alt" size="xl" />

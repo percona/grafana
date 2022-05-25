@@ -11,7 +11,7 @@ export interface AddAlertRuleFormValues {
   template: SelectableValue<string>;
   name: string;
   duration: number;
-  filters: FiltersForm[] | undefined;
+  filters: FiltersForm[];
   notificationChannels: Array<SelectableValue<string>>;
   severity: SelectableValue<Severity>;
   enabled: boolean;
