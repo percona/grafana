@@ -11,7 +11,6 @@ import {
   formatFilters,
   formatTemplateOptions,
   formatUpdateAPIPayload,
-  formatEditFilter,
   formatEditFilters,
   formatEditTemplate,
   formatEditSeverity,
@@ -224,26 +223,6 @@ describe('AddAlertRuleModal utils', () => {
       template_name: 'Test Template',
       name: 'test name',
     });
-  });
-
-  test('formatEditFilter', () => {
-    expect(
-      formatEditFilter({
-        key: 'testKey',
-        type: 'EQUAL',
-        value: 'testValue',
-      })
-    ).toEqual('testKey=testValue');
-  });
-
-  test('formatEditFilter', () => {
-    expect(
-      formatEditFilter({
-        key: 'testKey',
-        type: 'EQUAL',
-        value: 'testValue',
-      })
-    ).toEqual('testKey=testValue');
   });
 
   test('formatEditFilters', () => {

@@ -83,19 +83,17 @@ export const formatUpdateAPIPayload = (
   };
 };
 
-export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string => {
-  const { key, type, value } = filter;
-
-  return `${key}${AlertRuleFilterType[type]}${value}`;
-};
-
 export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): FiltersForm[] | [] => {
   return filters
-    ? filters.map((value) => {
+    ? filters.map((filterData) => {
+        const { key, type, value } = filterData;
         return {
-          label: value.key,
-          value: value.value,
-          operators: { label: AlertRuleFilterType[value.type], value: AlertRuleFilterType[value.type] },
+          label: key,
+          value: value,
+          operators: {
+            label: `${AlertRuleFilterType[type]} (${type})`,
+            value: AlertRuleFilterType[type],
+          },
         };
       })
     : [];

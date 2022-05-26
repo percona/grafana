@@ -22,7 +22,7 @@ export interface FiltersForm {
   label: string;
   value: string;
   operators: {
-    label: AlertRuleFilterType;
+    label: string;
     value: AlertRuleFilterType;
   };
 }

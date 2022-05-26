@@ -12,6 +12,7 @@ import { Messages } from './AddAlertRuleModal.messages';
 import { AddAlertRuleModalProps, AddAlertRuleFormValues } from './AddAlertRuleModal.types';
 import { getStyles } from './AddAlertRuleModal.styles';
 import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './AddAlertRulesModal.constants';
+import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import {
   formatTemplateOptions,
   formatChannelsOptions,
@@ -42,9 +43,9 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
 
   const filterOptions: Array<SelectableValue<AlertRuleFilterType>> = useMemo(
     () =>
-      Object.values(AlertRuleFilterType).map((operator) => ({
-        label: operator,
-        value: operator,
+      Object.entries(AlertRuleFilterType).map(([key, value]) => ({
+        label: `${value} (${key})`,
+        value: value,
       })),
     []
   );
@@ -218,6 +219,10 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                 />
               )}
             </Field>
+            <div className={styles.filtersLabelWrapper}>
+              <Label label={'Filters'} />
+              <LinkTooltip tooltipText={Messages.tooltips.filters} icon={'info-circle'} />
+            </div>
 
             <Button
               className={styles.filterButton}
