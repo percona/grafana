@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTour } from '@reactour/tour';
 import { useAppDispatch } from 'app/store/store';
 import {
   fetchSettingsAction,
@@ -12,8 +13,11 @@ import { contextSrv } from 'app/core/services/context_srv';
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
   const dispatch = useAppDispatch();
+  const { setCurrentStep, setIsOpen } = useTour();
 
   useEffect(() => {
+    setCurrentStep(0);
+
     const getSettings = async () => {
       try {
         await dispatch(fetchSettingsAction()).unwrap();
@@ -30,12 +34,13 @@ export const PerconaBootstrapper = () => {
       await dispatch(fetchUserStatusAction());
       await dispatch(fetchServerInfoAction());
       await dispatch(fetchServerSaasHostAction());
+      setTimeout(() => setIsOpen(true), 2000);
     };
 
     if (contextSrv.user.isSignedIn) {
       bootstrap();
     }
-  }, [dispatch]);
+  }, [dispatch, setCurrentStep, setIsOpen]);
 
   return <></>;
 };
