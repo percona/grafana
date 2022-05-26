@@ -40,7 +40,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<string>>>();
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
 
-  const filterOptions: Array<SelectableValue<string>> = useMemo(
+  const filterOptions: Array<SelectableValue<AlertRuleFilterType>> = useMemo(
     () =>
       Object.values(AlertRuleFilterType).map((operator) => ({
         label: operator,
@@ -225,7 +225,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               type="button"
               onClick={() => push('filters', undefined)}
             >
-              Add Filter
+              {Messages.filtersAddButton}
             </Button>
             <FieldArray name="filters">
               {({ fields }) =>

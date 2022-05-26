@@ -31,7 +31,7 @@ export const Messages = {
   nameField: 'Name',
   thresholdField: 'Threshold',
   durationField: 'Duration (s)',
-  filtersField: 'Filters',
+  filtersAddButton: 'Add Filter',
   severityField: 'Severity',
   channelField: 'Channels',
   activateSwitch: 'Activate',

@@ -31,14 +31,9 @@ export const formatTemplateOptions = (templates: Template[]): Array<SelectableVa
 
 export const formatFilters = (filters: FiltersForm[]): AlertRulesListPayloadFilter[] => {
   return filters.map((value) => {
-    let type: keyof typeof AlertRuleFilterType = 'EQUAL';
-    if (value.operators.value === '=') {
-      type = 'EQUAL';
-    }
-    if (value.operators.value === '=~') {
-      type = 'REGEX';
-    }
-    return { key: value.label, type, value: value.value };
+    const indexOfValue = Object.values(AlertRuleFilterType).indexOf(value.operators.value);
+    const key = Object.keys(AlertRuleFilterType)[indexOfValue];
+    return { key: value.label, type: key as keyof typeof AlertRuleFilterType, value: value.value };
   });
 };
 
@@ -141,7 +136,6 @@ export const getInitialValues = (alertRule?: AlertRule | null): AddAlertRuleForm
     template_name,
     summary,
   } = alertRule.rawValues;
-  console.log(alertRule.rawValues);
   const result: AddAlertRuleFormValues = {
     enabled: !disabled,
     duration: parseInt(duration, 10),

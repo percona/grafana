@@ -1,6 +1,6 @@
 import { SelectableValue } from '@grafana/data';
 import { Severity } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
-import { AlertRule } from '../AlertRules.types';
+import { AlertRule, AlertRuleFilterType } from '../AlertRules.types';
 
 export interface AddAlertRuleModalProps {
   isVisible: boolean;
@@ -22,7 +22,7 @@ export interface FiltersForm {
   label: string;
   value: string;
   operators: {
-    label: string;
-    value: string;
+    label: AlertRuleFilterType;
+    value: AlertRuleFilterType;
   };
 }

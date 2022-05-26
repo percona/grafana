@@ -4,7 +4,7 @@ import {
   TemplateParamType,
   TemplateParamUnit,
 } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
-import { AlertRuleCreatePayload, AlertRuleUpdatePayload } from '../AlertRules.types';
+import { AlertRuleCreatePayload, AlertRuleFilterType, AlertRuleUpdatePayload } from '../AlertRules.types';
 import { AddAlertRuleFormValues, FiltersForm } from './AddAlertRuleModal.types';
 import {
   formatCreateAPIPayload,
@@ -23,7 +23,13 @@ import {
 
 describe('AddAlertRuleModal utils', () => {
   test('formatFilters', () => {
-    const filterObject: FiltersForm[] = [{ label: 'key', value: 'value', operators: { label: '=', value: '=' } }];
+    const filterObject: FiltersForm[] = [
+      {
+        label: 'key',
+        value: 'value',
+        operators: { label: AlertRuleFilterType.EQUAL, value: AlertRuleFilterType.EQUAL },
+      },
+    ];
     expect(formatFilters(filterObject)).toEqual([
       {
         key: 'key',
@@ -92,8 +98,16 @@ describe('AddAlertRuleModal utils', () => {
       enabled: false,
       duration: 123,
       filters: [
-        { label: 'key', value: 'value', operators: { label: '=', value: '=' } },
-        { label: 'key', value: 'value', operators: { label: '=~', value: '=~' } },
+        {
+          label: 'key',
+          value: 'value',
+          operators: { label: AlertRuleFilterType.EQUAL, value: AlertRuleFilterType.EQUAL },
+        },
+        {
+          label: 'key',
+          value: 'value',
+          operators: { label: AlertRuleFilterType.REGEX, value: AlertRuleFilterType.REGEX },
+        },
       ],
       name: 'test name',
       notificationChannels: [
@@ -154,7 +168,13 @@ describe('AddAlertRuleModal utils', () => {
     const inputData: AddAlertRuleFormValues = {
       enabled: false,
       duration: 123,
-      filters: [{ label: 'key', value: 'value', operators: { label: '=', value: '=' } }],
+      filters: [
+        {
+          label: 'key',
+          value: 'value',
+          operators: { label: AlertRuleFilterType.EQUAL, value: AlertRuleFilterType.EQUAL },
+        },
+      ],
       name: 'test name',
       notificationChannels: [
         { value: 'pagerDuty', label: 'Pager Duty' },
