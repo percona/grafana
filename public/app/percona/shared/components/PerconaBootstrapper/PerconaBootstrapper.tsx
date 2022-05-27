@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTour } from '@reactour/tour';
+import { useLocalStorage } from 'react-use';
 import { useAppDispatch } from 'app/store/store';
 import {
   fetchSettingsAction,
@@ -17,10 +18,14 @@ export const PerconaBootstrapper = () => {
   const dispatch = useAppDispatch();
   const { setCurrentStep, setIsOpen } = useTour();
   const [modalIsOpen, setModalIsOpen] = useState(true);
+  const [showTour, setShowTour] = useLocalStorage<boolean>('percona.showTour', true);
   const styles = useStyles2(getStyles);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
 
-  const dismissModal = () => setModalIsOpen(false);
+  const dismissModal = () => {
+    setModalIsOpen(false);
+    setShowTour(false);
+  };
 
   useEffect(() => {
     setCurrentStep(0);
@@ -49,7 +54,7 @@ export const PerconaBootstrapper = () => {
     }
   }, [dispatch, isLoggedIn, setCurrentStep, setIsOpen]);
 
-  return isLoggedIn ? (
+  return isLoggedIn && showTour ? (
     <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title=" Welcome to Percona Monitoring and Management">
       <div className={styles.iconContainer}>
         <Icon type="mono" name="pmm-logo" className={styles.svg} />
