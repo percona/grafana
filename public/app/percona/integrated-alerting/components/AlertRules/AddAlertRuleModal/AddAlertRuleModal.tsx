@@ -220,7 +220,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
             <div className={styles.filtersLabelWrapper}>
-              <Label label={'Filters'} />
+              <Label label={Messages.filter.header} />
               <LinkTooltip tooltipText={Messages.tooltips.filters} icon={'info-circle'} />
             </div>
 
@@ -231,14 +231,18 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               onClick={() => push('filters', undefined)}
               data-testId="add-filter-button"
             >
-              {Messages.filtersAddButton}
+              {Messages.filter.addButton}
             </Button>
             <FieldArray name="filters">
               {({ fields }) =>
                 fields.map((name, index) => (
-                  <div key={name} className={styles.filterWrapper} data-testid="filter-fields-row">
+                  <div key={name} className={styles.filterRowWrapper} data-testid="filter-fields-row">
                     <div className={styles.filterFields}>
-                      <TextInputField label="Label" name={`${name}.label`} validators={filterTextFieldsValidators} />
+                      <TextInputField
+                        label={Messages.filter.fieldLabel}
+                        name={`${name}.label`}
+                        validators={filterTextFieldsValidators}
+                      />
                     </div>
 
                     <div className={styles.filterFields}>
@@ -246,7 +250,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                         {({ input }) => (
                           <SelectField
                             className={styles.selectField}
-                            label="Operators"
+                            label={Messages.filter.fieldOperators}
                             options={filterOptions}
                             {...input}
                           />
@@ -254,7 +258,11 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                       </Field>
                     </div>
                     <div className={styles.filterFields}>
-                      <TextInputField label="Value" name={`${name}.value`} validators={filterTextFieldsValidators} />
+                      <TextInputField
+                        label={Messages.filter.fieldValue}
+                        name={`${name}.value`}
+                        validators={filterTextFieldsValidators}
+                      />
                     </div>
                     <div className={styles.iconWrapper}>
                       <Icon

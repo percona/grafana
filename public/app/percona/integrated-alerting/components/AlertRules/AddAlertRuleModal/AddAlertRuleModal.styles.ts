@@ -11,9 +11,10 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   toogleField: css`
     margin-top: ${spacing.formInputMargin};
   `,
-  filterWrapper: css`
+  filterRowWrapper: css`
     display: flex;
     gap: 10px;
+    margin-bottom: ${spacing.sm};
   `,
   filterFields: css`
     flex: 1;
@@ -36,8 +37,8 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   `,
   filtersLabelWrapper: css`
     display: flex;
-    gap: 4px;
-    margin-bottom: 4px;
+    gap: ${spacing.xs};
+    margin-bottom: ${spacing.xs};
     align-items: baseline;
   `,
 });
