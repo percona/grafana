@@ -27,9 +27,13 @@ export const PerconaBootstrapper = () => {
     setShowTour(false);
   };
 
-  useEffect(() => {
+  const startTour = () => {
+    setModalIsOpen(false);
     setCurrentStep(0);
+    setIsOpen(true);
+  };
 
+  useEffect(() => {
     const getSettings = async () => {
       try {
         await dispatch(fetchSettingsAction()).unwrap();
@@ -46,7 +50,6 @@ export const PerconaBootstrapper = () => {
       await dispatch(fetchUserStatusAction());
       await dispatch(fetchServerInfoAction());
       await dispatch(fetchServerSaasHostAction());
-      // setTimeout(() => setIsOpen(true), 2000);
     };
 
     if (isLoggedIn) {
@@ -86,7 +89,7 @@ export const PerconaBootstrapper = () => {
         .
       </p>
       <HorizontalGroup justify="center" spacing="md">
-        <Button>Start tour</Button>
+        <Button onClick={startTour}>Start tour</Button>
         <Button variant="secondary" onClick={dismissModal}>
           Skip
         </Button>
