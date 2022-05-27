@@ -113,6 +113,10 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                       steps={steps}
                       components={{ Close, Navigation, Badge }}
                       disableFocusLock
+                      onClickClose={({ setIsOpen }) => {
+                        localStorage.setItem('percona.showTour', 'false');
+                        setIsOpen(false);
+                      }}
                       styles={{
                         popover: (base) => ({
                           ...base,
