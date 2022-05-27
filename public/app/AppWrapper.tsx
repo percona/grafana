@@ -20,6 +20,8 @@ import { AngularRoot } from './angular/AngularRoot';
 import { PerconaBootstrapper } from 'app/percona/shared/components/PerconaBootstrapper';
 import steps from './tour/steps';
 import Close from './tour/Close';
+import Navigation from './tour/Navigation';
+import Badge from './tour/Badge';
 
 interface AppWrapperProps {
   app: GrafanaApp;
@@ -107,8 +109,9 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                 <div className="grafana-app">
                   <Router history={locationService.getHistory()}>
                     <TourProvider
+                      showBadge={false}
                       steps={steps}
-                      components={{ Close }}
+                      components={{ Close, Navigation, Badge }}
                       disableFocusLock
                       styles={{
                         popover: (base) => ({
