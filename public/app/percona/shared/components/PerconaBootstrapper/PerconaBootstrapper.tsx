@@ -63,8 +63,8 @@ export const PerconaBootstrapper = () => {
         <Icon type="mono" name="pmm-logo" className={styles.svg} />
       </div>
       <p>
-        <strong>Percona Monitoring and Management</strong> Percona Monitoring and Management (PMM) is an open source
-        database monitoring, management, and observability solution for MySQL, PostgreSQL, and MongoDB.
+        <strong>Percona Monitoring and Management</strong> (PMM) is an open source database monitoring, management, and
+        observability solution for MySQL, PostgreSQL, and MongoDB.
       </p>
       <p>
         It allows you to observe the health of your database systems, explore new patterns in their behavior,
