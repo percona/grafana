@@ -244,8 +244,8 @@ describe('AddAlertRuleModal utils', () => {
         },
       ])
     ).toEqual([
-      { label: 'testKey1', operators: { label: '=', value: '=' }, value: 'testValue1' },
-      { label: 'testKey2', operators: { label: '=', value: '=' }, value: 'testValue2' },
+      { label: 'testKey1', operators: { label: '= (EQUAL)', value: '=' }, value: 'testValue1' },
+      { label: 'testKey2', operators: { label: '= (EQUAL)', value: '=' }, value: 'testValue2' },
     ]);
   });
 

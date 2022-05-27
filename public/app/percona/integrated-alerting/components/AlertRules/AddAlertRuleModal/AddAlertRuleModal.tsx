@@ -229,13 +229,14 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               variant="secondary"
               type="button"
               onClick={() => push('filters', undefined)}
+              data-testId="add-filter-button"
             >
               {Messages.filtersAddButton}
             </Button>
             <FieldArray name="filters">
               {({ fields }) =>
                 fields.map((name, index) => (
-                  <div key={name} className={styles.filterWrapper}>
+                  <div key={name} className={styles.filterWrapper} data-testid="filter-fields-row">
                     <div className={styles.filterFields}>
                       <TextInputField label="Label" name={`${name}.label`} validators={filterTextFieldsValidators} />
                     </div>
@@ -256,7 +257,13 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                       <TextInputField label="Value" name={`${name}.value`} validators={filterTextFieldsValidators} />
                     </div>
                     <div className={styles.iconWrapper}>
-                      <Icon className={styles.icon} onClick={() => fields.remove(index)} name="trash-alt" size="xl" />
+                      <Icon
+                        className={styles.icon}
+                        onClick={() => fields.remove(index)}
+                        name="trash-alt"
+                        size="xl"
+                        data-testId="delete-filter-button"
+                      />
                     </div>
                   </div>
                 ))
