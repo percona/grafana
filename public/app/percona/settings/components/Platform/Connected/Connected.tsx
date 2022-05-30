@@ -31,6 +31,17 @@ export const Connected: FC = () => {
     }
   };
 
+  const handleForceDisconnect = async () => {
+    setDisconnecting(true);
+    closeModal();
+    try {
+      await PlatformService.forceDisconnect();
+    } catch (e) {
+      logger.error(e);
+      setDisconnecting(false);
+    }
+  };
+
   const closeModal = useCallback(() => setShowModal(false), []);
   const openModal = useCallback(() => setShowModal(true), []);
 
@@ -67,6 +78,8 @@ export const Connected: FC = () => {
         title={Messages.modalTitle}
         onDismiss={closeModal}
         onConfirm={handleDisconnect}
+        alternativeText="Force disconnect"
+        onAlternative={handleForceDisconnect}
       />
     </>
   );
