@@ -221,15 +221,15 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
             </Field>
             <div className={styles.filtersLabelWrapper}>
               <Label label={Messages.filter.header} />
-              <LinkTooltip tooltipText={Messages.tooltips.filters} icon={'info-circle'} />
+              <LinkTooltip tooltipText={Messages.tooltips.filters} icon="info-circle" />
             </div>
 
             <Button
               className={styles.filterButton}
               variant="secondary"
               type="button"
-              onClick={() => push('filters', undefined)}
-              data-testId="add-filter-button"
+              onClick={() => push('filters')}
+              data-testid="add-filter-button"
             >
               {Messages.filter.addButton}
             </Button>
@@ -270,7 +270,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
                         onClick={() => fields.remove(index)}
                         name="trash-alt"
                         size="xl"
-                        data-testId="delete-filter-button"
+                        data-testid="delete-filter-button"
                       />
                     </div>
                   </div>

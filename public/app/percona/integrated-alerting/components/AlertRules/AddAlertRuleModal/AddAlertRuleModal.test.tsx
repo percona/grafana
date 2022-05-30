@@ -210,7 +210,7 @@ describe('AddAlertRuleModal', () => {
     fireEvent.click(screen.getByTestId('add-filter-button'));
     expect(screen.getByTestId('filter-fields-row')).toBeInTheDocument();
 
-    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toBeDisabled();
   });
 
   it('should enable submit button again when filter field without data is deleted', async () => {
@@ -228,11 +228,11 @@ describe('AddAlertRuleModal', () => {
     fireEvent.click(screen.getByTestId('add-filter-button'));
     expect(screen.getByTestId('filter-fields-row')).toBeInTheDocument();
 
-    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toBeDisabled();
 
     fireEvent.click(screen.getByTestId('delete-filter-button'));
     expect(screen.queryByTestId('filter-fields-row')).not.toBeInTheDocument();
 
-    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toHaveProperty('disabled', false);
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).not.toBeDisabled();
   });
 });
