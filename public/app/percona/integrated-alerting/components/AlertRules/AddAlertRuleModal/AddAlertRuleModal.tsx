@@ -220,7 +220,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
               )}
             </Field>
             <div className={styles.filtersLabelWrapper}>
-              <Label label={Messages.filter.header} />
+              <Label label={Messages.filter.header} dataTestId="filters-field-label" />
               <LinkTooltip tooltipText={Messages.tooltips.filters} icon="info-circle" />
             </div>
 
