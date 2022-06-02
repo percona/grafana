@@ -169,7 +169,7 @@ export const Alerts: FC = () => {
       setPageSize(pageSize);
       setPageindex(pageIndex);
     },
-    [setPageSize]
+    [setPageSize, setPageindex]
   );
 
   const renderSelectedSubRow = React.useCallback(
@@ -191,7 +191,7 @@ export const Alerts: FC = () => {
   useEffect(() => {
     getAlerts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pageSize, pageIndex]);
 
   return (
     <Page navModel={navModel}>
