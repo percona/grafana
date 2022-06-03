@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ConfirmModal, useStyles } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { Form } from 'react-final-form';
@@ -9,33 +9,33 @@ import { PlatformService } from '../Platform.service';
 import { Messages as PlatformMessages } from '../Platform.messages';
 import { Messages } from './Connected.messages';
 import { getStyles } from './Connected.styles';
+import { ModalBody } from './components/ModalBody';
+import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 
 export const Connected: FC = () => {
   const styles = useStyles(getStyles);
   const [disconnecting, setDisconnecting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const { serverId = '', serverName = '' } = useSelector(getPerconaServer);
+  const [isChecked, setIsChecked] = useState(false);
+  const dispatch = useDispatch();
 
   const handleDisconnect = async () => {
     setDisconnecting(true);
     closeModal();
     try {
-      await PlatformService.disconnect();
-      setTimeout(() => {
-        window.location.assign(`${config.appSubUrl}/logout`);
-        return;
-      }, 3000);
-    } catch (e) {
-      logger.error(e);
-      setDisconnecting(false);
-    }
-  };
-
-  const handleForceDisconnect = async () => {
-    setDisconnecting(true);
-    closeModal();
-    try {
-      await PlatformService.forceDisconnect();
+      if (isChecked) {
+        await PlatformService.forceDisconnect();
+        setDisconnecting(false);
+        dispatch(fetchServerInfoAction());
+        dispatch(fetchSettingsAction());
+      } else {
+        await PlatformService.disconnect();
+        setTimeout(() => {
+          window.location.assign(`${config.appSubUrl}/logout`);
+          return;
+        }, 3000);
+      }
     } catch (e) {
       logger.error(e);
       setDisconnecting(false);
@@ -72,14 +72,12 @@ export const Connected: FC = () => {
         </LoaderButton>
       </section>
       <ConfirmModal
-        body={Messages.modalBody}
+        body={<ModalBody isChecked={isChecked} setIsChecked={setIsChecked} />}
         confirmText={Messages.disconnect}
         isOpen={showModal}
         title={Messages.modalTitle}
         onDismiss={closeModal}
         onConfirm={handleDisconnect}
-        alternativeText="Force disconnect"
-        onAlternative={handleForceDisconnect}
       />
     </>
   );
