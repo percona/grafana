@@ -11,6 +11,8 @@ import { Messages } from './Connected.messages';
 import { getStyles } from './Connected.styles';
 import { ModalBody } from './components/ModalBody';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
+import { appEvents } from 'app/core/app_events';
+import { AppEvents } from '@grafana/data';
 
 export const Connected: FC = () => {
   const styles = useStyles(getStyles);
@@ -26,6 +28,7 @@ export const Connected: FC = () => {
     try {
       if (isChecked) {
         await PlatformService.forceDisconnect();
+        appEvents.emit(AppEvents.alertSuccess, [Messages.forceDisconnectSucceeded]);
         setDisconnecting(false);
         dispatch(fetchServerInfoAction());
         dispatch(fetchSettingsAction());
