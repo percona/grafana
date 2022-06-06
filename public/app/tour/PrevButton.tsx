@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { IconButton } from '@grafana/ui';
 import { BtnFnProps } from '@reactour/tour/dist/types';
 
-const NextButton: FC<BtnFnProps> = ({ currentStep, setCurrentStep }) => (
+const PrevButton: FC<BtnFnProps> = ({ currentStep, setCurrentStep }) => (
   <IconButton
     onClick={() => setCurrentStep((step) => (step === 0 ? 0 : step - 1))}
     name="arrow-left"
@@ -11,4 +11,4 @@ const NextButton: FC<BtnFnProps> = ({ currentStep, setCurrentStep }) => (
   />
 );
 
-export default NextButton;
+export default PrevButton;
