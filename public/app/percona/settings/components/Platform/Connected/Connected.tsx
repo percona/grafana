@@ -4,12 +4,11 @@ import { ConfirmModal, useStyles } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { Form } from 'react-final-form';
 import { LoaderButton, logger, TextInputField } from '@percona/platform-core';
-import { getPerconaServer } from 'app/percona/shared/core/selectors';
+import { getPerconaServer, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { PlatformService } from '../Platform.service';
 import { Messages as PlatformMessages } from '../Platform.messages';
 import { Messages } from './Connected.messages';
 import { getStyles } from './Connected.styles';
-import { ModalBody } from './components/ModalBody';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { appEvents } from 'app/core/app_events';
 import { AppEvents } from '@grafana/data';
@@ -19,26 +18,33 @@ export const Connected: FC = () => {
   const [disconnecting, setDisconnecting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const { serverId = '', serverName = '' } = useSelector(getPerconaServer);
-  const [isChecked, setIsChecked] = useState(false);
+  const { isPlatformUser } = useSelector(getPerconaUser);
   const dispatch = useDispatch();
 
   const handleDisconnect = async () => {
     setDisconnecting(true);
     closeModal();
     try {
-      if (isChecked) {
-        await PlatformService.forceDisconnect();
-        appEvents.emit(AppEvents.alertSuccess, [Messages.forceDisconnectSucceeded]);
-        setDisconnecting(false);
-        dispatch(fetchServerInfoAction());
-        dispatch(fetchSettingsAction());
-      } else {
-        await PlatformService.disconnect();
-        setTimeout(() => {
-          window.location.assign(`${config.appSubUrl}/logout`);
-          return;
-        }, 3000);
-      }
+      await PlatformService.disconnect();
+      setTimeout(() => {
+        window.location.assign(`${config.appSubUrl}/logout`);
+        return;
+      }, 3000);
+    } catch (e) {
+      logger.error(e);
+      setDisconnecting(false);
+    }
+  };
+
+  const handleForceDisconnect = async () => {
+    setDisconnecting(true);
+    closeModal();
+    try {
+      await PlatformService.forceDisconnect();
+      appEvents.emit(AppEvents.alertSuccess, [Messages.forceDisconnectSucceeded]);
+      setDisconnecting(false);
+      dispatch(fetchServerInfoAction());
+      dispatch(fetchSettingsAction());
     } catch (e) {
       logger.error(e);
       setDisconnecting(false);
@@ -75,12 +81,12 @@ export const Connected: FC = () => {
         </LoaderButton>
       </section>
       <ConfirmModal
-        body={<ModalBody isChecked={isChecked} setIsChecked={setIsChecked} />}
-        confirmText={Messages.disconnect}
+        body={isPlatformUser ? Messages.modalBodyPlatformUser : Messages.modalBody}
+        confirmText={isPlatformUser ? Messages.disconnect : Messages.forceDisconnect}
         isOpen={showModal}
         title={Messages.modalTitle}
         onDismiss={closeModal}
-        onConfirm={handleDisconnect}
+        onConfirm={isPlatformUser ? handleDisconnect : handleForceDisconnect}
       />
     </>
   );
