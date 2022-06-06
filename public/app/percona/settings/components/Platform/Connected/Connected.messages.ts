@@ -4,9 +4,9 @@ export const Messages = {
   disconnect: 'Disconnect',
   modalTitle: 'Disconnect PMM from Percona Platform',
   forceDisconnect: 'Force disconnect',
-  forceDisconnectSucceeded: 'PMM was successfully forcefully disconnected from Percona Platform',
+  forceDisconnectSucceeded: 'You have successfully force-disconnected this server from Percona Platform',
   modalBodyPlatformUser:
     'Are you sure you want to disconnect from Percona Platform? This will automatically log you out from PMM.',
   modalBody:
-    'Are you sure you want to force disconnect from Percona Platform? You are able to force disconnect from Percona Platform even if you are not a Platform user',
+    'Are you sure you want to force-disconnect this PMM instance? This will unlink the instance from its current organization and stop all synchronizations with Percona Platform.',
 };
