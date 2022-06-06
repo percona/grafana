@@ -6,6 +6,7 @@ import { configureStore } from 'app/store/configureStore';
 import { Connected } from './Connected';
 import { Messages } from './Connected.messages';
 import { PlatformService } from '../Platform.service';
+import { StoreState } from 'app/types';
 
 describe('Connected::', () => {
   it('render connected message', () => {
@@ -36,7 +37,14 @@ describe('Connected::', () => {
     });
 
     render(
-      <Provider store={configureStore()}>
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: true },
+            settings: { result: { isConnectedToPortal: true } },
+          },
+        } as StoreState)}
+      >
         <Connected />
       </Provider>
     );
