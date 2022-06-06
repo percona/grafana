@@ -63,28 +63,33 @@ export const PerconaBootstrapper = () => {
         <Icon type="mono" name="pmm-logo" className={styles.svg} />
       </div>
       <p>
-        <strong>Percona Monitoring and Management</strong> (PMM) is an open source database monitoring, management, and
-        observability solution for MySQL, PostgreSQL, and MongoDB.
+        <strong>Percona Monitoring and Management</strong> (PMM) is an open source database monitoring and management
+        tool for MySQL, PostgreSQL and MongoDB.
       </p>
       <p>
-        It allows you to observe the health of your database systems, explore new patterns in their behavior,
-        troubleshoot them and perform database management operations no matter where they are located - on-prem or in
-        the cloud.
+        PMM enables you to:
+        <ul className={styles.list}>
+          <li>
+            Spot critical performance issues faster, understand the root cause of incidents better and troubleshoot them
+            more efficiently;
+          </li>
+          <li>Monitor your database performance with customizable dashboards and real-time alerting;</li>
+          <li>
+            Run regular database health checks with built-in Advisors. The checks identify and alert you of potential
+            security threats, performance degradation, data loss and data corruption;
+          </li>
+          <li>Back up your critical data with zero-downtime and minimal performance impact.</li>
+        </ul>
       </p>
-      <ul className={styles.list}>
-        <li>PMM collects thousands of out-of-the-box performance metrics from databases and their hosts.</li>
-        <li>The PMM web UI visualizes data in dashboards.</li>
-        <li>Additional features include advisors for database health assessments.</li>
-      </ul>
       <p>
-        For more information, please check our{' '}
+        For more information, please check out the{' '}
         <a
           href="https://docs.percona.com/percona-monitoring-and-management/index.html"
           target="_blank"
           rel="noreferrer noopener"
           className={styles.docsLink}
         >
-          documentation
+          PMM online help
         </a>
         .
       </p>

@@ -8,20 +8,20 @@ const steps: StepType[] = [
     content: (
       <SidebarStep title="PMM Dashboards">
         <p>
-          Several Grafana dashboards shipped with PMM for efficient database monitoring, from CPU Utilization to MySQL
+          PMM ships with several Grafana dashboards for efficient database monitoring, from CPU utilization to MySQL
           Replication Summary.
         </p>
         <p>
-          Check our dashboards{' '}
+          Check our{' '}
           <a
             href="https://github.com/percona/grafana-dashboards"
             target="_blank"
             rel="noreferrer noopener"
             style={{ textDecoration: 'underline' }}
           >
-            repo
+            dashboards repo
           </a>{' '}
-          and see how you can contribute with your own dashboard.
+          and see how you can contribute with your own.
         </p>
       </SidebarStep>
     ),
@@ -30,25 +30,22 @@ const steps: StepType[] = [
     selector: '.dropdown > [aria-label="Alerting"]',
     content: (
       <SidebarStep title="PMM Alerting">
+        <p>PMM comes with a simpler-to-use alerting system that works side-by-side with Grafana&apos;s.</p>
         <p>
-          Besides Grafana&apos;s native alerting system, PMM comes with a simpler-to-use alerting system that works
-          side-by-side with Grafana&apos;s.
-        </p>
-        <p>
-          You define what system metrics are critical for your environment and what thresholds are acceptable for each
+          You define what system metrics are critical to your environment, and what thresholds are acceptable for each
           metric. When something needs your attention, PMM automatically sends you an alert through your specified
           communication channels.
         </p>
-        <p>To use our alerting system, make sure to activate it via Settings, on this sidebar.</p>
+        <p>To use PMM Alerting, make sure to activate it via Settings, on this sidebar.</p>
         <p>
-          Read more about our alerting{' '}
+          For more information, see the{' '}
           <a
             href="https://docs.percona.com/percona-monitoring-and-management/using/alerting.html"
             target="_blank"
             rel="noreferrer noopener"
             style={{ textDecoration: 'underline' }}
           >
-            here
+            Integrated Alerting documentation
           </a>
           .
         </p>
@@ -60,13 +57,12 @@ const steps: StepType[] = [
     content: (
       <SidebarStep title="Configuration Panel">
         <p>
-          From this menu, you can check PMM&apos;s Inventory (Services, Agents and Nodes) as well as adding a new
-          instance to be monitored (PostgreSQL, MySQL, MongoDB, HAProxy...).
+          Here you can check Services, Agents and Nodes in your PMM&apos;s Inventory, and add new instances for
+          monitoring: PostgreSQL, MySQL, MongoDB, HAProxy, etc.
         </p>
         <p>
-          PMM Settings also live here. From there, you can connect your PMM instance to Percona Platform, change all
-          sort of advanced settings (e.g. activate PMM&apos;s alerting, DBaaS, ...) and apply other more refined
-          settings.
+          PMM Settings also live here. From there, you can connect your PMM instance to Percona Platform and change more
+          advanced settings, for example to activate PMM Alerting, DBaaS, etc.
         </p>
       </SidebarStep>
     ),
@@ -81,14 +77,14 @@ const steps: StepType[] = [
           issues, etc.
         </p>
         <p>
-          To know more about Advisors, check{' '}
+          To find out more, check out the{' '}
           <a
             href="https://docs.percona.com/percona-platform/checks.html"
             target="_blank"
             rel="noreferrer noopener"
             style={{ textDecoration: 'underline' }}
           >
-            here
+            Advisors documentation
           </a>
           .
         </p>
