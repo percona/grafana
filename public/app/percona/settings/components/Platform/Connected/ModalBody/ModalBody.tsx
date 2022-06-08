@@ -11,11 +11,17 @@ export const ModalBody = () => {
   const styles = useStyles2(getStyles);
   return (
     <p>
-      {isPlatformUser ? Messages.modalBodyPlatformUser : Messages.modalBody} <br />
-      {Messages.modalBodySecondMessage}
-      <a href={`${saasHost}/pmm-instances`} rel="noreferrer noopener" target="_blank" className={styles.link}>
-        Portal instances
-      </a>
+      {isPlatformUser ? (
+        Messages.modalBodyPlatformUser
+      ) : (
+        <>
+          {Messages.modalBody} <br />
+          {Messages.modalBodySecondMessage}
+          <a href={`${saasHost}/pmm-instances`} rel="noreferrer noopener" target="_blank" className={styles.link}>
+            {Messages.portalInstances}
+          </a>
+        </>
+      )}
       .
     </p>
   );
