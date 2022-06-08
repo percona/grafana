@@ -25,6 +25,7 @@ export class GrafanaBootConfig implements GrafanaConfig {
   panels: { [key: string]: PanelPluginMeta } = {};
   minRefreshInterval = '';
   appUrl = '';
+  perconaPortalUrl = '';
   appSubUrl = '';
   windowTitlePrefix = '';
   buildInfo: BuildInfo = {} as BuildInfo;

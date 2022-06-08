@@ -60,6 +60,7 @@ const zoneInfo = "ZONEINFO"
 var (
 	// App settings.
 	Env              = Dev
+	PerconaPortalUrl string
 	AppUrl           string
 	AppSubUrl        string
 	ServeFromSubPath bool
@@ -370,6 +371,8 @@ type Cfg struct {
 	ErrTemplateName string
 
 	Env string
+
+	PerconaPortalUrl string
 
 	// Analytics
 	CheckForUpdates                     bool
@@ -893,6 +896,8 @@ func (cfg *Cfg) Load(args CommandLineArgs) error {
 
 	Env = valueAsString(iniFile.Section(""), "app_mode", "development")
 	cfg.Env = Env
+	PerconaPortalUrl = valueAsString(iniFile.Section(""), "percona_portal_url", "https://portal.percona.com")
+	cfg.PerconaPortalUrl = PerconaPortalUrl
 	InstanceName = valueAsString(iniFile.Section(""), "instance_name", "unknown_instance_name")
 	plugins := valueAsString(iniFile.Section("paths"), "plugins", "")
 	cfg.PluginsPath = makeAbsolute(plugins, HomePath)
