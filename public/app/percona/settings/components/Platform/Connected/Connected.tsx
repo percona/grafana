@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ConfirmModal, useStyles } from '@grafana/ui';
+import { ConfirmModal, useStyles2 } from '@grafana/ui';
 import { config } from '@grafana/runtime';
 import { Form } from 'react-final-form';
 import { LoaderButton, logger, TextInputField } from '@percona/platform-core';
@@ -12,9 +12,10 @@ import { getStyles } from './Connected.styles';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { appEvents } from 'app/core/app_events';
 import { AppEvents } from '@grafana/data';
+import { ModalBody } from './ModalBody/ModalBody';
 
 export const Connected: FC = () => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const [disconnecting, setDisconnecting] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const { serverId = '', serverName = '' } = useSelector(getPerconaServer);
@@ -81,7 +82,7 @@ export const Connected: FC = () => {
         </LoaderButton>
       </section>
       <ConfirmModal
-        body={isPlatformUser ? Messages.modalBodyPlatformUser : Messages.modalBody}
+        body={<ModalBody />}
         confirmText={isPlatformUser ? Messages.disconnect : Messages.forceDisconnect}
         isOpen={showModal}
         title={Messages.modalTitle}
