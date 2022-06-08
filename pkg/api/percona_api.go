@@ -15,6 +15,5 @@ func (hs *HTTPServer) registerPerconaRoutes() {
 		apiRoute.Group("/user", func(userRoute routing.RouteRegister) {
 			userRoute.Get("/oauth-token", routing.Wrap(hs.GetUserOAuthToken))
 		}, reqSignedInNoAnonymous)
-		apiRoute.Get("/saas-host", routing.Wrap(GetPerconaSaasHost))
 	}, reqSignedIn)
 }
