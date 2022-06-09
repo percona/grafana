@@ -3,6 +3,7 @@ export const Messages = {
   connected: 'This PMM instance is connected to Percona Platform.',
   disconnect: 'Disconnect',
   modalTitle: 'Disconnect PMM from Percona Platform',
+  forceModalTitle: 'Force-disconnect PMM from Percona Platform',
   forceDisconnect: 'Force disconnect',
   forceDisconnectSucceeded: 'You have successfully force-disconnected this server from Percona Platform',
 };
