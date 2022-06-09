@@ -4,6 +4,7 @@ import {
   fetchSettingsAction,
   setAuthorized,
   fetchServerInfoAction,
+  fetchServerSaasHostAction,
   fetchUserStatusAction,
 } from 'app/percona/shared/core/reducers';
 import { contextSrv } from 'app/core/services/context_srv';
@@ -28,6 +29,7 @@ export const PerconaBootstrapper = () => {
       await getSettings();
       await dispatch(fetchUserStatusAction());
       await dispatch(fetchServerInfoAction());
+      await dispatch(fetchServerSaasHostAction());
     };
 
     if (contextSrv.user.isSignedIn) {

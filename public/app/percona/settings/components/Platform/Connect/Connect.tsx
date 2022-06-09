@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStyles } from '@grafana/ui';
-import config from 'app/core/config';
 import validators from 'app/percona/shared/helpers/validators';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { ConnectRenderProps } from '../types';
@@ -19,7 +18,7 @@ export const Connect: FC = () => {
   const styles = useStyles(getStyles);
   const [connecting, setConnecting] = useState(false);
   const dispatch = useDispatch();
-  const { serverId: pmmServerId = '' } = useSelector(getPerconaServer);
+  const { serverId: pmmServerId = '', saasHost } = useSelector(getPerconaServer);
   const initialValues: ConnectRenderProps = {
     pmmServerName: '',
     pmmServerId,
@@ -67,7 +66,7 @@ export const Connect: FC = () => {
           showErrorOnBlur
           required
         />
-        <a href={`${config.perconaPortalUrl}/profile`} rel="noreferrer noopener" target="_blank">
+        <a href={`${saasHost}/profile`} rel="noreferrer noopener" target="_blank">
           Get token
         </a>
       </div>

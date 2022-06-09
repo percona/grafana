@@ -282,25 +282,33 @@ export const fetchDBClustersAction = createAsyncThunk(
       })()
     )
 );
+export interface PerconaServerState extends ServerInfo {
+  saasHost: string;
+}
 
-export const initialServerState: ServerInfo = {
+export const initialServerState: PerconaServerState = {
   serverName: '',
   serverId: '',
+  saasHost: 'https://portal.percona.com',
 };
 
 const perconaServerSlice = createSlice({
   name: 'perconaServer',
   initialState: initialServerState,
   reducers: {
-    setServerInfo: (state, action: PayloadAction<ServerInfo>): ServerInfo => ({
+    setServerInfo: (state, action: PayloadAction<ServerInfo>): PerconaServerState => ({
       ...state,
       serverName: action.payload.serverName,
       serverId: action.payload.serverId,
     }),
+    setServerSaasHost: (state, action: PayloadAction<string>): PerconaServerState => ({
+      ...state,
+      saasHost: action.payload,
+    }),
   },
 });
 
-const { setServerInfo } = perconaServerSlice.actions;
+const { setServerInfo, setServerSaasHost } = perconaServerSlice.actions;
 
 export const perconaServerReducers = perconaServerSlice.reducer;
 
@@ -320,6 +328,22 @@ export const fetchServerInfoAction = createAsyncThunk(
             serverId: pmm_server_id,
           })
         );
+      })()
+    )
+);
+
+export const fetchServerSaasHostAction = createAsyncThunk(
+  'percona/fetchServerSaasHost',
+  (_, thunkAPI): Promise<void> =>
+    withSerializedError(
+      (async () => {
+        let host = 'https://portal.percona.com';
+        const { host: envHost = '' } = await api.get('/graph/percona-api/saas-host');
+
+        if (envHost.includes('dev')) {
+          host = 'https://platform-dev.percona.com';
+        }
+        thunkAPI.dispatch(setServerSaasHost(host));
       })()
     )
 );
