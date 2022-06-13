@@ -91,31 +91,6 @@ const steps: StepType[] = [
       </SidebarStep>
     ),
   },
-  // {
-  //   selector: '.dropdown > [aria-label="Backup"]',
-  //   content: (
-  //     <SidebarStep title="Backup and Restore">
-  //       <p>
-  //         This PMM feature allows you to backup and restore your MySQL and MongoDB databases to/from an Amazon S3
-  //         location.
-  //       </p>
-  //       <p>Besides regular on-demand backups, you can also schedule your own backups at specific points in time.</p>
-  //       <p>For MongoDB databases, we also include Point-In-Time-Recoverable backups.</p>
-  //       <p>
-  //         Check all details and instructions{' '}
-  //         <a
-  //           href="https://docs.percona.com/percona-monitoring-and-management/using/backup.html#backup-and-restore"
-  //           target="_blank"
-  //           rel="noreferrer noopener"
-  //           style={{ textDecoration: 'underline' }}
-  //         >
-  //           here
-  //         </a>
-  //         .
-  //       </p>
-  //     </SidebarStep>
-  //   ),
-  // },
 ];
 
 export default steps;
