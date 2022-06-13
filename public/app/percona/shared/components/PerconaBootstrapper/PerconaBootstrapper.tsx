@@ -99,6 +99,9 @@ export const PerconaBootstrapper = () => {
         <Button variant="secondary" onClick={dismissModal}>
           Skip
         </Button>
+        <Button variant="secondary" onClick={() => setModalIsOpen(false)}>
+          Check later
+        </Button>
       </HorizontalGroup>
     </Modal>
   ) : (
