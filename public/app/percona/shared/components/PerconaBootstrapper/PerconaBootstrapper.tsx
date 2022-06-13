@@ -13,6 +13,7 @@ import { contextSrv } from 'app/core/services/context_srv';
 import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
 import { getStyles } from './PerconaBootstrapper.styles';
 import { isPmmAdmin } from '../../helpers/permissions';
+import { Messages } from './PerconaBootstrapper.messages';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
@@ -64,43 +65,37 @@ export const PerconaBootstrapper = () => {
         <Icon type="mono" name="pmm-logo" className={styles.svg} />
       </div>
       <p>
-        <strong>Percona Monitoring and Management</strong> (PMM) is an open source database monitoring and management
-        tool for MySQL, PostgreSQL and MongoDB.
+        <strong>{Messages.pmm}</strong>
+        {Messages.pmmIs}
       </p>
       <p>
-        PMM enables you to:
+        {Messages.pmmEnables}
         <ul className={styles.list}>
-          <li>
-            Spot critical performance issues faster, understand the root cause of incidents better and troubleshoot them
-            more efficiently;
-          </li>
-          <li>Monitor your database performance with customizable dashboards and real-time alerting;</li>
-          <li>
-            Run regular database health checks with built-in Advisors. The checks identify and alert you of potential
-            security threats, performance degradation, data loss and data corruption;
-          </li>
-          <li>Back up your critical data with zero-downtime and minimal performance impact.</li>
+          <li>{Messages.spotCriticalPerformance}</li>
+          <li>{Messages.monitorDb}</li>
+          <li>{Messages.runDbHealth}</li>
+          <li>{Messages.backup}</li>
         </ul>
       </p>
       <p>
-        For more information, please check out the{' '}
+        {Messages.moreInfo}
         <a
           href="https://docs.percona.com/percona-monitoring-and-management/index.html"
           target="_blank"
           rel="noreferrer noopener"
           className={styles.docsLink}
         >
-          PMM online help
+          {Messages.pmmOnlineHelp}
         </a>
         .
       </p>
       <HorizontalGroup justify="center" spacing="md">
         <Button onClick={startTour}>Start tour</Button>
         <Button variant="secondary" onClick={dismissModal}>
-          Skip
+          {Messages.skip}
         </Button>
         <Button variant="secondary" onClick={() => setModalIsOpen(false)}>
-          Check later
+          {Messages.checkLater}
         </Button>
       </HorizontalGroup>
     </Modal>
