@@ -12,6 +12,7 @@ import {
 import { contextSrv } from 'app/core/services/context_srv';
 import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
 import { getStyles } from './PerconaBootstrapper.styles';
+import { isPmmAdmin } from '../../helpers/permissions';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
@@ -57,7 +58,7 @@ export const PerconaBootstrapper = () => {
     }
   }, [dispatch, isLoggedIn, setCurrentStep, setIsOpen]);
 
-  return isLoggedIn && showTour ? (
+  return isLoggedIn && isPmmAdmin(contextSrv.user) && showTour ? (
     <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title=" Welcome to Percona Monitoring and Management">
       <div className={styles.iconContainer}>
         <Icon type="mono" name="pmm-logo" className={styles.svg} />
