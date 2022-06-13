@@ -109,9 +109,9 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                 <div className="grafana-app">
                   <Router history={locationService.getHistory()}>
                     <TourProvider
-                      showBadge={false}
                       steps={steps}
                       components={{ Close, Navigation, Badge }}
+                      badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
                       disableFocusLock
                       onClickClose={({ setIsOpen }) => {
                         localStorage.setItem('percona.showTour', 'false');

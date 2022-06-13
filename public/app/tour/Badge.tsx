@@ -9,7 +9,12 @@ const Badge: FC<BadgeProps> = ({ children }) => {
   return (
     <components.Badge
       styles={{
-        badge: (base) => ({ ...base, background: theme.colors.primary.main }),
+        badge: (base) => ({
+          ...base,
+          background: theme.colors.primary.main,
+          fontFamily: theme.typography.fontFamily,
+          fontSize: '0.8em',
+        }),
       }}
     >
       {children}
