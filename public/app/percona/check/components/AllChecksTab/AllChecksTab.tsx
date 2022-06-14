@@ -1,11 +1,10 @@
 import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { AppEvents } from '@grafana/data';
-import { Column } from 'react-table';
 import { LoaderButton, logger } from '@percona/platform-core';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { Table } from 'app/percona/integrated-alerting/components/Table';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { CheckService } from 'app/percona/check/Check.service';
 import { ALL_CHECKS_TABLE_ID, GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
@@ -25,6 +24,8 @@ import { ALL_VALUES_VALUE, isTextIncluded, isSameOption } from 'app/percona/shar
 import { CheckFilters } from './CheckFilters/CheckFilters';
 import { getFiltersFromUrlParams, updateChecksUIState } from './AllChecksTab.utils';
 import { useStoredTablePageSize } from 'app/percona/integrated-alerting/components/Table/Pagination';
+import { Filter } from '@grafana/ui/src/components/Table/Filter';
+import { getTableStyles } from '@grafana/ui/src/components/Table/styles';
 
 export const AllChecksTab: FC = () => {
   const [queryParams] = useQueryParams();
@@ -124,14 +125,16 @@ export const AllChecksTab: FC = () => {
   );
 
   const columns = useMemo(
-    (): Array<Column<CheckDetails>> => [
+    (): Array<ExtendedColumn<CheckDetails>> => [
       {
         Header: Messages.table.columns.name,
         accessor: 'summary',
+        type: FilterFieldTypes.TEXT_FIELD,
       },
       {
         Header: Messages.table.columns.description,
         accessor: 'description',
+        type: FilterFieldTypes.TEXT_FIELD,
       },
       {
         Header: Messages.table.columns.status,
@@ -142,6 +145,20 @@ export const AllChecksTab: FC = () => {
         Header: Messages.table.columns.interval,
         accessor: 'interval',
         Cell: ({ value }) => Interval[value],
+        options: [
+          {
+            label: 'Standart',
+            value: 'Standart',
+          },
+          {
+            label: 'Rare',
+            value: 'Rare',
+          },
+          {
+            label: 'Frequent',
+            value: 'Frequent',
+          },
+        ],
       },
       {
         Header: Messages.table.columns.actions,
@@ -186,6 +203,8 @@ export const AllChecksTab: FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
+  const tableStyles = useStyles2(getTableStyles);
+
   return (
     <Page navModel={navModel} tabsDataTestId="db-check-tabs-bar" data-testid="db-check-panel">
       <Page.Contents dataTestId="db-check-tab-content">
@@ -195,6 +214,7 @@ export const AllChecksTab: FC = () => {
           featureSelector={featureSelector}
         >
           <CheckFilters />
+          <Filter column={columns} tableStyles={tableStyles} />
           <div className={styles.actionButtons} data-testid="db-check-panel-actions">
             <LoaderButton
               type="button"
@@ -215,6 +235,7 @@ export const AllChecksTab: FC = () => {
             emptyMessage={Messages.table.noData}
             showPagination
             onPaginationChanged={handlePaginationChanged}
+            showFilter
           />
           {!!selectedCheck && checkIntervalModalVisible && (
             <ChangeCheckIntervalModal

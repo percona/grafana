@@ -24,9 +24,19 @@ export interface ExtendedTableHeaderProps extends TableHeaderProps {
   onClick?: () => void;
 }
 
+export type ExtendedColumn<D extends object = {}> = Column<D> & {
+  type?: FilterFieldTypes;
+  options?: Object[];
+};
+
+export enum FilterFieldTypes {
+  TEXT_FIELD,
+  RADIO_BUTTON_GROUP_FIELD,
+}
+
 export interface TableProps {
   data: object[];
-  columns: Array<Column<any>>;
+  columns: Array<ExtendedColumn<any>>;
   pendingRequest?: boolean;
   emptyMessage?: string;
   showPagination?: boolean;
@@ -45,6 +55,7 @@ export interface TableProps {
   getRowProps?: (row: Row<any>) => ExtendedTableRowProps;
   getColumnProps?: (column: ColumnInstance) => ExtendedTableCellProps;
   getCellProps?: (cell: Cell<any, any>) => ExtendedTableCellProps;
+  showFilter?: boolean;
 }
 
 export interface PaginatedTableState extends TableState {
