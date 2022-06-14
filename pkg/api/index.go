@@ -190,9 +190,9 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool) ([]*dto
 	mysqlHAChildNavs := []*dtos.NavLink{
 		{Text: "MySQL Group Replication Summary", Id: "mysql-group-replication-summary", Url: setting.AppSubUrl + "/d/mysql-group-replicaset-summary/mysql-group-replication-summary", Icon: "percona-cluster", HideFromTabs: true},
 		{Text: "MySQL Replication Summary", Id: "mysql-replication-summary", Url: setting.AppSubUrl + "/d/mysql-replicaset-summary/mysql-replication-summary", Icon: "percona-cluster", HideFromTabs: true},
-		{Text: "PXC/Galera Cluster Summary", Id: "pxc-cluster-summary", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
-		{Text: "PXC/Galera Node Summary", Id: "pxc-node-summary", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "percona-cluster", HideFromTabs: true},
-		{Text: "PXC/Galera Nodes Compare", Id: "pxc-nodes-compare", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "Percona Operator for MySQL/Galera Cluster Summary", Id: "pxc-cluster-summary", Url: setting.AppSubUrl + "/d/pxc-cluster-summary/pxc-galera-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "Percona Operator for MySQL/Galera Node Summary", Id: "pxc-node-summary", Url: setting.AppSubUrl + "/d/pxc-node-summary/pxc-galera-node-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "Percona Operator for MySQL/Galera Nodes Compare", Id: "pxc-nodes-compare", Url: setting.AppSubUrl + "/d/pxc-nodes-compare/pxc-galera-nodes-compare", Icon: "percona-cluster", HideFromTabs: true},
 	}
 
 	mysqlSummaryChildNavs := []*dtos.NavLink{
