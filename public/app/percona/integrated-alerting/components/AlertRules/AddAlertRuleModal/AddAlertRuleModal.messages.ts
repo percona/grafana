@@ -4,12 +4,6 @@ export const Messages = {
     pagerDuty: 'PagerDuty',
     slack: 'Slack',
   },
-  severities: {
-    SEVERITY_CRITICAL: 'Critical',
-    SEVERITY_ERROR: 'High',
-    SEVERITY_WARNING: 'Warning',
-    SEVERITY_NOTICE: 'Notice',
-  },
   tooltips: {
     template: 'The alert template to use for this rule.',
     name: 'The name for this rule.',

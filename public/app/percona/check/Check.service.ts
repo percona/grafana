@@ -1,4 +1,4 @@
-import { API, PaginatedFomattedResponse } from 'app/percona/shared/core';
+import { API, PaginatedFomattedResponse, Severity } from 'app/percona/shared/core';
 import { api } from 'app/percona/shared/helpers/api';
 import { CancelToken } from 'axios';
 import {
@@ -10,15 +10,19 @@ import {
   FailedCheckSummary,
   ServiceFailedCheck,
 } from 'app/percona/check/types';
-import { AlertRuleSeverity } from '../integrated-alerting/components/AlertRules/AlertRules.types';
+
 import { formatLabels } from '../shared/helpers/labels';
 
 export const makeApiUrl: (segment: string) => string = (segment) => `${API.ALERTMANAGER}/${segment}`;
 const order = {
-  [AlertRuleSeverity.SEVERITY_CRITICAL]: 1,
-  [AlertRuleSeverity.SEVERITY_ERROR]: 2,
-  [AlertRuleSeverity.SEVERITY_WARNING]: 3,
-  [AlertRuleSeverity.SEVERITY_NOTICE]: 4,
+  [Severity.SEVERITY_EMERGENCY]: 1,
+  [Severity.SEVERITY_ALERT]: 2,
+  [Severity.SEVERITY_CRITICAL]: 3,
+  [Severity.SEVERITY_ERROR]: 4,
+  [Severity.SEVERITY_WARNING]: 5,
+  [Severity.SEVERITY_NOTICE]: 6,
+  [Severity.SEVERITY_INFO]: 7,
+  [Severity.SEVERITY_DEBUG]: 8,
 };
 const BASE_URL = '/v1/management/SecurityChecks';
 
@@ -78,7 +82,7 @@ export const CheckService = {
           }) => ({
             summary,
             description,
-            severity: AlertRuleSeverity[severity],
+            severity: Severity[severity],
             labels: formatLabels(labels),
             readMoreUrl: read_more_url,
             serviceName: service_name,
