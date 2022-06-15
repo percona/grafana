@@ -18,9 +18,9 @@ export const Messages = {
     [Operators.psmdb]: (version: string) => `Percona Operator for MongoDB ${version}`,
   },
   componentLabel: {
-    pxc: 'PXC',
+    pxc: 'Percona Operator for MySQL',
     haproxy: 'HAProxy',
     backup: 'Backup',
-    mongod: 'PSMDB',
+    mongod: 'Percona Operator for MongoDB',
   },
 };
