@@ -23,15 +23,20 @@ export interface ExtendedTableCellProps extends TableCellProps {
 export interface ExtendedTableHeaderProps extends TableHeaderProps {
   onClick?: () => void;
 }
+interface Options {
+  label: string;
+  value: string | boolean | number;
+}
 
 export type ExtendedColumn<D extends object = {}> = Column<D> & {
   type?: FilterFieldTypes;
-  options?: Object[];
+  options?: Options[];
 };
 
 export enum FilterFieldTypes {
-  TEXT_FIELD,
-  RADIO_BUTTON_GROUP_FIELD,
+  TEXT,
+  RADIO_BUTTON,
+  DROPDOWN,
 }
 
 export interface TableProps {

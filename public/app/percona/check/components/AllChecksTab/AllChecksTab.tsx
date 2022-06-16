@@ -129,22 +129,34 @@ export const AllChecksTab: FC = () => {
       {
         Header: Messages.table.columns.name,
         accessor: 'summary',
-        type: FilterFieldTypes.TEXT_FIELD,
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.table.columns.description,
         accessor: 'description',
-        type: FilterFieldTypes.TEXT_FIELD,
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.table.columns.status,
         accessor: 'disabled',
         Cell: ({ value }) => (!!value ? Messages.disabled : Messages.enabled),
+        type: FilterFieldTypes.DROPDOWN,
+        options: [
+          {
+            label: 'Enabled',
+            value: true,
+          },
+          {
+            label: 'Disabled',
+            value: false,
+          },
+        ],
       },
       {
         Header: Messages.table.columns.interval,
         accessor: 'interval',
         Cell: ({ value }) => Interval[value],
+        type: FilterFieldTypes.DROPDOWN,
         options: [
           {
             label: 'Standart',
