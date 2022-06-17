@@ -59,16 +59,13 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
           <div className={openCollapse ? styles.collapseOpen : styles.collapseClose}>
             <div className={styles.advanceFilter}>
               {columns.map((column) => {
+                const columnOptions = [{ value: '', label: 'All' }, ...(column.options ?? [])];
                 if (column.type === FilterFieldTypes.DROPDOWN) {
                   return (
                     <div className={styles.advanceFilterColumn}>
                       <Field name={`${column.accessor}`}>
                         {({ input }) => (
-                          <SelectField
-                            options={column.options ?? []}
-                            label={column.label ?? column.Header}
-                            {...input}
-                          />
+                          <SelectField options={columnOptions} label={column.label ?? column.Header} {...input} />
                         )}
                       </Field>
                     </div>
@@ -78,7 +75,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
                   return (
                     <div className={styles.advanceFilterColumn}>
                       <RadioButtonGroupField
-                        options={column.options ?? []}
+                        options={columnOptions}
                         name={`${column.accessor}`}
                         label={column.label ?? column.Header}
                         fullWidth
