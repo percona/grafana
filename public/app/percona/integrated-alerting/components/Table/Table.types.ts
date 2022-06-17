@@ -1,3 +1,4 @@
+import { SelectableValue } from '@grafana/data';
 import {
   Column,
   TableInstance,
@@ -24,14 +25,10 @@ export interface ExtendedTableHeaderProps extends TableHeaderProps {
   onClick?: () => void;
 }
 
-interface Options {
-  label: string;
-  value: string | boolean | number;
-}
-
 export type ExtendedColumn<D extends object = {}> = Column<D> & {
   type?: FilterFieldTypes;
-  options?: Options[];
+  options?: Array<SelectableValue<any>>;
+  label?: string;
 };
 
 export enum FilterFieldTypes {

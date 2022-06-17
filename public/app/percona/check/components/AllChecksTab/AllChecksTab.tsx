@@ -139,6 +139,7 @@ export const AllChecksTab: FC = () => {
         accessor: 'disabled',
         Cell: ({ value }) => (!!value ? Messages.disabled : Messages.enabled),
         type: FilterFieldTypes.RADIO_BUTTON,
+        label: 'Test',
         options: [
           {
             label: 'Enabled',

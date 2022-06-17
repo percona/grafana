@@ -1,92 +1,92 @@
-import { Icon, IconButton, useStyles2 } from '@grafana/ui';
-import { TextInputField } from '@percona/platform-core';
+import { Icon, IconButton, Input, useStyles2 } from '@grafana/ui';
+import { RadioButtonGroupField } from '@percona/platform-core';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
-import { debounce } from 'lodash';
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { FilterFieldTypes } from '..';
 import { getStyles } from './Filter.styles';
 import { FilterProps } from './Filter.types';
+import arrayMutators from 'final-form-arrays';
 
 export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const styles = useStyles2(getStyles);
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedColumn, setSelectedColumn] = useState<string>('');
-  const textColumns = columns.filter((value) => FilterFieldTypes.TEXT === value.type);
 
-  const searchColumnsOptions = textColumns.map((column) => ({
-    value: column.accessor?.toString(),
-    label: column.Header?.toString(),
-  }));
+  const searchColumnsOptions = useMemo(() => {
+    const searchOptions = columns
+      .filter((value) => FilterFieldTypes.TEXT === value.type)
+      .map((column) => ({
+        value: column.accessor?.toString(),
+        label: column.Header?.toString(),
+      }));
+    searchOptions.unshift({ value: '', label: 'All' });
+    return searchOptions;
+  }, [columns]);
 
-  useEffect(() => {
-    const dataArray = rawData.filter((filterValue) => isValueInColumn(filterValue));
-    setFilteredData(dataArray);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawData, searchValue]);
-
-  const isValueInColumn = (filterValue: Object) => {
-    let result = false;
-    textColumns.forEach((column) => {
-      if (column.accessor === selectedColumn || selectedColumn === '') {
-        // @ts-ignore
-        if (isTextIncluded(searchValue, filterValue[column.accessor])) {
-          result = true;
-          return;
-        }
-      }
-    });
-    return result;
-  };
-
-  const onNameChanged = debounce((e: FormEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-    setSearchValue(target.value);
-    console.log(e);
-  }, 600);
-
-  const isTextIncluded = (needle: string, haystack: string): boolean =>
-    haystack.toLowerCase().includes(needle.toLowerCase());
-
+  const all = [{ value: '', label: 'All' }, ...searchColumnsOptions];
+  console.log(all);
   return (
     <Form
-      render={({ handleSubmit }) => (
+      initialValues={{}}
+      onSubmit={() => {}}
+      mutators={{
+        ...arrayMutators,
+      }}
+      render={({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} role="form">
           <div className={styles.filterWrapper}>
             <span className={styles.filterLabel}>Filter</span>
             <div className={styles.filterActionsWrapper}>
               <Icon name="search" size="xl" />
-              <Field name="template">
+              <Field name="search-select">
                 {({ input }) => (
-                  <SelectField
-                    options={searchColumnsOptions}
-                    {...input}
-                    onChange={(name) => {
-                      setSelectedColumn(name.value);
-                      input.onChange(name);
-                    }}
-                    value={selectedColumn}
-                    data-testid="template-select-input"
-                  />
+                  <SelectField className={styles.searchSelect} options={searchColumnsOptions ?? []} {...input} />
                 )}
               </Field>
-              <TextInputField
-                name="name"
-                placeholder="Search"
-                value={searchValue}
-                inputProps={{ onKeyUp: onNameChanged }}
-              />
+              <Field name="search-text-input">
+                {({ input }) => <Input type="text" placeholder="Search" {...input} />}
+              </Field>
               <Icon name="times" size="xl" />
               <IconButton name="filter" size="xl" onClick={() => setOpenCollapse(!openCollapse)} />
             </div>
           </div>
           <div className={openCollapse ? styles.collapseOpen : styles.collapseClose}>
-            <div className={styles.collapseBody}>Test</div>
+            <div className={styles.advanceFilter}>
+              {columns.map((column) => {
+                if (column.type === FilterFieldTypes.DROPDOWN) {
+                  return (
+                    <div className={styles.advanceFilterColumn}>
+                      <Field name={`${column.accessor}`}>
+                        {({ input }) => (
+                          <SelectField
+                            options={column.options ?? []}
+                            label={column.label ?? column.Header}
+                            {...input}
+                          />
+                        )}
+                      </Field>
+                    </div>
+                  );
+                }
+                if (column.type === FilterFieldTypes.RADIO_BUTTON) {
+                  return (
+                    <div className={styles.advanceFilterColumn}>
+                      <RadioButtonGroupField
+                        options={column.options ?? []}
+                        name={`${column.accessor}`}
+                        label={column.label ?? column.Header}
+                        fullWidth
+                      />
+                    </div>
+                  );
+                }
+                return <></>;
+              })}
+              {JSON.stringify(values)}
+            </div>
           </div>
         </form>
       )}
-      onSubmit={() => {}}
     />
   );
 };
