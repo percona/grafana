@@ -2,15 +2,18 @@ import { Icon, IconButton, Input, useStyles2 } from '@grafana/ui';
 import { RadioButtonGroupField } from '@percona/platform-core';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import React, { useMemo, useState } from 'react';
-import { Field, Form } from 'react-final-form';
+import { Field, Form, FormSpy } from 'react-final-form';
 import { FilterFieldTypes } from '..';
 import { getStyles } from './Filter.styles';
 import { FilterProps } from './Filter.types';
 import arrayMutators from 'final-form-arrays';
+import { debounce } from 'lodash';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
 
 export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const styles = useStyles2(getStyles);
+  const [queryParams, setQueryParams] = useQueryParams();
 
   const searchColumnsOptions = useMemo(() => {
     const searchOptions = columns
@@ -23,8 +26,11 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
     return searchOptions;
   }, [columns]);
 
-  const all = [{ value: '', label: 'All' }, ...searchColumnsOptions];
-  console.log(all);
+  const onFormChange = debounce((values: any) => {
+    console.log(values);
+    setQueryParams(values);
+  }, 600);
+
   return (
     <Form
       initialValues={{}}
@@ -83,6 +89,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
                 return <></>;
               })}
               {JSON.stringify(values)}
+              <FormSpy onChange={(state) => onFormChange(state.values)}></FormSpy>
             </div>
           </div>
         </form>
