@@ -22,13 +22,23 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
         value: column.accessor?.toString(),
         label: column.Header?.toString(),
       }));
-    searchOptions.unshift({ value: '', label: 'All' });
+    searchOptions.unshift({ value: 'All', label: 'All' });
     return searchOptions;
   }, [columns]);
 
   const onFormChange = debounce((values: any) => {
-    console.log(values);
-    setQueryParams(values);
+    let obj = {};
+    obj = { ...obj, 'search-text-input': values['search-text-input'], 'search-select': values['search-select']?.value };
+    columns.forEach((column) => {
+      const accessor = column.accessor as string;
+      if (column.type === FilterFieldTypes.RADIO_BUTTON) {
+        obj = { ...obj, [accessor]: values[accessor] };
+      }
+      if (column.type === FilterFieldTypes.DROPDOWN) {
+        obj = { ...obj, [accessor]: values[accessor]?.value };
+      }
+    });
+    setQueryParams(obj);
   }, 600);
 
   return (
@@ -59,7 +69,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
           <div className={openCollapse ? styles.collapseOpen : styles.collapseClose}>
             <div className={styles.advanceFilter}>
               {columns.map((column) => {
-                const columnOptions = [{ value: '', label: 'All' }, ...(column.options ?? [])];
+                const columnOptions = [{ value: 'All', label: 'All' }, ...(column.options ?? [])];
                 if (column.type === FilterFieldTypes.DROPDOWN) {
                   return (
                     <div className={styles.advanceFilterColumn}>
