@@ -9,11 +9,28 @@ import { FilterProps } from './Filter.types';
 import arrayMutators from 'final-form-arrays';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
+import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
+import { UrlQueryValue } from '@grafana/data';
 
 export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const styles = useStyles2(getStyles);
   const [queryParams, setQueryParams] = useQueryParams();
+
+  const buildInitialValues = useMemo(() => {
+    const customTransform = (params: UrlQueryValue): any => {
+      if (params !== undefined && params !== null) {
+        return params;
+      }
+      return [];
+    };
+    const queryKeys = columns.map((column) => ({ key: column.accessor as string, transform: customTransform }));
+    queryKeys.push({ key: 'search-text-input', transform: customTransform });
+    queryKeys.push({ key: 'search-select', transform: customTransform });
+    const params = getValuesFromQueryParams(queryParams, queryKeys);
+    return params ?? {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const searchColumnsOptions = useMemo(() => {
     const searchOptions = columns
@@ -28,14 +45,18 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
 
   const onFormChange = debounce((values: any) => {
     let obj = {};
-    obj = { ...obj, 'search-text-input': values['search-text-input'], 'search-select': values['search-select']?.value };
+    obj = {
+      ...obj,
+      'search-text-input': values['search-text-input'],
+      'search-select': values['search-select']?.value ?? values['search-select'],
+    };
     columns.forEach((column) => {
       const accessor = column.accessor as string;
       if (column.type === FilterFieldTypes.RADIO_BUTTON) {
         obj = { ...obj, [accessor]: values[accessor] };
       }
       if (column.type === FilterFieldTypes.DROPDOWN) {
-        obj = { ...obj, [accessor]: values[accessor]?.value };
+        obj = { ...obj, [accessor]: values[accessor]?.value ? values[accessor]?.value : values[accessor] };
       }
     });
     setQueryParams(obj);
@@ -43,7 +64,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
 
   return (
     <Form
-      initialValues={{}}
+      initialValues={buildInitialValues}
       onSubmit={() => {}}
       mutators={{
         ...arrayMutators,
@@ -56,7 +77,12 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
               <Icon name="search" size="xl" />
               <Field name="search-select">
                 {({ input }) => (
-                  <SelectField className={styles.searchSelect} options={searchColumnsOptions ?? []} {...input} />
+                  <SelectField
+                    className={styles.searchSelect}
+                    options={searchColumnsOptions ?? []}
+                    {...input}
+                    value={input.value}
+                  />
                 )}
               </Field>
               <Field name="search-text-input">

@@ -16,13 +16,13 @@ export const getValuesFromQueryParams = <T extends any[]>(
   queryParams: UrlQueryMap,
   keys: QueryParamTransform[]
 ): [...T] => {
-  const result: any[] = [];
+  let result: Object = {};
 
   keys.forEach(({ key, transform = defaultTransform }) => {
     const param = queryParams[key];
 
     if (param !== undefined && param !== null) {
-      result.push(transform(param));
+      result = { ...result, [key]: transform(param) };
     }
   });
 
