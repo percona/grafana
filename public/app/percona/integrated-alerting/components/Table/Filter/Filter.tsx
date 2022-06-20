@@ -78,10 +78,10 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
               <Field name="search-select">
                 {({ input }) => (
                   <SelectField
+                    defaultValue={{ value: 'All', label: 'All' }}
                     className={styles.searchSelect}
                     options={searchColumnsOptions ?? []}
                     {...input}
-                    value={input.value}
                   />
                 )}
               </Field>
