@@ -28,7 +28,7 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: any) =
       [SEARCH_SELECT_FIELD_NAME]: ALL_VALUE,
     };
   }
-  if (!obj[SEARCH_INPUT_FIELD_NAME] && obj[SEARCH_SELECT_FIELD_NAME] === ALL_VALUE) {
+  if (!obj[SEARCH_INPUT_FIELD_NAME] && obj[SEARCH_SELECT_FIELD_NAME]) {
     obj = {
       ...obj,
       [SEARCH_SELECT_FIELD_NAME]: undefined,
