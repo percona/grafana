@@ -77,3 +77,24 @@ export const buildEmptyValues = (columns: ExtendedColumn[]) => {
   });
   return obj;
 };
+
+export const isValueInTextColumn = (columns: ExtendedColumn[], filterValue: any, queryParamsObj: any) => {
+  let result = false;
+  columns.forEach((column) => {
+    if (column.type === FilterFieldTypes.TEXT && queryParamsObj[SEARCH_INPUT_FIELD_NAME]) {
+      if (
+        column.accessor === queryParamsObj[SEARCH_SELECT_FIELD_NAME] ||
+        queryParamsObj[SEARCH_SELECT_FIELD_NAME] === ALL_VALUE
+      ) {
+        if (isTextIncluded(queryParamsObj[SEARCH_INPUT_FIELD_NAME], filterValue[column.accessor as string])) {
+          result = true;
+          return;
+        }
+      }
+    }
+  });
+  return result;
+};
+
+export const isTextIncluded = (needle: string, haystack: string): boolean =>
+  haystack.toLowerCase().includes(needle.toLowerCase());
