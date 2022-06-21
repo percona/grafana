@@ -1,7 +1,7 @@
 import { UrlQueryMap, UrlQueryValue } from '@grafana/data';
 import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
 import { ExtendedColumn, FilterFieldTypes } from '..';
-import { SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
+import { ALL_LABEL, ALL_VALUE, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 
 export const getQueryParams = (columns: ExtendedColumn[], queryParams: UrlQueryMap) => {
   const customTransform = (params: UrlQueryValue): any => {
@@ -25,10 +25,10 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: any) =
   if (obj[SEARCH_INPUT_FIELD_NAME] && !obj[SEARCH_SELECT_FIELD_NAME]) {
     obj = {
       ...obj,
-      [SEARCH_SELECT_FIELD_NAME]: 'All',
+      [SEARCH_SELECT_FIELD_NAME]: ALL_VALUE,
     };
   }
-  if (!obj[SEARCH_INPUT_FIELD_NAME] && obj[SEARCH_SELECT_FIELD_NAME] === 'All') {
+  if (!obj[SEARCH_INPUT_FIELD_NAME] && obj[SEARCH_SELECT_FIELD_NAME] === ALL_VALUE) {
     obj = {
       ...obj,
       [SEARCH_SELECT_FIELD_NAME]: undefined,
@@ -37,14 +37,14 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: any) =
   columns.forEach((column) => {
     const accessor = column.accessor as string;
     if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-      if (values[accessor] === 'All') {
+      if (values[accessor] === ALL_VALUE) {
         obj = { ...obj, [accessor]: undefined };
       } else {
         obj = { ...obj, [accessor]: values[accessor] };
       }
     }
     if (column.type === FilterFieldTypes.DROPDOWN) {
-      if (values[accessor]?.value === 'All') {
+      if (values[accessor]?.value === ALL_VALUE) {
         obj = { ...obj, [accessor]: undefined };
       } else {
         obj = { ...obj, [accessor]: values[accessor]?.value ?? values[accessor] };
@@ -61,6 +61,6 @@ export const buildSearchOptions = (columns: ExtendedColumn[]) => {
       value: column.accessor?.toString(),
       label: column.Header?.toString(),
     }));
-  searchOptions.unshift({ value: 'All', label: 'All' });
+  searchOptions.unshift({ value: ALL_VALUE, label: ALL_LABEL });
   return searchOptions;
 };

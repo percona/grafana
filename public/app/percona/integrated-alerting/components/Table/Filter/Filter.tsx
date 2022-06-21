@@ -10,6 +10,7 @@ import arrayMutators from 'final-form-arrays';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { buildObjForQueryParams, buildSearchOptions, getQueryParams } from './Filter.utils';
+import { ALL_LABEL, ALL_VALUE } from './Filter.constants';
 
 export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
@@ -44,7 +45,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
               <Field name="search-select">
                 {({ input }) => (
                   <SelectField
-                    defaultValue={{ value: 'All', label: 'All' }}
+                    defaultValue={{ value: ALL_VALUE, label: ALL_LABEL }}
                     className={styles.searchSelect}
                     options={searchColumnsOptions ?? []}
                     {...input}
@@ -61,13 +62,18 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
           <div className={openCollapse ? styles.collapseOpen : styles.collapseClose}>
             <div className={styles.advanceFilter}>
               {columns.map((column) => {
-                const columnOptions = [{ value: 'All', label: 'All' }, ...(column.options ?? [])];
+                const columnOptions = [{ value: ALL_VALUE, label: ALL_LABEL }, ...(column.options ?? [])];
                 if (column.type === FilterFieldTypes.DROPDOWN) {
                   return (
                     <div className={styles.advanceFilterColumn}>
                       <Field name={`${column.accessor}`}>
                         {({ input }) => (
-                          <SelectField options={columnOptions} label={column.label ?? column.Header} {...input} />
+                          <SelectField
+                            options={columnOptions}
+                            defaultValue={{ value: ALL_VALUE, label: ALL_LABEL }}
+                            label={column.label ?? column.Header}
+                            {...input}
+                          />
                         )}
                       </Field>
                     </div>
@@ -78,6 +84,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
                     <div className={styles.advanceFilterColumn}>
                       <RadioButtonGroupField
                         options={columnOptions}
+                        defaultValue={ALL_VALUE}
                         name={`${column.accessor}`}
                         label={column.label ?? column.Header}
                         fullWidth
