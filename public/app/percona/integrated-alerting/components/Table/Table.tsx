@@ -1,14 +1,23 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTable, usePagination, useExpanded } from 'react-table';
 import { css } from '@emotion/css';
 import { useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
-import { TableProps, PaginatedTableInstance, PaginatedTableOptions, PaginatedTableState } from './Table.types';
+import {
+  TableProps,
+  PaginatedTableInstance,
+  PaginatedTableOptions,
+  PaginatedTableState,
+  FilterFieldTypes,
+} from './Table.types';
 import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableContent } from './TableContent';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { Filter } from './Filter/Filter';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
+import { UrlQueryValue } from '@grafana/data';
+import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
 
 const defaultPropGetter = () => ({});
 
@@ -35,6 +44,7 @@ export const Table: FC<TableProps> = ({
   showFilter,
 }) => {
   const [data, setFilteredData] = useState<Object[]>([]);
+  const [queryParams] = useQueryParams();
   const style = useStyles(getStyles);
   const manualPagination = !!(totalPages && totalPages >= 0);
   const initialState: Partial<PaginatedTableState> = {
@@ -88,6 +98,53 @@ export const Table: FC<TableProps> = ({
     setPageSize(newPageSize);
     onPaginationChanged(newPageSize, 0);
   };
+
+  const getQueryParams = useMemo(() => {
+    const customTransform = (params: UrlQueryValue): any => {
+      if (params !== undefined && params !== null) {
+        return params;
+      }
+      return [];
+    };
+    const queryKeys = columns.map((column) => ({ key: column.accessor as string, transform: customTransform }));
+    queryKeys.push({ key: 'search-text-input', transform: customTransform });
+    queryKeys.push({ key: 'search-select', transform: customTransform });
+    const params = getValuesFromQueryParams(queryParams, queryKeys);
+    return params ?? {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryParams]);
+
+  const filter = useCallback(() => {
+    const queryParamsObj = getQueryParams;
+    if (Object.keys(queryParams).length > 0) {
+      const dataArray = rawData.filter((filterValue) => isValueInColumn(filterValue, queryParamsObj));
+      setFilteredData(dataArray);
+    } else {
+      setFilteredData(rawData);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getQueryParams, rawData]);
+  useEffect(() => filter(), [filter, rawData]);
+
+  const isValueInColumn = (filterValue: any, queryParams: any) => {
+    let result = false;
+    columns.forEach((column) => {
+      if (column.type === FilterFieldTypes.TEXT && queryParams['search-text-input']) {
+        if (column.accessor === queryParams['search-select'] || queryParams['search-select'] === 'All') {
+          if (isTextIncluded(queryParams['search-text-input'], filterValue[column.accessor as string])) {
+            result = true;
+            return;
+          }
+        }
+      }
+    });
+    console.log(result);
+    return result;
+  };
+
+  const isTextIncluded = (needle: string, haystack: string): boolean =>
+    haystack.toLowerCase().includes(needle.toLowerCase());
 
   return (
     <>

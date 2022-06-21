@@ -44,12 +44,16 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   }, [columns]);
 
   const onFormChange = debounce((values: any) => {
-    let obj = {};
-    obj = {
-      ...obj,
+    let obj = {
       'search-text-input': values['search-text-input'],
       'search-select': values['search-select']?.value ?? values['search-select'],
     };
+    if (obj['search-text-input'] && !obj['search-select']) {
+      obj = {
+        ...obj,
+        'search-select': 'All',
+      };
+    }
     columns.forEach((column) => {
       const accessor = column.accessor as string;
       if (column.type === FilterFieldTypes.RADIO_BUTTON) {
