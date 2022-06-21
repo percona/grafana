@@ -9,66 +9,28 @@ import { FilterProps } from './Filter.types';
 import arrayMutators from 'final-form-arrays';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
-import { UrlQueryValue } from '@grafana/data';
+import { buildObjForQueryParams, buildSearchOptions, getQueryParams } from './Filter.utils';
 
 export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const styles = useStyles2(getStyles);
   const [queryParams, setQueryParams] = useQueryParams();
 
-  const buildInitialValues = useMemo(() => {
-    const customTransform = (params: UrlQueryValue): any => {
-      if (params !== undefined && params !== null) {
-        return params;
-      }
-      return [];
-    };
-    const queryKeys = columns.map((column) => ({ key: column.accessor as string, transform: customTransform }));
-    queryKeys.push({ key: 'search-text-input', transform: customTransform });
-    queryKeys.push({ key: 'search-select', transform: customTransform });
-    const params = getValuesFromQueryParams(queryParams, queryKeys);
-    return params ?? {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const searchColumnsOptions = useMemo(() => {
-    const searchOptions = columns
-      .filter((value) => FilterFieldTypes.TEXT === value.type)
-      .map((column) => ({
-        value: column.accessor?.toString(),
-        label: column.Header?.toString(),
-      }));
-    searchOptions.unshift({ value: 'All', label: 'All' });
-    return searchOptions;
+    return buildSearchOptions(columns);
   }, [columns]);
 
   const onFormChange = debounce((values: any) => {
-    let obj = {
-      'search-text-input': values['search-text-input'],
-      'search-select': values['search-select']?.value ?? values['search-select'],
-    };
-    if (obj['search-text-input'] && !obj['search-select']) {
-      obj = {
-        ...obj,
-        'search-select': 'All',
-      };
-    }
-    columns.forEach((column) => {
-      const accessor = column.accessor as string;
-      if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-        obj = { ...obj, [accessor]: values[accessor] };
-      }
-      if (column.type === FilterFieldTypes.DROPDOWN) {
-        obj = { ...obj, [accessor]: values[accessor]?.value ? values[accessor]?.value : values[accessor] };
-      }
-    });
-    setQueryParams(obj);
+    const objForQueryParams = buildObjForQueryParams(columns, values);
+    setQueryParams(objForQueryParams);
   }, 600);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialValues = useMemo(() => getQueryParams(columns, queryParams), []);
 
   return (
     <Form
-      initialValues={buildInitialValues}
+      initialValues={initialValues}
       onSubmit={() => {}}
       mutators={{
         ...arrayMutators,
