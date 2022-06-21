@@ -44,7 +44,7 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: any) =
       }
     }
     if (column.type === FilterFieldTypes.DROPDOWN) {
-      if (values[accessor]?.value === ALL_VALUE) {
+      if (values[accessor]?.value === ALL_VALUE || values[accessor] === ALL_VALUE) {
         obj = { ...obj, [accessor]: undefined };
       } else {
         obj = { ...obj, [accessor]: values[accessor]?.value ?? values[accessor] };
@@ -63,4 +63,17 @@ export const buildSearchOptions = (columns: ExtendedColumn[]) => {
     }));
   searchOptions.unshift({ value: ALL_VALUE, label: ALL_LABEL });
   return searchOptions;
+};
+
+export const buildEmptyValues = (columns: ExtendedColumn[]) => {
+  let obj = {
+    [SEARCH_INPUT_FIELD_NAME]: undefined,
+    [SEARCH_SELECT_FIELD_NAME]: ALL_VALUE,
+  };
+  columns.map((column) => {
+    if (column.type === FilterFieldTypes.DROPDOWN || column.type === FilterFieldTypes.RADIO_BUTTON) {
+      obj = { ...obj, [column.accessor as string]: ALL_VALUE };
+    }
+  });
+  return obj;
 };

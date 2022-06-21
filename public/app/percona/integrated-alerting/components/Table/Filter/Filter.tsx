@@ -9,8 +9,9 @@ import { FilterProps } from './Filter.types';
 import arrayMutators from 'final-form-arrays';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { buildObjForQueryParams, buildSearchOptions, getQueryParams } from './Filter.utils';
+import { buildEmptyValues, buildObjForQueryParams, buildSearchOptions, getQueryParams } from './Filter.utils';
 import { ALL_LABEL, ALL_VALUE } from './Filter.constants';
+import { FormApi } from 'final-form';
 
 export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
@@ -29,6 +30,10 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialValues = useMemo(() => getQueryParams(columns, queryParams), []);
 
+  const onClearAll = (form: FormApi) => {
+    form.initialize(buildEmptyValues(columns));
+  };
+
   return (
     <Form
       initialValues={initialValues}
@@ -36,7 +41,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
       mutators={{
         ...arrayMutators,
       }}
-      render={({ handleSubmit, values }) => (
+      render={({ handleSubmit, values, form }) => (
         <form onSubmit={handleSubmit} role="form">
           <div className={styles.filterWrapper}>
             <span className={styles.filterLabel}>Filter</span>
@@ -55,8 +60,9 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
               <Field name="search-text-input">
                 {({ input }) => <Input type="text" placeholder="Search" {...input} />}
               </Field>
-              <Icon name="times" size="xl" />
+
               <IconButton name="filter" size="xl" onClick={() => setOpenCollapse(!openCollapse)} />
+              <IconButton name="times" size="xl" onClick={() => onClearAll(form)} />
             </div>
           </div>
           <div className={openCollapse ? styles.collapseOpen : styles.collapseClose}>
