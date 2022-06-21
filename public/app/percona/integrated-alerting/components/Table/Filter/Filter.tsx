@@ -100,7 +100,6 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
                 }
                 return <></>;
               })}
-              {JSON.stringify(values)}
               <FormSpy onChange={(state) => onFormChange(state.values)}></FormSpy>
             </div>
           </div>

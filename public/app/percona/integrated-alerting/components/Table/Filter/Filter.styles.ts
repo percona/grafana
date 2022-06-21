@@ -25,6 +25,7 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
       justify-content: center;
       align-items: center;
       gap: 4px;
+      width: 33%;
     `,
     collapseClose: css`
       max-height: 0;
