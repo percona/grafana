@@ -3,7 +3,13 @@ import { useTable, usePagination, useExpanded } from 'react-table';
 import { css } from '@emotion/css';
 import { useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
-import { TableProps, PaginatedTableInstance, PaginatedTableOptions, PaginatedTableState } from './Table.types';
+import {
+  TableProps,
+  PaginatedTableInstance,
+  PaginatedTableOptions,
+  PaginatedTableState,
+  FilterFieldTypes,
+} from './Table.types';
 import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableContent } from './TableContent';
@@ -11,6 +17,7 @@ import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay'
 import { Filter } from './Filter/Filter';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { getQueryParams, isValueInTextColumn } from './Filter/Filter.utils';
+import { ExtendedColumn } from '.';
 
 const defaultPropGetter = () => ({});
 
@@ -91,12 +98,16 @@ export const Table: FC<TableProps> = ({
     setPageSize(newPageSize);
     onPaginationChanged(newPageSize, 0);
   };
-
+  console.log(rawData);
   useEffect(() => {
     const queryParamsObj = getQueryParams(columns, queryParams);
-    console.log(queryParamsObj);
     if (Object.keys(queryParams).length > 0) {
-      const dataArray = rawData.filter((filterValue) => isValueInTextColumn(columns, filterValue, queryParamsObj));
+      const dataArray = rawData.filter(
+        (filterValue) =>
+          isValueInTextColumn(columns, filterValue, queryParamsObj) &&
+          isValueInDropdownColumn(columns, filterValue, queryParamsObj) &&
+          isValueInRadioButtonColumn(columns, filterValue, queryParamsObj)
+      );
       setFilteredData(dataArray);
     } else {
       setFilteredData(rawData);
@@ -104,21 +115,47 @@ export const Table: FC<TableProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParams, rawData]);
 
-  // const isValueInOtherColumns = (filterValue: any, queryParamsObj: any) => {
-  //   let result = false;
+  const isValueInDropdownColumn = (columns: ExtendedColumn[], filterValue: any, queryParamsObj: any) => {
+    let result: boolean[] = [];
 
-  //   columns.forEach((column) => {
-  //     const accessor = column.accessor as string;
-  //     if (column.type === FilterFieldTypes.DROPDOWN) {
-  //       if (queryParamsObj[accessor]) {
-  //         if (queryParamsObj[accessor] === filterValue[accessor]) {
-  //           result = true;
-  //         }
-  //       }
-  //     }
-  //   });
-  //   return result;
-  // };
+    columns.forEach((column) => {
+      const accessor = column.accessor as string;
+
+      if (column.type === FilterFieldTypes.DROPDOWN) {
+        if (queryParamsObj[accessor]) {
+          if (queryParamsObj[accessor]?.toString().toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
+            result.push(true);
+          } else {
+            result.push(false);
+          }
+        } else {
+          result.push(true);
+        }
+      }
+    });
+    return result.every((value) => value);
+  };
+
+  const isValueInRadioButtonColumn = (columns: ExtendedColumn[], filterValue: any, queryParamsObj: any) => {
+    let result: boolean[] = [];
+
+    columns.forEach((column) => {
+      const accessor = column.accessor as string;
+
+      if (column.type === FilterFieldTypes.RADIO_BUTTON) {
+        if (queryParamsObj[accessor]) {
+          if (queryParamsObj[accessor]?.toString().toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
+            result.push(true);
+          } else {
+            result.push(false);
+          }
+        } else {
+          result.push(true);
+        }
+      }
+    });
+    return result.every((value) => value);
+  };
 
   return (
     <>

@@ -143,11 +143,11 @@ export const AllChecksTab: FC = () => {
         options: [
           {
             label: 'Enabled',
-            value: true,
+            value: 'false',
           },
           {
             label: 'Disabled',
-            value: false,
+            value: 'true',
           },
         ],
       },
@@ -158,8 +158,8 @@ export const AllChecksTab: FC = () => {
         type: FilterFieldTypes.DROPDOWN,
         options: [
           {
-            label: 'Standart',
-            value: 'Standart',
+            label: 'Standard',
+            value: 'Standard',
           },
           {
             label: 'Rare',
