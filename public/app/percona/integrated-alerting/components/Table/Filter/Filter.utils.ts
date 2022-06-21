@@ -28,13 +28,27 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: any) =
       [SEARCH_SELECT_FIELD_NAME]: 'All',
     };
   }
+  if (!obj[SEARCH_INPUT_FIELD_NAME] && obj[SEARCH_SELECT_FIELD_NAME] === 'All') {
+    obj = {
+      ...obj,
+      [SEARCH_SELECT_FIELD_NAME]: undefined,
+    };
+  }
   columns.forEach((column) => {
     const accessor = column.accessor as string;
     if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-      obj = { ...obj, [accessor]: values[accessor] };
+      if (values[accessor] === 'All') {
+        obj = { ...obj, [accessor]: undefined };
+      } else {
+        obj = { ...obj, [accessor]: values[accessor] };
+      }
     }
     if (column.type === FilterFieldTypes.DROPDOWN) {
-      obj = { ...obj, [accessor]: values[accessor]?.value ?? values[accessor] };
+      if (values[accessor]?.value === 'All') {
+        obj = { ...obj, [accessor]: undefined };
+      } else {
+        obj = { ...obj, [accessor]: values[accessor]?.value ?? values[accessor] };
+      }
     }
   });
   return obj;
