@@ -83,9 +83,9 @@ export const Connected: FC = () => {
       </section>
       <ConfirmModal
         body={<ModalBody />}
-        confirmText={isPlatformUser ? Messages.disconnect : Messages.forceDisconnect}
+        confirmText={Messages.disconnect}
         isOpen={showModal}
-        title={isPlatformUser ? Messages.modalTitle : Messages.forceModalTitle}
+        title={Messages.modalTitle}
         onDismiss={closeModal}
         onConfirm={isPlatformUser ? handleDisconnect : handleForceDisconnect}
       />

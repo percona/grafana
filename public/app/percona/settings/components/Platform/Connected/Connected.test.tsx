@@ -97,7 +97,7 @@ describe('Connected:', () => {
     );
 
     fireEvent.click(screen.getByTestId('disconnect-button'));
-    expect(screen.getByText(Messages.forceModalTitle)).toBeInTheDocument();
+    expect(screen.getByTestId('force-disconnect-modal')).toBeInTheDocument();
   });
 
   it('should force disconnect for non percona platform users', async () => {
@@ -117,7 +117,7 @@ describe('Connected:', () => {
     );
 
     fireEvent.click(screen.getByTestId('disconnect-button'));
-    await waitFor(() => screen.getByText(Messages.forceModalTitle));
+    await waitFor(() => screen.getByTestId('force-disconnect-modal'));
 
     const confirmButton = screen
       .getAllByRole('button')
