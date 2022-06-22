@@ -38,12 +38,19 @@ export const CheckService = {
       token
     );
 
-    return result.map(({ service_name, service_id, critical_count = 0, warning_count = 0, notice_count = 0 }) => ({
+    return result.map(({ service_name, service_id, ...counts }) => ({
       serviceName: service_name,
       serviceId: service_id,
-      criticalCount: critical_count,
-      warningCount: warning_count,
-      noticeCount: notice_count,
+      counts: {
+        emergency: parseInt(counts.emergency_count, 10),
+        alert: parseInt(counts.alert_count, 10),
+        critical: parseInt(counts.critical_count, 10),
+        error: parseInt(counts.error_count, 10),
+        warning: parseInt(counts.warning_count, 10),
+        notice: parseInt(counts.notice_count, 10),
+        info: parseInt(counts.info_count, 10),
+        debug: parseInt(counts.debug_count, 10),
+      },
     }));
   },
   async getFailedCheckForService(
