@@ -22,7 +22,7 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
     `,
     filterActionsWrapper: css`
       display: flex;
-      justify-content: center;
+      justify-content: right;
       align-items: center;
       gap: 4px;
       width: 33%;
@@ -43,6 +43,10 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     `,
-    advanceFilterColumn: css``,
+    searchFields: css`
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    `,
   };
 };

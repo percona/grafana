@@ -1,4 +1,4 @@
-import { Icon, IconButton, Input, useStyles2 } from '@grafana/ui';
+import { IconButton, Input, useStyles2 } from '@grafana/ui';
 import { RadioButtonGroupField } from '@percona/platform-core';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -21,6 +21,7 @@ import { FormApi } from 'final-form';
 
 export const Filter = ({ columns }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
+  const [openSearchFields, setOpenSearchFields] = useState(false);
   const styles = useStyles2(getStyles);
   const [queryParams, setQueryParams] = useQueryParams();
 
@@ -39,6 +40,7 @@ export const Filter = ({ columns }: FilterProps) => {
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);
+    setOpenSearchFields(false);
   };
 
   useEffect(() => {
@@ -46,10 +48,17 @@ export const Filter = ({ columns }: FilterProps) => {
     if (numberOfParams > 0 && numberOfParams <= 2) {
       if (!initialValues[SEARCH_INPUT_FIELD_NAME] && !initialValues[SEARCH_SELECT_FIELD_NAME]) {
         setOpenCollapse(true);
+        setOpenSearchFields(true);
       }
     }
     if (numberOfParams > 2) {
       setOpenCollapse(true);
+      setOpenSearchFields(true);
+    }
+    if (numberOfParams === 2) {
+      if (initialValues[SEARCH_INPUT_FIELD_NAME] && initialValues[SEARCH_SELECT_FIELD_NAME]) {
+        setOpenSearchFields(true);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -71,21 +80,24 @@ export const Filter = ({ columns }: FilterProps) => {
           <div className={styles.filterWrapper}>
             <span className={styles.filterLabel}>Filter</span>
             <div className={styles.filterActionsWrapper}>
-              <Icon name="search" size="xl" />
-              <Field name="search-select">
-                {({ input }) => (
-                  <SelectField
-                    defaultValue={{ value: ALL_VALUE, label: ALL_LABEL }}
-                    className={styles.searchSelect}
-                    options={searchColumnsOptions ?? []}
-                    {...input}
-                  />
-                )}
-              </Field>
-              <Field name="search-text-input">
-                {({ input }) => <Input type="text" placeholder="Search" {...input} />}
-              </Field>
-
+              <IconButton name="search" size="xl" onClick={() => setOpenSearchFields((value) => !value)} />
+              {openSearchFields && (
+                <div className={styles.searchFields}>
+                  <Field name="search-select">
+                    {({ input }) => (
+                      <SelectField
+                        defaultValue={{ value: ALL_VALUE, label: ALL_LABEL }}
+                        className={styles.searchSelect}
+                        options={searchColumnsOptions ?? []}
+                        {...input}
+                      />
+                    )}
+                  </Field>
+                  <Field name="search-text-input">
+                    {({ input }) => <Input type="text" placeholder="Search" {...input} />}
+                  </Field>
+                </div>
+              )}
               {showAdvanceFilter && (
                 <IconButton name="filter" size="xl" onClick={() => setOpenCollapse(!openCollapse)} />
               )}
@@ -100,7 +112,7 @@ export const Filter = ({ columns }: FilterProps) => {
                   const columnOptions = [{ value: ALL_VALUE, label: ALL_LABEL }, ...(column.options ?? [])];
                   if (column.type === FilterFieldTypes.DROPDOWN) {
                     return (
-                      <div className={styles.advanceFilterColumn}>
+                      <div>
                         <Field name={`${column.accessor}`}>
                           {({ input }) => (
                             <SelectField
@@ -116,7 +128,7 @@ export const Filter = ({ columns }: FilterProps) => {
                   }
                   if (column.type === FilterFieldTypes.RADIO_BUTTON) {
                     return (
-                      <div className={styles.advanceFilterColumn}>
+                      <div>
                         <RadioButtonGroupField
                           options={columnOptions}
                           defaultValue={ALL_VALUE}
