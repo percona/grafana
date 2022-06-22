@@ -32,6 +32,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
 
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
+    setOpenCollapse(false);
   };
 
   return (
