@@ -195,7 +195,15 @@ export const AllChecksTab: FC = () => {
       try {
         const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
 
-        setChecks(checks);
+        setChecks(
+          checks.map((check) => {
+            if (check.disabled === undefined) {
+              return { ...check, disabled: false };
+            } else {
+              return check;
+            }
+          })
+        );
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
