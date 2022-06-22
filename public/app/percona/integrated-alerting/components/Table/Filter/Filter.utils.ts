@@ -4,11 +4,11 @@ import { ExtendedColumn, FilterFieldTypes } from '..';
 import { ALL_LABEL, ALL_VALUE, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 
 export const getQueryParams = (columns: ExtendedColumn[], queryParams: UrlQueryMap) => {
-  const customTransform = (params: UrlQueryValue): any => {
+  const customTransform = (params: UrlQueryValue): Object => {
     if (params !== undefined && params !== null) {
       return params.toString();
     }
-    return [];
+    return {};
   };
   const queryKeys = columns.map((column) => ({ key: column.accessor as string, transform: customTransform }));
   queryKeys.push({ key: SEARCH_INPUT_FIELD_NAME, transform: customTransform });

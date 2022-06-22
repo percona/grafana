@@ -1,7 +1,7 @@
 import { Icon, IconButton, Input, useStyles2 } from '@grafana/ui';
 import { RadioButtonGroupField } from '@percona/platform-core';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Field, Form, FormSpy } from 'react-final-form';
 import { FilterFieldTypes } from '..';
 import { getStyles } from './Filter.styles';
@@ -10,7 +10,7 @@ import arrayMutators from 'final-form-arrays';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { buildEmptyValues, buildObjForQueryParams, buildSearchOptions, getQueryParams } from './Filter.utils';
-import { ALL_LABEL, ALL_VALUE } from './Filter.constants';
+import { ALL_LABEL, ALL_VALUE, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 import { FormApi } from 'final-form';
 
 export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
@@ -34,6 +34,20 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);
   };
+
+  useEffect(() => {
+    const numberOfParams = Object.keys(initialValues).length;
+    if (numberOfParams > 0 && numberOfParams <= 2) {
+      //@ts-ignore
+      if (!initialValues[SEARCH_INPUT_FIELD_NAME] && !initialValues[SEARCH_SELECT_FIELD_NAME]) {
+        setOpenCollapse(true);
+      }
+    }
+    if (numberOfParams > 2) {
+      setOpenCollapse(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Form
