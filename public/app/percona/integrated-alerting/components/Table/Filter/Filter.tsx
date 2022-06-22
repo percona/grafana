@@ -13,7 +13,7 @@ import { buildEmptyValues, buildObjForQueryParams, buildSearchOptions, getQueryP
 import { ALL_LABEL, ALL_VALUE, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 import { FormApi } from 'final-form';
 
-export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
+export const Filter = ({ columns }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const styles = useStyles2(getStyles);
   const [queryParams, setQueryParams] = useQueryParams();
@@ -38,7 +38,6 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   useEffect(() => {
     const numberOfParams = Object.keys(initialValues).length;
     if (numberOfParams > 0 && numberOfParams <= 2) {
-      //@ts-ignore
       if (!initialValues[SEARCH_INPUT_FIELD_NAME] && !initialValues[SEARCH_SELECT_FIELD_NAME]) {
         setOpenCollapse(true);
       }

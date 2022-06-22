@@ -117,7 +117,7 @@ export const Table: FC<TableProps> = ({
   return (
     <>
       <Overlay dataTestId="table-loading" isPending={pendingRequest}>
-        {showFilter && <Filter columns={columns} rawData={rawData} setFilteredData={setFilteredData} />}
+        {showFilter && <Filter columns={columns} />}
         <div className={style.tableWrap} data-testid="table-outer-wrapper">
           <div className={style.table} data-testid="table-inner-wrapper">
             <TableContent loading={pendingRequest} hasData={hasData} emptyMessage={emptyMessage}>
