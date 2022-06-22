@@ -110,3 +110,29 @@ export const isValueInTextColumn = (columns: ExtendedColumn[], filterValue: any,
 
 export const isTextIncluded = (needle: string, haystack: string): boolean =>
   haystack.toLowerCase().includes(needle.toLowerCase());
+
+export const isInOptions = (
+  columns: ExtendedColumn[],
+  filterValue: any,
+  queryParamsObj: any,
+  filter: FilterFieldTypes
+) => {
+  let result: boolean[] = [];
+
+  columns.forEach((column) => {
+    const accessor = column.accessor as string;
+
+    if (column.type === filter) {
+      if (queryParamsObj[accessor]) {
+        if (queryParamsObj[accessor]?.toString().toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
+          result.push(true);
+        } else {
+          result.push(false);
+        }
+      } else {
+        result.push(true);
+      }
+    }
+  });
+  return result.every((value) => value);
+};

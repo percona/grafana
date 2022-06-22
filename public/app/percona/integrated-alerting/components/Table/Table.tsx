@@ -16,8 +16,7 @@ import { TableContent } from './TableContent';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { Filter } from './Filter/Filter';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { getQueryParams, isValueInTextColumn } from './Filter/Filter.utils';
-import { ExtendedColumn } from '.';
+import { getQueryParams, isInOptions, isValueInTextColumn } from './Filter/Filter.utils';
 
 const defaultPropGetter = () => ({});
 
@@ -105,8 +104,8 @@ export const Table: FC<TableProps> = ({
       const dataArray = rawData.filter(
         (filterValue) =>
           isValueInTextColumn(columns, filterValue, queryParamsObj) &&
-          isValueInDropdownColumn(columns, filterValue, queryParamsObj) &&
-          isValueInRadioButtonColumn(columns, filterValue, queryParamsObj)
+          isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.DROPDOWN) &&
+          isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.RADIO_BUTTON)
       );
       setFilteredData(dataArray);
     } else {
@@ -114,48 +113,6 @@ export const Table: FC<TableProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParams, rawData]);
-
-  const isValueInDropdownColumn = (columns: ExtendedColumn[], filterValue: any, queryParamsObj: any) => {
-    let result: boolean[] = [];
-
-    columns.forEach((column) => {
-      const accessor = column.accessor as string;
-
-      if (column.type === FilterFieldTypes.DROPDOWN) {
-        if (queryParamsObj[accessor]) {
-          if (queryParamsObj[accessor]?.toString().toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
-            result.push(true);
-          } else {
-            result.push(false);
-          }
-        } else {
-          result.push(true);
-        }
-      }
-    });
-    return result.every((value) => value);
-  };
-
-  const isValueInRadioButtonColumn = (columns: ExtendedColumn[], filterValue: any, queryParamsObj: any) => {
-    let result: boolean[] = [];
-
-    columns.forEach((column) => {
-      const accessor = column.accessor as string;
-
-      if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-        if (queryParamsObj[accessor]) {
-          if (queryParamsObj[accessor]?.toString().toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
-            result.push(true);
-          } else {
-            result.push(false);
-          }
-        } else {
-          result.push(true);
-        }
-      }
-    });
-    return result.every((value) => value);
-  };
 
   return (
     <>
