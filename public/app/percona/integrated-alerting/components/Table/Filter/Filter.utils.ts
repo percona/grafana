@@ -136,3 +136,13 @@ export const isInOptions = (
   });
   return result.every((value) => value);
 };
+
+export const isOtherThanTextType = (columns: ExtendedColumn[]) => {
+  let result = false;
+  columns.forEach((column) => {
+    if (column.type !== undefined && column.type !== FilterFieldTypes.TEXT) {
+      result = true;
+    }
+  });
+  return result;
+};
