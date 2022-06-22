@@ -6,7 +6,7 @@ import { ALL_LABEL, ALL_VALUE, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME
 export const getQueryParams = (columns: ExtendedColumn[], queryParams: UrlQueryMap) => {
   const customTransform = (params: UrlQueryValue): any => {
     if (params !== undefined && params !== null) {
-      return params;
+      return params.toString();
     }
     return [];
   };
@@ -36,18 +36,26 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: any) =
   }
   columns.forEach((column) => {
     const accessor = column.accessor as string;
+
     if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-      if (values[accessor] === ALL_VALUE) {
-        obj = { ...obj, [accessor]: undefined };
-      } else {
-        obj = { ...obj, [accessor]: values[accessor] };
+      if (values[accessor]) {
+        if (values[accessor] === ALL_VALUE) {
+          obj = { ...obj, [accessor]: undefined };
+        } else {
+          obj = { ...obj, [accessor]: values[accessor].toString() };
+        }
       }
     }
     if (column.type === FilterFieldTypes.DROPDOWN) {
-      if (values[accessor]?.value === ALL_VALUE || values[accessor] === ALL_VALUE) {
-        obj = { ...obj, [accessor]: undefined };
-      } else {
-        obj = { ...obj, [accessor]: values[accessor]?.value ?? values[accessor] };
+      if (values[accessor]) {
+        if (values[accessor]?.value === ALL_VALUE || values[accessor] === ALL_VALUE) {
+          obj = { ...obj, [accessor]: undefined };
+        } else {
+          obj = {
+            ...obj,
+            [accessor]: values[accessor]?.value ? values[accessor]?.value.toString() : values[accessor].toString(),
+          };
+        }
       }
     }
   });

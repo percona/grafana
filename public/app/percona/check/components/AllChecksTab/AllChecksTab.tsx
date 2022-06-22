@@ -143,11 +143,11 @@ export const AllChecksTab: FC = () => {
         options: [
           {
             label: 'Enabled',
-            value: 'false',
+            value: false,
           },
           {
             label: 'Disabled',
-            value: 'true',
+            value: true,
           },
         ],
       },

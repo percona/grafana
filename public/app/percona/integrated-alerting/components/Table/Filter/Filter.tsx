@@ -41,7 +41,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
       mutators={{
         ...arrayMutators,
       }}
-      render={({ handleSubmit, values, form }) => (
+      render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} role="form">
           <div className={styles.filterWrapper}>
             <span className={styles.filterLabel}>Filter</span>
@@ -68,6 +68,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
           <div className={openCollapse ? styles.collapseOpen : styles.collapseClose}>
             <div className={styles.advanceFilter}>
               {columns.map((column) => {
+                column.options = column.options?.map((option) => ({ ...option, value: option.value?.toString() }));
                 const columnOptions = [{ value: ALL_VALUE, label: ALL_LABEL }, ...(column.options ?? [])];
                 if (column.type === FilterFieldTypes.DROPDOWN) {
                   return (
