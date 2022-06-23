@@ -28,15 +28,6 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
       gap: 5px;
       width: 33%;
     `,
-    collapseClose: css`
-      max-height: 0;
-      transition: max-height 0.5s ease-out;
-      overflow: hidden;
-    `,
-    collapseOpen: css`
-      max-height: fit-content;
-      transition: max-height 0.5s ease-in;
-    `,
     advanceFilter: css`
       border-top: 2px solid ${colors.border2};
       padding: 16px;
