@@ -80,7 +80,12 @@ export const Filter = ({ columns }: FilterProps) => {
           <div className={styles.filterWrapper}>
             <span className={styles.filterLabel}>Filter</span>
             <div className={styles.filterActionsWrapper}>
-              <IconButton name="search" size="xl" onClick={() => setOpenSearchFields((value) => !value)} />
+              <IconButton
+                className={styles.icon}
+                name="search"
+                size="xl"
+                onClick={() => setOpenSearchFields((value) => !value)}
+              />
               {openSearchFields && (
                 <div className={styles.searchFields}>
                   <Field name="search-select">
@@ -99,9 +104,14 @@ export const Filter = ({ columns }: FilterProps) => {
                 </div>
               )}
               {showAdvanceFilter && (
-                <IconButton name="filter" size="xl" onClick={() => setOpenCollapse(!openCollapse)} />
+                <IconButton
+                  className={styles.icon}
+                  name="filter"
+                  size="xl"
+                  onClick={() => setOpenCollapse(!openCollapse)}
+                />
               )}
-              <IconButton name="times" size="xl" onClick={() => onClearAll(form)} />
+              <IconButton className={styles.icon} name="times" size="xl" onClick={() => onClearAll(form)} />
             </div>
           </div>
           {showAdvanceFilter && (

@@ -13,9 +13,10 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
       background-color: ${colors.bg2};
       border: 2px solid ${colors.border2};
       border-bottom: none;
-      padding: 4px 16px;
+      padding: 2px 16px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     `,
     filterLabel: css`
       font-size: 20px;
@@ -24,7 +25,7 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
       display: flex;
       justify-content: right;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       width: 33%;
     `,
     collapseClose: css`
@@ -41,12 +42,16 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
       padding: 16px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 5px;
     `,
     searchFields: css`
       display: flex;
       gap: 10px;
       width: 100%;
+    `,
+    icon: css`
+      margin-top: 5px;
+      margin-bottom: 5px;
     `,
   };
 };
