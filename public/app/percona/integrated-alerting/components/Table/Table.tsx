@@ -97,7 +97,6 @@ export const Table: FC<TableProps> = ({
     setPageSize(newPageSize);
     onPaginationChanged(newPageSize, 0);
   };
-  console.log(rawData);
   useEffect(() => {
     const queryParamsObj = getQueryParams(columns, queryParams);
     if (Object.keys(queryParams).length > 0) {

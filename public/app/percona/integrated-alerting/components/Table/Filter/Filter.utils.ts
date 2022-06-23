@@ -4,11 +4,11 @@ import { ExtendedColumn, FilterFieldTypes } from '..';
 import { ALL_LABEL, ALL_VALUE, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 
 export const getQueryParams = (columns: ExtendedColumn[], queryParams: UrlQueryMap) => {
-  const customTransform = (params: UrlQueryValue): Object => {
+  const customTransform = (params: UrlQueryValue): string | undefined => {
     if (params !== undefined && params !== null) {
       return params.toString();
     }
-    return {};
+    return undefined;
   };
   const queryKeys = columns.map((column) => ({ key: column.accessor as string, transform: customTransform }));
   queryKeys.push({ key: SEARCH_INPUT_FIELD_NAME, transform: customTransform });
@@ -17,7 +17,7 @@ export const getQueryParams = (columns: ExtendedColumn[], queryParams: UrlQueryM
   return params ?? {};
 };
 
-export const buildObjForQueryParams = (columns: ExtendedColumn[], values: any) => {
+export const buildObjForQueryParams = (columns: ExtendedColumn[], values: Record<string, any>) => {
   let obj = {
     [SEARCH_INPUT_FIELD_NAME]: values[SEARCH_INPUT_FIELD_NAME],
     [SEARCH_SELECT_FIELD_NAME]: values[SEARCH_SELECT_FIELD_NAME]?.value ?? values[SEARCH_SELECT_FIELD_NAME],
@@ -86,7 +86,11 @@ export const buildEmptyValues = (columns: ExtendedColumn[]) => {
   return obj;
 };
 
-export const isValueInTextColumn = (columns: ExtendedColumn[], filterValue: any, queryParamsObj: any) => {
+export const isValueInTextColumn = (
+  columns: ExtendedColumn[],
+  filterValue: any,
+  queryParamsObj: { [key: keyof UrlQueryMap]: string }
+) => {
   let result = false;
   columns.forEach((column) => {
     if (column.type === FilterFieldTypes.TEXT) {
@@ -114,7 +118,7 @@ export const isTextIncluded = (needle: string, haystack: string): boolean =>
 export const isInOptions = (
   columns: ExtendedColumn[],
   filterValue: any,
-  queryParamsObj: any,
+  queryParamsObj: { [key: keyof UrlQueryMap]: string },
   filter: FilterFieldTypes
 ) => {
   let result: boolean[] = [];
@@ -124,7 +128,7 @@ export const isInOptions = (
 
     if (column.type === filter) {
       if (queryParamsObj[accessor]) {
-        if (queryParamsObj[accessor]?.toString().toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
+        if (queryParamsObj[accessor]?.toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
           result.push(true);
         } else {
           result.push(false);

@@ -6,7 +6,6 @@ import { Field, Form, FormSpy } from 'react-final-form';
 import { FilterFieldTypes } from '..';
 import { getStyles } from './Filter.styles';
 import { FilterProps } from './Filter.types';
-import arrayMutators from 'final-form-arrays';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import {
@@ -29,7 +28,7 @@ export const Filter = ({ columns }: FilterProps) => {
     return buildSearchOptions(columns);
   }, [columns]);
 
-  const onFormChange = debounce((values: any) => {
+  const onFormChange = debounce((values: Record<string, any>) => {
     const objForQueryParams = buildObjForQueryParams(columns, values);
     setQueryParams(objForQueryParams);
   }, 600);
@@ -72,9 +71,6 @@ export const Filter = ({ columns }: FilterProps) => {
     <Form
       initialValues={initialValues}
       onSubmit={() => {}}
-      mutators={{
-        ...arrayMutators,
-      }}
       render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} role="form">
           <div className={styles.filterWrapper}>
