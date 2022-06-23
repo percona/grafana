@@ -47,7 +47,6 @@ export const Filter = ({ columns }: FilterProps) => {
     if (numberOfParams > 0 && numberOfParams <= 2) {
       if (!initialValues[SEARCH_INPUT_FIELD_NAME] && !initialValues[SEARCH_SELECT_FIELD_NAME]) {
         setOpenCollapse(true);
-        setOpenSearchFields(true);
       }
     }
     if (numberOfParams > 2) {
