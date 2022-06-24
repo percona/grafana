@@ -18,21 +18,15 @@ export const getQueryParams = (columns: ExtendedColumn[], queryParams: UrlQueryM
 };
 
 export const buildObjForQueryParams = (columns: ExtendedColumn[], values: Record<string, any>) => {
-  let obj = {
+  let obj: Record<string, any> = {
     [SEARCH_INPUT_FIELD_NAME]: values[SEARCH_INPUT_FIELD_NAME],
     [SEARCH_SELECT_FIELD_NAME]: values[SEARCH_SELECT_FIELD_NAME]?.value ?? values[SEARCH_SELECT_FIELD_NAME],
   };
   if (obj[SEARCH_INPUT_FIELD_NAME] && !obj[SEARCH_SELECT_FIELD_NAME]) {
-    obj = {
-      ...obj,
-      [SEARCH_SELECT_FIELD_NAME]: ALL_VALUE,
-    };
+    obj[SEARCH_SELECT_FIELD_NAME] = ALL_VALUE;
   }
   if (!obj[SEARCH_INPUT_FIELD_NAME] && obj[SEARCH_SELECT_FIELD_NAME]) {
-    obj = {
-      ...obj,
-      [SEARCH_SELECT_FIELD_NAME]: undefined,
-    };
+    obj[SEARCH_SELECT_FIELD_NAME] = undefined;
   }
   columns.forEach((column) => {
     const accessor = column.accessor as string;
@@ -40,21 +34,18 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: Record
     if (column.type === FilterFieldTypes.RADIO_BUTTON) {
       if (values[accessor]) {
         if (values[accessor] === ALL_VALUE) {
-          obj = { ...obj, [accessor]: undefined };
+          obj[accessor] = undefined;
         } else {
-          obj = { ...obj, [accessor]: values[accessor].toString() };
+          obj[accessor] = values[accessor].toString();
         }
       }
     }
     if (column.type === FilterFieldTypes.DROPDOWN) {
       if (values[accessor]) {
         if (values[accessor]?.value === ALL_VALUE || values[accessor] === ALL_VALUE) {
-          obj = { ...obj, [accessor]: undefined };
+          obj[accessor] = undefined;
         } else {
-          obj = {
-            ...obj,
-            [accessor]: values[accessor]?.value ? values[accessor]?.value.toString() : values[accessor].toString(),
-          };
+          obj[accessor] = values[accessor]?.value ? values[accessor]?.value.toString() : values[accessor].toString();
         }
       }
     }

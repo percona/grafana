@@ -113,6 +113,8 @@ export const Table: FC<TableProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParams, rawData]);
 
+  console.log(rawData);
+
   return (
     <>
       <Overlay dataTestId="table-loading" isPending={pendingRequest}>
