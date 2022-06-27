@@ -42,7 +42,7 @@ export const Filter = ({ columns }: FilterProps) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialValues = useMemo(() => getQueryParams(columns, queryParams), []);
-
+  console.log(initialValues);
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);
@@ -80,13 +80,16 @@ export const Filter = ({ columns }: FilterProps) => {
       render={({ handleSubmit, form }) => (
         <form onSubmit={handleSubmit} role="form">
           <div className={styles.filterWrapper}>
-            <span className={styles.filterLabel}>{Messages.filterLabel}</span>
+            <span className={styles.filterLabel} data-testid="filter">
+              {Messages.filterLabel}
+            </span>
             <div className={styles.filterActionsWrapper}>
               <IconButton
                 className={styles.icon}
                 name="search"
                 size="xl"
                 onClick={() => setOpenSearchFields((value) => !value)}
+                data-testid="open-search-fields"
               />
               {openSearchFields && (
                 <div className={styles.searchFields}>
@@ -97,11 +100,19 @@ export const Filter = ({ columns }: FilterProps) => {
                         className={styles.searchSelect}
                         options={searchColumnsOptions ?? []}
                         {...input}
+                        data-testid={SEARCH_SELECT_FIELD_NAME}
                       />
                     )}
                   </Field>
                   <Field name={SEARCH_INPUT_FIELD_NAME}>
-                    {({ input }) => <Input type="text" placeholder={Messages.searchPlaceholder} {...input} />}
+                    {({ input }) => (
+                      <Input
+                        type="text"
+                        placeholder={Messages.searchPlaceholder}
+                        {...input}
+                        data-testid={SEARCH_INPUT_FIELD_NAME}
+                      />
+                    )}
                   </Field>
                 </div>
               )}
@@ -111,9 +122,16 @@ export const Filter = ({ columns }: FilterProps) => {
                   name="filter"
                   size="xl"
                   onClick={() => setOpenCollapse(!openCollapse)}
+                  data-testid="advance-filter-button"
                 />
               )}
-              <IconButton className={styles.icon} name="times" size="xl" onClick={() => onClearAll(form)} />
+              <IconButton
+                className={styles.icon}
+                name="times"
+                size="xl"
+                onClick={() => onClearAll(form)}
+                data-testid="clear-all-button"
+              />
             </div>
           </div>
           {showAdvanceFilter && openCollapse && (
@@ -131,6 +149,7 @@ export const Filter = ({ columns }: FilterProps) => {
                             defaultValue={{ value: ALL_VALUE, label: ALL_LABEL }}
                             label={column.label ?? column.Header}
                             {...input}
+                            data-testid="select-dropdown"
                           />
                         )}
                       </Field>
@@ -146,6 +165,7 @@ export const Filter = ({ columns }: FilterProps) => {
                         name={`${column.accessor}`}
                         label={column.label ?? column.Header}
                         fullWidth
+                        data-testid="radio-button"
                       />
                     </div>
                   );
