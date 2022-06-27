@@ -9,7 +9,7 @@ export const Messages = {
     name: 'The name for this rule.',
     duration: 'The alert query duration, in seconds.',
     severity:
-      'The severity level for the alert triggered by this rule. Either "Warning", "Notice", "High" or "Critical".',
+      'The severity level for the alert triggered by this rule. Either "Warning", "Notice", "Error" or "Critical".',
     channels: 'Which notification channels should be used to send the alert through.',
     filters: 'Apply rule only to required services or nodes.',
   },
