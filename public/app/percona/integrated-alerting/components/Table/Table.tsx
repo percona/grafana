@@ -1,22 +1,14 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useTable, usePagination, useExpanded } from 'react-table';
 import { css } from '@emotion/css';
 import { useStyles } from '@grafana/ui';
 import { getStyles } from './Table.styles';
-import {
-  TableProps,
-  PaginatedTableInstance,
-  PaginatedTableOptions,
-  PaginatedTableState,
-  FilterFieldTypes,
-} from './Table.types';
+import { TableProps, PaginatedTableInstance, PaginatedTableOptions, PaginatedTableState } from './Table.types';
 import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableContent } from './TableContent';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { Filter } from './Filter/Filter';
-import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { getQueryParams, isInOptions, isValueInTextColumn } from './Filter/Filter.utils';
 
 const defaultPropGetter = () => ({});
 
@@ -40,10 +32,10 @@ export const Table: FC<TableProps> = ({
   getRowProps = defaultPropGetter,
   getColumnProps = defaultPropGetter,
   getCellProps = defaultPropGetter,
-  showFilter,
+  showFilter = false,
 }) => {
   const [data, setFilteredData] = useState<Object[]>([]);
-  const [queryParams] = useQueryParams();
+
   const style = useStyles(getStyles);
   const manualPagination = !!(totalPages && totalPages >= 0);
   const initialState: Partial<PaginatedTableState> = {
@@ -97,28 +89,11 @@ export const Table: FC<TableProps> = ({
     setPageSize(newPageSize);
     onPaginationChanged(newPageSize, 0);
   };
-  useEffect(() => {
-    const queryParamsObj = getQueryParams(columns, queryParams);
-    if (Object.keys(queryParams).length > 0) {
-      const dataArray = rawData.filter(
-        (filterValue) =>
-          isValueInTextColumn(columns, filterValue, queryParamsObj) &&
-          isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.DROPDOWN) &&
-          isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.RADIO_BUTTON)
-      );
-      setFilteredData(dataArray);
-    } else {
-      setFilteredData(rawData);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryParams, rawData]);
-
-  console.log(rawData);
 
   return (
     <>
       <Overlay dataTestId="table-loading" isPending={pendingRequest}>
-        {showFilter && <Filter columns={columns} />}
+        {showFilter && <Filter columns={columns} rawData={rawData} setFilteredData={setFilteredData} />}
         <div className={style.tableWrap} data-testid="table-outer-wrapper">
           <div className={style.table} data-testid="table-inner-wrapper">
             <TableContent loading={pendingRequest} hasData={hasData} emptyMessage={emptyMessage}>

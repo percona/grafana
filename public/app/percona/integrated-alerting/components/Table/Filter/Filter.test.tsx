@@ -61,6 +61,30 @@ const columns: Array<ExtendedColumn<CheckDetails>> = [
   },
 ];
 
+const data = [
+  {
+    name: 'test1',
+    description: 'Test desctiption 1',
+    summary: 'Test summary 1',
+    interval: 'interval 1',
+    disabled: false,
+  },
+  {
+    name: 'test2',
+    description: 'Test desctiption 2',
+    summary: 'Test summary 2',
+    interval: 'interval 2',
+    disabled: false,
+  },
+  {
+    name: 'test3',
+    description: 'Test desctiption 3',
+    summary: 'Test summary 3',
+    interval: 'interval 3',
+    disabled: true,
+  },
+];
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useLocation: () => ({
@@ -68,9 +92,11 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
+const setFilteredData = jest.fn();
+
 describe('Filter', () => {
   it('should render the filter', async () => {
-    render(<Filter columns={columns} />);
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} />);
 
     expect(screen.getByTestId('advance-filter-button')).toBeInTheDocument();
     expect(screen.getByTestId('clear-all-button')).toBeInTheDocument();
@@ -78,7 +104,7 @@ describe('Filter', () => {
   });
 
   it('should open correctly text fields', async () => {
-    render(<Filter columns={columns} />);
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} />);
 
     fireEvent.click(screen.getByTestId('open-search-fields'));
     expect(screen.getByText('All')).toBeInTheDocument();
@@ -89,7 +115,7 @@ describe('Filter', () => {
     jest
       .spyOn(filterUtils, 'getQueryParams')
       .mockImplementation(() => ({ [SEARCH_SELECT_FIELD_NAME]: 'summary', [SEARCH_INPUT_FIELD_NAME]: 'data' }));
-    render(<Filter columns={columns} />);
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} />);
 
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toBeInTheDocument();
@@ -98,7 +124,7 @@ describe('Filter', () => {
 
   it('should correctly show init data in advance filter fields from url query', async () => {
     jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ disabled: 'true', interval: 'Rare' }));
-    render(<Filter columns={columns} />);
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} />);
 
     expect(screen.getByText('Rare')).toBeInTheDocument();
     expect(screen.getByTestId('disabled-radio-state')).toBeInTheDocument();
@@ -109,7 +135,7 @@ describe('Filter', () => {
     jest
       .spyOn(filterUtils, 'getQueryParams')
       .mockImplementation(() => ({ [SEARCH_SELECT_FIELD_NAME]: 'summary', [SEARCH_INPUT_FIELD_NAME]: 'data' }));
-    render(<Filter columns={columns} />);
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} />);
 
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByTestId(SEARCH_INPUT_FIELD_NAME)).toBeInTheDocument();
@@ -119,7 +145,7 @@ describe('Filter', () => {
 
   it('should show only advance filter fields when only advance filter fields are set', async () => {
     jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ disabled: 'true', interval: 'Rare' }));
-    render(<Filter columns={columns} />);
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} />);
 
     expect(screen.queryByText('Name')).not.toBeInTheDocument();
     expect(screen.queryByTestId(SEARCH_INPUT_FIELD_NAME)).not.toBeInTheDocument();

@@ -13,7 +13,9 @@ import {
   buildObjForQueryParams,
   buildSearchOptions,
   getQueryParams,
+  isInOptions,
   isOtherThanTextType,
+  isValueInTextColumn,
 } from './Filter.utils';
 import {
   ALL_LABEL,
@@ -25,7 +27,7 @@ import {
 import { FormApi } from 'final-form';
 import { Messages } from './Filter.messages';
 
-export const Filter = ({ columns }: FilterProps) => {
+export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const [openSearchFields, setOpenSearchFields] = useState(false);
   const styles = useStyles2(getStyles);
@@ -34,6 +36,8 @@ export const Filter = ({ columns }: FilterProps) => {
   const searchColumnsOptions = useMemo(() => {
     return buildSearchOptions(columns);
   }, [columns]);
+
+  console.log(rawData);
 
   const onFormChange = debounce((values: Record<string, any>) => {
     const objForQueryParams = buildObjForQueryParams(columns, values);
@@ -67,6 +71,22 @@ export const Filter = ({ columns }: FilterProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const queryParamsObj = getQueryParams(columns, queryParams);
+    if (Object.keys(queryParams).length > 0) {
+      const dataArray = rawData.filter(
+        (filterValue) =>
+          isValueInTextColumn(columns, filterValue, queryParamsObj) &&
+          isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.DROPDOWN) &&
+          isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.RADIO_BUTTON)
+      );
+      setFilteredData(dataArray);
+    } else {
+      setFilteredData(rawData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryParams, rawData]);
 
   const showAdvanceFilter = useMemo(() => {
     return isOtherThanTextType(columns);
