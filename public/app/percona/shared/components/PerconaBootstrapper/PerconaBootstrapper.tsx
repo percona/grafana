@@ -90,7 +90,11 @@ export const PerconaBootstrapper = () => {
         .
       </p>
       <HorizontalGroup justify="center" spacing="md">
-        <Button onClick={startTour}>Start tour</Button>
+        <Button onClick={startTour} size="lg" className={styles.callToAction}>
+          Start tour
+        </Button>
+      </HorizontalGroup>
+      <HorizontalGroup justify="flex-end" spacing="md">
         <Button variant="secondary" onClick={dismissModal}>
           {Messages.skip}
         </Button>

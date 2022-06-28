@@ -21,4 +21,7 @@ export const getStyles = ({ v1: { spacing }, isLight }: GrafanaTheme2) => ({
   docsLink: css`
     text-decoration: underline;
   `,
+  callToAction: css`
+    margin-top: ${spacing.sm};
+  `,
 });
