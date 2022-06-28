@@ -7,8 +7,8 @@ export const getStyles = ({ v1: { spacing }, isLight }: GrafanaTheme2) => ({
     margin-bottom: ${spacing.md};
   `,
   svg: css`
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
 
     & path {
       fill: ${isLight ? 'black' : ''};
