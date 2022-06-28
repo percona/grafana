@@ -139,14 +139,13 @@ export const AllChecksTab: FC = () => {
         accessor: 'disabled',
         Cell: ({ value }) => (!!value ? Messages.disabled : Messages.enabled),
         type: FilterFieldTypes.RADIO_BUTTON,
-        label: 'Test',
         options: [
           {
-            label: 'Enabled',
+            label: Messages.enabled,
             value: false,
           },
           {
-            label: 'Disabled',
+            label: Messages.disabled,
             value: true,
           },
         ],
@@ -158,16 +157,16 @@ export const AllChecksTab: FC = () => {
         type: FilterFieldTypes.DROPDOWN,
         options: [
           {
-            label: 'Standard',
-            value: 'Standard',
+            label: Interval.STANDARD,
+            value: Interval.STANDARD,
           },
           {
-            label: 'Rare',
-            value: 'Rare',
+            label: Interval.RARE,
+            value: Interval.RARE,
           },
           {
-            label: 'Frequent',
-            value: 'Frequent',
+            label: Interval.FREQUENT,
+            value: Interval.FREQUENT,
           },
         ],
       },
@@ -195,15 +194,7 @@ export const AllChecksTab: FC = () => {
       try {
         const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
 
-        setChecks(
-          checks.map((check) => {
-            if (check.disabled === undefined) {
-              return { ...check, disabled: false };
-            } else {
-              return check;
-            }
-          })
-        );
+        setChecks(checks.map((check) => (!!check.disabled ? check : { ...check, disabled: false })));
       } catch (e) {
         if (isApiCancelError(e)) {
           return;

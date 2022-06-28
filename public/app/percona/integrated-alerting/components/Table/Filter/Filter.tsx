@@ -33,20 +33,15 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   const styles = useStyles2(getStyles);
   const [queryParams, setQueryParams] = useQueryParams();
 
-  const searchColumnsOptions = useMemo(() => {
-    return buildSearchOptions(columns);
-  }, [columns]);
+  const searchColumnsOptions = useMemo(() => buildSearchOptions(columns), [columns]);
 
-  console.log(rawData);
-
-  const onFormChange = debounce((values: Record<string, any>) => {
-    const objForQueryParams = buildObjForQueryParams(columns, values);
-    setQueryParams(objForQueryParams);
-  }, DEBOUNCE_DELAY);
+  const onFormChange = debounce(
+    (values: Record<string, any>) => setQueryParams(buildObjForQueryParams(columns, values)),
+    DEBOUNCE_DELAY
+  );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialValues = useMemo(() => getQueryParams(columns, queryParams), []);
-  console.log(initialValues);
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);
@@ -55,19 +50,20 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
 
   useEffect(() => {
     const numberOfParams = Object.keys(initialValues).length;
-    if (numberOfParams > 0 && numberOfParams <= 2) {
-      if (!initialValues[SEARCH_INPUT_FIELD_NAME] && !initialValues[SEARCH_SELECT_FIELD_NAME]) {
-        setOpenCollapse(true);
-      }
+    if (
+      numberOfParams > 0 &&
+      numberOfParams <= 2 &&
+      !initialValues[SEARCH_INPUT_FIELD_NAME] &&
+      !initialValues[SEARCH_SELECT_FIELD_NAME]
+    ) {
+      setOpenCollapse(true);
     }
     if (numberOfParams > 2) {
       setOpenCollapse(true);
       setOpenSearchFields(true);
     }
-    if (numberOfParams === 2) {
-      if (initialValues[SEARCH_INPUT_FIELD_NAME] && initialValues[SEARCH_SELECT_FIELD_NAME]) {
-        setOpenSearchFields(true);
-      }
+    if (numberOfParams === 2 && initialValues[SEARCH_INPUT_FIELD_NAME] && initialValues[SEARCH_SELECT_FIELD_NAME]) {
+      setOpenSearchFields(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -88,10 +84,11 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParams, rawData]);
 
-  const showAdvanceFilter = useMemo(() => {
-    return isOtherThanTextType(columns);
+  const showAdvanceFilter = useMemo(
+    () => isOtherThanTextType(columns),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    []
+  );
 
   return (
     <Form
@@ -141,7 +138,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
                   className={styles.icon}
                   name="filter"
                   size="xl"
-                  onClick={() => setOpenCollapse(!openCollapse)}
+                  onClick={() => setOpenCollapse((open) => !open)}
                   data-testid="advance-filter-button"
                 />
               )}

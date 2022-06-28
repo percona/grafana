@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
+export const getStyles = ({ v1: { colors, spacing, typography } }: GrafanaTheme2) => {
   return {
     searchSelect: css`
       margin: 0;
@@ -11,38 +11,38 @@ export const getStyles = ({ v1: { colors } }: GrafanaTheme2) => {
     `,
     filterWrapper: css`
       background-color: ${colors.bg2};
-      border: 2px solid ${colors.border2};
+      border: 1px solid ${colors.border2};
       border-bottom: none;
-      padding: 2px 16px;
+      padding: ${spacing.xxs} ${spacing.md};
       display: flex;
       justify-content: space-between;
       align-items: center;
     `,
     filterLabel: css`
-      font-size: 20px;
+      font-size: ${typography.size.md};
     `,
     filterActionsWrapper: css`
       display: flex;
       justify-content: right;
       align-items: center;
-      gap: 5px;
+      gap: ${spacing.xs};
       width: 33%;
     `,
     advanceFilter: css`
-      border-top: 2px solid ${colors.border2};
-      padding: 16px;
+      border-top: 1px solid ${colors.border2};
+      padding: ${spacing.md};
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 5px;
+      gap: ${spacing.xs};
     `,
     searchFields: css`
       display: flex;
-      gap: 10px;
+      gap: ${spacing.xs};
       width: 100%;
     `,
     icon: css`
-      margin-top: 5px;
-      margin-bottom: 5px;
+      margin-top: ${spacing.xs};
+      margin-bottom: ${spacing.xs};
     `,
   };
 };
