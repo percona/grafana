@@ -26,6 +26,10 @@ export const PerconaBootstrapper = () => {
 
   const dismissModal = () => {
     setModalIsOpen(false);
+  };
+
+  const finishTour = () => {
+    setModalIsOpen(false);
     setShowTour(false);
   };
 
@@ -95,7 +99,7 @@ export const PerconaBootstrapper = () => {
         </Button>
       </HorizontalGroup>
       <HorizontalGroup justify="flex-end" spacing="md">
-        <Button variant="secondary" onClick={dismissModal}>
+        <Button variant="secondary" onClick={finishTour}>
           {Messages.skip}
         </Button>
         <Button variant="secondary" onClick={() => setModalIsOpen(false)}>
