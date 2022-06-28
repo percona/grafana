@@ -34,8 +34,8 @@ export const Table: FC<TableProps> = ({
   getCellProps = defaultPropGetter,
   showFilter = false,
 }) => {
-  const [data, setFilteredData] = useState<Object[]>([]);
-
+  const [filterData, setFilteredData] = useState<Object[]>([]);
+  const data = showFilter ? filterData : rawData;
   const style = useStyles(getStyles);
   const manualPagination = !!(totalPages && totalPages >= 0);
   const initialState: Partial<PaginatedTableState> = {
