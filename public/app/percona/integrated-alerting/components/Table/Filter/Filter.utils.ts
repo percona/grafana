@@ -141,3 +141,9 @@ export const isOtherThanTextType = (columns: ExtendedColumn[]) => {
   });
   return result;
 };
+
+export const buildColumnOptions = (column: ExtendedColumn) => {
+  column.options = column.options?.map((option) => ({ ...option, value: option.value?.toString() }));
+  console.log(column);
+  return [{ value: ALL_VALUE, label: ALL_LABEL }, ...(column.options ?? [])];
+};

@@ -9,6 +9,7 @@ import { FilterProps } from './Filter.types';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import {
+  buildColumnOptions,
   buildEmptyValues,
   buildObjForQueryParams,
   buildSearchOptions,
@@ -161,8 +162,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
           {showAdvanceFilter && openCollapse && (
             <div className={styles.advanceFilter}>
               {columns.map((column) => {
-                column.options = column.options?.map((option) => ({ ...option, value: option.value?.toString() }));
-                const columnOptions = [{ value: ALL_VALUE, label: ALL_LABEL }, ...(column.options ?? [])];
+                const columnOptions = buildColumnOptions(column);
                 if (column.type === FilterFieldTypes.DROPDOWN) {
                   return (
                     <div>
