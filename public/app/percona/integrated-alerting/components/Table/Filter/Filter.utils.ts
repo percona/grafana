@@ -133,13 +133,11 @@ export const isInOptions = (
 };
 
 export const isOtherThanTextType = (columns: ExtendedColumn[]) => {
-  let result = false;
-  columns.forEach((column) => {
-    if (column.type !== undefined && column.type !== FilterFieldTypes.TEXT) {
-      result = true;
-    }
-  });
-  return result;
+  return columns.find((column) => {
+    return column.type !== undefined && column.type !== FilterFieldTypes.TEXT;
+  })
+    ? true
+    : false;
 };
 
 export const buildColumnOptions = (column: ExtendedColumn) => {
