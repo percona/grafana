@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useTable, usePagination, useExpanded } from 'react-table';
 import { css } from '@emotion/css';
 import { useStyles } from '@grafana/ui';
@@ -35,7 +35,7 @@ export const Table: FC<TableProps> = ({
   showFilter = false,
 }) => {
   const [filterData, setFilteredData] = useState<Object[]>([]);
-  const data = showFilter ? filterData : rawData;
+  const data = useMemo(() => (showFilter ? filterData : rawData), [showFilter, filterData, rawData]);
   const style = useStyles(getStyles);
   const manualPagination = !!(totalPages && totalPages >= 0);
   const initialState: Partial<PaginatedTableState> = {

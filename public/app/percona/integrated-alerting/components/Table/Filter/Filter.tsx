@@ -95,7 +95,13 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
       initialValues={initialValues}
       onSubmit={() => {}}
       render={({ handleSubmit, form }) => (
-        <form onSubmit={handleSubmit} role="form">
+        <form
+          onSubmit={handleSubmit}
+          role="form"
+          onKeyPress={(e) => {
+            e.key === 'Enter' && e.preventDefault();
+          }}
+        >
           <div className={styles.filterWrapper}>
             <span className={styles.filterLabel} data-testid="filter">
               {Messages.filterLabel}
@@ -128,6 +134,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
                         placeholder={Messages.searchPlaceholder}
                         {...input}
                         data-testid={SEARCH_INPUT_FIELD_NAME}
+                        autoFocus={true}
                       />
                     )}
                   </Field>
