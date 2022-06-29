@@ -35,7 +35,7 @@ export const FailedChecksTab: FC = () => {
         accessor: 'serviceName',
       },
       {
-        Header: 'Failures',
+        Header: 'Fail Count by Severity',
         accessor: 'counts',
         // eslint-disable-next-line react/display-name
         Cell: ({ value }) => <Failures counts={value} />,
