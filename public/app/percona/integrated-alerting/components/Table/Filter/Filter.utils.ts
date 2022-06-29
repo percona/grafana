@@ -46,7 +46,7 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: Record
 
 export const buildSearchOptions = (columns: ExtendedColumn[]) => {
   const searchOptions = columns
-    .filter((value) => FilterFieldTypes.TEXT === value.type)
+    .filter((value) => value.type === FilterFieldTypes.TEXT)
     .map((column) => ({
       value: column.accessor?.toString(),
       label: column.Header?.toString(),
