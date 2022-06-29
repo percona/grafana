@@ -22,31 +22,22 @@ export const buildObjForQueryParams = (columns: ExtendedColumn[], values: Record
     [SEARCH_INPUT_FIELD_NAME]: values[SEARCH_INPUT_FIELD_NAME],
     [SEARCH_SELECT_FIELD_NAME]: values[SEARCH_SELECT_FIELD_NAME]?.value ?? values[SEARCH_SELECT_FIELD_NAME],
   };
-  if (obj[SEARCH_INPUT_FIELD_NAME] && !obj[SEARCH_SELECT_FIELD_NAME]) {
-    obj[SEARCH_SELECT_FIELD_NAME] = ALL_VALUE;
-  }
-  if (!obj[SEARCH_INPUT_FIELD_NAME] && obj[SEARCH_SELECT_FIELD_NAME]) {
+  const searchSelectValue = obj[SEARCH_SELECT_FIELD_NAME];
+  const searchInputValue = obj[SEARCH_INPUT_FIELD_NAME];
+
+  if (searchInputValue) {
+    obj[SEARCH_SELECT_FIELD_NAME] = searchSelectValue ?? ALL_VALUE;
+  } else if (searchSelectValue) {
     obj[SEARCH_SELECT_FIELD_NAME] = undefined;
   }
+
   columns.forEach((column) => {
     const accessor = column.accessor as string;
+    const value = values[accessor]?.value ?? values[accessor];
 
-    if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-      if (values[accessor]) {
-        if (values[accessor] === ALL_VALUE) {
-          obj[accessor] = undefined;
-        } else {
-          obj[accessor] = values[accessor].toString();
-        }
-      }
-    }
-    if (column.type === FilterFieldTypes.DROPDOWN) {
-      if (values[accessor]) {
-        if (values[accessor]?.value === ALL_VALUE || values[accessor] === ALL_VALUE) {
-          obj[accessor] = undefined;
-        } else {
-          obj[accessor] = values[accessor]?.value ? values[accessor]?.value.toString() : values[accessor].toString();
-        }
+    if (value) {
+      if (column.type === FilterFieldTypes.RADIO_BUTTON || column.type === FilterFieldTypes.DROPDOWN) {
+        obj[accessor] = value === ALL_VALUE ? undefined : value.toString();
       }
     }
   });
@@ -142,6 +133,5 @@ export const isOtherThanTextType = (columns: ExtendedColumn[]) => {
 
 export const buildColumnOptions = (column: ExtendedColumn) => {
   column.options = column.options?.map((option) => ({ ...option, value: option.value?.toString() }));
-  console.log(column);
   return [{ value: ALL_VALUE, label: ALL_LABEL }, ...(column.options ?? [])];
 };
