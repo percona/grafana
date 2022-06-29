@@ -73,18 +73,17 @@ export const isValueInTextColumn = (
   filterValue: any,
   queryParamsObj: { [key: keyof UrlQueryMap]: string }
 ) => {
+  const searchInputValue = queryParamsObj[SEARCH_INPUT_FIELD_NAME];
+  const selectColumnValue = queryParamsObj[SEARCH_SELECT_FIELD_NAME];
   let result = false;
   columns.forEach((column) => {
     if (column.type === FilterFieldTypes.TEXT) {
-      if (queryParamsObj[SEARCH_INPUT_FIELD_NAME]) {
+      if (searchInputValue) {
         if (
-          column.accessor === queryParamsObj[SEARCH_SELECT_FIELD_NAME] ||
-          queryParamsObj[SEARCH_SELECT_FIELD_NAME] === ALL_VALUE
+          (column.accessor === selectColumnValue || selectColumnValue === ALL_VALUE) &&
+          isTextIncluded(searchInputValue, filterValue[column.accessor as string])
         ) {
-          if (isTextIncluded(queryParamsObj[SEARCH_INPUT_FIELD_NAME], filterValue[column.accessor as string])) {
-            result = true;
-            return;
-          }
+          result = true;
         }
       } else {
         result = true;
@@ -101,16 +100,17 @@ export const isInOptions = (
   columns: ExtendedColumn[],
   filterValue: any,
   queryParamsObj: { [key: keyof UrlQueryMap]: string },
-  filter: FilterFieldTypes
+  filterFieldType: FilterFieldTypes
 ) => {
   let result: boolean[] = [];
 
   columns.forEach((column) => {
     const accessor = column.accessor as string;
-
-    if (column.type === filter) {
-      if (queryParamsObj[accessor]) {
-        if (queryParamsObj[accessor]?.toLowerCase() === filterValue[accessor]?.toString().toLowerCase()) {
+    const queryParamValueAccessor = queryParamsObj[accessor];
+    const filterValueAccessor = filterValue[accessor];
+    if (column.type === filterFieldType) {
+      if (queryParamValueAccessor) {
+        if (queryParamValueAccessor.toLowerCase() === filterValueAccessor?.toString().toLowerCase()) {
           result.push(true);
         } else {
           result.push(false);
