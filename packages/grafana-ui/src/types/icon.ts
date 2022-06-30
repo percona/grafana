@@ -189,6 +189,7 @@ export const getAvailableIcons = () =>
     'percona-setting',
     'percona-bell',
     'percona-bell-slash',
+    'qan',
     'pmm-logo',
     'qan',
   ] as const;
