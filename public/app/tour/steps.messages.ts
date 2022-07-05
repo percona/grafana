@@ -1,10 +1,28 @@
 export const Messages = {
   dashboards: {
-    pmmShipping:
-      'PMM ships with several Grafana dashboards for efficient database monitoring, from CPU utilization to MySQL Replication Summary.',
-    checkOur: 'Check our ',
-    dashboardsRepo: 'dashboards repo',
-    contribute: ' and see how you can contribute with your own.',
+    browse: 'Here you can access your Home Dashboard and browse the dashboards.',
+    folders: 'Dashboards are grouped into folders. You can customize these by renaming them or creating new ones.',
+    playlists:
+      'You can also create and browse playlists. A playlist can be a great way to to just show your metrics to your team or visitors.',
+  },
+  pmmDashboards: {
+    grafanaTechnology:
+      'PMM dashboards are built on Grafana technology, powered by decades of Percona expertise in database performance optimization.',
+    observe:
+      'Use these dashboards to observe top to bottom metrics of performance and get to the root of the database issues in the matter of minutes.',
+    zoomIn:
+      'Zoom-in, drill-down database performance from node to single query levels. Get insights about your DBs no matter where they are stored - on-premises, in the cloud, or hybrid environments.',
+  },
+  qan: {
+    queries: 'Query Analytics (QAN) dashboard shows how queries are executed along with the query count and time.',
+    analyze:
+      'It helps you analyze the database queries over time, optimize database performance, and find and remedy the source of problems.',
+  },
+  explore: {
+    data:
+      'If you just want to explore your data and do not want to create a dashboard, then Explore is the option for you.',
+    graphs: 'If your data source supports graph and table data, then Explore shows the results as a graph and a table.',
+    query: 'Explore panel strips away the dashboard and panel options so that you can focus on the query.',
   },
   alerting: {
     simplerToUse: "PMM comes with a simpler-to-use alerting system that works side-by-side with Grafana's.",
@@ -18,9 +36,16 @@ export const Messages = {
     services:
       "Here you can check Services, Agents and Nodes in your PMM's Inventory, and add new instances for monitoring: PostgreSQL, MySQL, MongoDB, HAProxy, etc.",
     settings:
-      'PMM Settings also live here. From there, you can connect your PMM instance to Percona Platform and change more advanced settings, for example to activate PMM Alerting, DBaaS, etc.',
+      'PMM Settings also live here. From there, you can connect your PMM instance to Percona Platform and change more advanced settings, for example to activate PMM Alerting, private DBaaS feature (currently in technical preview), etc.',
     settingsDocs: 'Documentation for PMM Settings',
     settingsDocsLink: 'here',
+  },
+  serverAdmin: {
+    userManagement: 'In the Server Admin panel you can assign and control user management for PMM:',
+    addEditRemove: 'Add, edit, and remove users.',
+    grant: 'Grant or Revoke admin privileges for a user.',
+    manageOrg: 'Manage organizations to which the user belongs and their assigned role.',
+    changeOrg: 'Change the organization role assigned to the user account.',
   },
   advisors: {
     pmmIncludes:
