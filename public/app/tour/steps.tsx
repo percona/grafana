@@ -7,7 +7,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="Dashboards"]',
     content: (
-      <SidebarStep title="Dashboards">
+      <SidebarStep title={Messages.dashboards.title}>
         <p>{Messages.dashboards.browse}</p>
         <p>{Messages.dashboards.folders}</p>
         <p>{Messages.dashboards.playlists}</p>
@@ -17,7 +17,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="PMM dashboards"]',
     content: (
-      <SidebarStep title="PMM Dashboards">
+      <SidebarStep title={Messages.pmmDashboards.title}>
         <p>{Messages.pmmDashboards.grafanaTechnology}</p>
         <p>{Messages.pmmDashboards.observe}</p>
         <p>{Messages.pmmDashboards.zoomIn}</p>
@@ -27,7 +27,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="Query Analytics (QAN)"]',
     content: (
-      <SidebarStep title="PMM Query Analytics">
+      <SidebarStep title={Messages.qan.title}>
         <p>{Messages.qan.queries}</p>
         <p>{Messages.qan.analyze}</p>
       </SidebarStep>
@@ -36,7 +36,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="Explore"]',
     content: (
-      <SidebarStep title="Explore">
+      <SidebarStep title={Messages.explore.title}>
         <p>{Messages.explore.data}</p>
         <p>{Messages.explore.graphs}</p>
         <p>{Messages.explore.query}</p>
@@ -46,7 +46,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="Alerting"]',
     content: (
-      <SidebarStep title="PMM Alerting">
+      <SidebarStep title={Messages.alerting.title}>
         <p>{Messages.alerting.simplerToUse}</p>
         <p>{Messages.alerting.youDefine}</p>
         <p>{Messages.alerting.howToUse}</p>
@@ -67,7 +67,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="Configuration"]',
     content: (
-      <SidebarStep title="Configuration Panel">
+      <SidebarStep title={Messages.configPanel.title}>
         <p>{Messages.configPanel.services}</p>
         <p>{Messages.configPanel.settings}</p>
         <p>
@@ -87,7 +87,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="Server Admin"]',
     content: (
-      <SidebarStep title="Server Admin">
+      <SidebarStep title={Messages.serverAdmin.title}>
         <p>{Messages.serverAdmin.userManagement}</p>
         <ul>
           <li>{Messages.serverAdmin.addEditRemove}</li>
@@ -101,7 +101,7 @@ const steps: StepType[] = [
   {
     selector: '.dropdown > [aria-label="Advisor Checks"]',
     content: (
-      <SidebarStep title="Advisor checks">
+      <SidebarStep title={Messages.advisors.title}>
         <p>{Messages.advisors.pmmIncludes}</p>
         <p>
           {Messages.advisors.findOutMore}
