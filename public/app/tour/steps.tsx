@@ -56,7 +56,6 @@ const steps: StepType[] = [
             href="https://docs.percona.com/percona-monitoring-and-management/using/alerting.html"
             target="_blank"
             rel="noreferrer noopener"
-            style={{ textDecoration: 'underline' }}
           >
             {Messages.alerting.docs}
           </a>
@@ -77,7 +76,6 @@ const steps: StepType[] = [
             href="https://docs.percona.com/percona-monitoring-and-management/how-to/configure.html"
             target="_blank"
             rel="noreferrer noopener"
-            style={{ textDecoration: 'underline' }}
           >
             {Messages.configPanel.settingsDocsLink}
           </a>
@@ -107,12 +105,7 @@ const steps: StepType[] = [
         <p>{Messages.advisors.pmmIncludes}</p>
         <p>
           {Messages.advisors.findOutMore}
-          <a
-            href="https://docs.percona.com/percona-platform/checks.html"
-            target="_blank"
-            rel="noreferrer noopener"
-            style={{ textDecoration: 'underline' }}
-          >
+          <a href="https://docs.percona.com/percona-platform/checks.html" target="_blank" rel="noreferrer noopener">
             {Messages.advisors.docs}
           </a>
           .
