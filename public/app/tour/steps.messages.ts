@@ -61,4 +61,17 @@ export const Messages = {
     findOutMore: 'To find out more, check out the ',
     docs: 'Advisors documentation',
   },
+  dbaas: {
+    title: 'DBaaS',
+    feature:
+      'Private DBaaS feature allows you to CRUD (Create, Read, Update, Delete) Percona XtraDB Cluster (PXC), and Percona Server for MongoDB (PSMDB) managed databases in Kubernetes clusters.',
+    techPreview:
+      'This is a technical preview feature recommended for test environments only. To use private DBaaS feature, make sure to activate it via Settings, on the sidebar.',
+    benefits: 'The benefits of using private DBaaS feature are manifold such as:',
+    singleInterface:
+      'A single interface to deploy and manage your open source databases on-premises, in the cloud, or across hybrid and multi-cloud environments.',
+    dbManagement: 'Critical database management operations, such as backup, recovery, and patching.',
+    automation:
+      'Enhanced automation and advisory services allow you to find, eliminate, and prevent outages, security issues, and slowdowns.',
+  },
 };
