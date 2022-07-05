@@ -5,22 +5,41 @@ import { Messages } from './steps.messages';
 
 const steps: StepType[] = [
   {
+    selector: '.dropdown > [aria-label="Dashboards"]',
+    content: (
+      <SidebarStep title="Dashboards">
+        <p>{Messages.dashboards.browse}</p>
+        <p>{Messages.dashboards.folders}</p>
+        <p>{Messages.dashboards.playlists}</p>
+      </SidebarStep>
+    ),
+  },
+  {
     selector: '.dropdown > [aria-label="PMM dashboards"]',
     content: (
       <SidebarStep title="PMM Dashboards">
-        <p>{Messages.dashboards.pmmShipping}</p>
-        <p>
-          {Messages.dashboards.checkOur}
-          <a
-            href="https://github.com/percona/grafana-dashboards"
-            target="_blank"
-            rel="noreferrer noopener"
-            style={{ textDecoration: 'underline' }}
-          >
-            {Messages.dashboards.dashboardsRepo}
-          </a>
-          {Messages.dashboards.contribute}
-        </p>
+        <p>{Messages.pmmDashboards.grafanaTechnology}</p>
+        <p>{Messages.pmmDashboards.observe}</p>
+        <p>{Messages.pmmDashboards.zoomIn}</p>
+      </SidebarStep>
+    ),
+  },
+  {
+    selector: '.dropdown > [aria-label="Query Analytics (QAN)"]',
+    content: (
+      <SidebarStep title="PMM Query Analytics">
+        <p>{Messages.qan.queries}</p>
+        <p>{Messages.qan.analyze}</p>
+      </SidebarStep>
+    ),
+  },
+  {
+    selector: '.dropdown > [aria-label="Explore"]',
+    content: (
+      <SidebarStep title="Explore">
+        <p>{Messages.explore.data}</p>
+        <p>{Messages.explore.graphs}</p>
+        <p>{Messages.explore.query}</p>
       </SidebarStep>
     ),
   },
@@ -64,6 +83,20 @@ const steps: StepType[] = [
           </a>
           .
         </p>
+      </SidebarStep>
+    ),
+  },
+  {
+    selector: '.dropdown > [aria-label="Server Admin"]',
+    content: (
+      <SidebarStep title="Server Admin">
+        <p>{Messages.serverAdmin.userManagement}</p>
+        <ul>
+          <li>{Messages.serverAdmin.addEditRemove}</li>
+          <li>{Messages.serverAdmin.grant}</li>
+          <li>{Messages.serverAdmin.manageOrg}</li>
+          <li>{Messages.serverAdmin.changeOrg}</li>
+        </ul>
       </SidebarStep>
     ),
   },
