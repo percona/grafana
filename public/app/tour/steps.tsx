@@ -1,9 +1,10 @@
 import React from 'react';
-import { StepType } from '@reactour/tour';
 import SidebarStep from './SidebarStep';
 import { Messages } from './steps.messages';
+import { Settings } from 'app/percona/settings/Settings.types';
+import { StepType } from '@reactour/tour';
 
-const steps: StepType[] = [
+export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => [
   {
     selector: '.dropdown > [aria-label="Dashboards"]',
     content: (
@@ -33,16 +34,20 @@ const steps: StepType[] = [
       </SidebarStep>
     ),
   },
-  {
-    selector: '.dropdown > [aria-label="Explore"]',
-    content: (
-      <SidebarStep title={Messages.explore.title}>
-        <p>{Messages.explore.data}</p>
-        <p>{Messages.explore.graphs}</p>
-        <p>{Messages.explore.query}</p>
-      </SidebarStep>
-    ),
-  },
+  ...(isPmmAdmin
+    ? [
+        {
+          selector: '.dropdown > [aria-label="Explore"]',
+          content: (
+            <SidebarStep title={Messages.explore.title}>
+              <p>{Messages.explore.data}</p>
+              <p>{Messages.explore.graphs}</p>
+              <p>{Messages.explore.query}</p>
+            </SidebarStep>
+          ),
+        },
+      ]
+    : []),
   {
     selector: '.dropdown > [aria-label="Alerting"]',
     content: (
@@ -64,55 +69,67 @@ const steps: StepType[] = [
       </SidebarStep>
     ),
   },
-  {
-    selector: '.dropdown > [aria-label="Configuration"]',
-    content: (
-      <SidebarStep title={Messages.configPanel.title}>
-        <p>{Messages.configPanel.services}</p>
-        <p>{Messages.configPanel.settings}</p>
-        <p>
-          {Messages.configPanel.settingsDocs}{' '}
-          <a
-            href="https://docs.percona.com/percona-monitoring-and-management/how-to/configure.html"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            {Messages.configPanel.settingsDocsLink}
-          </a>
-          .
-        </p>
-      </SidebarStep>
-    ),
-  },
-  {
-    selector: '.dropdown > [aria-label="Server Admin"]',
-    content: (
-      <SidebarStep title={Messages.serverAdmin.title}>
-        <p>{Messages.serverAdmin.userManagement}</p>
-        <ul>
-          <li>{Messages.serverAdmin.addEditRemove}</li>
-          <li>{Messages.serverAdmin.grant}</li>
-          <li>{Messages.serverAdmin.manageOrg}</li>
-          <li>{Messages.serverAdmin.changeOrg}</li>
-        </ul>
-      </SidebarStep>
-    ),
-  },
-  {
-    selector: '.dropdown > [aria-label="Advisor Checks"]',
-    content: (
-      <SidebarStep title={Messages.advisors.title}>
-        <p>{Messages.advisors.pmmIncludes}</p>
-        <p>
-          {Messages.advisors.findOutMore}
-          <a href="https://docs.percona.com/percona-platform/checks.html" target="_blank" rel="noreferrer noopener">
-            {Messages.advisors.docs}
-          </a>
-          .
-        </p>
-      </SidebarStep>
-    ),
-  },
+  ...(isPmmAdmin
+    ? [
+        {
+          selector: '.dropdown > [aria-label="Configuration"]',
+          content: (
+            <SidebarStep title={Messages.configPanel.title}>
+              <p>{Messages.configPanel.services}</p>
+              <p>{Messages.configPanel.settings}</p>
+              <p>
+                {Messages.configPanel.settingsDocs}{' '}
+                <a
+                  href="https://docs.percona.com/percona-monitoring-and-management/how-to/configure.html"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {Messages.configPanel.settingsDocsLink}
+                </a>
+                .
+              </p>
+            </SidebarStep>
+          ),
+        },
+        {
+          selector: '.dropdown > [aria-label="Server Admin"]',
+          content: (
+            <SidebarStep title={Messages.serverAdmin.title}>
+              <p>{Messages.serverAdmin.userManagement}</p>
+              <ul>
+                <li>{Messages.serverAdmin.addEditRemove}</li>
+                <li>{Messages.serverAdmin.grant}</li>
+                <li>{Messages.serverAdmin.manageOrg}</li>
+                <li>{Messages.serverAdmin.changeOrg}</li>
+              </ul>
+            </SidebarStep>
+          ),
+        },
+      ]
+    : []),
+  ...(isPmmAdmin && !!settings?.sttEnabled
+    ? [
+        {
+          selector: '.dropdown > [aria-label="Advisor Checks"]',
+          content: (
+            <SidebarStep title={Messages.advisors.title}>
+              <p>{Messages.advisors.pmmIncludes}</p>
+              <p>
+                {Messages.advisors.findOutMore}
+                <a
+                  href="https://docs.percona.com/percona-platform/checks.html"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {Messages.advisors.docs}
+                </a>
+                .
+              </p>
+            </SidebarStep>
+          ),
+        },
+      ]
+    : []),
 ];
 
-export default steps;
+export default getSteps;

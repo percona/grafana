@@ -15,11 +15,12 @@ import { getStyles } from './PerconaBootstrapper.styles';
 import { isPmmAdmin } from '../../helpers/permissions';
 import { Messages } from './PerconaBootstrapper.messages';
 import { PERCONA_TOUR_FLAG } from 'app/tour/constants';
+import getSteps from 'app/tour/steps';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
   const dispatch = useAppDispatch();
-  const { setCurrentStep, setIsOpen } = useTour();
+  const { setCurrentStep, setIsOpen, setSteps } = useTour();
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [showTour, setShowTour] = useLocalStorage<boolean>(PERCONA_TOUR_FLAG, true);
   const styles = useStyles2(getStyles);
@@ -43,7 +44,8 @@ export const PerconaBootstrapper = () => {
   useEffect(() => {
     const getSettings = async () => {
       try {
-        await dispatch(fetchSettingsAction()).unwrap();
+        const settings = await dispatch(fetchSettingsAction()).unwrap();
+        setSteps(getSteps(isPmmAdmin(contextSrv.user), settings));
         dispatch(setAuthorized(true));
       } catch (e) {
         if (e.response?.status === 401) {
@@ -62,9 +64,9 @@ export const PerconaBootstrapper = () => {
     if (isLoggedIn) {
       bootstrap();
     }
-  }, [dispatch, isLoggedIn, setCurrentStep, setIsOpen]);
+  }, [dispatch, isLoggedIn, setCurrentStep, setIsOpen, setSteps]);
 
-  return isLoggedIn && isPmmAdmin(contextSrv.user) && showTour ? (
+  return isLoggedIn && showTour ? (
     <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title={Messages.title}>
       <div className={styles.iconContainer}>
         <Icon type="mono" name="pmm-logo" className={styles.svg} />

@@ -18,10 +18,11 @@ import { SearchWrapper } from 'app/features/search';
 import { LiveConnectionWarning } from './features/live/LiveConnectionWarning';
 import { AngularRoot } from './angular/AngularRoot';
 import { PerconaBootstrapper } from 'app/percona/shared/components/PerconaBootstrapper';
-import steps from './tour/steps';
+import getSteps from './tour/steps';
 import Close from './tour/Close';
 import Navigation from './tour/Navigation';
 import { PERCONA_TOUR_FLAG } from './tour/constants';
+import { isPmmAdmin } from './percona/shared/helpers/permissions';
 
 interface AppWrapperProps {
   app: GrafanaApp;
@@ -109,7 +110,7 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                 <div className="grafana-app">
                   <Router history={locationService.getHistory()}>
                     <TourProvider
-                      steps={steps}
+                      steps={getSteps(isPmmAdmin(contextSrv.user))}
                       components={{ Close, Navigation }}
                       showBadge={false}
                       badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
