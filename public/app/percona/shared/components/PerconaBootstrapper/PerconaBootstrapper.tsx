@@ -14,13 +14,14 @@ import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
 import { getStyles } from './PerconaBootstrapper.styles';
 import { isPmmAdmin } from '../../helpers/permissions';
 import { Messages } from './PerconaBootstrapper.messages';
+import { PERCONA_TOUR_FLAG } from 'app/tour/constants';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
   const dispatch = useAppDispatch();
   const { setCurrentStep, setIsOpen } = useTour();
   const [modalIsOpen, setModalIsOpen] = useState(true);
-  const [showTour, setShowTour] = useLocalStorage<boolean>('percona.showTour', true);
+  const [showTour, setShowTour] = useLocalStorage<boolean>(PERCONA_TOUR_FLAG, true);
   const styles = useStyles2(getStyles);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
 
