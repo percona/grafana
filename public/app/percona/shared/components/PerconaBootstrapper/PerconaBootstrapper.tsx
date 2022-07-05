@@ -65,7 +65,7 @@ export const PerconaBootstrapper = () => {
   }, [dispatch, isLoggedIn, setCurrentStep, setIsOpen]);
 
   return isLoggedIn && isPmmAdmin(contextSrv.user) && showTour ? (
-    <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title="Welcome to Percona Monitoring and Management">
+    <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title={Messages.title}>
       <div className={styles.iconContainer}>
         <Icon type="mono" name="pmm-logo" className={styles.svg} />
       </div>
@@ -95,7 +95,7 @@ export const PerconaBootstrapper = () => {
       </p>
       <HorizontalGroup justify="center" spacing="md">
         <Button onClick={startTour} size="lg" className={styles.callToAction}>
-          Start tour
+          {Messages.startTour}
         </Button>
       </HorizontalGroup>
       <HorizontalGroup justify="flex-end" spacing="md">
