@@ -21,6 +21,7 @@ import { PerconaBootstrapper } from 'app/percona/shared/components/PerconaBootst
 import steps from './tour/steps';
 import Close from './tour/Close';
 import Navigation from './tour/Navigation';
+import { PERCONA_TOUR_FLAG } from './tour/constants';
 
 interface AppWrapperProps {
   app: GrafanaApp;
@@ -114,7 +115,7 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                       badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
                       disableFocusLock
                       onClickClose={({ setIsOpen }) => {
-                        localStorage.setItem('percona.showTour', 'false');
+                        localStorage.setItem(PERCONA_TOUR_FLAG, 'false');
                         setIsOpen(false);
                       }}
                       styles={{
