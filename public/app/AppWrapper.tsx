@@ -118,6 +118,7 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                         localStorage.setItem(PERCONA_TOUR_FLAG, 'false');
                         setIsOpen(false);
                       }}
+                      className="pmm-tour"
                       styles={{
                         popover: (base) => ({
                           ...base,
