@@ -1,4 +1,5 @@
 export const Messages = {
+  title: 'Welcome to Percona Monitoring and Management (PMM)',
   pmm: 'Percona Monitoring and Management',
   pmmIs:
     ' is an open-source database monitoring, management, and observability solution for MySQL, PostgreSQL, MongoDB and other popular databases.',
@@ -12,4 +13,5 @@ export const Messages = {
   pmmOnlineHelp: 'PMM online help',
   skip: 'Skip',
   checkLater: 'Check later',
+  startTour: 'Start tour',
 };
