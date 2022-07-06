@@ -90,21 +90,22 @@ export const PerconaBootstrapper = () => {
           target="_blank"
           rel="noreferrer noopener"
           className={styles.docsLink}
+          data-testid="pmm-tour-online-docs"
         >
           {Messages.pmmOnlineHelp}
         </a>
         .
       </p>
       <HorizontalGroup justify="center" spacing="md">
-        <Button onClick={startTour} size="lg" className={styles.callToAction}>
+        <Button onClick={startTour} size="lg" className={styles.callToAction} data-testid="pmm-tour-start">
           {Messages.startTour}
         </Button>
       </HorizontalGroup>
       <HorizontalGroup justify="flex-end" spacing="md">
-        <Button variant="secondary" onClick={finishTour}>
+        <Button variant="secondary" onClick={finishTour} data-testid="pmm-tour-skip">
           {Messages.skip}
         </Button>
-        <Button variant="secondary" onClick={() => setModalIsOpen(false)}>
+        <Button variant="secondary" onClick={() => setModalIsOpen(false)} data-testid="pmm-tour-check-later">
           {Messages.checkLater}
         </Button>
       </HorizontalGroup>

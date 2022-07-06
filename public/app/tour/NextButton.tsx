@@ -16,9 +16,9 @@ const NextButton: FC<BtnFnProps> = ({ currentStep, setCurrentStep, stepsLength, 
   const onNext = () => setCurrentStep((step) => (step === stepsLength - 1 ? step : step + 1));
 
   return lastStep ? (
-    <Button onClick={onDone}>Done</Button>
+    <Button onClick={onDone} data-testid="pmm-tour-done">Done</Button>
   ) : (
-    <IconButton onClick={onNext} name="arrow-right" size="lg" />
+    <IconButton onClick={onNext} name="arrow-right" size="lg" data-testid="pmm-tour-next-step" />
   );
 };
 
