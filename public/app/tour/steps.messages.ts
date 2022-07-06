@@ -30,7 +30,7 @@ export const Messages = {
   },
   alerting: {
     title: 'PMM Alerting',
-    simplerToUse: "PMM comes with a simpler-to-use alerting system that works side-by-side with Grafana's.",
+    simplerToUse: "PMM comes with a simpler-to-use alerting system for admin users that works side-by-side with Grafana's.",
     youDefine:
       'You define what system metrics are critical to your environment, and what thresholds are acceptable for each metric. When something needs your attention, PMM automatically sends you an alert through your specified communication channels.',
     howToUse: 'To use PMM Alerting, make sure to activate it via Settings, on this sidebar.',
