@@ -8,6 +8,7 @@ const PrevButton: FC<BtnFnProps> = ({ currentStep, setCurrentStep }) => (
     name="arrow-left"
     size="lg"
     disabled={currentStep === 0}
+    data-testid="pmm-tour-prev-step"
   />
 );
 
