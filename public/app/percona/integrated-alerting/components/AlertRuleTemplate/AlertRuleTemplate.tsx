@@ -72,7 +72,7 @@ export const AlertRuleTemplate: FC = () => {
       {
         Header: nameColumn,
         accessor: 'summary',
-        width: '70%',
+        width: '60%',
       },
       {
         Header: sourceColumn,
