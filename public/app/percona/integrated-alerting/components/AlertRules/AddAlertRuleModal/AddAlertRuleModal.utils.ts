@@ -1,4 +1,4 @@
-import { AddAlertRuleFormValues } from './AddAlertRuleModal.types';
+import { AddAlertRuleFormValues, FiltersForm } from './AddAlertRuleModal.types';
 import {
   AlertRule,
   AlertRuleParamType,
@@ -8,9 +8,9 @@ import {
   AlertRuleFilterType,
   AlertRulesListResponseChannel,
 } from '../AlertRules.types';
-import { Severity, Template, TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
+import { Template, TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
 import { SelectableValue } from '@grafana/data';
-import { Messages } from './AddAlertRuleModal.messages';
+import { Severity } from 'app/percona/shared/core';
 
 export const formatChannelsOptions = (channels: string[]): Array<SelectableValue<string>> =>
   channels
@@ -28,35 +28,12 @@ export const formatTemplateOptions = (templates: Template[]): Array<SelectableVa
       }))
     : [];
 
-// TODO: handle new types as they gets added to AlertRuleFilterType
-export const formatFilter = (filter: string): AlertRulesListPayloadFilter => {
-  if (!filter) {
-    return {
-      key: '',
-      value: '',
-      type: 'EQUAL',
-    };
-  }
-
-  const [key, value] = filter.split('=');
-
-  return {
-    key,
-    value,
-    type: 'EQUAL',
-  };
-};
-
-export const formatFilters = (filters: string): AlertRulesListPayloadFilter[] => {
-  const trimmedFilters = filters.trim();
-
-  if (trimmedFilters === '') {
-    return [];
-  }
-
-  const filterList = trimmedFilters.split(/,\s*/);
-
-  return filterList.map(formatFilter);
+export const formatFilters = (filters: FiltersForm[]): AlertRulesListPayloadFilter[] => {
+  return filters.map((value) => {
+    const indexOfValue = Object.values(AlertRuleFilterType).indexOf(value.operators.value);
+    const key = Object.keys(AlertRuleFilterType)[indexOfValue];
+    return { key: value.label, type: key as keyof typeof AlertRuleFilterType, value: value.value };
+  });
 };
 
 export const formatCreateAPIPayload = (
@@ -71,8 +48,8 @@ export const formatCreateAPIPayload = (
     channel_ids: notificationChannels ? notificationChannels.map((channel) => channel.value as string) : [],
     filters: filters ? formatFilters(filters) : [],
     for: `${duration}s`,
-    severity: severity.value as Severity,
-    template_name: template.value as string,
+    severity: severity.value!,
+    template_name: template.value!,
     name,
     params: [],
   };
@@ -105,14 +82,20 @@ export const formatUpdateAPIPayload = (
   };
 };
 
-export const formatEditFilter = (filter: AlertRulesListPayloadFilter): string => {
-  const { key, type, value } = filter;
-
-  return `${key}${AlertRuleFilterType[type]}${value}`;
-};
-
-export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): string => {
-  return filters ? filters.map(formatEditFilter).join(', ') : '';
+export const formatEditFilters = (filters: AlertRulesListPayloadFilter[] | undefined | null): FiltersForm[] | [] => {
+  return filters
+    ? filters.map((filterData) => {
+        const { key, type, value } = filterData;
+        return {
+          label: key,
+          value: value,
+          operators: {
+            label: `${AlertRuleFilterType[type]} (${type})`,
+            value: AlertRuleFilterType[type],
+          },
+        };
+      })
+    : [];
 };
 
 export const formatEditTemplate = (templateName: string, templateSummary: string): SelectableValue<string> => ({
@@ -120,9 +103,9 @@ export const formatEditTemplate = (templateName: string, templateSummary: string
   label: templateSummary,
 });
 
-export const formatEditSeverity = (severity: keyof typeof Severity): SelectableValue<Severity> => ({
-  value: Severity[severity],
-  label: Messages.severities[severity],
+export const formatEditSeverity = (severity: keyof typeof Severity): SelectableValue<keyof typeof Severity> => ({
+  value: severity,
+  label: Severity[severity],
 });
 
 export const formatEditNotificationChannel = (channel: AlertRulesListResponseChannel) => ({

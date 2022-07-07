@@ -1,18 +1,15 @@
 import {
-  Severity,
   SourceDescription,
   TemplateParamType,
   TemplateParamUnit,
 } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
-import { AlertRuleCreatePayload, AlertRuleUpdatePayload } from '../AlertRules.types';
-import { AddAlertRuleFormValues } from './AddAlertRuleModal.types';
+import { AlertRuleCreatePayload, AlertRuleFilterType, AlertRuleUpdatePayload } from '../AlertRules.types';
+import { AddAlertRuleFormValues, FiltersForm } from './AddAlertRuleModal.types';
 import {
   formatCreateAPIPayload,
-  formatFilter,
   formatFilters,
   formatTemplateOptions,
   formatUpdateAPIPayload,
-  formatEditFilter,
   formatEditFilters,
   formatEditTemplate,
   formatEditSeverity,
@@ -23,78 +20,18 @@ import {
 } from './AddAlertRuleModal.utils';
 
 describe('AddAlertRuleModal utils', () => {
-  test('formatFilter', () => {
-    expect(formatFilter('key=value')).toEqual({
-      key: 'key',
-      value: 'value',
-      type: 'EQUAL',
-    });
-
-    expect(formatFilter('key=')).toEqual({
-      key: 'key',
-      value: '',
-      type: 'EQUAL',
-    });
-
-    expect(formatFilter('=')).toEqual({
-      key: '',
-      value: '',
-      type: 'EQUAL',
-    });
-
-    expect(formatFilter('=value')).toEqual({
-      key: '',
-      value: 'value',
-      type: 'EQUAL',
-    });
-
-    expect(formatFilter('')).toEqual({
-      key: '',
-      value: '',
-      type: 'EQUAL',
-    });
-  });
-
   test('formatFilters', () => {
-    expect(formatFilters('')).toEqual([]);
-    expect(formatFilters('=')).toEqual([
+    const filterObject: FiltersForm[] = [
       {
-        key: '',
-        value: '',
-        type: 'EQUAL',
+        label: 'key',
+        value: 'value',
+        operators: { label: AlertRuleFilterType.EQUAL, value: AlertRuleFilterType.EQUAL },
       },
-    ]);
-    expect(formatFilters('test=xyz')).toEqual([
+    ];
+    expect(formatFilters(filterObject)).toEqual([
       {
-        key: 'test',
-        value: 'xyz',
-        type: 'EQUAL',
-      },
-    ]);
-    expect(formatFilters('  test=xyz, ijk=,   foo =bar,\nzyx=abc, \naaa=   zzz ')).toEqual([
-      {
-        key: 'test',
-        value: 'xyz',
-        type: 'EQUAL',
-      },
-      {
-        key: 'ijk',
-        value: '',
-        type: 'EQUAL',
-      },
-      {
-        key: 'foo ',
-        value: 'bar',
-        type: 'EQUAL',
-      },
-      {
-        key: 'zyx',
-        value: 'abc',
-        type: 'EQUAL',
-      },
-      {
-        key: 'aaa',
-        value: '   zzz',
+        key: 'key',
+        value: 'value',
         type: 'EQUAL',
       },
     ]);
@@ -112,7 +49,7 @@ describe('AddAlertRuleModal utils', () => {
           yaml: 'test',
           params: [],
           expr: '',
-          severity: Severity.SEVERITY_CRITICAL,
+          severity: 'SEVERITY_CRITICAL',
           for: '200s',
         },
         {
@@ -123,7 +60,7 @@ describe('AddAlertRuleModal utils', () => {
           yaml: 'test',
           params: [],
           expr: '',
-          severity: Severity.SEVERITY_ERROR,
+          severity: 'SEVERITY_ERROR',
           for: '100s',
         },
         {
@@ -134,7 +71,7 @@ describe('AddAlertRuleModal utils', () => {
           yaml: 'test',
           params: [],
           expr: '',
-          severity: Severity.SEVERITY_CRITICAL,
+          severity: 'SEVERITY_CRITICAL',
           for: '150s',
         },
       ])
@@ -158,14 +95,25 @@ describe('AddAlertRuleModal utils', () => {
     const inputData: AddAlertRuleFormValues = {
       enabled: false,
       duration: 123,
-      filters: 'test=filter,',
+      filters: [
+        {
+          label: 'key',
+          value: 'value',
+          operators: { label: AlertRuleFilterType.EQUAL, value: AlertRuleFilterType.EQUAL },
+        },
+        {
+          label: 'key',
+          value: 'value',
+          operators: { label: AlertRuleFilterType.REGEX, value: AlertRuleFilterType.REGEX },
+        },
+      ],
       name: 'test name',
       notificationChannels: [
         { value: 'pagerDuty', label: 'Pager Duty' },
         { value: 'email', label: 'email' },
         { value: 'slack', label: 'Slack' },
       ],
-      severity: { value: Severity.SEVERITY_CRITICAL, label: 'Critical' },
+      severity: { value: 'SEVERITY_CRITICAL', label: 'Critical' },
       template: { value: 'Test Template', label: 'Test Template' },
       threshold: 10,
     };
@@ -190,14 +138,14 @@ describe('AddAlertRuleModal utils', () => {
       channel_ids: ['pagerDuty', 'email', 'slack'],
       filters: [
         {
-          key: 'test',
-          value: 'filter',
+          key: 'key',
+          value: 'value',
           type: 'EQUAL',
         },
         {
-          key: '',
-          value: '',
-          type: 'EQUAL',
+          key: 'key',
+          value: 'value',
+          type: 'REGEX',
         },
       ],
       for: '123s',
@@ -208,7 +156,7 @@ describe('AddAlertRuleModal utils', () => {
           type: 'FLOAT',
         },
       ],
-      severity: Severity.SEVERITY_CRITICAL,
+      severity: 'SEVERITY_CRITICAL',
       template_name: 'Test Template',
       name: 'test name',
     });
@@ -218,14 +166,20 @@ describe('AddAlertRuleModal utils', () => {
     const inputData: AddAlertRuleFormValues = {
       enabled: false,
       duration: 123,
-      filters: 'test=filter,',
+      filters: [
+        {
+          label: 'key',
+          value: 'value',
+          operators: { label: AlertRuleFilterType.EQUAL, value: AlertRuleFilterType.EQUAL },
+        },
+      ],
       name: 'test name',
       notificationChannels: [
         { value: 'pagerDuty', label: 'Pager Duty' },
         { value: 'email', label: 'email' },
         { value: 'slack', label: 'Slack' },
       ],
-      severity: { value: Severity.SEVERITY_CRITICAL, label: 'Critical' },
+      severity: { value: 'SEVERITY_CRITICAL', label: 'Critical' },
       template: { value: 'Test Template', label: 'Test Template' },
       threshold: 10,
     };
@@ -251,13 +205,8 @@ describe('AddAlertRuleModal utils', () => {
       channel_ids: ['pagerDuty', 'email', 'slack'],
       filters: [
         {
-          key: 'test',
-          value: 'filter',
-          type: 'EQUAL',
-        },
-        {
-          key: '',
-          value: '',
+          key: 'key',
+          value: 'value',
           type: 'EQUAL',
         },
       ],
@@ -269,36 +218,16 @@ describe('AddAlertRuleModal utils', () => {
           type: 'FLOAT',
         },
       ],
-      severity: Severity.SEVERITY_CRITICAL,
+      severity: 'SEVERITY_CRITICAL',
       template_name: 'Test Template',
       name: 'test name',
     });
   });
 
-  test('formatEditFilter', () => {
-    expect(
-      formatEditFilter({
-        key: 'testKey',
-        type: 'EQUAL',
-        value: 'testValue',
-      })
-    ).toEqual('testKey=testValue');
-  });
-
-  test('formatEditFilter', () => {
-    expect(
-      formatEditFilter({
-        key: 'testKey',
-        type: 'EQUAL',
-        value: 'testValue',
-      })
-    ).toEqual('testKey=testValue');
-  });
-
   test('formatEditFilters', () => {
-    expect(formatEditFilters(undefined)).toEqual('');
+    expect(formatEditFilters(undefined)).toEqual([]);
 
-    expect(formatEditFilters(null)).toEqual('');
+    expect(formatEditFilters(null)).toEqual([]);
 
     expect(
       formatEditFilters([
@@ -313,7 +242,10 @@ describe('AddAlertRuleModal utils', () => {
           value: 'testValue2',
         },
       ])
-    ).toEqual('testKey1=testValue1, testKey2=testValue2');
+    ).toEqual([
+      { label: 'testKey1', operators: { label: '= (EQUAL)', value: '=' }, value: 'testValue1' },
+      { label: 'testKey2', operators: { label: '= (EQUAL)', value: '=' }, value: 'testValue2' },
+    ]);
   });
 
   test('formatEditTemplate', () => {
@@ -324,7 +256,7 @@ describe('AddAlertRuleModal utils', () => {
   });
 
   test('formatEditSeverity', () => {
-    expect(formatEditSeverity(Severity.SEVERITY_CRITICAL)).toEqual({ value: 'SEVERITY_CRITICAL', label: 'Critical' });
+    expect(formatEditSeverity('SEVERITY_CRITICAL')).toEqual({ value: 'SEVERITY_CRITICAL', label: 'Critical' });
   });
 
   test('formatEditNotificationChannel', () => {

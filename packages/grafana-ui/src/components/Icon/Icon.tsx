@@ -34,6 +34,8 @@ const alwaysMonoIcons: IconName[] = [
   'percona-process',
   'percona-setting',
   'percona-database-checks',
+  'pmm-logo',
+  'qan-logo',
 ];
 
 export interface IconProps extends React.HTMLAttributes<HTMLDivElement> {

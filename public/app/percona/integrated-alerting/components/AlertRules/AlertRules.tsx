@@ -16,19 +16,20 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
 import { Table } from '../Table/Table';
 import { AddAlertRuleModal } from './AddAlertRuleModal';
-import { Severity } from '../Severity';
+import { Severity as SeverityComp } from '../Severity';
 import { getStyles } from './AlertRules.styles';
 import { AlertRulesProvider } from './AlertRules.provider';
 import { AlertRulesService } from './AlertRules.service';
 import { Messages } from '../../IntegratedAlerting.messages';
 import { formatRules, sortRules } from './AlertRules.utils';
-import { AlertRule, AlertRuleSeverity } from './AlertRules.types';
+import { AlertRule } from './AlertRules.types';
 import { AlertRulesActions } from './AlertRulesActions';
 import { ALERT_RULES_TABLE_ID, GET_ALERT_RULES_CANCEL_TOKEN } from './AlertRules.constants';
 import { useStoredTablePageSize } from '../Table/Pagination';
 import { AlertRulesParamsDetails } from './AlertRulesParamsDetails';
 import { cx } from '@emotion/css';
 import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
+import { Severity } from 'app/percona/shared/core';
 
 const { columns } = Messages.alertRules.table;
 
@@ -114,7 +115,7 @@ export const AlertRules: FC = () => {
       {
         Header: severityColumn,
         accessor: 'severity',
-        Cell: ({ value }) => <Severity severity={value as AlertRuleSeverity} />,
+        Cell: ({ value }) => <SeverityComp severity={value as Severity} />,
         width: '5%',
       },
       {

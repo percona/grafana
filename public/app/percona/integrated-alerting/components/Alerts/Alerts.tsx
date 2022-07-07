@@ -50,7 +50,7 @@ export const Alerts: FC = () => {
   const navModel = useNavModel('integrated-alerting-alerts');
   const [data, setData] = useState<Alert[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULE_TEMPLATES_TABLE_ID);
-  const [pageIndex, setPageindex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [generateToken] = useCancelToken();
@@ -184,9 +184,9 @@ export const Alerts: FC = () => {
   const handlePaginationChanged = useCallback(
     (pageSize: number, pageIndex: number) => {
       setPageSize(pageSize);
-      setPageindex(pageIndex);
+      setPageIndex(pageIndex);
     },
-    [setPageSize]
+    [setPageSize, setPageIndex]
   );
 
   const renderSelectedSubRow = React.useCallback(
@@ -208,7 +208,7 @@ export const Alerts: FC = () => {
   useEffect(() => {
     getAlerts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pageSize, pageIndex]);
 
   return (
     <Page navModel={navModel}>

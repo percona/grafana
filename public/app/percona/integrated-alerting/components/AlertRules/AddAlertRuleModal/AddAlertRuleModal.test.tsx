@@ -1,6 +1,6 @@
 import React from 'react';
 import { AddAlertRuleModal } from './AddAlertRuleModal';
-import { AlertRule, AlertRuleSeverity } from '../AlertRules.types';
+import { AlertRule } from '../AlertRules.types';
 import { templateStubs } from '../../AlertRuleTemplate/__mocks__/alertRuleTemplateStubs';
 import { SEVERITY_OPTIONS } from './AddAlertRulesModal.constants';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -41,7 +41,7 @@ describe('AddAlertRuleModal', () => {
       params_values: [],
       default_for: '3600s',
       for: '3600s',
-      default_severity: AlertRuleSeverity.SEVERITY_CRITICAL,
+      default_severity: 'SEVERITY_CRITICAL',
       name: templateName,
       expr_template: '',
       template_name: templateName,
@@ -178,5 +178,61 @@ describe('AddAlertRuleModal', () => {
     expect(screen.getByTestId('template-alert').querySelector('pre')?.textContent).toEqual(
       templateStubs[0].annotations?.summary
     );
+  });
+
+  it('should add filter fields when clicked on add filter button', async () => {
+    render(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+    fireEvent.click(screen.getByTestId('add-filter-button'));
+    expect(screen.getByTestId('filter-fields-row')).toBeInTheDocument();
+  });
+
+  it('should remove filter field when clicked on remove filter icon', async () => {
+    render(<AddAlertRuleModal setVisible={jest.fn()} isVisible />);
+    fireEvent.click(screen.getByTestId('add-filter-button'));
+    expect(screen.getByTestId('filter-fields-row')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('delete-filter-button'));
+    expect(screen.queryByTestId('filter-fields-row')).not.toBeInTheDocument();
+  });
+
+  it('should disable submit button when new filter field without data is added', async () => {
+    await waitFor(() => render(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />));
+
+    const thresholdInput = screen.getByTestId(`${templateParams[0].name}-number-input`);
+    await waitFor(() =>
+      fireEvent.change(thresholdInput, {
+        target: {
+          value: '2',
+        },
+      })
+    );
+
+    fireEvent.click(screen.getByTestId('add-filter-button'));
+    expect(screen.getByTestId('filter-fields-row')).toBeInTheDocument();
+
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toBeDisabled();
+  });
+
+  it('should enable submit button again when filter field without data is deleted', async () => {
+    await waitFor(() => render(<AddAlertRuleModal setVisible={jest.fn()} isVisible alertRule={initialValues} />));
+
+    const thresholdInput = screen.getByTestId(`${templateParams[0].name}-number-input`);
+    await waitFor(() =>
+      fireEvent.change(thresholdInput, {
+        target: {
+          value: '2',
+        },
+      })
+    );
+
+    fireEvent.click(screen.getByTestId('add-filter-button'));
+    expect(screen.getByTestId('filter-fields-row')).toBeInTheDocument();
+
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).toBeDisabled();
+
+    fireEvent.click(screen.getByTestId('delete-filter-button'));
+    expect(screen.queryByTestId('filter-fields-row')).not.toBeInTheDocument();
+
+    expect(screen.getByTestId('add-alert-rule-modal-add-button')).not.toBeDisabled();
   });
 });

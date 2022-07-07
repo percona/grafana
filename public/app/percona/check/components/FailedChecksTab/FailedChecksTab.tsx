@@ -18,6 +18,7 @@ import { Messages } from './FailedChecksTab.messages';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { getStyles } from './FailedChecksTab.styles';
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
+import { Failures } from './Failures/Failures';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
@@ -33,16 +34,10 @@ export const FailedChecksTab: FC = () => {
         accessor: 'serviceName',
       },
       {
-        Header: 'Critical',
-        accessor: 'criticalCount',
-      },
-      {
-        Header: 'Warning',
-        accessor: 'warningCount',
-      },
-      {
-        Header: 'Notice',
-        accessor: 'noticeCount',
+        Header: 'Fail Count by Severity',
+        accessor: 'counts',
+        // eslint-disable-next-line react/display-name
+        Cell: ({ value }) => <Failures counts={value} />,
       },
     ],
     []
