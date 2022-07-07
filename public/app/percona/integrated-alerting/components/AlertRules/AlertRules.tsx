@@ -1,18 +1,23 @@
 /* eslint-disable react/display-name */
+import { cx } from '@emotion/css';
 import { logger } from '@percona/platform-core';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState, useMemo } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
-import { Button, useStyles } from '@grafana/ui';
+import { Button, useStyles2 } from '@grafana/ui';
+import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 import Page from 'app/core/components/Page/Page';
+import { useNavModel } from 'app/core/hooks/useNavModel';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { Severity } from 'app/percona/shared/core';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getValuesFromQueryParams } from 'app/percona/shared/helpers/getValuesFromQueryParams';
+import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 
 import { Messages } from '../../IntegratedAlerting.messages';
 import { Severity as SeverityComp } from '../Severity';
@@ -25,11 +30,11 @@ import { AlertRulesProvider } from './AlertRules.provider';
 import { AlertRulesService } from './AlertRules.service';
 import { getStyles } from './AlertRules.styles';
 import { AlertRule } from './AlertRules.types';
-import { formatRules } from './AlertRules.utils';
+import { formatRules, sortRules } from './AlertRules.utils';
 import { AlertRulesActions } from './AlertRulesActions';
 import { AlertRulesParamsDetails } from './AlertRulesParamsDetails';
 
-const { noData, columns } = Messages.alertRules.table;
+const { columns } = Messages.alertRules.table;
 
 const {
   createdAt: createdAtColumn,
@@ -42,10 +47,10 @@ const {
 } = columns;
 
 export const AlertRules: FC = () => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = usePerconaNavModel('integrated-alerting-rules');
+  const navModel = useNavModel('integrated-alerting-rules');
   const [selectedAlertRule, setSelectedAlertRule] = useState<AlertRule | null>();
   const [data, setData] = useState<AlertRule[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULES_TABLE_ID);
@@ -53,6 +58,9 @@ export const AlertRules: FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [generateToken] = useCancelToken();
+  const [queryParams] = useQueryParams();
+  const params = useMemo(() => getValuesFromQueryParams(queryParams, [{ key: 'highlightRule' }]), [queryParams]);
+  const highlightRuleId = params.highlightRule;
 
   const getAlertRules = useCallback(async () => {
     setPendingRequest(true);
@@ -66,6 +74,9 @@ export const AlertRules: FC = () => {
         },
         generateToken(GET_ALERT_RULES_CANCEL_TOKEN)
       );
+      if (highlightRuleId) {
+        sortRules(highlightRuleId, rules);
+      }
       setData(formatRules(rules));
       setTotalItems(totals.total_items || 0);
       setTotalPages(totals.total_pages || 0);
@@ -158,10 +169,22 @@ export const AlertRules: FC = () => {
 
   const getCellProps = useCallback(
     (cell: Cell<AlertRule>) => ({
-      className: cell.row.original.disabled ? styles.disabledRow : '',
+      className: cx({
+        [styles.disabledRow]: cell.row.original.disabled,
+      }),
       key: cell.row.original.ruleId,
     }),
     [styles.disabledRow]
+  );
+
+  const getRowProps = useCallback(
+    (row: Row<AlertRule>) => ({
+      className: cx({
+        [styles.highlightedRow]: highlightRuleId === stripPerconaApiId(row.original.ruleId, 'rule_id'),
+      }),
+      key: row.original.ruleId,
+    }),
+    [highlightRuleId, styles.highlightedRow]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -176,7 +199,7 @@ export const AlertRules: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents>
         <TechnicalPreview />
-        <FeatureLoader featureName={Messages.integratedAlerting} featureSelector={featureSelector}>
+        <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
           <AlertRulesProvider.Provider value={{ getAlertRules, setAddModalVisible, setSelectedAlertRule }}>
             <div className={styles.actionsWrapper}>
               <Button
@@ -205,8 +228,16 @@ export const AlertRules: FC = () => {
               data={data}
               columns={columns}
               pendingRequest={pendingRequest}
-              emptyMessage={noData}
+              emptyMessage={
+                <EmptyListCTA
+                  title={Messages.alertRules.table.noCreated}
+                  buttonIcon="bell"
+                  buttonTitle={Messages.alertRules.table.newAlertRule}
+                  onClick={handleAddButton}
+                />
+              }
               getCellProps={getCellProps}
+              getRowProps={getRowProps}
             />
           </AlertRulesProvider.Provider>
         </FeatureLoader>

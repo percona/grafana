@@ -16,7 +16,7 @@ export const AlertsService = {
           index: pageIndex,
         },
       },
-      false,
+      true,
       token
     );
   },

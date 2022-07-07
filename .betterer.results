@@ -3699,7 +3699,7 @@ exports[`better eslint`] = {
     "public/app/core/reducers/appNotification.ts:735507530": [
       [77, 35, 3, "Unexpected any. Specify a different type.", "193409811"]
     ],
-    "public/app/core/reducers/navModel.ts:2429673026": [
+    "public/app/core/reducers/navModel.ts:3685515694": [
       [7, 20, 41, "Do not use any type assertions.", "680953089"]
     ],
     "public/app/core/reducers/processsAclItems.ts:2776156466": [
@@ -8302,7 +8302,7 @@ exports[`better eslint`] = {
     "public/app/percona/environment-overview/components/ContactWidget/Contact.test.tsx:188839041": [
       [15, 28, 178, "Do not use any type assertions.", "2509815973"]
     ],
-    "public/app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.service.ts:1719238094": [
+    "public/app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.service.ts:3006031077": [
       [20, 38, 3, "Unexpected any. Specify a different type.", "193409811"]
     ],
     "public/app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.test.tsx:3174310781": [
@@ -8310,22 +8310,22 @@ exports[`better eslint`] = {
       [51, 30, 205, "Do not use any type assertions.", "4111788887"],
       [76, 30, 205, "Do not use any type assertions.", "4111788887"]
     ],
-    "public/app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.tsx:3502712470": [
-      [49, 23, 18, "Do not use any type assertions.", "1700565186"]
+    "public/app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.tsx:499175375": [
+      [51, 23, 18, "Do not use any type assertions.", "1700565186"]
     ],
     "public/app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.utils.test.ts:4116699694": [
       [7, 21, 158, "Do not use any type assertions.", "3245117702"],
       [31, 25, 132, "Do not use any type assertions.", "3207274127"]
     ],
-    "public/app/percona/integrated-alerting/components/AlertRules/AddAlertRuleModal/AddAlertRuleModal.types.ts:2127980434": [
+    "public/app/percona/integrated-alerting/components/AlertRules/AddAlertRuleModal/AddAlertRuleModal.types.ts:1766107703": [
       [18, 19, 3, "Unexpected any. Specify a different type.", "193409811"]
     ],
-    "public/app/percona/integrated-alerting/components/AlertRules/AddAlertRuleModal/AddAlertRuleModal.utils.ts:3633110585": [
-      [37, 37, 39, "Do not use any type assertions.", "1166453015"],
-      [50, 78, 23, "Do not use any type assertions.", "1163888420"],
-      [150, 59, 3, "Unexpected any. Specify a different type.", "193409811"],
-      [162, 10, 3, "Unexpected any. Specify a different type.", "193409811"],
-      [167, 10, 3, "Unexpected any. Specify a different type.", "193409811"]
+    "public/app/percona/integrated-alerting/components/AlertRules/AddAlertRuleModal/AddAlertRuleModal.utils.ts:3309800664": [
+      [36, 37, 39, "Do not use any type assertions.", "1166453015"],
+      [49, 78, 23, "Do not use any type assertions.", "1163888420"],
+      [149, 59, 3, "Unexpected any. Specify a different type.", "193409811"],
+      [161, 10, 3, "Unexpected any. Specify a different type.", "193409811"],
+      [166, 10, 3, "Unexpected any. Specify a different type.", "193409811"]
     ],
     "public/app/percona/integrated-alerting/components/AlertRules/AlertRuleParamField/AlertRuleParamField.tsx:1095830071": [
       [11, 25, 3, "Unexpected any. Specify a different type.", "193409811"]
@@ -8339,17 +8339,17 @@ exports[`better eslint`] = {
       [94, 30, 205, "Do not use any type assertions.", "4111788887"],
       [117, 30, 205, "Do not use any type assertions.", "4111788887"]
     ],
-    "public/app/percona/integrated-alerting/components/AlertRules/AlertRules.tsx:592796345": [
-      [63, 23, 18, "Do not use any type assertions.", "1700565186"],
-      [106, 53, 17, "Do not use any type assertions.", "907672111"],
-      [200, 24, 18, "Do not use any type assertions.", "1700565186"]
+    "public/app/percona/integrated-alerting/components/AlertRules/AlertRules.tsx:576978190": [
+      [74, 23, 18, "Do not use any type assertions.", "1700565186"],
+      [120, 53, 17, "Do not use any type assertions.", "907672111"],
+      [226, 24, 18, "Do not use any type assertions.", "1700565186"]
     ],
     "public/app/percona/integrated-alerting/components/Alerts/Alerts.test.tsx:647777787": [
       [20, 30, 205, "Do not use any type assertions.", "4111788887"],
       [44, 30, 205, "Do not use any type assertions.", "4111788887"]
     ],
-    "public/app/percona/integrated-alerting/components/Alerts/Alerts.tsx:2070582918": [
-      [113, 55, 21, "Do not use any type assertions.", "2451160324"]
+    "public/app/percona/integrated-alerting/components/Alerts/Alerts.tsx:407459190": [
+      [114, 55, 21, "Do not use any type assertions.", "2451160324"]
     ],
     "public/app/percona/integrated-alerting/components/NotificationChannel/AddNotificationChannelModal/AddNotificationChannelModal.tsx:1615062758": [
       [65, 48, 39, "Do not use any type assertions.", "852535372"]
@@ -8370,7 +8370,7 @@ exports[`better eslint`] = {
       [15, 30, 205, "Do not use any type assertions.", "4111788887"],
       [36, 30, 205, "Do not use any type assertions.", "4111788887"]
     ],
-    "public/app/percona/integrated-alerting/components/NotificationChannel/NotificationChannel.tsx:1068350640": [
+    "public/app/percona/integrated-alerting/components/NotificationChannel/NotificationChannel.tsx:3669755591": [
       [72, 23, 18, "Do not use any type assertions.", "1700565186"],
       [153, 35, 38, "Do not use any type assertions.", "104339347"]
     ],
@@ -8406,7 +8406,7 @@ exports[`better eslint`] = {
     "public/app/percona/integrated-alerting/components/Table/Table.tsx:3784146776": [
       [53, 17, 3, "Unexpected any. Specify a different type.", "193409811"]
     ],
-    "public/app/percona/integrated-alerting/components/Table/Table.types.ts:1592840939": [
+    "public/app/percona/integrated-alerting/components/Table/Table.types.ts:2403180432": [
       [30, 34, 3, "Unexpected any. Specify a different type.", "193409811"],
       [42, 32, 3, "Unexpected any. Specify a different type.", "193409811"],
       [56, 32, 3, "Unexpected any. Specify a different type.", "193409811"],

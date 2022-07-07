@@ -14,13 +14,13 @@ import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 
 import { AlertRuleTemplateService } from '../../AlertRuleTemplate/AlertRuleTemplate.service';
 import { Template, TemplateParamType } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
-import { NotificationChannelService } from '../../NotificationChannel/NotificationChannel.service';
 import { AlertRuleParamField } from '../AlertRuleParamField';
 import { AlertRulesProvider } from '../AlertRules.provider';
 import { AlertRulesService } from '../AlertRules.service';
 import { AlertRuleFilterType } from '../AlertRules.types';
 
 import { Messages } from './AddAlertRuleModal.messages';
+import { AddAlertRuleModalService } from './AddAlertRuleModal.service';
 import { getStyles } from './AddAlertRuleModal.styles';
 import { AddAlertRuleFormValues, AddAlertRuleModalProps } from './AddAlertRuleModal.types';
 import {
@@ -63,12 +63,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
   const getData = useCallback(async () => {
     try {
       const [channelsListResponse, templatesListResponse] = await Promise.all([
-        NotificationChannelService.list({
-          page_params: {
-            index: 0,
-            page_size: 100,
-          },
-        }),
+        AddAlertRuleModalService.notificationList(),
         AlertRuleTemplateService.list({
           page_params: {
             index: 0,
@@ -76,7 +71,7 @@ export const AddAlertRuleModal: FC<AddAlertRuleModalProps> = ({ isVisible, setVi
           },
         }),
       ]);
-      setChannelsOptions(formatChannelsOptions(channelsListResponse.channels));
+      setChannelsOptions(formatChannelsOptions(channelsListResponse));
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
       templates.current = templatesListResponse.templates;
       updateAlertRuleTemplateParams();

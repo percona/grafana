@@ -25,7 +25,6 @@ import { NavBarToggle } from './NavBarToggle';
 import {
   getPmmSettingsPage,
   PMM_ADD_INSTANCE_PAGE,
-  PMM_ALERTING_PAGE,
   PMM_BACKUP_PAGE,
   PMM_DBAAS_PAGE,
   PMM_ENTITLEMENTS_PAGE,
@@ -105,9 +104,9 @@ export const NavBar = React.memo(() => {
   ).map((item) => enrichWithInteractionTracking(item, menuOpen));
 
   const activeItem = isSearchActive(location) ? searchItem : getActiveItem(navTree, location.pathname);
+  const iaMenuItem = buildIntegratedAlertingMenuItem(coreItems);
 
   dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
-  dispatch(updateNavIndex(PMM_ALERTING_PAGE));
   dispatch(updateNavIndex(PMM_STT_PAGE));
   dispatch(updateNavIndex(PMM_DBAAS_PAGE));
   dispatch(updateNavIndex(PMM_BACKUP_PAGE));
@@ -117,6 +116,10 @@ export const NavBar = React.memo(() => {
   dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
   dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
 
+  if (iaMenuItem) {
+    dispatch(updateNavIndex(iaMenuItem));
+  }
+
   if (isPlatformUser) {
     coreItems.push(PMM_ENTITLEMENTS_PAGE);
     coreItems.push(PMM_TICKETS_PAGE);
@@ -125,10 +128,6 @@ export const NavBar = React.memo(() => {
 
   if (isAuthorized) {
     buildInventoryAndSettings(configItems);
-
-    if (alertingEnabled) {
-      buildIntegratedAlertingMenuItem(coreItems);
-    }
 
     if (sttEnabled) {
       coreItems.push(PMM_STT_PAGE);

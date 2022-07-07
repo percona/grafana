@@ -1,5 +1,5 @@
 export const Messages = {
-  title: 'Integrated Alerting',
+  title: 'Alerting',
   tabs: {
     alerts: 'Alerts',
     alertRules: 'Alert Rules',
@@ -7,8 +7,8 @@ export const Messages = {
     notificationChannels: 'Notification Channels',
   },
   alerts: {
-    silenceAllAction: 'Silence All',
-    unsilenceAllAction: 'Unsilence All',
+    silenceAllAction: 'Silence all',
+    unsilenceAllAction: 'Unsilence all',
     activateSuccess: 'Alert activated',
     silenceSuccess: 'Alert silenced',
     activateTitle: 'Activate',
@@ -16,9 +16,9 @@ export const Messages = {
     table: {
       noData: 'No alerts',
       columns: {
-        activeSince: 'Active Since',
+        activeSince: 'Active since',
         labels: 'Labels',
-        lastNotified: 'Last Notified',
+        lastNotified: 'Last notified',
         severity: 'Severity',
         summary: 'Name',
         state: 'State',
@@ -28,12 +28,13 @@ export const Messages = {
   },
   alertRules: {
     table: {
-      noData: 'No alert rules found',
+      newAlertRule: 'New alert rule',
+      noCreated: 'You haven`t created any alert rules yet',
       columns: {
         createdAt: 'Created',
         duration: 'Duration',
         filters: 'Filters',
-        lastNotified: 'Last Notified',
+        lastNotified: 'Last notified',
         severity: 'Severity',
         summary: 'Name',
         params: 'Parameters',
@@ -47,14 +48,15 @@ export const Messages = {
     addModal: {
       confirm: 'Add',
       cancel: 'Cancel',
-      title: 'Add Alert Rule Template',
+      title: 'Add alert rule template',
       upload: 'Upload',
       fields: {
-        alertRuleTemplate: 'Alert Rule Template',
+        alertRuleTemplate: 'Alert rule template',
       },
     },
     table: {
-      noData: 'No templates found',
+      newAlertRuleTemplate: 'New alert rule template',
+      noCreated: 'You haven`t created any alert rule template yet',
       columns: {
         name: 'Name',
         source: 'Source',
@@ -63,5 +65,5 @@ export const Messages = {
       },
     },
   },
-  integratedAlerting: 'Integrated Alerting',
+  alerting: 'Alerting',
 };

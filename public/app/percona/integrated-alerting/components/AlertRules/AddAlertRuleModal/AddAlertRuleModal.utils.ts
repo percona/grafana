@@ -2,7 +2,6 @@ import { SelectableValue } from '@grafana/data';
 import { Severity } from 'app/percona/shared/core';
 
 import { Template, TemplateParam } from '../../AlertRuleTemplate/AlertRuleTemplate.types';
-import { NotificationChannel } from '../../NotificationChannel/NotificationChannel.types';
 import {
   AlertRule,
   AlertRuleParamType,
@@ -15,11 +14,11 @@ import {
 
 import { AddAlertRuleFormValues, FiltersForm } from './AddAlertRuleModal.types';
 
-export const formatChannelsOptions = (channels: NotificationChannel[]): Array<SelectableValue<string>> =>
+export const formatChannelsOptions = (channels: string[]): Array<SelectableValue<string>> =>
   channels
     ? channels.map((channel) => ({
-        value: channel.channelId,
-        label: channel.summary,
+        value: channel,
+        label: channel,
       }))
     : [];
 

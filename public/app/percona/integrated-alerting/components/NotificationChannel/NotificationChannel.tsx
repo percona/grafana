@@ -108,7 +108,7 @@ export const NotificationChannel: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents>
         <TechnicalPreview />
-        <FeatureLoader featureName={IAMessages.integratedAlerting} featureSelector={featureSelector}>
+        <FeatureLoader featureName={IAMessages.alerting} featureSelector={featureSelector}>
           <NotificationChannelProvider.Provider
             value={{
               getNotificationChannels,

@@ -1,8 +1,8 @@
 import { css } from '@emotion/css';
 
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ palette, colors, spacing }: GrafanaTheme) => {
+export const getStyles = ({ v1: { palette, colors, spacing }, colors: v2Colors }: GrafanaTheme2) => {
   const cellPadding = 16;
 
   return {
@@ -49,6 +49,9 @@ export const getStyles = ({ palette, colors, spacing }: GrafanaTheme) => {
     `,
     disabledRow: css`
       background-color: ${colors.dashboardBg} !important;
+    `,
+    highlightedRow: css`
+      border: 2px solid ${v2Colors.primary.border};
     `,
   };
 };

@@ -5,17 +5,18 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, useStyles2 } from '@grafana/ui';
+import { Button, useStyles2, Icon } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import Page from 'app/core/components/Page/Page';
+import { useNavModel } from 'app/core/hooks/useNavModel';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 
 import { Messages } from '../../IntegratedAlerting.messages';
 import { Severity } from '../Severity';
@@ -30,7 +31,7 @@ import { Alert, AlertStatus, AlertTogglePayload } from './Alerts.types';
 import { formatAlerts } from './Alerts.utils';
 
 const {
-  table: { noData, columns },
+  table: { columns },
   activateSuccess,
   silenceSuccess,
   activateTitle,
@@ -49,7 +50,7 @@ const {
 export const Alerts: FC = () => {
   const style = useStyles2(getStyles);
   const [pendingRequest, setPendingRequest] = useState(true);
-  const navModel = usePerconaNavModel('integrated-alerting-alerts');
+  const navModel = useNavModel('integrated-alerting-alerts');
   const [data, setData] = useState<Alert[]>([]);
   const [pageSize, setPageSize] = useStoredTablePageSize(ALERT_RULE_TEMPLATES_TABLE_ID);
   const [pageIndex, setPageIndex] = useState(0);
@@ -130,7 +131,7 @@ export const Alerts: FC = () => {
             ))}
           </div>
         ),
-        width: '40%',
+        width: '20%',
       },
       {
         Header: activeSinceColumn,
@@ -155,8 +156,24 @@ export const Alerts: FC = () => {
           </span>
         ),
       },
+      {
+        Header: 'Triggered By',
+        accessor: 'rule',
+        Cell: ({ value, row }) => (
+          <a
+            className={style.ruleLink}
+            href={
+              row.original.ruleUid
+                ? `/alerting/${row.original.ruleUid}/edit`
+                : `/alerting/alert-rules?highlightRule=${stripPerconaApiId(value?.ruleId || '', 'rule_id')}`
+            }
+          >
+            {row.original.templateName}
+          </a>
+        ),
+      },
     ],
-    [style.actionsWrapper, style.labelsWrapper, style.silencedSeverity, toggleAlert]
+    [style.actionsWrapper, style.labelsWrapper, style.ruleLink, style.silencedSeverity, toggleAlert]
   );
 
   const getCellProps = useCallback(
@@ -200,8 +217,8 @@ export const Alerts: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents>
         <TechnicalPreview />
-        <FeatureLoader featureName={Messages.integratedAlerting} featureSelector={featureSelector}>
-          <div className={style.actionsWrapper}>
+        <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
+          <div className={style.generalActionsWrapper}>
             <Button
               size="md"
               icon="bell-slash"
@@ -231,7 +248,11 @@ export const Alerts: FC = () => {
             data={data}
             columns={columns}
             pendingRequest={pendingRequest}
-            emptyMessage={noData}
+            emptyMessage={
+              <h1>
+                <Icon name="check-circle" size="xxl" /> No alerts detected
+              </h1>
+            }
             getCellProps={getCellProps}
             renderExpandedRow={renderSelectedSubRow}
           />

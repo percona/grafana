@@ -9,6 +9,8 @@ import { Alert, AlertsListResponseAlert, AlertStatus } from './Alerts.types';
 
 export const formatAlert = (alert: AlertsListResponseAlert): Alert => {
   const { alert_id, created_at, labels, updated_at, severity, status, summary, rule } = alert;
+  const { ia, __alert_rule_uid__, alertname, template_name } = labels;
+  const isPerconaAlert = !!ia;
 
   return {
     alertId: alert_id,
@@ -16,9 +18,12 @@ export const formatAlert = (alert: AlertsListResponseAlert): Alert => {
     labels: formatLabels(labels),
     severity: Severity[severity],
     status: AlertStatus[status],
-    summary,
+    summary: isPerconaAlert ? summary : alertname,
     lastNotified: updated_at ? moment(updated_at).format('YYYY-MM-DD HH:mm:ss.SSS') : '',
     rule: rule ? formatRule(rule) : undefined,
+    ruleUid: __alert_rule_uid__,
+    templateName: template_name,
+    isPerconaAlert,
   };
 };
 

@@ -7,7 +7,6 @@ export const getStyles = ({ colors, v1: { colors: v1Colors, spacing } }: Grafana
     generalActionsWrapper: css`
       display: flex;
       justify-content: flex-end;
-      margin-bottom: ${spacing.sm};
     `,
     labelsWrapper: css`
       padding: 5px;
@@ -36,8 +35,11 @@ export const getStyles = ({ colors, v1: { colors: v1Colors, spacing } }: Grafana
       color: inherit;
     `,
     actionsWrapper: css`
-      display: flex;
-      justify-content: flex-end;
+      display: block;
+      text-align: center;
+    `,
+    ruleLink: css`
+      color: ${colors.text.link};
     `,
   };
 };

@@ -19,6 +19,9 @@ export interface Alert {
   status: AlertStatus[keyof AlertStatus];
   summary: string;
   rule?: AlertRule;
+  ruleUid: string;
+  templateName: string;
+  isPerconaAlert: boolean;
 }
 
 interface AlertsTotals {

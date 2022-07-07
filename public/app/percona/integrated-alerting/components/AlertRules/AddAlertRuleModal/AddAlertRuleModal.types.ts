@@ -19,6 +19,21 @@ export interface AddAlertRuleFormValues {
   [field: string]: any;
 }
 
+export interface NotificationListResponse {
+  alertmanager_config: AlertManagerConfig;
+}
+
+interface AlertManagerConfig {
+  route: {
+    receiver: string;
+  };
+  receivers: Receiver[];
+}
+
+interface Receiver {
+  name: string;
+}
+
 export interface FiltersForm {
   label: string;
   value: string;

@@ -10,7 +10,7 @@ import appEvents from '../../app_events';
 import { getFooterLinks } from '../Footer/Footer';
 import { HelpModal } from '../help/HelpModal';
 
-import { PMM_ADD_INSTANCE_PAGE } from './constants';
+import { PMM_ADD_INSTANCE_PAGE, PMM_ALERTING_PERCONA_ALERTS } from './constants';
 
 export const SEARCH_ITEM_ID = 'search';
 export const NAV_MENU_PORTAL_CONTAINER_ID = 'navbar-menu-portal-container';
@@ -173,30 +173,10 @@ export function getNavModelItemKey(item: NavModelItem) {
   return item.id ?? item.text;
 }
 
-export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavModelItem[] => {
-  const integratedAlertingLink = {
-    id: 'integrated-alerting',
-    text: 'Integrated Alerting',
-    icon: 'bell',
-    url: `${config.appSubUrl}/integrated-alerting`,
-  };
-
-  const alertingIndex = mainLinks.findIndex(({ id }) => id === 'alerting');
-
-  if (alertingIndex === -1) {
-    mainLinks.push({
-      id: 'alerting',
-      text: 'Alerting',
-      icon: 'bell',
-      url: `${config.appSubUrl}/integrated-alerting/alerts`,
-      subTitle: 'Alert rules & notifications',
-      children: [integratedAlertingLink],
-    });
-  } else {
-    mainLinks[alertingIndex].children?.unshift(integratedAlertingLink, DIVIDER);
-  }
-
-  return mainLinks;
+export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavModelItem | undefined => {
+  const alertingItem = mainLinks.find(({ id }) => id === 'alerting');
+  alertingItem?.children?.unshift(...PMM_ALERTING_PERCONA_ALERTS);
+  return alertingItem;
 };
 
 export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelItem[] => {

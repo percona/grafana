@@ -9,7 +9,7 @@ export const Messages = {
     name: 'The name for this rule.',
     duration: 'The alert query duration, in seconds.',
     severity: 'The severity level for the alert triggered by this rule.',
-    channels: 'Which notification channels should be used to send the alert through.',
+    channels: 'Which contact points should be used to send the alert through.',
     filters: 'Apply rule only to required services or nodes.',
   },
   filter: {
@@ -32,7 +32,7 @@ export const Messages = {
   thresholdField: 'Threshold',
   durationField: 'Duration (s)',
   severityField: 'Severity',
-  channelField: 'Channels',
+  channelField: 'Contact points',
   activateSwitch: 'Activate',
   templateExpression: 'Template Expression',
   ruleAlert: 'Rule Alert',
