@@ -59,7 +59,10 @@ export const AlertRules: FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [generateToken] = useCancelToken();
   const [queryParams] = useQueryParams();
-  const params = useMemo(() => getValuesFromQueryParams(queryParams, [{ key: 'highlightRule' }]), [queryParams]);
+  const params = useMemo(
+    () => getValuesFromQueryParams(queryParams, [{ key: 'highlightRule', transform: (p) => p }]),
+    [queryParams]
+  );
   const highlightRuleId = params.highlightRule;
 
   const getAlertRules = useCallback(async () => {

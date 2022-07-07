@@ -8339,10 +8339,10 @@ exports[`better eslint`] = {
       [94, 30, 205, "Do not use any type assertions.", "4111788887"],
       [117, 30, 205, "Do not use any type assertions.", "4111788887"]
     ],
-    "public/app/percona/integrated-alerting/components/AlertRules/AlertRules.tsx:576978190": [
-      [74, 23, 18, "Do not use any type assertions.", "1700565186"],
-      [120, 53, 17, "Do not use any type assertions.", "907672111"],
-      [226, 24, 18, "Do not use any type assertions.", "1700565186"]
+    "public/app/percona/integrated-alerting/components/AlertRules/AlertRules.tsx:145474748": [
+      [71, 23, 18, "Do not use any type assertions.", "1700565186"],
+      [117, 53, 17, "Do not use any type assertions.", "907672111"],
+      [223, 24, 18, "Do not use any type assertions.", "1700565186"]
     ],
     "public/app/percona/integrated-alerting/components/Alerts/Alerts.test.tsx:647777787": [
       [20, 30, 205, "Do not use any type assertions.", "4111788887"],
