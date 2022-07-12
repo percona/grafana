@@ -28,7 +28,7 @@ import {
 import { FormApi } from 'final-form';
 import { Messages } from './Filter.messages';
 
-export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
+export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const [openSearchFields, setOpenSearchFields] = useState(false);
   const styles = useStyles2(getStyles);
@@ -40,6 +40,9 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
     (values: Record<string, any>) => setQueryParams(buildObjForQueryParams(columns, values)),
     DEBOUNCE_DELAY
   );
+  const onSubmit = (values: Record<string, any>) => {
+    setQueryParams(buildObjForQueryParams(columns, values));
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialValues = useMemo(() => getQueryParams(columns, queryParams), []);
@@ -94,7 +97,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
   return (
     <Form
       initialValues={initialValues}
-      onSubmit={() => {}}
+      onSubmit={onSubmit}
       render={({ handleSubmit, form }) => (
         <form
           onSubmit={handleSubmit}
@@ -157,6 +160,9 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
                 onClick={() => onClearAll(form)}
                 data-testid="clear-all-button"
               />
+              {hasBackendFiltering && (
+                <IconButton className={styles.icon} name="check" size="xl" type="submit" data-testid="submit-button" />
+              )}
             </div>
           </div>
           {showAdvanceFilter && openCollapse && (
@@ -198,7 +204,7 @@ export const Filter = ({ columns, rawData, setFilteredData }: FilterProps) => {
               })}
             </div>
           )}
-          <FormSpy onChange={(state) => onFormChange(state.values)}></FormSpy>
+          {!hasBackendFiltering && <FormSpy onChange={(state) => onFormChange(state.values)}></FormSpy>}
         </form>
       )}
     />

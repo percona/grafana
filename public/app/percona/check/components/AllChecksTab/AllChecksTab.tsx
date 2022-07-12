@@ -274,6 +274,7 @@ export const AllChecksTab: FC = () => {
             pendingRequest={fetchChecksPending}
             emptyMessage={Messages.table.noData}
             showFilter
+            hasBackendFiltering
           />
           {!!selectedCheck && checkIntervalModalVisible && (
             <ChangeCheckIntervalModal
