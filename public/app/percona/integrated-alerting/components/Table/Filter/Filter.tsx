@@ -1,15 +1,12 @@
-import { IconButton, Input, useStyles2 } from '@grafana/ui';
-import { RadioButtonGroupField } from '@percona/platform-core';
-import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+import { IconButton, useStyles2 } from '@grafana/ui';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Field, Form, FormSpy } from 'react-final-form';
+import { Form, FormSpy } from 'react-final-form';
 import { FilterFieldTypes } from '..';
 import { getStyles } from './Filter.styles';
 import { FilterProps } from './Filter.types';
 import { debounce } from 'lodash';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import {
-  buildColumnOptions,
   buildEmptyValues,
   buildObjForQueryParams,
   buildSearchOptions,
@@ -18,15 +15,13 @@ import {
   isOtherThanTextType,
   isValueInTextColumn,
 } from './Filter.utils';
-import {
-  ALL_LABEL,
-  ALL_VALUE,
-  DEBOUNCE_DELAY,
-  SEARCH_INPUT_FIELD_NAME,
-  SEARCH_SELECT_FIELD_NAME,
-} from './Filter.constants';
+import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 import { FormApi } from 'final-form';
 import { Messages } from './Filter.messages';
+import { SearchTextField } from './components/fields/SearchTextField';
+import { SelectDropdownField } from './components/fields/SelectDropdownField';
+import { SelectColumnField } from './components/fields/SelectColumnField';
+import { RadioButtonField } from './components/fields/RadioButtonField';
 
 export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
@@ -120,28 +115,8 @@ export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering 
               />
               {openSearchFields && (
                 <div className={styles.searchFields}>
-                  <Field name={SEARCH_SELECT_FIELD_NAME}>
-                    {({ input }) => (
-                      <SelectField
-                        defaultValue={{ value: ALL_VALUE, label: ALL_LABEL }}
-                        className={styles.searchSelect}
-                        options={searchColumnsOptions ?? []}
-                        {...input}
-                        data-testid={SEARCH_SELECT_FIELD_NAME}
-                      />
-                    )}
-                  </Field>
-                  <Field name={SEARCH_INPUT_FIELD_NAME}>
-                    {({ input }) => (
-                      <Input
-                        type="text"
-                        placeholder={Messages.searchPlaceholder}
-                        {...input}
-                        data-testid={SEARCH_INPUT_FIELD_NAME}
-                        autoFocus={true}
-                      />
-                    )}
-                  </Field>
+                  <SelectColumnField searchColumnsOptions={searchColumnsOptions} />
+                  <SearchTextField />
                 </div>
               )}
               {showAdvanceFilter && (
@@ -168,37 +143,11 @@ export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering 
           {showAdvanceFilter && openCollapse && (
             <div className={styles.advanceFilter}>
               {columns.map((column) => {
-                const columnOptions = buildColumnOptions(column);
                 if (column.type === FilterFieldTypes.DROPDOWN) {
-                  return (
-                    <div>
-                      <Field name={`${column.accessor}`}>
-                        {({ input }) => (
-                          <SelectField
-                            options={columnOptions}
-                            defaultValue={{ value: ALL_VALUE, label: ALL_LABEL }}
-                            label={column.label ?? column.Header}
-                            {...input}
-                            data-testid="select-dropdown"
-                          />
-                        )}
-                      </Field>
-                    </div>
-                  );
+                  return <SelectDropdownField column={column} />;
                 }
                 if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-                  return (
-                    <div>
-                      <RadioButtonGroupField
-                        options={columnOptions}
-                        defaultValue={ALL_VALUE}
-                        name={`${column.accessor}`}
-                        label={column.label ?? column.Header}
-                        fullWidth
-                        data-testid="radio-button"
-                      />
-                    </div>
-                  );
+                  return <RadioButtonField column={column} />;
                 }
                 return <></>;
               })}
