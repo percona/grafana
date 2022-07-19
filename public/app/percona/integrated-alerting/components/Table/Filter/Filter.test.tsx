@@ -152,4 +152,9 @@ describe('Filter', () => {
     expect(screen.getByText('Rare')).toBeInTheDocument();
     expect(screen.getByTestId('disabled-radio-state')).toBeInTheDocument();
   });
+
+  it('should show apply button when backend filtering is enabled', async () => {
+    render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={true} />);
+    expect(screen.queryByTestId('submit-button'));
+  });
 });
