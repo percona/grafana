@@ -69,7 +69,7 @@ export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering 
 
   useEffect(() => {
     const queryParamsObj = getQueryParams(columns, queryParams);
-    if (Object.keys(queryParams).length > 0) {
+    if (Object.keys(queryParams).length > 0 && !hasBackendFiltering) {
       const dataArray = rawData.filter(
         (filterValue) =>
           isValueInTextColumn(columns, filterValue, queryParamsObj) &&
