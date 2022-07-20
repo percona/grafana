@@ -12,6 +12,7 @@ import { RuleFormType } from '../../../types/rule-form';
 import { GrafanaManagedRuleType } from './GrafanaManagedAlert';
 import { MimirFlavoredType } from './MimirOrLokiAlert';
 import { RecordingRuleType } from './MimirOrLokiRecordingRule';
+import { TemplatedAlertRuleType } from './TemplatedAlert';
 
 interface RuleTypePickerProps {
   onChange: (value: RuleFormType) => void;
@@ -28,6 +29,9 @@ const RuleTypePicker: FC<RuleTypePickerProps> = ({ selected, onChange, enabledTy
   return (
     <>
       <Stack direction="row" gap={2}>
+        {enabledTypes.includes(RuleFormType.grafana) && (
+          <TemplatedAlertRuleType selected={selected === RuleFormType.percona} onClick={onChange} />
+        )}
         {enabledTypes.includes(RuleFormType.grafana) && (
           <GrafanaManagedRuleType selected={selected === RuleFormType.grafana} onClick={onChange} />
         )}
