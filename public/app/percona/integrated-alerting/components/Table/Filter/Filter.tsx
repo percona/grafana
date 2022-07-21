@@ -23,7 +23,7 @@ import { SelectDropdownField } from './components/fields/SelectDropdownField';
 import { SelectColumnField } from './components/fields/SelectColumnField';
 import { RadioButtonField } from './components/fields/RadioButtonField';
 
-export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering }: FilterProps) => {
+export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering = false }: FilterProps) => {
   const [openCollapse, setOpenCollapse] = useState(false);
   const [openSearchFields, setOpenSearchFields] = useState(false);
   const styles = useStyles2(getStyles);
@@ -142,15 +142,11 @@ export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering 
           </div>
           {showAdvanceFilter && openCollapse && (
             <div className={styles.advanceFilter}>
-              {columns.map((column) => {
-                if (column.type === FilterFieldTypes.DROPDOWN) {
-                  return <SelectDropdownField column={column} />;
-                }
-                if (column.type === FilterFieldTypes.RADIO_BUTTON) {
-                  return <RadioButtonField column={column} />;
-                }
-                return <></>;
-              })}
+              {columns.map(
+                (column) =>
+                  (column.type === FilterFieldTypes.DROPDOWN && <SelectDropdownField column={column} />) ||
+                  (column.type === FilterFieldTypes.RADIO_BUTTON && <RadioButtonField column={column} />)
+              )}
             </div>
           )}
           {!hasBackendFiltering && <FormSpy onChange={(state) => onFormChange(state.values)}></FormSpy>}
