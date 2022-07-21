@@ -1,4 +1,7 @@
+import { Severity } from 'app/percona/shared/core';
 import { AlertQuery, GrafanaAlertStateDecision } from 'app/types/unified-alerting-dto';
+
+import { FiltersForm } from '../components/rule-editor/TemplateStep/TemplateStep.types';
 
 export enum RuleFormType {
   grafana = 'grafana',
@@ -36,4 +39,12 @@ export interface RuleFormValues {
   forTime: number;
   forTimeUnit: string;
   expression: string;
+
+  // templated rules
+  template: string;
+  duration: number;
+  filters: FiltersForm[];
+  notificationChannels: string[];
+  severity: keyof typeof Severity;
+  enabled: boolean;
 }

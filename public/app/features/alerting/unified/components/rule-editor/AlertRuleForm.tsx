@@ -23,6 +23,7 @@ import { DetailsStep } from './DetailsStep';
 import { GrafanaEvaluationBehavior } from './GrafanaEvaluationBehavior';
 import { NotificationsStep } from './NotificationsStep';
 import { RuleInspector } from './RuleInspector';
+import { TemplateStep } from './TemplateStep/TemplateStep';
 import { QueryAndAlertConditionStep } from './query-and-alert-condition/QueryAndAlertConditionStep';
 
 type Props = {
@@ -63,6 +64,7 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
   const dataSourceName = watch('dataSourceName');
 
   const showStep2 = Boolean(type && (type === RuleFormType.grafana || !!dataSourceName));
+  const showTemplateStep = type === RuleFormType.percona;
 
   const submitState = useUnifiedAlertingSelector((state) => state.ruleForm.saveRule) || initialAsyncRequestState;
   useCleanup((state) => state.unifiedAlerting.ruleForm.saveRule);
@@ -159,6 +161,7 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
                   <NotificationsStep />
                 </>
               )}
+              {showTemplateStep && <TemplateStep />}
             </div>
           </CustomScrollbar>
         </div>
