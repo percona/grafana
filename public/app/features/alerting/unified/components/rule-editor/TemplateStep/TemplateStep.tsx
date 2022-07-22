@@ -122,10 +122,11 @@ export const TemplateStep: FC = () => {
       {currentTemplate?.params?.map(
         ({ float, type, name, summary, unit }) =>
           type === TemplateParamType.FLOAT && (
-            // @ts-ignore
             <Field
               label={Messages.getFloatDescription(name, summary, unit, float)}
+              // @ts-ignore
               error={errors[name]?.message}
+              // @ts-ignore
               invalid={!!errors[name]?.message}
             >
               <Input

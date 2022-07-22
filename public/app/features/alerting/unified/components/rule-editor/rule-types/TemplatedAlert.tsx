@@ -12,7 +12,7 @@ const TemplatedAlertRuleType: FC<SharedProps> = ({ selected = false, disabled, o
       image="public/img/grafana_icon.svg"
       selected={selected}
       disabled={disabled}
-      value={RuleFormType.percona}
+      value={RuleFormType.templated}
       onClick={onClick}
     />
   );

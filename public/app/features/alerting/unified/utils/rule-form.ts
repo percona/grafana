@@ -10,10 +10,12 @@ import {
 } from '@grafana/data';
 import { getDataSourceSrv } from '@grafana/runtime';
 import { ExpressionDatasourceRef } from '@grafana/runtime/src/utils/DataSourceWithBackend';
+import { contextSrv } from 'app/core/services/context_srv';
 import { getNextRefIdChar } from 'app/core/utils/query';
 import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
 import { ExpressionDatasourceUID } from 'app/features/expressions/ExpressionDatasource';
 import { ExpressionQuery, ExpressionQueryType } from 'app/features/expressions/types';
+import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { RuleWithLocation } from 'app/types/unified-alerting';
 import {
   AlertQuery,
@@ -46,7 +48,13 @@ export const getDefaultFormValues = (): RuleFormValues => {
       { key: Annotation.runbookURL, value: '' },
     ],
     dataSourceName: null,
-    type: canCreateGrafanaRules ? RuleFormType.grafana : canCreateCloudRules ? RuleFormType.cloudAlerting : undefined, // viewers can't create prom alerts
+    type: isPmmAdmin(contextSrv.user)
+      ? RuleFormType.templated
+      : canCreateGrafanaRules
+      ? RuleFormType.grafana
+      : canCreateCloudRules
+      ? RuleFormType.cloudAlerting
+      : undefined, // viewers can't create prom alerts
     group: '',
 
     // grafana
@@ -66,7 +74,7 @@ export const getDefaultFormValues = (): RuleFormValues => {
 
     // templated rules
     template: null,
-    duration: 0,
+    duration: 1,
     filters: [],
     severity: null,
     notificationChannels: [],

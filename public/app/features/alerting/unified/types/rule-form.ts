@@ -8,7 +8,7 @@ export enum RuleFormType {
   grafana = 'grafana',
   cloudAlerting = 'cloud-alerting',
   cloudRecording = 'cloud-recording',
-  percona = 'percona',
+  templated = 'templated',
 }
 
 export interface RuleForm {

@@ -392,7 +392,7 @@ export const saveRuleFormAction = createAsyncThunk(
             const rulerConfig = getDataSourceRulerConfig(thunkAPI.getState, GRAFANA_RULES_SOURCE_NAME);
             const rulerClient = getRulerClient(rulerConfig);
             identifier = await rulerClient.saveGrafanaRule(values, existing);
-          } else if (type === RuleFormType.percona) {
+          } else if (type === RuleFormType.templated) {
             await AlertRulesService.create(formatCreateAPIPayload(values));
             identifier = { uid: '', ruleSourceName: 'grafana' };
           } else {

@@ -9,6 +9,8 @@ import { Button, ConfirmModal, CustomScrollbar, PageToolbar, Spinner, useStyles2
 import { useAppNotification } from 'app/core/copy/appNotification';
 import { useCleanup } from 'app/core/hooks/useCleanup';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
+import { contextSrv } from 'app/core/services/context_srv';
+import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { RuleWithLocation } from 'app/types/unified-alerting';
 
 import { useUnifiedAlertingSelector } from '../../hooks/useUnifiedAlertingSelector';
@@ -48,7 +50,7 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
       ...getDefaultFormValues(),
       queries: getDefaultQueries(),
       ...(queryParams['defaults'] ? JSON.parse(queryParams['defaults'] as string) : {}),
-      type: RuleFormType.grafana,
+      type: isPmmAdmin(contextSrv.user) ? RuleFormType.templated : RuleFormType.grafana,
     };
   }, [existing, queryParams]);
 
@@ -64,7 +66,7 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
   const dataSourceName = watch('dataSourceName');
 
   const showStep2 = Boolean(type && (type === RuleFormType.grafana || !!dataSourceName));
-  const showTemplateStep = type === RuleFormType.percona;
+  const showTemplateStep = type === RuleFormType.templated;
 
   const submitState = useUnifiedAlertingSelector((state) => state.ruleForm.saveRule) || initialAsyncRequestState;
   useCleanup((state) => state.unifiedAlerting.ruleForm.saveRule);

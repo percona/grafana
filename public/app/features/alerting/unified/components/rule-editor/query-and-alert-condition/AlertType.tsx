@@ -5,6 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { DataSourceInstanceSettings, GrafanaTheme2 } from '@grafana/data';
 import { Field, InputControl, useStyles2 } from '@grafana/ui';
 import { contextSrv } from 'app/core/services/context_srv';
+import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { AccessControlAction } from 'app/types';
 
 import { RuleFormType, RuleFormValues } from '../../../types/rule-form';
@@ -90,9 +91,14 @@ function getAvailableRuleTypes() {
     contextSrv.hasEditPermissionInFolders
   );
   const canCreateCloudRules = contextSrv.hasAccess(AccessControlAction.AlertingRuleExternalWrite, contextSrv.isEditor);
-  const defaultRuleType = RuleFormType.percona;
+  const defaultRuleType = RuleFormType.templated;
 
-  const enabledRuleTypes: RuleFormType[] = [RuleFormType.percona];
+  const enabledRuleTypes: RuleFormType[] = [];
+
+  if (isPmmAdmin(contextSrv.user)) {
+    enabledRuleTypes.push(RuleFormType.templated);
+  }
+
   if (canCreateGrafanaRules) {
     enabledRuleTypes.push(RuleFormType.grafana);
   }

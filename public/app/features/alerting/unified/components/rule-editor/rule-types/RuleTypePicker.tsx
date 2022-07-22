@@ -29,8 +29,8 @@ const RuleTypePicker: FC<RuleTypePickerProps> = ({ selected, onChange, enabledTy
   return (
     <>
       <Stack direction="row" gap={2}>
-        {enabledTypes.includes(RuleFormType.grafana) && (
-          <TemplatedAlertRuleType selected={selected === RuleFormType.percona} onClick={onChange} />
+        {enabledTypes.includes(RuleFormType.templated) && (
+          <TemplatedAlertRuleType selected={selected === RuleFormType.templated} onClick={onChange} />
         )}
         {enabledTypes.includes(RuleFormType.grafana) && (
           <GrafanaManagedRuleType selected={selected === RuleFormType.grafana} onClick={onChange} />
