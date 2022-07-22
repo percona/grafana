@@ -1,6 +1,5 @@
 import { PrioritizedLabels, Severity } from 'app/percona/shared/core';
-
-import { AlertRulesListResponseRule, AlertRule } from '../AlertRules/AlertRules.types';
+import { AlertRule, AlertRulesListResponseRule } from 'app/percona/shared/services/AlertRules/AlertRules.types';
 
 export enum AlertStatus {
   STATUS_INVALID = 'Invalid',

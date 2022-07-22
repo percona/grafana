@@ -443,15 +443,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/alerting/alert-rules',
-      component: SafeDynamicImport(
-        () =>
-          import(
-            /* webpackChunkName: "IntegratedAlertingRules" */ 'app/percona/integrated-alerting/components/AlertRules/AlertRules'
-          )
-      ),
-    },
-    {
       path: '/dbaas',
       // eslint-disable-next-line react/display-name
       component: () => <Redirect to="/dbaas/kubernetes" />,

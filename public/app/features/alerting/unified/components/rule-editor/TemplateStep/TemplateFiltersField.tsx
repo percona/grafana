@@ -3,7 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import { SelectableValue } from '@grafana/data';
 import { Button, Field, FieldArray, Input, useStyles2, Select, Label } from '@grafana/ui';
-import { AlertRuleFilterType } from 'app/percona/integrated-alerting/components/AlertRules/AlertRules.types';
+import { AlertRuleFilterType } from 'app/percona/shared/services/AlertRules/AlertRules.types';
 
 import { Messages } from './TemplateStep.messages';
 import { getStyles } from './TemplateStep.styles';

@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { isEmpty } from 'lodash';
 
 import { getBackendSrv, locationService } from '@grafana/runtime';
-import { AlertRulesService } from 'app/percona/integrated-alerting/components/AlertRules/AlertRules.service';
+import { AlertRulesService } from 'app/percona/shared/services/AlertRules/AlertRules.service';
 import {
   AlertmanagerAlert,
   AlertManagerCortexConfig,

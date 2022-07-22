@@ -1,5 +1,6 @@
-import { NotificationListResponse } from 'app/percona/integrated-alerting/components/AlertRules/AddAlertRuleModal/AddAlertRuleModal.types';
 import { api } from 'app/percona/shared/helpers/api';
+
+import { NotificationListResponse } from './TemplateStep.types';
 
 export const AddAlertRuleModalService = {
   async notificationList(): Promise<string[]> {
