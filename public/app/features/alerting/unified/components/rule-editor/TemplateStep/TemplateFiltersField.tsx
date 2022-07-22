@@ -2,10 +2,8 @@ import React, { FC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { SelectableValue } from '@grafana/data';
-import { Button, Field, FieldArray, Input, useStyles2, Select } from '@grafana/ui';
+import { Button, Field, FieldArray, Input, useStyles2, Select, Label } from '@grafana/ui';
 import { AlertRuleFilterType } from 'app/percona/integrated-alerting/components/AlertRules/AlertRules.types';
-import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
-import { Label } from 'app/percona/shared/components/Form/Label/Label';
 
 import { Messages } from './TemplateStep.messages';
 import { getStyles } from './TemplateStep.styles';
@@ -27,8 +25,7 @@ const TemplateFiltersField: FC = () => {
       {({ fields, append, remove }) => (
         <>
           <div className={styles.filtersLabelWrapper}>
-            <Label label={Messages.filter.header} dataTestId="filters-field-label" />
-            <LinkTooltip tooltipText={Messages.tooltips.filters} icon="info-circle" />
+            <Label description={Messages.tooltips.filters}>{Messages.filter.header}</Label>
           </div>
 
           <Button
