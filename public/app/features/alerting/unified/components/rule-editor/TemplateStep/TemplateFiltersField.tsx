@@ -35,7 +35,7 @@ const TemplateFiltersField: FC = () => {
             className={styles.filterButton}
             variant="secondary"
             type="button"
-            onClick={append}
+            onClick={() => append({})}
             data-testid="add-filter-button"
           >
             {Messages.filter.addButton}
@@ -45,7 +45,7 @@ const TemplateFiltersField: FC = () => {
               <div className={styles.filterFields}>
                 <Field>
                   <Input
-                    {...register(`labels[${name}].key`, { required: true })}
+                    {...register(`filters[${index}].key`, { required: true })}
                     placeholder={Messages.filter.fieldLabel}
                   />
                 </Field>
@@ -54,10 +54,10 @@ const TemplateFiltersField: FC = () => {
               <div className={styles.filterFields}>
                 <Field>
                   <Controller
-                    name={`labels[${name}].operators`}
+                    name={`filters[${index}].operators`}
                     render={({ field: { onChange, value } }) => (
                       <Select
-                        onChange={onChange}
+                        onChange={(e) => onChange(e.value)}
                         value={value}
                         options={filterOptions}
                         placeholder={Messages.filter.fieldOperators}
@@ -69,7 +69,7 @@ const TemplateFiltersField: FC = () => {
               <div className={styles.filterFields}>
                 <Field>
                   <Input
-                    {...register(`labels[${name}].value`, { required: true })}
+                    {...register(`filters[${index}].value`, { required: true })}
                     placeholder={Messages.filter.fieldValue}
                   />
                 </Field>

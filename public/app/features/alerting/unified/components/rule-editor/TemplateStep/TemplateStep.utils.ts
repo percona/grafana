@@ -14,6 +14,8 @@ import {
 } from 'app/percona/integrated-alerting/components/AlertRules/AlertRules.types';
 import { Severity } from 'app/percona/shared/core';
 
+import { RuleFormValues } from '../../../types/rule-form';
+
 import { AddAlertRuleFormValues, FiltersForm } from './TemplateStep.types';
 
 export const formatChannelsOptions = (channels: string[]): Array<SelectableValue<string>> =>
@@ -24,44 +26,42 @@ export const formatChannelsOptions = (channels: string[]): Array<SelectableValue
       }))
     : [];
 
-export const formatTemplateOptions = (templates: Template[]): Array<SelectableValue<string>> =>
+export const formatTemplateOptions = (templates: Template[]): Array<SelectableValue<Template>> =>
   templates
     ? templates.map((template) => ({
-        value: template.name,
+        value: template,
         label: template.summary,
       }))
     : [];
 
-// We have always problems reading keys, as they come out as string
-// @ts-ignore
 export const formatFilters = (filters: FiltersForm[]): AlertRulesListPayloadFilter[] =>
-  filters.map((value) => {
-    const indexOfValue = Object.values(AlertRuleFilterType).indexOf(value.operators.value);
-    const key = Object.keys(AlertRuleFilterType)[indexOfValue];
-    return { key: value.label, type: key, value: value.value };
+  // We have always problems reading keys, as they come out as string
+  // @ts-ignore
+  filters.map(({ key, operators, value }) => {
+    const indexOfValue = Object.values(AlertRuleFilterType).indexOf(operators);
+    const type = Object.keys(AlertRuleFilterType)[indexOfValue];
+    return { key, type, value };
   });
 
-export const formatCreateAPIPayload = (
-  data: AddAlertRuleFormValues,
-  params: TemplateParam[] = []
-): AlertRuleCreatePayload => {
-  const { enabled, duration, filters, name, notificationChannels, severity, template } = data;
+export const formatCreateAPIPayload = (data: RuleFormValues): AlertRuleCreatePayload => {
+  const { duration, filters, name, notificationChannels, severity, template } = data;
 
   const payload: AlertRuleCreatePayload = {
     custom_labels: {},
-    disabled: !enabled,
-    channel_ids: notificationChannels ? notificationChannels.map((channel) => channel.value || '') : [],
+    disabled: false,
+    channel_ids: notificationChannels ? notificationChannels.map((channel) => channel || '') : [],
     filters: filters ? formatFilters(filters) : [],
     for: `${duration}s`,
-    severity: severity.value!,
-    template_name: template.value!,
+    severity: severity!,
+    template_name: template?.name!,
     name,
     params: [],
   };
 
-  params.forEach((param) => {
+  template?.params?.forEach((param) => {
     if (data.hasOwnProperty(param.name)) {
       const { name, type } = param;
+      // @ts-ignore
       const value = data[param.name];
       payload.params?.push({
         name,

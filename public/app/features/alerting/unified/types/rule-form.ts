@@ -1,3 +1,4 @@
+import { Template } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
 import { Severity } from 'app/percona/shared/core';
 import { AlertQuery, GrafanaAlertStateDecision } from 'app/types/unified-alerting-dto';
 
@@ -41,10 +42,9 @@ export interface RuleFormValues {
   expression: string;
 
   // templated rules
-  template: string;
+  template: Template | null;
   duration: number;
   filters: FiltersForm[];
   notificationChannels: string[];
-  severity: keyof typeof Severity;
-  enabled: boolean;
+  severity: keyof typeof Severity | null;
 }

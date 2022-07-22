@@ -36,10 +36,7 @@ interface Receiver {
 }
 
 export interface FiltersForm {
-  label: string;
+  key: string;
   value: string;
-  operators: {
-    label: string;
-    value: AlertRuleFilterType;
-  };
+  operators: AlertRuleFilterType;
 }

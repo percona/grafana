@@ -154,6 +154,7 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
           <CustomScrollbar autoHeightMin="100%" hideHorizontalTrack={true}>
             <div className={styles.contentInner}>
               <QueryAndAlertConditionStep editingExistingRule={!!existing} />
+              {showTemplateStep && <TemplateStep />}
               {showStep2 && (
                 <>
                   {type === RuleFormType.grafana ? <GrafanaEvaluationBehavior /> : <CloudEvaluationBehavior />}
@@ -161,7 +162,6 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
                   <NotificationsStep />
                 </>
               )}
-              {showTemplateStep && <TemplateStep />}
             </div>
           </CustomScrollbar>
         </div>

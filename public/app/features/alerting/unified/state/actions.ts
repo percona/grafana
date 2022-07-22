@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { isEmpty } from 'lodash';
 
 import { getBackendSrv, locationService } from '@grafana/runtime';
+import { AlertRulesService } from 'app/percona/integrated-alerting/components/AlertRules/AlertRules.service';
 import {
   AlertmanagerAlert,
   AlertManagerCortexConfig,
@@ -53,6 +54,7 @@ import {
   FetchRulerRulesFilter,
   setRulerRuleGroup,
 } from '../api/ruler';
+import { formatCreateAPIPayload } from '../components/rule-editor/TemplateStep/TemplateStep.utils';
 import { RuleFormType, RuleFormValues } from '../types/rule-form';
 import { addDefaultsToAlertmanagerConfig, removeMuteTimingFromRoute } from '../utils/alertmanager';
 import {
@@ -390,6 +392,9 @@ export const saveRuleFormAction = createAsyncThunk(
             const rulerConfig = getDataSourceRulerConfig(thunkAPI.getState, GRAFANA_RULES_SOURCE_NAME);
             const rulerClient = getRulerClient(rulerConfig);
             identifier = await rulerClient.saveGrafanaRule(values, existing);
+          } else if (type === RuleFormType.percona) {
+            await AlertRulesService.create(formatCreateAPIPayload(values));
+            identifier = { uid: '', ruleSourceName: 'grafana' };
           } else {
             throw new Error('Unexpected rule form type');
           }

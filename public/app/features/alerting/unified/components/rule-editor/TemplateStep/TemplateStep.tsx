@@ -3,7 +3,7 @@ import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { SelectableValue } from '@grafana/data';
-import { Checkbox, Field, Input, MultiSelect, Select } from '@grafana/ui';
+import { Field, Input, MultiSelect, Select } from '@grafana/ui';
 import { AlertRuleTemplateService } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.service';
 import {
   Template,
@@ -11,17 +11,18 @@ import {
 } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
 
 import { RuleFormValues } from '../../../types/rule-form';
+import { RuleEditorSection } from '../RuleEditorSection';
 
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import TemplateFiltersField from './TemplateFiltersField';
 import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './TemplateStep.constants';
 import { Messages } from './TemplateStep.messages';
 import { AddAlertRuleModalService } from './TemplateStep.service';
-import { formatTemplateOptions, formatChannelsOptions } from './TemplateStep.utils';
+import { formatChannelsOptions, formatTemplateOptions } from './TemplateStep.utils';
 
 export const TemplateStep: FC = () => {
   const { register, setValue } = useFormContext<RuleFormValues>();
-  const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<string>>>();
+  const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<Template>>>();
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
@@ -57,34 +58,44 @@ export const TemplateStep: FC = () => {
   };
 
   return (
-    <div>
+    <RuleEditorSection stepNo={2} title="Template details">
       <Field label={Messages.templateField} description={Messages.tooltips.template}>
-        <Select
-          id="template"
-          onChange={(name) => {
-            const curTemplateData = templates.current.find((template) => template.name === name.value);
-            const newDuration = curTemplateData?.for;
-            const severityStr = curTemplateData?.severity;
-            const newSeverity = SEVERITY_OPTIONS.find((severity) => severity.value === severityStr);
-            const newTemplate = handleTemplateChange(name.value);
+        <Controller
+          name="template"
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id="template"
+              value={templateOptions?.find((opt) => opt.value?.name === value?.name)}
+              onChange={(selectedTemplate) => {
+                const curTemplateData = templates.current.find(
+                  (template) => template.name === selectedTemplate.value?.name
+                );
+                const newDuration = curTemplateData?.for;
+                const severityStr = curTemplateData?.severity;
+                const newSeverity = SEVERITY_OPTIONS.find((severity) => severity.value === severityStr);
+                const newTemplate = handleTemplateChange(selectedTemplate.value?.name);
 
-            if (newSeverity && newSeverity.value) {
-              setValue('severity', newSeverity.value);
-            }
-            setValue('duration', parseInt(newDuration || '0', 10));
-
-            if (newTemplate) {
-              newTemplate.params?.forEach(({ type, float, name }) => {
-                // TODO add missing types when supported
-                if (type === TemplateParamType.FLOAT && float?.default !== undefined) {
+                if (newSeverity && newSeverity.value) {
                   // @ts-ignore
-                  setValue(name, float.default);
+                  setValue('severity', newSeverity.value);
                 }
-              });
-            }
-          }}
-          options={templateOptions}
-          data-testid="template-select-input"
+                setValue('duration', parseInt(newDuration || '0', 10));
+
+                if (newTemplate) {
+                  newTemplate.params?.forEach(({ type, float, name }) => {
+                    // TODO add missing types when supported
+                    if (type === TemplateParamType.FLOAT && float?.default !== undefined) {
+                      // @ts-ignore
+                      setValue(name, float.default);
+                    }
+                  });
+                }
+                onChange(selectedTemplate.value);
+              }}
+              options={templateOptions}
+              data-testid="template-select-input"
+            />
+          )}
         />
       </Field>
       <Field label={Messages.nameField} description={Messages.tooltips.name}>
@@ -97,8 +108,9 @@ export const TemplateStep: FC = () => {
         ({ float, type, name, summary, unit }) =>
           type === TemplateParamType.FLOAT && (
             <Field label={Messages.getFloatDescription(name, summary, unit, float)}>
-              {/* @ts-ignore */}
               <Input
+                type="number"
+                // @ts-ignore
                 {...register(name, {
                   required: true,
                   min: float?.hasMin ? float.min : undefined,
@@ -120,7 +132,7 @@ export const TemplateStep: FC = () => {
           render={({ field: { onChange, value } }) => (
             <Select
               value={value}
-              onChange={onChange}
+              onChange={(v) => onChange(v.value)}
               id="severity"
               options={SEVERITY_OPTIONS}
               data-testid="severity-select-input"
@@ -132,21 +144,23 @@ export const TemplateStep: FC = () => {
       <TemplateFiltersField />
 
       <Field label={Messages.channelField} description={Messages.tooltips.channels}>
-        <MultiSelect
-          id="notificationChannels"
-          onChange={() => {}}
-          options={channelsOptions}
-          data-testid="notificationChannels-multiselect-input"
+        <Controller
+          name="notificationChannels"
+          render={({ field: { value, onChange } }) => (
+            <MultiSelect
+              id="notificationChannels"
+              onChange={(e) => onChange(e.map((channel) => channel.value))}
+              value={value}
+              options={channelsOptions}
+              data-testid="notificationChannels-multiselect-input"
+            />
+          )}
         />
       </Field>
 
       {currentTemplate && (
         <AdvancedRuleSection expression={currentTemplate.expr} summary={currentTemplate.annotations?.summary} />
       )}
-
-      <Field label={Messages.activateSwitch}>
-        <Checkbox id="enabled" name="enabled" />
-      </Field>
-    </div>
+    </RuleEditorSection>
   );
 };

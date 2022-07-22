@@ -65,10 +65,10 @@ export const getDefaultFormValues = (): RuleFormValues => {
     forTimeUnit: 'm',
 
     // templated rules
-    template: '',
+    template: null,
     duration: 0,
     filters: [],
-    severity: 'SEVERITY_EMERGENCY',
+    severity: null,
     notificationChannels: [],
     enabled: true,
   });
