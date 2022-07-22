@@ -21,7 +21,11 @@ import { AddAlertRuleModalService } from './TemplateStep.service';
 import { formatChannelsOptions, formatTemplateOptions } from './TemplateStep.utils';
 
 export const TemplateStep: FC = () => {
-  const { register, setValue } = useFormContext<RuleFormValues>();
+  const {
+    register,
+    setValue,
+    formState: { errors },
+  } = useFormContext<RuleFormValues>();
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<Template>>>();
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
   const templates = useRef<Template[]>([]);
@@ -59,9 +63,15 @@ export const TemplateStep: FC = () => {
 
   return (
     <RuleEditorSection stepNo={2} title="Template details">
-      <Field label={Messages.templateField} description={Messages.tooltips.template}>
+      <Field
+        label={Messages.templateField}
+        description={Messages.tooltips.template}
+        error={errors.template?.message}
+        invalid={!!errors.template?.message}
+      >
         <Controller
           name="template"
+          rules={{ required: { value: true, message: Messages.errors.template } }}
           render={({ field: { value, onChange } }) => (
             <Select
               id="template"
@@ -98,8 +108,13 @@ export const TemplateStep: FC = () => {
           )}
         />
       </Field>
-      <Field label={Messages.nameField} description={Messages.tooltips.name}>
-        <Input id="name" {...register('name', { required: true })} />
+      <Field
+        label={Messages.nameField}
+        description={Messages.tooltips.name}
+        error={errors.name?.message}
+        invalid={!!errors.name?.message}
+      >
+        <Input id="name" {...register('name', { required: { value: true, message: Messages.errors.name } })} />
       </Field>
 
       {/* TODO add remaining params as API starts supporting them
@@ -107,14 +122,23 @@ export const TemplateStep: FC = () => {
       {currentTemplate?.params?.map(
         ({ float, type, name, summary, unit }) =>
           type === TemplateParamType.FLOAT && (
-            <Field label={Messages.getFloatDescription(name, summary, unit, float)}>
+            // @ts-ignore
+            <Field
+              label={Messages.getFloatDescription(name, summary, unit, float)}
+              error={errors[name]?.message}
+              invalid={!!errors[name]?.message}
+            >
               <Input
                 type="number"
                 // @ts-ignore
                 {...register(name, {
-                  required: true,
-                  min: float?.hasMin ? float.min : undefined,
-                  max: float?.hasMax ? float.max : undefined,
+                  required: { value: true, message: Messages.errors.floatParamRequired(name) },
+                  min: float?.hasMin
+                    ? { value: float.min || 0, message: Messages.errors.floatParamMin(float.min || 0) }
+                    : undefined,
+                  max: float?.hasMax
+                    ? { value: float.max || 0, message: Messages.errors.floatParamMax(float.max || 0) }
+                    : undefined,
                 })}
                 name={name}
                 defaultValue={`${float?.default}`}
@@ -123,12 +147,30 @@ export const TemplateStep: FC = () => {
           )
       )}
 
-      <Field label={Messages.durationField} description={Messages.tooltips.duration}>
-        <Input type="number" id="duration" {...register('duration', { required: true, min: MINIMUM_DURATION_VALUE })} />
+      <Field
+        label={Messages.durationField}
+        description={Messages.tooltips.duration}
+        error={errors.duration?.message}
+        invalid={!!errors.duration?.message}
+      >
+        <Input
+          type="number"
+          id="duration"
+          {...register('duration', {
+            required: { value: true, message: Messages.errors.durationRequired },
+            min: { value: MINIMUM_DURATION_VALUE, message: Messages.errors.durationMin(MINIMUM_DURATION_VALUE) },
+          })}
+        />
       </Field>
-      <Field label={Messages.severityField} description={Messages.tooltips.severity}>
+      <Field
+        label={Messages.severityField}
+        description={Messages.tooltips.severity}
+        error={errors.severity?.message}
+        invalid={!!errors.severity?.message}
+      >
         <Controller
           name="severity"
+          rules={{ required: { value: true, message: Messages.errors.severity } }}
           render={({ field: { onChange, value } }) => (
             <Select
               value={value}
