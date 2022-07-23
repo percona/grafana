@@ -19,7 +19,6 @@ const expectedAlertResult1: Alert = {
   summary: 'PXC cluster on [HR prod] is down',
   lastNotified: '2020-11-25 16:53:39.366',
   ruleUid: '',
-  isPerconaAlert: false,
   templateName: '',
 };
 
@@ -35,7 +34,6 @@ const expectedAlertResult2: Alert = {
   summary: 'Memory consumption on [Mncfg Dev] instance 1 reached 80%',
   lastNotified: '',
   ruleUid: '',
-  isPerconaAlert: false,
   templateName: '',
 };
 

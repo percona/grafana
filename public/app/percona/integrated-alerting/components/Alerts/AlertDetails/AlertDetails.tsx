@@ -15,10 +15,12 @@ export const AlertDetails: FC<AlertDetailsProps> = ({ ruleExpression = '', label
 
   return (
     <div data-testid="alert-details-wrapper" className={styles.wrapper}>
-      <div>
-        <span>{Messages.ruleExpression}</span>
-        <pre>{ruleExpression}</pre>
-      </div>
+      {ruleExpression && (
+        <div>
+          <span>{Messages.ruleExpression}</span>
+          <pre>{ruleExpression}</pre>
+        </div>
+      )}
       <div>
         <span>{Messages.secondaryLabels}</span>
         <div className={mainStyles.labelsWrapper}>

@@ -16,7 +16,6 @@ import { TechnicalPreview } from 'app/percona/shared/components/Elements/Technic
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { stripPerconaApiId } from 'app/percona/shared/helpers/stripPerconaId';
 
 import { Messages } from '../../IntegratedAlerting.messages';
 import { Severity } from '../Severity';
@@ -112,7 +111,7 @@ export const Alerts: FC = () => {
         Cell: ({ row, value }) => (
           <Severity
             severity={value}
-            className={cx({ [style.silencedSeverity]: (row.original as Alert).status === AlertStatus.SILENCED })}
+            className={cx({ [style.silencedSeverity]: row.original.status === AlertStatus.SILENCED })}
           />
         ),
         width: '5%',
@@ -159,14 +158,10 @@ export const Alerts: FC = () => {
       {
         Header: 'Triggered By',
         accessor: 'rule',
-        Cell: ({ value, row }) => (
+        Cell: ({ row }) => (
           <a
             className={style.ruleLink}
-            href={
-              row.original.ruleUid
-                ? `/alerting/${row.original.ruleUid}/edit`
-                : `/alerting/alert-rules?highlightRule=${stripPerconaApiId(value?.ruleId || '', 'rule_id')}`
-            }
+            href={`/alerting/grafana/${row.original.ruleUid}/view?returnTo=%2Falerting%2Falerts`}
           >
             {row.original.templateName}
           </a>

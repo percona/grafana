@@ -20,7 +20,6 @@ export interface Alert {
   rule?: AlertRule;
   ruleUid: string;
   templateName: string;
-  isPerconaAlert: boolean;
 }
 
 interface AlertsTotals {
