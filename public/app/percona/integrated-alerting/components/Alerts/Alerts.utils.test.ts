@@ -12,14 +12,15 @@ const expectedAlertResult1: Alert = {
   activeSince: '2020-11-25 16:53:39.366',
   labels: {
     primary: ['environment=prod', 'node_name=pxc_instance1', 'cluster=PXCCluster1', 'service_name=my_db1'],
-    secondary: ['app=wordpress'],
+    secondary: ['app=wordpress', '__alert_rule_uid__=uid_1', 'rulename=Rule one'],
   },
   severity: Severity.SEVERITY_CRITICAL,
   status: 'Firing',
   summary: 'PXC cluster on [HR prod] is down',
   lastNotified: '2020-11-25 16:53:39.366',
-  ruleUid: '',
-  templateName: '',
+  ruleUid: 'uid_1',
+  templateName: 'Rule one',
+  rule: undefined,
 };
 
 const expectedAlertResult2: Alert = {
@@ -27,14 +28,15 @@ const expectedAlertResult2: Alert = {
   activeSince: '',
   labels: {
     primary: ['environment=dev', 'node_name=mdb_prod_7', 'cluster=MDBReplicaSet2', 'service_name=mdb_replset1'],
-    secondary: ['service_type=mongodb'],
+    secondary: ['service_type=mongodb', '__alert_rule_uid__=uid_6'],
   },
   severity: Severity.SEVERITY_WARNING,
   status: 'Silenced',
-  summary: 'Memory consumption on [Mncfg Dev] instance 1 reached 80%',
+  summary: 'Alert one',
   lastNotified: '',
-  ruleUid: '',
-  templateName: '',
+  ruleUid: 'uid_6',
+  templateName: 'Alert one',
+  rule: undefined,
 };
 
 describe('AlertRulesTable utils', () => {

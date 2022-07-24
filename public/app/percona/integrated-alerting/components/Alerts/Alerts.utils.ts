@@ -1,14 +1,14 @@
 import moment from 'moment/moment';
 
-import { Severity } from 'app/percona/shared/core';
-import { formatLabels } from 'app/percona/shared/helpers/labels';
 import {
   AlertRule,
   AlertRuleFilterType,
   AlertRulesListPayloadFilter,
   AlertRulesListResponseRule,
   AlertRulesParsedParam,
-} from 'app/percona/shared/services/AlertRules/AlertRules.types';
+  Severity,
+} from 'app/percona/shared/core';
+import { formatLabels } from 'app/percona/shared/helpers/labels';
 
 import { Alert, AlertsListResponseAlert, AlertStatus } from './Alerts.types';
 

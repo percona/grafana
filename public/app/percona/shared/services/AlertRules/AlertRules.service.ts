@@ -2,7 +2,7 @@ import { CancelToken } from 'axios';
 
 import { api } from 'app/percona/shared/helpers/api';
 
-import { AlertRuleCreatePayload } from './AlertRules.types';
+import { AlertRuleCreatePayload } from '../../core';
 
 const BASE_URL = `/v1/management/ia/Rules`;
 

@@ -1,12 +1,12 @@
 import { SelectableValue } from '@grafana/data';
 import { Template } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
-import { Severity } from 'app/percona/shared/core';
 import {
   AlertRuleCreatePayload,
   AlertRuleFilterType,
   AlertRulesListPayloadFilter,
   AlertRulesListResponseChannel,
-} from 'app/percona/shared/services/AlertRules/AlertRules.types';
+  Severity,
+} from 'app/percona/shared/core';
 
 import { RuleFormValues } from '../../../types/rule-form';
 
