@@ -123,7 +123,8 @@ export const TemplateStep: FC = () => {
         ({ float, type, name, summary, unit }) =>
           type === TemplateParamType.FLOAT && (
             <Field
-              label={Messages.getFloatDescription(name, summary, unit, float)}
+              label={`${name[0].toUpperCase()}${name.slice(1)}`}
+              description={Messages.getFloatDescription(summary, unit, float)}
               // @ts-ignore
               error={errors[name]?.message}
               // @ts-ignore
