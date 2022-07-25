@@ -1,6 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { Severity } from 'app/percona/shared/core';
-import { AlertRuleFilterType } from 'app/percona/shared/services/AlertRules/AlertRules.types';
+import { AlertRuleFilterType, Severity } from 'app/percona/shared/core';
 
 export interface AddAlertRuleFormValues {
   template: SelectableValue<string>;
