@@ -23,6 +23,7 @@ import Close from './tour/Close';
 import Navigation from './tour/Navigation';
 import { PERCONA_TOUR_FLAG } from './tour/constants';
 import { isPmmAdmin } from './percona/shared/helpers/permissions';
+import { WebSocketProvider } from './percona/shared/websockets/WebSocketProvider';
 
 interface AppWrapperProps {
   app: GrafanaApp;
@@ -109,40 +110,42 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                 <GlobalStyles />
                 <div className="grafana-app">
                   <Router history={locationService.getHistory()}>
-                    <TourProvider
-                      steps={getSteps(isPmmAdmin(contextSrv.user))}
-                      components={{ Close, Navigation }}
-                      showBadge={false}
-                      badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
-                      disableFocusLock
-                      onClickClose={({ setIsOpen }) => {
-                        localStorage.setItem(PERCONA_TOUR_FLAG, 'false');
-                        setIsOpen(false);
-                      }}
-                      className="pmm-tour"
-                      styles={{
-                        popover: (base) => ({
-                          ...base,
-                          backgroundColor: getTheme(config.bootData.user.lightTheme ? 'light' : 'dark').colors.bg1,
-                        }),
-                      }}
-                    >
-                      <PerconaBootstrapper />
-                      {newNavigationEnabled ? <NavBarNext /> : <NavBar />}
-                      <main className="main-view">
-                        {pageBanners.map((Banner, index) => (
-                          <Banner key={index.toString()} />
-                        ))}
+                    <WebSocketProvider>
+                      <TourProvider
+                        steps={getSteps(isPmmAdmin(contextSrv.user))}
+                        components={{ Close, Navigation }}
+                        showBadge={false}
+                        badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
+                        disableFocusLock
+                        onClickClose={({ setIsOpen }) => {
+                          localStorage.setItem(PERCONA_TOUR_FLAG, 'false');
+                          setIsOpen(false);
+                        }}
+                        className="pmm-tour"
+                        styles={{
+                          popover: (base) => ({
+                            ...base,
+                            backgroundColor: getTheme(config.bootData.user.lightTheme ? 'light' : 'dark').colors.bg1,
+                          }),
+                        }}
+                      >
+                        <PerconaBootstrapper />
+                        {newNavigationEnabled ? <NavBarNext /> : <NavBar />}
+                        <main className="main-view">
+                          {pageBanners.map((Banner, index) => (
+                            <Banner key={index.toString()} />
+                          ))}
 
-                        <AngularRoot ref={this.container} />
-                        <AppNotificationList />
-                        <SearchWrapper />
-                        {this.state.ngInjector && this.renderRoutes()}
-                        {bodyRenderHooks.map((Hook, index) => (
-                          <Hook key={index.toString()} />
-                        ))}
-                      </main>
-                    </TourProvider>
+                          <AngularRoot ref={this.container} />
+                          <AppNotificationList />
+                          <SearchWrapper />
+                          {this.state.ngInjector && this.renderRoutes()}
+                          {bodyRenderHooks.map((Hook, index) => (
+                            <Hook key={index.toString()} />
+                          ))}
+                        </main>
+                      </TourProvider>
+                    </WebSocketProvider>
                   </Router>
                 </div>
                 <LiveConnectionWarning />
