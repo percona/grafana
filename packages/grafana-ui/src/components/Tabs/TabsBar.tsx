@@ -25,7 +25,7 @@ const getTabsBarStyles = stylesFactory((theme: GrafanaTheme2, hideBorder = false
     tabs: css`
       position: relative;
       display: flex;
-      min-height: ${theme.components.menuTabs.height}px;
+      ${!!vertical ? 'height' : 'min-height'}: ${theme.components.menuTabs.height}px;
       flex-direction: ${!!vertical ? 'column' : 'row'};
       flex-wrap: ${!!vertical ? 'no-wrap' : 'wrap'};
     `,
