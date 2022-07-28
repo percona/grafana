@@ -4,6 +4,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import { SelectableValue } from '@grafana/data';
 import { Field, Input, MultiSelect, Select } from '@grafana/ui';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { AlertRuleTemplateService } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.service';
 import {
   Template,
@@ -30,6 +31,40 @@ export const TemplateStep: FC = () => {
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
+  const [queryParams] = useQueryParams();
+  /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
+  const selectedTemplate: string | null = (queryParams['template'] as string | undefined) || null;
+
+  const handleTemplateChange = useCallback(
+    (selectedTemplate?: Template, onChange?: (template?: Template) => void) => {
+      const newTemplate = templates.current.find((template) => template.name === selectedTemplate?.name);
+      const newDuration = newTemplate?.for;
+      const severityStr = newTemplate?.severity;
+      const newSeverity = SEVERITY_OPTIONS.find((severity) => severity.value === severityStr);
+
+      setCurrentTemplate(newTemplate);
+      if (newSeverity && newSeverity.value) {
+        // @ts-ignore
+        setValue('severity', newSeverity.value);
+      }
+      setValue('duration', parseInt(newDuration || '0', 10));
+
+      if (newTemplate) {
+        newTemplate.params?.forEach(({ type, float, name }) => {
+          // TODO add missing types when supported
+          if (type === TemplateParamType.FLOAT && float?.default !== undefined) {
+            // @ts-ignore
+            setValue(name, float.default);
+          }
+        });
+      }
+
+      if (!!onChange) {
+        onChange(selectedTemplate);
+      }
+    },
+    [setValue]
+  );
 
   const getData = useCallback(async () => {
     try {
@@ -45,21 +80,23 @@ export const TemplateStep: FC = () => {
       setChannelsOptions(formatChannelsOptions(channelsListResponse));
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
       templates.current = templatesListResponse.templates;
+
+      if (selectedTemplate) {
+        const matchingTemplate = templates.current.find((template) => template.name === selectedTemplate);
+
+        if (matchingTemplate) {
+          setValue('template', matchingTemplate);
+          handleTemplateChange(matchingTemplate);
+        }
+      }
     } catch (e) {
       logger.error(e);
     }
-  }, []);
+  }, [handleTemplateChange, selectedTemplate, setValue]);
 
   useEffect(() => {
     getData();
   }, [getData]);
-
-  const handleTemplateChange = (name = ''): Template | undefined => {
-    const template = templates.current.find((template) => template.name === name);
-    setCurrentTemplate(template);
-
-    return template;
-  };
 
   return (
     <RuleEditorSection stepNo={2} title="Template details">
@@ -76,32 +113,7 @@ export const TemplateStep: FC = () => {
             <Select
               id="template"
               value={templateOptions?.find((opt) => opt.value?.name === value?.name)}
-              onChange={(selectedTemplate) => {
-                const curTemplateData = templates.current.find(
-                  (template) => template.name === selectedTemplate.value?.name
-                );
-                const newDuration = curTemplateData?.for;
-                const severityStr = curTemplateData?.severity;
-                const newSeverity = SEVERITY_OPTIONS.find((severity) => severity.value === severityStr);
-                const newTemplate = handleTemplateChange(selectedTemplate.value?.name);
-
-                if (newSeverity && newSeverity.value) {
-                  // @ts-ignore
-                  setValue('severity', newSeverity.value);
-                }
-                setValue('duration', parseInt(newDuration || '0', 10));
-
-                if (newTemplate) {
-                  newTemplate.params?.forEach(({ type, float, name }) => {
-                    // TODO add missing types when supported
-                    if (type === TemplateParamType.FLOAT && float?.default !== undefined) {
-                      // @ts-ignore
-                      setValue(name, float.default);
-                    }
-                  });
-                }
-                onChange(selectedTemplate.value);
-              }}
+              onChange={(selectedTemplate) => handleTemplateChange(selectedTemplate.value, onChange)}
               options={templateOptions}
               data-testid="template-select-input"
             />
