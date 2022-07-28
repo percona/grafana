@@ -28,7 +28,9 @@ export const TemplateStep: FC = () => {
     formState: { errors },
   } = useFormContext<RuleFormValues>();
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<Template>>>();
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
   const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
+  const [loadingChannels, setLoadingChannels] = useState(false);
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const [queryParams] = useQueryParams();
@@ -68,6 +70,8 @@ export const TemplateStep: FC = () => {
 
   const getData = useCallback(async () => {
     try {
+      setLoadingTemplates(true);
+      setLoadingChannels(true);
       const [channelsListResponse, templatesListResponse] = await Promise.all([
         AddAlertRuleModalService.notificationList(),
         AlertRuleTemplateService.list({
@@ -91,6 +95,9 @@ export const TemplateStep: FC = () => {
       }
     } catch (e) {
       logger.error(e);
+    } finally {
+      setLoadingTemplates(false);
+      setLoadingChannels(false);
     }
   }, [handleTemplateChange, selectedTemplate, setValue]);
 
@@ -112,6 +119,9 @@ export const TemplateStep: FC = () => {
           render={({ field: { value, onChange } }) => (
             <Select
               id="template"
+              isLoading={loadingTemplates}
+              disabled={loadingTemplates}
+              placeholder={loadingTemplates ? Messages.loadingTemplates : undefined}
               value={templateOptions?.find((opt) => opt.value?.name === value?.name)}
               onChange={(selectedTemplate) => handleTemplateChange(selectedTemplate.value, onChange)}
               options={templateOptions}
@@ -206,6 +216,9 @@ export const TemplateStep: FC = () => {
           render={({ field: { value, onChange } }) => (
             <MultiSelect
               id="notificationChannels"
+              isLoading={loadingChannels}
+              disabled={loadingChannels}
+              placeholder={loadingChannels ? Messages.loadingContactPoints : undefined}
               onChange={(e) => onChange(e.map((channel) => channel.value))}
               value={value}
               options={channelsOptions}

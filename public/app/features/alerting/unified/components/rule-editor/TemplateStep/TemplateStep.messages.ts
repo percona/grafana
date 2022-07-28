@@ -56,6 +56,8 @@ export const Messages = {
   templateExpression: 'Template Expression',
   ruleAlert: 'Rule Alert',
   advanced: 'Advanced details',
+  loadingTemplates: 'Loading templates...',
+  loadingContactPoints: 'Loading contact points...',
   getFloatDescription: (summary: string, unit?: TemplateParamUnit, float?: TemplateFloatParam) => {
     if (!float) {
       return '';
