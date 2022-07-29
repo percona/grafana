@@ -38,8 +38,8 @@ describe('AddKubernetesModal::', () => {
       kubeConfig,
     };
 
-    fireEvent.change(screen.getByTestId('name-text-input'), nameEvent);
     fireEvent.change(screen.getByTestId('kubeConfig-textarea-input'), configEvent);
+    fireEvent.change(screen.getByTestId('name-text-input'), nameEvent);
     fireEvent.click(screen.getByTestId('kubernetes-add-cluster-button'));
 
     expect(addKubernetes).toHaveBeenCalledWith(expected);
