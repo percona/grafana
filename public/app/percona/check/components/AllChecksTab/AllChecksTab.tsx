@@ -58,7 +58,7 @@ export const AllChecksTab: FC = () => {
     setRunChecksPending(true);
     try {
       await CheckService.runDbChecks();
-      socket.send('{}');
+      socket.send(JSON.stringify({}));
       appEvents.emit(AppEvents.alertSuccess, [Messages.checksExecutionStarted]);
     } catch (e) {
       logger.error(e);
@@ -71,7 +71,7 @@ export const AllChecksTab: FC = () => {
     async (check: CheckDetails) => {
       try {
         await CheckService.runIndividualDbCheck(check.name);
-        socket.send(`{"names": ["${check.name}"]}`);
+        socket.send(JSON.stringify({ names: [check.name] }));
         appEvents.emit(AppEvents.alertSuccess, [`${check.summary} ${Messages.runIndividualDbCheck}`]);
       } catch (e) {
         logger.error(e);
