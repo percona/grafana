@@ -6,7 +6,6 @@ import { CheckStreamData } from './notifications.types';
 export const checkNotification = (data: CheckStreamData) => {
   if (data.result.topic === 'checks' && data.result.results) {
     data.result.results.forEach((value) => {
-      console.log(value.severity);
       if (
         Severity[value.severity] === Severity.SEVERITY_WARNING ||
         Severity[value.severity] === Severity.SEVERITY_NOTICE ||
