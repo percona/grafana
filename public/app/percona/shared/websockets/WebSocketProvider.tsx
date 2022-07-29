@@ -1,3 +1,4 @@
+import { contextSrv } from 'app/core/core';
 import React, { useEffect, useState, createContext, ReactChild, useContext } from 'react';
 import { checkNotification } from './notifications';
 
@@ -12,6 +13,7 @@ export const useSocket = () => {
 
 export const WebSocketProvider = ({ children }: { children: ReactChild }) => {
   const [ws, setWs] = useState<WebSocket>(webSocket);
+  const isLoggedIn = !!contextSrv.user.isSignedIn;
 
   useEffect(() => {
     const onClose = () => {
@@ -28,13 +30,15 @@ export const WebSocketProvider = ({ children }: { children: ReactChild }) => {
         }
       };
     }
-
-    ws.addEventListener('close', onClose);
-
+    if (isLoggedIn) {
+      ws.addEventListener('close', onClose);
+    } else {
+      ws.removeEventListener('close', onClose);
+    }
     return () => {
       ws.removeEventListener('close', onClose);
     };
-  }, [ws, setWs]);
+  }, [ws, setWs, isLoggedIn]);
 
   return <SocketContext.Provider value={ws}>{children}</SocketContext.Provider>;
 };

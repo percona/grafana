@@ -9,10 +9,9 @@ export const checkNotification = (data: CheckStreamData) => {
       if (
         Severity[value.severity] === Severity.SEVERITY_WARNING ||
         Severity[value.severity] === Severity.SEVERITY_NOTICE ||
-        Severity[value.severity] === Severity.SEVERITY_INFO ||
         Severity[value.severity] === Severity.SEVERITY_DEBUG
       ) {
-        appEvents.emit(AppEvents.alertWarning, [value.summary]);
+        appEvents.emit(AppEvents.alertWarning, [`${value.service_name}: ${value.summary}`]);
       }
       if (
         Severity[value.severity] === Severity.SEVERITY_ALERT ||
@@ -20,7 +19,10 @@ export const checkNotification = (data: CheckStreamData) => {
         Severity[value.severity] === Severity.SEVERITY_ERROR ||
         Severity[value.severity] === Severity.SEVERITY_EMERGENCY
       ) {
-        appEvents.emit(AppEvents.alertError, [value.summary]);
+        appEvents.emit(AppEvents.alertError, [`${value.service_name}: ${value.summary}`]);
+      }
+      if (Severity[value.severity] === Severity.SEVERITY_INFO) {
+        appEvents.emit(AppEvents.alertSuccess, [`${value.service_name}: ${value.summary}`]);
       }
     });
   }
