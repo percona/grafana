@@ -1,6 +1,10 @@
 import { parse } from 'yaml';
+import { KubeConfig } from '../Kubernetes.types';
 
-export const onKubeConfigValueChange = (value: string | undefined, updateFormMutator: any) => {
+export const onKubeConfigValueChange = (
+  value: string | undefined,
+  updateFormMutator: (configValue: string | undefined, nameValue: string | undefined) => void
+) => {
   const defaultName = getClusterNameFromKubeConfig(value);
   updateFormMutator(value, defaultName);
 };
@@ -9,7 +13,7 @@ const getClusterNameFromKubeConfig = (value: string | undefined): string | undef
   if (value) {
     try {
       const parsedYAML = parse(value);
-      const clusters = parsedYAML?.clusters;
+      const clusters: KubeConfig[] = parsedYAML?.clusters;
       if (clusters && clusters.length) {
         const clusterWithName = clusters.find((item: any) => item?.name != null);
         if (clusterWithName) {

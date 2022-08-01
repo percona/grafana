@@ -98,3 +98,21 @@ export interface KubernetesProps {
   setLoading: SetKubernetesLoadingAction;
   loading: boolean;
 }
+
+export interface KubeConfig {
+  name?: string;
+  cluster: {
+    'certificate-authority-data'?: string;
+    extensions: {
+      extention?: Extention[];
+      name?: string;
+    };
+  };
+  server?: string;
+}
+
+interface Extention {
+  'last-update'?: string;
+  provider?: string;
+  version?: string;
+}
