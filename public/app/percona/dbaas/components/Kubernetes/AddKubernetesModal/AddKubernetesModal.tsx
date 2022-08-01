@@ -45,7 +45,7 @@ export const AddKubernetesModal = ({
           setAddModalVisible(false);
         }}
         mutators={{
-          setKubeConfigAndName: ([configValue, nameValue], state, { changeValue }) => {
+          setKubeConfigAndName: ([configValue, nameValue]: string[], state, { changeValue }) => {
             changeValue(state, 'kubeConfig', () => configValue);
             changeValue(state, 'name', () => nameValue);
           },

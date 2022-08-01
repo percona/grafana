@@ -5,6 +5,6 @@ describe('AddKubernetesModal.utils::', () => {
   it('getClusterNameFromKubeConfig returns name of cluster', () => {
     const mutatorMock = jest.fn();
     onKubeConfigValueChange(kubeConfigFile, mutatorMock);
-    expect(mutatorMock).toBeCalledWith(expect.anything(), 'minikube');
+    expect(mutatorMock).toBeCalledWith(kubeConfigFile, 'minikube');
   });
 });
