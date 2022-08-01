@@ -101,17 +101,31 @@ export interface KubernetesProps {
 
 export interface KubeConfig {
   name?: string;
-  cluster: {
-    'certificate-authority-data'?: string;
-    extensions: {
-      extention?: Extention[];
-      name?: string;
-    };
+  server?: string;
+  apiVersion?: string;
+  clusters: Cluster[];
+}
+
+export interface Cluster {
+  name?: string;
+  cluster?: ClusterInfo;
+}
+
+export interface ClusterInfo {
+  'certificate-authority-data'?: string;
+  extensions?: {
+    extension?: Extension[];
+    name?: string;
   };
   server?: string;
 }
 
-interface Extention {
+interface Extension {
+  extension?: ExtensionInfo;
+  name?: string;
+}
+
+interface ExtensionInfo {
   'last-update'?: string;
   provider?: string;
   version?: string;
