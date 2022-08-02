@@ -55,6 +55,7 @@ export const AddKubernetesModal = ({
             <>
               <div className={styles.pasteButtonWrapper}>
                 <Button
+                  data-testid="kubernetes-paste-from-clipboard-button"
                   variant="secondary"
                   onClick={() => {
                     pasteFromClipboard(form.mutators.setKubeConfigAndName);
