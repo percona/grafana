@@ -31,7 +31,7 @@ export const AddKubernetesModal = ({
   isVisible,
   addKubernetes,
   setAddModalVisible,
-  showMonitoringWarning,
+  showMonitoringWarning = false,
 }: AddKubernetesModalProps) => {
   const styles = useStyles(getStyles);
 

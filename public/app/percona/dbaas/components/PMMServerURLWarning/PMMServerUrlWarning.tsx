@@ -3,7 +3,7 @@ import { Alert } from '@grafana/ui';
 import { Link } from 'react-router-dom';
 
 export const PMMServerUrlWarning: FC = () => (
-  <Alert title="PMM Public Address" severity="info">
+  <Alert title="PMM Public Address" severity="info" data-testid="pmm-server-url-warning">
     <p>
       This will also set &quot;Public Address&quot; as {window.location.host}.<br></br>
       If you need to set if differently or edit later, use{' '}

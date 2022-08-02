@@ -1,6 +1,8 @@
 import React from 'react';
 import { fireEvent, screen, render } from '@testing-library/react';
 import { AddKubernetesModal } from './AddKubernetesModal';
+import { Router } from 'react-router-dom';
+import { locationService } from '@grafana/runtime';
 
 describe('AddKubernetesModal::', () => {
   it('renders the modal with all the fields', () => {
@@ -14,12 +16,9 @@ describe('AddKubernetesModal::', () => {
 
   it('shows PMM Server Url Warning', async () => {
     render(
-      <AddKubernetesModal
-        isVisible
-        addKubernetes={() => {}}
-        setAddModalVisible={() => {}}
-        showMonitoringWarning={true}
-      />
+      <Router history={locationService.getHistory()}>
+        <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} showMonitoringWarning />
+      </Router>
     );
     expect(await screen.findByTestId('pmm-server-url-warning')).toBeInTheDocument();
   });
@@ -42,7 +41,7 @@ describe('AddKubernetesModal::', () => {
     fireEvent.change(screen.getByTestId('kubeConfig-textarea-input'), configEvent);
     fireEvent.click(screen.getByTestId('kubernetes-add-cluster-button'));
 
-    expect(addKubernetes).toHaveBeenCalledWith(expected);
+    expect(addKubernetes).toHaveBeenCalledWith(expected, false);
   });
 
   it('clicking isEKS checkbox shows AWS credentials fields', () => {
