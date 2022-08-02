@@ -89,7 +89,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
       showMonitoringWarning &&
         (await dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } })));
       setVisible(false);
-      onDBClusterAdded();
+      onDBClusterAdded(true);
     } catch (e) {
       logger.error(e);
     }
