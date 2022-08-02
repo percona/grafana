@@ -10,7 +10,11 @@ describe('Connect::', () => {
   it('renders Connect form correctly', () => {
     render(
       <Provider store={configureStore()}>
-        <Connect />
+        <Connect
+          onConnect={() => {}}
+          connecting={false}
+          initialValues={{ pmmServerId: '', pmmServerName: 'test', accessToken: '' }}
+        />
       </Provider>
     );
 
