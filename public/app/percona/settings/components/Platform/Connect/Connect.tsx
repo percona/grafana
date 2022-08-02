@@ -9,14 +9,9 @@ import { getStyles } from './Connect.styles';
 import { LoaderButton, TextInputField } from '@percona/platform-core';
 import { getPerconaServer, getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { PMMServerUrlWarning } from 'app/percona/dbaas/components/PMMServerURLWarning/PMMServerUrlWarning';
+import { ConnectProps } from './Connect.types';
 
-interface Props {
-  onConnect: (values: ConnectRenderProps) => void;
-  connecting: boolean;
-  initialValues: ConnectRenderProps;
-}
-
-export const Connect: FC<Props> = ({ onConnect, connecting, initialValues }) => {
+export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues }) => {
   const styles = useStyles(getStyles);
   const { saasHost } = useSelector(getPerconaServer);
   const { result: settings, loading: settingsLoading } = useSelector(getPerconaSettings);
