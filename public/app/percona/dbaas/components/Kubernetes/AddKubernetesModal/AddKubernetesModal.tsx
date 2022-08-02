@@ -37,10 +37,10 @@ export const AddKubernetesModal = ({
 
   return (
     <Modal title={Messages.kubernetes.addModal.title} isVisible={isVisible} onClose={() => setAddModalVisible(false)}>
-      {showMonitoringWarning && <PMMServerUrlWarning className={styles.urlWarningWrapper} />}
+      {showMonitoringWarning && <PMMServerUrlWarning />}
       <Form
         onSubmit={(values: NewKubernetesCluster) => {
-          addKubernetes(values);
+          addKubernetes(values, showMonitoringWarning);
           setAddModalVisible(false);
         }}
         render={({ handleSubmit, valid, pristine, values: { isEKS } }: FormRenderProps<NewKubernetesCluster>) => (

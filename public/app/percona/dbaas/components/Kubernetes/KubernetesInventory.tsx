@@ -8,7 +8,12 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
-import { fetchKubernetesAction, deleteKubernetesAction, addKubernetesAction } from 'app/percona/shared/core/reducers';
+import {
+  fetchKubernetesAction,
+  deleteKubernetesAction,
+  addKubernetesAction,
+  updateSettingsAction,
+} from 'app/percona/shared/core/reducers';
 import {
   getKubernetes as getKubernetesSelector,
   getDeleteKubernetes,
@@ -128,8 +133,11 @@ export const KubernetesInventory: FC = () => {
     [addModalVisible]
   );
 
-  const addKubernetes = useCallback((cluster: NewKubernetesCluster) => {
-    dispatch(addKubernetesAction({ kubernetesToAdd: cluster, token: generateToken(DELETE_KUBERNETES_CANCEL_TOKEN) }));
+  const addKubernetes = useCallback(async (cluster: NewKubernetesCluster, setPMMAddress = false) => {
+    await dispatch(
+      addKubernetesAction({ kubernetesToAdd: cluster, token: generateToken(DELETE_KUBERNETES_CANCEL_TOKEN) })
+    );
+    setPMMAddress && dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

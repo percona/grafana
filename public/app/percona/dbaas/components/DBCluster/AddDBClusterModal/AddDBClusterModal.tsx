@@ -3,6 +3,7 @@ import React, { FC, useMemo } from 'react';
 import { Modal, logger } from '@percona/platform-core';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { useStyles } from '@grafana/ui';
+import { useDispatch } from 'react-redux';
 import { StepProgress } from 'app/percona/dbaas/components/StepProgress/StepProgress';
 import { AddDBClusterModalProps, AddDBClusterFields } from './AddDBClusterModal.types';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
@@ -14,6 +15,7 @@ import { getStyles } from './AddDBClusterModal.styles';
 import { FormRenderProps } from 'react-final-form';
 import { getActiveOperators, getDatabaseOptionFromOperator } from '../../Kubernetes/Kubernetes.utils';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
+import { updateSettingsAction } from 'app/percona/shared/core/reducers';
 
 export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   kubernetes,
@@ -23,7 +25,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   showMonitoringWarning,
 }) => {
   const styles = useStyles(getStyles);
-
+  const dispatch = useDispatch();
   const initialValues = useMemo(() => {
     const activeOperators = getActiveOperators(kubernetes);
 
@@ -73,7 +75,6 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   }: Record<string, any>) => {
     try {
       const dbClusterService = newDBClusterService(databaseType.value);
-
       await dbClusterService.addDBCluster({
         kubernetesClusterName: kubernetesCluster.value,
         clusterName: name,
@@ -85,6 +86,8 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
         databaseImage: databaseVersion.value,
         expose,
       });
+      showMonitoringWarning &&
+        (await dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } })));
       setVisible(false);
       onDBClusterAdded();
     } catch (e) {
