@@ -130,6 +130,10 @@ func addUserMigrations(mg *Migrator) {
 	mg.AddMigration("Add is_service_account column to user", NewAddColumnMigration(userV2, &Column{
 		Name: "is_service_account", Type: DB_Bool, Nullable: false, Default: "0",
 	}))
+
+	mg.AddMigration("Add product_tour_done column to user", NewAddColumnMigration(userV2, &Column{
+		Name: "product_tour_done", Type: DB_Bool, Nullable: false, Default: "0",
+	}))
 }
 
 type AddMissingUserSaltAndRandsMigration struct {

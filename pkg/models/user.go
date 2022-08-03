@@ -38,6 +38,8 @@ type User struct {
 	IsServiceAccount bool
 	OrgId            int64
 
+	ProductTourDone bool
+
 	Created    time.Time
 	Updated    time.Time
 	LastSeenAt time.Time
@@ -237,6 +239,8 @@ type UserProfileDTO struct {
 	UpdatedAt      time.Time `json:"updatedAt"`
 	CreatedAt      time.Time `json:"createdAt"`
 	AvatarUrl      string    `json:"avatarUrl"`
+
+	ProductTourDone bool `json:"productTourDone"`
 }
 
 type UserSearchHitDTO struct {
