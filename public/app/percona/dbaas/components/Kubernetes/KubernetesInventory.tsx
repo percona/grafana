@@ -36,6 +36,7 @@ import {
   CHECK_OPERATOR_UPDATE_CANCEL_TOKEN,
   DELETE_KUBERNETES_CANCEL_TOKEN,
 } from './Kubernetes.constants';
+import { PortalK8sFreeClusterPromotingMessage } from './PortalK8sFreeClusterPromotingMessage/PortalK8sFreeClusterPromotingMessage';
 
 export const KubernetesInventory: FC = () => {
   const styles = useStyles(getStyles);
@@ -223,6 +224,7 @@ export const KubernetesInventory: FC = () => {
             <Table columns={columns} data={kubernetes} loading={loading} noData={<AddNewClusterButton />} />
           </div>
         </FeatureLoader>
+        {kubernetes.length === 0 && <PortalK8sFreeClusterPromotingMessage />}
       </Page.Contents>
     </Page>
   );
