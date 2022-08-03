@@ -23,6 +23,7 @@ func (ss *SQLStore) addUserQueryAndCommandHandlers() {
 	bus.AddHandlerCtx("sql", GetUserById)
 	bus.AddHandlerCtx("sql", UpdateUser)
 	bus.AddHandlerCtx("sql", ChangeUserPassword)
+	bus.AddHandlerCtx("sql", UpdateUserProductTour)
 	bus.AddHandlerCtx("sql", ss.GetUserByLogin)
 	bus.AddHandlerCtx("sql", ss.GetUserByEmail)
 	bus.AddHandlerCtx("sql", SetUsingOrg)
@@ -396,6 +397,17 @@ func UpdateUser(ctx context.Context, cmd *models.UpdateUserCommand) error {
 		})
 
 		return nil
+	})
+}
+
+func UpdateUserProductTour(ctx context.Context, cmd *models.UpdateUserProductTourCommand) error {
+	return inTransaction(func(sess *DBSession) error {
+		user := models.User{
+			ProductTourDone: cmd.ProductTourDone,
+		}
+
+		_, err := sess.ID(cmd.UserId).Update(&user)
+		return err
 	})
 }
 

@@ -146,6 +146,7 @@ func (hs *HTTPServer) registerRoutes() {
 		apiRoute.Group("/user", func(userRoute routing.RouteRegister) {
 			userRoute.Get("/", routing.Wrap(GetSignedInUser))
 			userRoute.Put("/", bind(models.UpdateUserCommand{}), routing.Wrap(UpdateSignedInUser))
+			userRoute.Put("/product-tour", bind(models.UpdateUserProductTourCommand{}), routing.Wrap(UpdateUserProductTour))
 			userRoute.Post("/using/:id", routing.Wrap(UserSetUsingOrg))
 			userRoute.Get("/orgs", routing.Wrap(GetSignedInUserOrgList))
 			userRoute.Get("/teams", routing.Wrap(GetSignedInUserTeamList))

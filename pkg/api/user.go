@@ -83,6 +83,12 @@ func UpdateSignedInUser(c *models.ReqContext, cmd models.UpdateUserCommand) resp
 	return handleUpdateUser(c.Req.Context(), cmd)
 }
 
+// PUT /api/user/product-tour
+func UpdateUserProductTour(c *models.ReqContext, cmd models.UpdateUserProductTourCommand) response.Response {
+	cmd.UserId = c.UserId
+	return handleSignedInUserUpdateProductTour(c.Req.Context(), cmd)
+}
+
 // POST /api/users/:id
 func UpdateUser(c *models.ReqContext, cmd models.UpdateUserCommand) response.Response {
 	cmd.UserId = c.ParamsInt64(":id")
@@ -105,6 +111,18 @@ func UpdateUserActiveOrg(c *models.ReqContext) response.Response {
 	}
 
 	return response.Success("Active organization changed")
+}
+
+func handleSignedInUserUpdateProductTour(ctx context.Context, cmd models.UpdateUserProductTourCommand) response.Response {
+	if !cmd.ProductTourDone {
+		return response.Error(400, "Validation error, cannot unset product tour flag", nil)
+	}
+
+	if err := bus.DispatchCtx(ctx, &cmd); err != nil {
+		return response.Error(500, "Failed to update user", err)
+	}
+
+	return response.Success("User updated")
 }
 
 func handleUpdateUser(ctx context.Context, cmd models.UpdateUserCommand) response.Response {
