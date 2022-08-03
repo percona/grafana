@@ -1,8 +1,14 @@
 import React from 'react';
 import { AddDBClusterModal } from './AddDBClusterModal';
-import { setVisibleStub, onDBClusterAddedStub } from './__mocks__/addDBClusterModalStubs';
+import { onDBClusterAddedStub, setVisibleStub } from './__mocks__/addDBClusterModalStubs';
 import { kubernetesStub } from '../../Kubernetes/__mocks__/kubernetesStubs';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { updateDatabaseTypeInitialValues } from './AddDBClusterModal.utils';
+
+jest.mock('./AddDBClusterModal.utils', () => ({
+  ...jest.requireActual('./AddDBClusterModal.utils'),
+  updateDatabaseTypeInitialValues: jest.fn(),
+}));
 
 jest.mock('app/core/app_events');
 
@@ -71,5 +77,26 @@ describe('AddDBClusterModal::', () => {
     openStep('dbcluster-advanced-options-step');
     expect(isStepActive('dbcluster-advanced-options-step')).toBeTruthy();
     expect(isStepActive('dbcluster-basic-options-step')).toBeFalsy();
+  });
+
+  it('form should have default values', () => {
+    render(
+      <AddDBClusterModal
+        kubernetes={kubernetesStub}
+        isVisible
+        setVisible={setVisibleStub}
+        onDBClusterAdded={onDBClusterAddedStub}
+      />
+    );
+
+    expect(updateDatabaseTypeInitialValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        databaseType: expect.objectContaining({ value: 'mongodb' }),
+        kubernetesCluster: expect.objectContaining({
+          value: 'Cluster 1',
+        }),
+        name: expect.stringContaining('mongodb-'),
+      })
+    );
   });
 });

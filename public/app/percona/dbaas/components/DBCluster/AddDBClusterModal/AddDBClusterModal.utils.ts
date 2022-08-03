@@ -27,17 +27,16 @@ export const getInitialValues = (kubernetes: Kubernetes[]): AddDbClusterFormValu
       }
     }
   }
-
   return initialValues;
 };
 
-const generateUID = (): string => {
+export const generateUID = (): string => {
   const firstPart = ('000' + ((Math.random() * 46656) | 0).toString(36)).slice(-3);
   const secondPart = ('000' + ((Math.random() * 46656) | 0).toString(36)).slice(-3);
   return firstPart + secondPart;
 };
 
-export const updatedDatabaseTypeInitialValues = (initialValues: AddDbClusterFormValues) => {
+export const updateDatabaseTypeInitialValues = (initialValues: AddDbClusterFormValues) => {
   if (initialValues[AddDBClusterFields.databaseType]) {
     return {
       ...initialValues,
