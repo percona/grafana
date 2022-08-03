@@ -68,11 +68,6 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
 
   return (
     <>
-      <TextInputField
-        name={AddDBClusterFields.name}
-        label={Messages.dbcluster.addModal.fields.clusterName}
-        validators={[required, kubernetesClusterNameValidator, maxLength(CLUSTER_NAME_MAX_LENGTH)]}
-      />
       <Field
         dataTestId="dbcluster-kubernetes-cluster-field"
         name={AddDBClusterFields.kubernetesCluster}
@@ -102,6 +97,11 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
         loading={loadingDatabaseVersions}
         options={databaseVersions}
         validate={optionRequired}
+      />
+      <TextInputField
+        name={AddDBClusterFields.name}
+        label={Messages.dbcluster.addModal.fields.clusterName}
+        validators={[required, kubernetesClusterNameValidator, maxLength(CLUSTER_NAME_MAX_LENGTH)]}
       />
     </>
   );

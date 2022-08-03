@@ -7,13 +7,12 @@ import { StepProgress } from 'app/percona/dbaas/components/StepProgress/StepProg
 import { AddDBClusterModalProps, AddDBClusterFields } from './AddDBClusterModal.types';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
-import { INITIAL_VALUES } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import { DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import { newDBClusterService } from '../DBCluster.utils';
 import { getStyles } from './AddDBClusterModal.styles';
 import { FormRenderProps } from 'react-final-form';
-import { getActiveOperators, getDatabaseOptionFromOperator } from '../../Kubernetes/Kubernetes.utils';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
+import { getInitialValues, updatedDatabaseTypeInitialValues } from './AddDBClusterModal.utils';
 
 export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   kubernetes,
@@ -24,17 +23,12 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
 }) => {
   const styles = useStyles(getStyles);
 
-  const initialValues = useMemo(() => {
-    const activeOperators = getActiveOperators(kubernetes);
+  const initialFieldValues = useMemo(() => getInitialValues(kubernetes), [kubernetes]);
+  const initialValues = useMemo(
+    () => (isVisible ? updatedDatabaseTypeInitialValues(initialFieldValues) : initialFieldValues),
+    [initialFieldValues, isVisible]
+  );
 
-    return {
-      ...INITIAL_VALUES,
-      [AddDBClusterFields.databaseType]:
-        activeOperators.length === 1
-          ? getDatabaseOptionFromOperator(activeOperators[0])
-          : { value: undefined, label: undefined },
-    };
-  }, [kubernetes]);
   const steps = useMemo(
     () => [
       {
