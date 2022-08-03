@@ -35,6 +35,7 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
   selectedKubernetes,
   isVisible,
   setVisible,
+  setSelectedCluster,
 }) => {
   const styles = useStyles(getStyles);
   const [
@@ -105,6 +106,8 @@ export const ManageComponentsVersionsModal: FC<ManageComponentsVersionsModalProp
       appEvents.emit(AppEvents.alertSuccess, [Messages.success]);
     } catch (e) {
       logger.error(e);
+    } finally {
+      setSelectedCluster(null);
     }
   };
 

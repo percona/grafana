@@ -5,7 +5,8 @@ export interface AddDBClusterModalProps {
   isVisible: boolean;
   showMonitoringWarning?: boolean;
   setVisible: (value: boolean) => void;
-  onDBClusterAdded: (triggerLoading?: boolean) => void;
+  onSubmit: (values: Record<string, any>) => void;
+  initialValues: Record<string, any>;
 }
 
 export enum AddDBClusterFields {

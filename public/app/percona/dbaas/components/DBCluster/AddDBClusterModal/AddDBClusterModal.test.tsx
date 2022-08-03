@@ -33,10 +33,11 @@ describe('AddDBClusterModal::', () => {
         } as StoreState)}
       >
         <AddDBClusterModal
+          initialValues={{}}
           kubernetes={kubernetesStub}
           isVisible
           setVisible={setVisibleStub}
-          onDBClusterAdded={onDBClusterAddedStub}
+          onSubmit={onDBClusterAddedStub}
           showMonitoringWarning={false}
         />
       </Provider>
@@ -67,7 +68,8 @@ describe('AddDBClusterModal::', () => {
           kubernetes={kubernetesStub}
           isVisible
           setVisible={setVisibleStub}
-          onDBClusterAdded={onDBClusterAddedStub}
+          onSubmit={onDBClusterAddedStub}
+          initialValues={{}}
         />
       </Provider>
     );
@@ -92,7 +94,8 @@ describe('AddDBClusterModal::', () => {
           kubernetes={kubernetesStub}
           isVisible
           setVisible={setVisibleStub}
-          onDBClusterAdded={onDBClusterAddedStub}
+          onSubmit={onDBClusterAddedStub}
+          initialValues={{}}
         />
       </Provider>
     );
