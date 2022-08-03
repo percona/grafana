@@ -53,6 +53,7 @@ export const Advanced: FC = () => {
     azureDiscoverEnabled,
     publicAddress,
     alertingEnabled,
+    telemetrySummary,
   } = settings!;
   const settingsStyles = useStyles2(getSettingsStyles);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
@@ -65,6 +66,7 @@ export const Advanced: FC = () => {
       telemetryLabel,
       telemetryLink,
       telemetryTooltip,
+      telemetrySummaryTitle,
       telemetryDisclaimer,
       updatesLabel,
       updatesLink,
@@ -107,6 +109,7 @@ export const Advanced: FC = () => {
     rareInterval,
     standardInterval,
     frequentInterval,
+    telemetrySummary,
   };
   const [loading, setLoading] = useState(false);
 
@@ -163,6 +166,20 @@ export const Advanced: FC = () => {
   };
   const { Form } = withTypes<AdvancedFormProps>();
 
+  const getTooltipWithDatapointSummaries = () => {
+    return (
+      <div>
+        <p>{telemetryTooltip}</p>
+        <p>{telemetrySummaryTitle}</p>
+        <ul className={styles.telemetryTooltip}>
+          {telemetrySummary.map((summary) => (
+            <li key={summary}>{summary}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
       <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
@@ -197,7 +214,7 @@ export const Advanced: FC = () => {
                     name="telemetry"
                     type="checkbox"
                     label={telemetryLabel}
-                    tooltip={telemetryTooltip}
+                    tooltipComponent={getTooltipWithDatapointSummaries()}
                     tooltipLinkText={tooltipLinkText}
                     link={telemetryLink}
                     dataTestId="advanced-telemetry"

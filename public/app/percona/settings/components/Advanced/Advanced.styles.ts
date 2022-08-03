@@ -21,6 +21,11 @@ export const getStyles = ({ v1: { breakpoints, spacing, typography, border, colo
       display: flex;
       width: 230px;
     `,
+    wideAdvancedCol: css`
+      align-items: center;
+      display: flex;
+      width: 300px;
+    `,
     advancedChildCol: css`
       width: 150px;
       margin-left: 30px;
@@ -111,6 +116,9 @@ export const getStyles = ({ v1: { breakpoints, spacing, typography, border, colo
     infoBoxIcon: css`
       margin: ${spacing.sm};
       fill: ${colors.linkExternal};
+    `,
+    telemetryTooltip: css`
+      padding-left: 10px;
     `,
   };
 };

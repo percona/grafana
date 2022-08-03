@@ -19,6 +19,7 @@ describe('Advanced::', () => {
                 sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
                 dataRetention: '2592000s',
                 telemetryEnabled: true,
+                telemetrySummary: ['summary1', 'summary2'],
                 updatesDisabled: true,
                 backupEnabled: false,
                 sttEnabled: true,
@@ -52,6 +53,7 @@ describe('Advanced::', () => {
                 sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
                 dataRetention: '2592000s',
                 telemetryEnabled: true,
+                telemetrySummary: ['summary1', 'summary2'],
                 updatesDisabled: true,
                 backupEnabled: false,
                 sttEnabled: true,
@@ -96,6 +98,7 @@ describe('Advanced::', () => {
                 sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
                 dataRetention: '2592000s',
                 telemetryEnabled: true,
+                telemetrySummary: ['summary1', 'summary2'],
                 updatesDisabled: true,
                 backupEnabled: false,
                 sttEnabled: true,
@@ -130,6 +133,7 @@ describe('Advanced::', () => {
                 sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
                 dataRetention: '2592000s',
                 telemetryEnabled: true,
+                telemetrySummary: ['summary1', 'summary2'],
                 updatesDisabled: true,
                 backupEnabled: false,
                 sttEnabled: false,
@@ -167,6 +171,7 @@ describe('Advanced::', () => {
                 sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
                 dataRetention: '2592000s',
                 telemetryEnabled: true,
+                telemetrySummary: ['summary1', 'summary2'],
                 updatesDisabled: true,
                 backupEnabled: false,
                 sttEnabled: true,
@@ -188,5 +193,42 @@ describe('Advanced::', () => {
     await waitForElementToBeRemoved(() => container.querySelector('.fa-spin'));
 
     expect(spy.calls.mostRecent().args[0].body.stt_check_intervals).toBeDefined();
+  });
+
+  it('Show summaries in tooltip', async () => {
+    const spy = spyOn(reducers, 'updateSettingsAction').and.callThrough();
+
+    const { container } = render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: {
+                sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
+                dataRetention: '2592000s',
+                telemetryEnabled: true,
+                telemetrySummary: ['summary1', 'summary2'],
+                updatesDisabled: true,
+                backupEnabled: false,
+                sttEnabled: true,
+                dbaasEnabled: false,
+                azureDiscoverEnabled: true,
+                publicAddress: 'localhost',
+                alertingEnabled: true,
+              },
+            },
+          },
+        } as StoreState)}
+      >
+        <Advanced />
+      </Provider>
+    );
+
+    let el = screen.getByTestId('advanced-telemetry');
+    console.log(el.__html);
+    fireEvent.hover(el);
+    await waitForElementToBeRemoved(() => container.querySelector('.fa-spin'));
   });
 });
