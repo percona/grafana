@@ -41,7 +41,7 @@ describe('AddKubernetesModal::', () => {
     fireEvent.change(screen.getByTestId('kubeConfig-textarea-input'), configEvent);
     fireEvent.click(screen.getByTestId('kubernetes-add-cluster-button'));
 
-    expect(addKubernetes).toHaveBeenCalledWith(expected, false);
+    expect(addKubernetes).toHaveBeenCalledWith(expected, undefined);
   });
 
   it('clicking isEKS checkbox shows AWS credentials fields', () => {
