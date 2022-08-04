@@ -113,7 +113,7 @@ export const getStyles = ({ v1: { breakpoints, spacing, typography, border, colo
       fill: ${colors.linkExternal};
     `,
     telemetryTooltip: css`
-      padding-left: 10px;
+      padding-left: ${spacing.sm};
     `,
   };
 };
