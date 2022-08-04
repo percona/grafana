@@ -17,7 +17,7 @@ describe('AddKubernetesModal::', () => {
   it('shows PMM Server Url Warning', async () => {
     render(
       <Router history={locationService.getHistory()}>
-        <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} showMonitoringWarning />
+        <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
       </Router>
     );
     expect(await screen.findByTestId('pmm-server-url-warning')).toBeInTheDocument();

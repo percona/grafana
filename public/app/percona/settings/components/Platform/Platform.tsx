@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { useDispatch, useSelector } from 'react-redux';
 import Page from 'app/core/components/Page/Page';
@@ -23,12 +23,7 @@ export const Platform: FC = () => {
   const { result } = useSelector(getPerconaSettings);
   const [connecting, setConnecting] = useState(false);
   const { serverId: pmmServerId = '' } = useSelector(getPerconaServer);
-  const { result: settings, loading: settingsLoading } = useSelector(getPerconaSettings);
   const dispatch = useDispatch();
-  const showMonitoringWarning = useMemo(() => settingsLoading || !settings?.publicAddress, [
-    settings?.publicAddress,
-    settingsLoading,
-  ]);
 
   const [initialValues, setInitialValues] = useState<ConnectRenderProps>({
     pmmServerName: '',
@@ -57,10 +52,10 @@ export const Platform: FC = () => {
     }
   };
 
-  const handleConnect = async ({ pmmServerName, accessToken }: ConnectRenderProps) => {
+  const handleConnect = async ({ pmmServerName, accessToken }: ConnectRenderProps, setPMMAddress: boolean) => {
     setInitialValues((oldValues) => ({ ...oldValues, pmmServerName, accessToken }));
     setConnecting(true);
-    if (showMonitoringWarning) {
+    if (setPMMAddress) {
       await dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } }));
       setTimeout(() => connect(pmmServerName, accessToken), CONNECT_AFTER_SETTINGS_DELAY);
     } else {

@@ -12,17 +12,18 @@ import { FormRenderProps } from 'react-final-form';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 import { useSelector } from 'react-redux';
 import { getAddDbCluster } from 'app/percona/shared/core/selectors';
+import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 
 export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   kubernetes,
   isVisible,
   setVisible,
   onSubmit,
-  showMonitoringWarning,
   initialValues,
 }) => {
   const styles = useStyles(getStyles);
   const { loading } = useSelector(getAddDbCluster);
+  const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const steps = useMemo(
     () => [
       {
@@ -51,12 +52,12 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
     <div className={styles.modalWrapper} key="add-db-cluster-modal">
       <Modal title={Messages.dbcluster.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>
         <div className={styles.stepProgressWrapper}>
-          {showMonitoringWarning && <PMMServerUrlWarning />}
+          {showPMMAddressWarning && <PMMServerUrlWarning />}
           <StepProgress
             steps={steps}
             initialValues={initialValues}
             submitButtonMessage={Messages.dbcluster.addModal.confirm}
-            onSubmit={onSubmit}
+            onSubmit={(values) => onSubmit(values, showPMMAddressWarning)}
             loading={loading}
           />
         </div>

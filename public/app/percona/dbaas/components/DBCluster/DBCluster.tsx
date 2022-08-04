@@ -6,12 +6,7 @@ import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { Table } from 'app/percona/shared/components/Elements/Table';
-import {
-  getKubernetes,
-  getPerconaDBClusters,
-  getPerconaSettingFlag,
-  getPerconaSettings,
-} from 'app/percona/shared/core/selectors';
+import { getKubernetes, getPerconaDBClusters, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { getStyles } from './DBCluster.styles';
@@ -59,7 +54,6 @@ export const DBCluster: FC = () => {
   const navModel = usePerconaNavModel('dbclusters');
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
-  const { result: settings, loading: settingsLoading } = useSelector(getPerconaSettings);
   const { result: kubernetes = [], loading: kubernetesLoading } = useSelector(getKubernetes);
   const { result: dbClusters = [], loading: dbClustersLoading } = useSelector(getPerconaDBClusters);
   const [catchFromAsyncThunkAction] = useCatchCancellationError();
@@ -157,10 +151,10 @@ export const DBCluster: FC = () => {
     [addModalVisible, addDisabled]
   );
 
-  const addCluster = async (values: Record<string, any>) => {
+  const addCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
     setInitialValues(values);
     try {
-      await dispatch(addDbClusterAction({ values, setPMMAddress: showMonitoringWarning })).unwrap();
+      await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning })).unwrap();
       setAddModalVisible(false);
       getDBClusters(true);
     } catch (e) {
@@ -214,11 +208,6 @@ export const DBCluster: FC = () => {
     [kubernetes.length, kubernetesLoading]
   );
 
-  const showMonitoringWarning = useMemo(() => settingsLoading || !settings?.publicAddress, [
-    settings?.publicAddress,
-    settingsLoading,
-  ]);
-
   return (
     <Page navModel={navModel}>
       <Page.Contents>
@@ -233,7 +222,6 @@ export const DBCluster: FC = () => {
               isVisible={addModalVisible}
               setVisible={setAddModalVisible}
               onSubmit={addCluster}
-              showMonitoringWarning={showMonitoringWarning}
               initialValues={initialValues}
             />
             <DeleteDBClusterModal

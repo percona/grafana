@@ -38,7 +38,6 @@ describe('AddDBClusterModal::', () => {
           isVisible
           setVisible={setVisibleStub}
           onSubmit={onDBClusterAddedStub}
-          showMonitoringWarning={false}
         />
       </Provider>
     );

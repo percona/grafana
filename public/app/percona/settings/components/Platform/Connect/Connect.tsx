@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 import { useSelector } from 'react-redux';
 import { useStyles } from '@grafana/ui';
@@ -7,23 +7,20 @@ import { ConnectRenderProps } from '../types';
 import { Messages } from '../Platform.messages';
 import { getStyles } from './Connect.styles';
 import { LoaderButton, TextInputField } from '@percona/platform-core';
-import { getPerconaServer, getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { getPerconaServer } from 'app/percona/shared/core/selectors';
 import { PMMServerUrlWarning } from 'app/percona/dbaas/components/PMMServerURLWarning/PMMServerUrlWarning';
 import { ConnectProps } from './Connect.types';
+import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 
 export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues }) => {
   const styles = useStyles(getStyles);
   const { saasHost } = useSelector(getPerconaServer);
-  const { result: settings, loading: settingsLoading } = useSelector(getPerconaSettings);
-  const showMonitoringWarning = useMemo(() => settingsLoading || !settings?.publicAddress, [
-    settings?.publicAddress,
-    settingsLoading,
-  ]);
+  const [showPMMAddressWarning] = useShowPMMAddressWarning();
 
-  const ConnectForm: FC<FormRenderProps<ConnectRenderProps>> = ({ pristine, valid, handleSubmit }) => (
+  const ConnectForm: FC<FormRenderProps<ConnectRenderProps>> = ({ valid, handleSubmit }) => (
     <form data-testid="connect-form" className={styles.form} onSubmit={handleSubmit} autoComplete="off">
       <legend className={styles.legend}>{Messages.title}</legend>
-      {showMonitoringWarning && <PMMServerUrlWarning />}
+      {showPMMAddressWarning && <PMMServerUrlWarning />}
       <TextInputField name="pmmServerId" disabled label={Messages.pmmServerId} />
       <TextInputField
         name="pmmServerName"
@@ -60,5 +57,11 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
     </form>
   );
 
-  return <Form onSubmit={onConnect} initialValues={initialValues} render={ConnectForm} />;
+  return (
+    <Form
+      onSubmit={(values) => onConnect(values, showPMMAddressWarning)}
+      initialValues={initialValues}
+      render={ConnectForm}
+    />
+  );
 };
