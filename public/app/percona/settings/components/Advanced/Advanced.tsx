@@ -166,20 +166,6 @@ export const Advanced: FC = () => {
   };
   const { Form } = withTypes<AdvancedFormProps>();
 
-  const getTooltipWithDatapointSummaries = () => {
-    return (
-      <div>
-        <p>{telemetryTooltip}</p>
-        <p>{telemetrySummaryTitle}</p>
-        <ul className={styles.telemetryTooltip}>
-          {telemetrySummary.map((summary) => (
-            <li key={summary}>{summary}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
   return (
     <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
       <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
@@ -214,7 +200,13 @@ export const Advanced: FC = () => {
                     name="telemetry"
                     type="checkbox"
                     label={telemetryLabel}
-                    tooltipComponent={getTooltipWithDatapointSummaries()}
+                    tooltipComponent={
+                      <TelemetryTooltip
+                        telemetryTooltip={telemetryTooltip}
+                        telemetrySummaryTitle={telemetrySummaryTitle}
+                        telemetrySummaries={telemetrySummary}
+                      />
+                    }
                     tooltipLinkText={tooltipLinkText}
                     link={telemetryLink}
                     dataTestId="advanced-telemetry"
@@ -359,6 +351,30 @@ export const Advanced: FC = () => {
         </FeatureLoader>
       </Page.Contents>
     </Page>
+  );
+};
+
+interface TelemetryTooltipProps {
+  telemetryTooltip: string;
+  telemetrySummaryTitle: string;
+  telemetrySummaries: string[];
+}
+
+const TelemetryTooltip: FC<TelemetryTooltipProps> = ({
+  telemetryTooltip,
+  telemetrySummaryTitle,
+  telemetrySummaries,
+}) => {
+  return (
+    <div>
+      <p>{telemetryTooltip}</p>
+      <p>{telemetrySummaryTitle}</p>
+      <ul>
+        {telemetrySummaries.map((summary) => (
+          <li key={summary}>{summary}</li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
