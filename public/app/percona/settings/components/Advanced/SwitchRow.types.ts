@@ -1,7 +1,6 @@
 export interface SwitchRowProps {
   label?: string;
-  tooltip?: string;
-  tooltipComponent?: React.Component;
+  tooltip?: React.ReactNode;
   tooltipLinkText?: string;
   link?: string;
   disabled?: boolean;

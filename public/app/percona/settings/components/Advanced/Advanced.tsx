@@ -181,7 +181,7 @@ export const Advanced: FC = () => {
                       <div className={settingsStyles.labelWrapper} data-testid="advanced-label">
                         <span>{retentionLabel}</span>
                         <LinkTooltip
-                          tooltipText={retentionTooltip}
+                          tooltipContent={retentionTooltip}
                           link={Messages.advanced.retentionLink}
                           linkText={tooltipLinkText}
                           icon="info-circle"
@@ -200,7 +200,7 @@ export const Advanced: FC = () => {
                     name="telemetry"
                     type="checkbox"
                     label={telemetryLabel}
-                    tooltipComponent={
+                    tooltip={
                       <TelemetryTooltip
                         telemetryTooltip={telemetryTooltip}
                         telemetrySummaryTitle={telemetrySummaryTitle}
@@ -240,7 +240,7 @@ export const Advanced: FC = () => {
                     <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                       <div className={settingsStyles.labelWrapper} data-testid="public-address-label">
                         <span>{publicAddressLabel}</span>
-                        <LinkTooltip tooltipText={publicAddressTooltip} icon="info-circle" />
+                        <LinkTooltip tooltipContent={publicAddressTooltip} icon="info-circle" />
                       </div>
                     </div>
                     <div className={styles.publicAddressWrapper}>
@@ -261,7 +261,7 @@ export const Advanced: FC = () => {
                     <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
                       <div className={settingsStyles.labelWrapper} data-testid="check-intervals-label">
                         <span>{sttCheckIntervalsLabel}</span>
-                        <LinkTooltip tooltipText={sttCheckIntervalTooltip} icon="info-circle" />
+                        <LinkTooltip tooltipContent={sttCheckIntervalTooltip} icon="info-circle" />
                       </div>
                     </div>
                   </div>
