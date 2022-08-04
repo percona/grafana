@@ -6,6 +6,8 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import { StoreState } from 'app/types';
 import { Provider } from 'react-redux';
 import { configureStore } from 'app/store/configureStore';
+import { Router } from 'react-router-dom';
+import { locationService } from '@grafana/runtime';
 
 jest.mock('app/core/app_events');
 
@@ -32,13 +34,15 @@ describe('AddDBClusterModal::', () => {
           },
         } as StoreState)}
       >
-        <AddDBClusterModal
-          initialValues={{}}
-          kubernetes={kubernetesStub}
-          isVisible
-          setVisible={setVisibleStub}
-          onSubmit={onDBClusterAddedStub}
-        />
+        <Router history={locationService.getHistory()}>
+          <AddDBClusterModal
+            initialValues={{}}
+            kubernetes={kubernetesStub}
+            isVisible
+            setVisible={setVisibleStub}
+            onSubmit={onDBClusterAddedStub}
+          />
+        </Router>
       </Provider>
     );
 
@@ -63,13 +67,15 @@ describe('AddDBClusterModal::', () => {
           },
         } as StoreState)}
       >
-        <AddDBClusterModal
-          kubernetes={kubernetesStub}
-          isVisible
-          setVisible={setVisibleStub}
-          onSubmit={onDBClusterAddedStub}
-          initialValues={{}}
-        />
+        <Router history={locationService.getHistory()}>
+          <AddDBClusterModal
+            kubernetes={kubernetesStub}
+            isVisible
+            setVisible={setVisibleStub}
+            onSubmit={onDBClusterAddedStub}
+            initialValues={{}}
+          />
+        </Router>
       </Provider>
     );
 
@@ -89,13 +95,15 @@ describe('AddDBClusterModal::', () => {
           },
         } as StoreState)}
       >
-        <AddDBClusterModal
-          kubernetes={kubernetesStub}
-          isVisible
-          setVisible={setVisibleStub}
-          onSubmit={onDBClusterAddedStub}
-          initialValues={{}}
-        />
+        <Router history={locationService.getHistory()}>
+          <AddDBClusterModal
+            kubernetes={kubernetesStub}
+            isVisible
+            setVisible={setVisibleStub}
+            onSubmit={onDBClusterAddedStub}
+            initialValues={{}}
+          />
+        </Router>
       </Provider>
     );
 
