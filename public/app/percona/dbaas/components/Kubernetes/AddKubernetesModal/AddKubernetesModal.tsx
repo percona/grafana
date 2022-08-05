@@ -17,6 +17,7 @@ import { Messages as ModalMessages } from './AddKubernetesModal.messages';
 import { AWS_CREDENTIALS_DOC_LINK } from './AddKubernetesModal.constants';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 import { onKubeConfigValueChange, pasteFromClipboard } from './AddKubernatesModal.utils';
+import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 
 const { required } = validators;
 const {
@@ -28,20 +29,16 @@ const {
   awsSecretAccessKeyTooltip,
 } = ModalMessages;
 
-export const AddKubernetesModal = ({
-  isVisible,
-  addKubernetes,
-  setAddModalVisible,
-  showMonitoringWarning,
-}: AddKubernetesModalProps) => {
+export const AddKubernetesModal = ({ isVisible, addKubernetes, setAddModalVisible }: AddKubernetesModalProps) => {
   const styles = useStyles(getStyles);
+  const [showPMMAddressWarning] = useShowPMMAddressWarning();
 
   return (
     <Modal title={Messages.kubernetes.addModal.title} isVisible={isVisible} onClose={() => setAddModalVisible(false)}>
-      {showMonitoringWarning && <PMMServerUrlWarning className={styles.urlWarningWrapper} />}
+      {showPMMAddressWarning && <PMMServerUrlWarning />}
       <Form
         onSubmit={(values: NewKubernetesCluster) => {
-          addKubernetes(values);
+          addKubernetes(values, showPMMAddressWarning);
           setAddModalVisible(false);
         }}
         mutators={{

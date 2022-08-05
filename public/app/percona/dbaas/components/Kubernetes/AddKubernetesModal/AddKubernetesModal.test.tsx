@@ -1,10 +1,28 @@
 import React from 'react';
 import { fireEvent, screen, render } from '@testing-library/react';
 import { AddKubernetesModal } from './AddKubernetesModal';
+import { Router } from 'react-router-dom';
+import { locationService } from '@grafana/runtime';
+import { Provider } from 'react-redux';
+import { configureStore } from 'app/store/configureStore';
+import { StoreState } from 'app/types';
 
 describe('AddKubernetesModal::', () => {
   it('renders the modal with all elements', () => {
-    render(<AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { publicAddress: 'localhost' } },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
+        </Router>
+      </Provider>
+    );
 
     expect(screen.getByTestId('name-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('kubeConfig-textarea-input')).toBeInTheDocument();
@@ -15,12 +33,18 @@ describe('AddKubernetesModal::', () => {
 
   it('shows PMM Server Url Warning', async () => {
     render(
-      <AddKubernetesModal
-        isVisible
-        addKubernetes={() => {}}
-        setAddModalVisible={() => {}}
-        showMonitoringWarning={true}
-      />
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { publicAddress: '' } },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
+        </Router>
+      </Provider>
     );
     expect(await screen.findByTestId('pmm-server-url-warning')).toBeInTheDocument();
   });
@@ -28,7 +52,18 @@ describe('AddKubernetesModal::', () => {
   it('calls addKubernetes with correct values on registering new cluster', () => {
     const addKubernetes = jest.fn();
 
-    render(<AddKubernetesModal isVisible addKubernetes={addKubernetes} setAddModalVisible={() => {}} />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { publicAddress: 'localhost' } },
+          },
+        } as StoreState)}
+      >
+        <AddKubernetesModal isVisible addKubernetes={addKubernetes} setAddModalVisible={() => {}} />
+      </Provider>
+    );
 
     const name = 'Test name';
     const kubeConfig = 'Test config';
@@ -43,11 +78,22 @@ describe('AddKubernetesModal::', () => {
     fireEvent.change(screen.getByTestId('name-text-input'), nameEvent);
     fireEvent.click(screen.getByTestId('kubernetes-add-cluster-button'));
 
-    expect(addKubernetes).toHaveBeenCalledWith(expected);
+    expect(addKubernetes).toHaveBeenCalledWith(expected, false);
   });
 
   it('clicking isEKS checkbox shows AWS credentials fields', () => {
-    render(<AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { publicAddress: 'localhost' } },
+          },
+        } as StoreState)}
+      >
+        <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
+      </Provider>
+    );
 
     expect(screen.queryByTestId('awsAccessKeyID-text-input')).not.toBeInTheDocument();
     expect(screen.queryByTestId('awsSecretAccessKey-password-input')).not.toBeInTheDocument();
