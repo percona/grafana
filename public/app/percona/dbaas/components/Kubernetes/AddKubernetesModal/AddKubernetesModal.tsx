@@ -16,6 +16,7 @@ import { getStyles } from './AddKubernetesModal.styles';
 import { Messages as ModalMessages } from './AddKubernetesModal.messages';
 import { AWS_CREDENTIALS_DOC_LINK } from './AddKubernetesModal.constants';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
+import { onKubeConfigValueChange, pasteFromClipboard } from './AddKubernatesModal.utils';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 
 const { required } = validators;
@@ -40,18 +41,38 @@ export const AddKubernetesModal = ({ isVisible, addKubernetes, setAddModalVisibl
           addKubernetes(values, showPMMAddressWarning);
           setAddModalVisible(false);
         }}
-        render={({ handleSubmit, valid, pristine, values: { isEKS } }: FormRenderProps<NewKubernetesCluster>) => (
+        mutators={{
+          setKubeConfigAndName: ([configValue, nameValue]: string[], state, { changeValue }) => {
+            changeValue(state, 'kubeConfig', () => configValue);
+            changeValue(state, 'name', () => nameValue);
+          },
+        }}
+        render={({ handleSubmit, valid, pristine, values: { isEKS }, form }: FormRenderProps<NewKubernetesCluster>) => (
           <form onSubmit={handleSubmit}>
             <>
-              <TextInputField
-                name="name"
-                label={Messages.kubernetes.addModal.fields.clusterName}
-                validators={[required]}
-              />
+              <div className={styles.pasteButtonWrapper}>
+                <Button
+                  data-testid="kubernetes-paste-from-clipboard-button"
+                  variant="secondary"
+                  onClick={() => {
+                    pasteFromClipboard(form.mutators.setKubeConfigAndName);
+                  }}
+                  type="button"
+                  icon="copy"
+                  className={styles.pasteButton}
+                >
+                  {Messages.kubernetes.addModal.paste}
+                </Button>
+              </div>
               <TextareaInputField
                 name="kubeConfig"
                 label={Messages.kubernetes.addModal.fields.kubeConfig}
                 validators={[required]}
+                inputProps={{
+                  onChange: (event) => {
+                    onKubeConfigValueChange(event?.target?.value, form.mutators.setKubeConfigAndName);
+                  },
+                }}
               />
               <CheckboxField
                 name="isEKS"
@@ -80,6 +101,11 @@ export const AddKubernetesModal = ({ isVisible, addKubernetes, setAddModalVisibl
                   />
                 </>
               )}
+              <TextInputField
+                name="name"
+                label={Messages.kubernetes.addModal.fields.clusterName}
+                validators={[required]}
+              />
               <HorizontalGroup justify="center" spacing="md">
                 <Button
                   data-testid="kubernetes-add-cluster-button"

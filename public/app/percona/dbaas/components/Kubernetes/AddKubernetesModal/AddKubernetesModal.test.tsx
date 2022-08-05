@@ -8,24 +8,14 @@ import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
 describe('AddKubernetesModal::', () => {
-  it('renders the modal with all the fields', () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true },
-            settings: { loading: false, result: { publicAddress: 'localhost' } },
-          },
-        } as StoreState)}
-      >
-        <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
-      </Provider>
-    );
+  it('renders the modal with all elements', () => {
+    render(<AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />);
 
     expect(screen.getByTestId('name-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('kubeConfig-textarea-input')).toBeInTheDocument();
     expect(screen.getByTestId('isEKS-checkbox-input')).toBeInTheDocument();
     expect(screen.queryByTestId('pmm-server-url-warning')).toBeFalsy();
+    expect(screen.queryByTestId('kubernetes-paste-from-clipboard-button')).toBeInTheDocument();
   });
 
   it('shows PMM Server Url Warning', async () => {
@@ -71,8 +61,8 @@ describe('AddKubernetesModal::', () => {
       kubeConfig,
     };
 
-    fireEvent.change(screen.getByTestId('name-text-input'), nameEvent);
     fireEvent.change(screen.getByTestId('kubeConfig-textarea-input'), configEvent);
+    fireEvent.change(screen.getByTestId('name-text-input'), nameEvent);
     fireEvent.click(screen.getByTestId('kubernetes-add-cluster-button'));
 
     expect(addKubernetes).toHaveBeenCalledWith(expected, false);
