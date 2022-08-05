@@ -12,7 +12,7 @@ export const stub: Settings = {
     hr: '15s',
     mr: '20s',
   },
-  telemetrySummary: [],
+  telemetrySummaries: [],
   dataRetention: '',
   sshKey: 'key',
   awsPartitions: [],

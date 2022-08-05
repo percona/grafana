@@ -53,7 +53,7 @@ export const Advanced: FC = () => {
     azureDiscoverEnabled,
     publicAddress,
     alertingEnabled,
-    telemetrySummary,
+    telemetrySummaries,
   } = settings!;
   const settingsStyles = useStyles2(getSettingsStyles);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
@@ -109,7 +109,7 @@ export const Advanced: FC = () => {
     rareInterval,
     standardInterval,
     frequentInterval,
-    telemetrySummary,
+    telemetrySummaries,
   };
   const [loading, setLoading] = useState(false);
 
@@ -204,7 +204,7 @@ export const Advanced: FC = () => {
                       <TelemetryTooltip
                         telemetryTooltip={telemetryTooltip}
                         telemetrySummaryTitle={telemetrySummaryTitle}
-                        telemetrySummaries={telemetrySummary}
+                        telemetrySummaries={telemetrySummaries}
                       />
                     }
                     tooltipLinkText={tooltipLinkText}

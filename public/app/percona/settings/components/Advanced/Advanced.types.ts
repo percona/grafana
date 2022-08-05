@@ -11,5 +11,5 @@ export interface AdvancedFormProps {
   rareInterval: string;
   standardInterval: string;
   frequentInterval: string;
-  telemetrySummary: string[];
+  telemetrySummaries: string[];
 }
