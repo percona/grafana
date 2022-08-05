@@ -9,7 +9,18 @@ import { StoreState } from 'app/types';
 
 describe('AddKubernetesModal::', () => {
   it('renders the modal with all elements', () => {
-    render(<AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { publicAddress: '' } },
+          },
+        } as StoreState)}
+      >
+        <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
+      </Provider>
+    );
 
     expect(screen.getByTestId('name-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('kubeConfig-textarea-input')).toBeInTheDocument();
