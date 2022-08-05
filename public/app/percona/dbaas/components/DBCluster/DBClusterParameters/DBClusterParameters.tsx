@@ -13,7 +13,8 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
   // const { status } = dbCluster;
   const { result: clusters = {}, loading: dbClusterLoading } = useSelector(getPerconaDBClustersDetails);
   console.log(dbCluster);
-  const { status } = clusters[dbCluster.id!];
+  const { status = DBClusterStatus.unknown } =
+    Object.keys(clusters).length && dbCluster.id ? clusters[dbCluster.id] : {};
   const {
     label: exposeLabel,
     enabled: exposeEnabled,
