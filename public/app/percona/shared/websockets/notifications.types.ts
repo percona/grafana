@@ -28,6 +28,7 @@ export interface CheckStreamData {
         check_name: string;
         alert_id: string;
         silenced: boolean;
+        alert_message: string;
       }
     ];
   };
