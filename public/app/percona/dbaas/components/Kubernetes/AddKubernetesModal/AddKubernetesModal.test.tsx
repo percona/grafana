@@ -14,11 +14,13 @@ describe('AddKubernetesModal::', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { publicAddress: '' } },
+            settings: { loading: false, result: { publicAddress: 'localhost' } },
           },
         } as StoreState)}
       >
-        <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
+        <Router history={locationService.getHistory()}>
+          <AddKubernetesModal isVisible addKubernetes={() => {}} setAddModalVisible={() => {}} />
+        </Router>
       </Provider>
     );
 
