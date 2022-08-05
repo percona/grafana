@@ -21,11 +21,12 @@ import {
 } from 'app/percona/settings/Settings.types';
 import { KubernetesClusterStatus } from 'app/percona/dbaas/components/Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
-import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
-import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
+import { formatDBClusterDetails, formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
+import { DBCluster, DBClusterDetails } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
 import { UserService } from '../services/user/User.service';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { ServerInfo } from './types';
+import { CLUSTER_TYPE_DATABASE } from '../../dbaas/components/DBCluster/DBCluster.constants';
 
 const toSettingsModel = (response: SettingsPayload): Settings => ({
   awsPartitions: response.aws_partitions,
@@ -271,7 +272,7 @@ export const instalKuberneteslOperatorAction = createAsyncThunk(
 
 export const fetchDBClustersAction = createAsyncThunk(
   'percona/fetchDBClusters',
-  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }): Promise<DBCluster[]> =>
+  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }): Promise<Array<Partial<DBCluster>>> =>
     withSerializedError(
       (async () => {
         const requests = args.kubernetes.map((k, idx) =>
@@ -279,6 +280,29 @@ export const fetchDBClustersAction = createAsyncThunk(
         );
         const promiseResults = await Promise.all(requests);
         return formatDBClusters(promiseResults, args.kubernetes);
+      })()
+    )
+);
+
+export const fetchDBClusterDetailsAction = createAsyncThunk(
+  'percona/fetchDBClustersDetail',
+  (args: { dbClusters: Array<Partial<DBCluster>>; tokens: CancelToken[] }): Promise<DBClusterDetails> =>
+    withSerializedError(
+      (async () => {
+        const requests = args.dbClusters.map((d, idx) =>
+          apiManagement.post<any, any>(
+            '/DBaaS/DBClusters/Get',
+            {
+              name: d.clusterName,
+              kubernetes_cluster_name: d.kubernetesClusterName,
+              cluster_type: CLUSTER_TYPE_DATABASE[d.databaseType!],
+            },
+            true,
+            args.tokens[idx]
+          )
+        );
+        const promiseResults = await Promise.all(requests);
+        return formatDBClusterDetails(promiseResults, args.dbClusters);
       })()
     )
 );
@@ -349,6 +373,7 @@ const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesActi
 const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOperator', instalKuberneteslOperatorAction)
   .reducer;
 const DBClusterReducer = createAsyncSlice('DBCluster', fetchDBClustersAction).reducer;
+const DBClusterDetailsReducer = createAsyncSlice('DBClustersDetail', fetchDBClusterDetailsAction).reducer;
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 
@@ -362,6 +387,7 @@ export default {
     addKubernetes: addKubernetesReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbCluster: DBClusterReducer,
+    dbClusterDetails: DBClusterDetailsReducer,
     server: perconaServerReducers,
   }),
 };

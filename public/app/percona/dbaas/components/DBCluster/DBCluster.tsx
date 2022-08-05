@@ -29,7 +29,11 @@ import {
 } from './ColumnRenderers/ColumnRenderers';
 import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModal';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
-import { fetchDBClustersAction, fetchKubernetesAction } from 'app/percona/shared/core/reducers';
+import {
+  fetchDBClusterDetailsAction,
+  fetchDBClustersAction,
+  fetchKubernetesAction,
+} from 'app/percona/shared/core/reducers';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
@@ -77,6 +81,28 @@ export const DBCluster: FC = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [kubernetes]
+  );
+
+  const getDBClusterDetails = useCallback(
+    async (triggerLoading = true) => {
+      if (triggerLoading) {
+        setLoading(true);
+      }
+
+      const tokens: CancelToken[] = kubernetes.map((k) =>
+        generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}-details`)
+      );
+
+      const result = await catchFromAsyncThunkAction(dispatch(fetchDBClusterDetailsAction({ dbClusters, tokens })));
+      setLoading(false);
+
+      // undefined means request was cancelled
+      if (result === undefined) {
+        return;
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [getDBClusters]
   );
 
   const columns = useMemo(
@@ -224,7 +250,7 @@ export const DBCluster: FC = () => {
                 isVisible={updateModalVisible}
                 setVisible={setUpdateModalVisible}
                 setLoading={setLoading}
-                onUpdateFinished={getDBClusters}
+                onUpdateFinished={getDBClusterDetails}
               />
             )}
             <Table

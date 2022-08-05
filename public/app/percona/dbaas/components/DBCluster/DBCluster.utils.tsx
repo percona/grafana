@@ -2,13 +2,14 @@ import { SelectableValue } from '@grafana/data';
 import { Databases } from 'app/percona/shared/core';
 import {
   DBCluster,
+  DBClusterDetails,
   DBClusterExpectedResources,
-  DBClusterPayload,
+  DBClusterListPayload,
   DBClusterStatus,
   ResourcesUnits,
   ResourcesWithUnits,
 } from './DBCluster.types';
-import { SERVICE_MAP, THOUSAND } from './DBCluster.constants';
+import { DATABASE_CLUSTER_TYPE, SERVICE_MAP, THOUSAND } from './DBCluster.constants';
 import { DBClusterService } from './DBCluster.service';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 
@@ -80,20 +81,44 @@ export const formatDBClusterVersion = (version?: string) => (version ? version.s
 
 export const formatDBClusterVersionWithBuild = (version?: string) => (version ? version.split(':')[1] : '');
 
-const clustersToModel = (database: Databases, clusters: DBClusterPayload[], kubernetes: Kubernetes[], index: number) =>
-  clusters.map((cluster) => {
-    return newDBClusterService(database).toModel(cluster, kubernetes[index].kubernetesClusterName, database);
+const clustersToModel = (clusters: DBClusterListPayload[], kubernetes: Kubernetes[], index: number) =>
+  clusters.map((dbCluster) => {
+    let database = DATABASE_CLUSTER_TYPE[dbCluster.cluster_type] as Databases;
+    return {
+      id: dbCluster.id,
+      clusterName: dbCluster.name,
+      kubernetesClusterName: kubernetes[index].kubernetesClusterName,
+      databaseType: database,
+      installedImage: dbCluster.installed_image,
+      availableImage: dbCluster.available_image,
+    };
+    // return newDBClusterService(database).toModel(cluster, kubernetes[index].kubernetesClusterName, database);
   });
 
 export const formatDBClusters = (results: any[], kubernetes: Kubernetes[]) => {
-  const clustersList: DBCluster[] = results.reduce((acc: DBCluster[], r, index) => {
-    const pxcClusters: DBClusterPayload[] = r.pxc_clusters ?? [];
-    const psmdbClusters: DBClusterPayload[] = r.psmdb_clusters ?? [];
-    const pxcClustersModel = clustersToModel(Databases.mysql, pxcClusters, kubernetes, index);
-    const psmdbClustersModel = clustersToModel(Databases.mongodb, psmdbClusters, kubernetes, index);
+  const clustersList: Array<Partial<DBCluster>> = results.reduce((acc: Array<Partial<DBCluster>>, r, index) => {
+    const dbClusters: DBClusterListPayload[] = r.db_clusters ?? [];
+    const dbClustersModel = clustersToModel(dbClusters, kubernetes, index);
 
-    return acc.concat([...pxcClustersModel, ...psmdbClustersModel]);
+    return acc.concat([...dbClustersModel]);
   }, []);
+
+  return clustersList;
+};
+
+export const formatDBClusterDetails = (results: any[], db_clusters: Array<Partial<DBCluster>>) => {
+  const clustersList: DBClusterDetails = results.reduce((acc: DBClusterDetails, r, index) => {
+    let cluster = db_clusters[index];
+    let database = cluster.databaseType!;
+
+    let dbCluster = newDBClusterService(database).toModel(cluster, r, cluster.kubernetesClusterName!, database);
+
+    console.log(dbCluster, r);
+    acc[dbCluster.id!] = dbCluster;
+    return acc;
+  }, []);
+
+  console.log(clustersList);
 
   return clustersList;
 };
