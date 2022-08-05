@@ -11,7 +11,7 @@ export const getStyles = ({ v1: { spacing, palette } }: GrafanaTheme2) => ({
       text-decoration: underline;
     }
   `,
-  alertWrapper: css`
+  alert: css`
     margin-top: ${spacing.md};
   `,
 });
