@@ -6,6 +6,7 @@ export interface ManageComponentsVersionsModalProps {
   selectedKubernetes: Kubernetes;
   isVisible: boolean;
   setVisible: (value: boolean) => void;
+  setSelectedCluster: (kubernetesCluster: Kubernetes | null) => void;
 }
 
 export interface ManageComponentsVersionsRenderProps {

@@ -1,19 +1,13 @@
 import React, { FC } from 'react';
-import { Icon, useStyles } from '@grafana/ui';
-import { cx } from '@emotion/css';
-import { getStyles } from './PMMServerUrlWarning.styles';
-import { PMMServerUrlWarningProps } from './PMMServerUrlWarning.types';
-import { WarningMessage } from './WarningMessage/WarningMessage';
+import { Alert } from '@grafana/ui';
+import { Link } from 'react-router-dom';
 
-export const PMMServerUrlWarning: FC<PMMServerUrlWarningProps> = ({ className }) => {
-  const styles = useStyles(getStyles);
-
-  return (
-    <div className={cx(styles.warningWrapper, className)} data-testid="pmm-server-url-warning">
-      <Icon name="exclamation-triangle" className={styles.warningIcon} />
-      <span className={styles.warningMessage}>
-        <WarningMessage className={styles.settingsLink} />
-      </span>
-    </div>
-  );
-};
+export const PMMServerUrlWarning: FC = () => (
+  <Alert title="PMM Public Address" severity="info" data-testid="pmm-server-url-warning">
+    <p>
+      This will also set &quot;Public Address&quot; as {window.location.host}.<br></br>
+      If you need to set if differently or edit later, use{' '}
+      <Link to="/settings/advanced-settings">Advanced Settings</Link>
+    </p>
+  </Alert>
+);
