@@ -255,7 +255,7 @@
     "@opentelemetry/api": "1.0.2",
     "@opentelemetry/exporter-collector": "0.23.0",
     "@opentelemetry/semantic-conventions": "1.0.0",
-    "@percona/platform-core": "1.0.1",
+    "@percona/platform-core": "1.0.7",
     "@popperjs/core": "2.11.0",
     "@react-aria/button": "3.3.4",
     "@react-aria/focus": "3.5.0",
@@ -388,7 +388,8 @@
     "uuid": "8.3.0",
     "vendor": "link:./public/vendor",
     "visjs-network": "4.25.0",
-    "whatwg-fetch": "3.1.0"
+    "whatwg-fetch": "3.1.0",
+    "yaml": "^2.1.1"
   },
   "resolutions": {
     "underscore": "1.12.1",
