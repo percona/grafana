@@ -291,7 +291,7 @@ export const fetchDBClusterDetailsAction = createAsyncThunk(
       (async () => {
         const requests = args.dbClusters.map((d, idx) =>
           apiManagement.post<any, any>(
-            '/DBaaS/DBClusters/Get',
+            '/DBaaS/PXCClusters/Get',
             {
               name: d.clusterName,
               kubernetes_cluster_name: d.kubernetesClusterName,
