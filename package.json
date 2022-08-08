@@ -3,7 +3,7 @@
   "license": "AGPL-3.0-only",
   "private": true,
   "name": "grafana",
-  "version": "8.3.5",
+  "version": "8.3.10",
   "repository": "github:grafana/grafana",
   "scripts": {
     "api-tests": "jest --notify --watch --config=devenv/e2e-api-tests/jest.js",
@@ -39,6 +39,7 @@
     "packages:clean": "lerna run clean",
     "precommit": "yarn run lint-staged",
     "prettier:check": "prettier --list-different \"**/*.{scss,md,mdx}\"",
+    "prettier:checkDocs": "prettier --check --list-different=false --loglevel=warn \"docs/**.md\" \"packages/**.{ts,tsx,scss,md,mdx}\"",
     "prettier:write": "prettier --list-different \"**/*.{scss,md,mdx}\" --write",
     "start": "yarn themes:generate && webpack --progress --color --watch --env noTsCheck=0 --config scripts/webpack/webpack.dev.js",
     "start:hot": "yarn themes:generate && webpack serve --progress --color --config scripts/webpack/webpack.hot.js",
@@ -254,7 +255,7 @@
     "@opentelemetry/api": "1.0.2",
     "@opentelemetry/exporter-collector": "0.23.0",
     "@opentelemetry/semantic-conventions": "1.0.0",
-    "@percona/platform-core": "1.0.1",
+    "@percona/platform-core": "1.0.7",
     "@popperjs/core": "2.11.0",
     "@react-aria/button": "3.3.4",
     "@react-aria/focus": "3.5.0",
@@ -387,7 +388,8 @@
     "uuid": "8.3.0",
     "vendor": "link:./public/vendor",
     "visjs-network": "4.25.0",
-    "whatwg-fetch": "3.1.0"
+    "whatwg-fetch": "3.1.0",
+    "yaml": "^2.1.1"
   },
   "resolutions": {
     "underscore": "1.12.1",
