@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 import { Platform } from './Platform';
+import { Router } from 'react-router-dom';
+import { locationService } from '@grafana/runtime';
 
 describe('Platform::', () => {
   it('shows form to connect if not connected', () => {
@@ -16,7 +18,9 @@ describe('Platform::', () => {
           },
         } as StoreState)}
       >
-        <Platform />
+        <Router history={locationService.getHistory()}>
+          <Platform />
+        </Router>
       </Provider>
     );
 
@@ -33,7 +37,9 @@ describe('Platform::', () => {
           },
         } as StoreState)}
       >
-        <Platform />
+        <Router history={locationService.getHistory()}>
+          <Platform />
+        </Router>
       </Provider>
     );
 
