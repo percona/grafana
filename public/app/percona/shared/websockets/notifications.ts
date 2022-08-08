@@ -14,25 +14,19 @@ export const checkNotification = (data: CheckStreamData) => {
         return;
       }
 
-      if (
-        Severity[value.severity] === Severity.SEVERITY_ALERT ||
-        Severity[value.severity] === Severity.SEVERITY_CRITICAL ||
-        Severity[value.severity] === Severity.SEVERITY_ERROR ||
-        Severity[value.severity] === Severity.SEVERITY_EMERGENCY
-      ) {
-        appEvents.emit(AppEvents.alertError, [message]);
-      }
-      if (
-        Severity[value.severity] === Severity.SEVERITY_WARNING ||
-        Severity[value.severity] === Severity.SEVERITY_DEBUG
-      ) {
-        appEvents.emit(AppEvents.alertWarning, [message]);
-      }
-      if (
-        Severity[value.severity] === Severity.SEVERITY_INFO ||
-        Severity[value.severity] === Severity.SEVERITY_NOTICE
-      ) {
-        appEvents.emit(AppEvents.alertSuccess, [message]);
+      switch (Severity[value.severity]) {
+        case Severity.SEVERITY_ALERT ||
+          Severity.SEVERITY_CRITICAL ||
+          Severity.SEVERITY_ERROR ||
+          Severity.SEVERITY_EMERGENCY:
+          appEvents.emit(AppEvents.alertError, [message]);
+          break;
+        case Severity.SEVERITY_WARNING || Severity.SEVERITY_DEBUG:
+          appEvents.emit(AppEvents.alertWarning, [message]);
+          break;
+        case Severity.SEVERITY_INFO || Severity.SEVERITY_NOTICE:
+          appEvents.emit(AppEvents.alertSuccess, [message]);
+          break;
       }
     });
 };
