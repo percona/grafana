@@ -15,16 +15,18 @@ export const checkNotification = (data: CheckStreamData) => {
       }
 
       switch (Severity[value.severity]) {
-        case Severity.SEVERITY_ALERT ||
-          Severity.SEVERITY_CRITICAL ||
-          Severity.SEVERITY_ERROR ||
-          Severity.SEVERITY_EMERGENCY:
+        case Severity.SEVERITY_ALERT:
+        case Severity.SEVERITY_CRITICAL:
+        case Severity.SEVERITY_ERROR:
+        case Severity.SEVERITY_EMERGENCY:
           appEvents.emit(AppEvents.alertError, [message]);
           break;
-        case Severity.SEVERITY_WARNING || Severity.SEVERITY_DEBUG:
+        case Severity.SEVERITY_WARNING:
+        case Severity.SEVERITY_DEBUG:
           appEvents.emit(AppEvents.alertWarning, [message]);
           break;
-        case Severity.SEVERITY_INFO || Severity.SEVERITY_NOTICE:
+        case Severity.SEVERITY_INFO:
+        case Severity.SEVERITY_NOTICE:
           appEvents.emit(AppEvents.alertSuccess, [message]);
           break;
       }
