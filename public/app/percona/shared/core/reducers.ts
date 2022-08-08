@@ -344,7 +344,7 @@ export const fetchDBClusterDetailsAction = createAsyncThunk(
       (async () => {
         const requests = args.dbClusters.map((d, idx) =>
           apiManagement.post<any, any>(
-            '/DBaaS/PXCClusters/Get',
+            '/DBaaS/DBClusters/Get',
             {
               name: d.clusterName,
               kubernetes_cluster_name: d.kubernetesClusterName,
@@ -427,7 +427,7 @@ const addDbClusterReducer = createAsyncSlice('addDbCluster', addDbClusterAction)
 const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOperator', instalKuberneteslOperatorAction)
   .reducer;
 const dbClustersReducer = createAsyncSlice('dbClusters', fetchDBClustersAction).reducer;
-const dbClustersDetailsReducer = createAsyncSlice('DBClustersDetail', fetchDBClusterDetailsAction).reducer;
+const dbClustersDetailsReducer = createAsyncSlice('dbClustersDetails', fetchDBClusterDetailsAction).reducer;
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 

@@ -10,10 +10,13 @@ import { getStyles } from './DBClusterStatus.styles';
 import { DBClusterStatus as Status } from '../DBCluster.types';
 import { COMPLETE_PROGRESS_DELAY, STATUS_DATA_QA } from './DBClusterStatus.constants';
 import { getProgressMessage, getShowProgressBarValue } from './DBClusterStatus.utils';
+import { useSelector } from 'react-redux';
+import { getPerconaDBClustersDetails } from 'app/percona/shared/core/selectors';
 
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelectedCluster, setLogsModalVisible }) => {
-  const { message, finishedSteps, totalSteps } = dbCluster;
-  const status = dbCluster.status as Status;
+  const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
+  const { status = Status.unknown, totalSteps = 0, finishedSteps = 0, message = '' } =
+    Object.keys(clusters).length && dbCluster.id ? clusters[dbCluster.id] : {};
   const styles = useStyles2(getStyles);
   const prevStatus = useRef<Status>();
   const statusError = status === Status.failed || status === Status.invalid;
@@ -61,8 +64,8 @@ export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelect
       {showProgressBar ? (
         <ProgressBar
           status={statusError ? ProgressBarStatus.error : ProgressBarStatus.progress}
-          finishedSteps={finishedSteps || 0}
-          totalSteps={totalSteps || 0}
+          finishedSteps={finishedSteps}
+          totalSteps={totalSteps}
           message={getProgressMessage(status, prevStatus.current)}
           dataTestId="cluster-progress-bar"
         />
