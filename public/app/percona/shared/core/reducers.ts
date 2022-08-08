@@ -21,11 +21,13 @@ import {
 } from 'app/percona/settings/Settings.types';
 import { KubernetesClusterStatus } from 'app/percona/dbaas/components/Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
-import { formatDBClusters } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
+import { formatDBClusters, newDBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
 import { UserService } from '../services/user/User.service';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { ServerInfo } from './types';
+import { DBClusterTopology } from 'app/percona/dbaas/components/DBCluster/AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
+import { SETTINGS_TIMEOUT } from './constants';
 
 const toSettingsModel = (response: SettingsPayload): Settings => ({
   awsPartitions: response.aws_partitions,
@@ -250,11 +252,58 @@ export const deleteKubernetesAction = createAsyncThunk(
 
 export const addKubernetesAction = createAsyncThunk(
   'percona/addKubernetes',
-  async (args: { kubernetesToAdd: NewKubernetesCluster; token?: CancelToken }, thunkAPI): Promise<void> => {
+  async (
+    args: { kubernetesToAdd: NewKubernetesCluster; setPMMAddress?: boolean; token?: CancelToken },
+    thunkAPI
+  ): Promise<void> => {
+    if (args.setPMMAddress) {
+      await thunkAPI.dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } }));
+      await new Promise((resolve) => setTimeout(resolve, SETTINGS_TIMEOUT));
+    }
     await withAppEvents(KubernetesService.addKubernetes(args.kubernetesToAdd, args.token), {
       successMessage: 'Cluster was successfully registered',
     });
     await thunkAPI.dispatch(fetchKubernetesAction());
+  }
+);
+
+export const addDbClusterAction = createAsyncThunk(
+  'percona/addDbCluster',
+  async (args: { values: Record<string, any>; setPMMAddress?: boolean }, thunkAPI): Promise<void> => {
+    const {
+      name,
+      kubernetesCluster,
+      databaseType,
+      databaseVersion,
+      topology,
+      nodes,
+      single,
+      memory,
+      cpu,
+      disk,
+      expose,
+    } = args.values;
+    const dbClusterService = newDBClusterService(databaseType.value);
+    if (args.setPMMAddress) {
+      await thunkAPI.dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } }));
+      await new Promise((resolve) => setTimeout(resolve, SETTINGS_TIMEOUT));
+    }
+    await withAppEvents(
+      dbClusterService.addDBCluster({
+        kubernetesClusterName: kubernetesCluster.value,
+        clusterName: name,
+        databaseType: databaseType.value,
+        clusterSize: topology === DBClusterTopology.cluster ? nodes : single,
+        cpu,
+        memory,
+        disk,
+        databaseImage: databaseVersion.value,
+        expose,
+      }),
+      {
+        successMessage: 'Cluster was successfully added',
+      }
+    );
   }
 );
 
@@ -346,9 +395,10 @@ export const fetchServerSaasHostAction = createAsyncThunk(
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
 const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesAction).reducer;
+const addDbClusterReducer = createAsyncSlice('addDbCluster', addDbClusterAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOperator', instalKuberneteslOperatorAction)
   .reducer;
-const DBClusterReducer = createAsyncSlice('DBCluster', fetchDBClustersAction).reducer;
+const dbClustersReducer = createAsyncSlice('dbClusters', fetchDBClustersAction).reducer;
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 
@@ -360,8 +410,9 @@ export default {
     kubernetes: kubernetesReducer,
     deleteKubernetes: deleteKubernetesReducer,
     addKubernetes: addKubernetesReducer,
+    addDbCluster: addDbClusterReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
-    dbCluster: DBClusterReducer,
+    dbClusters: dbClustersReducer,
     server: perconaServerReducers,
   }),
 };
