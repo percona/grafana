@@ -29,6 +29,7 @@ export const dbClustersStub: DBCluster[] = [
     availableImage: 'percona/percona-xtra-dbcluster:8.0',
   },
   {
+    id: 'cluster_2',
     kubernetesClusterName: 'Kubernetes Cluster 2',
     clusterName: 'dbcluster2',
     databaseType: Databases.mysql,
@@ -42,6 +43,7 @@ export const dbClustersStub: DBCluster[] = [
     installedImage: 'percona/percona-xtra-dbcluster:8.0',
   },
   {
+    id: 'cluster_3',
     kubernetesClusterName: 'Kubernetes Cluster 1',
     clusterName: 'mongodbcluster1',
     databaseType: Databases.mongodb,
@@ -55,6 +57,7 @@ export const dbClustersStub: DBCluster[] = [
     expose: false,
   },
   {
+    id: 'cluster_4',
     kubernetesClusterName: 'Kubernetes Cluster 2',
     clusterName: 'dbcluster3',
     databaseType: Databases.mysql,
@@ -69,6 +72,7 @@ export const dbClustersStub: DBCluster[] = [
     expose: false,
   },
   {
+    id: 'cluster_5',
     kubernetesClusterName: 'Kubernetes Cluster 1',
     clusterName: 'dbcluster4',
     databaseType: Databases.mysql,

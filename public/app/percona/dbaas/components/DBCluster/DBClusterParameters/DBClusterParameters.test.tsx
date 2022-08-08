@@ -2,6 +2,10 @@ import React from 'react';
 import { DBClusterParameters } from './DBClusterParameters';
 import { dbClustersStub } from '../__mocks__/dbClustersStubs';
 import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { configureStore } from 'app/store/configureStore';
+import { DBClusterDetails, DBClusterStatus } from '../DBCluster.types';
+import { StoreState } from 'app/types';
 
 jest.mock('app/core/app_events');
 jest.mock('../XtraDB.service');
@@ -9,7 +13,32 @@ jest.mock('../PSMDB.service');
 
 describe('DBClusterParameters::', () => {
   it('renders parameters items correctly', async () => {
-    render(<DBClusterParameters dbCluster={dbClustersStub[0]} />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            dbClustersDetails: {
+              loading: false,
+              result: {
+                cluster_1: {
+                  clusterName: 'cluster_1',
+                  kubernetesClusterName: 'cluster_1',
+                  databaseType: 'mongodb',
+                  clusterSize: 1,
+                  memory: 1000,
+                  cpu: 1000,
+                  disk: 1000,
+                  status: DBClusterStatus.ready,
+                  message: 'Ready',
+                },
+              } as DBClusterDetails,
+            },
+          },
+        } as StoreState)}
+      >
+        <DBClusterParameters dbCluster={dbClustersStub[0]} />
+      </Provider>
+    );
 
     expect(screen.getByTestId('cluster-parameters-cluster-name')).toBeInTheDocument();
 
@@ -29,7 +58,32 @@ describe('DBClusterParameters::', () => {
   });
 
   it('renders parameters items correctly with MongoDB cluster', async () => {
-    render(<DBClusterParameters dbCluster={dbClustersStub[2]} />);
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            dbClustersDetails: {
+              loading: false,
+              result: {
+                cluster_3: {
+                  clusterName: 'cluster_3',
+                  kubernetesClusterName: 'cluster_1',
+                  databaseType: 'mongodb',
+                  clusterSize: 1,
+                  memory: 1000,
+                  cpu: 1000,
+                  disk: 1000,
+                  status: DBClusterStatus.ready,
+                  message: 'Ready',
+                },
+              } as DBClusterDetails,
+            },
+          },
+        } as StoreState)}
+      >
+        <DBClusterParameters dbCluster={dbClustersStub[2]} />
+      </Provider>
+    );
 
     expect(screen.getByTestId('cluster-parameters-cluster-name')).toBeInTheDocument();
 
