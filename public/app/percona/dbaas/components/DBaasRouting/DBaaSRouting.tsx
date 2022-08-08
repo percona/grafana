@@ -1,13 +1,15 @@
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, useMemo } from 'react';
 import { getKubernetes as getKubernetesSelector } from '../../../shared/core/selectors';
 import { fetchKubernetesAction } from '../../../shared/core/reducers';
 import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
 import { useCancelToken } from '../../../shared/components/hooks/cancelToken.hook';
 import { useDispatch, useSelector } from 'react-redux';
-import { Spinner } from '@grafana/ui/src';
 import { Redirect } from 'react-router-dom';
+import { Spinner, useStyles } from '@grafana/ui/src';
+import { getStyles } from '../DBaasRouting/DBaasRouting.styles';
 
 export const DBaaSRouting: FC<{}> = ({}) => {
+  const styles = useStyles(getStyles);
   const { result: kubernetes = [], loading: kubernetesLoading } = useSelector(getKubernetesSelector);
   const firstRender = useRef(true);
   const [generateToken] = useCancelToken();
@@ -25,8 +27,10 @@ export const DBaaSRouting: FC<{}> = ({}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return kubernetesLoading || firstRender.current ? (
-    <div data-testid="dbaas-loading">
+  const showLoading = useMemo(() => kubernetesLoading || firstRender.current, [kubernetesLoading, firstRender]);
+
+  return showLoading ? (
+    <div data-testid="dbaas-loading" className={styles.spinnerWrapper}>
       <Spinner />
     </div>
   ) : kubernetes.length > 0 ? (
