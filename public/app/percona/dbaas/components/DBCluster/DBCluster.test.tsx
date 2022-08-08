@@ -6,7 +6,7 @@ import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { DBCluster } from './DBCluster';
 import { formatDBClusterVersion } from './DBCluster.utils';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import { DBClusterStatus } from './DBCluster.types';
+import { DBClusterDetails, DBClusterStatus } from './DBCluster.types';
 
 jest.mock('app/core/app_events');
 jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
@@ -102,6 +102,7 @@ describe('DBCluster::', () => {
               loading: false,
               result: [
                 {
+                  id: 'cluster_1',
                   clusterName: 'cluster_1',
                   kubernetesClusterName: 'cluster_1',
                   databaseType: 'mongodb',
@@ -113,6 +114,22 @@ describe('DBCluster::', () => {
                   message: 'Error',
                 },
               ],
+            },
+            dbClustersDetails: {
+              loading: false,
+              result: {
+                cluster_1: {
+                  clusterName: 'cluster_1',
+                  kubernetesClusterName: 'cluster_1',
+                  databaseType: 'mongodb',
+                  clusterSize: 1,
+                  memory: 1000,
+                  cpu: 1000,
+                  disk: 1000,
+                  status: DBClusterStatus.failed,
+                  message: 'Error',
+                },
+              } as DBClusterDetails,
             },
           },
         } as StoreState)}

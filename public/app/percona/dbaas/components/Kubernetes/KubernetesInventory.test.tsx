@@ -6,6 +6,8 @@ import { render, screen, waitForElementToBeRemoved } from '@testing-library/reac
 import { KubernetesInventory } from './KubernetesInventory';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from './OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
+import { KubernetesService } from './Kubernetes.service';
+import { Kubernetes } from './Kubernetes.types';
 
 jest.mock('app/core/app_events');
 jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
@@ -53,6 +55,7 @@ describe('KubernetesInventory::', () => {
   });
 
   it('shows portal k8s free cluster promoting message when user has no clusters', async () => {
+    spyOn(KubernetesService, 'getKubernetes').and.returnValue([]);
     render(
       <Provider
         store={configureStore({
@@ -61,6 +64,7 @@ describe('KubernetesInventory::', () => {
             settings: { loading: false, result: { isConnectedToPortal: true, dbaasEnabled: true } },
             kubernetes: {
               loading: false,
+              result: [] as Kubernetes[],
             },
             addKubernetes: { loading: false },
             deleteKubernetes: { loading: false },
@@ -71,6 +75,7 @@ describe('KubernetesInventory::', () => {
       </Provider>
     );
 
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
     expect(screen.getByTestId('pmm-server-promote-portal-k8s-cluster-message')).toBeInTheDocument();
   });
 });

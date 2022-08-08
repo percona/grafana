@@ -13,6 +13,7 @@ import {
 
 export const dbClustersStub: DBCluster[] = [
   {
+    id: 'cluster_1',
     kubernetesClusterName: 'Kubernetes Cluster 1',
     clusterName: 'dbcluster1',
     databaseType: Databases.mysql,
