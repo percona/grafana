@@ -22,7 +22,6 @@ export const DBClusterConnection: FC<DBClusterConnectionProps> = ({ dbCluster })
       ? clusters[dbCluster.id]
       : { status: DBClusterStatus.unknown, databaseType: undefined };
   const { host, password, port, username } = connection;
-  // const { status, databaseType } = dbCluster;
   const isClusterReady = status && status === DBClusterStatus.ready;
 
   useEffect(() => {

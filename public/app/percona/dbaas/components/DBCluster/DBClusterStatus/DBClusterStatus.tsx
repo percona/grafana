@@ -15,8 +15,10 @@ import { getPerconaDBClustersDetails } from 'app/percona/shared/core/selectors';
 
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelectedCluster, setLogsModalVisible }) => {
   const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
-  const { status = Status.unknown, totalSteps = 0, finishedSteps = 0, message = '' } =
-    Object.keys(clusters).length && dbCluster.id ? clusters[dbCluster.id] : {};
+  const { status = Status.unknown, totalSteps = 0, finishedSteps = 0, message } =
+    Object.keys(clusters).length && dbCluster.id
+      ? clusters[dbCluster.id]
+      : { status: Status.unknown, totalSteps: 0, finishedSteps: 0, message: '' };
   const styles = useStyles2(getStyles);
   const prevStatus = useRef<Status>();
   const statusError = status === Status.failed || status === Status.invalid;

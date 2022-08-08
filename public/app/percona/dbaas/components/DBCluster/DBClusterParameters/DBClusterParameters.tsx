@@ -11,8 +11,8 @@ import { useSelector } from 'react-redux';
 export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster }) => {
   const styles = useStyles(getStyles);
   const { result: clusters = {}, loading: dbClusterLoading } = useSelector(getPerconaDBClustersDetails);
-  const { status = DBClusterStatus.unknown } =
-    Object.keys(clusters).length && dbCluster.id ? clusters[dbCluster.id] : {};
+  const { status } =
+    Object.keys(clusters).length && dbCluster.id ? clusters[dbCluster.id] : { status: DBClusterStatus.unknown };
   const {
     label: exposeLabel,
     enabled: exposeEnabled,
