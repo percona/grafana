@@ -69,8 +69,11 @@ export const DBCluster: FC = () => {
     const tokens: CancelToken[] = kubernetes.map((k) =>
       generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}-details`)
     );
-    console.log(dbClusters);
-    dispatch(fetchDBClusterDetailsAction({ dbClusters, tokens }));
+    try {
+      await dispatch(fetchDBClusterDetailsAction({ dbClusters, tokens })).unwrap();
+    } catch (e) {
+      logger.error(e);
+    }
   }, [dbClusters, dispatch, generateToken, kubernetes]);
 
   const getDBClusters = useCallback(

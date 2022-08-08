@@ -225,7 +225,7 @@ export const KubernetesInventory: FC = () => {
             <Table columns={columns} data={kubernetes} loading={loading} noData={<AddNewClusterButton />} />
           </div>
         </FeatureLoader>
-        {kubernetes.length === 0 && <PortalK8sFreeClusterPromotingMessage />}
+        {kubernetes.length === 0 && !kubernetesLoading && <PortalK8sFreeClusterPromotingMessage />}
       </Page.Contents>
     </Page>
   );
