@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
+import { Kubernetes, OperatorsList } from '../../../Kubernetes/Kubernetes.types';
 import { Databases } from 'app/percona/shared/core';
 
 export interface DBClusterBasicOptionsProps {
@@ -17,8 +17,20 @@ export interface DatabaseOption {
   label: string;
 }
 
+export interface DatabaseOptionInitial {
+  value?: Databases;
+  label?: string;
+}
+
 export interface KubernetesOptionProps {
   disabledOperators: Operators[];
   availableOperators: Operators[];
   kubernetesClusterName: string;
+}
+
+export interface KubernetesOption {
+  value: string;
+  label: JSX.Element;
+  operators: OperatorsList;
+  availableOperators: Operators[];
 }
