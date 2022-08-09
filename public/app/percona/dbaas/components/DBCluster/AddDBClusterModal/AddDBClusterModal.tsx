@@ -13,17 +13,19 @@ import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarni
 import { useSelector } from 'react-redux';
 import { getAddDbCluster } from 'app/percona/shared/core/selectors';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
+import { getInitialValues, updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
 
-export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
-  kubernetes,
-  isVisible,
-  setVisible,
-  onSubmit,
-  initialValues,
-}) => {
+export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({ kubernetes, isVisible, setVisible, onSubmit }) => {
   const styles = useStyles(getStyles);
   const { loading } = useSelector(getAddDbCluster);
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
+
+  const initialValues = useMemo(() => getInitialValues(kubernetes), [kubernetes]);
+  const updatedItialValues = useMemo(
+    () => (isVisible ? updateDatabaseClusterNameInitialValue(initialValues) : initialValues),
+    [initialValues, isVisible]
+  );
+
   const steps = useMemo(
     () => [
       {
@@ -55,7 +57,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
           {showPMMAddressWarning && <PMMServerUrlWarning />}
           <StepProgress
             steps={steps}
-            initialValues={initialValues}
+            initialValues={updatedItialValues}
             submitButtonMessage={Messages.dbcluster.addModal.confirm}
             onSubmit={(values) => onSubmit(values, showPMMAddressWarning)}
             loading={loading}
