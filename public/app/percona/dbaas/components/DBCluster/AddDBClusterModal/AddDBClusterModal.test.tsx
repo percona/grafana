@@ -12,7 +12,7 @@ import { updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils
 
 jest.mock('./AddDBClusterModal.utils', () => ({
   ...jest.requireActual('./AddDBClusterModal.utils'),
-  updateDatabaseTypeInitialValues: jest.fn(),
+  updateDatabaseClusterNameInitialValue: jest.fn(),
 }));
 
 jest.mock('app/core/app_events');
