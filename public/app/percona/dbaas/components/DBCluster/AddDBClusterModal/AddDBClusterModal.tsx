@@ -12,7 +12,7 @@ import { newDBClusterService } from '../DBCluster.utils';
 import { getStyles } from './AddDBClusterModal.styles';
 import { FormRenderProps } from 'react-final-form';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
-import { getInitialValues, updateDatabaseTypeInitialValues } from './AddDBClusterModal.utils';
+import { getInitialValues, updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
 
 export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   kubernetes,
@@ -25,7 +25,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
 
   const initialFieldValues = useMemo(() => getInitialValues(kubernetes), [kubernetes]);
   const initialValues = useMemo(
-    () => (isVisible ? updateDatabaseTypeInitialValues(initialFieldValues) : initialFieldValues),
+    () => (isVisible ? updateDatabaseClusterNameInitialValue(initialFieldValues) : initialFieldValues),
     [initialFieldValues, isVisible]
   );
 

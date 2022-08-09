@@ -5,6 +5,8 @@ import { HorizontalGroup, useStyles } from '@grafana/ui';
 import { LoaderButton } from '@percona/platform-core';
 import { Step, StepStatus } from './Step/Step';
 import { getStyles } from './StepProgress.styles';
+import { AddDBClusterFields } from '../DBCluster/AddDBClusterModal/AddDBClusterModal.types';
+import { generateUID } from '../DBCluster/AddDBClusterModal/AddDBClusterModal.utils';
 
 export interface StepProgressProps {
   steps: StepProps[];
@@ -57,6 +59,11 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
     <Form
       initialValues={initialValues}
       onSubmit={onSubmit}
+      mutators={{
+        setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
+          changeValue(state, `${AddDBClusterFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
+        },
+      }}
       render={({ form, handleSubmit, valid, pristine, submitting, ...props }) => (
         <form onSubmit={handleSubmit} className={styles.stepProgressWrapper} data-testid="step-progress">
           {steps.map(({ render, title, fields, dataTestId }, index) => (

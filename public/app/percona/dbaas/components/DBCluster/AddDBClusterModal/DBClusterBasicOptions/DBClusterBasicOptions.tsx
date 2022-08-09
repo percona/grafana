@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState, useMemo } from 'react';
+import React, { FC, useCallback, useState, useMemo, useRef } from 'react';
 import { Field } from 'react-final-form';
 import { TextInputField, validators } from '@percona/platform-core';
 import { Databases } from 'app/percona/shared/core';
@@ -18,7 +18,20 @@ import { isOptionEmpty } from '../../DBCluster.utils';
 import { useDatabaseVersions } from './DBClusterBasicOptions.hooks';
 import { CLUSTER_NAME_MAX_LENGTH } from './DBClusterBasicOptions.constants';
 import { getDatabaseOptionFromOperator } from '../../../Kubernetes/Kubernetes.utils';
-import { Operator } from '../../../Kubernetes/Kubernetes.types';
+import { Kubernetes, Operator } from '../../../Kubernetes/Kubernetes.types';
+
+const getAvailableDatabaseOptions = (kubernetesCluster: Kubernetes): DatabaseOption[] => {
+  const { operators } = kubernetesCluster;
+  const availableDatabaseOptions: DatabaseOption[] = [];
+
+  Object.entries(operators).forEach(([operator, { status }]: [string, Operator]) => {
+    if (status === KubernetesOperatorStatus.ok) {
+      availableDatabaseOptions.push(getDatabaseOptionFromOperator(operator as Operators) as DatabaseOption);
+    }
+  });
+
+  return availableDatabaseOptions;
+};
 
 export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernetes, form }) => {
   const { required, maxLength } = validators;
@@ -26,27 +39,30 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   const { kubernetesCluster, databaseType } = form.getState().values;
   const [databaseVersions, setDatabaseVersions] = useState<SelectableValue[]>([]);
   const [loadingDatabaseVersions, setLoadingDatabaseVersions] = useState(false);
+  const firstRender = useRef(true);
   const onChangeDatabase = useCallback((databaseType) => {
     if (databaseType.value !== Databases.mysql) {
       change(AddDBClusterFields.topology, DBClusterTopology.cluster);
     }
 
     change(AddDBClusterFields.databaseType, databaseType);
+    form.mutators.setClusterName(databaseType.value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const kubernetesOptions = getKubernetesOptions(kubernetes);
 
-  const [databaseOptions, setDatabaseOptions] = useState(DATABASE_OPTIONS);
-  const onChangeCluster = useCallback((selectedKubernetes) => {
-    const { operators } = selectedKubernetes;
-    const availableDatabaseOptions: DatabaseOption[] = [];
+  const [databaseOptions, setDatabaseOptions] = useState(() => {
+    if (firstRender.current && kubernetesCluster) {
+      const availableDatabaseOptions = getAvailableDatabaseOptions(kubernetesCluster);
+      firstRender.current = false;
+      return availableDatabaseOptions;
+    }
+    return DATABASE_OPTIONS;
+  });
 
-    Object.entries(operators as Operator).forEach(([operator, { status }]: [string, Operator]) => {
-      if (status === KubernetesOperatorStatus.ok) {
-        availableDatabaseOptions.push(getDatabaseOptionFromOperator(operator as Operators) as DatabaseOption);
-      }
-    });
+  const onChangeCluster = useCallback((selectedKubernetes) => {
+    const availableDatabaseOptions = getAvailableDatabaseOptions(selectedKubernetes);
 
     if (availableDatabaseOptions.length === 1) {
       change(AddDBClusterFields.databaseType, availableDatabaseOptions[0]);

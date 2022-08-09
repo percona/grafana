@@ -36,7 +36,7 @@ export const generateUID = (): string => {
   return firstPart + secondPart;
 };
 
-export const updateDatabaseTypeInitialValues = (initialValues: AddDbClusterFormValues) => {
+export const updateDatabaseClusterNameInitialValue = (initialValues: AddDbClusterFormValues) => {
   if (initialValues[AddDBClusterFields.databaseType]) {
     return {
       ...initialValues,

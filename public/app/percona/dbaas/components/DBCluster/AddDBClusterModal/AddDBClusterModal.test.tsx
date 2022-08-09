@@ -3,7 +3,7 @@ import { AddDBClusterModal } from './AddDBClusterModal';
 import { onDBClusterAddedStub, setVisibleStub } from './__mocks__/addDBClusterModalStubs';
 import { kubernetesStub } from '../../Kubernetes/__mocks__/kubernetesStubs';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { updateDatabaseTypeInitialValues } from './AddDBClusterModal.utils';
+import { updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
 
 jest.mock('./AddDBClusterModal.utils', () => ({
   ...jest.requireActual('./AddDBClusterModal.utils'),
@@ -89,7 +89,7 @@ describe('AddDBClusterModal::', () => {
       />
     );
 
-    expect(updateDatabaseTypeInitialValues).toHaveBeenCalledWith(
+    expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalledWith(
       expect.objectContaining({
         databaseType: expect.objectContaining({ value: 'mongodb' }),
         kubernetesCluster: expect.objectContaining({
