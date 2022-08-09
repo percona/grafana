@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState, useMemo, useRef } from 'react';
+import React, { FC, useCallback, useState, useMemo } from 'react';
 import { Field } from 'react-final-form';
 import { TextInputField, validators } from '@percona/platform-core';
 import { Databases } from 'app/percona/shared/core';
@@ -39,7 +39,6 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   const { kubernetesCluster, databaseType } = form.getState().values;
   const [databaseVersions, setDatabaseVersions] = useState<SelectableValue[]>([]);
   const [loadingDatabaseVersions, setLoadingDatabaseVersions] = useState(false);
-  const firstRender = useRef(true);
   const onChangeDatabase = useCallback((databaseType) => {
     if (databaseType.value !== Databases.mysql) {
       change(AddDBClusterFields.topology, DBClusterTopology.cluster);
@@ -53,9 +52,8 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   const kubernetesOptions = getKubernetesOptions(kubernetes);
 
   const [databaseOptions, setDatabaseOptions] = useState(() => {
-    if (firstRender.current && kubernetesCluster) {
+    if (kubernetesCluster) {
       const availableDatabaseOptions = getAvailableDatabaseOptions(kubernetesCluster);
-      firstRender.current = false;
       return availableDatabaseOptions;
     }
     return DATABASE_OPTIONS;
