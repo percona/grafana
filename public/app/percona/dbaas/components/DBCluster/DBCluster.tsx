@@ -34,7 +34,6 @@ import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 import { GET_CLUSTERS_CANCEL_TOKEN } from './DBCluster.constants';
 import { useAppDispatch } from 'app/store/store';
 import { logger } from '@sentry/utils';
-// import {getInitialValues, updateDatabaseClusterNameInitialValue} from './AddDBClusterModal/AddDBClusterModal.utils';
 
 export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
