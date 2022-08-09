@@ -5,9 +5,8 @@ import { DatabaseOptionInitial, KubernetesOption } from './DBClusterBasicOptions
 export interface AddDBClusterModalProps {
   kubernetes: Kubernetes[];
   isVisible: boolean;
-  showMonitoringWarning?: boolean;
   setVisible: (value: boolean) => void;
-  onDBClusterAdded: () => void;
+  onSubmit: (values: Record<string, any>, showPMMAddressWarning: boolean) => void;
 }
 
 export enum AddDBClusterFields {

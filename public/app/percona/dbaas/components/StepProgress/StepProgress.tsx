@@ -13,6 +13,7 @@ export interface StepProgressProps {
   initialValues?: Record<string, any>;
   submitButtonMessage: string;
   onSubmit: (values: Record<string, any>) => void;
+  loading: boolean;
 }
 
 export interface StepProps {
@@ -43,7 +44,13 @@ const getStepStatus = (
   return StepStatus.todo;
 };
 
-export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, submitButtonMessage, onSubmit }) => {
+export const StepProgress: FC<StepProgressProps> = ({
+  steps,
+  initialValues,
+  submitButtonMessage,
+  onSubmit,
+  loading,
+}) => {
   const styles = useStyles(getStyles);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepsVisited, setStepsVisited] = useState([currentStep]);
@@ -64,7 +71,7 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
           changeValue(state, `${AddDBClusterFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
         },
       }}
-      render={({ form, handleSubmit, valid, pristine, submitting, ...props }) => (
+      render={({ form, handleSubmit, valid, pristine, ...props }) => (
         <form onSubmit={handleSubmit} className={styles.stepProgressWrapper} data-testid="step-progress">
           {steps.map(({ render, title, fields, dataTestId }, index) => (
             <Step
@@ -81,7 +88,6 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
                 handleSubmit,
                 valid,
                 pristine,
-                submitting,
                 ...props,
               })}
             </Step>
@@ -91,8 +97,8 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
               data-testid="step-progress-submit-button"
               size="md"
               variant="primary"
-              disabled={!valid || pristine || submitting}
-              loading={submitting}
+              disabled={!valid || pristine || loading}
+              loading={loading}
               className={styles.createButton}
             >
               {submitButtonMessage}
