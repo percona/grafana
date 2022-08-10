@@ -133,8 +133,8 @@ export const DBCluster: FC = () => {
 
   const addCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
     try {
-      setAddModalVisible(false);
       await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning })).unwrap();
+      setAddModalVisible(false);
       getDBClusters(true);
     } catch (e) {
       logger.error(e);
