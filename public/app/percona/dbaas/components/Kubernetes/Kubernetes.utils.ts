@@ -1,4 +1,7 @@
-import { Operators } from '../DBCluster/AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
+import {
+  DatabaseOption,
+  Operators,
+} from '../DBCluster/AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { Kubernetes, Operator } from './Kubernetes.types';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from './OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
@@ -27,5 +30,5 @@ export const getActiveOperators = (kubernetes: Kubernetes[]): Operators[] => {
   return activeOperators;
 };
 
-export const getDatabaseOptionFromOperator = (operator: Operators) =>
+export const getDatabaseOptionFromOperator = (operator: Operators): DatabaseOption | undefined =>
   DATABASE_OPTIONS.find(({ value }) => value === DATABASE_OPERATORS[operator]);

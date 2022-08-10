@@ -34,7 +34,7 @@ export interface Kubernetes {
   status: KubernetesClusterStatus;
 }
 
-export type AddKubernetesAction = (kubernetesToAdd: NewKubernetesCluster) => void;
+export type AddKubernetesAction = (kubernetesToAdd: NewKubernetesCluster, setPMMAddress?: boolean) => void;
 export type SetKubernetesLoadingAction = (loading: boolean) => void;
 export type ManageKubernetes = [Kubernetes[], SetKubernetesLoadingAction, boolean];
 
@@ -97,4 +97,36 @@ export interface KubernetesProps {
   kubernetes: Kubernetes[];
   setLoading: SetKubernetesLoadingAction;
   loading: boolean;
+}
+
+export interface KubeConfig {
+  name?: string;
+  server?: string;
+  apiVersion?: string;
+  clusters: Cluster[];
+}
+
+export interface Cluster {
+  name?: string;
+  cluster?: ClusterInfo;
+}
+
+export interface ClusterInfo {
+  'certificate-authority-data'?: string;
+  extensions?: {
+    extension?: Extension[];
+    name?: string;
+  };
+  server?: string;
+}
+
+interface Extension {
+  extension?: ExtensionInfo;
+  name?: string;
+}
+
+interface ExtensionInfo {
+  'last-update'?: string;
+  provider?: string;
+  version?: string;
 }

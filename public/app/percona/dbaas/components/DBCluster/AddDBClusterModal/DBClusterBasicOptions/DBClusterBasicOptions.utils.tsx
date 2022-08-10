@@ -5,7 +5,7 @@ import { DatabaseOperators, OPERATORS } from './DBClusterBasicOptions.constants'
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { OptionContent } from '../../OptionContent/OptionContent';
 import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
-import { KubernetesOptionProps } from './DBClusterBasicOptions.types';
+import { KubernetesOption as KubernetesOptionInterface, KubernetesOptionProps } from './DBClusterBasicOptions.types';
 import { DatabaseVersion } from '../../DBCluster.types';
 
 export const kubernetesClusterNameValidator = (value: string) => {
@@ -28,7 +28,7 @@ const KubernetesOption: FC<KubernetesOptionProps> = ({
   />
 );
 
-export const getKubernetesOptions = (kubernetes: Kubernetes[]) =>
+export const getKubernetesOptions = (kubernetes: Kubernetes[]): KubernetesOptionInterface[] =>
   kubernetes
     .map((kubernetesCluster) => {
       const { kubernetesClusterName, operators } = kubernetesCluster;
