@@ -25,12 +25,4 @@ describe('SwitchField::', () => {
 
     expect(screen.getByTestId('spinner-wrapper')).toBeInTheDocument();
   });
-
-  it('should return redirect to dbclusters  if we have one or more kubernetes clusters', async () => {
-    //
-  });
-
-  it('should should show loading and DBaaS when we are waiting kubernetes response', async () => {
-    //
-  });
 });
