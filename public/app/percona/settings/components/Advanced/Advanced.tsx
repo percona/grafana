@@ -368,10 +368,10 @@ const TelemetryTooltip: FC<TelemetryTooltipProps> = ({
   const styles = useStyles2(getStyles);
 
   return (
-    <div>
+    <div className={styles.telemetryTooltip}>
       <p>{telemetryTooltip}</p>
       <p>{telemetrySummaryTitle}</p>
-      <ul className={styles.telemetryTooltip}>
+      <ul className={styles.telemetryListTooltip}>
         {telemetrySummaries.map((summary) => (
           <li key={summary}>{summary}</li>
         ))}
