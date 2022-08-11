@@ -7,8 +7,6 @@ import { StoreState } from 'app/types';
 
 import { Alerts } from './Alerts';
 
-jest.mock('./Alerts.service');
-
 describe('AlertsTable', () => {
   afterEach(() => {
     jest.clearAllMocks();

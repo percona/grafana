@@ -50,18 +50,13 @@ export const Alerts: FC = () => {
         Header: triggered,
         accessor: 'labels',
         id: 'triggeredBy',
-        Cell: ({ row, value: { __alert_rule_uid__, rulename, alertname } }) => (
-          <ExpandableCell
-            value={
-              <a
-                className={style.ruleLink}
-                href={`/alerting/grafana/${__alert_rule_uid__}/view?returnTo=%2Falerting%2Falerts`}
-              >
-                {rulename ?? alertname}
-              </a>
-            }
-            row={row}
-          />
+        Cell: ({ value: { __alert_rule_uid__, rulename, alertname } }) => (
+          <a
+            className={style.ruleLink}
+            href={`/alerting/grafana/${__alert_rule_uid__}/view?returnTo=%2Falerting%2Falerts`}
+          >
+            {rulename ?? alertname}
+          </a>
         ),
       },
       {
@@ -73,7 +68,7 @@ export const Alerts: FC = () => {
       {
         Header: 'Summary',
         accessor: 'annotations',
-        Cell: ({ value: { summary } }) => summary,
+        Cell: ({ value: { summary } }) => summary || '',
         width: '30%',
       },
       {
@@ -105,11 +100,20 @@ export const Alerts: FC = () => {
         Header: actionsColumn,
         accessor: 'receivers',
         id: 'actions',
-        width: '5%',
+        width: '15%',
         Cell: ({ row }) => (
-          <LinkButton href={makeLabelBasedSilenceLink('grafana', row.original.labels)} icon={'bell-slash'} size={'sm'}>
-            Silence
-          </LinkButton>
+          <ExpandableCell
+            row={row}
+            value={
+              <LinkButton
+                href={makeLabelBasedSilenceLink('grafana', row.original.labels)}
+                icon={'bell-slash'}
+                size={'sm'}
+              >
+                Silence
+              </LinkButton>
+            }
+          ></ExpandableCell>
         ),
       },
     ],
