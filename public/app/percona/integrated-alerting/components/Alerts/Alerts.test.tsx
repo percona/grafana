@@ -6,7 +6,6 @@ import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
 import { Alerts } from './Alerts';
-import { AlertsService } from './Alerts.service';
 
 jest.mock('./Alerts.service');
 
@@ -36,10 +35,6 @@ describe('AlertsTable', () => {
   });
 
   it('should render correctly without data', async () => {
-    jest
-      .spyOn(AlertsService, 'list')
-      .mockReturnValueOnce(Promise.resolve({ alerts: [], totals: { total_items: 0, total_pages: 1 } }));
-
     render(
       <Provider
         store={configureStore({

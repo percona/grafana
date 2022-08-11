@@ -1,4 +1,5 @@
-import { PrioritizedLabels, Severity, AlertRule, AlertRulesListResponseRule } from 'app/percona/shared/core';
+import { PrioritizedLabels, Severity, AlertRulesListResponseRule } from 'app/percona/shared/core';
+import { AlertmanagerAlert, AlertState } from 'app/plugins/datasource/alertmanager/types';
 
 export enum AlertStatus {
   STATUS_INVALID = 'Invalid',
@@ -13,12 +14,12 @@ export interface Alert {
   activeSince: string;
   labels: PrioritizedLabels;
   lastNotified: string;
-  severity: Severity;
-  status: AlertStatus[keyof AlertStatus];
-  summary: string;
-  rule?: AlertRule;
+  severity?: string;
+  state: AlertState;
+  summary?: string;
   ruleUid: string;
-  templateName: string;
+  ruleName: string;
+  originalData: AlertmanagerAlert;
 }
 
 interface AlertsTotals {
@@ -40,9 +41,4 @@ export interface AlertsListResponseAlert {
 export interface AlertsListResponse {
   totals: AlertsTotals;
   alerts: AlertsListResponseAlert[];
-}
-
-export interface AlertTogglePayload {
-  alert_ids: string[];
-  silenced: 'DO_NOT_CHANGE' | 'TRUE' | 'FALSE';
 }

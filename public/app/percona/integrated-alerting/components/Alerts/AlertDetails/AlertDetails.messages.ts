@@ -1,4 +1,4 @@
 export const Messages = {
-  ruleExpression: 'Rule Expression',
-  secondaryLabels: 'Secondary Labels',
+  summary: 'Summary',
+  labels: 'Labels',
 };
