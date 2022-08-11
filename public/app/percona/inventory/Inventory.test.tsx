@@ -1,8 +1,8 @@
 import React from 'react';
-import { Table } from 'app/percona/shared/components/Elements/Table/Table';
+import { Table } from '@percona/platform-core';
 import { AGENTS_COLUMNS, NODES_COLUMNS, SERVICES_COLUMNS } from './Inventory.constants';
 import { InventoryDataService } from './Inventory.tools';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 jest.mock('app/percona/settings/Settings.service');
 
@@ -39,13 +39,17 @@ describe('Inventory tables', () => {
         },
       ],
     };
+    const data = InventoryDataService.getAgentModel(response as any);
 
     const { container } = render(
       <Table
-        data={InventoryDataService.getAgentModel(response as any)}
-        rowKey={(rec) => rec.agent_id}
+        data={data}
+        totalItems={data.length}
+        rowSelection
         columns={AGENTS_COLUMNS}
-        loading={false}
+        pendingRequest={false}
+        showPagination
+        pageSize={25}
       />
     );
 
@@ -53,7 +57,7 @@ describe('Inventory tables', () => {
     expect(container.querySelectorAll('tr')).toHaveLength(5);
   });
 
-  it('Agents table only first page', () => {
+  it('Agents table only first page', async () => {
     const response = {
       pmm_agent: [{ agent_id: 'pmm-server', runs_on_node_id: 'pmm-server', connected: true }],
       node_exporter: new Array(50).fill({
@@ -79,18 +83,22 @@ describe('Inventory tables', () => {
         status: 'RUNNING',
       }),
     };
+    const data = InventoryDataService.getAgentModel(response as any);
 
     const { container } = render(
       <Table
-        data={InventoryDataService.getAgentModel(response as any)}
-        rowKey={(rec) => rec.agent_id}
+        data={data}
+        totalItems={data.length}
+        rowSelection
         columns={AGENTS_COLUMNS}
-        loading={false}
+        pendingRequest={false}
+        showPagination
+        pageSize={25}
       />
     );
 
     // default page size is 25
-    expect(container.querySelectorAll('tbody tr')).toHaveLength(25);
+    await waitFor(() => expect(container.querySelectorAll('tbody tr')).toHaveLength(25));
   });
 
   it('Services table renders correct with right data', () => {
@@ -105,12 +113,16 @@ describe('Inventory tables', () => {
         },
       ],
     };
+    const data = InventoryDataService.getServiceModel(response as any);
     const { container } = render(
       <Table
-        data={InventoryDataService.getServiceModel(response as any)}
-        rowKey={(rec) => rec.service_id}
+        data={data}
+        totalItems={data.length}
         columns={SERVICES_COLUMNS}
-        loading={false}
+        pendingRequest={false}
+        rowSelection
+        showPagination
+        pageSize={25}
       />
     );
 
@@ -118,7 +130,7 @@ describe('Inventory tables', () => {
     expect(container.querySelectorAll('tr')).toHaveLength(2);
   });
 
-  it('Services table renders only first page', () => {
+  it('Services table renders only first page', async () => {
     const response = {
       postgresql: new Array(100).fill({
         service_id: '/service_id/ab477624-4ee9-49cd-8bd4-9bf3b91628b2',
@@ -128,17 +140,21 @@ describe('Inventory tables', () => {
         port: 5432,
       }),
     };
+    const data = InventoryDataService.getServiceModel(response as any);
     const { container } = render(
       <Table
-        data={InventoryDataService.getServiceModel(response as any)}
-        rowKey={(rec) => rec.service_id}
+        data={data}
+        totalItems={data.length}
         columns={SERVICES_COLUMNS}
-        loading={false}
+        pendingRequest={false}
+        rowSelection
+        showPagination
+        pageSize={25}
       />
     );
 
     // default page size is 25
-    expect(container.querySelectorAll('tbody tr')).toHaveLength(25);
+    await waitFor(() => expect(container.querySelectorAll('tbody tr')).toHaveLength(25));
   });
 
   it('Nodes table renders correct with right data', () => {
@@ -148,12 +164,16 @@ describe('Inventory tables', () => {
         { node_id: 'pmm-server2', node_name: 'pmm-server2', address: '127.0.0.1' },
       ],
     };
+    const data = InventoryDataService.getNodeModel(response as any);
     const { container } = render(
       <Table
-        data={InventoryDataService.getNodeModel(response as any)}
-        rowKey={(rec) => rec.node_id}
+        data={data}
+        totalItems={data.length}
         columns={NODES_COLUMNS}
-        loading={false}
+        pendingRequest={false}
+        rowSelection
+        showPagination
+        pageSize={25}
       />
     );
 
@@ -161,20 +181,24 @@ describe('Inventory tables', () => {
     expect(container.querySelectorAll('tr')).toHaveLength(3);
   });
 
-  fit('Nodes table renders first page only', () => {
+  it('Nodes table renders first page only', async () => {
     const response = {
       generic: new Array(100).fill({ node_id: 'pmm-server', node_name: 'pmm-server', address: '127.0.0.1' }),
     };
+    const data = InventoryDataService.getNodeModel(response as any);
     const { container } = render(
       <Table
-        data={InventoryDataService.getNodeModel(response as any)}
-        rowKey={(rec) => rec.node_id}
+        data={data}
+        totalItems={data.length}
         columns={NODES_COLUMNS}
-        loading={false}
+        pendingRequest={false}
+        rowSelection
+        showPagination
+        pageSize={25}
       />
     );
 
     // default page size is 25
-    expect(container.querySelectorAll('tbody tr')).toHaveLength(25);
+    await waitFor(() => expect(container.querySelectorAll('tbody tr')).toHaveLength(25));
   });
 });
