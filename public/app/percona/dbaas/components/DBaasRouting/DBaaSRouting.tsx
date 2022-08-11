@@ -8,7 +8,7 @@ import { Redirect } from 'react-router-dom';
 import { Spinner, useStyles } from '@grafana/ui/src';
 import { getStyles } from '../DBaasRouting/DBaasRouting.styles';
 
-export const DBaaSRouting: FC<{}> = ({}) => {
+export const DBaaSRouting: FC = ({}) => {
   const styles = useStyles(getStyles);
   const { result: kubernetes, loading: kubernetesLoading } = useSelector(getKubernetesSelector);
   const [generateToken] = useCancelToken();

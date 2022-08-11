@@ -10,7 +10,7 @@ import { locationService } from '@grafana/runtime/src';
 import { Router } from 'react-router-dom';
 
 describe('SwitchField::', () => {
-  it('should should show loading when we are waiting kubernetes response', () => {
+  it('should show loading when we are waiting kubernetes response', () => {
     render(
       <Provider
         store={configureStore({
@@ -30,7 +30,7 @@ describe('SwitchField::', () => {
     expect(screen.getByTestId('spinner-wrapper')).toBeInTheDocument();
   });
 
-  it('', async () => {
+  it('should return redirect to /dbclusters  if we have one or more kubernetes clusters', async () => {
     render(
       <Provider
         store={configureStore({
@@ -62,7 +62,7 @@ describe('SwitchField::', () => {
     expect(locationService.getLocation().pathname).toBe('/dbaas/dbclusters');
   });
 
-  it('', async () => {
+  it('should return redirect to /kubernetes  if we have one or more kubernetes clusters', async () => {
     render(
       <Provider
         store={configureStore({
