@@ -33,6 +33,7 @@ const toModel = (response: SettingsPayload): Settings => ({
   awsPartitions: response.aws_partitions,
   updatesDisabled: response.updates_disabled,
   telemetryEnabled: response.telemetry_enabled,
+  telemetrySummaries: response.telemetry_summaries,
   metricsResolutions: response.metrics_resolutions,
   dataRetention: response.data_retention,
   sshKey: response.ssh_key,
