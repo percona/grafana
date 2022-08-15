@@ -9,7 +9,6 @@ import EmptyListCTA from 'app/core/components/EmptyListCTA/EmptyListCTA';
 import Page from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -49,7 +48,7 @@ export const AlertRuleTemplate: FC = () => {
         {
           page_params: {
             index: pageIndex,
-            page_size: pageSize as number,
+            page_size: pageSize,
           },
         },
         generateToken(GET_TEMPLATES_CANCEL_TOKEN)
@@ -125,7 +124,6 @@ export const AlertRuleTemplate: FC = () => {
   return (
     <Page navModel={navModel}>
       <Page.Contents>
-        <TechnicalPreview />
         <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
           <div className={styles.actionsWrapper}>
             <Button

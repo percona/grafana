@@ -14,7 +14,6 @@ import { makeLabelBasedSilenceLink } from 'app/features/alerting/unified/utils/m
 import { initialAsyncRequestState } from 'app/features/alerting/unified/utils/redux';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { AlertmanagerAlert, AlertState } from 'app/plugins/datasource/alertmanager/types';
 import { dispatch } from 'app/store/store';
@@ -144,7 +143,6 @@ export const Alerts: FC = () => {
   return (
     <Page navModel={navModel}>
       <Page.Contents>
-        <TechnicalPreview />
         <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
           <Table
             totalItems={alertsRequest?.result?.length || 0}
