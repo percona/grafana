@@ -4,7 +4,6 @@ export const Messages = {
     alerts: 'Alerts',
     alertRules: 'Alert Rules',
     alertRuleTemplates: 'Alert Rule Templates',
-    notificationChannels: 'Notification Channels',
   },
   alerts: {
     silenceAllAction: 'Silence all',

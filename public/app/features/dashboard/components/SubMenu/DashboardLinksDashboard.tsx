@@ -36,10 +36,10 @@ export const DashboardLinksDashboard: React.FC<Props> = (props) => {
   if (link.title === 'PMM') {
     if (isPmmAdmin(config.bootData.user)) {
       resolvedLinks = [
-        { id: 'pmm-add-instance', url: '/graph/add-instance', title: 'PMM Add Instance' },
-        { id: 'pmm-database-checks', url: '/graph/pmm-database-checks', title: 'PMM Advisor Checks' },
-        { id: 'pmm-inventory', url: '/graph/inventory', title: 'PMM Inventory' },
-        { id: 'pmm-settings', url: '/graph/settings', title: 'PMM Settings' },
+        { id: 1000, url: '/graph/add-instance', title: 'PMM Add Instance' },
+        { id: 1001, url: '/graph/pmm-database-checks', title: 'PMM Advisor Checks' },
+        { id: 1002, url: '/graph/inventory', title: 'PMM Inventory' },
+        { id: 1003, url: '/graph/settings', title: 'PMM Settings' },
       ];
     } else {
       return <></>;
