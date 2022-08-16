@@ -36,6 +36,7 @@ import {
   DELETE_KUBERNETES_CANCEL_TOKEN,
 } from './Kubernetes.constants';
 import { PortalK8sFreeClusterPromotingMessage } from './PortalK8sFreeClusterPromotingMessage/PortalK8sFreeClusterPromotingMessage';
+// import { OperatorStatusRow } from './OperatorStatusRow/OperatorStatusRow';
 
 export const KubernetesInventory: FC = () => {
   const styles = useStyles(getStyles);
@@ -97,6 +98,7 @@ export const KubernetesInventory: FC = () => {
               setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
             />
           </div>
+          // <OperatorStatusRow kubernetes={kubernetes} kubernetesLoading={kubernetesLoading} element={element} />
         ),
       },
       {
