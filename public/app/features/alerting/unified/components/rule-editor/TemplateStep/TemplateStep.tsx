@@ -10,15 +10,18 @@ import {
   Template,
   TemplateParamType,
 } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
+import { dispatch } from 'app/store/store';
 
+import { useUnifiedAlertingSelector } from '../../../hooks/useUnifiedAlertingSelector';
+import { fetchAlertManagerConfigAction } from '../../../state/actions';
 import { RuleFormValues } from '../../../types/rule-form';
+import { initialAsyncRequestState } from '../../../utils/redux';
 import { RuleEditorSection } from '../RuleEditorSection';
 
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import TemplateFiltersField from './TemplateFiltersField';
 import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './TemplateStep.constants';
 import { Messages } from './TemplateStep.messages';
-import { AddAlertRuleModalService } from './TemplateStep.service';
 import { formatChannelsOptions, formatTemplateOptions } from './TemplateStep.utils';
 
 export const TemplateStep: FC = () => {
@@ -29,13 +32,16 @@ export const TemplateStep: FC = () => {
   } = useFormContext<RuleFormValues>();
   const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<Template>>>();
   const [loadingTemplates, setLoadingTemplates] = useState(false);
-  const [channelsOptions, setChannelsOptions] = useState<Array<SelectableValue<string>>>();
-  const [loadingChannels, setLoadingChannels] = useState(false);
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const [queryParams] = useQueryParams();
+  const amConfigs = useUnifiedAlertingSelector((state) => state.amConfigs);
   /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
   const selectedTemplate: string | null = (queryParams['template'] as string | undefined) || null;
+
+  const { result: amConfigsResult, loading: amConfigsLoading } = amConfigs['grafana'] || initialAsyncRequestState;
+  const receivers = (amConfigsResult?.alertmanager_config?.receivers || []).map((r) => r.name);
+  const channelsOptions = formatChannelsOptions(receivers);
 
   const handleTemplateChange = useCallback(
     (selectedTemplate?: Template, onChange?: (template?: Template) => void) => {
@@ -69,19 +75,15 @@ export const TemplateStep: FC = () => {
   );
 
   const getData = useCallback(async () => {
+    dispatch(fetchAlertManagerConfigAction('grafana'));
     try {
       setLoadingTemplates(true);
-      setLoadingChannels(true);
-      const [channelsListResponse, templatesListResponse] = await Promise.all([
-        AddAlertRuleModalService.notificationList(),
-        AlertRuleTemplateService.list({
-          page_params: {
-            index: 0,
-            page_size: 100,
-          },
-        }),
-      ]);
-      setChannelsOptions(formatChannelsOptions(channelsListResponse));
+      const templatesListResponse = await AlertRuleTemplateService.list({
+        page_params: {
+          index: 0,
+          page_size: 100,
+        },
+      });
       setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
       templates.current = templatesListResponse.templates;
 
@@ -97,7 +99,6 @@ export const TemplateStep: FC = () => {
       logger.error(e);
     } finally {
       setLoadingTemplates(false);
-      setLoadingChannels(false);
     }
   }, [handleTemplateChange, selectedTemplate, setValue]);
 
@@ -216,9 +217,9 @@ export const TemplateStep: FC = () => {
           render={({ field: { value, onChange } }) => (
             <MultiSelect
               id="notificationChannels"
-              isLoading={loadingChannels}
-              disabled={loadingChannels}
-              placeholder={loadingChannels ? Messages.loadingContactPoints : undefined}
+              isLoading={amConfigsLoading}
+              disabled={amConfigsLoading}
+              placeholder={amConfigsLoading ? Messages.loadingContactPoints : undefined}
               onChange={(e) => onChange(e.map((channel) => channel.value))}
               value={value}
               options={channelsOptions}
