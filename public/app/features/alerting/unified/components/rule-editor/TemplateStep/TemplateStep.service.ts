@@ -6,7 +6,7 @@ export const AddAlertRuleModalService = {
   async notificationList(): Promise<string[]> {
     const {
       alertmanager_config: { receivers },
-    } = await api.get<NotificationListResponse, {}>(`/graph/api/alertmanager/grafana/config/api/v1/alerts`);
+    } = await api.get<NotificationListResponse, {}>('/graph/api/alertmanager/grafana/config/api/v1/alerts');
     return receivers.map((value) => value.name);
   },
 };
