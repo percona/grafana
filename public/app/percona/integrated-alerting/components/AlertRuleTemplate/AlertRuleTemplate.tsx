@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import { logger } from '@percona/platform-core';
-import moment from 'moment/moment';
+import { format } from 'date-fns';
 import React, { FC, useState, useEffect, useCallback } from 'react';
 import { Column } from 'react-table';
 
@@ -84,7 +84,7 @@ export const AlertRuleTemplate: FC = () => {
               <br />
               {row.original.created_at && (
                 <span className={styles.dateWrapper}>
-                  Created at: {moment(row.original.created_at).format('YYYY-MM-DD')}
+                  Created at: {format(new Date(row.original.created_at), 'YYYY-MM-DD')}
                 </span>
               )}
             </div>
