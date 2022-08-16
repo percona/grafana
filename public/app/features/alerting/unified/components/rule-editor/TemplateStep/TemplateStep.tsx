@@ -1,15 +1,15 @@
-import { logger } from '@percona/platform-core';
 import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 
-import { SelectableValue } from '@grafana/data';
 import { Field, Input, MultiSelect, Select } from '@grafana/ui';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { AlertRuleTemplateService } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.service';
 import {
   Template,
   TemplateParamType,
 } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
+import { fetchTemplatesAction } from 'app/percona/shared/core/reducers';
+import { getTemplates } from 'app/percona/shared/core/selectors';
 import { dispatch } from 'app/store/store';
 
 import { useUnifiedAlertingSelector } from '../../../hooks/useUnifiedAlertingSelector';
@@ -30,8 +30,6 @@ export const TemplateStep: FC = () => {
     setValue,
     formState: { errors },
   } = useFormContext<RuleFormValues>();
-  const [templateOptions, setTemplateOptions] = useState<Array<SelectableValue<Template>>>();
-  const [loadingTemplates, setLoadingTemplates] = useState(false);
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const [queryParams] = useQueryParams();
@@ -40,8 +38,11 @@ export const TemplateStep: FC = () => {
   const selectedTemplate: string | null = (queryParams['template'] as string | undefined) || null;
 
   const { result: amConfigsResult, loading: amConfigsLoading } = amConfigs['grafana'] || initialAsyncRequestState;
+  const { result: templatesResult, loading: templatesLoading } = useSelector(getTemplates) || initialAsyncRequestState;
   const receivers = (amConfigsResult?.alertmanager_config?.receivers || []).map((r) => r.name);
   const channelsOptions = formatChannelsOptions(receivers);
+  const templateOptions = formatTemplateOptions(templatesResult?.templates || []);
+  templates.current = templatesResult?.templates || [];
 
   const handleTemplateChange = useCallback(
     (selectedTemplate?: Template, onChange?: (template?: Template) => void) => {
@@ -74,37 +75,21 @@ export const TemplateStep: FC = () => {
     [setValue]
   );
 
-  const getData = useCallback(async () => {
-    dispatch(fetchAlertManagerConfigAction('grafana'));
-    try {
-      setLoadingTemplates(true);
-      const templatesListResponse = await AlertRuleTemplateService.list({
-        page_params: {
-          index: 0,
-          page_size: 100,
-        },
-      });
-      setTemplateOptions(formatTemplateOptions(templatesListResponse.templates));
-      templates.current = templatesListResponse.templates;
+  useEffect(() => {
+    if (selectedTemplate) {
+      const matchingTemplate = templates.current.find((template) => template.name === selectedTemplate);
 
-      if (selectedTemplate) {
-        const matchingTemplate = templates.current.find((template) => template.name === selectedTemplate);
-
-        if (matchingTemplate) {
-          setValue('template', matchingTemplate);
-          handleTemplateChange(matchingTemplate);
-        }
+      if (matchingTemplate) {
+        setValue('template', matchingTemplate);
+        handleTemplateChange(matchingTemplate);
       }
-    } catch (e) {
-      logger.error(e);
-    } finally {
-      setLoadingTemplates(false);
     }
   }, [handleTemplateChange, selectedTemplate, setValue]);
 
   useEffect(() => {
-    getData();
-  }, [getData]);
+    dispatch(fetchAlertManagerConfigAction('grafana'));
+    dispatch(fetchTemplatesAction());
+  }, []);
 
   return (
     <RuleEditorSection stepNo={2} title="Template details">
@@ -120,9 +105,9 @@ export const TemplateStep: FC = () => {
           render={({ field: { value, onChange } }) => (
             <Select
               id="template"
-              isLoading={loadingTemplates}
-              disabled={loadingTemplates}
-              placeholder={loadingTemplates ? Messages.loadingTemplates : undefined}
+              isLoading={templatesLoading}
+              disabled={templatesLoading}
+              placeholder={templatesLoading ? Messages.loadingTemplates : undefined}
               value={templateOptions?.find((opt) => opt.value?.name === value?.name)}
               onChange={(selectedTemplate) => handleTemplateChange(selectedTemplate.value, onChange)}
               options={templateOptions}
