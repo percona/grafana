@@ -27,13 +27,6 @@ export function getPageStyles(theme: GrafanaTheme2) {
       overflow: auto;
     }
 
-    .page-scrollbar-wrapper {
-      width: 100%;
-      flex-grow: 1;
-      width: 100%;
-      min-height: 0;
-    }
-
     .page-scrollbar-content {
       display: flex;
       min-height: 100%;
@@ -41,7 +34,7 @@ export function getPageStyles(theme: GrafanaTheme2) {
       width: 100%;
       height: 100%;
 
-      &.vertical-content > .page-container {
+      &.vertical-content > .page-container.page-body {
         @media (min-width: ${theme.breakpoints.values.lg}px) {
           margin-left: auto;
           width: 70%;

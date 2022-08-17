@@ -5,7 +5,7 @@ import React, { FC, useCallback, useEffect } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
 import { useStyles2, Icon, LinkButton } from '@grafana/ui';
-import Page from 'app/core/components/Page/Page';
+import { OldPage } from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { AmAlertStateTag } from 'app/features/alerting/unified/components/silences/AmAlertStateTag';
 import { useUnifiedAlertingSelector } from 'app/features/alerting/unified/hooks/useUnifiedAlertingSelector';
@@ -141,8 +141,8 @@ export const Alerts: FC = () => {
   }, []);
 
   return (
-    <Page navModel={navModel}>
-      <Page.Contents>
+    <OldPage navModel={navModel}>
+      <OldPage.Contents>
         <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
           <Table
             totalItems={alertsRequest?.result?.length || 0}
@@ -158,8 +158,8 @@ export const Alerts: FC = () => {
             renderExpandedRow={renderSelectedSubRow}
           />
         </FeatureLoader>
-      </Page.Contents>
-    </Page>
+      </OldPage.Contents>
+    </OldPage>
   );
 };
 
