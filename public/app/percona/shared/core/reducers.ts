@@ -280,7 +280,7 @@ const perconaDBaaSSlice = createSlice({
   name: 'perconaDBaaS',
   initialState: initialDBaaSState,
   reducers: {
-    selectKubernetesCluster: (state, action: PayloadAction<Kubernetes>): PerconaDBaaSState => ({
+    selectKubernetesCluster: (state, action: PayloadAction<Kubernetes | null>): PerconaDBaaSState => ({
       ...state,
       selectedKubernetesCluster: action.payload,
     }),

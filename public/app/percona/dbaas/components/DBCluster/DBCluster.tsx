@@ -29,7 +29,12 @@ import {
 } from './ColumnRenderers/ColumnRenderers';
 import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModal';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
-import { addDbClusterAction, fetchDBClustersAction, fetchKubernetesAction } from 'app/percona/shared/core/reducers';
+import {
+  addDbClusterAction,
+  fetchDBClustersAction,
+  fetchKubernetesAction,
+  selectKubernetesCluster,
+} from 'app/percona/shared/core/reducers';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
@@ -165,6 +170,13 @@ export const DBCluster: FC = () => {
         operator: generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN),
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      dispatch(selectKubernetesCluster(null));
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
