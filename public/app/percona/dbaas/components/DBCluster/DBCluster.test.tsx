@@ -7,7 +7,16 @@ import { DBCluster } from './DBCluster';
 import { formatDBClusterVersion } from './DBCluster.utils';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { DBClusterStatus } from './DBCluster.types';
+import { KubernetesOperatorStatus } from '../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
+import { KubernetesClusterStatus } from '../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
+import { locationService } from '@grafana/runtime/src';
+import { Router } from 'react-router-dom';
+import { updateDatabaseClusterNameInitialValue } from './AddDBClusterModal/AddDBClusterModal.utils';
 
+jest.mock('./AddDBClusterModal/AddDBClusterModal.utils', () => ({
+  ...jest.requireActual('./AddDBClusterModal/AddDBClusterModal.utils'),
+  updateDatabaseClusterNameInitialValue: jest.fn(),
+}));
 jest.mock('app/core/app_events');
 jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
 jest.mock('@percona/platform-core', () => {
@@ -166,5 +175,65 @@ describe('DBCluster::', () => {
     expect(screen.getAllByRole('cell')[1].textContent).toEqual(
       `${DATABASE_LABELS.mongodb} ${formatDBClusterVersion('percona/percona-xtra-dbcluster:8.0')}`
     );
+  });
+
+  it('should open AddModal if kubernetesCluster was selected', async () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, dbaasEnabled: true } },
+            kubernetes: {
+              loading: false,
+            },
+            dbaas: {
+              selectedKubernetesCluster: {
+                kubernetesClusterName: 'testPreselectedCluster',
+                operators: {
+                  psmdb: {
+                    availableVersion: '1.12.0',
+                    status: KubernetesOperatorStatus.ok,
+                    version: '1.11.0',
+                  },
+                  pxc: {
+                    availableVersion: undefined,
+                    status: KubernetesOperatorStatus.ok,
+                    version: '1.11.0',
+                  },
+                },
+                status: KubernetesClusterStatus.ok,
+              },
+            },
+            addKubernetes: { loading: false },
+            deleteKubernetes: { loading: false },
+            dbClusters: {
+              loading: false,
+              result: [
+                {
+                  clusterName: 'cluster_1',
+                  kubernetesClusterName: 'cluster_1',
+                  databaseType: 'mongodb',
+                  clusterSize: 1,
+                  memory: 1000,
+                  cpu: 1000,
+                  disk: 1000,
+                  status: DBClusterStatus.failed,
+                  message: 'Error',
+                  installedImage: 'percona/percona-xtra-dbcluster:8.0',
+                },
+              ],
+            },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <DBCluster />
+        </Router>
+      </Provider>
+    );
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalled();
   });
 });
