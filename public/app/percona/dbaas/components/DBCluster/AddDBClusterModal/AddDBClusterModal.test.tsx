@@ -46,6 +46,7 @@ describe('AddDBClusterModal::', () => {
             isVisible
             setVisible={setVisibleStub}
             onSubmit={onDBClusterAddedStub}
+            preSelectedKubernetesCluster={null}
           />
         </Router>
       </Provider>
@@ -78,6 +79,7 @@ describe('AddDBClusterModal::', () => {
             isVisible
             setVisible={setVisibleStub}
             onSubmit={onDBClusterAddedStub}
+            preSelectedKubernetesCluster={null}
           />
         </Router>
       </Provider>
@@ -105,6 +107,7 @@ describe('AddDBClusterModal::', () => {
             isVisible
             setVisible={setVisibleStub}
             onSubmit={onDBClusterAddedStub}
+            preSelectedKubernetesCluster={null}
           />
         </Router>
       </Provider>
@@ -132,6 +135,7 @@ describe('AddDBClusterModal::', () => {
             isVisible
             setVisible={setVisibleStub}
             onSubmit={onDBClusterAddedStub}
+            preSelectedKubernetesCluster={null}
           />
         </Router>
       </Provider>
