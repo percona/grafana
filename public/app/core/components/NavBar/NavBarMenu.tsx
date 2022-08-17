@@ -8,7 +8,16 @@ import { useLocalStorage } from 'react-use';
 
 import { GrafanaTheme2, NavModelItem } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
-import { CollapsableSection, CustomScrollbar, Icon, IconButton, IconName, useStyles2, useTheme2 } from '@grafana/ui';
+import {
+  CollapsableSection,
+  CustomScrollbar,
+  Icon,
+  IconButton,
+  IconName,
+  IconSize,
+  useStyles2,
+  useTheme2,
+} from '@grafana/ui';
 
 import { Branding } from '../Branding/Branding';
 
@@ -228,31 +237,45 @@ function NavItem({
 }) {
   const styles = useStyles2(getNavItemStyles);
 
+  const renderCollapsibleItem = (childLink: NavModelItem) => {
+    if (linkHasChildren(childLink)) {
+      return (
+        <NavItem
+          link={{ ...childLink, parentItem: link }}
+          onClose={onClose}
+          activeItem={activeItem}
+          key={childLink.text}
+        />
+      );
+    }
+
+    if (!childLink.divider) {
+      return (
+        <NavBarMenuItem
+          key={`${childLink.text}-${childLink.text}`}
+          isActive={activeItem === childLink}
+          isDivider={childLink.divider}
+          icon={childLink.showIconInNavbar ? (childLink.icon as IconName) : undefined}
+          onClick={() => {
+            childLink.onClick?.();
+            onClose();
+          }}
+          styleOverrides={styles.item}
+          target={childLink.target}
+          text={childLink.text}
+          url={childLink.url}
+          isMobile={true}
+        />
+      );
+    }
+
+    return null;
+  };
+
   if (linkHasChildren(link)) {
     return (
       <CollapsibleNavItem onClose={onClose} link={link} isActive={isMatchOrChildMatch(link, activeItem)}>
-        <ul className={styles.children}>
-          {link.children.map(
-            (childLink) =>
-              !childLink.divider && (
-                <NavBarMenuItem
-                  key={`${link.text}-${childLink.text}`}
-                  isActive={activeItem === childLink}
-                  isDivider={childLink.divider}
-                  icon={childLink.showIconInNavbar ? (childLink.icon as IconName) : undefined}
-                  onClick={() => {
-                    childLink.onClick?.();
-                    onClose();
-                  }}
-                  styleOverrides={styles.item}
-                  target={childLink.target}
-                  text={childLink.text}
-                  url={childLink.url}
-                  isMobile={true}
-                />
-              )
-          )}
-        </ul>
+        <ul className={styles.children}>{link.children.map(renderCollapsibleItem)}</ul>
       </CollapsibleNavItem>
     );
   } else {
@@ -344,9 +367,10 @@ function CollapsibleNavItem({
   const styles = useStyles2(getCollapsibleStyles);
   const [sectionExpanded, setSectionExpanded] = useLocalStorage(`grafana.navigation.expanded[${link.text}]`, false);
   const FeatureHighlightWrapper = link.highlightText ? NavFeatureHighlight : React.Fragment;
+  const isRoot = !link.parentItem;
 
   return (
-    <li className={cx(styles.menuItem, className)}>
+    <li className={cx(styles.menuItem, isRoot && styles.rootMenuItem, className)}>
       <NavBarItemWithoutMenu
         isActive={isActive}
         label={link.text}
@@ -356,16 +380,16 @@ function CollapsibleNavItem({
           link.onClick?.();
           onClose();
         }}
-        className={styles.collapsibleMenuItem}
+        className={cx(styles.collapsibleMenuItem, isRoot && styles.rootCollabsibleMenuItem)}
         elClassName={styles.collapsibleIcon}
       >
-        <FeatureHighlightWrapper>{getLinkIcon(link)}</FeatureHighlightWrapper>
+        <FeatureHighlightWrapper>{getLinkIcon(link, isRoot ? 'xl' : 'sm')}</FeatureHighlightWrapper>
       </NavBarItemWithoutMenu>
       <div className={styles.collapsibleSectionWrapper}>
         <CollapsableSection
           isOpen={Boolean(sectionExpanded)}
           onToggle={(isOpen) => setSectionExpanded(isOpen)}
-          className={styles.collapseWrapper}
+          className={cx(styles.collapseWrapper, isRoot && styles.rootCollapseWrapper)}
           contentClassName={styles.collapseContent}
           label={
             <div className={cx(styles.labelWrapper, { [styles.primary]: isActive })}>
@@ -382,12 +406,21 @@ function CollapsibleNavItem({
 
 const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
   menuItem: css({
+    display: 'flex',
+    flexDirection: 'row',
+  }),
+  rootMenuItem: css({
     position: 'relative',
     display: 'grid',
     gridAutoFlow: 'column',
     gridTemplateColumns: `${theme.spacing(7)} minmax(calc(${MENU_WIDTH} - ${theme.spacing(7)}), auto)`,
   }),
   collapsibleMenuItem: css({
+    height: theme.spacing(4),
+    width: theme.spacing(4),
+    display: 'grid',
+  }),
+  rootCollabsibleMenuItem: css({
     height: theme.spacing(6),
     width: theme.spacing(7),
     display: 'grid',
@@ -405,7 +438,7 @@ const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
   collapseWrapper: css({
     paddingLeft: theme.spacing(0.5),
     paddingRight: theme.spacing(4.25),
-    minHeight: theme.spacing(6),
+    minHeight: theme.spacing(4),
     overflowWrap: 'anywhere',
     alignItems: 'center',
     color: theme.colors.text.secondary,
@@ -419,6 +452,9 @@ const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
       outlineOffset: '-2px',
       transition: 'none',
     },
+  }),
+  rootCollapseWrapper: css({
+    minHeight: theme.spacing(6),
   }),
   collapseContent: css({
     padding: 0,
@@ -439,11 +475,11 @@ function linkHasChildren(link: NavModelItem): link is NavModelItem & { children:
   return Boolean(link.children && link.children.length > 0);
 }
 
-function getLinkIcon(link: NavModelItem) {
+function getLinkIcon(link: NavModelItem, size: IconSize = 'xl') {
   if (link.id === 'home') {
     return <Branding.MenuLogo />;
   } else if (link.icon) {
-    return <Icon name={link.icon as IconName} size="xl" />;
+    return <Icon name={link.icon as IconName} size={size} />;
   } else {
     return <img src={link.img} alt={`${link.text} logo`} height="24" width="24" style={{ borderRadius: '50%' }} />;
   }
