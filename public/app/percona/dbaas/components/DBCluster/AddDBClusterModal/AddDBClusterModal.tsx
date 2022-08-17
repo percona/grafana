@@ -15,12 +15,21 @@ import { getAddDbCluster } from 'app/percona/shared/core/selectors';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { getInitialValues, updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
 
-export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({ kubernetes, isVisible, setVisible, onSubmit }) => {
+export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
+  kubernetes,
+  isVisible,
+  setVisible,
+  onSubmit,
+  preSelectedKubernetesCluster,
+}) => {
   const styles = useStyles(getStyles);
   const { loading } = useSelector(getAddDbCluster);
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
 
-  const initialValues = useMemo(() => getInitialValues(kubernetes), [kubernetes]);
+  const initialValues = useMemo(() => getInitialValues(kubernetes, preSelectedKubernetesCluster), [
+    kubernetes,
+    preSelectedKubernetesCluster,
+  ]);
   const updatedItialValues = useMemo(
     () => (isVisible ? updateDatabaseClusterNameInitialValue(initialValues) : initialValues),
     [initialValues, isVisible]

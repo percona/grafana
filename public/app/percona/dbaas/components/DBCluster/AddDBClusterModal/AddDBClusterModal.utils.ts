@@ -4,7 +4,10 @@ import { INITIAL_VALUES } from './DBClusterAdvancedOptions/DBClusterAdvancedOpti
 import { getKubernetesOptions } from './DBClusterBasicOptions/DBClusterBasicOptions.utils';
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 
-export const getInitialValues = (kubernetes: Kubernetes[]): AddDbClusterFormValues => {
+export const getInitialValues = (
+  kubernetes: Kubernetes[],
+  preSelectedCluster: Kubernetes | null
+): AddDbClusterFormValues => {
   const activeOperators = getActiveOperators(kubernetes);
 
   const initialValues: AddDbClusterFormValues = {
@@ -16,7 +19,7 @@ export const getInitialValues = (kubernetes: Kubernetes[]): AddDbClusterFormValu
   };
 
   if (kubernetes.length > 0) {
-    const kubernetesOptions = getKubernetesOptions(kubernetes);
+    const kubernetesOptions = getKubernetesOptions(preSelectedCluster ? [preSelectedCluster] : kubernetes);
     const initialCluster = kubernetesOptions.length > 0 && kubernetesOptions[0];
     if (initialCluster) {
       initialValues[AddDBClusterFields.kubernetesCluster] = initialCluster;

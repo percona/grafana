@@ -6,7 +6,12 @@ import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { Table } from 'app/percona/shared/components/Elements/Table';
-import { getKubernetes, getPerconaDBClusters, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import {
+  getDBaaS,
+  getKubernetes,
+  getPerconaDBClusters,
+  getPerconaSettingFlag,
+} from 'app/percona/shared/core/selectors';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { getStyles } from './DBCluster.styles';
@@ -37,12 +42,13 @@ import { logger } from '@sentry/utils';
 
 export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
-  const [addModalVisible, setAddModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<Cluster>();
+  const { selectedKubernetesCluster } = useSelector(getDBaaS);
+  const [addModalVisible, setAddModalVisible] = useState(selectedKubernetesCluster ? true : false);
   const navModel = usePerconaNavModel('dbclusters');
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
@@ -201,6 +207,7 @@ export const DBCluster: FC = () => {
               isVisible={addModalVisible}
               setVisible={setAddModalVisible}
               onSubmit={addCluster}
+              preSelectedKubernetesCluster={selectedKubernetesCluster}
             />
             <DeleteDBClusterModal
               isVisible={deleteModalVisible}

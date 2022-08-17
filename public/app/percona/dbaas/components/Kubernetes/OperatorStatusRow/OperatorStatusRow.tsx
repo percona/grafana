@@ -1,43 +1,60 @@
 import React, { FC } from 'react';
-import { Kubernetes } from '../Kubernetes.types';
+import { Kubernetes, OperatorToUpdate } from '../Kubernetes.types';
+import { OperatorStatusItem } from '../OperatorStatusItem/OperatorStatusItem';
+import { AddClusterButton } from '../../AddClusterButton/AddClusterButton';
+import { Databases } from '../../../../shared/core';
+import { Messages } from 'app/percona/dbaas/DBaaS.messages';
+import { useStyles } from '@grafana/ui/src';
+import { getStyles } from './OperatorStatusRow.styles';
+import { selectKubernetesCluster } from '../../../../shared/core/reducers';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 interface OperatorStatusRowProps {
-  kubernetes: Kubernetes[];
-  kubernetesLoading: boolean;
   element: Kubernetes;
+  setSelectedCluster: React.Dispatch<React.SetStateAction<Kubernetes | null>>;
+  setOperatorToUpdate: React.Dispatch<React.SetStateAction<OperatorToUpdate | null>>;
+  setUpdateOperatorModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const OperatorStatusRow: FC<OperatorStatusRowProps> = ({ kubernetes, element }) => {
-  // const styles = useStyles(getStyles);
-  // const addDisabled = kubernetes.length === 0 || isKubernetesListUnavailable(kubernetes) || loading;
+export const OperatorStatusRow: FC<OperatorStatusRowProps> = ({
+  element,
+  setSelectedCluster,
+  setOperatorToUpdate,
+  setUpdateOperatorModalVisible,
+}) => {
+  const styles = useStyles(getStyles);
+  const history = useHistory();
+  const dispatch = useDispatch();
 
   return (
-    <div data-testid={`${element.kubernetesClusterName}-kubernetes-row-wrapper`}>
+    <div data-testid={`${element.kubernetesClusterName}-kubernetes-row-wrapper`} className={styles.operatorRowWrapper}>
       <div>
-        {/*  <OperatorStatusItem*/}
-        {/*    databaseType={Databases.mysql}*/}
-        {/*    operator={element.operators.pxc}*/}
-        {/*    kubernetes={element}*/}
-        {/*    setSelectedCluster={setSelectedCluster}*/}
-        {/*    setOperatorToUpdate={setOperatorToUpdate}*/}
-        {/*    setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}*/}
-        {/*  />*/}
-        {/*  <OperatorStatusItem*/}
-        {/*    databaseType={Databases.mongodb}*/}
-        {/*    operator={element.operators.psmdb}*/}
-        {/*    kubernetes={element}*/}
-        {/*    setSelectedCluster={setSelectedCluster}*/}
-        {/*    setOperatorToUpdate={setOperatorToUpdate}*/}
-        {/*    setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}*/}
-        {/*  />*/}
-        {/*</div>*/}
-        {/*<AddClusterButton*/}
-        {/*  label={Messages.dbcluster.addAction}*/}
-        {/*  disabled={addDisabled}*/}
-        {/*  action={() => setAddModalVisible(!addModalVisible)}*/}
-        {/*  data-testid="dbcluster-add-cluster-button"*/}
-        {/*/>*/}
+        <OperatorStatusItem
+          databaseType={Databases.mysql}
+          operator={element.operators.pxc}
+          kubernetes={element}
+          setSelectedCluster={setSelectedCluster}
+          setOperatorToUpdate={setOperatorToUpdate}
+          setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
+        />
+        <OperatorStatusItem
+          databaseType={Databases.mongodb}
+          operator={element.operators.psmdb}
+          kubernetes={element}
+          setSelectedCluster={setSelectedCluster}
+          setOperatorToUpdate={setOperatorToUpdate}
+          setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
+        />
       </div>
+      <AddClusterButton
+        label={Messages.dbcluster.addAction}
+        action={() => {
+          dispatch(selectKubernetesCluster(element));
+          history.push('/dbaas/dbclusters');
+        }}
+        data-testid={`${element.kubernetesClusterName}-add-cluster-button`}
+      />
     </div>
   );
 };
