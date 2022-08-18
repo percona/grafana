@@ -179,9 +179,12 @@ export const BackupInventory: FC = () => {
     [getData, selectedBackup]
   );
 
-  const getLogs = async (startingChunk: number, offset: number, token?: CancelToken) => {
-    return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset, token);
-  };
+  const getLogs = useCallback(
+    async (startingChunk: number, offset: number, token?: CancelToken) => {
+      return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset, token);
+    },
+    [selectedBackup]
+  );
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<Backup>) => (
