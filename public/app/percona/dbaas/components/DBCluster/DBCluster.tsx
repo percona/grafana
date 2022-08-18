@@ -53,7 +53,7 @@ export const DBCluster: FC = () => {
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [selectedCluster, setSelectedCluster] = useState<Cluster>();
   const { selectedKubernetesCluster } = useSelector(getDBaaS);
-  const [addModalVisible, setAddModalVisible] = useState(selectedKubernetesCluster ? true : false);
+  const [addModalVisible, setAddModalVisible] = useState(!!selectedKubernetesCluster);
   const navModel = usePerconaNavModel('dbclusters');
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
