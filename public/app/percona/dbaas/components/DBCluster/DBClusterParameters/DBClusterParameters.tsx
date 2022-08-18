@@ -10,9 +10,11 @@ import { useSelector } from 'react-redux';
 
 export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster }) => {
   const styles = useStyles(getStyles);
-  const { result: clusters = {}, loading: dbClusterLoading } = useSelector(getPerconaDBClustersDetails);
-  const { status } =
-    Object.keys(clusters).length && dbCluster.id ? clusters[dbCluster.id] : { status: DBClusterStatus.unknown };
+  const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
+  const { status, cpu, memory, disk, expose } =
+    Object.keys(clusters).length && dbCluster.id
+      ? clusters[dbCluster.id]
+      : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
   const {
     label: exposeLabel,
     enabled: exposeEnabled,
@@ -21,7 +23,7 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
 
   return (
     <>
-      {!dbClusterLoading && status && status === DBClusterStatus.ready && (
+      {status && status === DBClusterStatus.ready && (
         <div className={styles.wrapper}>
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.clusterName}
@@ -30,22 +32,22 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.cpu}
-            value={dbCluster.cpu!}
+            value={cpu}
             dataTestId="cluster-parameters-cpu"
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.memory}
-            value={`${dbCluster.memory!} GB`}
+            value={`${memory} GB`}
             dataTestId="cluster-parameters-memory"
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.disk}
-            value={`${dbCluster.disk!} GB`}
+            value={`${disk} GB`}
             dataTestId="cluster-parameters-disk"
           />
           <DBClusterConnectionItem
             label={exposeLabel}
-            value={dbCluster.expose ? exposeEnabled : exposeDisabled}
+            value={expose ? exposeEnabled : exposeDisabled}
             dataTestId="cluster-parameters-expose"
           />
         </div>
