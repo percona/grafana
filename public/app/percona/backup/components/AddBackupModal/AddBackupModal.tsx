@@ -22,6 +22,7 @@ import {
   PERIOD_OPTIONS,
   getBackupModeOptions,
   getDataModelFromVendor,
+  isDataModelDisabled,
 } from './AddBackupModal.utils';
 import { AddBackupModalService } from './AddBackupModal.service';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
@@ -43,9 +44,6 @@ import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { BackupMode, DataModel } from '../../Backup.types';
 import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
-
-const isDataModelDisabled = (values: AddBackupFormProps) =>
-  values.service?.value?.vendor === Databases.mysql || values.mode === BackupMode.PITR;
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
