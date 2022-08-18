@@ -41,8 +41,11 @@ import {
 import { getStyles } from './AddBackupModal.styles';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
-import { BackupMode } from '../../Backup.types';
+import { BackupMode, DataModel } from '../../Backup.types';
 import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
+
+const isDataModelDisabled = (values: AddBackupFormProps) =>
+  values.service?.value?.vendor === Databases.mysql || values.mode === BackupMode.PITR;
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
@@ -69,12 +72,21 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
         initialValues={initialValues}
         onSubmit={handleSubmit}
         mutators={{
-          changeVendor: ([vendor]: [Databases, BackupMode], state, tools) => {
+          changeVendor: ([vendor]: [Databases], state, tools) => {
             tools.changeValue(state, 'vendor', () => vendor);
             tools.changeValue(state, 'dataModel', () => getDataModelFromVendor(vendor));
             //TODO remove this when we support incremental backups for MySQL
             if (vendor === Databases.mysql) {
               tools.changeValue(state, 'mode', () => BackupMode.SNAPSHOT);
+            }
+          },
+          changeDataModel: ([labels]: [NodeListOf<HTMLLabelElement> | null], state, tools) => {
+            if (labels?.length) {
+              const label = labels[0].textContent;
+
+              if (label === BackupMode.PITR) {
+                tools.changeValue(state, 'dataModel', () => DataModel.LOGICAL);
+              }
             }
           },
         }}
@@ -132,7 +144,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               </div>
             </div>
             <RadioButtonGroupField
-              disabled
+              disabled={isDataModelDisabled(values)}
               options={DATA_MODEL_OPTIONS}
               name="dataModel"
               label={Messages.dataModel}
@@ -146,6 +158,9 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 disabled={!!backup || values.vendor === Databases.mysql}
                 label={Messages.type}
                 fullWidth
+                inputProps={{
+                  onInput: (e: React.ChangeEvent<HTMLInputElement>) => form.mutators.changeDataModel(e.target.labels),
+                }}
               />
             )}
             {!scheduleMode && <RetryModeSelector retryMode={values.retryMode} />}

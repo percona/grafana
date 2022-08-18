@@ -207,6 +207,7 @@ export const BackupInventory: FC = () => {
     retryMode,
     retryInterval,
     retryTimes,
+    dataModel,
   }: AddBackupFormProps) => {
     const strRetryInterval = `${retryInterval}s`;
     let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
@@ -218,6 +219,7 @@ export const BackupInventory: FC = () => {
         description,
         strRetryInterval,
         resultRetryTimes!,
+        dataModel,
         generateToken(BACKUP_CANCEL_TOKEN)
       );
       setBackupModalVisible(false);
