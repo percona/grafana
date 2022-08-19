@@ -57,6 +57,17 @@ export const BackupInventory: FC = () => {
   const columns = useMemo(
     (): Array<Column<Backup>> => [
       {
+        Header: Messages.backupInventory.table.columns.status,
+        accessor: 'status',
+        Cell: ({ value, row }) => (
+          <Status
+            showLogsAction={row.original.vendor === Databases.mongodb}
+            status={value}
+            onLogClick={() => onLogClick(row.original)}
+          />
+        ),
+      },
+      {
         Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
         id: 'name',
@@ -81,17 +92,6 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
-      },
-      {
-        Header: Messages.backupInventory.table.columns.status,
-        accessor: 'status',
-        Cell: ({ value, row }) => (
-          <Status
-            showLogsAction={row.original.vendor === Databases.mongodb}
-            status={value}
-            onLogClick={() => onLogClick(row.original)}
-          />
-        ),
       },
       {
         Header: Messages.backupInventory.table.columns.actions,

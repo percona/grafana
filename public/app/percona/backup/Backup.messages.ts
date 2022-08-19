@@ -1,6 +1,6 @@
 export const Messages = {
   tabs: {
-    inventory: 'Backup Inventory',
+    inventory: 'All backups',
     scheduled: 'Scheduled Backups',
     locations: 'Storage Locations',
     restore: 'Restore History',
@@ -14,7 +14,7 @@ export const Messages = {
         name: 'Backup name',
         created: 'Created',
         location: 'Location',
-        vendor: 'Vendor',
+        vendor: 'DB Technology',
         status: 'Status',
         actions: 'Actions',
         type: 'Type',
@@ -68,7 +68,7 @@ export const Messages = {
       noData: 'No scheduled backups found',
       columns: {
         name: 'Name',
-        vendor: 'Vendor',
+        vendor: 'DB Technology',
         start: 'Start at',
         retention: 'Retention',
         frequency: 'Frequency',

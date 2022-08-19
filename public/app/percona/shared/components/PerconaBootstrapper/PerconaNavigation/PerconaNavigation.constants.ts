@@ -75,14 +75,8 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
   children: [
     {
       id: 'backup-inventory',
-      text: 'Backup Inventory',
+      text: 'All backups',
       url: `${config.appSubUrl}/backup/inventory`,
-      hideFromMenu: true,
-    },
-    {
-      id: 'restore-history',
-      text: 'Restore History',
-      url: `${config.appSubUrl}/backup/restore`,
       hideFromMenu: true,
     },
     {
@@ -92,8 +86,14 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
       hideFromMenu: true,
     },
     {
+      id: 'restore-history',
+      text: 'Restore History',
+      url: `${config.appSubUrl}/backup/restore`,
+      hideFromMenu: true,
+    },
+    {
       id: 'storage-locations',
-      text: 'Storage Locations',
+      text: 'Settings',
       url: `${config.appSubUrl}/backup/locations`,
       hideFromMenu: true,
     },
