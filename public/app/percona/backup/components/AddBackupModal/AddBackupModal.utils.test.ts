@@ -1,4 +1,4 @@
-import { BackupMode, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, DataModel, RetryMode, BackupType } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 
 import { stubs as backupStubs } from '../BackupInventory/__mocks__/BackupInventory.service';
@@ -38,6 +38,7 @@ describe('AddBackupModal::utils', () => {
         active: true,
         vendor: null,
         mode: BackupMode.SNAPSHOT,
+        type: BackupType.DEMAND,
       });
     });
 
@@ -57,6 +58,7 @@ describe('AddBackupModal::utils', () => {
         retryInterval: 30,
         retryMode: RetryMode.MANUAL,
         retryTimes: 2,
+        type: BackupType.DEMAND,
       });
     });
 
@@ -102,6 +104,7 @@ describe('AddBackupModal::utils', () => {
         active: true,
         vendor: Databases.mongodb,
         mode: BackupMode.SNAPSHOT,
+        type: BackupType.SCHEDULED,
       });
     });
   });

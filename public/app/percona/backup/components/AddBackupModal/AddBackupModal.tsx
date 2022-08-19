@@ -19,7 +19,7 @@ import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 
-import { BackupMode, DataModel } from '../../Backup.types';
+import { BackupMode, DataModel, BackupType } from '../../Backup.types';
 import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
 
 import {
@@ -57,7 +57,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
   onBackup,
 }) => {
   const styles = useStyles(getStyles);
-  const initialValues = useMemo(() => toFormBackup(backup), [backup]);
+  const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup, scheduleMode]);
   const { Form } = withTypes<AddBackupFormProps>();
 
   const handleSubmit = (values: AddBackupFormProps) =>
@@ -93,6 +93,14 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
           <form onSubmit={handleSubmit}>
+            <div className={styles.typeSelectionRow}>
+              <label>
+                <Field name="type" component="input" type="radio" value={BackupType.DEMAND} /> On Demand
+              </label>
+              <label>
+                <Field name="type" component="input" type="radio" value={BackupType.SCHEDULED} /> Schedule Backup
+              </label>
+            </div>
             <div className={styles.formContainer}>
               <div className={styles.formHalf}>
                 <Field name="service" validate={validators.required}>
@@ -152,7 +160,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
               label={Messages.dataModel}
               fullWidth
             />
-            {scheduleMode && (
+            {values.type === BackupType.SCHEDULED && (
               <RadioButtonGroupField
                 options={getBackupModeOptions(values.vendor)}
                 name="mode"
@@ -165,9 +173,9 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 }}
               />
             )}
-            {!scheduleMode && <RetryModeSelector retryMode={values.retryMode} />}
+            {values.type !== BackupType.SCHEDULED && <RetryModeSelector retryMode={values.retryMode} />}
             <TextareaInputField name="description" label={Messages.description} />
-            {scheduleMode && (
+            {values.type === BackupType.SCHEDULED && (
               <div className={styles.advancedGroup} data-testid="advanced-backup-fields">
                 <h6 className={styles.advancedTitle}>{Messages.scheduleSection}</h6>
                 <div>
@@ -290,7 +298,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 loading={submitting}
                 type="submit"
               >
-                {Messages.getSubmitButtonText(scheduleMode, !!backup)}
+                {Messages.getSubmitButtonText(values.type === BackupType.SCHEDULED, !!backup)}
               </LoaderButton>
               <Button data-testid="storage-location-cancel-button" variant="secondary" onClick={onClose}>
                 {Messages.cancelAction}

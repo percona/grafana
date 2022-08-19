@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { BackupMode, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
@@ -41,7 +41,10 @@ const isScheduledBackup = (backup: Backup | ScheduledBackup): backup is Schedule
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   (backup as ScheduledBackup).cronExpression !== undefined;
 
-export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackupFormProps => {
+const getBackupType = (backup: Backup | ScheduledBackup | null): BackupType =>
+  backup ? (isScheduledBackup(backup) ? BackupType.SCHEDULED : BackupType.DEMAND) : BackupType.DEMAND;
+
+export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMode?: boolean): AddBackupFormProps => {
   if (!backup) {
     return {
       id: '',
@@ -64,6 +67,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       active: true,
       vendor: null,
       mode: BackupMode.SNAPSHOT,
+      type: scheduleMode ? BackupType.SCHEDULED : getBackupType(backup),
     };
   }
 
@@ -113,6 +117,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       active,
       vendor,
       mode,
+      type: BackupType.SCHEDULED,
     };
   } else {
     return {
@@ -127,6 +132,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null): AddBackup
       retryMode: RetryMode.MANUAL,
       retryTimes: 2,
       retryInterval: 30,
+      type: BackupType.DEMAND,
     };
   }
 };

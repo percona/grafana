@@ -82,4 +82,11 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
   apiErrorSection: css`
     margin-bottom: ${spacing.md};
   `,
+  typeSelectionRow: css`
+    margin-bottom: ${spacing.md};
+
+    label:first-child {
+      margin-right: ${spacing.md};
+    }
+  `,
 });
