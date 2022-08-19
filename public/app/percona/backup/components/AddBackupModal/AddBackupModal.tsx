@@ -8,7 +8,7 @@ import {
   TextInputField,
   validators,
 } from '@percona/platform-core';
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
@@ -57,8 +57,10 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
   onBackup,
 }) => {
   const styles = useStyles(getStyles);
+  const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
   const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup, scheduleMode]);
   const { Form } = withTypes<AddBackupFormProps>();
+  const editing = !!backup;
 
   const handleSubmit = (values: AddBackupFormProps) =>
     onBackup({
@@ -67,8 +69,10 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
       retryTimes: parseInt(`${values.retryTimes}`, 10),
     });
 
+  useEffect(() => setModalTitle(Messages.getModalTitle(scheduleMode, editing)), [editing, scheduleMode]);
+
   return (
-    <Modal title={Messages.getModalTitle(scheduleMode, !!backup)} isVisible={isVisible} onClose={onClose}>
+    <Modal title={modalTitle} isVisible={isVisible} onClose={onClose}>
       <Form
         initialValues={initialValues}
         onSubmit={handleSubmit}
@@ -93,14 +97,38 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
           <form onSubmit={handleSubmit}>
-            <div className={styles.typeSelectionRow}>
-              <label>
-                <Field name="type" component="input" type="radio" value={BackupType.DEMAND} /> On Demand
-              </label>
-              <label>
-                <Field name="type" component="input" type="radio" value={BackupType.SCHEDULED} /> Schedule Backup
-              </label>
-            </div>
+            {!editing && (
+              <div className={styles.typeSelectionRow}>
+                <Field name="type" component="input" type="radio" value={BackupType.DEMAND}>
+                  {({ input }) => (
+                    <label>
+                      <input
+                        {...input}
+                        onChange={(e) => {
+                          setModalTitle(Messages.getModalTitle(false, editing));
+                          input.onChange(e);
+                        }}
+                      ></input>
+                      On Demand
+                    </label>
+                  )}
+                </Field>
+                <Field name="type" component="input" type="radio" value={BackupType.SCHEDULED}>
+                  {({ input }) => (
+                    <label>
+                      <input
+                        {...input}
+                        onChange={(e) => {
+                          setModalTitle(Messages.getModalTitle(true, editing));
+                          input.onChange(e);
+                        }}
+                      ></input>
+                      Schedule Backup
+                    </label>
+                  )}
+                </Field>
+              </div>
+            )}
             <div className={styles.formContainer}>
               <div className={styles.formHalf}>
                 <Field name="service" validate={validators.required}>
@@ -109,7 +137,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                       <AsyncSelectField
                         label={Messages.serviceName}
                         isSearchable={false}
-                        disabled={!!backup}
+                        disabled={editing}
                         loadOptions={AddBackupModalService.loadServiceOptions}
                         defaultOptions
                         {...input}
@@ -142,7 +170,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                       <AsyncSelectField
                         label={Messages.location}
                         isSearchable={false}
-                        disabled={!!backup}
+                        disabled={editing}
                         loadOptions={AddBackupModalService.loadLocationOptions}
                         defaultOptions
                         {...input}
@@ -165,7 +193,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 options={getBackupModeOptions(values.vendor)}
                 name="mode"
                 //TODO remove this when we support incremental backups for MySQL
-                disabled={!!backup || values.vendor === Databases.mysql}
+                disabled={editing || values.vendor === Databases.mysql}
                 label={Messages.type}
                 fullWidth
                 inputProps={{
@@ -298,7 +326,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 loading={submitting}
                 type="submit"
               >
-                {Messages.getSubmitButtonText(values.type === BackupType.SCHEDULED, !!backup)}
+                {Messages.getSubmitButtonText(values.type === BackupType.SCHEDULED, editing)}
               </LoaderButton>
               <Button data-testid="storage-location-cancel-button" variant="secondary" onClick={onClose}>
                 {Messages.cancelAction}

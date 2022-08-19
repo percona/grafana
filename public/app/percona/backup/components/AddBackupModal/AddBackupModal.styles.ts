@@ -85,8 +85,14 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
   typeSelectionRow: css`
     margin-bottom: ${spacing.md};
 
-    label:first-child {
-      margin-right: ${spacing.md};
+    label {
+      &:first-child {
+        margin-right: ${spacing.md};
+      }
+
+      & > input {
+        margin-right: ${spacing.sm};
+      }
     }
   `,
 });

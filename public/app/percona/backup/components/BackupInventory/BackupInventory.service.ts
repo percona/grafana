@@ -3,7 +3,7 @@ import { CancelToken } from 'axios';
 import { DBServiceList, ServiceListPayload } from 'app/percona/inventory/Inventory.types';
 import { api } from 'app/percona/shared/helpers/api';
 
-import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
+import { BackupLogResponse, BackupLogs } from '../../Backup.types';
 
 import { Backup, BackupResponse } from './BackupInventory.types';
 
@@ -46,31 +46,6 @@ export const BackupInventoryService = {
       {
         service_id: serviceId,
         artifact_id: artifactId,
-      },
-      false,
-      token
-    );
-  },
-  async backup(
-    serviceId: string,
-    locationId: string,
-    name: string,
-    description: string,
-    retryInterval: string,
-    retryTimes: number,
-    dataModel: DataModel,
-    token?: CancelToken
-  ) {
-    return api.post(
-      `${BASE_URL}/Backups/Start`,
-      {
-        service_id: serviceId,
-        location_id: locationId,
-        name,
-        description,
-        retry_interval: retryInterval,
-        retries: retryTimes,
-        data_model: dataModel,
       },
       false,
       token
