@@ -6,7 +6,6 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
 import { CheckDetails, Interval } from 'app/percona/check/types';
-import { CheckService } from 'app/percona/check/Check.service';
 import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { Messages } from './AllChecksTab.messages';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
@@ -19,6 +18,8 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { CheckService } from '../../Check.service';
+import { useSocket } from 'app/percona/shared/websockets/WebSocketProvider';
 
 export const AllChecksTab: FC = () => {
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
@@ -29,11 +30,13 @@ export const AllChecksTab: FC = () => {
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
+  const socket = useSocket();
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
     try {
       await CheckService.runDbChecks();
+      socket.send(JSON.stringify({}));
       appEvents.emit(AppEvents.alertSuccess, [Messages.checksExecutionStarted]);
     } catch (e) {
       logger.error(e);
@@ -42,15 +45,19 @@ export const AllChecksTab: FC = () => {
     }
   };
 
-  const runIndividualCheck = async (check: CheckDetails) => {
-    try {
-      await CheckService.runIndividualDbCheck(check.name);
-      appEvents.emit(AppEvents.alertSuccess, [`${check.summary} ${Messages.runIndividualDbCheck}`]);
-    } catch (e) {
-      logger.error(e);
-    } finally {
-    }
-  };
+  const runIndividualCheck = useCallback(
+    async (check: CheckDetails) => {
+      try {
+        await CheckService.runIndividualDbCheck(check.name);
+        socket.send(JSON.stringify({ names: [check.name] }));
+        appEvents.emit(AppEvents.alertSuccess, [`${check.summary} ${Messages.runIndividualDbCheck}`]);
+      } catch (e) {
+        logger.error(e);
+      } finally {
+      }
+    },
+    [socket]
+  );
 
   const updateUI = (check: CheckDetails) => {
     const { name, disabled, interval } = check;
@@ -157,7 +164,7 @@ export const AllChecksTab: FC = () => {
         ),
       },
     ],
-    [changeCheck, handleIntervalChangeClick]
+    [changeCheck, handleIntervalChangeClick, runIndividualCheck]
   );
 
   useEffect(() => {
