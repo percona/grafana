@@ -8,4 +8,9 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     justify-content: flex-end;
     margin-bottom: ${spacing.sm};
   `,
+  createdAtWrapper: css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  `,
 });

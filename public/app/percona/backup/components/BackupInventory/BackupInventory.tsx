@@ -59,6 +59,7 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.status,
         accessor: 'status',
+        width: '100px',
         Cell: ({ value, row }) => (
           <Status
             showLogsAction={row.original.vendor === Databases.mongodb}
@@ -71,7 +72,6 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
         id: 'name',
-        width: '250px',
         Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
@@ -82,7 +82,8 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.created,
         accessor: 'created',
-        Cell: ({ value }) => <DetailedDate date={value} />,
+        width: '200px',
+        Cell: ({ value }) => <DetailedDate date={value} className={styles.createdAtWrapper} />,
       },
       {
         Header: Messages.backupInventory.table.columns.type,
@@ -92,6 +93,7 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
+        width: '250px',
       },
       {
         Header: Messages.backupInventory.table.columns.actions,
@@ -104,9 +106,10 @@ export const BackupInventory: FC = () => {
             onDelete={onDeleteClick}
           />
         ),
-        width: '150px',
+        width: '100px',
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
   const styles = useStyles(getStyles);
