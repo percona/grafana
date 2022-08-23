@@ -40,7 +40,7 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({ backup
       title: (
         <div className={styles.dropdownField}>
           <DBIcon type="delete" data-testid="delete-backup-artifact-button" role="button" />
-          {Messages.restoreBackup}
+          {Messages.deleteBackup}
         </div>
       ),
       disabled:
