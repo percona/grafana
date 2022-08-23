@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { useStyles } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import { BackupStatus } from 'app/percona/backup/Backup.types';
 
 import { DBIcon } from '../../DBIcon';
@@ -11,7 +11,7 @@ import { BackupInventoryActionsProps } from './BackupInventoryActions.types';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
 
 export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({ backup, onRestore, onBackup, onDelete }) => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const handeClick = () => onRestore(backup);
   const handleBackup = () => onBackup(backup);
   const handleDelete = () => onDelete(backup);
