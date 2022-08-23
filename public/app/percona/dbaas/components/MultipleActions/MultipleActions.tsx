@@ -21,7 +21,15 @@ export const MultipleActions: FC<MultipleActionsProps> = ({ actions, disabled, d
     <Dropdown toggle={Toggle} data-testid="multiple-actions-dropdown">
       {actions.map(({ title, action, disabled }, index) => (
         <Fragment key={index}>
-          {disabled ? <span className={styles.disabledButton}>{title}</span> : <span onClick={action}>{title}</span>}
+          {disabled ? (
+            <span className={styles.disabledButton} data-testid="disabled-dropdown-button">
+              {title}
+            </span>
+          ) : (
+            <span onClick={action} data-testid="dropdown-button">
+              {title}
+            </span>
+          )}
         </Fragment>
       ))}
     </Dropdown>

@@ -49,9 +49,9 @@ export const Status: FC<StatusProps> = ({ status, showLogsAction = false, onLogC
         <span data-testid="statusMsg" className={cx(statusStyles)}>
           <Tooltip placement="top" content={statusMsg}>
             {backupSucceeded ? (
-              <Icon name="check-circle" size="xl" />
+              <Icon name="check-circle" size="xl" data-testid="success-icon" />
             ) : (
-              <Icon name={'times-circle' as IconName} size="xl" />
+              <Icon name={'times-circle' as IconName} size="xl" data-testid="fail-icon" />
             )}
           </Tooltip>
         </span>
