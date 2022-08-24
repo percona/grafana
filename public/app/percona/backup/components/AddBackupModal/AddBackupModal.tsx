@@ -109,7 +109,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                           input.onChange(e);
                         }}
                       ></input>
-                      On Demand
+                      {Messages.onDemand}
                     </label>
                   )}
                 </Field>
@@ -123,7 +123,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                           input.onChange(e);
                         }}
                       ></input>
-                      Schedule Backup
+                      {Messages.schedule}
                     </label>
                   )}
                 </Field>
