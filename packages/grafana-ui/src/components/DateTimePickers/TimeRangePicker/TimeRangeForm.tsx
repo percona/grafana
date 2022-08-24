@@ -106,12 +106,13 @@ export const TimeRangeForm: React.FC<Props> = (props) => {
       aria-label={selectors.components.TimePicker.calendar.openButton}
       icon="calendar-alt"
       variant="secondary"
+      type="button"
       onClick={onOpen}
     />
   );
 
   return (
-    <div>
+    <form>
       <div className={style.fieldContainer}>
         <Field label="From" invalid={from.invalid} error={from.errorMessage}>
           <Input
@@ -151,7 +152,7 @@ export const TimeRangeForm: React.FC<Props> = (props) => {
         timeZone={timeZone}
         isReversed={isReversed}
       />
-    </div>
+    </form>
   );
 };
 

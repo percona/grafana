@@ -91,7 +91,7 @@ export const AlertManager: FC = () => {
                     </strong>
                     <span>{urlLabel}</span>
                     <LinkTooltip
-                      tooltipText={urlTooltip}
+                      tooltipContent={urlTooltip}
                       link={urlLink}
                       linkText={tooltipLinkText}
                       icon="info-circle"
@@ -108,7 +108,7 @@ export const AlertManager: FC = () => {
                   >
                     <span>{rulesLabel}</span>
                     <LinkTooltip
-                      tooltipText={rulesTooltip}
+                      tooltipContent={rulesTooltip}
                       link={rulesLink}
                       linkText={tooltipLinkText}
                       icon="info-circle"

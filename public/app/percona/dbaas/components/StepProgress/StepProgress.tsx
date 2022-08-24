@@ -5,12 +5,15 @@ import { HorizontalGroup, useStyles } from '@grafana/ui';
 import { LoaderButton } from '@percona/platform-core';
 import { Step, StepStatus } from './Step/Step';
 import { getStyles } from './StepProgress.styles';
+import { AddDBClusterFields } from '../DBCluster/AddDBClusterModal/AddDBClusterModal.types';
+import { generateUID } from '../DBCluster/AddDBClusterModal/AddDBClusterModal.utils';
 
 export interface StepProgressProps {
   steps: StepProps[];
   initialValues?: Record<string, any>;
   submitButtonMessage: string;
   onSubmit: (values: Record<string, any>) => void;
+  loading: boolean;
 }
 
 export interface StepProps {
@@ -41,7 +44,13 @@ const getStepStatus = (
   return StepStatus.todo;
 };
 
-export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, submitButtonMessage, onSubmit }) => {
+export const StepProgress: FC<StepProgressProps> = ({
+  steps,
+  initialValues,
+  submitButtonMessage,
+  onSubmit,
+  loading,
+}) => {
   const styles = useStyles(getStyles);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepsVisited, setStepsVisited] = useState([currentStep]);
@@ -57,7 +66,12 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
     <Form
       initialValues={initialValues}
       onSubmit={onSubmit}
-      render={({ form, handleSubmit, valid, pristine, submitting, ...props }) => (
+      mutators={{
+        setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
+          changeValue(state, `${AddDBClusterFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
+        },
+      }}
+      render={({ form, handleSubmit, valid, pristine, ...props }) => (
         <form onSubmit={handleSubmit} className={styles.stepProgressWrapper} data-testid="step-progress">
           {steps.map(({ render, title, fields, dataTestId }, index) => (
             <Step
@@ -74,7 +88,6 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
                 handleSubmit,
                 valid,
                 pristine,
-                submitting,
                 ...props,
               })}
             </Step>
@@ -84,8 +97,8 @@ export const StepProgress: FC<StepProgressProps> = ({ steps, initialValues, subm
               data-testid="step-progress-submit-button"
               size="md"
               variant="primary"
-              disabled={!valid || pristine || submitting}
-              loading={submitting}
+              disabled={!valid || pristine || loading}
+              loading={loading}
               className={styles.createButton}
             >
               {submitButtonMessage}

@@ -34,7 +34,7 @@ describe('StepProgress::', () => {
   };
 
   it('renders steps correctly', () => {
-    render(<StepProgress steps={steps} submitButtonMessage="Confirm" onSubmit={() => {}} />);
+    render(<StepProgress loading={false} steps={steps} submitButtonMessage="Confirm" onSubmit={() => {}} />);
     const a = screen.queryAllByRole('textbox');
     expect(a.filter((item) => item.tagName === 'INPUT')).toHaveLength(2);
     expect(a.filter((item) => item.tagName === 'TEXTAREA')).toHaveLength(1);
@@ -47,6 +47,7 @@ describe('StepProgress::', () => {
   it('renders steps correctly with initial values', () => {
     render(
       <StepProgress
+        loading={false}
         steps={steps}
         submitButtonMessage="Confirm"
         onSubmit={() => {}}
@@ -62,7 +63,7 @@ describe('StepProgress::', () => {
   });
 
   it('changes current step correctly', () => {
-    render(<StepProgress steps={steps} submitButtonMessage="Confirm" onSubmit={() => {}} />);
+    render(<StepProgress loading={false} steps={steps} submitButtonMessage="Confirm" onSubmit={() => {}} />);
 
     expect(isCurrentStep('step-1')).toBeTruthy();
 
@@ -80,6 +81,7 @@ describe('StepProgress::', () => {
     const onSubmit = jest.fn();
     render(
       <StepProgress
+        loading={false}
         steps={steps}
         submitButtonMessage="Confirm"
         onSubmit={onSubmit}
