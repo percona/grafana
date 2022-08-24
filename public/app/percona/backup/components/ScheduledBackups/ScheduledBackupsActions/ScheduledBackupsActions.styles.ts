@@ -5,11 +5,16 @@ import { GrafanaTheme } from '@grafana/data';
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   actionsWrapper: css`
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 
     button {
       margin-left: ${spacing.md};
     }
+  `,
+  dropdownField: css`
+    display: flex;
+    align-items: center;
+    gap: ${spacing.sm};
   `,
 });
