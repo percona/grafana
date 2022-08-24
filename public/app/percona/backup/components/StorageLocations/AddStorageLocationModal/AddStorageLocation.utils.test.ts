@@ -65,29 +65,6 @@ describe('AddStorageLocationUtils', () => {
         bucketName: '',
       });
     });
-
-    it('should convert a local server location', () => {
-      const location: StorageLocation = {
-        locationID: 'Location_1',
-        name: 'Local Server',
-        description: 'Server location',
-        path: '/foo/bar',
-        type: LocationType.SERVER,
-      };
-
-      expect(toFormStorageLocation(location)).toEqual({
-        locationID: location.locationID,
-        name: location.name,
-        description: location.description,
-        type: LocationType.SERVER,
-        server: location.path,
-        endpoint: '',
-        client: '',
-        accessKey: '',
-        secretKey: '',
-        bucketName: '',
-      });
-    });
   });
 
   describe('toStorageLocation', () => {
@@ -99,7 +76,6 @@ describe('AddStorageLocationUtils', () => {
         type: LocationType.S3,
         endpoint: 's3://foo',
         client: '',
-        server: '',
         accessKey: 'accessKey',
         secretKey: 'secretKey',
         bucketName: 'bucket',
@@ -125,7 +101,6 @@ describe('AddStorageLocationUtils', () => {
         type: LocationType.CLIENT,
         endpoint: '',
         client: '/foo/bar',
-        server: '',
         accessKey: '',
         secretKey: '',
         bucketName: '',
@@ -137,29 +112,6 @@ describe('AddStorageLocationUtils', () => {
         description: location.description,
         type: LocationType.CLIENT,
         path: location.client,
-      });
-    });
-
-    it('should convert a local server location', () => {
-      const location: AddStorageLocationFormProps = {
-        locationID: 'Location1',
-        name: 'Server Location',
-        description: 'server',
-        type: LocationType.SERVER,
-        endpoint: '',
-        client: '',
-        server: '/foo/bar',
-        accessKey: '',
-        secretKey: '',
-        bucketName: '',
-      };
-
-      expect(toStorageLocation(location)).toEqual({
-        locationID: location.locationID,
-        name: location.name,
-        description: location.description,
-        type: LocationType.SERVER,
-        path: location.server,
       });
     });
   });

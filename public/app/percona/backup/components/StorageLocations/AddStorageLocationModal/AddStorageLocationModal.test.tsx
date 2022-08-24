@@ -54,7 +54,6 @@ describe('AddStorageLocationModal', () => {
     expect(screen.queryByTestId('secretKey-field-container')).not.toBeInTheDocument();
     expect(screen.queryByTestId('endpoint-field-container')).not.toBeInTheDocument();
     //LocalFields
-    expect(screen.queryByTestId('server-field-container')).not.toBeInTheDocument();
     expect(screen.queryByTestId('client-field-container')).not.toBeInTheDocument();
   });
 
