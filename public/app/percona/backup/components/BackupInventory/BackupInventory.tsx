@@ -8,7 +8,6 @@ import { Button, useStyles } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
-import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -72,7 +71,6 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
         id: 'name',
-        Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
         Header: Messages.backupInventory.table.columns.vendor,
@@ -100,6 +98,7 @@ export const BackupInventory: FC = () => {
         accessor: 'id',
         Cell: ({ row }) => (
           <BackupInventoryActions
+            row={row}
             onRestore={onRestoreClick}
             onBackup={onBackupClick}
             backup={row.original}

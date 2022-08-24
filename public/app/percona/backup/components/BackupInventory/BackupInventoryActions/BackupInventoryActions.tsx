@@ -8,15 +8,22 @@ import { DBIcon } from '../../DBIcon';
 import { Messages } from './BackupInventoryActions.messages';
 import { getStyles } from './BackupInventoryActions.styles';
 import { BackupInventoryActionsProps } from './BackupInventoryActions.types';
-import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
+import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
+import { ExpandebleRowButton } from './components/ExpandebleRowButton';
 
-export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({ backup, onRestore, onBackup, onDelete }) => {
+export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
+  row,
+  backup,
+  onRestore,
+  onBackup,
+  onDelete,
+}) => {
   const styles = useStyles2(getStyles);
   const handeClick = () => onRestore(backup);
   const handleBackup = () => onBackup(backup);
   const handleDelete = () => onDelete(backup);
 
-  const getActions = [
+  const getActions: Action[] = [
     {
       title: (
         <div className={styles.dropdownField}>
@@ -53,6 +60,7 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({ backup
 
   return (
     <div className={styles.actionsWrapper}>
+      <ExpandebleRowButton row={row} />
       <MultipleActions actions={getActions} dataTestId="dbcluster-actions" />
     </div>
   );
