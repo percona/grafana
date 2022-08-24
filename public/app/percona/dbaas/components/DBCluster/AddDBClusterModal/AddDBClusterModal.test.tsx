@@ -1,8 +1,19 @@
 import React from 'react';
 import { AddDBClusterModal } from './AddDBClusterModal';
-import { setVisibleStub, onDBClusterAddedStub } from './__mocks__/addDBClusterModalStubs';
+import { onDBClusterAddedStub, setVisibleStub } from './__mocks__/addDBClusterModalStubs';
 import { kubernetesStub } from '../../Kubernetes/__mocks__/kubernetesStubs';
 import { render, fireEvent, screen } from '@testing-library/react';
+import { StoreState } from 'app/types';
+import { Provider } from 'react-redux';
+import { configureStore } from 'app/store/configureStore';
+import { Router } from 'react-router-dom';
+import { locationService } from '@grafana/runtime';
+import { updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
+
+jest.mock('./AddDBClusterModal.utils', () => ({
+  ...jest.requireActual('./AddDBClusterModal.utils'),
+  updateDatabaseClusterNameInitialValue: jest.fn(),
+}));
 
 jest.mock('app/core/app_events');
 
@@ -21,13 +32,23 @@ describe('AddDBClusterModal::', () => {
 
   it('renders correctly', () => {
     render(
-      <AddDBClusterModal
-        kubernetes={kubernetesStub}
-        isVisible
-        setVisible={setVisibleStub}
-        onDBClusterAdded={onDBClusterAddedStub}
-        showMonitoringWarning={false}
-      />
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <AddDBClusterModal
+            kubernetes={kubernetesStub}
+            isVisible
+            setVisible={setVisibleStub}
+            onSubmit={onDBClusterAddedStub}
+          />
+        </Router>
+      </Provider>
     );
 
     expect(screen.findByRole('form')).toBeTruthy();
@@ -43,12 +64,23 @@ describe('AddDBClusterModal::', () => {
 
   it('should disable submit button when there is no values', () => {
     render(
-      <AddDBClusterModal
-        kubernetes={kubernetesStub}
-        isVisible
-        setVisible={setVisibleStub}
-        onDBClusterAdded={onDBClusterAddedStub}
-      />
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <AddDBClusterModal
+            kubernetes={kubernetesStub}
+            isVisible
+            setVisible={setVisibleStub}
+            onSubmit={onDBClusterAddedStub}
+          />
+        </Router>
+      </Provider>
     );
 
     openStep('dbcluster-advanced-options-step');
@@ -59,17 +91,60 @@ describe('AddDBClusterModal::', () => {
 
   it('should change step correctly', () => {
     render(
-      <AddDBClusterModal
-        kubernetes={kubernetesStub}
-        isVisible
-        setVisible={setVisibleStub}
-        onDBClusterAdded={onDBClusterAddedStub}
-      />
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <AddDBClusterModal
+            kubernetes={kubernetesStub}
+            isVisible
+            setVisible={setVisibleStub}
+            onSubmit={onDBClusterAddedStub}
+          />
+        </Router>
+      </Provider>
     );
 
     expect(isStepActive('dbcluster-basic-options-step')).toBeTruthy();
     openStep('dbcluster-advanced-options-step');
     expect(isStepActive('dbcluster-advanced-options-step')).toBeTruthy();
     expect(isStepActive('dbcluster-basic-options-step')).toBeFalsy();
+  });
+
+  it('form should have default values', () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <AddDBClusterModal
+            kubernetes={kubernetesStub}
+            isVisible
+            setVisible={setVisibleStub}
+            onSubmit={onDBClusterAddedStub}
+          />
+        </Router>
+      </Provider>
+    );
+
+    expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalledWith(
+      expect.objectContaining({
+        databaseType: expect.objectContaining({ value: 'mongodb' }),
+        kubernetesCluster: expect.objectContaining({
+          value: 'Cluster 1',
+        }),
+        name: expect.stringContaining('mongodb-'),
+      })
+    );
   });
 });
