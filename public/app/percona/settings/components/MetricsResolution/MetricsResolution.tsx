@@ -109,7 +109,7 @@ export const MetricsResolution: FC = () => {
                 >
                   <div className={settingsStyles.labelWrapper} data-testid="metrics-resolution-label">
                     <span>{label}</span>
-                    <LinkTooltip tooltipText={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
+                    <LinkTooltip tooltipContent={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
                   </div>
                   <RadioButtonGroupField
                     name="resolutions"

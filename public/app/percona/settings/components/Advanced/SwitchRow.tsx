@@ -7,7 +7,7 @@ import { getStyles } from './Advanced.styles';
 
 export const SwitchRow: FC<SwitchRowProps> = ({
   label,
-  tooltip = '',
+  tooltip,
   tooltipLinkText = '',
   link = '',
   disabled,
@@ -23,7 +23,7 @@ export const SwitchRow: FC<SwitchRowProps> = ({
       <div className={styles.advancedCol}>
         <div className={settingsStyles.labelWrapper}>
           <span>{label}</span>
-          <LinkTooltip tooltipText={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
+          <LinkTooltip tooltipContent={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
         </div>
       </div>
       <div className={className}>
