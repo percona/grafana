@@ -41,8 +41,13 @@ const isScheduledBackup = (backup: Backup | ScheduledBackup): backup is Schedule
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   (backup as ScheduledBackup).cronExpression !== undefined;
 
-const getBackupType = (backup: Backup | ScheduledBackup | null): BackupType =>
-  backup ? (isScheduledBackup(backup) ? BackupType.SCHEDULED : BackupType.DEMAND) : BackupType.DEMAND;
+const getBackupType = (backup: Backup | ScheduledBackup | null): BackupType => {
+  if (backup && isScheduledBackup(backup)) {
+    return BackupType.SCHEDULED;
+  }
+
+  return BackupType.DEMAND;
+}
 
 export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMode?: boolean): AddBackupFormProps => {
   if (!backup) {
