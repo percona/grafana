@@ -7,9 +7,6 @@ import { configureStore } from '../../../../../store/configureStore';
 import { StoreState } from '../../../../../types';
 import { Provider } from 'react-redux';
 
-jest.mock('app/core/app_events');
-jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
-
 describe('OperatorStatusRow::', () => {
   it('createDBCluster button should be disabled when kubernetesClusterStatus is invalid', async () => {
     const element = {
