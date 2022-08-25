@@ -99,17 +99,19 @@ export const AddStorageLocationModal: FC<AddStorageLocationModalProps> = ({
               >
                 {location ? Messages.editAction : Messages.addAction}
               </LoaderButton>
-              <LoaderButton
-                type="button"
-                className={cx(styles.button, styles.testButton)}
-                data-testid="storage-location-test-button"
-                size="md"
-                loading={waitingLocationValidation}
-                disabled={!valid}
-                onClick={() => handleTest(values)}
-              >
-                {Messages.test}
-              </LoaderButton>
+              {values.type === LocationType.S3 && (
+                <LoaderButton
+                  type="button"
+                  className={cx(styles.button, styles.testButton)}
+                  data-testid="storage-location-test-button"
+                  size="md"
+                  loading={waitingLocationValidation}
+                  disabled={!valid}
+                  onClick={() => handleTest(values)}
+                >
+                  {Messages.test}
+                </LoaderButton>
+              )}
               <Button
                 className={styles.button}
                 data-testid="storage-location-cancel-button"
