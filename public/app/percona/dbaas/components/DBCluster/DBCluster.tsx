@@ -164,12 +164,14 @@ export const DBCluster: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('dbaasEnabled'), []);
 
   useEffect(() => {
-    dispatch(
-      fetchKubernetesAction({
-        kubernetes: generateToken(GET_KUBERNETES_CANCEL_TOKEN),
-        operator: generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN),
-      })
-    );
+    if (!selectedKubernetesCluster) {
+      dispatch(
+        fetchKubernetesAction({
+          kubernetes: generateToken(GET_KUBERNETES_CANCEL_TOKEN),
+          operator: generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN),
+        })
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

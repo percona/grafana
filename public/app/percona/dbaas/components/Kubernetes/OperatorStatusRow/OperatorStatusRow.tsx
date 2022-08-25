@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Kubernetes, OperatorToUpdate } from '../Kubernetes.types';
 import { OperatorStatusItem } from '../OperatorStatusItem/OperatorStatusItem';
 import { AddClusterButton } from '../../AddClusterButton/AddClusterButton';
@@ -9,6 +9,8 @@ import { getStyles } from './OperatorStatusRow.styles';
 import { selectKubernetesCluster } from '../../../../shared/core/reducers';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { KubernetesOperatorStatus } from '../OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
+import { KubernetesClusterStatus } from '../KubernetesClusterStatus/KubernetesClusterStatus.types';
 
 interface OperatorStatusRowProps {
   element: Kubernetes;
@@ -26,6 +28,15 @@ export const OperatorStatusRow: FC<OperatorStatusRowProps> = ({
   const styles = useStyles(getStyles);
   const history = useHistory();
   const dispatch = useDispatch();
+  const isDisabled = useMemo(
+    () =>
+      element.status !== KubernetesClusterStatus.ok ||
+      !(
+        element?.operators?.pxc?.status === KubernetesOperatorStatus.ok ||
+        element?.operators?.psmdb?.status === KubernetesOperatorStatus.ok
+      ),
+    [element]
+  );
 
   return (
     <div data-testid={`${element.kubernetesClusterName}-kubernetes-row-wrapper`} className={styles.operatorRowWrapper}>
@@ -54,6 +65,7 @@ export const OperatorStatusRow: FC<OperatorStatusRowProps> = ({
           history.push('/dbaas/dbclusters');
         }}
         data-testid={`${element.kubernetesClusterName}-add-cluster-button`}
+        disabled={isDisabled}
       />
     </div>
   );

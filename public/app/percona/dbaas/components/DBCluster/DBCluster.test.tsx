@@ -233,7 +233,6 @@ describe('DBCluster::', () => {
       </Provider>
     );
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
     expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalled();
   });
 });
