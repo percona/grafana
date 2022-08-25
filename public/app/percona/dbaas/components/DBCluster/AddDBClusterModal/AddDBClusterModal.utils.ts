@@ -8,7 +8,7 @@ export const getInitialValues = (
   kubernetes: Kubernetes[],
   preSelectedCluster: Kubernetes | null
 ): AddDbClusterFormValues => {
-  const activeOperators = getActiveOperators(kubernetes);
+  const activeOperators = getActiveOperators(preSelectedCluster ? [preSelectedCluster] : kubernetes);
 
   const initialValues: AddDbClusterFormValues = {
     ...INITIAL_VALUES,

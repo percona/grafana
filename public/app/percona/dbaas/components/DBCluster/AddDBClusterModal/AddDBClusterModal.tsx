@@ -30,6 +30,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
     kubernetes,
     preSelectedKubernetesCluster,
   ]);
+
   const updatedItialValues = useMemo(
     () => (isVisible ? updateDatabaseClusterNameInitialValue(initialValues) : initialValues),
     [initialValues, isVisible]
