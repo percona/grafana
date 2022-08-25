@@ -33,6 +33,11 @@ export const RestoreHistory: FC = () => {
   const columns = useMemo(
     (): Array<Column<Restore>> => [
       {
+        Header: Messages.backupInventory.table.columns.status,
+        accessor: 'status',
+        Cell: ({ value }) => <Status status={value} />,
+      },
+      {
         Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
         id: 'name',
@@ -52,11 +57,6 @@ export const RestoreHistory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
-      },
-      {
-        Header: Messages.backupInventory.table.columns.status,
-        accessor: 'status',
-        Cell: ({ value }) => <Status status={value} />,
       },
     ],
     []
