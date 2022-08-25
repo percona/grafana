@@ -9,11 +9,11 @@ describe('MultipleActions::', () => {
       <MultipleActions
         actions={[
           {
-            title: 'Test action 1',
+            content: 'Test action 1',
             action: jest.fn(),
           },
           {
-            title: 'Test action 2',
+            content: 'Test action 2',
             action: jest.fn(),
           },
         ]}

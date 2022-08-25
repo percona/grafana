@@ -321,14 +321,8 @@ export const ScheduledBackups: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            <Button
-              size="md"
-              icon="plus-square"
-              fill="text"
-              data-testid="scheduled-backup-add-modal-button"
-              onClick={onAddClick}
-            >
-              {Messages.add}
+            <Button size="md" variant="primary" data-testid="scheduled-backup-add-modal-button" onClick={onAddClick}>
+              {Messages.createScheduledBackup}
             </Button>
           </div>
           <Table

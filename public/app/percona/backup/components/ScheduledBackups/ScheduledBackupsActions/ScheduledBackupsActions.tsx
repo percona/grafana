@@ -21,7 +21,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
 
   const getActions = [
     {
-      title: (
+      content: (
         <div className={styles.dropdownField}>
           <Icon data-testid="copy-scheduled-backup-button" name="copy" />
           {Messages.copy}
@@ -30,7 +30,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
       action: handleCopy,
     },
     {
-      title: (
+      content: (
         <div className={styles.dropdownField}>
           <Icon data-testid="edit-scheduled-backpup-button" name="pen" />
           {Messages.edit}
@@ -39,7 +39,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
       action: handleEdit,
     },
     {
-      title: (
+      content: (
         <div className={styles.dropdownField}>
           <Icon data-testid="delete-scheduled-backpup-button" name="times" />
           {Messages.delete}

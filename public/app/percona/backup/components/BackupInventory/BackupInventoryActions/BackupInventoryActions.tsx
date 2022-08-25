@@ -25,7 +25,7 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
 
   const getActions: Action[] = [
     {
-      title: (
+      content: (
         <div className={styles.dropdownField}>
           <DBIcon type="restore" data-testid="restore-backup-artifact-button" role="button" />
           {Messages.restoreBackup}
@@ -35,7 +35,7 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
       action: handeClick,
     },
     {
-      title: (
+      content: (
         <div className={styles.dropdownField}>
           <DBIcon type="backup" data-testid="add-backup-artifact-button" role="button" />
           {Messages.addBackup}
@@ -44,7 +44,7 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
       action: handleBackup,
     },
     {
-      title: (
+      content: (
         <div className={styles.dropdownField}>
           <DBIcon type="delete" data-testid="delete-backup-artifact-button" role="button" />
           {Messages.deleteBackup}

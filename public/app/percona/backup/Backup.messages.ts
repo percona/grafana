@@ -6,6 +6,8 @@ export const Messages = {
     restore: 'Restore History',
   },
   add: 'Add',
+  createNewBackup: 'Create backup',
+  createScheduledBackup: 'Create scheduled backup',
   backupManagement: 'Backup Management',
   backupInventory: {
     table: {

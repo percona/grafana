@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 export interface Action {
-  title: ReactNode;
+  content: ReactNode;
   action: () => void;
   disabled?: boolean;
 }

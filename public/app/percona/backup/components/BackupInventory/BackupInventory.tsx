@@ -262,10 +262,11 @@ export const BackupInventory: FC = () => {
               size="md"
               icon="plus-square"
               fill="text"
+              variant="primary"
               data-testid="backup-add-modal-button"
               onClick={() => onBackupClick(null)}
             >
-              {Messages.add}
+              {Messages.createNewBackup}
             </Button>
           </div>
           <Table
