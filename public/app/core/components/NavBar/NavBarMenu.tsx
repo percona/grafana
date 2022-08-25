@@ -3,8 +3,8 @@ import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { OverlayContainer, useOverlay } from '@react-aria/overlays';
 import React, { useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import CSSTransition from 'react-transition-group/CSSTransition';
-import { useLocalStorage } from 'react-use';
 
 import { GrafanaTheme2, NavModelItem } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
@@ -18,6 +18,7 @@ import {
   useStyles2,
   useTheme2,
 } from '@grafana/ui';
+import { updateMenuTree } from 'app/core/reducers/navBarTree';
 
 import { Branding } from '../Branding/Branding';
 
@@ -365,9 +366,16 @@ function CollapsibleNavItem({
   onClose: () => void;
 }) {
   const styles = useStyles2(getCollapsibleStyles);
-  const [sectionExpanded, setSectionExpanded] = useLocalStorage(`grafana.navigation.expanded[${link.text}]`, false);
+  const sectionExpanded = link.expanded;
   const FeatureHighlightWrapper = link.highlightText ? NavFeatureHighlight : React.Fragment;
   const isRoot = !link.parentItem;
+  const dispatch = useDispatch();
+
+  const handleToggle = (isOpen: boolean) => {
+    if (link.id) {
+      dispatch(updateMenuTree({ id: link.id, active: isOpen }));
+    }
+  };
 
   return (
     <li className={cx(styles.menuItem, isRoot && styles.rootMenuItem, className)}>
@@ -388,7 +396,7 @@ function CollapsibleNavItem({
       <div className={styles.collapsibleSectionWrapper}>
         <CollapsableSection
           isOpen={Boolean(sectionExpanded)}
-          onToggle={(isOpen) => setSectionExpanded(isOpen)}
+          onToggle={handleToggle}
           className={cx(styles.collapseWrapper, isRoot && styles.rootCollapseWrapper)}
           contentClassName={styles.collapseContent}
           label={

@@ -3,6 +3,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NavModelItem } from '@grafana/data';
 import config from 'app/core/config';
 
+import { traverseMenuTree } from './navBarTree.utils';
+
 export const initialState: NavModelItem[] = config.bootData?.navTree ?? [];
 
 const navTreeSlice = createSlice({
@@ -37,8 +39,36 @@ const navTreeSlice = createSlice({
         starredItems?.children?.sort((a, b) => a.text.localeCompare(b.text));
       }
     },
+    updateMenuTree: (state, action: PayloadAction<{ id: string; active: boolean }>) => {
+      const { id, active } = action.payload;
+
+      const nodeMap: Record<string, NavModelItem> = {};
+
+      // Close all other menu items
+      traverseMenuTree(state, (item) => {
+        item.expanded = false;
+
+        item.children?.map((child) => {
+          child.parentItem = item;
+        });
+
+        nodeMap[item.id || ''] = item;
+      });
+
+      // Expand menu tree for the currently active menu item
+      let current = nodeMap[id];
+
+      current.expanded = active;
+
+      while (current && current.parentItem) {
+        current = nodeMap[current.parentItem?.id || ''];
+        if (current) {
+          current.expanded = true;
+        }
+      }
+    },
   },
 });
 
-export const { setStarred, updateDashboardName } = navTreeSlice.actions;
+export const { setStarred, updateDashboardName, updateMenuTree } = navTreeSlice.actions;
 export const navTreeReducer = navTreeSlice.reducer;

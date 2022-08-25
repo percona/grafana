@@ -39,6 +39,7 @@ import {
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
   enrichConfigItems,
+  enrichWithClickDispatch,
   enrichWithInteractionTracking,
   getActiveItem,
   isMatchOrChildMatch,
@@ -54,6 +55,7 @@ export const NavBar = React.memo(() => {
   const navBarTree = useSelector((state: StoreState) => state.navBarTree);
   const theme = useTheme2();
   const styles = getStyles(theme);
+  const dispatchOffset = theme.transitions.duration.standard;
   const location = useLocation();
   const dispatch = useDispatch();
   const kiosk = getKioskMode();
@@ -94,15 +96,19 @@ export const NavBar = React.memo(() => {
 
   const coreItems = navTree
     .filter((item) => item.section === NavSection.Core)
-    .map((item) => enrichWithInteractionTracking(item, menuOpen));
+    .map((item) => enrichWithInteractionTracking(item, menuOpen))
+    .map((item) => enrichWithClickDispatch(item, dispatch, dispatchOffset));
   const pluginItems = navTree
     .filter((item) => item.section === NavSection.Plugin)
-    .map((item) => enrichWithInteractionTracking(item, menuOpen));
+    .map((item) => enrichWithInteractionTracking(item, menuOpen))
+    .map((item) => enrichWithClickDispatch(item, dispatch, dispatchOffset));
   const configItems = enrichConfigItems(
     navTree.filter((item) => item.section === NavSection.Config),
     location,
     toggleSwitcherModal
-  ).map((item) => enrichWithInteractionTracking(item, menuOpen));
+  )
+    .map((item) => enrichWithInteractionTracking(item, menuOpen))
+    .map((item) => enrichWithClickDispatch(item, dispatch, dispatchOffset));
 
   const activeItem = isSearchActive(location) ? searchItem : getActiveItem(navTree, location.pathname);
 
