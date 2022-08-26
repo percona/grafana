@@ -13,7 +13,15 @@ export const MultipleActions: FC<MultipleActionsProps> = ({ actions, disabled, d
 
   const Toggle = React.forwardRef<HTMLButtonElement>((props, ref) => (
     <span className={styles.iconWrapper}>
-      <IconButton name="ellipsis-v" size="xl" disabled={disabled} data-testid={dataTestId} ref={ref} {...props} />
+      <IconButton
+        name="ellipsis-v"
+        size="xl"
+        disabled={disabled}
+        data-testid={dataTestId}
+        ref={ref}
+        className={styles.icon}
+        {...props}
+      />
     </span>
   ));
 

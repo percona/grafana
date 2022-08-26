@@ -1,10 +1,12 @@
 import { css } from '@emotion/css';
-import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
+export const getStyles = () => ({
   buttonWrapper: css`
     display: flex;
     justify-content: center;
     align-items: center;
+  `,
+  icon: css`
+    margin-right: 0;
   `,
 });

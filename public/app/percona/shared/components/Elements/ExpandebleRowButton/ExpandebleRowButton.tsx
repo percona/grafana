@@ -8,9 +8,9 @@ export const ExpandebleRowButton = ({ row }: ExpandebleButtonProps) => {
   return (
     <span className={styles.buttonWrapper} {...expandedRowProps}>
       {row.isExpanded ? (
-        <IconButton data-testid="hide-row-details" size="xl" name="arrow-up" />
+        <IconButton data-testid="hide-row-details" size="xl" name="arrow-up" className={styles.icon} />
       ) : (
-        <IconButton data-testid="show-row-details" size="xl" name="arrow-down" />
+        <IconButton data-testid="show-row-details" size="xl" name="arrow-down" className={styles.icon} />
       )}
     </span>
   );
