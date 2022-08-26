@@ -28,6 +28,7 @@ import { SettingsService } from 'app/percona/settings/Settings.service';
 import { ServerInfo } from './types';
 import { DBClusterTopology } from 'app/percona/dbaas/components/DBCluster/AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import { SETTINGS_TIMEOUT } from './constants';
+import { UserDetailsResponse } from '../services/user/User.types';
 
 const toSettingsModel = (response: SettingsPayload): Settings => ({
   awsPartitions: response.aws_partitions,
@@ -394,6 +395,56 @@ export const fetchServerSaasHostAction = createAsyncThunk(
     )
 );
 
+export interface UserDetails {
+  userId: number;
+  productTourCompleted: boolean;
+}
+
+const userDetailsInitialState: UserDetails = {
+  userId: 0,
+  productTourCompleted: false,
+};
+
+const toUserDetailsModel = (res: UserDetailsResponse): UserDetails => ({
+  userId: res.user_id,
+  productTourCompleted: !!res.product_tour_completed,
+});
+
+export const userDetailsSlice = createSlice({
+  name: 'userDetails',
+  initialState: userDetailsInitialState,
+  reducers: {
+    setUserDetails: (state, action: PayloadAction<UserDetails>) => ({
+      ...state,
+      ...action.payload,
+    }),
+  },
+});
+
+const { setUserDetails } = userDetailsSlice.actions;
+
+export const userDetailsReducers = userDetailsSlice.reducer;
+
+export const fetchUserDetailsAction = createAsyncThunk(
+  'percona/fetchUserDetails',
+  async (_, thunkAPI): Promise<UserDetails> => {
+    const res = await UserService.getUserDetails();
+    const details = toUserDetailsModel(res);
+    thunkAPI.dispatch(setUserDetails(details));
+    return details;
+  }
+);
+
+export const setProductTourCompleted = createAsyncThunk(
+  'percona/setProductTourCompleted',
+  async (productTourCompleted: boolean, thunkAPI): Promise<UserDetails> => {
+    const res = await UserService.setProductTourCompleted(productTourCompleted);
+    const details = toUserDetailsModel(res);
+    thunkAPI.dispatch(setUserDetails(details));
+    return details;
+  }
+);
+
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
 const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesAction).reducer;
@@ -416,5 +467,6 @@ export default {
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbClusters: dbClustersReducer,
     server: perconaServerReducers,
+    userDetails: userDetailsReducers,
   }),
 };

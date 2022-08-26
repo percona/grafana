@@ -1,16 +1,16 @@
 import React, { FC } from 'react';
 import { Button, IconButton } from '@grafana/ui';
 import { BtnFnProps } from '@reactour/tour/dist/types';
-import { useLocalStorage } from 'react-use';
-import { PERCONA_TOUR_FLAG } from './constants';
+import { useAppDispatch } from 'app/store/store';
+import { setProductTourCompleted } from 'app/percona/shared/core/reducers';
 
 const NextButton: FC<BtnFnProps> = ({ currentStep, setCurrentStep, stepsLength, setIsOpen }) => {
   const lastStep = currentStep === stepsLength - 1;
-  const [, setShowTour] = useLocalStorage<boolean>(PERCONA_TOUR_FLAG, true);
+  const dispatch = useAppDispatch();
 
   const onDone = () => {
     setIsOpen(false);
-    setShowTour(false);
+    dispatch(setProductTourCompleted(true));
   };
 
   const onNext = () => setCurrentStep((step) => (step === stepsLength - 1 ? step : step + 1));

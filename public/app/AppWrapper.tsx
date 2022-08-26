@@ -1,10 +1,9 @@
 import React, { ComponentType } from 'react';
 import { Router, Route, Redirect, Switch } from 'react-router-dom';
 import { config, locationService, navigationLogger } from '@grafana/runtime';
-import { TourProvider } from '@reactour/tour';
 import { Provider } from 'react-redux';
 import { store } from 'app/store/store';
-import { ErrorBoundaryAlert, GlobalStyles, ModalRoot, ModalsProvider, getTheme } from '@grafana/ui';
+import { ErrorBoundaryAlert, GlobalStyles, ModalRoot, ModalsProvider } from '@grafana/ui';
 import { GrafanaApp } from './app';
 import { getAppRoutes } from 'app/routes/routes';
 import { ConfigContext, ThemeProvider } from './core/utils/ConfigProvider';
@@ -18,11 +17,7 @@ import { SearchWrapper } from 'app/features/search';
 import { LiveConnectionWarning } from './features/live/LiveConnectionWarning';
 import { AngularRoot } from './angular/AngularRoot';
 import { PerconaBootstrapper } from 'app/percona/shared/components/PerconaBootstrapper';
-import getSteps from './tour/steps';
-import Close from './tour/Close';
-import Navigation from './tour/Navigation';
-import { PERCONA_TOUR_FLAG } from './tour/constants';
-import { isPmmAdmin } from './percona/shared/helpers/permissions';
+import PerconaTourProvider from './tour/TourProvider';
 
 interface AppWrapperProps {
   app: GrafanaApp;
@@ -109,24 +104,7 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                 <GlobalStyles />
                 <div className="grafana-app">
                   <Router history={locationService.getHistory()}>
-                    <TourProvider
-                      steps={getSteps(isPmmAdmin(contextSrv.user))}
-                      components={{ Close, Navigation }}
-                      showBadge={false}
-                      badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
-                      disableFocusLock
-                      onClickClose={({ setIsOpen }) => {
-                        localStorage.setItem(PERCONA_TOUR_FLAG, 'false');
-                        setIsOpen(false);
-                      }}
-                      className="pmm-tour"
-                      styles={{
-                        popover: (base) => ({
-                          ...base,
-                          backgroundColor: getTheme(config.bootData.user.lightTheme ? 'light' : 'dark').colors.bg1,
-                        }),
-                      }}
-                    >
+                    <PerconaTourProvider>
                       <PerconaBootstrapper />
                       {newNavigationEnabled ? <NavBarNext /> : <NavBar />}
                       <main className="main-view">
@@ -142,7 +120,7 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                           <Hook key={index.toString()} />
                         ))}
                       </main>
-                    </TourProvider>
+                    </PerconaTourProvider>
                   </Router>
                 </div>
                 <LiveConnectionWarning />
