@@ -9,7 +9,7 @@ import { Messages } from './BackupInventoryActions.messages';
 import { getStyles } from './BackupInventoryActions.styles';
 import { BackupInventoryActionsProps } from './BackupInventoryActions.types';
 import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
-import { ExpandebleRowButton } from './components/ExpandebleRowButton';
+import { ExpandebleRowButton } from 'app/percona/shared/components/Elements/ExpandebleRowButton/ExpandebleRowButton';
 
 export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
   row,
@@ -60,8 +60,8 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
 
   return (
     <div className={styles.actionsWrapper}>
-      <ExpandebleRowButton row={row} />
       <MultipleActions actions={getActions} dataTestId="dbcluster-actions" />
+      <ExpandebleRowButton row={row} />
     </div>
   );
 };

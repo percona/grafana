@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme } from '@grafana/data';
 
-export const getStyles = ({ colors }: GrafanaTheme) => ({
+export const getStyles = ({ colors, spacing }: GrafanaTheme) => ({
   disabledButton: css`
     color: ${colors.formInputDisabledText};
     background-color: ${colors.dropdownBg};
@@ -16,5 +16,6 @@ export const getStyles = ({ colors }: GrafanaTheme) => ({
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: ${spacing.xs};
   `,
 });
