@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
-
-import { Icon, Spinner, Switch, useStyles } from '@grafana/ui';
+import { Icon, Spinner, Switch, useStyles2 } from '@grafana/ui';
 import { getStyles } from './ScheduledBackupsActions.styles';
 import { ScheduledBackupsActionsProps } from './ScheduledBackupsActions.types';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
@@ -15,7 +14,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
   onToggle = () => {},
   pending,
 }) => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const handleEdit = () => onEdit(backup);
   const handleDelete = () => onDelete(backup);
   const handleCopy = () => onCopy(backup);

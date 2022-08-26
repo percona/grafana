@@ -1,13 +1,13 @@
 /* eslint-disable react/display-name */
-import { logger } from '@percona/platform-core';
 import { CancelToken } from 'axios';
 import React, { FC, useMemo, useState, useEffect, useCallback } from 'react';
 import { Column, Row } from 'react-table';
 
-import { Button, useStyles } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
+import { Button, useStyles2 } from '@grafana/ui';
+import { logger } from '@percona/platform-core';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -111,7 +111,7 @@ export const BackupInventory: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
 
   const onRestoreClick = (backup: Backup) => {
     setSelectedBackup(backup);
