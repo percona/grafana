@@ -93,7 +93,7 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
     },
     {
       id: 'storage-locations',
-      text: 'Settings',
+      text: 'Storage Locations',
       url: `${config.appSubUrl}/backup/locations`,
       hideFromMenu: true,
     },
