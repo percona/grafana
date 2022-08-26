@@ -38,7 +38,6 @@ import { CancelToken } from 'axios';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 import { GET_CLUSTERS_CANCEL_TOKEN } from './DBCluster.constants';
 import { useAppDispatch } from 'app/store/store';
-import { AddDBClusterFields } from './AddDBClusterModal/AddDBClusterModal.types';
 import { logger } from '@sentry/utils';
 
 export const DBCluster: FC = () => {

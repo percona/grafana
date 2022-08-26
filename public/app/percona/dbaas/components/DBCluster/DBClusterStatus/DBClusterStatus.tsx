@@ -18,7 +18,7 @@ export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelect
   const { status, totalSteps = 0, finishedSteps = 0, message } =
     Object.keys(clusters).length && dbCluster.id
       ? clusters[dbCluster.id]
-      : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
+      : { status: Status.unknown, totalSteps: 0, finishedSteps: 0, message: '' };
   const styles = useStyles2(getStyles);
   const prevStatus = useRef<Status>();
   const statusError = status === Status.failed || status === Status.invalid;
