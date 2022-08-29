@@ -7,7 +7,7 @@ export const PMMServerUrlWarning: FC = () => (
     <p>
       This will also set &quot;Public Address&quot; as {window.location.host}.<br></br>
       If you need to set it differently or edit later, use{' '}
-      <Link to="/settings/advanced-settings">Advanced Settings</Link>
+      <Link to="/settings/advanced-settings">Advanced Settings</Link>.
     </p>
   </Alert>
 );
