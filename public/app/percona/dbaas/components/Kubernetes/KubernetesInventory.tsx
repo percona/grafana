@@ -82,7 +82,7 @@ export const KubernetesInventory: FC = () => {
             element={element}
             setSelectedCluster={setSelectedCluster}
             setOperatorToUpdate={setOperatorToUpdate}
-            setUpdateOperatorModalVisible={setAddModalVisible}
+            setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
           />
         ),
       },
