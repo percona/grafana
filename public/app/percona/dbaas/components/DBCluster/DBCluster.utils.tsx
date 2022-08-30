@@ -92,7 +92,6 @@ const clustersToModel = (clusters: DBClusterListPayload[], kubernetes: Kubernete
       installedImage: dbCluster.installed_image,
       availableImage: dbCluster.available_image,
     };
-    // return newDBClusterService(database).toModel(cluster, kubernetes[index].kubernetesClusterName, database);
   });
 
 export const formatDBClusters = (results: any[], kubernetes: Kubernetes[]) => {
