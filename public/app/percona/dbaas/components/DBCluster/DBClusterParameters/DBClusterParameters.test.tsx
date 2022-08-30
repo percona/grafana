@@ -1,7 +1,7 @@
 import React from 'react';
 import { DBClusterParameters } from './DBClusterParameters';
 import { dbClustersStub } from '../__mocks__/dbClustersStubs';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from 'app/store/configureStore';
 import { DBClusterDetails, DBClusterStatus } from '../DBCluster.types';
@@ -30,6 +30,7 @@ describe('DBClusterParameters::', () => {
                   disk: 1000,
                   status: DBClusterStatus.ready,
                   message: 'Ready',
+                  expose: true,
                 },
               } as DBClusterDetails,
             },
@@ -40,7 +41,7 @@ describe('DBClusterParameters::', () => {
       </Provider>
     );
 
-    expect(screen.getByTestId('cluster-parameters-cluster-name')).toBeInTheDocument();
+    await waitFor(() => screen.getByTestId('cluster-parameters-cluster-name'));
 
     const memory = screen.getByTestId('cluster-parameters-memory');
     const cpu = screen.getByTestId('cluster-parameters-cpu');
@@ -48,11 +49,11 @@ describe('DBClusterParameters::', () => {
     const expose = screen.getByTestId('cluster-parameters-expose');
 
     expect(memory).toBeInTheDocument();
-    expect(memory).toHaveTextContent('Memory:1024 GB');
+    expect(memory).toHaveTextContent('Memory:1000 GB');
     expect(cpu).toBeInTheDocument();
     expect(cpu).toHaveTextContent('CPU:1');
     expect(disk).toBeInTheDocument();
-    expect(disk).toHaveTextContent('Disk:25 GB');
+    expect(disk).toHaveTextContent('Disk:1000 GB');
     expect(expose).toBeInTheDocument();
     expect(expose).toHaveTextContent('External Access:Enabled');
   });
@@ -71,8 +72,8 @@ describe('DBClusterParameters::', () => {
                   databaseType: 'mongodb',
                   clusterSize: 1,
                   memory: 1000,
-                  cpu: 1000,
-                  disk: 1000,
+                  cpu: 300,
+                  disk: 15,
                   status: DBClusterStatus.ready,
                   message: 'Ready',
                 },
@@ -85,7 +86,7 @@ describe('DBClusterParameters::', () => {
       </Provider>
     );
 
-    expect(screen.getByTestId('cluster-parameters-cluster-name')).toBeInTheDocument();
+    await waitFor(() => screen.getByTestId('cluster-parameters-cluster-name'));
 
     const memory = screen.getByTestId('cluster-parameters-memory');
     const cpu = screen.getByTestId('cluster-parameters-cpu');
@@ -93,11 +94,11 @@ describe('DBClusterParameters::', () => {
     const expose = screen.getByTestId('cluster-parameters-expose');
 
     expect(memory).toBeInTheDocument();
-    expect(memory).toHaveTextContent('Memory:0 GB');
+    expect(memory).toHaveTextContent('Memory:1000 GB');
     expect(cpu).toBeInTheDocument();
-    expect(cpu).toHaveTextContent('CPU:0');
+    expect(cpu).toHaveTextContent('CPU:300');
     expect(disk).toBeInTheDocument();
-    expect(disk).toHaveTextContent('Disk:25 GB');
+    expect(disk).toHaveTextContent('Disk:15 GB');
     expect(expose).toBeInTheDocument();
     expect(expose).toHaveTextContent('External Access:Disabled');
   });
