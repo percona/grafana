@@ -16,13 +16,9 @@ export const UserService = {
     );
     return is_platform_user;
   },
-  async getUserDetails(): Promise<UserDetailsResponse> {
-    const res: UserDetailsResponse = await api.get('/v1/user');
-    return res;
-  },
+  getUserDetails: async (): Promise<UserDetailsResponse> => await api.get('/v1/user', true),
   async setProductTourCompleted(completed: boolean): Promise<UserDetailsResponse> {
     const payload: UserDetailsPutPayload = { product_tour_completed: completed };
-    const res: UserDetailsResponse = await api.put('/v1/user', payload);
-    return res;
+    return await api.put('/v1/user', payload);
   },
 };
