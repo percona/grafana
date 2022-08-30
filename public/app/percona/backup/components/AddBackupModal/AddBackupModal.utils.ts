@@ -164,3 +164,6 @@ export const getDataModelFromVendor = (db: Databases): DataModel => {
   const logicalDbs = [Databases.mongodb];
   return logicalDbs.includes(db) ? DataModel.LOGICAL : DataModel.PHYSICAL;
 };
+
+export const isDataModelDisabled = (values: AddBackupFormProps) =>
+  values.service?.value?.vendor === Databases.mysql || values.mode === BackupMode.PITR;

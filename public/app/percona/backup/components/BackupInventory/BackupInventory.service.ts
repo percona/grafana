@@ -1,7 +1,7 @@
 import { DBServiceList, ServiceListPayload } from 'app/percona/inventory/Inventory.types';
 import { api } from 'app/percona/shared/helpers/api';
 import { CancelToken } from 'axios';
-import { BackupLogResponse, BackupLogs } from '../../Backup.types';
+import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
 import { Backup, BackupResponse } from './BackupInventory.types';
 
 const BASE_URL = '/v1/management/backup';
@@ -55,6 +55,7 @@ export const BackupInventoryService = {
     description: string,
     retryInterval: string,
     retryTimes: number,
+    dataModel: DataModel,
     token?: CancelToken
   ) {
     return api.post(
@@ -66,6 +67,7 @@ export const BackupInventoryService = {
         description,
         retry_interval: retryInterval,
         retries: retryTimes,
+        data_model: dataModel,
       },
       false,
       token
