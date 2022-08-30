@@ -67,7 +67,6 @@ describe('KubernetesInventory::', () => {
             settings: { loading: false, result: { isConnectedToPortal: true, dbaasEnabled: true } },
             kubernetes: {
               loading: false,
-              result: [],
             },
             addKubernetes: { loading: false },
             deleteKubernetes: { loading: false },
