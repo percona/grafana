@@ -96,12 +96,19 @@ const initialSettingsState: Settings = {
   isConnectedToPortal: false,
 };
 
-export interface PerconaUserState {
+export interface UserDetails {
+  userId: number;
+  productTourCompleted: boolean;
+}
+
+export interface PerconaUserState extends UserDetails {
   isAuthorized: boolean;
   isPlatformUser: boolean;
 }
 
 export const initialUserState: PerconaUserState = {
+  userId: 0,
+  productTourCompleted: true,
   isAuthorized: false,
   isPlatformUser: false,
 };
@@ -118,10 +125,14 @@ const perconaUserSlice = createSlice({
       ...state,
       isPlatformUser: action.payload,
     }),
+    setUserDetails: (state, action: PayloadAction<UserDetails>) => ({
+      ...state,
+      ...action.payload,
+    }),
   },
 });
 
-export const { setAuthorized, setIsPlatformUser } = perconaUserSlice.actions;
+export const { setAuthorized, setIsPlatformUser, setUserDetails } = perconaUserSlice.actions;
 
 export const fetchUserStatusAction = createAsyncThunk(
   'percona/fetchUserStatus',
@@ -395,35 +406,10 @@ export const fetchServerSaasHostAction = createAsyncThunk(
     )
 );
 
-export interface UserDetails {
-  userId: number;
-  productTourCompleted: boolean;
-}
-
-const userDetailsInitialState: UserDetails = {
-  userId: 0,
-  productTourCompleted: false,
-};
-
 const toUserDetailsModel = (res: UserDetailsResponse): UserDetails => ({
   userId: res.user_id,
   productTourCompleted: !!res.product_tour_completed,
 });
-
-export const userDetailsSlice = createSlice({
-  name: 'userDetails',
-  initialState: userDetailsInitialState,
-  reducers: {
-    setUserDetails: (state, action: PayloadAction<UserDetails>) => ({
-      ...state,
-      ...action.payload,
-    }),
-  },
-});
-
-const { setUserDetails } = userDetailsSlice.actions;
-
-export const userDetailsReducers = userDetailsSlice.reducer;
 
 export const fetchUserDetailsAction = createAsyncThunk(
   'percona/fetchUserDetails',
@@ -467,6 +453,5 @@ export default {
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbClusters: dbClustersReducer,
     server: perconaServerReducers,
-    userDetails: userDetailsReducers,
   }),
 };
