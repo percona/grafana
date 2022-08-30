@@ -13,14 +13,10 @@ import { Field, withTypes } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
+
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
-import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
-import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
-
-import { BackupMode, DataModel } from '../../Backup.types';
-import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
 
 import {
   DATA_MODEL_OPTIONS,
@@ -47,6 +43,10 @@ import {
   isDataModelDisabled,
 } from './AddBackupModal.utils';
 import { RetryModeSelector } from './RetryModeSelector';
+import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
+import { BackupMode, DataModel } from '../../Backup.types';
+import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
 
 export const AddBackupModal: FC<AddBackupModalProps> = ({
   backup,
