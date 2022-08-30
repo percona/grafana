@@ -8,7 +8,6 @@ import { Button, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
-import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -42,7 +41,6 @@ export const StorageLocations: FC = () => {
         accessor: 'name',
         id: 'name',
         width: '315px',
-        Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
         Header: Messages.storageLocations.table.columns.type,
@@ -57,9 +55,14 @@ export const StorageLocations: FC = () => {
         Header: Messages.storageLocations.table.columns.actions,
         accessor: 'locationID',
         Cell: ({ row }) => (
-          <StorageLocationsActions onUpdate={handleUpdate} onDelete={onDeleteCLick} location={row.original} />
+          <StorageLocationsActions
+            row={row}
+            onUpdate={handleUpdate}
+            onDelete={onDeleteCLick}
+            location={row.original as StorageLocation}
+          />
         ),
-        width: '130px',
+        width: '100px',
       },
     ],
     []
@@ -156,13 +159,14 @@ export const StorageLocations: FC = () => {
               size="md"
               icon="plus-square"
               fill="text"
+              variant="primary"
               data-testid="storage-location-add-modal-button"
               onClick={() => {
                 setSelectedLocation(null);
                 setAddModalVisible(true);
               }}
             >
-              {Messages.add}
+              {Messages.addStorageLocation}
             </Button>
           </div>
           <Table

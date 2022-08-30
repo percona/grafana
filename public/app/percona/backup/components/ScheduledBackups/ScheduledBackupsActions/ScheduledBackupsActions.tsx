@@ -59,7 +59,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
           <span>
             <Switch value={backup.enabled} onClick={handleToggle} data-testid="toggle-scheduled-backpup" />
           </span>
-          <MultipleActions actions={getActions} dataTestId="dbcluster-actions" />
+          <MultipleActions actions={getActions} dataTestId="scheduled-backups-actions" />
           <ExpandebleRowButton row={row} />
         </>
       )}

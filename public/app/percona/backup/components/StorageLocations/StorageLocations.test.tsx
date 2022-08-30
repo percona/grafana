@@ -1,9 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
-import { Provider } from 'react-redux';
-
-import { configureStore } from 'app/store/configureStore';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { StoreState } from 'app/types';
+import { configureStore } from 'app/store/configureStore';
+import { Provider } from 'react-redux';
 
 import { StorageLocations } from './StorageLocations';
 import { StorageLocationsService } from './StorageLocations.service';
@@ -28,11 +27,12 @@ describe('StorageLocations', () => {
     );
 
     await screen.findByText('first location');
-    expect(screen.queryByText('Delete Storage Location')).toBeFalsy();
+    const btn = screen.getAllByTestId('dropdown-menu-toggle')[0];
+    await waitFor(() => fireEvent.click(btn));
+    const deleteBtn = screen.getAllByTestId('dropdown-button')[1];
+    await waitFor(() => fireEvent.click(deleteBtn));
 
-    fireEvent.click(screen.getAllByTestId('delete-storage-location-button')[0]);
-
-    expect(screen.getByText('Delete Storage Location')).toBeTruthy();
+    expect(screen.getByText(/Are you sure you want to delete the Storage Location/i)).toBeTruthy();
   });
 
   it('should close delete modal after deletion confirmation', async () => {
@@ -52,7 +52,10 @@ describe('StorageLocations', () => {
 
     await screen.findByText('first location');
 
-    fireEvent.click(screen.getAllByTestId('delete-storage-location-button')[0]);
+    const btn = screen.getAllByTestId('dropdown-menu-toggle')[0];
+    await waitFor(() => fireEvent.click(btn));
+    const deleteBtn = screen.getAllByTestId('dropdown-button')[1];
+    await waitFor(() => fireEvent.click(deleteBtn));
 
     expect(screen.getByText('Delete Storage Location')).toBeTruthy();
     fireEvent.submit(screen.getByTestId('confirm-delete-modal-button'));

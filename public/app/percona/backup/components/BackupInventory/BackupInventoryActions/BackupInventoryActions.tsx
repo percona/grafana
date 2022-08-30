@@ -60,7 +60,7 @@ export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
 
   return (
     <div className={styles.actionsWrapper}>
-      <MultipleActions actions={getActions} dataTestId="dbcluster-actions" />
+      <MultipleActions actions={getActions} dataTestId="backup-inventory-actions" />
       <ExpandebleRowButton row={row} />
     </div>
   );
