@@ -9,7 +9,7 @@ import { Messages } from './BackupInventoryActions.messages';
 import { getStyles } from './BackupInventoryActions.styles';
 import { BackupInventoryActionsProps } from './BackupInventoryActions.types';
 import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
-import { ExpandebleRowButton } from 'app/percona/shared/components/Elements/ExpandebleRowButton/ExpandebleRowButton';
+import { ExpandebleRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
 
 export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
   row,
