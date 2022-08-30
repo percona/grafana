@@ -84,7 +84,7 @@ export const AlertRuleTemplate: FC = () => {
               <br />
               {row.original.created_at && (
                 <span className={styles.dateWrapper}>
-                  Created at: {format(new Date(row.original.created_at), 'YYYY-MM-DD')}
+                  Created at: {format(new Date(row.original.created_at), 'yyyy-MM-dd')}
                 </span>
               )}
             </div>
