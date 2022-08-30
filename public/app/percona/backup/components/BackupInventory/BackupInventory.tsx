@@ -18,7 +18,7 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages } from '../../Backup.messages';
-import { BackupService } from '../../Backup.service';
+import { RetryMode } from '../../Backup.types';
 import { formatBackupMode } from '../../Backup.utils';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
 import { AddBackupModal } from '../AddBackupModal';
@@ -206,9 +206,29 @@ export const BackupInventory: FC = () => {
     setBackupModalVisible(true);
   };
 
-  const handleBackup = async (values: AddBackupFormProps) => {
+  const handleBackup = async ({
+    service,
+    location,
+    backupName,
+    description,
+    retryMode,
+    retryInterval,
+    retryTimes,
+    dataModel,
+  }: AddBackupFormProps) => {
+    const strRetryInterval = `${retryInterval}s`;
+    let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
     try {
-      await BackupService.backup(values, generateToken(BACKUP_CANCEL_TOKEN));
+      await BackupInventoryService.backup(
+        service!.value?.id || '',
+        location!.value || '',
+        backupName,
+        description,
+        strRetryInterval,
+        resultRetryTimes!,
+        dataModel,
+        generateToken(BACKUP_CANCEL_TOKEN)
+      );
       setBackupModalVisible(false);
       setSelectedBackup(null);
       setBackupErrors([]);
