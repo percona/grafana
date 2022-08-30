@@ -1,0 +1,626 @@
+[
+  {
+    "id": "create",
+    "text": "Create",
+    "section": "core",
+    "icon": "plus",
+    "url": "/graph/dashboard/new",
+    "sortWeight": -1900,
+    "children": [
+      {
+        "text": "Dashboard",
+        "icon": "apps",
+        "url": "/graph/dashboard/new"
+      },
+      {
+        "id": "folder",
+        "text": "Folder",
+        "subTitle": "Create a new folder to organize your dashboards",
+        "icon": "folder-plus",
+        "url": "/graph/dashboards/folder/new"
+      },
+      {
+        "id": "import",
+        "text": "Import",
+        "subTitle": "Import dashboard from file or Grafana.com",
+        "icon": "import",
+        "url": "/graph/dashboard/import"
+      },
+      {
+        "id": "alert",
+        "text": "Alert rule",
+        "subTitle": "Create an alert rule",
+        "icon": "bell",
+        "url": "/graph/alerting/new"
+      }
+    ]
+  },
+  {
+    "id": "dashboards",
+    "text": "Dashboards",
+    "section": "core",
+    "subTitle": "Manage dashboards and folders",
+    "icon": "apps",
+    "url": "/graph/",
+    "sortWeight": -1800,
+    "children": [
+      {
+        "id": "home",
+        "text": "Home",
+        "icon": "home-alt",
+        "url": "/graph/",
+        "hideFromTabs": true
+      },
+      {
+        "id": "divider",
+        "text": "Divider",
+        "divider": true,
+        "hideFromTabs": true
+      },
+      {
+        "id": "manage-dashboards",
+        "text": "Browse",
+        "icon": "sitemap",
+        "url": "/graph/dashboards"
+      },
+      {
+        "id": "playlists",
+        "text": "Playlists",
+        "icon": "presentation-play",
+        "url": "/graph/playlists"
+      },
+      {
+        "id": "snapshots",
+        "text": "Snapshots",
+        "icon": "camera",
+        "url": "/graph/dashboard/snapshots"
+      },
+      {
+        "id": "library-panels",
+        "text": "Library panels",
+        "icon": "library-panel",
+        "url": "/graph/library-panels"
+      }
+    ]
+  },
+  {
+    "id": "system",
+    "text": "System",
+    "section": "core",
+    "icon": "percona-system",
+    "url": "/graph/d/node-instance-overview/nodes-overview",
+    "hideFromTabs": true,
+    "sortWeight": -1800,
+    "children": [
+      {
+        "id": "node-overview",
+        "text": "Overview",
+        "icon": "percona-nav-overview",
+        "url": "/graph/d/node-instance-overview/nodes-overview",
+        "showIconInNavbar": true,
+        "hideFromTabs": true
+      },
+      {
+        "id": "node-summary",
+        "text": "Summary",
+        "icon": "percona-nav-summary",
+        "url": "/graph/d/node-instance-summary/node-summary",
+        "showIconInNavbar": true,
+        "hideFromTabs": true
+      },
+      {
+        "id": "cpu-utilization",
+        "text": "CPU Utilization",
+        "icon": "percona-cpu",
+        "url": "/graph/d/node-cpu/cpu-utilization-details",
+        "hideFromTabs": true
+      },
+      {
+        "id": "disk",
+        "text": "Disk",
+        "icon": "percona-disk",
+        "url": "/graph/d/node-disk/disk-details",
+        "hideFromTabs": true
+      },
+      {
+        "id": "memory",
+        "text": "Memory",
+        "icon": "percona-memory",
+        "url": "/graph/d/node-memory/memory-details",
+        "hideFromTabs": true
+      },
+      {
+        "id": "network",
+        "text": "Network",
+        "icon": "percona-network",
+        "url": "/graph/d/node-network/network-details",
+        "hideFromTabs": true
+      },
+      {
+        "id": "temperature",
+        "text": "Temperature",
+        "icon": "percona-temperature",
+        "url": "/graph/d/node-temp/node-temperature-details",
+        "hideFromTabs": true
+      },
+      {
+        "id": "numa",
+        "text": "NUMA",
+        "icon": "percona-cluster-network",
+        "url": "/graph/d/node-memory-numa/numa-details",
+        "hideFromTabs": true
+      },
+      {
+        "id": "processes",
+        "text": "Processes",
+        "icon": "percona-process",
+        "url": "/graph/d/node-cpu-process/processes-details",
+        "hideFromTabs": true
+      }
+    ]
+  },
+  {
+    "id": "mysql",
+    "text": "MySQL",
+    "section": "core",
+    "icon": "percona-database-1",
+    "url": "/graph/d/mysql-instance-overview/mysql-instances-overview",
+    "hideFromTabs": true,
+    "showIconInNavbar": true,
+    "children": [
+      {
+        "id": "mysql-overview",
+        "text": "Overview",
+        "icon": "percona-nav-overview",
+        "url": "/graph/d/mysql-instance-overview/mysql-instances-overview",
+        "showIconInNavbar": true,
+        "hideFromTabs": true
+      },
+      {
+        "id": "mysql-summary",
+        "text": "Summary",
+        "icon": "percona-nav-summary",
+        "url": "/graph/d/mysql-instance-summary/mysql-instances-summary",
+        "showIconInNavbar": true,
+        "hideFromTabs": true
+      },
+      {
+        "id": "mysql-ha",
+        "text": "High Availability",
+        "icon": "percona-cluster",
+        "hideFromTabs": true,
+        "children": [
+          {
+            "id": "mysql-group-replication-summary",
+            "text": "Group Replication Summary",
+            "icon": "percona-cluster",
+            "url": "/graph/d/mysql-group-replicaset-summary/mysql-group-replication-summary",
+            "hideFromTabs": true
+          },
+          {
+            "id": "mysql-replication-summary",
+            "text": "Replication Summary",
+            "icon": "percona-cluster",
+            "url": "/graph/d/mysql-replicaset-summary/mysql-replication-summary",
+            "hideFromTabs": true
+          },
+          {
+            "id": "pxc-cluster-summary",
+            "text": "PXC/Galera Cluster Summary",
+            "icon": "percona-cluster",
+            "url": "/graph/d/pxc-cluster-summary/pxc-galera-cluster-summary",
+            "hideFromTabs": true
+          },
+          {
+            "id": "pxc-node-summary",
+            "text": "PXC/Galera Node Summary",
+            "icon": "percona-cluster",
+            "url": "/graph/d/pxc-node-summary/pxc-galera-node-summary",
+            "hideFromTabs": true
+          },
+          {
+            "id": "pxc-nodes-compare",
+            "text": "PXC/Galera Nodes Compare",
+            "icon": "percona-cluster",
+            "url": "/graph/d/pxc-nodes-compare/pxc-galera-nodes-compare",
+            "hideFromTabs": true
+          }
+        ]
+      },
+      {
+        "id": "mysql-overview",
+        "text": "MySQL Overview",
+        "icon": "percona-cluster-network",
+        "url": "/graph/d/mysql-instance-overview/mysql-instances-overview",
+        "hideFromTabs": true
+      },
+      {
+        "id": "mysql-command-handler-counters-compare",
+        "text": "MySQL Command/Handler Counters Compare",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-commandhandler-compare/mysql-command-handler-counters-compare"
+      },
+      {
+        "id": "mysql-innodb-compression-details",
+        "text": "MySQL InnoDB Compression Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-innodb-compression/mysql-innodb-compression-details"
+      },
+      {
+        "id": "mysql-innodb-details",
+        "text": "MySQL InnoDB Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-innodb/mysql-innodb-details"
+      },
+      {
+        "id": "mysql-performance-schema-details",
+        "text": "MySQL Performance Schema Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-performance-schema/mysql-performance-schema-details"
+      },
+      {
+        "id": "mysql-query-response-time-details",
+        "text": "MySQL Query Response Time Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-queryresponsetime/mysql-query-response-time-details"
+      },
+      {
+        "id": "mysql-table-details",
+        "text": "MySQL Table Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-table/mysql-table-details"
+      },
+      {
+        "id": "mysql-tokudb-details",
+        "text": "MySQL TokuDB Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-tokudb/mysql-tokudb-details"
+      },
+      {
+        "id": "mysql-user-details",
+        "text": "MySQL User Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-user/mysql-user-details"
+      },
+      {
+        "id": "mysql-wait-event-analyses-details",
+        "text": "MySQL Wait Event Analyses Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-waitevents-analysis/mysql-wait-event-analyses-details"
+      },
+      {
+        "id": "mysql-myisam-aria-details",
+        "text": "MySQL MyISAM/Aria Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-myisamaria/mysql-myisam-aria-details"
+      },
+      {
+        "id": "mysql-myrocks-details",
+        "text": "MySQL MyRocks Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-myrocks/mysql-myrocks-details"
+      },
+      {
+        "id": "mysql-amazon-aurora-details",
+        "text": "MySQL Amazon Aurora Details",
+        "icon": "sitemap",
+        "url": "/graph/d/mysql-amazonaurora/mysql-amazon-aurora-details"
+      }
+    ]
+  },
+  {
+    "id": "pmm",
+    "text": "PMM dashboards",
+    "section": "core",
+    "subTitle": "Manage dashboards & folders",
+    "icon": "percona-dashboard",
+    "url": "/graph/",
+    "sortWeight": -1800,
+    "children": [
+      {
+        "id": "mongo",
+        "text": "MongoDB",
+        "icon": "percona-database",
+        "url": "/graph/d/mongodb-instance-overview/mongodb-instances-overview",
+        "hideFromTabs": true,
+        "children": [
+          {
+            "id": "mongo-ha",
+            "text": "HA (High availability)",
+            "icon": "percona-cluster",
+            "hideFromTabs": true,
+            "children": [
+              {
+                "id": "mongo-cluster-summary",
+                "text": "MongoDB Cluster Summary",
+                "icon": "percona-cluster",
+                "url": "/graph/d/mongodb-cluster-summary/mongodb-cluster-summary",
+                "hideFromTabs": true
+              },
+              {
+                "id": "mongo-rplset-summary",
+                "text": "MongoDB ReplSet Summary",
+                "icon": "percona-cluster",
+                "url": "/graph/d/mongodb-replicaset-summary/mongodb-replset-summary",
+                "hideFromTabs": true
+              }
+            ]
+          },
+          {
+            "id": "mongo-overview",
+            "text": "MongoDB Overview",
+            "icon": "percona-cluster-network",
+            "url": "/graph/d/mongodb-instance-overview/mongodb-instances-overview",
+            "hideFromTabs": true
+          },
+          {
+            "id": "mongo-summary",
+            "text": "MongoDB Summary",
+            "icon": "percona-summary",
+            "url": "/graph/d/mongodb-instance-summary/mongodb-instance-summary",
+            "hideFromTabs": true,
+            "children": [
+              {
+                "id": "mongo-memory-details",
+                "text": "MongoDB InMemory Details",
+                "icon": "sitemap",
+                "url": "/graph/d/mongodb-inmemory/mongodb-inmemory-details",
+                "hideFromTabs": true
+              },
+              {
+                "id": "mongo-mmap-details",
+                "text": "MongoDB MMAPv1 Details",
+                "icon": "sitemap",
+                "url": "/graph/d/mongodb-mmapv1/mongodb-mmapv1-details",
+                "hideFromTabs": true
+              },
+              {
+                "id": "mondo-wiredtiger-details",
+                "text": "MongoDB WiredTiger Details",
+                "icon": "sitemap",
+                "url": "/graph/d/mongodb-wiredtiger/mongodb-wiredtiger-details",
+                "hideFromTabs": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "postgre",
+        "text": "PostgreSQL",
+        "icon": "percona-database",
+        "url": "/graph/d/postgresql-instance-overview/postgresql-instances-overview",
+        "hideFromTabs": true,
+        "children": [
+          {
+            "id": "postgre-overwiew",
+            "text": "PostgreSQL Overview",
+            "icon": "percona-cluster-network",
+            "url": "/graph/d/postgresql-instance-overview/postgresql-instances-overview",
+            "hideFromTabs": true
+          },
+          {
+            "id": "postgre-summary",
+            "text": "PostgreSQL Summary",
+            "icon": "percona-summary",
+            "url": "/graph/d/postgresql-instance-summary/postgresql-instances-summary",
+            "hideFromTabs": true
+          }
+        ]
+      },
+      {
+        "id": "proxysql",
+        "text": "ProxySQL",
+        "icon": "percona-database",
+        "url": "/graph/d/proxysql-instance-summary/proxysql-instance-summary",
+        "hideFromTabs": true
+      },
+      {
+        "id": "haproxy",
+        "text": "HAProxy",
+        "icon": "percona-database",
+        "url": "/graph/d/haproxy-instance-summary/haproxy-instance-summary",
+        "hideFromTabs": true
+      }
+    ]
+  },
+  {
+    "id": "qan",
+    "text": "Query Analytics (QAN)",
+    "section": "core",
+    "icon": "qan-logo",
+    "url": "/graph/d/pmm-qan/pmm-query-analytics",
+    "sortWeight": -1800,
+    "hideFromTabs": true
+  },
+  {
+    "id": "explore",
+    "text": "Explore",
+    "section": "core",
+    "subTitle": "Explore your data",
+    "icon": "compass",
+    "url": "/graph/explore",
+    "sortWeight": -1700
+  },
+  {
+    "id": "alerting",
+    "text": "Alerting",
+    "section": "core",
+    "subTitle": "Alert rules and notifications",
+    "icon": "bell",
+    "url": "/graph/alerting/list",
+    "sortWeight": -1600,
+    "children": [
+      {
+        "id": "alert-list",
+        "text": "Alert rules",
+        "icon": "list-ul",
+        "url": "/graph/alerting/list"
+      },
+      {
+        "id": "receivers",
+        "text": "Contact points",
+        "icon": "comment-alt-share",
+        "url": "/graph/alerting/notifications"
+      },
+      {
+        "id": "am-routes",
+        "text": "Notification policies",
+        "icon": "sitemap",
+        "url": "/graph/alerting/routes"
+      },
+      {
+        "id": "silences",
+        "text": "Silences",
+        "icon": "bell-slash",
+        "url": "/graph/alerting/silences"
+      },
+      {
+        "id": "groups",
+        "text": "Alert groups",
+        "icon": "layer-group",
+        "url": "/graph/alerting/groups"
+      },
+      {
+        "id": "alerting-admin",
+        "text": "Admin",
+        "icon": "cog",
+        "url": "/graph/alerting/admin"
+      }
+    ]
+  },
+  {
+    "id": "cfg",
+    "text": "Configuration",
+    "section": "core",
+    "subTitle": "Organization: Main Org.",
+    "icon": "cog",
+    "url": "/graph/datasources",
+    "sortWeight": -1400,
+    "children": [
+      {
+        "id": "datasources",
+        "text": "Data sources",
+        "description": "Add and configure data sources",
+        "icon": "database",
+        "url": "/graph/datasources"
+      },
+      {
+        "id": "users",
+        "text": "Users",
+        "description": "Manage org members",
+        "icon": "user",
+        "url": "/graph/org/users"
+      },
+      {
+        "id": "teams",
+        "text": "Teams",
+        "description": "Manage org groups",
+        "icon": "users-alt",
+        "url": "/graph/org/teams"
+      },
+      {
+        "id": "plugins",
+        "text": "Plugins",
+        "description": "View and configure plugins",
+        "icon": "plug",
+        "url": "/graph/plugins"
+      },
+      {
+        "id": "org-settings",
+        "text": "Preferences",
+        "description": "Organization preferences",
+        "icon": "sliders-v-alt",
+        "url": "/graph/org"
+      },
+      {
+        "id": "apikeys",
+        "text": "API keys",
+        "description": "Create & manage API keys",
+        "icon": "key-skeleton-alt",
+        "url": "/graph/org/apikeys"
+      }
+    ]
+  },
+  {
+    "id": "admin",
+    "text": "Server Admin",
+    "section": "core",
+    "subTitle": "Manage all users and orgs",
+    "icon": "shield",
+    "url": "/graph/admin/users",
+    "sortWeight": -1300,
+    "hideFromTabs": true,
+    "children": [
+      {
+        "id": "global-users",
+        "text": "Users",
+        "icon": "user",
+        "url": "/graph/admin/users"
+      },
+      {
+        "id": "global-orgs",
+        "text": "Orgs",
+        "icon": "building",
+        "url": "/graph/admin/orgs"
+      },
+      {
+        "id": "server-settings",
+        "text": "Settings",
+        "icon": "sliders-v-alt",
+        "url": "/graph/admin/settings"
+      },
+      {
+        "id": "admin-plugins",
+        "text": "Plugins",
+        "icon": "plug",
+        "url": "/graph/admin/plugins"
+      },
+      {
+        "id": "upgrading",
+        "text": "Stats and license",
+        "icon": "unlock",
+        "url": "/graph/admin/upgrading"
+      }
+    ]
+  },
+  {
+    "id": "profile",
+    "text": "admin",
+    "section": "config",
+    "img": "/graph/avatar/46d229b033af06a191ff2267bca9ae56",
+    "url": "/graph/profile",
+    "sortWeight": -1200,
+    "children": [
+      {
+        "id": "profile-settings",
+        "text": "Preferences",
+        "icon": "sliders-v-alt",
+        "url": "/graph/profile"
+      },
+      {
+        "id": "change-password",
+        "text": "Change password",
+        "icon": "lock",
+        "url": "/graph/profile/password"
+      },
+      {
+        "id": "sign-out",
+        "text": "Sign out",
+        "icon": "arrow-from-right",
+        "url": "/graph/logout",
+        "target": "_self",
+        "hideFromTabs": true
+      }
+    ]
+  },
+  {
+    "id": "help",
+    "text": "Help",
+    "section": "config",
+    "subTitle": "Grafana v8.3.10 (unknown-dev)",
+    "icon": "question-circle",
+    "url": "#",
+    "sortWeight": -1000
+  }
+]
