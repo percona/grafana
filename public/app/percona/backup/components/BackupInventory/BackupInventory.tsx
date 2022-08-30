@@ -179,9 +179,12 @@ export const BackupInventory: FC = () => {
     [getData, selectedBackup]
   );
 
-  const getLogs = async (startingChunk: number, offset: number, token?: CancelToken) => {
-    return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset, token);
-  };
+  const getLogs = useCallback(
+    async (startingChunk: number, offset: number, token?: CancelToken) => {
+      return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset, token);
+    },
+    [selectedBackup]
+  );
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<Backup>) => (
@@ -207,6 +210,7 @@ export const BackupInventory: FC = () => {
     retryMode,
     retryInterval,
     retryTimes,
+    dataModel,
   }: AddBackupFormProps) => {
     const strRetryInterval = `${retryInterval}s`;
     let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
@@ -218,6 +222,7 @@ export const BackupInventory: FC = () => {
         description,
         strRetryInterval,
         resultRetryTimes!,
+        dataModel,
         generateToken(BACKUP_CANCEL_TOKEN)
       );
       setBackupModalVisible(false);
