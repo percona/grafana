@@ -6,6 +6,7 @@ import { render, screen, waitForElementToBeRemoved } from '@testing-library/reac
 import { KubernetesInventory } from './KubernetesInventory';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from './OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
+import { KubernetesService } from './Kubernetes.service';
 
 jest.mock('app/core/app_events');
 jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
@@ -53,6 +54,11 @@ describe('KubernetesInventory::', () => {
   });
 
   it('shows portal k8s free cluster promoting message when user has no clusters', async () => {
+    jest.spyOn(KubernetesService, 'getKubernetes').mockImplementation(() =>
+      Promise.resolve({
+        kubernetes_clusters: [],
+      })
+    );
     render(
       <Provider
         store={configureStore({
@@ -71,6 +77,8 @@ describe('KubernetesInventory::', () => {
       </Provider>
     );
 
+    expect(screen.queryByTestId('pmm-server-promote-portal-k8s-cluster-message')).not.toBeInTheDocument();
+    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
     expect(screen.getByTestId('pmm-server-promote-portal-k8s-cluster-message')).toBeInTheDocument();
   });
 });
