@@ -13,7 +13,6 @@ describe('AddStorageLocationUtils', () => {
         type: LocationType.S3,
         endpoint: '',
         client: '',
-        server: '',
         accessKey: '',
         secretKey: '',
         bucketName: '',
@@ -41,7 +40,6 @@ describe('AddStorageLocationUtils', () => {
         accessKey: location.accessKey,
         secretKey: location.secretKey,
         client: '',
-        server: '',
         bucketName: 'bucket',
       });
     });
@@ -62,7 +60,6 @@ describe('AddStorageLocationUtils', () => {
         type: LocationType.CLIENT,
         client: location.path,
         endpoint: '',
-        server: '',
         accessKey: '',
         secretKey: '',
         bucketName: '',

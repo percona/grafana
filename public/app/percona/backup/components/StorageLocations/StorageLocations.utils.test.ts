@@ -95,7 +95,7 @@ describe('StorageLocationsUtils', () => {
       location_id: fsLocation.locationID,
       name: fsLocation.name,
       description: fsLocation.description,
-      pmm_server_config: {
+      pmm_client_config: {
         path: fsLocation.path,
       },
     });
