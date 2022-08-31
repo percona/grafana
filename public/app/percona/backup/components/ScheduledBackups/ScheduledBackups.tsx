@@ -18,11 +18,9 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 
 import { Messages } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
-import { RetryMode } from '../../Backup.types';
 import { formatBackupMode } from '../../Backup.utils';
 import { AddBackupModal } from '../AddBackupModal';
 import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
@@ -201,67 +199,13 @@ export const ScheduledBackups: FC = () => {
     setBackupModalVisible(false);
   };
 
-  const handleBackup = async (backup: AddBackupFormProps) => {
-    const {
-      id,
-      service,
-      location,
-      period,
-      month,
-      day,
-      weekDay,
-      startHour,
-      startMinute,
-      backupName,
-      description,
-      retryMode,
-      retryInterval,
-      retryTimes,
-      active,
-      retention,
-      mode,
-      dataModel,
-    } = backup;
+  const handleBackup = async (values: AddBackupFormProps) => {
+    const { id, backupName } = values;
     try {
-      const cronExpression = getCronStringFromValues(
-        period!.value!,
-        month!.map((m) => m.value!),
-        day!.map((m) => m.value!),
-        weekDay!.map((m) => m.value!),
-        startHour!.map((m) => m.value!),
-        startMinute!.map((m) => m.value!)
-      );
-      const strRetryInterval = `${retryInterval}s`;
-      let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
-
-      if (id) {
-        await ScheduledBackupsService.change(
-          id,
-          active!,
-          cronExpression,
-          backupName,
-          description,
-          strRetryInterval,
-          resultRetryTimes!,
-          retention!
-        );
-        appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.getEditSuccess(backupName)]);
-      } else {
-        await ScheduledBackupsService.schedule(
-          service!.value?.id!,
-          location!.value!,
-          cronExpression,
-          backupName,
-          description,
-          strRetryInterval,
-          resultRetryTimes!,
-          retention!,
-          active!,
-          mode,
-          dataModel
-        );
-        appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.addSuccess]);
-      }
+      await BackupService.backup(values);
+      appEvents.emit(AppEvents.alertSuccess, [
+        id ? Messages.scheduledBackups.getEditSuccess(backupName) : Messages.scheduledBackups.addSuccess,
+      ]);
       setBackupModalVisible(false);
       setSelectedBackup(null);
       getData();

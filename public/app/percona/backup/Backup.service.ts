@@ -4,7 +4,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { getCronStringFromValues } from '../shared/helpers/cron/cron';
 
-import { BackupMode, BackupType, RetryMode } from './Backup.types';
+import { BackupMode, BackupType, DataModel, RetryMode } from './Backup.types';
 import { AddBackupFormProps } from './components/AddBackupModal/AddBackupModal.types';
 
 const BASE_URL = '/v1/management/backup/Backups';
@@ -30,6 +30,7 @@ export const BackupService = {
       retention,
       mode,
       type,
+      dataModel,
     } = values;
     const strRetryInterval = `${retryInterval}s`;
     const resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
@@ -75,7 +76,8 @@ export const BackupService = {
           resultRetryTimes!,
           retention!,
           active!,
-          mode
+          mode,
+          dataModel
         );
       }
     }
@@ -113,7 +115,8 @@ export const BackupService = {
     retryTimes: number,
     retention: number,
     enabled: boolean,
-    mode: BackupMode
+    mode: BackupMode,
+    dataModel: DataModel
   ) {
     return api.post(`${BASE_URL}/Schedule`, {
       service_id: serviceId,
@@ -126,6 +129,7 @@ export const BackupService = {
       enabled: !!enabled,
       retention,
       mode,
+      data_model: dataModel,
     });
   },
   async changeScheduleBackup(
