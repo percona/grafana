@@ -4,7 +4,7 @@ import { getStyles } from './ScheduledBackupsActions.styles';
 import { ScheduledBackupsActionsProps } from './ScheduledBackupsActions.types';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
 import { Messages } from './ScheduledBackupsActions.messages';
-import { ExpandebleRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
+import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
 export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
   row,
   backup,
@@ -60,7 +60,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
             <Switch value={backup.enabled} onClick={handleToggle} data-testid="toggle-scheduled-backpup" />
           </span>
           <MultipleActions actions={getActions} dataTestId="scheduled-backups-actions" />
-          <ExpandebleRowButton row={row} />
+          <ExpandableRowButton row={row} />
         </>
       )}
     </div>

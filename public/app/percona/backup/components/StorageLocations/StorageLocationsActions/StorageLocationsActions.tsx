@@ -6,7 +6,7 @@ import { Messages } from './StorageLocationsActions.messages';
 import { getStyles } from './StorageLocationsActions.styles';
 import { StorageLocatationsActionProps } from './StorageLocationsActions.types';
 import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
-import { ExpandebleRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
+import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
 
 export const StorageLocationsActions: FC<StorageLocatationsActionProps> = ({ row, location, onUpdate, onDelete }) => {
   const styles = useStyles2(getStyles);
@@ -37,7 +37,7 @@ export const StorageLocationsActions: FC<StorageLocatationsActionProps> = ({ row
   return (
     <div className={styles.actionsWrapper}>
       <MultipleActions actions={getActions} dataTestId="storage-location-actions" />
-      <ExpandebleRowButton row={row} />
+      <ExpandableRowButton row={row} />
     </div>
   );
 };

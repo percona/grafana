@@ -1,5 +1,5 @@
 import { Row } from 'react-table';
 
-export interface ExpandebleButtonProps {
+export interface ExpandableButtonProps {
   row: Row<any>;
 }
