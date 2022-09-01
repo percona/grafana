@@ -19,11 +19,9 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { Table } from 'app/percona/shared/components/Elements/Table/Table';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { Form } from 'react-final-form';
-import { Databases } from 'app/percona/shared/core';
 import { getStyles } from './Kubernetes.styles';
 import { Kubernetes, OperatorToUpdate, NewKubernetesCluster } from './Kubernetes.types';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
-import { OperatorStatusItem } from './OperatorStatusItem/OperatorStatusItem';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus';
 import { clusterActionsRender } from './ColumnRenderers/ColumnRenderers';
 import { ViewClusterConfigModal } from './ViewClusterConfigModal/ViewClusterConfigModal';
@@ -36,6 +34,7 @@ import {
   DELETE_KUBERNETES_CANCEL_TOKEN,
 } from './Kubernetes.constants';
 import { PortalK8sFreeClusterPromotingMessage } from './PortalK8sFreeClusterPromotingMessage/PortalK8sFreeClusterPromotingMessage';
+import { OperatorStatusRow } from './OperatorStatusRow/OperatorStatusRow';
 
 export const KubernetesInventory: FC = () => {
   const styles = useStyles(getStyles);
@@ -49,7 +48,7 @@ export const KubernetesInventory: FC = () => {
   const [operatorToUpdate, setOperatorToUpdate] = useState<OperatorToUpdate | null>(null);
   const [updateOperatorModalVisible, setUpdateOperatorModalVisible] = useState(false);
   const [generateToken] = useCancelToken();
-  const { result: kubernetes = [], loading: kubernetesLoading } = useSelector(getKubernetesSelector);
+  const { result: kubernetes, loading: kubernetesLoading } = useSelector(getKubernetesSelector);
   const { loading: deleteKubernetesLoading } = useSelector(getDeleteKubernetes);
   const { loading: addKubernetesLoading } = useSelector(getAddKubernetes);
   const loading = kubernetesLoading || deleteKubernetesLoading || addKubernetesLoading;
@@ -79,24 +78,12 @@ export const KubernetesInventory: FC = () => {
       {
         Header: Messages.kubernetes.table.operatorsColumn,
         accessor: (element: Kubernetes) => (
-          <div>
-            <OperatorStatusItem
-              databaseType={Databases.mysql}
-              operator={element.operators.pxc}
-              kubernetes={element}
-              setSelectedCluster={setSelectedCluster}
-              setOperatorToUpdate={setOperatorToUpdate}
-              setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
-            />
-            <OperatorStatusItem
-              databaseType={Databases.mongodb}
-              operator={element.operators.psmdb}
-              kubernetes={element}
-              setSelectedCluster={setSelectedCluster}
-              setOperatorToUpdate={setOperatorToUpdate}
-              setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
-            />
-          </div>
+          <OperatorStatusRow
+            element={element}
+            setSelectedCluster={setSelectedCluster}
+            setOperatorToUpdate={setOperatorToUpdate}
+            setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
+          />
         ),
       },
       {
@@ -222,10 +209,15 @@ export const KubernetesInventory: FC = () => {
                 setOperatorToUpdate={setOperatorToUpdate}
               />
             )}
-            <Table columns={columns} data={kubernetes} loading={loading} noData={<AddNewClusterButton />} />
+            <Table
+              columns={columns}
+              data={kubernetes ? kubernetes : []}
+              loading={loading}
+              noData={<AddNewClusterButton />}
+            />
           </div>
         </FeatureLoader>
-        {kubernetes.length === 0 && <PortalK8sFreeClusterPromotingMessage />}
+        {kubernetes && kubernetes.length === 0 && <PortalK8sFreeClusterPromotingMessage />}
       </Page.Contents>
     </Page>
   );
