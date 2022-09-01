@@ -21,9 +21,9 @@ export const Messages = {
   filter: {
     header: 'Filters',
     addButton: 'Add Filter',
-    fieldKey: 'Label',
+    fieldLabel: 'Label',
     fieldOperators: 'Operators',
-    fieldValue: 'Value',
+    fieldRegex: 'Regex',
   },
   errors: {
     template: 'Must select a template',
@@ -34,8 +34,8 @@ export const Messages = {
     durationRequired: 'Must enter a duration',
     durationMin: (min: number) => `Duration must be at least ${min}`,
     severity: 'Must select a severity',
-    filterKey: 'Must enter a label',
-    filterValue: 'Must enter a value',
+    filterLabel: 'Must enter a label',
+    filterRegex: 'Must enter a regex',
     operatorRequired: 'Must select an operator',
   },
   title: 'Add Alert Rule',

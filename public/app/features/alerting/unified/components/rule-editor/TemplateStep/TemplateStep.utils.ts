@@ -1,16 +1,8 @@
 import { SelectableValue } from '@grafana/data';
 import { Template } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
-import {
-  AlertRuleCreatePayload,
-  AlertRuleFilterType,
-  AlertRulesListPayloadFilter,
-  AlertRulesListResponseChannel,
-  Severity,
-} from 'app/percona/shared/core';
+import { AlertRuleCreatePayload, AlertRulesListResponseChannel, Severity } from 'app/percona/shared/core';
 
 import { RuleFormValues } from '../../../types/rule-form';
-
-import { FiltersForm } from './TemplateStep.types';
 
 export const formatChannelsOptions = (channels: string[]): Array<SelectableValue<string>> =>
   channels
@@ -28,21 +20,12 @@ export const formatTemplateOptions = (templates: Template[]): Array<SelectableVa
       }))
     : [];
 
-export const formatFilters = (filters: FiltersForm[]): AlertRulesListPayloadFilter[] =>
-  // We have always problems reading keys, as they come out as string
-  // @ts-ignore
-  filters.map(({ key, operators, value }) => {
-    const indexOfValue = Object.values(AlertRuleFilterType).indexOf(operators);
-    const type = Object.keys(AlertRuleFilterType)[indexOfValue];
-    return { key, type, value };
-  });
-
 export const formatCreateAPIPayload = (data: RuleFormValues): AlertRuleCreatePayload => {
   const { duration, filters, name, severity, template } = data;
 
   const payload: AlertRuleCreatePayload = {
     custom_labels: {},
-    filters: filters ? formatFilters(filters) : [],
+    filters: filters || [],
     for: `${duration}s`,
     severity: severity!,
     template_name: template?.name!,

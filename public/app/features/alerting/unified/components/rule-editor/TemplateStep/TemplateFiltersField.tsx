@@ -17,8 +17,8 @@ const TemplateFiltersField: FC = () => {
   } = useFormContext();
   const filterOptions: Array<SelectableValue<AlertRuleFilterType>> = useMemo(
     () =>
-      Object.entries(AlertRuleFilterType).map(([key, value]) => ({
-        label: `${value} (${key})`,
+      Object.entries(AlertRuleFilterType).map(([, value]) => ({
+        label: value,
         value: value,
       })),
     []
@@ -44,23 +44,26 @@ const TemplateFiltersField: FC = () => {
           {fields.map((name, index) => (
             <div key={name.id} className={styles.filterRowWrapper} data-testid="filter-fields-row">
               <div className={styles.filterFields}>
-                <Field error={errors.filters?.[index]?.key?.message} invalid={!!errors.filters?.[index]?.key?.message}>
+                <Field
+                  error={errors.filters?.[index]?.label?.message}
+                  invalid={!!errors.filters?.[index]?.label?.message}
+                >
                   <Input
-                    {...register(`filters[${index}].key`, {
-                      required: { value: true, message: Messages.errors.filterKey },
+                    {...register(`filters[${index}].label`, {
+                      required: { value: true, message: Messages.errors.filterLabel },
                     })}
-                    placeholder={Messages.filter.fieldKey}
+                    placeholder={Messages.filter.fieldLabel}
                   />
                 </Field>
               </div>
 
               <div className={styles.filterFields}>
                 <Field
-                  error={errors.filters?.[index]?.operators?.message}
-                  invalid={!!errors.filters?.[index]?.operators?.message}
+                  error={errors.filters?.[index]?.type?.message}
+                  invalid={!!errors.filters?.[index]?.type?.message}
                 >
                   <Controller
-                    name={`filters[${index}].operators`}
+                    name={`filters[${index}].type`}
                     rules={{ required: { value: true, message: Messages.errors.operatorRequired } }}
                     render={({ field: { onChange, value } }) => (
                       <Select
@@ -75,14 +78,14 @@ const TemplateFiltersField: FC = () => {
               </div>
               <div className={styles.filterFields}>
                 <Field
-                  error={errors.filters?.[index]?.value?.message}
-                  invalid={!!errors.filters?.[index]?.value?.message}
+                  error={errors.filters?.[index]?.regexp?.message}
+                  invalid={!!errors.filters?.[index]?.regexp?.message}
                 >
                   <Input
-                    {...register(`filters[${index}].value`, {
-                      required: { value: true, message: Messages.errors.filterValue },
+                    {...register(`filters[${index}].regexp`, {
+                      required: { value: true, message: Messages.errors.filterRegex },
                     })}
-                    placeholder={Messages.filter.fieldValue}
+                    placeholder={Messages.filter.fieldRegex}
                   />
                 </Field>
               </div>

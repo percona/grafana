@@ -99,8 +99,8 @@ export enum AlertRuleParamType {
 }
 
 export enum AlertRuleFilterType {
-  EQUAL = '=',
-  REGEX = '=~',
+  MATCH = 'MATCH',
+  MISMATCH = 'MISMATCH',
 }
 
 export type AlertRulesParsedParam = TemplateParam & { value: string | boolean | number };
@@ -147,9 +147,9 @@ export interface AlertRulesListResponseChannel {
 }
 
 export interface AlertRulesListPayloadFilter {
-  key: string;
-  type: keyof typeof AlertRuleFilterType;
-  value: string;
+  label: string;
+  type: AlertRuleFilterType;
+  regexp: string;
 }
 
 export interface AlertRulesListResponseParam {
