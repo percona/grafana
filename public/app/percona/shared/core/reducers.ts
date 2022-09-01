@@ -426,13 +426,11 @@ const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOper
 export interface PerconaDBClustersState {
   result: DBCluster[];
   loading: boolean | undefined;
-  credentialsLoading: boolean | undefined;
 }
 
 export const initialDBClustersState: PerconaDBClustersState = {
   result: [],
   loading: undefined,
-  credentialsLoading: undefined,
 };
 
 const perconaDBClustersState = createSlice({
