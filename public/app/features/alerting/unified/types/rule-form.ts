@@ -45,6 +45,5 @@ export interface RuleFormValues {
   template: Template | null;
   duration: number;
   filters: FiltersForm[];
-  notificationChannels: string[];
   severity: keyof typeof Severity | null;
 }

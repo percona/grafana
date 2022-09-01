@@ -38,11 +38,10 @@ export const formatFilters = (filters: FiltersForm[]): AlertRulesListPayloadFilt
   });
 
 export const formatCreateAPIPayload = (data: RuleFormValues): AlertRuleCreatePayload => {
-  const { duration, filters, name, notificationChannels, severity, template } = data;
+  const { duration, filters, name, severity, template } = data;
 
   const payload: AlertRuleCreatePayload = {
     custom_labels: {},
-    channel_ids: notificationChannels ? notificationChannels.map((channel) => channel || '') : [],
     filters: filters ? formatFilters(filters) : [],
     for: `${duration}s`,
     severity: severity!,

@@ -161,7 +161,6 @@ export interface AlertRulesListResponseParam {
 }
 
 export interface AlertRuleCreatePayload {
-  channel_ids: string[];
   custom_labels?: { [K: string]: string };
   filters: AlertRulesListPayloadFilter[];
   for: string;

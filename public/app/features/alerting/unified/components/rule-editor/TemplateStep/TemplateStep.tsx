@@ -2,7 +2,7 @@ import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
-import { Field, Input, MultiSelect, Select } from '@grafana/ui';
+import { Field, Input, Select } from '@grafana/ui';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import {
   Template,
@@ -12,7 +12,6 @@ import { fetchTemplatesAction } from 'app/percona/shared/core/reducers';
 import { getTemplates } from 'app/percona/shared/core/selectors';
 import { dispatch } from 'app/store/store';
 
-import { useUnifiedAlertingSelector } from '../../../hooks/useUnifiedAlertingSelector';
 import { fetchAlertManagerConfigAction } from '../../../state/actions';
 import { RuleFormValues } from '../../../types/rule-form';
 import { initialAsyncRequestState } from '../../../utils/redux';
@@ -22,7 +21,7 @@ import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import TemplateFiltersField from './TemplateFiltersField';
 import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './TemplateStep.constants';
 import { Messages } from './TemplateStep.messages';
-import { formatChannelsOptions, formatTemplateOptions } from './TemplateStep.utils';
+import { formatTemplateOptions } from './TemplateStep.utils';
 
 export const TemplateStep: FC = () => {
   const {
@@ -33,14 +32,10 @@ export const TemplateStep: FC = () => {
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const [queryParams] = useQueryParams();
-  const amConfigs = useUnifiedAlertingSelector((state) => state.amConfigs);
   /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
   const selectedTemplate: string | null = (queryParams['template'] as string | undefined) || null;
 
-  const { result: amConfigsResult, loading: amConfigsLoading } = amConfigs['grafana'] || initialAsyncRequestState;
   const { result: templatesResult, loading: templatesLoading } = useSelector(getTemplates) || initialAsyncRequestState;
-  const receivers = (amConfigsResult?.alertmanager_config?.receivers || []).map((r) => r.name);
-  const channelsOptions = formatChannelsOptions(receivers);
   const templateOptions = formatTemplateOptions(templatesResult?.templates || []);
   templates.current = templatesResult?.templates || [];
 
@@ -195,24 +190,6 @@ export const TemplateStep: FC = () => {
       </Field>
 
       <TemplateFiltersField />
-
-      <Field label={Messages.channelField} description={Messages.tooltips.channels}>
-        <Controller
-          name="notificationChannels"
-          render={({ field: { value, onChange } }) => (
-            <MultiSelect
-              id="notificationChannels"
-              isLoading={amConfigsLoading}
-              disabled={amConfigsLoading}
-              placeholder={amConfigsLoading ? Messages.loadingContactPoints : undefined}
-              onChange={(e) => onChange(e.map((channel) => channel.value))}
-              value={value}
-              options={channelsOptions}
-              data-testid="notificationChannels-multiselect-input"
-            />
-          )}
-        />
-      </Field>
 
       {currentTemplate && (
         <AdvancedRuleSection expression={currentTemplate.expr} summary={currentTemplate.annotations?.summary} />
