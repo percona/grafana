@@ -1,8 +1,13 @@
 import { css } from '@emotion/css';
 
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme) => ({
+export const getStyles = ({
+  colors,
+  shape,
+  spacing,
+  v1: { colors: colorsV1, typography, spacing: spacingV1, border },
+}: GrafanaTheme2) => ({
   retryFields: css`
     display: flex;
   `,
@@ -10,11 +15,11 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
     flex: 1 1 50%;
 
     &:first-child {
-      padding-right: ${spacing.sm};
+      padding-right: ${spacingV1.sm};
     }
 
     &:last-child {
-      padding-left: ${spacing.sm};
+      padding-left: ${spacingV1.sm};
     }
   `,
   formContainer: css`
@@ -25,27 +30,27 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
     flex: 0 0 50%;
 
     &:first-child {
-      padding-right: ${spacing.md};
+      padding-right: ${spacingV1.md};
     }
 
     &:last-child {
-      padding-left: ${spacing.md};
+      padding-left: ${spacingV1.md};
     }
   `,
   advancedGroup: css`
-    border: ${border.width.sm} solid ${colors.formInputBorder};
+    border: ${border.width.sm} solid ${colorsV1.formInputBorder};
     border-radius: ${border.radius.sm};
-    padding: ${spacing.md};
-    margin-bottom: ${spacing.formInputMargin};
+    padding: ${spacingV1.md};
+    margin-bottom: ${spacingV1.formInputMargin};
     position: relative;
   `,
   advancedTitle: css`
-    color: ${colors.formLabel};
+    color: ${colorsV1.formLabel};
     font-weight: ${typography.weight.semibold};
     position: absolute;
     top: -8px;
-    padding: 0 ${spacing.xs};
-    background-color: ${colors.bodyBg};
+    padding: 0 ${spacingV1.xs};
+    background-color: ${colorsV1.bodyBg};
   `,
   advancedRow: css`
     display: flex;
@@ -56,11 +61,11 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
       flex: 1 0 50%;
 
       &:first-child {
-        padding-right: ${spacing.sm};
+        padding-right: ${spacingV1.sm};
       }
 
       &:last-child {
-        padding-left: ${spacing.sm};
+        padding-left: ${spacingV1.sm};
       }
 
       &:first-child:last-child {
@@ -80,19 +85,31 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
     }
   `,
   apiErrorSection: css`
-    margin-bottom: ${spacing.md};
+    margin-bottom: ${spacingV1.md};
   `,
   typeSelectionRow: css`
-    margin-bottom: ${spacing.md};
+    margin-bottom: ${spacingV1.md};
 
     label {
       &:first-child {
-        margin-right: ${spacing.md};
+        margin-right: ${spacingV1.md};
       }
 
       & > input {
-        margin-right: ${spacing.sm};
+        margin-right: ${spacingV1.sm};
       }
     }
+  `,
+  contentInner: css`
+    flex: 1;
+    padding: ${spacing(2)};
+  `,
+  contentOuter: css`
+    background: ${colors.background.primary};
+    border: 1px solid ${colors.border.weak};
+    border-radius: ${shape.borderRadius()};
+    margin: ${spacing(0, 2, 2)};
+    overflow: hidden;
+    flex: 1;
   `,
 });

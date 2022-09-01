@@ -4,7 +4,8 @@ import { CancelToken } from 'axios';
 import React, { FC, useMemo, useState, useEffect, useCallback } from 'react';
 import { Column, Row } from 'react-table';
 
-import { Button, useStyles } from '@grafana/ui';
+import { urlUtil } from '@grafana/data';
+import { LinkButton, useStyles } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
@@ -18,16 +19,13 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages } from '../../Backup.messages';
-import { RetryMode } from '../../Backup.types';
 import { formatBackupMode } from '../../Backup.utils';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
-import { AddBackupModal } from '../AddBackupModal';
-import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
 
 import {
-  BACKUP_CANCEL_TOKEN,
+  // BACKUP_CANCEL_TOKEN,
   LIST_ARTIFACTS_CANCEL_TOKEN,
   RESTORE_CANCEL_TOKEN,
   DATA_INTERVAL,
@@ -40,16 +38,18 @@ import { BackupInventoryDetails } from './BackupInventoryDetails';
 import { BackupLogsModal } from './BackupLogsModal/BackupLogsModal';
 import { RestoreBackupModal } from './RestoreBackupModal';
 
+//import { BackupService } from '../../Backup.service';
+
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
   const [deletePending, setDeletePending] = useState(false);
   const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
-  const [backupModalVisible, setBackupModalVisible] = useState(false);
+  const [, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
-  const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
+  const [, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
   const navModel = usePerconaNavModel('backup-inventory');
   const [triggerTimeout] = useRecurringCall();
@@ -205,42 +205,42 @@ export const BackupInventory: FC = () => {
     setBackupModalVisible(true);
   };
 
-  const handleBackup = async ({
-    service,
-    location,
-    backupName,
-    description,
-    retryMode,
-    retryInterval,
-    retryTimes,
-    dataModel,
-  }: AddBackupFormProps) => {
-    const strRetryInterval = `${retryInterval}s`;
-    let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
-    try {
-      await BackupInventoryService.backup(
-        service!.value?.id || '',
-        location!.value || '',
-        backupName,
-        description,
-        strRetryInterval,
-        resultRetryTimes!,
-        dataModel,
-        generateToken(BACKUP_CANCEL_TOKEN)
-      );
-      setBackupModalVisible(false);
-      setSelectedBackup(null);
-      setBackupErrors([]);
-      getData(true);
-    } catch (e) {
-      if (isApiCancelError(e)) {
-        return;
-      }
+  // const handleBackup = async ({
+  //   service,
+  //   location,
+  //   backupName,
+  //   description,
+  //   retryMode,
+  //   retryInterval,
+  //   retryTimes,
+  //   dataModel,
+  // }: AddBackupFormProps) => {
+  //   const strRetryInterval = `${retryInterval}s`;
+  //   let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
+  //   try {
+  //     await BackupInventoryService.backup(
+  //       service!.value?.id || '',
+  //       location!.value || '',
+  //       backupName,
+  //       description,
+  //       strRetryInterval,
+  //       resultRetryTimes!,
+  //       dataModel,
+  //       generateToken(BACKUP_CANCEL_TOKEN)
+  //     );
+  //     setBackupModalVisible(false);
+  //     setSelectedBackup(null);
+  //     setBackupErrors([]);
+  //     getData(true);
+  //   } catch (e) {
+  //     if (isApiCancelError(e)) {
+  //       return;
+  //     }
 
-      setBackupErrors(apiErrorParser(e));
-      logger.error(e);
-    }
-  };
+  //     setBackupErrors(apiErrorParser(e));
+  //     logger.error(e);
+  //   }
+  // };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('backupEnabled'), []);
@@ -256,7 +256,7 @@ export const BackupInventory: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            <Button
+            {/* <Button
               size="md"
               icon="plus-square"
               fill="text"
@@ -264,7 +264,13 @@ export const BackupInventory: FC = () => {
               onClick={() => onBackupClick(null)}
             >
               {Messages.add}
-            </Button>
+            </Button> */}
+            <LinkButton
+              href={urlUtil.renderUrl('/backup/new', { returnTo: location.pathname + location.search })}
+              icon="plus"
+            >
+              New backup
+            </LinkButton>
           </div>
           <Table
             data={data}
@@ -285,7 +291,7 @@ export const BackupInventory: FC = () => {
               noService={!selectedBackup?.serviceId || !selectedBackup?.serviceName}
             />
           )}
-          {backupModalVisible && (
+          {/* {backupModalVisible && (
             <AddBackupModal
               backup={selectedBackup}
               isVisible
@@ -293,7 +299,7 @@ export const BackupInventory: FC = () => {
               onBackup={handleBackup}
               backupErrors={backupErrors}
             />
-          )}
+          )} */}
           {deleteModalVisible && (
             <DeleteModal
               title={Messages.backupInventory.deleteModalTitle}

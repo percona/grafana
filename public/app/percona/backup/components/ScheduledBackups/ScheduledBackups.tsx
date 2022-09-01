@@ -19,11 +19,11 @@ import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
+
+//import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { Messages } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
 import { formatBackupMode } from '../../Backup.utils';
-import { AddBackupModal } from '../AddBackupModal';
-import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { DetailedDate } from '../DetailedDate';
 
 import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
@@ -39,7 +39,7 @@ export const ScheduledBackups: FC = () => {
   const [actionPending, setActionPending] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
-  const [backupModalVisible, setBackupModalVisible] = useState(false);
+  //const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const navModel = usePerconaNavModel('scheduled-backups');
   const [generateToken] = useCancelToken();
@@ -195,24 +195,24 @@ export const ScheduledBackups: FC = () => {
     []
   );
 
-  const handleClose = () => {
-    setBackupModalVisible(false);
-  };
+  // const handleClose = () => {
+  //   setBackupModalVisible(false);
+  // };
 
-  const handleBackup = async (values: AddBackupFormProps) => {
-    const { id, backupName } = values;
-    try {
-      await BackupService.backup(values);
-      appEvents.emit(AppEvents.alertSuccess, [
-        id ? Messages.scheduledBackups.getEditSuccess(backupName) : Messages.scheduledBackups.addSuccess,
-      ]);
-      setBackupModalVisible(false);
-      setSelectedBackup(null);
-      getData();
-    } catch (e) {
-      logger.error(e);
-    }
-  };
+  // const handleBackup = async (values: AddBackupFormProps) => {
+  //   const { id, backupName } = values;
+  //   try {
+  //     await BackupService.backup(values);
+  //     appEvents.emit(AppEvents.alertSuccess, [
+  //       id ? Messages.scheduledBackups.getEditSuccess(backupName) : Messages.scheduledBackups.addSuccess,
+  //     ]);
+  //     setBackupModalVisible(false);
+  //     setSelectedBackup(null);
+  //     getData();
+  //   } catch (e) {
+  //     logger.error(e);
+  //   }
+  // };
 
   const onDeleteClick = (backup: ScheduledBackup) => {
     setDeleteModalVisible(true);
@@ -236,12 +236,12 @@ export const ScheduledBackups: FC = () => {
 
   const onEditClick = (backup: ScheduledBackup) => {
     setSelectedBackup(backup);
-    setBackupModalVisible(true);
+    // setBackupModalVisible(true);
   };
 
   const onAddClick = () => {
     setSelectedBackup(null);
-    setBackupModalVisible(true);
+    // setBackupModalVisible(true);
   };
 
   const getCellProps = useCallback(
@@ -285,13 +285,13 @@ export const ScheduledBackups: FC = () => {
             renderExpandedRow={renderSelectedSubRow}
             getCellProps={getCellProps}
           />
-          <AddBackupModal
+          {/* <AddBackupModal
             scheduleMode
             backup={selectedBackup}
             isVisible={backupModalVisible}
             onClose={handleClose}
             onBackup={handleBackup}
-          />
+          /> */}
           <DeleteModal
             title={Messages.scheduledBackups.deleteModalTitle}
             isVisible={deleteModalVisible}

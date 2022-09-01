@@ -501,6 +501,15 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
+      path: '/backup/new',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/backup/components/AddBackupModal/AddBackupModal'
+          )
+      ),
+    },
+    {
       path: '/backup/restore',
       component: SafeDynamicImport(
         () =>
