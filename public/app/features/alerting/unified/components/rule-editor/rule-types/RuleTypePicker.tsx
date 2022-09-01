@@ -23,7 +23,8 @@ interface RuleTypePickerProps {
 const RuleTypePicker: FC<RuleTypePickerProps> = ({ selected, onChange, enabledTypes }) => {
   const rulesSourcesWithRuler = useRulesSourcesWithRuler();
   const hasLotexDatasources = !isEmpty(rulesSourcesWithRuler);
-
+  const showTemplateRuleDisclaimer = enabledTypes.includes(RuleFormType.templated);
+  const showGrafanaManagedRuleDisclaimer = !showTemplateRuleDisclaimer && enabledTypes.includes(RuleFormType.grafana);
   const styles = useStyles2(getStyles);
 
   return (
@@ -50,7 +51,11 @@ const RuleTypePicker: FC<RuleTypePickerProps> = ({ selected, onChange, enabledTy
           />
         )}
       </Stack>
-      {enabledTypes.includes(RuleFormType.grafana) && (
+      {showTemplateRuleDisclaimer && (
+        <small className={styles.meta}>Select &ldquo;Percona templated&rdquo; for an easier alert rule setup.</small>
+      )}
+      {/* First condition shouldn't occur, just a safety measure */}
+      {!showTemplateRuleDisclaimer && showGrafanaManagedRuleDisclaimer && (
         <small className={styles.meta}>
           Select &ldquo;Grafana managed&rdquo; unless you have a Mimir, Loki or Cortex data source with the Ruler API
           enabled.
