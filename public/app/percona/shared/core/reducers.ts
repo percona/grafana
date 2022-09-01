@@ -322,14 +322,15 @@ export const instalKuberneteslOperatorAction = createAsyncThunk(
 
 export const fetchDBClustersAction = createAsyncThunk(
   'percona/fetchDBClusters',
-  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }): Promise<DBCluster[]> =>
+  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }, thunkAPI): Promise<void> =>
     withSerializedError(
       (async () => {
         const requests = args.kubernetes.map((k, idx) =>
           apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', k, true, args.tokens[idx])
         );
         const promiseResults = await Promise.all(requests);
-        return formatDBClusters(promiseResults, args.kubernetes);
+        const dbClusters = formatDBClusters(promiseResults, args.kubernetes);
+        thunkAPI.dispatch(setDBClusters(dbClusters));
       })()
     )
 );
@@ -400,7 +401,39 @@ const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesActi
 const addDbClusterReducer = createAsyncSlice('addDbCluster', addDbClusterAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOperator', instalKuberneteslOperatorAction)
   .reducer;
-const dbClustersReducer = createAsyncSlice('dbClusters', fetchDBClustersAction).reducer;
+
+export interface PerconaDBClustersState {
+  result: DBCluster[];
+  loading: boolean | undefined;
+  credentialsLoading: boolean | undefined;
+}
+
+export const initialDBClustersState: PerconaDBClustersState = {
+  result: [],
+  loading: undefined,
+  credentialsLoading: undefined,
+};
+
+const perconaDBClustersState = createSlice({
+  name: 'perconaDBClusters',
+  initialState: initialDBClustersState,
+  reducers: {
+    resetDBClustersToInitial: (state): PerconaDBClustersState => ({
+      ...state,
+      result: [],
+    }),
+    setDBClusters: (state, action: PayloadAction<DBCluster[]>): PerconaDBClustersState => {
+      return {
+        ...state,
+        result: action.payload,
+      };
+    },
+  },
+});
+
+export const { resetDBClustersToInitial, setDBClusters } = perconaDBClustersState.actions;
+export const perconaDBClustersReducer = perconaDBClustersState.reducer;
+
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 
@@ -414,7 +447,7 @@ export default {
     addKubernetes: addKubernetesReducer,
     addDbCluster: addDbClusterReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
-    dbClusters: dbClustersReducer,
+    dbClusters: perconaDBClustersReducer,
     server: perconaServerReducers,
   }),
 };

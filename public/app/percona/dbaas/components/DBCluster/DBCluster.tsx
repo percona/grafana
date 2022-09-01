@@ -10,7 +10,7 @@ import { getKubernetes, getPerconaDBClusters, getPerconaSettingFlag } from 'app/
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { getStyles } from './DBCluster.styles';
-import { DBCluster as Cluster } from './DBCluster.types';
+import { DBCluster as DBClusterInterface } from './DBCluster.types';
 import { AddDBClusterModal } from './AddDBClusterModal/AddDBClusterModal';
 import { EditDBClusterModal } from './EditDBClusterModal/EditDBClusterModal';
 import { DBClusterLogsModal } from './DBClusterLogsModal/DBClusterLogsModal';
@@ -24,7 +24,12 @@ import {
 } from './ColumnRenderers/ColumnRenderers';
 import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModal';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
-import { addDbClusterAction, fetchDBClustersAction, fetchKubernetesAction } from 'app/percona/shared/core/reducers';
+import {
+  addDbClusterAction,
+  fetchDBClustersAction,
+  fetchKubernetesAction,
+  resetDBClustersToInitial,
+} from 'app/percona/shared/core/reducers';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
@@ -42,7 +47,7 @@ export const DBCluster: FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
-  const [selectedCluster, setSelectedCluster] = useState<Cluster>();
+  const [selectedCluster, setSelectedCluster] = useState<DBClusterInterface>();
   const navModel = usePerconaNavModel('dbclusters');
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
@@ -159,6 +164,9 @@ export const DBCluster: FC = () => {
         operator: generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN),
       })
     );
+    return () => {
+      dispatch(resetDBClustersToInitial());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
