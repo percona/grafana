@@ -50,6 +50,8 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
       ...getDefaultFormValues(),
       queries: getDefaultQueries(),
       ...(queryParams['defaults'] ? JSON.parse(queryParams['defaults'] as string) : {}),
+      // @PERCONA
+      // Set templated as default
       type: result && !!result.alertingEnabled ? RuleFormType.templated : RuleFormType.grafana,
     };
   }, [existing, queryParams, result]);
@@ -156,6 +158,7 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
           <CustomScrollbar autoHeightMin="100%" hideHorizontalTrack={true}>
             <div className={styles.contentInner}>
               <QueryAndAlertConditionStep editingExistingRule={!!existing} />
+              {/* @PERCONA */}
               {showTemplateStep && <TemplateStep />}
               {showStep2 && (
                 <>

@@ -64,13 +64,12 @@ export const getDefaultFormValues = (): RuleFormValues => {
     forTime: 1,
     forTimeUnit: 'm',
 
+    // @PERCONA
     // templated rules
     template: null,
     duration: 1,
     filters: [],
     severity: null,
-    notificationChannels: [],
-    enabled: true,
   });
 };
 

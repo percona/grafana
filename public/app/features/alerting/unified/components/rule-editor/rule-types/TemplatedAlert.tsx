@@ -1,3 +1,5 @@
+// @PERCONA
+// This whole component is custom
 import React, { FC } from 'react';
 
 import { RuleFormType } from '../../../types/rule-form';

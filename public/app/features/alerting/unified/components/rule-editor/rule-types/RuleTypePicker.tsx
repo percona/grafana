@@ -23,6 +23,8 @@ interface RuleTypePickerProps {
 const RuleTypePicker: FC<RuleTypePickerProps> = ({ selected, onChange, enabledTypes }) => {
   const rulesSourcesWithRuler = useRulesSourcesWithRuler();
   const hasLotexDatasources = !isEmpty(rulesSourcesWithRuler);
+  // @PERCONA
+  // Simplified conditions by adding these two consts below
   const showTemplateRuleDisclaimer = enabledTypes.includes(RuleFormType.templated);
   const showGrafanaManagedRuleDisclaimer = !showTemplateRuleDisclaimer && enabledTypes.includes(RuleFormType.grafana);
   const styles = useStyles2(getStyles);
@@ -30,6 +32,7 @@ const RuleTypePicker: FC<RuleTypePickerProps> = ({ selected, onChange, enabledTy
   return (
     <>
       <Stack direction="row" gap={2}>
+        {/* @PERCONA */}
         {enabledTypes.includes(RuleFormType.templated) && (
           <TemplatedAlertRuleType selected={selected === RuleFormType.templated} onClick={onChange} />
         )}

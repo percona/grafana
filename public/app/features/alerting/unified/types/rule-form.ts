@@ -8,6 +8,7 @@ export enum RuleFormType {
   grafana = 'grafana',
   cloudAlerting = 'cloud-alerting',
   cloudRecording = 'cloud-recording',
+  // @PERCONA
   templated = 'templated',
 }
 
@@ -44,6 +45,7 @@ export interface RuleFormValues {
   forTimeUnit: string;
   expression: string;
 
+  // @PERCONA
   // templated rules
   template: Template | null;
   duration: number;
