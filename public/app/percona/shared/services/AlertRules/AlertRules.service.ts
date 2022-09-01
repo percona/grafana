@@ -4,7 +4,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { AlertRuleCreatePayload } from '../../core';
 
-const BASE_URL = `/v1/management/ia/Rules`;
+const BASE_URL = `/v1/management/alerting/Rules`;
 
 export const AlertRulesService = {
   async create(payload: AlertRuleCreatePayload, token?: CancelToken): Promise<void> {
