@@ -168,4 +168,6 @@ export interface AlertRuleCreatePayload {
   severity: keyof typeof Severity;
   name: string;
   template_name: string;
+  group: string;
+  folder_uid: string;
 }

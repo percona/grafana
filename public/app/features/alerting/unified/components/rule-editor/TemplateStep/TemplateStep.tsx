@@ -2,8 +2,12 @@ import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
-import { Field, Input, Select } from '@grafana/ui';
+import { Stack } from '@grafana/experimental';
+import { Field, Icon, Input, InputControl, Label, Select, Tooltip, useStyles2 } from '@grafana/ui';
+import { FolderPickerFilter } from 'app/core/components/Select/FolderPicker';
+import { contextSrv } from 'app/core/core';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
+import { DashboardSearchHit } from 'app/features/search/types';
 import {
   Template,
   TemplateParamType,
@@ -11,17 +15,48 @@ import {
 import { fetchTemplatesAction } from 'app/percona/shared/core/reducers';
 import { getTemplates } from 'app/percona/shared/core/selectors';
 import { dispatch } from 'app/store/store';
+import { AccessControlAction } from 'app/types';
 
 import { fetchAlertManagerConfigAction } from '../../../state/actions';
-import { RuleFormValues } from '../../../types/rule-form';
+import { RuleForm, RuleFormValues } from '../../../types/rule-form';
 import { initialAsyncRequestState } from '../../../utils/redux';
 import { RuleEditorSection } from '../RuleEditorSection';
+import { Folder, RuleFolderPicker } from '../RuleFolderPicker';
+import { checkForPathSeparator } from '../util';
 
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import TemplateFiltersField from './TemplateFiltersField';
 import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './TemplateStep.constants';
 import { Messages } from './TemplateStep.messages';
+import { getStyles } from './TemplateStep.styles';
 import { formatTemplateOptions } from './TemplateStep.utils';
+
+const useRuleFolderFilter = (existingRuleForm: RuleForm | null) => {
+  const isSearchHitAvailable = useCallback(
+    (hit: DashboardSearchHit) => {
+      const rbacDisabledFallback = contextSrv.hasEditPermissionInFolders;
+
+      const canCreateRuleInFolder = contextSrv.hasAccessInMetadata(
+        AccessControlAction.AlertingRuleCreate,
+        hit,
+        rbacDisabledFallback
+      );
+
+      const canUpdateInCurrentFolder =
+        existingRuleForm &&
+        hit.folderId === existingRuleForm.id &&
+        contextSrv.hasAccessInMetadata(AccessControlAction.AlertingRuleUpdate, hit, rbacDisabledFallback);
+
+      return canCreateRuleInFolder || canUpdateInCurrentFolder;
+    },
+    [existingRuleForm]
+  );
+
+  return useCallback<FolderPickerFilter>(
+    (folderHits) => folderHits.filter(isSearchHitAvailable),
+    [isSearchHitAvailable]
+  );
+};
 
 export const TemplateStep: FC = () => {
   const {
@@ -30,8 +65,10 @@ export const TemplateStep: FC = () => {
     formState: { errors },
   } = useFormContext<RuleFormValues>();
   const templates = useRef<Template[]>([]);
+  const styles = useStyles2(getStyles);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
   const [queryParams] = useQueryParams();
+  const folderFilter = useRuleFolderFilter(null);
   /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
   const selectedTemplate: string | null = (queryParams['template'] as string | undefined) || null;
 
@@ -188,6 +225,67 @@ export const TemplateStep: FC = () => {
           )}
         />
       </Field>
+
+      <div className={styles.folderAndGroupSelect}>
+        <Field
+          label={
+            <Label htmlFor="folder" description={'Select a folder to store your rule.'}>
+              <Stack gap={0.5}>
+                Folder
+                <Tooltip
+                  placement="top"
+                  content={
+                    <div>
+                      Each folder has unique folder permission. When you store multiple rules in a folder, the folder
+                      access permissions get assigned to the rules.
+                    </div>
+                  }
+                >
+                  <Icon name="info-circle" size="xs" />
+                </Tooltip>
+              </Stack>
+            </Label>
+          }
+          className={styles.folderAndGroupInput}
+          error={errors.folder?.message}
+          invalid={!!errors.folder?.message}
+          data-testid="folder-picker"
+        >
+          <InputControl
+            render={({ field: { ref, ...field } }) => (
+              <RuleFolderPicker
+                inputId="folder"
+                {...field}
+                enableCreateNew={contextSrv.hasPermission(AccessControlAction.FoldersCreate)}
+                enableReset={true}
+                filter={folderFilter}
+              />
+            )}
+            name="folder"
+            rules={{
+              required: { value: true, message: 'Please select a folder' },
+              validate: {
+                pathSeparator: (folder: Folder) => checkForPathSeparator(folder.title),
+              },
+            }}
+          />
+        </Field>
+        <Field
+          label="Group"
+          data-testid="group-picker"
+          description="Rules within the same group are evaluated after the same time interval."
+          className={styles.folderAndGroupInput}
+          error={errors.group?.message}
+          invalid={!!errors.group?.message}
+        >
+          <Input
+            id="group"
+            {...register('group', {
+              required: { value: true, message: 'Must enter a group name' },
+            })}
+          />
+        </Field>
+      </div>
 
       <TemplateFiltersField />
 

@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
+export const getStyles = ({ v1: { spacing: v1Spacing }, spacing }: GrafanaTheme2) => ({
   actionsWrapper: css`
     margin-top: 60px;
   `,
@@ -10,18 +10,18 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
     width: 100%;
   `,
   toogleField: css`
-    margin-top: ${spacing.formInputMargin};
+    margin-top: ${v1Spacing.formInputMargin};
   `,
   filterRowWrapper: css`
     display: flex;
     gap: 10px;
-    margin-bottom: ${spacing.sm};
+    margin-bottom: ${v1Spacing.sm};
   `,
   filterFields: css`
     flex: 1;
   `,
   filterButton: css`
-    margin-bottom: ${spacing.md};
+    margin-bottom: ${v1Spacing.md};
   `,
   selectField: css`
     padding-top: 7px;
@@ -38,8 +38,23 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   `,
   filtersLabelWrapper: css`
     display: flex;
-    gap: ${spacing.xs};
-    margin-bottom: ${spacing.xs};
+    gap: ${v1Spacing.xs};
+    margin-bottom: ${v1Spacing.xs};
     align-items: baseline;
+  `,
+  folderAndGroupSelect: css`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    align-items: baseline;
+    margin-bottom: ${spacing(3)};
+  `,
+  folderAndGroupInput: css`
+    width: 275px;
+
+    & + & {
+      margin-left: ${spacing(3)};
+    }
   `,
 });

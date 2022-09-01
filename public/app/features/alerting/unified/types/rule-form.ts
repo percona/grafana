@@ -11,9 +11,12 @@ export enum RuleFormType {
   templated = 'templated',
 }
 
+// @PERCONA
+// Added uid here as optional
 export interface RuleForm {
   title: string;
   id: number;
+  uid?: string;
 }
 
 export interface RuleFormValues {

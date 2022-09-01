@@ -21,7 +21,7 @@ export const formatTemplateOptions = (templates: Template[]): Array<SelectableVa
     : [];
 
 export const formatCreateAPIPayload = (data: RuleFormValues): AlertRuleCreatePayload => {
-  const { duration, filters, name, severity, template } = data;
+  const { duration, filters, name, severity, template, folder, group } = data;
 
   const payload: AlertRuleCreatePayload = {
     custom_labels: {},
@@ -31,6 +31,8 @@ export const formatCreateAPIPayload = (data: RuleFormValues): AlertRuleCreatePay
     template_name: template?.name!,
     name,
     params: [],
+    group,
+    folder_uid: folder?.uid || '',
   };
 
   template?.params?.forEach((param) => {
