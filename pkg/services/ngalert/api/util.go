@@ -17,6 +17,7 @@ import (
 
 	"github.com/grafana/grafana/pkg/api/response"
 	"github.com/grafana/grafana/pkg/models"
+	"github.com/grafana/grafana/pkg/services/accesscontrol"
 	"github.com/grafana/grafana/pkg/services/datasourceproxy"
 	"github.com/grafana/grafana/pkg/services/datasources"
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
@@ -25,7 +26,7 @@ import (
 )
 
 var searchRegex = regexp.MustCompile(`\{(\w+)\}`)
-
+var errInvalidRecipientFormat = errors.New("invalid recipient (datasource) identifier format. Only integer is expected")
 var NotImplementedResp = ErrResp(http.StatusNotImplemented, errors.New("endpoint not implemented"), "")
 
 func toMacaronPath(path string) string {
@@ -37,7 +38,8 @@ func toMacaronPath(path string) string {
 
 func backendTypeByUID(ctx *models.ReqContext, cache datasources.CacheService) (apimodels.Backend, error) {
 	datasourceUID := web.Params(ctx.Req)[":DatasourceUID"]
-	if ds, err := cache.GetDatasourceByUID(ctx.Req.Context(), datasourceUID, ctx.SignedInUser, ctx.SkipCache); err == nil {
+	ds, err := cache.GetDatasourceByUID(ctx.Req.Context(), datasourceUID, ctx.SignedInUser, ctx.SkipCache)
+	if err == nil {
 		switch ds.Type {
 		case "loki", "prometheus":
 			return apimodels.LoTexRulerBackend, nil
@@ -47,7 +49,7 @@ func backendTypeByUID(ctx *models.ReqContext, cache datasources.CacheService) (a
 			return 0, fmt.Errorf("unexpected backend type (%v)", ds.Type)
 		}
 	}
-	return 0, fmt.Errorf("unexpected backend type (%v)", datasourceUID)
+	return 0, errors.New("no datasource was found matching the given UID")
 }
 
 // macaron unsafely asserts the http.ResponseWriter is an http.CloseNotifier, which will panic.
@@ -62,19 +64,35 @@ func (w *safeMacaronWrapper) CloseNotify() <-chan bool {
 	return make(chan bool)
 }
 
-// replacedResponseWriter overwrites the underlying responsewriter used by a *models.ReqContext.
-// It's ugly because it needs to replace a value behind a few nested pointers.
-func replacedResponseWriter(ctx *models.ReqContext) (*models.ReqContext, *response.NormalResponse) {
-	resp := response.CreateNormalResponse(make(http.Header), nil, 0)
+// createProxyContext creates a new request context that is provided down to the data source proxy.
+// The request context
+// 1. overwrites the underlying response writer used by a *models.ReqContext because AlertingProxy needs to intercept
+// the response from the data source to analyze it and probably change
+// 2. elevates the current user permissions to Editor if both conditions are met: RBAC is enabled, user does not have Editor role.
+// This is needed to bypass the plugin authorization, which still relies on the legacy roles.
+// This elevation can be considered safe because all upstream calls are protected by the RBAC on web request router level.
+func (p *AlertingProxy) createProxyContext(ctx *models.ReqContext, request *http.Request, response *response.NormalResponse) *models.ReqContext {
 	cpy := *ctx
 	cpyMCtx := *cpy.Context
-	cpyMCtx.Resp = web.NewResponseWriter(ctx.Req.Method, &safeMacaronWrapper{resp})
+	cpyMCtx.Resp = web.NewResponseWriter(ctx.Req.Method, &safeMacaronWrapper{response})
 	cpy.Context = &cpyMCtx
-	return &cpy, resp
+	cpy.Req = request
+
+	// If RBAC is enabled, the actions are checked upstream and if the user gets here then it is allowed to do an action against a datasource.
+	// Some data sources require legacy Editor role in order to perform mutating operations. In this case, we elevate permissions for the context that we
+	// will provide downstream.
+	// TODO (yuri) remove this after RBAC for plugins is implemented
+	if !p.ac.IsDisabled() && !ctx.SignedInUser.HasRole(models.ROLE_EDITOR) {
+		newUser := *ctx.SignedInUser
+		newUser.OrgRole = models.ROLE_EDITOR
+		cpy.SignedInUser = &newUser
+	}
+	return &cpy
 }
 
 type AlertingProxy struct {
 	DataProxy *datasourceproxy.DataSourceProxyService
+	ac        accesscontrol.AccessControl
 }
 
 // withReq proxies a different request
@@ -93,23 +111,23 @@ func (p *AlertingProxy) withReq(
 	for h, v := range headers {
 		req.Header.Add(h, v)
 	}
-	newCtx, resp := replacedResponseWriter(ctx)
-	newCtx.Req = req
+	// this response will be populated by the response from the datasource
+	resp := response.CreateNormalResponse(make(http.Header), nil, 0)
+	proxyContext := p.createProxyContext(ctx, req, resp)
 
 	datasourceID := web.Params(ctx.Req)[":DatasourceID"]
 	if datasourceID != "" {
 		recipient, err := strconv.ParseInt(web.Params(ctx.Req)[":DatasourceID"], 10, 64)
 		if err != nil {
-			return ErrResp(http.StatusBadRequest, err, "DatasourceID is invalid")
+			return ErrResp(http.StatusBadRequest, errInvalidRecipientFormat, "")
 		}
-
-		p.DataProxy.ProxyDatasourceRequestWithID(newCtx, recipient)
+		p.DataProxy.ProxyDatasourceRequestWithID(proxyContext, recipient)
 	} else {
 		datasourceUID := web.Params(ctx.Req)[":DatasourceUID"]
 		if datasourceUID == "" {
 			return ErrResp(http.StatusBadRequest, err, "DatasourceUID is empty")
 		}
-		p.DataProxy.ProxyDatasourceRequestWithUID(newCtx, datasourceUID)
+		p.DataProxy.ProxyDatasourceRequestWithUID(proxyContext, datasourceUID)
 	}
 
 	status := resp.Status()

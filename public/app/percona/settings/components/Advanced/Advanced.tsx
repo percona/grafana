@@ -6,7 +6,7 @@ import { Field, withTypes } from 'react-final-form';
 import { useSelector } from 'react-redux';
 
 import { Button, Spinner, Icon, useStyles2 } from '@grafana/ui';
-import Page from 'app/core/components/Page/Page';
+import { OldPage } from 'app/core/components/Page/Page';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -56,6 +56,7 @@ export const Advanced: FC = () => {
     azureDiscoverEnabled,
     publicAddress,
     alertingEnabled,
+    telemetrySummaries,
   } = settings!;
   const settingsStyles = useStyles2(getSettingsStyles);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
@@ -68,6 +69,7 @@ export const Advanced: FC = () => {
       telemetryLabel,
       telemetryLink,
       telemetryTooltip,
+      telemetrySummaryTitle,
       telemetryDisclaimer,
       updatesLabel,
       updatesLink,
@@ -110,6 +112,7 @@ export const Advanced: FC = () => {
     rareInterval,
     standardInterval,
     frequentInterval,
+    telemetrySummaries,
   };
   const [loading, setLoading] = useState(false);
 
@@ -167,8 +170,8 @@ export const Advanced: FC = () => {
   const { Form } = withTypes<AdvancedFormProps>();
 
   return (
-    <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
-      <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
+    <OldPage navModel={navModel} vertical tabsDataTestId="settings-tabs">
+      <OldPage.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
         <FeatureLoader>
           <div className={styles.advancedWrapper}>
             <Form
@@ -181,7 +184,7 @@ export const Advanced: FC = () => {
                       <div className={settingsStyles.labelWrapper} data-testid="advanced-label">
                         <span>{retentionLabel}</span>
                         <LinkTooltip
-                          tooltipText={retentionTooltip}
+                          tooltipContent={retentionTooltip}
                           link={Messages.advanced.retentionLink}
                           linkText={tooltipLinkText}
                           icon="info-circle"
@@ -200,7 +203,13 @@ export const Advanced: FC = () => {
                     name="telemetry"
                     type="checkbox"
                     label={telemetryLabel}
-                    tooltip={telemetryTooltip}
+                    tooltip={
+                      <TelemetryTooltip
+                        telemetryTooltip={telemetryTooltip}
+                        telemetrySummaryTitle={telemetrySummaryTitle}
+                        telemetrySummaries={telemetrySummaries}
+                      />
+                    }
                     tooltipLinkText={tooltipLinkText}
                     link={telemetryLink}
                     dataTestId="advanced-telemetry"
@@ -234,7 +243,7 @@ export const Advanced: FC = () => {
                     <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                       <div className={settingsStyles.labelWrapper} data-testid="public-address-label">
                         <span>{publicAddressLabel}</span>
-                        <LinkTooltip tooltipText={publicAddressTooltip} icon="info-circle" />
+                        <LinkTooltip tooltipContent={publicAddressTooltip} icon="info-circle" />
                       </div>
                     </div>
                     <div className={styles.publicAddressWrapper}>
@@ -255,7 +264,7 @@ export const Advanced: FC = () => {
                     <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
                       <div className={settingsStyles.labelWrapper} data-testid="check-intervals-label">
                         <span>{sttCheckIntervalsLabel}</span>
-                        <LinkTooltip tooltipText={sttCheckIntervalTooltip} icon="info-circle" />
+                        <LinkTooltip tooltipContent={sttCheckIntervalTooltip} icon="info-circle" />
                       </div>
                     </div>
                   </div>
@@ -343,8 +352,34 @@ export const Advanced: FC = () => {
             />
           </div>
         </FeatureLoader>
-      </Page.Contents>
-    </Page>
+      </OldPage.Contents>
+    </OldPage>
+  );
+};
+
+interface TelemetryTooltipProps {
+  telemetryTooltip: string;
+  telemetrySummaryTitle: string;
+  telemetrySummaries: string[];
+}
+
+const TelemetryTooltip: FC<TelemetryTooltipProps> = ({
+  telemetryTooltip,
+  telemetrySummaryTitle,
+  telemetrySummaries,
+}) => {
+  const styles = useStyles2(getStyles);
+
+  return (
+    <div className={styles.telemetryTooltip} data-testid="info-tooltip">
+      <p>{telemetryTooltip}</p>
+      <p>{telemetrySummaryTitle}</p>
+      <ul className={styles.telemetryListTooltip}>
+        {telemetrySummaries.map((summary) => (
+          <li key={summary}>{summary}</li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

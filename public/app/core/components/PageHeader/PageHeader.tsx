@@ -1,14 +1,15 @@
 import { css, cx } from '@emotion/css';
 import React, { FC } from 'react';
 
-import { NavModel, NavModelItem, NavModelBreadcrumb, GrafanaTheme2 } from '@grafana/data';
+import { NavModelItem, NavModelBreadcrumb, GrafanaTheme2 } from '@grafana/data';
 import { Tab, TabsBar, Icon, IconName, useStyles2 } from '@grafana/ui';
 import { PanelHeaderMenuItem } from 'app/features/dashboard/dashgrid/PanelHeader/PanelHeaderMenuItem';
 
 import { ProBadge } from '../Upgrade/ProBadge';
 
 export interface Props {
-  model: NavModel;
+  navItem: NavModelItem;
+  // @PERCONA
   vertical?: boolean;
   tabsDataTestId?: string;
 }
@@ -55,6 +56,7 @@ const Navigation = ({
   dataTestId = '',
 }: {
   children: NavModelItem[];
+  // @PERCONA
   vertical?: boolean;
   dataTestId?: string;
   tabsdataTestId?: string;
@@ -88,23 +90,21 @@ const Navigation = ({
   );
 };
 
-export const PageHeader: FC<Props> = ({ model, vertical = false, tabsDataTestId = '' }) => {
+export const PageHeader: FC<Props> = ({ navItem: model, vertical = false, tabsDataTestId = '' }) => {
   const styles = useStyles2(getStyles);
 
   if (!model) {
     return null;
   }
 
-  const main = model.main;
-  const children = main.children;
   return (
     <div className={styles.headerCanvas}>
       <div className="page-container">
         <div className="page-header">
-          {renderHeaderTitle(main)}
-          {children && children.length && (
+          {renderHeaderTitle(model)}
+          {model.children && model.children.length && (
             <Navigation vertical={vertical} dataTestId={tabsDataTestId}>
-              {children}
+              {model.children}
             </Navigation>
           )}
         </div>
@@ -186,6 +186,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     headerCanvas: css`
       background: ${theme.colors.background.canvas};
     `,
+    // @PERCONA
     verticalNav: css`
       width: 20%;
       @media (min-width: ${maxWidthBreakpoint}px) {

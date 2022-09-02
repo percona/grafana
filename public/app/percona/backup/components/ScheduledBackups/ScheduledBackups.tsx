@@ -7,7 +7,7 @@ import { Cell, Column, Row } from 'react-table';
 import { AppEvents } from '@grafana/data';
 import { Button, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
-import Page from 'app/core/components/Page/Page';
+import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
@@ -75,8 +75,18 @@ export const ScheduledBackups: FC = () => {
 
   const handleCopy = useCallback(
     async (backup: ScheduledBackup) => {
-      const { serviceId, locationId, cronExpression, name, description, retention, retryInterval, retryTimes, mode } =
-        backup;
+      const {
+        serviceId,
+        locationId,
+        cronExpression,
+        name,
+        description,
+        retention,
+        retryInterval,
+        retryTimes,
+        mode,
+        dataModel,
+      } = backup;
       const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
       setActionPending(true);
       try {
@@ -90,7 +100,8 @@ export const ScheduledBackups: FC = () => {
           retryTimes,
           retention,
           false,
-          mode
+          mode,
+          dataModel
         );
         getData();
       } catch (e) {
@@ -208,6 +219,7 @@ export const ScheduledBackups: FC = () => {
       active,
       retention,
       mode,
+      dataModel,
     } = backup;
     try {
       const cronExpression = getCronStringFromValues(
@@ -244,7 +256,8 @@ export const ScheduledBackups: FC = () => {
           resultRetryTimes!,
           retention!,
           active!,
-          mode
+          mode,
+          dataModel
         );
         appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.addSuccess]);
       }
@@ -303,8 +316,8 @@ export const ScheduledBackups: FC = () => {
   }, []);
 
   return (
-    <Page navModel={navModel}>
-      <Page.Contents>
+    <OldPage navModel={navModel}>
+      <OldPage.Contents>
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
@@ -343,8 +356,8 @@ export const ScheduledBackups: FC = () => {
             message={Messages.scheduledBackups.getDeleteMessage(selectedBackup?.name!)}
           />
         </FeatureLoader>
-      </Page.Contents>
-    </Page>
+      </OldPage.Contents>
+    </OldPage>
   );
 };
 

@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { FieldConfigSource, GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { locationService } from '@grafana/runtime';
+import { isFetchError, locationService } from '@grafana/runtime';
 import {
   HorizontalGroup,
   InlineSwitch,
@@ -163,7 +163,9 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
         await saveAndRefreshLibraryPanel(this.props.panel, this.props.dashboard.meta.folderId!);
         this.props.notifyApp(createPanelLibrarySuccessNotification('Library panel saved'));
       } catch (err) {
-        this.props.notifyApp(createPanelLibraryErrorNotification(`Error saving library panel: "${err.statusText}"`));
+        if (isFetchError(err)) {
+          this.props.notifyApp(createPanelLibraryErrorNotification(`Error saving library panel: "${err.statusText}"`));
+        }
       }
       return;
     }
@@ -336,32 +338,31 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
       <ToolbarButton
         icon="cog"
         onClick={this.onOpenDashboardSettings}
-        title="Open dashboard settings"
+        tooltip="Open dashboard settings"
         key="settings"
       />,
-      <ToolbarButton onClick={this.onDiscard} title="Undo all changes" key="discard">
+      <ToolbarButton onClick={this.onDiscard} tooltip="Undo all changes" key="discard">
         Discard
       </ToolbarButton>,
       this.props.panel.libraryPanel ? (
         <ToolbarButton
           onClick={this.onSaveLibraryPanel}
           variant="primary"
-          title="Apply changes and save library panel"
+          tooltip="Apply changes and save library panel"
           key="save-panel"
         >
           Save library panel
         </ToolbarButton>
       ) : (
-        <ToolbarButton onClick={this.onSaveDashboard} title="Apply changes and save dashboard" key="save">
+        <ToolbarButton onClick={this.onSaveDashboard} tooltip="Apply changes and save dashboard" key="save">
           Save
         </ToolbarButton>
       ),
       <ToolbarButton
         onClick={this.onBack}
         variant="primary"
-        title="Apply changes and go back to dashboard"
+        tooltip="Apply changes and go back to dashboard"
         key="apply"
-        aria-label={selectors.components.PanelEditor.applyButton}
       >
         Apply
       </ToolbarButton>,

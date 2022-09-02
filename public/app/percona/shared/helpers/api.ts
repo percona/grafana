@@ -1,4 +1,5 @@
-import axios, { CancelToken, AxiosInstance, AxiosError } from 'axios';
+/* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
+import axios, { CancelToken, AxiosInstance } from 'axios';
 
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
@@ -14,12 +15,18 @@ export class ApiRequest {
     });
   }
 
-  async get<T, B>(path: string, query?: { params: B; cancelToken?: CancelToken }): Promise<T> {
+  async get<T, B>(
+    path: string,
+    disableNotifications = false,
+    query?: { params: B; cancelToken?: CancelToken }
+  ): Promise<T> {
     return this.axiosInstance
       .get<T>(path, query)
       .then((response): T => response.data)
       .catch((e) => {
-        appEvents.emit(AppEvents.alertError, [e.message]);
+        if (!disableNotifications) {
+          appEvents.emit(AppEvents.alertError, [e.message]);
+        }
         throw e;
       });
   }
@@ -90,7 +97,7 @@ export const translateApiError = (error: ApiErrorCode): ApiVerboseError | undefi
   return translatedError;
 };
 
-export const apiErrorParser = (e: AxiosError): ApiVerboseError[] => {
+export const apiErrorParser = (e: any): ApiVerboseError[] => {
   const errorData: ApiError = e.response?.data as ApiError;
   let result: ApiVerboseError[] = [];
 

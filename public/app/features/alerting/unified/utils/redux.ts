@@ -1,12 +1,10 @@
 import { AsyncThunk, createSlice, Draft, isAsyncThunkAction, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 
 import { AppEvents } from '@grafana/data';
-import { FetchError } from '@grafana/runtime';
+import { FetchError, isFetchError } from '@grafana/runtime';
 import { appEvents } from 'app/core/core';
 import { PERCONA_CANCELLED_ERROR_NAME } from 'app/percona/shared/core';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-
-import { isFetchError } from './alertmanager';
 
 export interface AsyncRequestState<T> {
   result?: T;
@@ -77,6 +75,7 @@ function requestStateReducer<T, ThunkArg = void, ThunkApiConfig = {}>(
 export function createAsyncSlice<T, ThunkArg = void, ThunkApiConfig = {}>(
   name: string,
   asyncThunk: AsyncThunk<T, ThunkArg, ThunkApiConfig>,
+  // @PERCONA
   initialState?: T
 ) {
   return createSlice({
@@ -127,6 +126,7 @@ export function withSerializedError<T>(p: Promise<T>): Promise<T> {
     const err: SerializedError = {
       message: messageFromError(e),
       code: e.statusCode,
+      // @PERCONA
       name: isApiCancelError(e) ? PERCONA_CANCELLED_ERROR_NAME : '',
     };
     throw err;
@@ -183,6 +183,10 @@ export function isAsyncRequestMapSlicePending<T>(slice: AsyncRequestMapSlice<T>)
   return Object.values(slice).some(isAsyncRequestStatePending);
 }
 
-export function isAsyncRequestStatePending<T>(state: AsyncRequestState<T>): boolean {
+export function isAsyncRequestStatePending<T>(state?: AsyncRequestState<T>): boolean {
+  if (!state) {
+    return false;
+  }
+
   return state.dispatched && state.loading;
 }

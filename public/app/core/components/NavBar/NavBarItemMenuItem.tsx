@@ -114,11 +114,5 @@ function getStyles(theme: GrafanaTheme2, isFocused: boolean, isSection: boolean)
       justify-content: center;
       align-items: center;
     `,
-    upgradeBoxContainer: css`
-      padding: ${theme.spacing(1)};
-    `,
-    upgradeBox: css`
-      width: 300px;
-    `,
   };
 }

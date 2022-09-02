@@ -324,7 +324,7 @@ Sets the maximum amount of time a connection may be reused. The default is 14400
 
 ### locking_attempt_timeout_sec
 
-For "mysql", if `lockingMigration` feature toggle is set, specify the time (in seconds) to wait before failing to lock the database for the migrations. Default is 0.
+For "mysql", if the `migrationLocking` feature toggle is set, specify the time (in seconds) to wait before failing to lock the database for the migrations. Default is 0.
 
 ### log_queries
 
@@ -610,6 +610,14 @@ Current core features that will stop working:
 - Legacy alerting edit rule UI
 
 Before we disable angular support by default we plan to migrate these remaining areas to React.
+
+### csrf_trusted_origins
+
+List of additional allowed URLs to pass by the CSRF check. Suggested when authentication comes from an IdP.
+
+### csrf_additional_headers
+
+List of allowed headers to be set by the user. Suggested to use for if authentication lives behind reverse proxies.
 
 ## [snapshots]
 
@@ -1096,6 +1104,10 @@ Syslog tag. By default, the process's `argv[0]` is used.
 
 Sentry javascript agent is initialized. Default is `false`.
 
+### provider
+
+Defines which provider to use `sentry` or `grafana`. Default is `sentry`
+
 ### sentry_dsn
 
 Sentry DSN if you want to send events to Sentry
@@ -1115,6 +1127,22 @@ Requests per second limit enforced per an extended period, for Grafana backend l
 ### log_endpoint_burst_limit
 
 Maximum requests accepted per short interval of time for Grafana backend log ingestion endpoint, `/log`. Default is `15`.
+
+### instrumentations_errors_enabled
+
+Turn on error instrumentation. Only affects Grafana Javascript Agent.
+
+### instrumentations_console_enabled
+
+Turn on console instrumentation. Only affects Grafana Javascript Agent
+
+### instrumentations_webvitals_enabled
+
+Turn on webvitals instrumentation. Only affects Grafana Javascript Agent
+
+### api_key
+
+If `custom_endpoint` required authentication, you can set the api key here. Only relevant for Grafana Javascript Agent provider.
 
 <hr>
 
@@ -1178,11 +1206,11 @@ Sets a global limit on number of alert rules that can be created. Default is -1 
 
 ## [unified_alerting]
 
-For more information about the Grafana alerts, refer to [About Grafana alerting]({{< relref "../../alerting/" >}}).
+For more information about the Grafana alerts, refer to [About Grafana Alerting]({{< relref "../../alerting/" >}}).
 
 ### enabled
 
-Enable the Unified Alerting sub-system and interface. When enabled we'll migrate all of your alert rules and notification channels to the new system. New alert rules will be created and your notification channels will be converted into an Alertmanager configuration. Previous data is preserved to enable backwards compatibility but new data is removed. The default value is `false`.
+Enable or disable Grafana Alerting. If disabled, all your legacy alerting data will be available again, but the data you created using Grafana Alerting will be deleted. Set force_migration=true to avoid deletion of data. The default value is `true`.
 
 Alerting Rules migrated from dashboards and panels will include a link back via the `annotations`.
 
@@ -1204,11 +1232,11 @@ The interval string is a possibly signed sequence of decimal numbers, followed b
 
 ### ha_listen_address
 
-Listen address/hostname and port to receive unified alerting messages for other Grafana instances. The port is used for both TCP and UDP. It is assumed other Grafana instances are also running on the same port. The default value is `0.0.0.0:9094`.
+Listen IP address and port to receive unified alerting messages for other Grafana instances. The port is used for both TCP and UDP. It is assumed other Grafana instances are also running on the same port. The default value is `0.0.0.0:9094`.
 
 ### ha_advertise_address
 
-Explicit address/hostname and port to advertise other Grafana instances. The port is used for both TCP and UDP.
+Explicit IP address and port to advertise other Grafana instances. The port is used for both TCP and UDP.
 
 ### ha_peers
 
@@ -1278,13 +1306,25 @@ Uploads screenshots to the local Grafana server or remote storage such as Azure,
 
 <hr>
 
+## [unified_alerting.reserved_labels]
+
+For more information about Grafana Reserved Labels, refer to [Labels in Grafana Alerting]({{< relref "../../alerting/fundamentals/annotation-label/how-to-use-labels/#grafana-reserved-labels" >}}).
+
+### disabled_labels
+
+Comma-separated list of reserved labels added by the Grafana Alerting engine that should be disabled.
+
+For example: `disabled_labels=grafana_folder`
+
+<hr>
+
 ## [alerting]
 
-For more information about the legacy dashboard alerting feature in Grafana, refer to [Alerts overview]({{< relref "../../alerting/" >}}).
+For more information about the legacy dashboard alerting feature in Grafana, refer to [the legacy Grafana alerts]({{< relref "https://grafana.com/docs/grafana/v8.5/alerting/old-alerting/" >}}).
 
 ### enabled
 
-Set to `false` to [enable Grafana alerting]({{<relref "#unified_alerting">}}) and to disable legacy alerting engine. to disable Grafana alerting, set to `true`.
+Set to `true` to [enable legacy dashboard alerting]({{<relref "#unified_alerting">}}). The default value is `false`.
 
 ### execute_alerts
 
@@ -1542,7 +1582,7 @@ The propagation specifies the text map propagation format.(ex: jaeger, w3c)
 
 ## [tracing.opentelemetry.otlp]
 
-Configure Grafana's OLTP client for distributed tracing.
+Configure Grafana's otlp client for distributed tracing.
 
 ### address
 

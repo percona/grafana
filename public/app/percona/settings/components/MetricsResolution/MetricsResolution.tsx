@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import { useSelector } from 'react-redux';
 
 import { Button, Spinner, useStyles2 } from '@grafana/ui';
-import Page from 'app/core/components/Page/Page';
+import { OldPage } from 'app/core/components/Page/Page';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { MetricsResolutions } from 'app/percona/settings/Settings.types';
@@ -67,7 +67,9 @@ export const MetricsResolution: FC = () => {
     setLoading(false);
   };
 
-  const updateResolutions = (form: FormApi<any>) => {
+  const updateResolutions = (
+    form: FormApi<{ hr: string; mr: string; lr: string; resolutions: MetricsResolutionPresets }>
+  ) => {
     const { hr, mr, lr, resolutions: newResolution } = form.getState().values;
 
     if (resolution === newResolution) {
@@ -75,6 +77,7 @@ export const MetricsResolution: FC = () => {
     }
 
     if (resolution === MetricsResolutionPresets.custom) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       updateCustomResolutions({ hr, mr, lr } as MetricsResolutions);
     }
 
@@ -97,8 +100,8 @@ export const MetricsResolution: FC = () => {
   };
 
   return (
-    <Page navModel={navModel} vertical tabsDataTestId="settings-tabs">
-      <Page.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
+    <OldPage navModel={navModel} vertical tabsDataTestId="settings-tabs">
+      <OldPage.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
         <FeatureLoader>
           <div className={styles.resolutionsWrapper}>
             <Form
@@ -107,12 +110,13 @@ export const MetricsResolution: FC = () => {
               render={({ form, handleSubmit, valid, pristine }) => (
                 <form
                   onSubmit={handleSubmit}
+                  // @ts-ignore
                   onChange={() => updateResolutions(form)}
                   data-testid="metrics-resolution-form"
                 >
                   <div className={settingsStyles.labelWrapper} data-testid="metrics-resolution-label">
                     <span>{label}</span>
-                    <LinkTooltip tooltipText={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
+                    <LinkTooltip tooltipContent={tooltip} link={link} linkText={tooltipLinkText} icon="info-circle" />
                   </div>
                   <RadioButtonGroupField
                     name="resolutions"
@@ -160,8 +164,8 @@ export const MetricsResolution: FC = () => {
             />
           </div>
         </FeatureLoader>
-      </Page.Contents>
-    </Page>
+      </OldPage.Contents>
+    </OldPage>
   );
 };
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 import { AxiosError, AxiosInstance } from 'axios';
 
 import { ApiErrorCode, ApiParams } from '../core';
@@ -32,7 +33,7 @@ describe('GET::', () => {
     const api = new ApiRequest({});
 
     (api.axiosInstance as AxiosInstanceEx).get.mockResolvedValueOnce({ data: 'some data' });
-    const result = await api.get('/test/path', { params: { key: 'value' } });
+    const result = await api.get('/test/path', false, { params: { key: 'value' } });
 
     expect(result).toEqual('some data');
   });

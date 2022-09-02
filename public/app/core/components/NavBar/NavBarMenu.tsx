@@ -1,4 +1,5 @@
 import { css, cx } from '@emotion/css';
+import { useLingui } from '@lingui/react';
 import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { OverlayContainer, useOverlay } from '@react-aria/overlays';
@@ -26,6 +27,7 @@ import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { NavBarMenuItem } from './NavBarMenuItem';
 import { NavBarToggle } from './NavBarToggle';
 import { NavFeatureHighlight } from './NavFeatureHighlight';
+import menuItemTranslations from './navBarItem-translations';
 import { isMatchOrInnerMatch } from './utils';
 
 const MENU_WIDTH = '350px';
@@ -227,7 +229,7 @@ const getAnimStyles = (theme: GrafanaTheme2, animationDuration: number) => {
   };
 };
 
-function NavItem({
+export function NavItem({
   link,
   activeItem,
   onClose,
@@ -236,6 +238,7 @@ function NavItem({
   activeItem?: NavModelItem;
   onClose: () => void;
 }) {
+  const { i18n } = useLingui();
   const styles = useStyles2(getNavItemStyles);
 
   // @Percona
@@ -279,6 +282,15 @@ function NavItem({
     return (
       <CollapsibleNavItem onClose={onClose} link={link} isActive={isMatchOrInnerMatch(link, activeItem)}>
         <ul className={styles.children}>{link.children.map(renderCollapsibleItem)}</ul>
+      </CollapsibleNavItem>
+    );
+  } else if (link.emptyMessageId) {
+    const emptyMessageTranslated = i18n._(menuItemTranslations[link.emptyMessageId]);
+    return (
+      <CollapsibleNavItem onClose={onClose} link={link} isActive={isMatchOrInnerMatch(link, activeItem)}>
+        <ul className={styles.children}>
+          <div className={styles.emptyMessage}>{emptyMessageTranslated}</div>
+        </ul>
       </CollapsibleNavItem>
     );
   } else {
@@ -351,6 +363,11 @@ const getNavItemStyles = (theme: GrafanaTheme2) => ({
     fontSize: theme.typography.pxToRem(14),
     justifySelf: 'start',
     padding: theme.spacing(0.5, 4.25, 0.5, 0.5),
+  }),
+  emptyMessage: css({
+    color: theme.colors.text.secondary,
+    fontStyle: 'italic',
+    padding: theme.spacing(1, 1.5),
   }),
 });
 
@@ -495,7 +512,7 @@ function linkHasChildren(link: NavModelItem): link is NavModelItem & { children:
 }
 
 function getLinkIcon(link: NavModelItem, size: IconSize = 'xl') {
-  if (link.id === 'home') {
+  if (link.icon === 'grafana') {
     return <Branding.MenuLogo />;
   } else if (link.icon) {
     return <Icon name={link.icon as IconName} size={size} />;

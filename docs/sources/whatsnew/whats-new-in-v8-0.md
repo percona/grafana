@@ -25,7 +25,7 @@ These features are included in the Grafana open source edition.
 
 ### Grafana v8.0 alerts
 
-The new alerts in Grafana 8.0 are an opt-in feature that centralizes alerting information for Grafana managed alerts and alerts from Prometheus-compatible data sources in one UI and API. You can create and edit alerting rules for Grafana managed alerts, Mimir alerts, and Loki alerts as well as see alerting information from prometheus-compatible data sources in a single, searchable view. For more information, on how to create and edit alerts and notifications, refer to [Grafana alerting]({{< relref "../alerting/" >}}).
+The new alerts in Grafana 8.0 are an opt-in feature that centralizes alerting information for Grafana managed alerts and alerts from Prometheus-compatible data sources in one UI and API. You can create and edit alerting rules for Grafana managed alerts, Mimir alerts, and Loki alerts as well as see alerting information from prometheus-compatible data sources in a single, searchable view. For more information, on how to create and edit alerts and notifications, refer to [Grafana Alerting]({{< relref "../alerting/" >}}).
 
 As part of the new alert changes, we have introduced a new data source, Alertmanager, which includes built-in support for Prometheus Alertmanager. It is presently in alpha and it not accessible unless alpha plugins are enabled in Grafana settings. For more information, refer to [Alertmanager data source]({{< relref "../datasources/alertmanager/" >}}).
 
@@ -95,9 +95,9 @@ For more information, refer to [Histogram]({{< relref "../visualizations/histogr
 The Time series is out of beta! We are removing the `Beta` tag and graduating the Time series visualization to a stable state.
 
 - **Time series** is now the default visualization option, replacing the **Graph (old)**.
-- The Time series panel now supports stacking. For more information, refer to [Graph stacked time series]({{< relref "../visualizations/time-series/graph-time-series-stacking/" >}}).
+- The Time series panel now supports stacking. For more information, refer to [Graph stacked time series]({{< relref "../visualizations/time-series#stack-series" >}}).
 - You can now add alerts in the Time series panel, just like the old Graph panel.
-- Updated [connect null values]({{< relref "../visualizations/time-series/graph-time-series-as-lines/#connect-null-values" >}}) options.
+- Updated [connect null values]({{< relref "../visualizations/time-series#connect-null-values" >}}) options.
 - We added support for a shared crosshair and a tooltip that’s now smarter when it comes to data display in the tooltip.
 - Various performance improvements.
 
@@ -121,7 +121,7 @@ Lots of panel editor improvements, heavily informed by user research and communi
 
 - All options are now shown in a single pane.
 - You can now search panel options.
-- The Value mappings feature has been completely redesigned. For more information, refer to [About value mappings]({{< relref "../panels/format-data/about-value-mapping/" >}}).
+- The Value mappings feature has been completely redesigned. For more information, refer to [Configure value mappings]({{< relref "../panels/configure-value-mappings/" >}}).
 - New **Table view** option is always available.
 
 The [Panels]({{< relref "../panels/" >}}) section has been updated to reflect these changes.
@@ -156,7 +156,7 @@ Log navigation in Explore has been significantly improved. We added pagination t
 
 You can now use the Plugin catalog app to easily manage your plugins from within Grafana. Install, update, and uninstall plugins without requiring a server restart.
 
-[Plugin catalog]({{< relref "../plugins/catalog/" >}}) was added as a result of this feature.
+[Plugin catalog]({{< relref "../administration/plugin-management#plugin-catalog/" >}}) was added as a result of this feature.
 
 ### Performance improvements
 
@@ -294,7 +294,7 @@ These features are included in the Grafana Enterprise edition.
 
 You can now add or remove detailed permissions from Viewer, Editor, and Admin org roles, to grant users just the right amount of access within Grafana. Available permissions include the ability to view and manage Users, Reports, and the Access Control API itself. Grafana will support more and more permissions over the coming months.
 
-[Role-based access control docs]({{< relref "../enterprise/access-control/" >}}) were added as a result of this feature.
+[Role-based access control docs]({{< relref "../administration/roles-and-permissions/access-control/" >}}) were added as a result of this feature.
 
 ### Data source query caching
 
@@ -318,7 +318,7 @@ For more information, refer to [Reporting docs]({{< relref "../enterprise/report
 
 The Grafana Enterprise documentation has been updated to describe more specifically how licensed roles are counted, how they can be updated, and where you can see details about dashboard and folder permissions that affect users' licensed roles.
 
-For more information, refer to [License restrictions docs]({{< relref "../enterprise/license/license-restrictions/" >}}).
+For more information, refer to [License restrictions docs]({{< relref "../administration/enterprise-licensing#license-restrictions" >}}).
 
 ## Breaking changes
 

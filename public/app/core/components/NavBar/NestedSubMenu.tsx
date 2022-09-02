@@ -1,3 +1,5 @@
+// @PERCONA
+// Recursive side menus
 import { css } from '@emotion/css';
 import React, { FC } from 'react';
 
@@ -14,8 +16,9 @@ export const NestedSubMenu: FC<Props> = ({ items = [] }) => {
     <ul className={styles.menu}>
       {items.map((item) => (
         <li key={item.id}>
-          <Link href={item.url || '#'} target={item.target} data-testid={`left-menu-${item.id}`} onClick={item.onClick}>
-            {item.showIconInNavbar && item.icon && <Icon name={item.icon as IconName} className={styles.icon} />}
+          <Link href={item.url || '#'} target={item.target} data-testid={`left-menu-${item.id}`}>
+            {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
+            {item.icon && <Icon name={item.icon as IconName} className={styles.icon} />}
             {item.text}
           </Link>
           {!!item.children?.length && !!item.children.find((child) => !child.hideFromMenu) && (

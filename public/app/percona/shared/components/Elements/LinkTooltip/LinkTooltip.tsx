@@ -5,7 +5,7 @@ import { Icon, IconName, Tooltip, useTheme } from '@grafana/ui';
 import { getStyles } from './LinkTooltip.styles';
 
 export interface LinkTooltipProps {
-  tooltipText: string;
+  tooltipContent?: React.ReactNode;
   link?: string;
   linkText?: string;
   icon: IconName;
@@ -15,7 +15,7 @@ export interface LinkTooltipProps {
 }
 
 export const LinkTooltip: FC<LinkTooltipProps> = ({
-  tooltipText,
+  tooltipContent,
   link,
   linkText,
   icon,
@@ -27,9 +27,10 @@ export const LinkTooltip: FC<LinkTooltipProps> = ({
 
   return (
     <Tooltip
+      interactive
       content={
-        <div className={styles.contentWrapper}>
-          <span>{tooltipText}</span>
+        <div className={styles.contentWrapper} data-testid={dataTestId || 'info-tooltip'}>
+          {typeof tooltipContent === 'string' ? <span>{tooltipContent}</span> : tooltipContent}
           {link && linkText && (
             <a className={styles.link} href={link} target={target}>
               {linkText}
@@ -37,7 +38,6 @@ export const LinkTooltip: FC<LinkTooltipProps> = ({
           )}
         </div>
       }
-      data-testid={dataTestId}
     >
       <div>
         <Icon name={icon} />
