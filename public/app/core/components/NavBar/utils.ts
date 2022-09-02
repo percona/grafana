@@ -125,8 +125,10 @@ export const enrichWithClickDispatch = (item: NavModelItem, dispatch: Dispatch, 
     }, dispatchOffset);
   });
 
-export const isMatchOrChildMatch = (itemToCheck: NavModelItem, searchItem?: NavModelItem) => {
-  return Boolean(itemToCheck === searchItem || itemToCheck.children?.some((child) => child === searchItem));
+export const isMatchOrChildMatch = (itemToCheck: NavModelItem, searchItem?: NavModelItem): boolean => {
+  return Boolean(
+    itemToCheck === searchItem || itemToCheck.children?.some((child) => isMatchOrChildMatch(child, searchItem))
+  );
 };
 
 const stripQueryParams = (url?: string) => {

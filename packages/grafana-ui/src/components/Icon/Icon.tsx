@@ -61,10 +61,6 @@ export const Icon = React.forwardRef<HTMLDivElement, IconProps>(
     const subDir = getIconSubDir(name, type);
     const svgPath = `${iconRoot}${subDir}/${name}.svg`;
 
-    if (name.startsWith('percona')) {
-      console.log(size, type, name, svgPath, subDir);
-    }
-
     return (
       <div className={styles.container} {...divElementProps} ref={ref}>
         <SVG

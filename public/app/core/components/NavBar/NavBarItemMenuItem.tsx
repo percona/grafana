@@ -6,9 +6,10 @@ import { TreeState } from '@react-stately/tree';
 import { Node } from '@react-types/shared';
 import React, { ReactElement, useRef, useState } from 'react';
 
-import { GrafanaTheme2, NavModelItem } from '@grafana/data';
+import { GrafanaTheme2, NavMenuItemType, NavModelItem } from '@grafana/data';
 import { useTheme2 } from '@grafana/ui';
 
+import { NestedSubMenu } from './NestedSubMenu';
 import { useNavBarItemMenuContext, useNavBarContext } from './context';
 
 export interface NavBarItemMenuItemProps {
@@ -62,22 +63,26 @@ export function NavBarItemMenuItem({ item, state, onNavigate }: NavBarItemMenuIt
     <>
       <li {...mergeProps(menuItemProps, focusProps, keyboardProps)} ref={ref} className={styles.menuItem}>
         {rendered}
+        {isNested(item.value) && <NestedSubMenu items={item.value.children} />}
       </li>
     </>
   );
+}
+
+function isNested(item: NavModelItem) {
+  return !!item.children?.length && item.menuItemType === NavMenuItemType.Item;
 }
 
 function getStyles(theme: GrafanaTheme2, isFocused: boolean, isSection: boolean) {
   let backgroundColor = 'transparent';
   if (isFocused) {
     backgroundColor = theme.colors.action.hover;
-  } else if (isSection) {
-    backgroundColor = theme.colors.background.secondary;
   }
   return {
     menuItem: css`
       background-color: ${backgroundColor};
       color: ${theme.colors.text.primary};
+      position: relative;
 
       &:focus-visible {
         background-color: ${theme.colors.action.hover};
@@ -87,6 +92,22 @@ function getStyles(theme: GrafanaTheme2, isFocused: boolean, isSection: boolean)
         outline-offset: -2px;
         transition: none;
       }
+
+      &:hover {
+        & > ul {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+    `,
+    menuArrow: css`
+      position: absolute;
+      right: 5px;
+      top: 0;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     `,
     upgradeBoxContainer: css`
       padding: ${theme.spacing(1)};

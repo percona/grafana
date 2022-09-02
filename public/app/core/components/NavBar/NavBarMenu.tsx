@@ -379,28 +379,31 @@ function CollapsibleNavItem({
 
   return (
     <li className={cx(styles.menuItem, isRoot && styles.rootMenuItem, className)}>
-      <NavBarItemWithoutMenu
-        isActive={isActive}
-        label={link.text}
-        url={link.url}
-        target={link.target}
-        onClick={() => {
-          link.onClick?.();
-          onClose();
-        }}
-        className={cx(styles.collapsibleMenuItem, isRoot && styles.rootCollabsibleMenuItem)}
-        elClassName={styles.collapsibleIcon}
-      >
-        <FeatureHighlightWrapper>{getLinkIcon(link, isRoot ? 'xl' : 'sm')}</FeatureHighlightWrapper>
-      </NavBarItemWithoutMenu>
+      {isRoot && (
+        <NavBarItemWithoutMenu
+          isActive={isActive}
+          label={link.text}
+          url={link.url}
+          target={link.target}
+          onClick={() => {
+            link.onClick?.();
+            onClose();
+          }}
+          className={cx(styles.collapsibleMenuItem, isRoot && styles.rootCollabsibleMenuItem)}
+          elClassName={styles.rootCollapsibleIcon}
+        >
+          <FeatureHighlightWrapper>{getLinkIcon(link, isRoot ? 'xl' : 'sm')}</FeatureHighlightWrapper>
+        </NavBarItemWithoutMenu>
+      )}
       <div className={styles.collapsibleSectionWrapper}>
         <CollapsableSection
           isOpen={Boolean(sectionExpanded)}
           onToggle={handleToggle}
           className={cx(styles.collapseWrapper, isRoot && styles.rootCollapseWrapper)}
-          contentClassName={styles.collapseContent}
+          contentClassName={cx(styles.collapseContent, isRoot && styles.rootCollapseContent)}
           label={
             <div className={cx(styles.labelWrapper, { [styles.primary]: isActive })}>
+              {!isRoot && <span className={styles.collapsibleIcon}>{getLinkIcon(link, isRoot ? 'xl' : 'sm')}</span>}
               <span className={styles.linkText}>{link.text}</span>
             </div>
           }
@@ -433,9 +436,12 @@ const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
     width: theme.spacing(7),
     display: 'grid',
   }),
-  collapsibleIcon: css({
+  rootCollapsibleIcon: css({
     display: 'grid',
     placeContent: 'center',
+  }),
+  collapsibleIcon: css({
+    marginRight: '0.5rem',
   }),
   collapsibleSectionWrapper: css({
     display: 'flex',
@@ -444,8 +450,7 @@ const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
     flexDirection: 'column',
   }),
   collapseWrapper: css({
-    paddingLeft: theme.spacing(0.5),
-    paddingRight: theme.spacing(4.25),
+    padding: theme.spacing(0.5, 2),
     minHeight: theme.spacing(4),
     overflowWrap: 'anywhere',
     alignItems: 'center',
@@ -466,6 +471,10 @@ const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
   }),
   collapseContent: css({
     padding: 0,
+    marginLeft: theme.spacing(3),
+  }),
+  rootCollapseContent: css({
+    margin: 0,
   }),
   labelWrapper: css({
     fontSize: '15px',

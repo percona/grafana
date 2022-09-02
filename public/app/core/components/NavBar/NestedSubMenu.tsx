@@ -14,8 +14,8 @@ export const NestedSubMenu: FC<Props> = ({ items = [] }) => {
     <ul className={styles.menu}>
       {items.map((item) => (
         <li key={item.id}>
-          <Link href={item.url || '#'} target={item.target} data-testid={`left-menu-${item.id}`}>
-            {item.icon && <Icon name={item.icon as IconName} className={styles.icon} />}
+          <Link href={item.url || '#'} target={item.target} data-testid={`left-menu-${item.id}`} onClick={item.onClick}>
+            {item.showIconInNavbar && item.icon && <Icon name={item.icon as IconName} className={styles.icon} />}
             {item.text}
           </Link>
           {!!item.children?.length && !!item.children.find((child) => !child.hideFromMenu) && (

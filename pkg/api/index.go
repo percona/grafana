@@ -220,11 +220,12 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 			ShowIconInNavbar: true,
 		},
 		{
-			Text:         "High availability",
-			Id:           "mysql-ha",
-			Icon:         "percona-cluster",
-			HideFromTabs: true,
-			Children:     mysqlHAChildNavs,
+			Text:             "High availability",
+			Id:               "mysql-ha",
+			Icon:             "percona-cluster",
+			HideFromTabs:     true,
+			ShowIconInNavbar: true,
+			Children:         mysqlHAChildNavs,
 		},
 		{
 			Text: "Command/Handler counters compare",
@@ -278,14 +279,14 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 	mongodbChildNavs := []*dtos.NavLink{
 		{Text: "Overview", Id: "mongo-overview", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "percona-nav-overview", HideFromTabs: true, ShowIconInNavbar: true},
 		{Text: "Summary", Id: "mongo-summary", Url: setting.AppSubUrl + "/d/mongodb-instance-summary/mongodb-instance-summary", Icon: "percona-nav-summary", HideFromTabs: true, ShowIconInNavbar: true},
-		{Text: "High availability", Id: "mongo-ha", Icon: "percona-cluster", HideFromTabs: true, Children: mongodbHAChildNavs},
+		{Text: "High availability", Id: "mongo-ha", Icon: "percona-cluster", HideFromTabs: true, Children: mongodbHAChildNavs, ShowIconInNavbar: true},
 		{Text: "InMemory", Id: "mongo-memory-details", Url: setting.AppSubUrl + "/d/mongodb-inmemory/mongodb-inmemory-details", Icon: "sitemap", HideFromTabs: true},
 		{Text: "MMAPv1", Id: "mongo-mmap-details", Url: setting.AppSubUrl + "/d/mongodb-mmapv1/mongodb-mmapv1-details", Icon: "sitemap", HideFromTabs: true},
 		{Text: "WiredTiger", Id: "mondo-wiredtiger-details", Url: setting.AppSubUrl + "/d/mongodb-wiredtiger/mongodb-wiredtiger-details", Icon: "sitemap", HideFromTabs: true},
 	}
 
 	postgresqlChildNavs := []*dtos.NavLink{
-		// 		{Text: "HA (High availability)", Id: "postgres-ha", Icon: "percona-cluster", HideFromTabs: true},
+		// 		{Text: "HA (High availability)", Id: "postgres-ha", Icon: "percona-cluster", HideFromTabs: true, ShowIconInNavbar: true},
 		{Text: "Overview", Id: "postgre-overwiew", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "percona-nav-overview", HideFromTabs: true, ShowIconInNavbar: true},
 		{Text: "Summary", Id: "postgre-summary", Url: setting.AppSubUrl + "/d/postgresql-instance-summary/postgresql-instances-summary", Icon: "percona-nav-summary", HideFromTabs: true, ShowIconInNavbar: true},
 	}

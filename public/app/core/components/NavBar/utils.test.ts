@@ -127,9 +127,14 @@ describe('enrichConfigItems', () => {
 });
 
 describe('isMatchOrChildMatch', () => {
+  const innerChild: NavModelItem = {
+    text: 'Inner Child',
+    url: '/dashboards/child/inner',
+  };
   const mockChild: NavModelItem = {
     text: 'Child',
     url: '/dashboards/child',
+    children: [innerChild],
   };
   const mockItemToCheck: NavModelItem = {
     text: 'Dashboards',
@@ -144,6 +149,11 @@ describe('isMatchOrChildMatch', () => {
 
   it('returns true if the itemToCheck has a child that matches the searchItem', () => {
     const searchItem = mockChild;
+    expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(true);
+  });
+
+  it('returns true if the itemToCheck inside the tree', () => {
+    const searchItem = innerChild;
     expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(true);
   });
 
