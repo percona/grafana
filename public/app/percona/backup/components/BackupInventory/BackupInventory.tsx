@@ -54,6 +54,8 @@ export const BackupInventory: FC = () => {
   const navModel = usePerconaNavModel('backup-inventory');
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
+
+  console.log(data);
   const columns = useMemo(
     (): Array<Column<Backup>> => [
       {
@@ -246,6 +248,7 @@ export const BackupInventory: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('backupEnabled'), []);
 
   useEffect(() => {
+    console.log('caa');
     getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -263,13 +266,18 @@ export const BackupInventory: FC = () => {
               data-testid="backup-add-modal-button"
               onClick={() => onBackupClick(null)}
             >
-              {Messages.add}
+              {Messages.add}"/artifact_id/04d692ce-4c8d-48fb-8f52-18a3e14baf42"
             </Button> */}
+            <LinkButton href="/backup/demand/new" icon="plus">
+              New backup
+            </LinkButton>{' '}
             <LinkButton
-              href={urlUtil.renderUrl('/backup/new', { returnTo: location.pathname + location.search })}
+              href={urlUtil.renderUrl('/backup/scheduled_task_id/4e1d6953-35ed-447f-bc91-b9a763e1e555/edit', {
+                returnTo: location.pathname + location.search,
+              })}
               icon="plus"
             >
-              New backup
+              Edit backup
             </LinkButton>
           </div>
           <Table

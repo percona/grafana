@@ -501,11 +501,20 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/backup/new',
+      path: '/backup/:type/new',
       component: SafeDynamicImport(
         () =>
           import(
-            /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/backup/components/AddBackupModal/AddBackupModal'
+            /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/backup/components/AddBackupPage/AddBackupPage'
+          )
+      ),
+    },
+    {
+      path: '/backup/:type/:id/edit',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/backup/components/AddBackupPage/AddBackupPage'
           )
       ),
     },
