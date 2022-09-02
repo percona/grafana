@@ -2,6 +2,7 @@ import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
+import { parseDuration } from '@grafana/data';
 import { Stack } from '@grafana/experimental';
 import { Field, Icon, Input, InputControl, Label, Select, Tooltip, useStyles2 } from '@grafana/ui';
 import { FolderPickerFilter } from 'app/core/components/Select/FolderPicker';
@@ -79,7 +80,7 @@ export const TemplateStep: FC = () => {
   const handleTemplateChange = useCallback(
     (selectedTemplate?: Template, onChange?: (template?: Template) => void) => {
       const newTemplate = templates.current.find((template) => template.name === selectedTemplate?.name);
-      const newDuration = newTemplate?.for;
+      const newDuration = parseDuration(newTemplate?.for || '1m');
       const severityStr = newTemplate?.severity;
       const newSeverity = SEVERITY_OPTIONS.find((severity) => severity.value === severityStr);
 
@@ -88,7 +89,7 @@ export const TemplateStep: FC = () => {
         // @ts-ignore
         setValue('severity', newSeverity.value);
       }
-      setValue('duration', parseInt(newDuration || '0', 10));
+      setValue('duration', newDuration.seconds || 60);
 
       if (newTemplate) {
         newTemplate.params?.forEach(({ type, float, name }) => {
@@ -201,7 +202,7 @@ export const TemplateStep: FC = () => {
           id="duration"
           {...register('duration', {
             required: { value: true, message: Messages.errors.durationRequired },
-            min: { value: MINIMUM_DURATION_VALUE, message: Messages.errors.durationMin(MINIMUM_DURATION_VALUE) },
+            min: { value: MINIMUM_DURATION_VALUE, message: Messages.errors.durationMin },
           })}
         />
       </Field>

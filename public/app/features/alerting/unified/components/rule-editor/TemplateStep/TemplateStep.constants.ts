@@ -37,4 +37,6 @@ export const SEVERITY_OPTIONS: Array<SelectableValue<keyof typeof Severity>> = [
   },
 ];
 
-export const MINIMUM_DURATION_VALUE = 1;
+// We define our default evaluation interval as 60s
+// 'for' can't be less than that, hence this minimum
+export const MINIMUM_DURATION_VALUE = 60;

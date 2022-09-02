@@ -13,7 +13,8 @@ export const Messages = {
   tooltips: {
     template: 'The alert template to use for this rule.',
     name: 'The name for this rule.',
-    duration: 'The alert query duration, in seconds.',
+    duration:
+      'Once condition is breached, alert will go into pending state. If it is pending for longer than this value, it will become a firing alert.',
     severity: 'The severity level for the alert triggered by this rule.',
     channels: 'Which contact points should be used to send the alert through.',
     filters: 'Apply rule only to required services or nodes.',
@@ -32,7 +33,7 @@ export const Messages = {
     floatParamMin: (min: number) => `Must be at least ${min}`,
     floatParamMax: (max: number) => `Must be at most ${max}`,
     durationRequired: 'Must enter a duration',
-    durationMin: (min: number) => `Duration must be at least ${min}`,
+    durationMin: 'Duration must be at least 60s, which is our default evaluation interval',
     severity: 'Must select a severity',
     filterLabel: 'Must enter a label',
     filterRegex: 'Must enter a regex',
