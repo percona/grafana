@@ -152,7 +152,7 @@ describe('isMatchOrChildMatch', () => {
     expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(true);
   });
 
-  it('returns true if the itemToCheck inside the tree', () => {
+  it('returns true if the itemToCheck is inside the tree', () => {
     const searchItem = innerChild;
     expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(true);
   });

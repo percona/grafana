@@ -30,9 +30,6 @@ export interface NavModelItem extends NavLinkDTO {
   highlightId?: string;
   tabSuffix?: ComponentType<{ className?: string }>;
   showIconInNavbar?: boolean;
-  // TODO: figure out a better name
-  // should denote if a menu item should be expanded
-  // if it's a leaf highlighted
   expanded?: boolean;
 }
 

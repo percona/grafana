@@ -78,7 +78,7 @@ const NavBarItem = ({ isActive = false, className, reverseMenuDirection = false,
             const translationKey = item.id && menuItemTranslations[item.id];
             const itemText = translationKey ? i18n._(translationKey) : item.text;
             const isSection = item.menuItemType === NavMenuItemType.Section;
-            const icon = item.showIconInNavbar ? (item.icon as IconName) : undefined;
+            const icon = item.showIconInNavbar && !isSection ? (item.icon as IconName) : undefined;
 
             return (
               <Item key={getNavModelItemKey(item)} textValue={item.text}>

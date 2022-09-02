@@ -1,6 +1,6 @@
 import { css, cx } from '@emotion/css';
 import { uniqueId } from 'lodash';
-import React, { FC, ReactNode, useRef } from 'react';
+import React, { FC, ReactNode, useRef, useState } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
@@ -30,6 +30,7 @@ export const CollapsableSection: FC<Props> = ({
   labelId,
   loading = false,
 }) => {
+  const [open, toggleOpen] = useState<boolean>(isOpen);
   const styles = useStyles2(collapsableSectionStyles);
 
   const onClick = (e: React.MouseEvent) => {
@@ -40,7 +41,8 @@ export const CollapsableSection: FC<Props> = ({
     e.preventDefault();
     e.stopPropagation();
 
-    onToggle?.(!isOpen);
+    onToggle?.(!open);
+    toggleOpen(!open);
   };
   const { current: id } = useRef(uniqueId());
 
@@ -53,21 +55,21 @@ export const CollapsableSection: FC<Props> = ({
           id={`collapse-button-${id}`}
           className={styles.button}
           onClick={onClick}
-          aria-expanded={isOpen && !loading}
+          aria-expanded={open && !loading}
           aria-controls={`collapse-content-${id}`}
           aria-labelledby={buttonLabelId}
         >
           {loading ? (
             <Spinner className={styles.spinner} />
           ) : (
-            <Icon name={isOpen ? 'angle-up' : 'angle-down'} className={styles.icon} />
+            <Icon name={open ? 'angle-up' : 'angle-down'} className={styles.icon} />
           )}
         </button>
         <div className={styles.label} id={`collapse-label-${id}`}>
           {label}
         </div>
       </div>
-      {isOpen && (
+      {open && (
         <div id={`collapse-content-${id}`} className={cx(styles.content, contentClassName)}>
           {children}
         </div>

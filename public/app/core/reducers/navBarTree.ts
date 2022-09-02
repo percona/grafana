@@ -3,9 +3,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NavModelItem } from '@grafana/data';
 import config from 'app/core/config';
 
-import { traverseMenuTree } from './navBarTree.utils';
+import { traverseMenuTree, initializeState } from './navBarTree.utils';
 
-export const initialState: NavModelItem[] = config.bootData?.navTree ?? [];
+export const initialState: NavModelItem[] = initializeState(config.bootData?.navTree ?? []);
 
 const navTreeSlice = createSlice({
   name: 'navBarTree',
