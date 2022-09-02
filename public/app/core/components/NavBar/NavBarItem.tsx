@@ -89,6 +89,7 @@ const NavBarItem = ({ isActive = false, className, reverseMenuDirection = false,
                   text={itemText}
                   url={item.url}
                   onClick={item.onClick}
+                  // @Percona
                   showArrow={!!item.children && !isSection}
                   styleOverrides={cx(styles.primaryText, { [styles.header]: isSection })}
                 />

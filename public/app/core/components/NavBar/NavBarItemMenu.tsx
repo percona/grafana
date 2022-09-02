@@ -63,6 +63,20 @@ export function NavBarItemMenu(props: NavBarItemMenuProps): ReactElement | null 
     </li>
   );
 
+  // @Percona
+  //
+  // Scrollcontainer prevented nested navigation from working
+  // as it was hiding the expanded menus to the left
+  //
+  // const contents = [itemComponents, subTitleComponent];
+  // const contentComponent = (
+  //   <NavBarScrollContainer key="scrollContainer">
+  //     {reverseMenuDirection ? contents.reverse() : contents}
+  //   </NavBarScrollContainer>
+  // );
+  //
+  // const menu = [headerComponent, contentComponent];
+
   const menu = [headerComponent, itemComponents, subTitleComponent];
 
   return (

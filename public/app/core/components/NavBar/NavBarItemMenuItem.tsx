@@ -63,6 +63,7 @@ export function NavBarItemMenuItem({ item, state, onNavigate }: NavBarItemMenuIt
     <>
       <li {...mergeProps(menuItemProps, focusProps, keyboardProps)} ref={ref} className={styles.menuItem}>
         {rendered}
+        {/* @Percona */}
         {isNested(item.value) && <NestedSubMenu items={item.value.children} />}
       </li>
     </>
@@ -93,6 +94,10 @@ function getStyles(theme: GrafanaTheme2, isFocused: boolean, isSection: boolean)
         transition: none;
       }
 
+      /*
+        @Percona 
+        show nested menu on hover
+      */
       &:hover {
         & > ul {
           opacity: 1;

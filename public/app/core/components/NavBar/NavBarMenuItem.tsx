@@ -15,6 +15,7 @@ export interface Props {
   url?: string;
   adjustHeightForBorder?: boolean;
   isMobile?: boolean;
+  // @Percona
   showArrow?: boolean;
 }
 

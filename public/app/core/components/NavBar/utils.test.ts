@@ -5,7 +5,14 @@ import { ContextSrv, setContextSrv } from 'app/core/services/context_srv';
 
 import { updateConfig } from '../../config';
 
-import { enrichConfigItems, getActiveItem, getForcedLoginUrl, isMatchOrChildMatch, isSearchActive } from './utils';
+import {
+  enrichConfigItems,
+  getActiveItem,
+  getForcedLoginUrl,
+  isMatchOrChildMatch,
+  isMatchOrInnerMatch,
+  isSearchActive,
+} from './utils';
 
 jest.mock('../../app_events', () => ({
   publish: jest.fn(),
@@ -127,14 +134,9 @@ describe('enrichConfigItems', () => {
 });
 
 describe('isMatchOrChildMatch', () => {
-  const innerChild: NavModelItem = {
-    text: 'Inner Child',
-    url: '/dashboards/child/inner',
-  };
   const mockChild: NavModelItem = {
     text: 'Child',
     url: '/dashboards/child',
-    children: [innerChild],
   };
   const mockItemToCheck: NavModelItem = {
     text: 'Dashboards',
@@ -152,9 +154,44 @@ describe('isMatchOrChildMatch', () => {
     expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(true);
   });
 
+  it('returns false otherwise', () => {
+    const searchItem: NavModelItem = {
+      text: 'No match',
+      url: '/noMatch',
+    };
+    expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(false);
+  });
+});
+
+describe('isMatchOrInnerMatch', () => {
+  const innerChild: NavModelItem = {
+    text: 'Inner Child',
+    url: '/dashboards/child/inner',
+  };
+  const mockChild: NavModelItem = {
+    text: 'Child',
+    url: '/dashboards/child',
+    children: [innerChild],
+  };
+  const mockItemToCheck: NavModelItem = {
+    text: 'Dashboards',
+    url: '/dashboards',
+    children: [mockChild],
+  };
+
+  it('returns true if the itemToCheck is an exact match with the searchItem', () => {
+    const searchItem = mockItemToCheck;
+    expect(isMatchOrInnerMatch(mockItemToCheck, searchItem)).toBe(true);
+  });
+
+  it('returns true if the itemToCheck has a child that matches the searchItem', () => {
+    const searchItem = mockChild;
+    expect(isMatchOrInnerMatch(mockItemToCheck, searchItem)).toBe(true);
+  });
+
   it('returns true if the itemToCheck is inside the tree', () => {
     const searchItem = innerChild;
-    expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(true);
+    expect(isMatchOrInnerMatch(mockItemToCheck, searchItem)).toBe(true);
   });
 
   it('returns false otherwise', () => {
@@ -162,7 +199,7 @@ describe('isMatchOrChildMatch', () => {
       text: 'No match',
       url: '/noMatch',
     };
-    expect(isMatchOrChildMatch(mockItemToCheck, searchItem)).toBe(false);
+    expect(isMatchOrInnerMatch(mockItemToCheck, searchItem)).toBe(false);
   });
 });
 

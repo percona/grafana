@@ -39,6 +39,7 @@ const navTreeSlice = createSlice({
         starredItems?.children?.sort((a, b) => a.text.localeCompare(b.text));
       }
     },
+    // @Percona
     updateMenuTree: (state, action: PayloadAction<{ id: string; active: boolean }>) => {
       const { id, active } = action.payload;
 

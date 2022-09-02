@@ -115,6 +115,7 @@ export const enrichWithInteractionTracking = (item: NavModelItem, expandedState:
     });
   });
 
+// @Percona
 export const enrichWithClickDispatch = (item: NavModelItem, dispatch: Dispatch, dispatchOffset: number) =>
   enrichClickWith(item, (link) => {
     // let the animation play out, dispatch action after that
@@ -126,6 +127,11 @@ export const enrichWithClickDispatch = (item: NavModelItem, dispatch: Dispatch, 
   });
 
 export const isMatchOrChildMatch = (itemToCheck: NavModelItem, searchItem?: NavModelItem): boolean => {
+  return Boolean(itemToCheck === searchItem || itemToCheck.children?.some((child) => child === searchItem));
+};
+
+// @Percona
+export const isMatchOrInnerMatch = (itemToCheck: NavModelItem, searchItem?: NavModelItem): boolean => {
   return Boolean(
     itemToCheck === searchItem || itemToCheck.children?.some((child) => isMatchOrChildMatch(child, searchItem))
   );

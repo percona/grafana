@@ -26,7 +26,7 @@ import { NavBarItemWithoutMenu } from './NavBarItemWithoutMenu';
 import { NavBarMenuItem } from './NavBarMenuItem';
 import { NavBarToggle } from './NavBarToggle';
 import { NavFeatureHighlight } from './NavFeatureHighlight';
-import { isMatchOrChildMatch } from './utils';
+import { isMatchOrInnerMatch } from './utils';
 
 const MENU_WIDTH = '350px';
 
@@ -238,6 +238,8 @@ function NavItem({
 }) {
   const styles = useStyles2(getNavItemStyles);
 
+  // @Percona
+  // allow for rendering of nested routes
   const renderCollapsibleItem = (childLink: NavModelItem) => {
     if (linkHasChildren(childLink)) {
       return (
@@ -275,7 +277,7 @@ function NavItem({
 
   if (linkHasChildren(link)) {
     return (
-      <CollapsibleNavItem onClose={onClose} link={link} isActive={isMatchOrChildMatch(link, activeItem)}>
+      <CollapsibleNavItem onClose={onClose} link={link} isActive={isMatchOrInnerMatch(link, activeItem)}>
         <ul className={styles.children}>{link.children.map(renderCollapsibleItem)}</ul>
       </CollapsibleNavItem>
     );

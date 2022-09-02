@@ -42,7 +42,7 @@ import {
   enrichWithClickDispatch,
   enrichWithInteractionTracking,
   getActiveItem,
-  isMatchOrChildMatch,
+  isMatchOrInnerMatch,
   isSearchActive,
   SEARCH_ITEM_ID,
 } from './utils';
@@ -194,7 +194,7 @@ export const NavBar = React.memo(() => {
                 {coreItems.map((link, index) => (
                   <NavBarItem
                     key={`${link.id}-${index}`}
-                    isActive={isMatchOrChildMatch(link, activeItem)}
+                    isActive={isMatchOrInnerMatch(link, activeItem)}
                     link={{ ...link, subTitle: undefined }}
                   />
                 ))}
@@ -203,7 +203,7 @@ export const NavBar = React.memo(() => {
                   pluginItems.map((link, index) => (
                     <NavBarItem
                       key={`${link.id}-${index}`}
-                      isActive={isMatchOrChildMatch(link, activeItem)}
+                      isActive={isMatchOrInnerMatch(link, activeItem)}
                       link={link}
                     />
                   ))}
@@ -211,7 +211,7 @@ export const NavBar = React.memo(() => {
                 {configItems.map((link, index) => (
                   <NavBarItem
                     key={`${link.id}-${index}`}
-                    isActive={isMatchOrChildMatch(link, activeItem)}
+                    isActive={isMatchOrInnerMatch(link, activeItem)}
                     reverseMenuDirection
                     link={link}
                     className={cx({ [styles.verticalSpacer]: index === 0 })}
