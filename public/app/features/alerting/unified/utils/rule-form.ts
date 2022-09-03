@@ -67,7 +67,7 @@ export const getDefaultFormValues = (): RuleFormValues => {
     // @PERCONA
     // templated rules
     template: null,
-    duration: 1,
+    duration: '1m',
     filters: [],
     severity: null,
   });

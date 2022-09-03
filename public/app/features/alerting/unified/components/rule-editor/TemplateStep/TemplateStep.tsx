@@ -2,7 +2,6 @@ import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
-import { parseDuration } from '@grafana/data';
 import { Stack } from '@grafana/experimental';
 import { Field, Icon, Input, InputControl, Label, Select, Tooltip, useStyles2 } from '@grafana/ui';
 import { FolderPickerFilter } from 'app/core/components/Select/FolderPicker';
@@ -21,13 +20,14 @@ import { AccessControlAction } from 'app/types';
 import { fetchAlertManagerConfigAction } from '../../../state/actions';
 import { RuleForm, RuleFormValues } from '../../../types/rule-form';
 import { initialAsyncRequestState } from '../../../utils/redux';
+import { durationValidationPattern, parseDurationToMilliseconds } from '../../../utils/time';
 import { RuleEditorSection } from '../RuleEditorSection';
 import { Folder, RuleFolderPicker } from '../RuleFolderPicker';
 import { checkForPathSeparator } from '../util';
 
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import TemplateFiltersField from './TemplateFiltersField';
-import { SEVERITY_OPTIONS, MINIMUM_DURATION_VALUE } from './TemplateStep.constants';
+import { SEVERITY_OPTIONS } from './TemplateStep.constants';
 import { Messages } from './TemplateStep.messages';
 import { getStyles } from './TemplateStep.styles';
 import { formatTemplateOptions } from './TemplateStep.utils';
@@ -80,7 +80,6 @@ export const TemplateStep: FC = () => {
   const handleTemplateChange = useCallback(
     (selectedTemplate?: Template, onChange?: (template?: Template) => void) => {
       const newTemplate = templates.current.find((template) => template.name === selectedTemplate?.name);
-      const newDuration = parseDuration(newTemplate?.for || '1m');
       const severityStr = newTemplate?.severity;
       const newSeverity = SEVERITY_OPTIONS.find((severity) => severity.value === severityStr);
 
@@ -89,7 +88,7 @@ export const TemplateStep: FC = () => {
         // @ts-ignore
         setValue('severity', newSeverity.value);
       }
-      setValue('duration', newDuration.seconds || 60);
+      setValue('duration', newTemplate?.for || '1m');
 
       if (newTemplate) {
         newTemplate.params?.forEach(({ type, float, name }) => {
@@ -198,11 +197,20 @@ export const TemplateStep: FC = () => {
         invalid={!!errors.duration?.message}
       >
         <Input
-          type="number"
           id="duration"
           {...register('duration', {
             required: { value: true, message: Messages.errors.durationRequired },
-            min: { value: MINIMUM_DURATION_VALUE, message: Messages.errors.durationMin },
+            pattern: durationValidationPattern,
+            validate: (value) => {
+              const millisFor = parseDurationToMilliseconds(value);
+
+              // 0 is a special value meaning for equals evaluation interval
+              if (millisFor === 0) {
+                return true;
+              }
+
+              return millisFor > 0 ? true : Messages.errors.durationMin;
+            },
           })}
         />
       </Field>

@@ -48,7 +48,8 @@ export interface RuleFormValues {
   // @PERCONA
   // templated rules
   template: Template | null;
-  duration: number;
+  // This is the same as evaluateFor, but we have a different validation
+  duration: string;
   filters: FiltersForm[];
   severity: keyof typeof Severity | null;
 }

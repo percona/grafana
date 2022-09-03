@@ -26,7 +26,7 @@ export const formatCreateAPIPayload = (data: RuleFormValues): AlertRuleCreatePay
   const payload: AlertRuleCreatePayload = {
     custom_labels: {},
     filters: filters || [],
-    for: `${duration}s`,
+    for: duration,
     severity: severity!,
     template_name: template?.name!,
     name,
