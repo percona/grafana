@@ -106,6 +106,8 @@ export const NavBar = React.memo(() => {
   const activeItem = isSearchActive(location) ? searchItem : getActiveItem(navTree, location.pathname);
   const iaMenuItem = buildIntegratedAlertingMenuItem(coreItems);
 
+  // @PERCONA
+  // All these dispatches are our pages
   dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
   dispatch(updateNavIndex(PMM_STT_PAGE));
   dispatch(updateNavIndex(PMM_DBAAS_PAGE));
@@ -120,12 +122,14 @@ export const NavBar = React.memo(() => {
     dispatch(updateNavIndex(iaMenuItem));
   }
 
+  // @PERCONA
   if (isPlatformUser) {
     coreItems.push(PMM_ENTITLEMENTS_PAGE);
     coreItems.push(PMM_TICKETS_PAGE);
     coreItems.push(PMM_ENVIRONMENT_OVERVIEW_PAGE);
   }
 
+  // @PERCONA
   if (isAuthorized) {
     buildInventoryAndSettings(configItems);
 
