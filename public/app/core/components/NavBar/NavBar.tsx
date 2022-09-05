@@ -1,7 +1,7 @@
 import { css, cx } from '@emotion/css';
 import { FocusScope } from '@react-aria/focus';
 import { cloneDeep } from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
@@ -11,6 +11,7 @@ import { Icon, useTheme2 } from '@grafana/ui';
 import { updateNavIndex } from 'app/core/actions';
 import { Branding } from 'app/core/components/Branding/Branding';
 import { getKioskMode } from 'app/core/navigation/kiosk';
+import { updateNavTree } from 'app/core/reducers/navBarTree';
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { KioskMode, StoreState } from 'app/types';
 
@@ -36,6 +37,7 @@ import {
 } from './constants';
 import { NavBarContext } from './context';
 import {
+  updatePerconaPage,
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
   enrichConfigItems,
@@ -60,7 +62,7 @@ export const NavBar = React.memo(() => {
   const dispatch = useDispatch();
   const kiosk = getKioskMode();
   const { result } = useSelector(getPerconaSettings);
-  const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = result!;
+  const { alertingEnabled } = result!;
   const { isPlatformUser, isAuthorized } = useSelector(getPerconaUser);
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -126,32 +128,32 @@ export const NavBar = React.memo(() => {
   dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
 
   // @PERCONA
-  if (isPlatformUser) {
-    coreItems.push(PMM_ENTITLEMENTS_PAGE);
-    coreItems.push(PMM_TICKETS_PAGE);
-    coreItems.push(PMM_ENVIRONMENT_OVERVIEW_PAGE);
-  }
+  useEffect(() => {
+    let updatedNavTree = cloneDeep(navBarTree);
 
-  // @PERCONA
-  if (isAuthorized) {
-    buildInventoryAndSettings(configItems);
+    const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = result!;
 
-    if (alertingEnabled) {
-      buildIntegratedAlertingMenuItem(coreItems);
+    if (isPlatformUser) {
+      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_ENTITLEMENTS_PAGE, true);
+      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_TICKETS_PAGE, true);
+      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_ENVIRONMENT_OVERVIEW_PAGE, true);
     }
 
-    if (sttEnabled) {
-      coreItems.push(PMM_STT_PAGE);
+    if (isAuthorized) {
+      updatedNavTree = buildInventoryAndSettings(updatedNavTree);
+
+      if (alertingEnabled) {
+        updatedNavTree = buildIntegratedAlertingMenuItem(updatedNavTree);
+      }
+
+      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_STT_PAGE, sttEnabled);
+      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_DBAAS_PAGE, dbaasEnabled);
+      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_BACKUP_PAGE, backupEnabled);
     }
 
-    if (dbaasEnabled) {
-      coreItems.push(PMM_DBAAS_PAGE);
-    }
-
-    if (backupEnabled) {
-      coreItems.push(PMM_BACKUP_PAGE);
-    }
-  }
+    dispatch(updateNavTree({ items: updatedNavTree }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result, isAuthorized, isPlatformUser]);
 
   if (kiosk !== KioskMode.Off) {
     return null;

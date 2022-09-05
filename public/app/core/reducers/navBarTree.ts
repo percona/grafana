@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { cloneDeep } from 'lodash';
 
 import { NavModelItem } from '@grafana/data';
 import { config } from '@grafana/runtime';
 
-import { traverseMenuTree, initializeState } from './navBarTree.utils';
+import { traverseMenuTree, updateExpandedState } from './navBarTree.utils';
 
-export const initialState: NavModelItem[] = initializeState(config.bootData?.navTree ?? []);
+export const initialState: NavModelItem[] = updateExpandedState(config.bootData?.navTree ?? []);
 
 const navTreeSlice = createSlice({
   name: 'navBarTree',
@@ -51,13 +52,14 @@ const navTreeSlice = createSlice({
       const { id, active } = action.payload;
 
       const nodeMap: Record<string, NavModelItem> = {};
+      const parentMap: Record<string, NavModelItem> = {};
 
       // Close all other menu items
       traverseMenuTree(state, (item) => {
         item.expanded = false;
 
         item.children?.map((child) => {
-          child.parentItem = item;
+          parentMap[child.id || ''] = item;
         });
 
         nodeMap[item.id || ''] = item;
@@ -65,18 +67,24 @@ const navTreeSlice = createSlice({
 
       // Expand menu tree for the currently active menu item
       let current = nodeMap[id];
+      let parent = parentMap[id];
 
       current.expanded = active;
 
-      while (current && current.parentItem) {
-        current = nodeMap[current.parentItem?.id || ''];
+      while (current && parent) {
+        current = parent;
+        parent = parentMap[current.id || ''];
+
         if (current) {
           current.expanded = true;
         }
       }
     },
+    updateNavTree: (_, action: PayloadAction<{ items: NavModelItem[] }>) => {
+      return updateExpandedState(cloneDeep(action.payload.items));
+    },
   },
 });
 
-export const { setStarred, updateDashboardName, updateMenuTree } = navTreeSlice.actions;
+export const { setStarred, updateDashboardName, updateMenuTree, updateNavTree } = navTreeSlice.actions;
 export const navTreeReducer = navTreeSlice.reducer;

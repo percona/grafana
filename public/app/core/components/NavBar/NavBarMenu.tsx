@@ -510,7 +510,7 @@ const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
 });
 
 function linkHasChildren(link: NavModelItem): link is NavModelItem & { children: NavModelItem[] } {
-  return Boolean(link.children && link.children.length > 0);
+  return Boolean(link.children && link.children.filter((child) => !child.hideFromMenu).length > 0);
 }
 
 function getLinkIcon(link: NavModelItem, size: IconSize = 'xl') {

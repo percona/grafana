@@ -133,7 +133,7 @@ export const isMatchOrChildMatch = (itemToCheck: NavModelItem, searchItem?: NavM
 // @Percona
 export const isMatchOrInnerMatch = (itemToCheck: NavModelItem, searchItem?: NavModelItem): boolean => {
   return Boolean(
-    itemToCheck === searchItem || itemToCheck.children?.some((child) => isMatchOrChildMatch(child, searchItem))
+    itemToCheck === searchItem || itemToCheck.children?.some((child) => isMatchOrInnerMatch(child, searchItem))
   );
 };
 
@@ -218,7 +218,7 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavM
       subTitle: 'Alert rules & notifications',
       children: [integratedAlertingLink],
     });
-  } else {
+  } else if (!mainLinks[alertingIndex].children?.some((c) => c.id === integratedAlertingLink.id)) {
     mainLinks[alertingIndex].children?.unshift(integratedAlertingLink, DIVIDER);
   }
 
@@ -278,7 +278,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
       subTitle: 'Configuration',
       children: [inventoryLink, settingsLink, DIVIDER, PMM_ADD_INSTANCE_PAGE],
     });
-  } else {
+  } else if (!configNode.children?.some((c) => c.id === PMM_ADD_INSTANCE_PAGE.id)) {
     if (!configNode.children) {
       configNode.children = [];
     }
@@ -287,4 +287,20 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
   }
 
   return mainLinks;
+};
+
+// @Percona
+export const updatePerconaPage = (
+  mainLinks: NavModelItem[],
+  page: NavModelItem,
+  featureEnabled: boolean
+): NavModelItem[] => {
+  if (featureEnabled && mainLinks.find((l) => l.id === page.id)) {
+    return mainLinks;
+  } else if (featureEnabled) {
+    mainLinks.push(page);
+    return mainLinks;
+  }
+
+  return mainLinks.filter((l) => l.id !== page.id);
 };
