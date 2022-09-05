@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, CustomScrollbar, LinkButton, PageToolbar, useStyles2 } from '@grafana/ui';
 import { Link } from 'react-router-dom';
 import {
@@ -6,6 +6,7 @@ import {
   LoaderButton,
   logger,
   NumberInputField,
+  Overlay,
   RadioButtonGroupField,
   TextareaInputField,
   TextInputField,
@@ -49,16 +50,23 @@ import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { BackupService } from '../../Backup.service';
-import { BACKUP_CANCEL_TOKEN } from '../BackupInventory/BackupInventory.constants';
+import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN } from '../BackupInventory/BackupInventory.constants';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { locationService } from '@grafana/runtime';
 import appEvents from 'app/core/app_events';
+import { BackupInventoryService } from '../BackupInventory/BackupInventory.service';
+import { Backup } from '../BackupInventory/BackupInventory.types';
+import { ScheduledBackupsService } from '../ScheduledBackups/ScheduledBackups.service';
+import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
+import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../ScheduledBackups/ScheduledBackups.constants';
 
 const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
   const [queryParams, setQueryParams] = useQueryParams();
-  const scheduleMode: boolean = queryParams['scheduled'] as boolean;
-  const backup = null;
+  const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || match.params.type === 'scheduled_task_id';
+  const [backup, setBackup] = useState<Backup | ScheduledBackup | null>(null);
+
+  const [pending, setPending] = useState(false);
   const styles = useStyles2(getStyles);
   const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
   const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup, scheduleMode]);
@@ -76,6 +84,52 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   } else {
     console.log(match.params.type);
   }
+
+  console.log(backup);
+
+  const getScheduledBackupData = useCallback(async () => {
+    setPending(true);
+    try {
+      const backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
+      const backup = backups.find((backup) => backup.id === `/${match.params.type}/${match.params.id}`);
+      console.log(backup);
+      setBackup(backup ?? null);
+    } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
+      logger.error(e);
+    }
+    setPending(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getBackupData = useCallback(async () => {
+    setPending(true);
+
+    try {
+      const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
+      const backup = backups.find((backup) => backup.id === `/${match.params.type}/${match.params.id}`);
+      console.log(backup);
+      setBackup(backup ?? null);
+    } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
+      logger.error(e);
+    }
+    setPending(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (scheduleMode) {
+      getScheduledBackupData();
+    } else {
+      getBackupData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleBackup = async (values: AddBackupFormProps) => {
     try {
@@ -127,7 +181,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   useEffect(() => setModalTitle(Messages.getModalTitle(scheduleMode, editing)), [editing, scheduleMode]);
 
   return (
-    <div>
+    <Overlay isPending={pending}>
       <Form
         initialValues={initialValues}
         onSubmit={handleSubmit}
@@ -399,7 +453,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
           </form>
         )}
       />
-    </div>
+    </Overlay>
   );
 };
 

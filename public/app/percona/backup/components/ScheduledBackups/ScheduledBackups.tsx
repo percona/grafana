@@ -284,6 +284,9 @@ export const ScheduledBackups: FC = () => {
             >
               New Scheduled backup
             </LinkButton>
+            <LinkButton href="/backup/scheduled_task_id/bd4225d8-73fd-476e-8c8a-5a039151315d/edit" icon="plus">
+              edit scheduled backup
+            </LinkButton>
           </div>
           <Table
             columns={columns}

@@ -256,7 +256,7 @@ export const BackupInventory: FC = () => {
               New backup
             </LinkButton>{' '}
             <LinkButton
-              href={urlUtil.renderUrl('/backup/scheduled_task_id/4e1d6953-35ed-447f-bc91-b9a763e1e555/edit', {
+              href={urlUtil.renderUrl('/backup/artifact_id/4d03847c-dd82-400a-9010-dc97a9ab0e85/edit', {
                 returnTo: location.pathname + location.search,
               })}
               icon="plus"
