@@ -50,7 +50,7 @@ export const Messages = {
   templateField: 'Template',
   nameField: 'Name',
   thresholdField: 'Threshold',
-  durationField: 'Duration (s)',
+  durationField: 'Duration',
   severityField: 'Severity',
   channelField: 'Contact points',
   activateSwitch: 'Activate',
