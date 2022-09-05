@@ -246,7 +246,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 			Icon: "sitemap",
 		},
 		{
-			Text: "InnoDB compression details",
+			Text: "InnoDB compression",
 			Id:   "mysql-innodb-compression-details",
 			Url:  setting.AppSubUrl + "/d/mysql-innodb-compression/mysql-innodb-compression-details",
 			Icon: "sitemap",
@@ -377,17 +377,6 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 		Text: "HAProxy", Id: "haproxy",
 		Url:              setting.AppSubUrl + "/d/haproxy-instance-summary/haproxy-instance-summary",
 		Icon:             "percona-database-haproxy",
-		HideFromTabs:     true,
-		ShowIconInNavbar: true,
-		SortWeight:       dtos.WeightDashboard,
-		Section:          dtos.NavSectionCore,
-	})
-
-	navTree = append(navTree, &dtos.NavLink{
-		Text:             "ProxySQL",
-		Id:               "proxysql",
-		Url:              setting.AppSubUrl + "/d/proxysql-instance-summary/proxysql-instance-summary",
-		Icon:             "percona-database-proxysql",
 		HideFromTabs:     true,
 		ShowIconInNavbar: true,
 		SortWeight:       dtos.WeightDashboard,

@@ -416,6 +416,7 @@ function CollapsibleNavItem({
       )}
       <div className={styles.collapsibleSectionWrapper}>
         <CollapsableSection
+          controlled
           isOpen={Boolean(sectionExpanded)}
           onToggle={handleToggle}
           className={cx(styles.collapseWrapper, isRoot && styles.rootCollapseWrapper)}
