@@ -56,13 +56,16 @@ import { locationService } from '@grafana/runtime';
 import appEvents from 'app/core/app_events';
 
 const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
-  const scheduleMode = match.params.type === 'scheduled';
+  const [queryParams, setQueryParams] = useQueryParams();
+  const scheduleMode: boolean = queryParams['scheduled'] as boolean;
   const backup = null;
   const styles = useStyles2(getStyles);
   const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
   const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup, scheduleMode]);
   const { Form } = withTypes<AddBackupFormProps>();
   const editing = !!backup;
+
+  console.log(scheduleMode);
 
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [generateToken] = useCancelToken();
@@ -170,13 +173,14 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                 <div className={styles.contentInner}>
                   {!editing && (
                     <div className={styles.typeSelectionRow}>
-                      {/* <Field name="type" component="input" type="radio" value={BackupType.DEMAND}>
+                      <Field name="type" component="input" type="radio" value={BackupType.DEMAND}>
                         {({ input }) => (
                           <label>
                             <input
                               {...input}
                               onChange={(e) => {
                                 setModalTitle(Messages.getModalTitle(false, editing));
+                                setQueryParams({ scheduled: null });
                                 input.onChange(e);
                               }}
                             ></input>
@@ -184,26 +188,21 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                           </label>
                         )}
                       </Field>
-                       <Field name="type" component="input" type="radio" value={BackupType.SCHEDULED}>
+                      <Field name="type" component="input" type="radio" value={BackupType.SCHEDULED}>
                         {({ input }) => (
                           <label>
                             <input
                               {...input}
                               onChange={(e) => {
                                 setModalTitle(Messages.getModalTitle(true, editing));
+                                setQueryParams({ scheduled: true });
                                 input.onChange(e);
                               }}
                             ></input>
                             {Messages.schedule}
                           </label>
                         )}
-                      </Field> */}
-                      <LinkButton href="/backup/demand/new" disabled={!scheduleMode}>
-                        {Messages.onDemand}
-                      </LinkButton>
-                      <LinkButton href="/backup/scheduled/new" disabled={scheduleMode} type="button">
-                        {Messages.schedule}
-                      </LinkButton>
+                      </Field>
                     </div>
                   )}
                   <div className={styles.formContainer}>

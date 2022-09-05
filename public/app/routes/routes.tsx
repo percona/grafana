@@ -501,7 +501,7 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/backup/:type/new',
+      path: '/backup/new',
       component: SafeDynamicImport(
         () =>
           import(

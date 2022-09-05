@@ -276,7 +276,12 @@ export const ScheduledBackups: FC = () => {
             >
               {Messages.add}
             </Button> */}
-            <LinkButton href="/backup/scheduled/new" icon="plus">
+            <LinkButton
+              href={urlUtil.renderUrl('/backup/new', {
+                scheduled: true,
+              })}
+              icon="plus"
+            >
               New Scheduled backup
             </LinkButton>
           </div>

@@ -268,7 +268,7 @@ export const BackupInventory: FC = () => {
             >
               {Messages.add}"/artifact_id/04d692ce-4c8d-48fb-8f52-18a3e14baf42"
             </Button> */}
-            <LinkButton href="/backup/demand/new" icon="plus">
+            <LinkButton href="/backup/new" icon="plus">
               New backup
             </LinkButton>{' '}
             <LinkButton
@@ -278,6 +278,14 @@ export const BackupInventory: FC = () => {
               icon="plus"
             >
               Edit backup
+            </LinkButton>
+            <LinkButton
+              href={urlUtil.renderUrl('/backup/demand/new', {
+                sheduled: true,
+              })}
+              icon="plus"
+            >
+              With params
             </LinkButton>
           </div>
           <Table
