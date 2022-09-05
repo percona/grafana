@@ -76,28 +76,23 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [generateToken] = useCancelToken();
 
-  const getScheduledBackupData = useCallback(async () => {
-    setPending(true);
-    try {
-      const backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
-      const backup = backups.find((backup) => backup.id === `/${match.params.type}/${match.params.id}`);
-      setBackup(backup ?? null);
-    } catch (e) {
-      if (isApiCancelError(e)) {
-        return;
-      }
-      logger.error(e);
-    }
-    setPending(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const getBackupData = useCallback(async () => {
     setPending(true);
 
     try {
-      const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
-      const backup = backups.find((backup) => backup.id === `/${match.params.type}/${match.params.id}`);
+      let backups: Backup[] | ScheduledBackup[];
+      let backup: Backup | ScheduledBackup | null = null;
+      if (scheduleMode) {
+        backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
+      } else {
+        backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
+      }
+      for (const value of backups) {
+        if (value.id === `/${match.params.type}/${match.params.id}`) {
+          backup = value;
+          break;
+        }
+      }
       setBackup(backup ?? null);
     } catch (e) {
       if (isApiCancelError(e)) {
@@ -106,26 +101,27 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       logger.error(e);
     }
     setPending(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (scheduleMode) {
-      getScheduledBackupData();
-    } else {
-      getBackupData();
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleBackup = async (values: AddBackupFormProps) => {
     try {
       await BackupService.backup(values, generateToken(BACKUP_CANCEL_TOKEN));
-      setBackupErrors([]);
-      locationService.push('/backup/inventory');
+      if (scheduleMode) {
+        appEvents.emit(AppEvents.alertSuccess, [
+          values.id
+            ? MessagesBackup.scheduledBackups.getEditSuccess(values.backupName)
+            : MessagesBackup.scheduledBackups.addSuccess,
+        ]);
+        setBackupErrors([]);
+        locationService.push('/backup/scheduled');
+      } else {
+        appEvents.emit(AppEvents.alertSuccess, [MessagesBackup.backupInventory.addSuccess]);
+        setBackupErrors([]);
+        locationService.push('/backup/inventory');
+      }
     } catch (e) {
       if (isApiCancelError(e)) {
-        locationService.push('/backup/inventory');
         return;
       }
 
@@ -134,38 +130,22 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     }
   };
 
-  const handleScheduledBackup = async (values: AddBackupFormProps) => {
-    const { id, backupName } = values;
-    try {
-      await BackupService.backup(values);
-      appEvents.emit(AppEvents.alertSuccess, [
-        id ? MessagesBackup.scheduledBackups.getEditSuccess(backupName) : MessagesBackup.scheduledBackups.addSuccess,
-      ]);
-      locationService.push('/backup/scheduled');
-    } catch (e) {
-      logger.error(e);
-    }
-  };
-
   const handleSubmit = (values: AddBackupFormProps) => {
-    if (scheduleMode) {
-      handleScheduledBackup({
-        ...values,
-        retention: parseInt(`${values.retention}`, 10),
-        retryTimes: parseInt(`${values.retryTimes}`, 10),
-      });
-    } else {
-      handleBackup({
-        ...values,
-        retention: parseInt(`${values.retention}`, 10),
-        retryTimes: parseInt(`${values.retryTimes}`, 10),
-      });
-    }
+    handleBackup({
+      ...values,
+      retention: parseInt(`${values.retention}`, 10),
+      retryTimes: parseInt(`${values.retryTimes}`, 10),
+    });
   };
 
   const onClose = () => {};
 
   useEffect(() => setModalTitle(Messages.getModalTitle(scheduleMode, editing)), [editing, scheduleMode]);
+
+  useEffect(() => {
+    getBackupData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Overlay isPending={pending}>
