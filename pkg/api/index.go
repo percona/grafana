@@ -394,16 +394,6 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 		Section:          dtos.NavSectionCore,
 	})
 
-	navTree = append(navTree, &dtos.NavLink{
-		Text: "HAProxy", Id: "haproxy",
-		Url:              setting.AppSubUrl + "/d/haproxy-instance-summary/haproxy-instance-summary",
-		Icon:             "percona-database-haproxy",
-		HideFromTabs:     true,
-		ShowIconInNavbar: true,
-		SortWeight:       dtos.WeightDashboard,
-		Section:          dtos.NavSectionCore,
-	})
-
 	// QAN
 	navTree = append(navTree, &dtos.NavLink{
 		Text:         "Query Analytics (QAN)",

@@ -487,6 +487,7 @@ const getCollapsibleStyles = (theme: GrafanaTheme2) => ({
   }),
   rootCollapseWrapper: css({
     minHeight: theme.spacing(6),
+    padding: theme.spacing(0.5, 4.25, 0.5, 0.5),
   }),
   collapseContent: css({
     padding: 0,
