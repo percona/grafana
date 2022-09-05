@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, CustomScrollbar, LinkButton, PageToolbar, useStyles2 } from '@grafana/ui';
+import { Button, CustomScrollbar, PageToolbar, useStyles2 } from '@grafana/ui';
 import { Link } from 'react-router-dom';
 import {
   CheckboxField,
@@ -13,7 +13,7 @@ import {
   validators,
 } from '@percona/platform-core';
 import { Field, withTypes } from 'react-final-form';
-import { AppEvents, SelectableValue, urlUtil } from '@grafana/data';
+import { AppEvents, SelectableValue } from '@grafana/data';
 import { AddBackupFormProps, SelectableService } from './AddBackupPage.types';
 import { RetryModeSelector } from './RetryModeSelector';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
@@ -73,26 +73,14 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const { Form } = withTypes<AddBackupFormProps>();
   const editing = !!backup;
 
-  console.log(scheduleMode);
-
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [generateToken] = useCancelToken();
-
-  if (match.params.id) {
-    console.log(match.params.id);
-    console.log(match.params.type);
-  } else {
-    console.log(match.params.type);
-  }
-
-  console.log(backup);
 
   const getScheduledBackupData = useCallback(async () => {
     setPending(true);
     try {
       const backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
       const backup = backups.find((backup) => backup.id === `/${match.params.type}/${match.params.id}`);
-      console.log(backup);
       setBackup(backup ?? null);
     } catch (e) {
       if (isApiCancelError(e)) {
@@ -110,7 +98,6 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     try {
       const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
       const backup = backups.find((backup) => backup.id === `/${match.params.type}/${match.params.id}`);
-      console.log(backup);
       setBackup(backup ?? null);
     } catch (e) {
       if (isApiCancelError(e)) {

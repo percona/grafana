@@ -4,7 +4,8 @@ import cronstrue from 'cronstrue';
 import React, { FC, useState, useMemo, useEffect, useCallback } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
-import { AppEvents } from '@grafana/data';
+import { AppEvents, urlUtil } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
 import { LinkButton, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
@@ -19,7 +20,6 @@ import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
-//import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { Messages } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
 import { formatBackupMode } from '../../Backup.utils';
@@ -38,13 +38,10 @@ export const ScheduledBackups: FC = () => {
   const [actionPending, setActionPending] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
-  //const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const navModel = usePerconaNavModel('scheduled-backups');
   const [generateToken] = useCancelToken();
   const styles = useStyles(getStyles);
-
-  console.log(data);
 
   const retentionValue = useCallback((n: number) => {
     if (n < 0) {
@@ -196,25 +193,6 @@ export const ScheduledBackups: FC = () => {
     []
   );
 
-  // const handleClose = () => {
-  //   setBackupModalVisible(false);
-  // };
-
-  // const handleBackup = async (values: AddBackupFormProps) => {
-  //   const { id, backupName } = values;
-  //   try {
-  //     await BackupService.backup(values);
-  //     appEvents.emit(AppEvents.alertSuccess, [
-  //       id ? Messages.scheduledBackups.getEditSuccess(backupName) : Messages.scheduledBackups.addSuccess,
-  //     ]);
-  //     setBackupModalVisible(false);
-  //     setSelectedBackup(null);
-  //     getData();
-  //   } catch (e) {
-  //     logger.error(e);
-  //   }
-  // };
-
   const onDeleteClick = (backup: ScheduledBackup) => {
     setDeleteModalVisible(true);
     setSelectedBackup(backup);
@@ -236,14 +214,8 @@ export const ScheduledBackups: FC = () => {
   };
 
   const onEditClick = (backup: ScheduledBackup) => {
-    setSelectedBackup(backup);
-    // setBackupModalVisible(true);
+    locationService.push(`/backup${backup.id}/edit`);
   };
-
-  // const onAddClick = () => {
-  //   setSelectedBackup(null);
-  //   // setBackupModalVisible(true);
-  // };
 
   const getCellProps = useCallback(
     (cell: Cell<ScheduledBackup>) => ({
@@ -267,25 +239,13 @@ export const ScheduledBackups: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            {/* <Button
-              size="md"
-              icon="plus-square"
-              fill="text"
-              data-testid="scheduled-backup-add-modal-button"
-              onClick={onAddClick}
-            >
-              {Messages.add}
-            </Button> */}
             <LinkButton
               href={urlUtil.renderUrl('/backup/new', {
                 scheduled: true,
               })}
               icon="plus"
             >
-              New Scheduled backup
-            </LinkButton>
-            <LinkButton href="/backup/scheduled_task_id/bd4225d8-73fd-476e-8c8a-5a039151315d/edit" icon="plus">
-              edit scheduled backup
+              New Scheduled Backup
             </LinkButton>
           </div>
           <Table
@@ -297,13 +257,6 @@ export const ScheduledBackups: FC = () => {
             renderExpandedRow={renderSelectedSubRow}
             getCellProps={getCellProps}
           />
-          {/* <AddBackupModal
-            scheduleMode
-            backup={selectedBackup}
-            isVisible={backupModalVisible}
-            onClose={handleClose}
-            onBackup={handleBackup}
-          /> */}
           <DeleteModal
             title={Messages.scheduledBackups.deleteModalTitle}
             isVisible={deleteModalVisible}
