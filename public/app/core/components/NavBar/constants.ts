@@ -185,13 +185,14 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
     },
   ];
 
-  if (alertingEnabled) {
-    children.push({
-      id: 'settings-communication',
-      text: 'Communication',
-      url: `${config.appSubUrl}/settings/communication`,
-    });
-  }
+  // TODO remove after integrating SMTP/slack with Grafana's alerting system
+  // if (alertingEnabled) {
+  //   children.push({
+  //     id: 'settings-communication',
+  //     text: 'Communication',
+  //     url: `${config.appSubUrl}/settings/communication`,
+  //   });
+  // }
   const page: NavModelItem = {
     id: 'settings',
     icon: 'percona-setting',
