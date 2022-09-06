@@ -142,7 +142,7 @@ export const NavBar = React.memo(() => {
 
     // @PERCONA
     if (isAuthorized) {
-      buildInventoryAndSettings(configItems);
+      buildInventoryAndSettings(updatedNavTree);
 
       if (alertingEnabled) {
         buildIntegratedAlertingMenuItem(updatedNavTree);
