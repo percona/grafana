@@ -14,8 +14,7 @@ import {
 } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
 import { fetchTemplatesAction } from 'app/percona/shared/core/reducers';
 import { getTemplates } from 'app/percona/shared/core/selectors';
-import { dispatch } from 'app/store/store';
-import { AccessControlAction } from 'app/types';
+import { AccessControlAction, useDispatch } from 'app/types';
 
 import { fetchAlertManagerConfigAction } from '../../../state/actions';
 import { RuleForm, RuleFormValues } from '../../../types/rule-form';
@@ -63,8 +62,10 @@ export const TemplateStep: FC = () => {
   const {
     register,
     setValue,
+    getValues,
     formState: { errors },
   } = useFormContext<RuleFormValues>();
+  const dispatch = useDispatch();
   const templates = useRef<Template[]>([]);
   const styles = useStyles2(getStyles);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
@@ -76,6 +77,15 @@ export const TemplateStep: FC = () => {
   const { result: templatesResult, loading: templatesLoading } = useSelector(getTemplates) || initialAsyncRequestState;
   const templateOptions = formatTemplateOptions(templatesResult?.templates || []);
   templates.current = templatesResult?.templates || [];
+
+  const setRuleNameAfterTemplate = useCallback(
+    (template?: Template) => {
+      if (!getValues('name')) {
+        setValue('name', `${template?.name} Alerting Rule`);
+      }
+    },
+    [getValues, setValue]
+  );
 
   const handleTemplateChange = useCallback(
     (selectedTemplate?: Template, onChange?: (template?: Template) => void) => {
@@ -89,6 +99,8 @@ export const TemplateStep: FC = () => {
         setValue('severity', newSeverity.value);
       }
       setValue('duration', newTemplate?.for || '1m');
+
+      setRuleNameAfterTemplate(newTemplate);
 
       if (newTemplate) {
         newTemplate.params?.forEach(({ type, float, name }) => {
@@ -104,24 +116,28 @@ export const TemplateStep: FC = () => {
         onChange(selectedTemplate);
       }
     },
-    [setValue]
+    [setRuleNameAfterTemplate, setValue]
   );
 
   useEffect(() => {
-    if (selectedTemplate) {
-      const matchingTemplate = templates.current.find((template) => template.name === selectedTemplate);
+    const getData = async () => {
+      dispatch(fetchAlertManagerConfigAction('grafana'));
+      const { templates } = await dispatch(fetchTemplatesAction()).unwrap();
 
-      if (matchingTemplate) {
-        setValue('template', matchingTemplate);
-        handleTemplateChange(matchingTemplate);
+      if (selectedTemplate) {
+        const matchingTemplate = templates.find((template) => template.name === selectedTemplate);
+
+        if (matchingTemplate) {
+          setValue('template', matchingTemplate);
+
+          setRuleNameAfterTemplate(matchingTemplate);
+
+          handleTemplateChange(matchingTemplate);
+        }
       }
-    }
-  }, [handleTemplateChange, selectedTemplate, setValue]);
-
-  useEffect(() => {
-    dispatch(fetchAlertManagerConfigAction('grafana'));
-    dispatch(fetchTemplatesAction());
-  }, []);
+    };
+    getData();
+  }, [dispatch, handleTemplateChange, selectedTemplate, setRuleNameAfterTemplate, setValue]);
 
   return (
     <RuleEditorSection stepNo={2} title="Template details">
