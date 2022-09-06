@@ -408,10 +408,10 @@ function CollapsibleNavItem({
             link.onClick?.();
             onClose();
           }}
-          className={cx(styles.collapsibleMenuItem, isRoot && styles.rootCollabsibleMenuItem)}
+          className={cx(styles.collapsibleMenuItem, styles.rootCollabsibleMenuItem)}
           elClassName={styles.rootCollapsibleIcon}
         >
-          <FeatureHighlightWrapper>{getLinkIcon(link, isRoot ? 'xl' : 'sm')}</FeatureHighlightWrapper>
+          <FeatureHighlightWrapper>{getLinkIcon(link, 'xl')}</FeatureHighlightWrapper>
         </NavBarItemWithoutMenu>
       )}
       <div className={styles.collapsibleSectionWrapper}>
@@ -423,7 +423,7 @@ function CollapsibleNavItem({
           contentClassName={cx(styles.collapseContent, isRoot && styles.rootCollapseContent)}
           label={
             <div className={cx(styles.labelWrapper, { [styles.primary]: isActive })}>
-              {!isRoot && <span className={styles.collapsibleIcon}>{getLinkIcon(link, isRoot ? 'xl' : 'sm')}</span>}
+              {!isRoot && <span className={styles.collapsibleIcon}>{getLinkIcon(link, 'sm')}</span>}
               <span className={styles.linkText}>{link.text}</span>
             </div>
           }
