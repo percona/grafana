@@ -11,7 +11,7 @@ import { Icon, useTheme2 } from '@grafana/ui';
 import { updateNavIndex } from 'app/core/actions';
 import { Branding } from 'app/core/components/Branding/Branding';
 import { getKioskMode } from 'app/core/navigation/kiosk';
-import { updateNavTree } from 'app/core/reducers/navBarTree';
+import { initialState, updateNavTree } from 'app/core/reducers/navBarTree';
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { KioskMode, StoreState } from 'app/types';
 
@@ -37,7 +37,7 @@ import {
 } from './constants';
 import { NavBarContext } from './context';
 import {
-  updatePerconaPage,
+  // updatePerconaPage,
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
   enrichConfigItems,
@@ -129,26 +129,36 @@ export const NavBar = React.memo(() => {
 
   // @PERCONA
   useEffect(() => {
-    let updatedNavTree = cloneDeep(navBarTree);
+    let updatedNavTree = cloneDeep(initialState);
 
     const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = result!;
 
+    // @PERCONA
     if (isPlatformUser) {
-      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_ENTITLEMENTS_PAGE, true);
-      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_TICKETS_PAGE, true);
-      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_ENVIRONMENT_OVERVIEW_PAGE, true);
+      updatedNavTree.push(PMM_ENTITLEMENTS_PAGE);
+      updatedNavTree.push(PMM_TICKETS_PAGE);
+      updatedNavTree.push(PMM_ENVIRONMENT_OVERVIEW_PAGE);
     }
 
+    // @PERCONA
     if (isAuthorized) {
-      updatedNavTree = buildInventoryAndSettings(updatedNavTree);
+      buildInventoryAndSettings(configItems);
 
       if (alertingEnabled) {
-        updatedNavTree = buildIntegratedAlertingMenuItem(updatedNavTree);
+        buildIntegratedAlertingMenuItem(updatedNavTree);
       }
 
-      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_STT_PAGE, sttEnabled);
-      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_DBAAS_PAGE, dbaasEnabled);
-      updatedNavTree = updatePerconaPage(updatedNavTree, PMM_BACKUP_PAGE, backupEnabled);
+      if (sttEnabled) {
+        updatedNavTree.push(PMM_STT_PAGE);
+      }
+
+      if (dbaasEnabled) {
+        updatedNavTree.push(PMM_DBAAS_PAGE);
+      }
+
+      if (backupEnabled) {
+        updatedNavTree.push(PMM_BACKUP_PAGE);
+      }
     }
 
     dispatch(updateNavTree({ items: updatedNavTree }));
