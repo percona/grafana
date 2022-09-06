@@ -37,7 +37,6 @@ import {
 } from './constants';
 import { NavBarContext } from './context';
 import {
-  // updatePerconaPage,
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
   enrichConfigItems,
@@ -129,7 +128,7 @@ export const NavBar = React.memo(() => {
 
   // @PERCONA
   useEffect(() => {
-    let updatedNavTree = cloneDeep(initialState);
+    const updatedNavTree = cloneDeep(initialState);
 
     const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = result!;
 
