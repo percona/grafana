@@ -5,7 +5,7 @@ import { api } from 'app/percona/shared/helpers/api';
 import { getCronStringFromValues } from '../shared/helpers/cron/cron';
 
 import { BackupMode, BackupType, DataModel, RetryMode } from './Backup.types';
-import { AddBackupFormProps } from './components/AddBackupModal/AddBackupModal.types';
+import { AddBackupFormProps } from './components/AddBackupPage/AddBackupPage.types';
 
 const BASE_URL = '/v1/management/backup/Backups';
 
