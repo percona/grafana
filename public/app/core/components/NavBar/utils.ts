@@ -175,7 +175,30 @@ export function getNavModelItemKey(item: NavModelItem) {
 
 export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavModelItem | undefined => {
   const alertingItem = mainLinks.find(({ id }) => id === 'alerting');
+
+  if (alertingItem?.url) {
+    alertingItem.url = `${config.appSubUrl}/alerting/alerts`;
+  }
+
   alertingItem?.children?.unshift(...PMM_ALERTING_PERCONA_ALERTS);
+  return alertingItem;
+};
+
+export const removeAlertingMenuItem = (mainLinks: NavModelItem[]) => {
+  const alertingItem = mainLinks.find(({ id }) => id === 'alerting');
+
+  PMM_ALERTING_PERCONA_ALERTS.forEach((alertingTab, idx) => {
+    const item = alertingItem?.children?.find((c) => c.id === alertingTab.id);
+
+    if (item) {
+      alertingItem?.children?.splice(idx, 1);
+    }
+  });
+
+  if (alertingItem?.url) {
+    alertingItem.url = `${config.appSubUrl}/alerting/list`;
+  }
+
   return alertingItem;
 };
 

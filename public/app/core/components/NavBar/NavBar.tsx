@@ -42,6 +42,7 @@ import {
   getActiveItem,
   isMatchOrChildMatch,
   isSearchActive,
+  removeAlertingMenuItem,
   SEARCH_ITEM_ID,
 } from './utils';
 
@@ -104,7 +105,7 @@ export const NavBar = React.memo(() => {
   ).map((item) => enrichWithInteractionTracking(item, menuOpen));
 
   const activeItem = isSearchActive(location) ? searchItem : getActiveItem(navTree, location.pathname);
-  const iaMenuItem = buildIntegratedAlertingMenuItem(coreItems);
+  const iaMenuItem = alertingEnabled ? buildIntegratedAlertingMenuItem(coreItems) : removeAlertingMenuItem(coreItems);
 
   // @PERCONA
   // All these dispatches are our pages
