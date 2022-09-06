@@ -7,6 +7,7 @@ export interface AddDBClusterModalProps {
   isVisible: boolean;
   setVisible: (value: boolean) => void;
   onSubmit: (values: Record<string, any>, showPMMAddressWarning: boolean) => void;
+  preSelectedKubernetesCluster: Kubernetes | null;
 }
 
 export enum AddDBClusterFields {
