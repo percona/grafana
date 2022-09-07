@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, CollapsableSection, CustomScrollbar, PageToolbar, useStyles2 } from '@grafana/ui';
+import { Button, CollapsableSection, PageToolbar, useStyles2 } from '@grafana/ui';
 import { Link } from 'react-router-dom';
 import {
   LoaderButton,
@@ -170,103 +170,104 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
               </Link>
             </PageToolbar>
             <div className={styles.contentOuter}>
-              <CustomScrollbar autoHeightMin="100%" hideHorizontalTrack={true}>
-                <div className={styles.contentInner}>
-                  {!editing && <PageSwitcher editing={editing} setModalTitle={setModalTitle} />}
-                  <div className={styles.formContainer}>
-                    <span className={styles.wideField}>
-                      <TextInputField
-                        name="backupName"
-                        label={Messages.backupName}
-                        validators={[validators.required, validators.maxLength(MAX_BACKUP_NAME)]}
-                      />
-                    </span>
-                    <span className={styles.SelectFieldWrap}>
-                      <Field name="service" validate={validators.required}>
-                        {({ input }) => (
-                          <AsyncSelectField
-                            label={Messages.serviceName}
-                            isSearchable={false}
-                            disabled={editing}
-                            loadOptions={AddBackupModalService.loadServiceOptions}
-                            defaultOptions
-                            {...input}
-                            onChange={(service: SelectableValue<SelectableService>) => {
-                              input.onChange(service);
-                              form.mutators.changeVendor(service.value!.vendor);
-                            }}
-                            className={styles.selectField}
-                            data-testid="service-select-input"
-                          />
-                        )}
-                      </Field>
-                    </span>
-                    <span className={styles.radioButtonField}>
-                      <RadioButtonGroupField
-                        disabled={isDataModelDisabled(values)}
-                        options={DATA_MODEL_OPTIONS}
-                        name="dataModel"
-                        label={Messages.dataModel}
-                        fullWidth
-                      />
-                    </span>
-                    <span className={styles.wideField}>
-                      <TextInputField
-                        name="vendor"
-                        label={Messages.vendor}
-                        disabled
-                        format={(vendor) => DATABASE_LABELS[vendor as Databases] || ''}
-                      />
-                    </span>
-                    <span className={cx(styles.wideField, styles.SelectFieldWrap)}>
-                      <Field name="location" validate={validators.required}>
-                        {({ input }) => (
-                          <div>
-                            <AsyncSelectField
-                              label={Messages.location}
-                              isSearchable={false}
-                              disabled={editing}
-                              loadOptions={AddBackupModalService.loadLocationOptions}
-                              defaultOptions
-                              {...input}
-                              className={styles.selectField}
-                              data-testid="location-select-input"
-                            />
-                          </div>
-                        )}
-                      </Field>
-                    </span>
-                    <span className={styles.wideField}>
-                      <TextareaInputField
-                        fieldClassName={styles.textAreaField}
-                        name="description"
-                        label={Messages.description}
-                      />
-                    </span>
-                    <span className={cx(styles.radioButtonField, styles.backupTypeField)}>
-                      {values.type === BackupType.SCHEDULED && (
-                        <RadioButtonGroupField
-                          options={getBackupModeOptions(values.vendor)}
-                          name="mode"
-                          //TODO remove this when we support incremental backups for MySQL
-                          disabled={editing || values.vendor === Databases.mysql}
-                          label={Messages.type}
-                          fullWidth
-                          inputProps={{
-                            onInput: (e: React.ChangeEvent<HTMLInputElement>) =>
-                              form.mutators.changeDataModel(e.target.labels),
+              <div className={styles.contentInner}>
+                {!editing && <PageSwitcher editing={editing} setModalTitle={setModalTitle} />}
+                <h4 className={styles.headingStyle}>Backup info</h4>
+                <div className={styles.formContainer}>
+                  <span className={styles.wideField}>
+                    <TextInputField
+                      name="backupName"
+                      label={Messages.backupName}
+                      validators={[validators.required, validators.maxLength(MAX_BACKUP_NAME)]}
+                    />
+                  </span>
+                  <span className={styles.SelectFieldWrap}>
+                    <Field name="service" validate={validators.required}>
+                      {({ input }) => (
+                        <AsyncSelectField
+                          label={Messages.serviceName}
+                          isSearchable={false}
+                          disabled={editing}
+                          loadOptions={AddBackupModalService.loadServiceOptions}
+                          defaultOptions
+                          {...input}
+                          onChange={(service: SelectableValue<SelectableService>) => {
+                            input.onChange(service);
+                            form.mutators.changeVendor(service.value!.vendor);
                           }}
+                          className={styles.selectField}
+                          data-testid="service-select-input"
                         />
                       )}
-                    </span>
-                  </div>
+                    </Field>
+                  </span>
+                  <span className={styles.radioButtonField}>
+                    <RadioButtonGroupField
+                      disabled={isDataModelDisabled(values)}
+                      options={DATA_MODEL_OPTIONS}
+                      name="dataModel"
+                      label={Messages.dataModel}
+                      fullWidth
+                    />
+                  </span>
+                  <span className={styles.wideField}>
+                    <TextInputField
+                      name="vendor"
+                      label={Messages.vendor}
+                      disabled
+                      format={(vendor) => DATABASE_LABELS[vendor as Databases] || ''}
+                    />
+                  </span>
+                  <span className={cx(styles.wideField, styles.SelectFieldWrap)}>
+                    <Field name="location" validate={validators.required}>
+                      {({ input }) => (
+                        <div>
+                          <AsyncSelectField
+                            label={Messages.location}
+                            isSearchable={false}
+                            disabled={editing}
+                            loadOptions={AddBackupModalService.loadLocationOptions}
+                            defaultOptions
+                            {...input}
+                            className={styles.selectField}
+                            data-testid="location-select-input"
+                          />
+                        </div>
+                      )}
+                    </Field>
+                  </span>
+                  <span className={styles.wideField}>
+                    <TextareaInputField
+                      fieldClassName={styles.textAreaField}
+                      name="description"
+                      label={Messages.description}
+                    />
+                  </span>
+                  <span className={cx(styles.radioButtonField, styles.backupTypeField)}>
+                    {values.type === BackupType.SCHEDULED && (
+                      <RadioButtonGroupField
+                        options={getBackupModeOptions(values.vendor)}
+                        name="mode"
+                        //TODO remove this when we support incremental backups for MySQL
+                        disabled={editing || values.vendor === Databases.mysql}
+                        label={Messages.type}
+                        fullWidth
+                        inputProps={{
+                          onInput: (e: React.ChangeEvent<HTMLInputElement>) =>
+                            form.mutators.changeDataModel(e.target.labels),
+                        }}
+                      />
+                    )}
+                  </span>
+                </div>
+                <div className={styles.halfPage}>
                   {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}
                   <CollapsableSection label="Advanced Settings:" isOpen={false}>
                     <RetryModeSelector retryMode={values.retryMode} />
                   </CollapsableSection>
                   {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
                 </div>
-              </CustomScrollbar>
+              </div>
             </div>
           </form>
         )}

@@ -24,6 +24,7 @@ export const getStyles = ({
   pageSwitcherWrapper: css`
     display: flex;
     padding: 20px 0px 20px 0px;
+    margin-bottom: 20px;
     & > label {
       display: flex;
       justify-content: center;
@@ -38,6 +39,10 @@ export const getStyles = ({
     align-items: center;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 10px;
+    margin-bottom: 40px;
+  `,
+  halfPage: css`
+    width: 50%;
   `,
   wideField: css`
     grid-column: span 2;
@@ -147,7 +152,9 @@ export const getStyles = ({
     border: 1px solid ${colors.border.weak};
     border-radius: ${shape.borderRadius()};
     margin: ${spacing(0, 2, 2)};
-    overflow: hidden;
     flex: 1;
+  `,
+  headingStyle: css`
+    margin-bottom: 20px;
   `,
 });
