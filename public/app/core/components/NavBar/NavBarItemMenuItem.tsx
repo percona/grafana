@@ -32,6 +32,10 @@ export function NavBarItemMenuItem({ item, state, onNavigate }: NavBarItemMenuIt
   const isSection = item.value.menuItemType === 'section';
   const styles = getStyles(theme, isFocused, isSection);
   const onAction = () => {
+    if (isNested(item.value) && !item.value.url) {
+      return;
+    }
+
     setMenuIdOpen(undefined);
     onNavigate(item.value);
     onClose();
@@ -42,7 +46,7 @@ export function NavBarItemMenuItem({ item, state, onNavigate }: NavBarItemMenuIt
       isDisabled,
       'aria-label': item['aria-label'],
       key,
-      closeOnSelect: true,
+      closeOnSelect: !isNested(item.value) || !!item.value.url,
       onClose,
       onAction,
     },
@@ -61,7 +65,12 @@ export function NavBarItemMenuItem({ item, state, onNavigate }: NavBarItemMenuIt
 
   return (
     <>
-      <li {...mergeProps(menuItemProps, focusProps, keyboardProps)} ref={ref} className={styles.menuItem}>
+      <li
+        {...mergeProps(menuItemProps, focusProps, keyboardProps)}
+        role={isNested(item.value) && !item.value.url ? 'menu' : 'menuitem'}
+        ref={ref}
+        className={styles.menuItem}
+      >
         {rendered}
         {/* @Percona */}
         {isNested(item.value) && <NestedSubMenu items={item.value.children} />}

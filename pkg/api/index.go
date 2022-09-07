@@ -315,7 +315,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 	}
 
 	navTree = append(navTree, &dtos.NavLink{
-		Text:             "System",
+		Text:             "Operating System (OS)",
 		Id:               "system",
 		Url:              setting.AppSubUrl + "/d/node-instance-overview/nodes-overview",
 		Icon:             "percona-system",
