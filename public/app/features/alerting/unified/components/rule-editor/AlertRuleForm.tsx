@@ -53,6 +53,7 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
       // @PERCONA
       // Set templated as default
       type: result && !!result.alertingEnabled ? RuleFormType.templated : RuleFormType.grafana,
+      group: result && !!result.alertingEnabled ? 'default-alert-group' : '',
     };
   }, [existing, queryParams, result]);
 
