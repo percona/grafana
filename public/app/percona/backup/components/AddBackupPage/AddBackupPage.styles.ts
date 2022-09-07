@@ -7,20 +7,6 @@ export const getStyles = ({
   spacing,
   v1: { colors: colorsV1, typography, spacing: spacingV1, border },
 }: GrafanaTheme2) => ({
-  // retryFields: css`
-  //   display: flex;
-  // `,
-  // retrySelect: css`
-  //   flex: 1 1 50%;
-
-  //   &:first-child {
-  //     padding-right: ${spacingV1.sm};
-  //   }
-
-  //   &:last-child {
-  //     padding-left: ${spacingV1.sm};
-  //   }
-  // `,
   pageSwitcherWrapper: css`
     display: flex;
     padding: 20px 0px 20px 0px;
@@ -39,7 +25,6 @@ export const getStyles = ({
     align-items: center;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 10px;
-    margin-bottom: 40px;
   `,
   halfPage: css`
     width: 50%;
@@ -73,76 +58,7 @@ export const getStyles = ({
       height: 50px;
     }
   `,
-  // formHalf: css` //   flex: 0 0 50%; //   &:first-child { //     padding-right: ${spacingV1.md};
-  //   }
 
-  //   &:last-child {
-  //     padding-left: ${spacingV1.md};
-  //   }
-  // `,
-  // advancedGroup: css`
-  //   border: ${border.width.sm} solid ${colorsV1.formInputBorder};
-  //   border-radius: ${border.radius.sm};
-  //   padding: ${spacingV1.md};
-  //   margin-bottom: ${spacingV1.formInputMargin};
-  //   position: relative;
-  // `,
-  // advancedTitle: css`
-  //   color: ${colorsV1.formLabel};
-  //   font-weight: ${typography.weight.semibold};
-  //   position: absolute;
-  //   top: -8px;
-  //   padding: 0 ${spacingV1.xs};
-  //   background-color: ${colorsV1.bodyBg};
-  // `,
-  // advancedRow: css`
-  //   display: flex;
-  //   max-width: 400px;
-  //   margin: 0 auto;
-
-  //   & > * {
-  //     flex: 1 0 50%;
-
-  //     &:first-child {
-  //       padding-right: ${spacingV1.sm};
-  //     }
-
-  //     &:last-child {
-  //       padding-left: ${spacingV1.sm};
-  //     }
-
-  //     &:first-child:last-child {
-  //       padding-right: 0;
-  //       padding-left: 0;
-  //     }
-  //   }
-  // `,
-  // checkbox: css`
-  //   &:not(:last-child) {
-  //     margin-bottom: 0;
-  //   }
-
-  //   & > div:last-child {
-  //     // we don't need the error line in this case
-  //     display: none;
-  //   }
-  // `,
-  // apiErrorSection: css`
-  //   margin-bottom: ${spacingV1.md};
-  // `,
-  // typeSelectionRow: css`
-  //   margin-bottom: ${spacingV1.md};
-
-  //   label {
-  //     &:first-child {
-  //       margin-right: ${spacingV1.md};
-  //     }
-
-  //     & > input {
-  //       margin-right: ${spacingV1.sm};
-  //     }
-  //   }
-  // `,
   contentInner: css`
     flex: 1;
     padding: ${spacing(2)};

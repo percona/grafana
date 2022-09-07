@@ -24,7 +24,7 @@ interface ScheduleSectionProps {
 export const ScheduleSection = ({ values }: ScheduleSectionProps) => {
   const styles = useStyles2(getStyles);
   return (
-    <div data-testid="advanced-backup-fields">
+    <div data-testid="advanced-backup-fields" className={styles.section}>
       <h4 className={styles.headingStyle}>Schedule</h4>
       <h6>{Messages.scheduleSection}</h6>
       <div className={styles.scheduleSectionWrapper}>

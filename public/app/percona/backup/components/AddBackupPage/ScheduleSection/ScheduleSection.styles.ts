@@ -23,6 +23,9 @@ export const getStyles = ({ colors, typography }: GrafanaTheme2) => ({
   multiSelectField: css`
     padding-bottom: 16px;
   `,
+  section: css`
+    margin-top: 40px;
+  `,
   halfPage: css`
     width: 50%;
   `,
