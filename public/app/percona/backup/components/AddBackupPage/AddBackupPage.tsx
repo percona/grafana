@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, CustomScrollbar, PageToolbar, useStyles2 } from '@grafana/ui';
+import { Button, CollapsableSection, CustomScrollbar, PageToolbar, useStyles2 } from '@grafana/ui';
 import { Link } from 'react-router-dom';
 import {
   LoaderButton,
@@ -243,24 +243,27 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                         label={Messages.description}
                       />
                     </span>
-                    {values.type === BackupType.SCHEDULED && (
-                      <RadioButtonGroupField
-                        options={getBackupModeOptions(values.vendor)}
-                        name="mode"
-                        //TODO remove this when we support incremental backups for MySQL
-                        disabled={editing || values.vendor === Databases.mysql}
-                        label={Messages.type}
-                        fullWidth
-                        inputProps={{
-                          onInput: (e: React.ChangeEvent<HTMLInputElement>) =>
-                            form.mutators.changeDataModel(e.target.labels),
-                        }}
-                      />
-                    )}
-                    {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}
+                    <span className={cx(styles.radioButtonField, styles.backupTypeField)}>
+                      {values.type === BackupType.SCHEDULED && (
+                        <RadioButtonGroupField
+                          options={getBackupModeOptions(values.vendor)}
+                          name="mode"
+                          //TODO remove this when we support incremental backups for MySQL
+                          disabled={editing || values.vendor === Databases.mysql}
+                          label={Messages.type}
+                          fullWidth
+                          inputProps={{
+                            onInput: (e: React.ChangeEvent<HTMLInputElement>) =>
+                              form.mutators.changeDataModel(e.target.labels),
+                          }}
+                        />
+                      )}
+                    </span>
                   </div>
-                  Advanced Settings:
-                  {values.type !== BackupType.SCHEDULED && <RetryModeSelector retryMode={values.retryMode} />}
+                  {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}
+                  <CollapsableSection label="Advanced Settings:" isOpen={false}>
+                    <RetryModeSelector retryMode={values.retryMode} />
+                  </CollapsableSection>
                   {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
                 </div>
               </CustomScrollbar>

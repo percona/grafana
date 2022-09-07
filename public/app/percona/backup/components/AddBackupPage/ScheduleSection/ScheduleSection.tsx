@@ -2,7 +2,6 @@ import { CheckboxField, NumberInputField, SelectField, validators } from '@perco
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import React from 'react';
 import { Field } from 'react-final-form';
-import { RetryModeSelector } from '../RetryModeSelector';
 import { Messages } from '../AddBackupPage.messages';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 import {
@@ -127,9 +126,6 @@ export const ScheduleSection = ({ values }: ScheduleSectionProps) => {
             label={Messages.retention}
             validators={[validators.required, customValidators.range(MIN_RETENTION, MAX_RETENTION)]}
           />
-        </div>
-        <div>
-          <RetryModeSelector retryMode={values.retryMode} />
         </div>
         <div>
           <CheckboxField name="active" label={Messages.enabled} />

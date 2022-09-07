@@ -60,6 +60,9 @@ export const getStyles = ({
       align-items: center;
     }
   `,
+  backupTypeField: css`
+    grid-row-start: 4;
+  `,
   textAreaField: css`
     & > textarea {
       height: 50px;

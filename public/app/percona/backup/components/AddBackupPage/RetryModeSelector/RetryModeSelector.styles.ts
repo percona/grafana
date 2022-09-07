@@ -2,18 +2,17 @@ import { css } from '@emotion/css';
 import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme) => ({
-  retryFields: css`
+  retryFieldWrapper: css`
     display: flex;
+    gap: 10px;
   `,
-  retrySelect: css`
-    flex: 1 1 50%;
-
-    &:first-child {
-      padding-right: ${spacing.sm};
-    }
-
-    &:last-child {
-      padding-left: ${spacing.sm};
+  radioButtonField: css`
+    & > div > div:nth-of-type(2) * {
+      height: 37px;
+      width: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   `,
 });
