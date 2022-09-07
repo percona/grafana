@@ -252,7 +252,7 @@ export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) 
             />
             <ResourcesBar
               resourceLabel={Messages.dbcluster.addModal.resourcesBar.disk}
-              resourceEmptyValueMessage={"Disk space information isn't available"}
+              resourceEmptyValueMessage={'Information about free disk space on the Kubernetes cluster is unavailable'}
               icon={<Disk />}
               total={allocatedResources?.total.disk}
               allocated={allocatedResources?.allocated.disk}
