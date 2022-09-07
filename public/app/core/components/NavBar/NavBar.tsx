@@ -174,6 +174,7 @@ export const NavBar = React.memo(() => {
       <nav className={cx(styles.sidemenu, 'sidemenu')} data-testid="sidemenu" aria-label="Main menu">
         <NavBarContext.Provider
           value={{
+            // Show MySQL item during onboarding tour
             menuIdOpen: isTourOpen && currentStep <= 1 ? 'mysql' : menuIdOpen,
             setMenuIdOpen: setMenuIdOpen,
           }}
