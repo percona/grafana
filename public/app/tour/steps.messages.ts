@@ -9,11 +9,11 @@ export const Messages = {
   pmmDashboards: {
     title: 'PMM Dashboards',
     grafanaTechnology:
-      'PMM dashboards are built on Grafana technology, powered by decades of Percona expertise in database performance optimization.',
+      'PMM dashboards built on Grafana technology are powered by decades of Percona expertise in database performance optimization.',
     observe:
-      'Use these dashboards to observe top to bottom metrics of performance and get to the root of the database issues in the matter of minutes.',
+      'Use technology-specific or Operating System dashboards to observe  top to bottom performance metrics and get to the root of the database problems in minutes.',
     zoomIn:
-      'Zoom-in, drill-down database performance from node to single query levels. Get insights about your DBs no matter where they are stored - on-premises, in the cloud, or hybrid environments.',
+      'Zoom in and drill-down to observe database performance from node to single query levels. Get insights about your database no matter where they are stored on-premises, in the cloud, or in hybrid environments.',
   },
   qan: {
     title: 'PMM Query Analytics',

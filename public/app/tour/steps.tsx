@@ -18,7 +18,7 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
     ),
   },
   {
-    selector: '.dropdown > [aria-label="PMM dashboards"]',
+    selector: '#navbar-menu-portal-container [role="dialog"]',
     content: (
       <SidebarStep title={Messages.pmmDashboards.title}>
         <p>{Messages.pmmDashboards.grafanaTechnology}</p>
@@ -26,6 +26,8 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
         <p>{Messages.pmmDashboards.zoomIn}</p>
       </SidebarStep>
     ),
+    highlightedSelectors: ['#navbar-menu-portal-container [role="dialog"]', '.dropdown > [aria-label="MySQL"]'],
+    position: 'right',
   },
   {
     selector: '.dropdown > [aria-label="Query Analytics (QAN)"]',
@@ -94,7 +96,7 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
           ),
         },
         {
-          selector: '.dropdown > [aria-label="Server Admin"]',
+          selector: '.dropdown > [aria-label="Server admin"]',
           content: (
             <SidebarStep title={Messages.serverAdmin.title}>
               <p>{Messages.serverAdmin.userManagement}</p>
