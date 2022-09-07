@@ -23,19 +23,23 @@ export const RetryModeSelector = ({ retryMode, disabled = false }: RetryModeSele
           fullWidth
         />
       </span>
-      <NumberInputField
-        // TODO fix typings in core. Validator must accept allValues as second arg
-        validators={[retryTimesValidator as any]}
-        disabled={disabledNumberInputs}
-        name="retryTimes"
-        label={Messages.retryTimes}
-      />
-      <NumberInputField
-        validators={[retryIntervalValidator as any]}
-        disabled={disabledNumberInputs}
-        name="retryInterval"
-        label={Messages.retryInterval}
-      />
+      <span className={styles.numberInputFieldWrapper}>
+        <NumberInputField
+          // TODO fix typings in core. Validator must accept allValues as second arg
+          validators={[retryTimesValidator as any]}
+          disabled={disabledNumberInputs}
+          fieldClassName={styles.retryField}
+          name="retryTimes"
+          label={Messages.retryTimes}
+        />
+        <NumberInputField
+          validators={[retryIntervalValidator as any]}
+          disabled={disabledNumberInputs}
+          fieldClassName={styles.retryField}
+          name="retryInterval"
+          label={Messages.retryInterval}
+        />
+      </span>
     </div>
   );
 };

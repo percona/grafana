@@ -7,6 +7,9 @@ export const getStyles = ({
   spacing,
   v1: { colors: colorsV1, typography, spacing: spacingV1, border },
 }: GrafanaTheme2) => ({
+  pageWrapper: css`
+    max-width: 1440px;
+  `,
   pageSwitcherWrapper: css`
     display: flex;
     padding: 20px 0px 20px 0px;
@@ -58,7 +61,6 @@ export const getStyles = ({
       height: 50px;
     }
   `,
-
   contentInner: css`
     flex: 1;
     padding: ${spacing(2)};
