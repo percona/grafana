@@ -11,7 +11,7 @@ export const Messages = {
     grafanaTechnology:
       'PMM dashboards built on Grafana technology are powered by decades of Percona expertise in database performance optimization.',
     observe:
-      'Use technology-specific or Operating System dashboards to observe  top to bottom performance metrics and get to the root of the database problems in minutes.',
+      'Use technology-specific or Operating System dashboards to observe top to bottom performance metrics and get to the root of the database problems in minutes.',
     zoomIn:
       'Zoom in and drill-down to observe database performance from node to single query levels. Get insights about your database no matter where they are stored on-premises, in the cloud, or in hybrid environments.',
   },
@@ -78,7 +78,7 @@ export const Messages = {
   backup: {
     title: 'Backup',
     feature:
-      'The backup feature allows you to back up the databases that PMM is monitoring. PMM supports backup for MySql and MongoDB (Point-In-Time-Recoverable Backups) databases.',
+      'The backup feature allows you to back up the databases that PMM is monitoring. PMM supports backup for MySQL and MongoDB (Point-In-Time-Recoverable Backups) databases.',
     onDemand:
       'You can set up backup on demand. In case of failures, you can predefine the retry mode, either manual or auto, along with the retry times and retry intervals.',
     shedule:
