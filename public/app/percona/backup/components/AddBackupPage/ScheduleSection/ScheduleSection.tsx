@@ -17,10 +17,8 @@ import {
 import { isCronFieldDisabled, PERIOD_OPTIONS } from '../AddBackupPage.utils';
 import { useStyles2 } from '@grafana/ui';
 import { getStyles } from './ScheduleSection.styles';
-import { AddBackupFormProps } from '../AddBackupPage.types';
-interface ScheduleSectionProps {
-  values: AddBackupFormProps;
-}
+import { ScheduleSectionProps } from './ScheduleSection.type';
+
 export const ScheduleSection = ({ values }: ScheduleSectionProps) => {
   const styles = useStyles2(getStyles);
   return (

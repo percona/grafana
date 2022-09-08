@@ -6,10 +6,8 @@ import React from 'react';
 import { Field } from 'react-final-form';
 import { Messages } from '../AddBackupPage.messages';
 import { getStyles } from './PageSwitcher.styles';
-interface PageSwitcherProps {
-  editing: boolean;
-  setModalTitle: React.Dispatch<React.SetStateAction<string>>;
-}
+import { PageSwitcherProps } from './PageSwitcher.types';
+
 export const PageSwitcher = ({ editing, setModalTitle }: PageSwitcherProps) => {
   const styles = useStyles2(getStyles);
   const [, setQueryParams] = useQueryParams();
