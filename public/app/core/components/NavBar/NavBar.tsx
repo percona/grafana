@@ -68,7 +68,7 @@ export const NavBar = React.memo(() => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnimationInProgress, setMenuAnimationInProgress] = useState(false);
   const [menuIdOpen, setMenuIdOpen] = useState<string | undefined>();
-  const { isOpen: isTourOpen, currentStep } = useTour();
+  const { isOpen: isTourOpen } = useTour();
 
   const toggleSwitcherModal = () => {
     setShowSwitcherModal(!showSwitcherModal);
@@ -175,7 +175,7 @@ export const NavBar = React.memo(() => {
         <NavBarContext.Provider
           value={{
             // Show MySQL item during onboarding tour
-            menuIdOpen: isTourOpen && currentStep === 1 ? 'mysql' : menuIdOpen,
+            menuIdOpen: isTourOpen ? 'mysql' : menuIdOpen,
             setMenuIdOpen: setMenuIdOpen,
           }}
         >
