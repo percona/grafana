@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, HorizontalGroup, Modal } from '@grafana/ui';
-import { CheckboxField, logger } from '@percona/platform-core';
+import { CheckboxField, logger, Table } from '@percona/platform-core';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import Page from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { Form } from 'react-final-form';
-import { Table } from 'app/percona/shared/components/Elements/Table/Table';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { InventoryDataService } from 'app/percona/inventory/Inventory.tools';
@@ -18,6 +17,7 @@ import { GET_SERVICES_CANCEL_TOKEN, SERVICES_COLUMNS } from '../Inventory.consta
 import { styles } from './Tabs.styles';
 import { appEvents } from '../../../core/app_events';
 import { AppEvents } from '@grafana/data';
+import { Row } from 'react-table';
 
 interface Service {
   service_id: string;
@@ -32,7 +32,7 @@ export const Services = () => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const [selected, setSelectedRows] = useState([]);
+  const [selected, setSelectedRows] = useState<any[]>([]);
   const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
 
@@ -82,6 +82,10 @@ export const Services = () => {
     },
     [loadData]
   );
+
+  const handleSelectionChange = useCallback((rows: Array<Row<{}>>) => {
+    setSelectedRows(rows);
+  }, []);
 
   return (
     <Page navModel={navModel}>
@@ -150,13 +154,17 @@ export const Services = () => {
             </Modal>
             <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
               <Table
-                className={styles.table}
                 columns={SERVICES_COLUMNS}
                 data={data}
+                totalItems={data.length}
                 rowSelection
-                onRowSelection={(selected) => setSelectedRows(selected)}
-                noData={<h1>No services Available</h1>}
-                loading={loading}
+                onRowSelection={handleSelectionChange}
+                showPagination
+                pageSize={25}
+                emptyMessage="No services Available"
+                emptyMessageClassName={styles.emptyMessage}
+                pendingRequest={loading}
+                overlayClassName={styles.overlay}
               />
             </div>
           </div>
