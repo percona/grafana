@@ -27,19 +27,19 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
       </SidebarStep>
     ),
     highlightedSelectors: ['#navbar-menu-portal-container [role="dialog"]', '.dropdown > [aria-label="MySQL"]'],
-    mutationObservables: ['.tour-test'],
+    mutationObservables: ['.product-tour-mutation-element'],
     position: 'right',
     // Without triggering a mutation observer only the menu item gets highlighted and not the open dialog
     action: () => {
       // Mutation observer wasn't working correctly with the dialog and without a delay in element addition
       setTimeout(() => {
         const tmp = document.createElement('div');
-        tmp.className = 'tour-test';
+        tmp.className = 'product-tour-mutation-element';
         document.querySelector('body')?.appendChild(tmp);
       }, 1);
     },
     actionAfter: () => {
-      const tmp = document.querySelector('.tour-test');
+      const tmp = document.querySelector('.product-tour-mutation-element');
       if (tmp) {
         document.querySelector('body')?.removeChild(tmp);
       }
