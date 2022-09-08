@@ -1,5 +1,6 @@
 import { css, cx } from '@emotion/css';
 import { FocusScope } from '@react-aria/focus';
+import { useTour } from '@reactour/tour';
 import { cloneDeep } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -66,7 +67,8 @@ export const NavBar = React.memo(() => {
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnimationInProgress, setMenuAnimationInProgress] = useState(false);
-  const [menuIdOpen, setMenuIdOpen] = useState<string | undefined>(undefined);
+  const [menuIdOpen, setMenuIdOpen] = useState<string | undefined>();
+  const { isOpen: isTourOpen } = useTour();
 
   const toggleSwitcherModal = () => {
     setShowSwitcherModal(!showSwitcherModal);
@@ -172,7 +174,8 @@ export const NavBar = React.memo(() => {
       <nav className={cx(styles.sidemenu, 'sidemenu')} data-testid="sidemenu" aria-label="Main menu">
         <NavBarContext.Provider
           value={{
-            menuIdOpen: menuIdOpen,
+            // Show MySQL item during onboarding tour
+            menuIdOpen: isTourOpen ? 'mysql' : menuIdOpen,
             setMenuIdOpen: setMenuIdOpen,
           }}
         >
