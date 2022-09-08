@@ -5,14 +5,14 @@ import { BackupType } from 'app/percona/backup/Backup.types';
 import React from 'react';
 import { Field } from 'react-final-form';
 import { Messages } from '../AddBackupPage.messages';
-import { getStyles } from '../AddBackupPage.styles';
+import { getStyles } from './PageSwitcher.styles';
 interface PageSwitcherProps {
   editing: boolean;
   setModalTitle: React.Dispatch<React.SetStateAction<string>>;
 }
 export const PageSwitcher = ({ editing, setModalTitle }: PageSwitcherProps) => {
   const styles = useStyles2(getStyles);
-  const [queryParams, setQueryParams] = useQueryParams();
+  const [, setQueryParams] = useQueryParams();
   return (
     <div className={styles.pageSwitcherWrapper}>
       <Field name="type" component="input" type="radio" value={BackupType.DEMAND}>

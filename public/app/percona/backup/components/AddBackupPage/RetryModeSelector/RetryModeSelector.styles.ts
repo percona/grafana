@@ -5,7 +5,7 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
   retryFieldWrapper: css`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: ${spacing.sm};
   `,
   retryField: css`
     flex: 1;
@@ -20,6 +20,6 @@ export const getStyles = ({ colors, typography, spacing, border }: GrafanaTheme)
   `,
   numberInputFieldWrapper: css`
     display: flex;
-    gap: 10px;
+    gap: ${spacing.sm};
   `,
 });

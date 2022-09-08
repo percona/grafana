@@ -17,12 +17,15 @@ export const Messages = {
   weekDay: 'Weekday',
   startTimeHour: 'Start time (hour)',
   startTimeMinute: 'Start time (minute)',
+  advanceSettings: 'Advanced Settings:',
   fullLogs: 'Full logs',
   enabled: 'Enabled',
   retention: 'Retention (Number of backups - 0 for unlimited)',
   scheduleSection: 'UTC time',
+  backupInfo: 'Backup info',
   onDemand: 'On Demand',
   schedule: 'Schedule Backup',
+  scheduleName: 'Schedule',
   getModalTitle: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
       return edit ? 'Edit Scheduled backup' : 'Create Schedule backup';

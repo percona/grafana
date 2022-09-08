@@ -173,7 +173,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
               <div className={styles.contentInner}>
                 <div className={styles.pageWrapper}>
                   {!editing && <PageSwitcher editing={editing} setModalTitle={setModalTitle} />}
-                  <h4 className={styles.headingStyle}>Backup info</h4>
+                  <h4 className={styles.headingStyle}>{Messages.backupInfo}</h4>
                   <div className={styles.formContainer}>
                     <span className={styles.wideField}>
                       <TextInputField
@@ -263,7 +263,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                   </div>
                   <div className={styles.halfPage}>
                     {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}
-                    <CollapsableSection label="Advanced Settings:" isOpen={false}>
+                    <CollapsableSection label={Messages.advanceSettings} isOpen={false}>
                       <RetryModeSelector retryMode={values.retryMode} />
                     </CollapsableSection>
                     {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}

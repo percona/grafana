@@ -1,16 +1,16 @@
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ colors, typography }: GrafanaTheme2) => ({
+export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   scheduleSectionWrapper: css`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: ${spacing.sm};
   `,
   SelectFieldWrap: css`
     display: flex;
     flex-direction: column;
-    padding-top: 4px;
+    padding-top: ${spacing.xs};
     margin-bottom: 17px;
   `,
   selectField: css`
@@ -21,15 +21,15 @@ export const getStyles = ({ colors, typography }: GrafanaTheme2) => ({
     display: none;
   `,
   multiSelectField: css`
-    padding-bottom: 16px;
+    padding-bottom: ${spacing.md};
   `,
   section: css`
-    margin-top: 40px;
+    margin-top: 48px;
   `,
   halfPage: css`
     width: 50%;
   `,
   headingStyle: css`
-    margin-bottom: 20px;
+    margin-bottom: ${spacing.lg};
   `,
 });
