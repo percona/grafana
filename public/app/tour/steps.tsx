@@ -29,7 +29,7 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
     highlightedSelectors: ['#navbar-menu-portal-container [role="dialog"]', '.dropdown > [aria-label="MySQL"]'],
     mutationObservables: ['.tour-test'],
     position: 'right',
-    // Without triggering a mutation observer only the menu item getts highlighted and not the open dialog
+    // Without triggering a mutation observer only the menu item gets highlighted and not the open dialog
     action: () => {
       // Mutation observer wasn't working correctly with the dialog and without a delay in element addition
       setTimeout(() => {
