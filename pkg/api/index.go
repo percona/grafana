@@ -221,7 +221,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 		{
 			Text: "Summary",
 			Id:   "mysql-summary",
-			Url:  setting.AppSubUrl + "/d/mysql-instance-summary/mysql-instances-summary", Icon: "percona-nav-summary",
+			Url:  setting.AppSubUrl + "/d/mysql-instance-summary/mysql-instance-summary", Icon: "percona-nav-summary",
 			HideFromTabs:     true,
 			ShowIconInNavbar: true,
 		},
@@ -294,7 +294,7 @@ func (hs *HTTPServer) getNavTree(c *models.ReqContext, hasEditPerm bool, prefs *
 	postgresqlChildNavs := []*dtos.NavLink{
 		// 		{Text: "HA (High availability)", Id: "postgres-ha", Icon: "percona-cluster", HideFromTabs: true, ShowIconInNavbar: true},
 		{Text: "Overview", Id: "postgre-overwiew", Url: setting.AppSubUrl + "/d/postgresql-instance-overview/postgresql-instances-overview", Icon: "percona-nav-overview", HideFromTabs: true, ShowIconInNavbar: true},
-		{Text: "Summary", Id: "postgre-summary", Url: setting.AppSubUrl + "/d/postgresql-instance-summary/postgresql-instances-summary", Icon: "percona-nav-summary", HideFromTabs: true, ShowIconInNavbar: true},
+		{Text: "Summary", Id: "postgre-summary", Url: setting.AppSubUrl + "/d/postgresql-instance-summary/postgresql-instance-summary", Icon: "percona-nav-summary", HideFromTabs: true, ShowIconInNavbar: true},
 	}
 
 	dashboardsUrl := "/dashboards"
