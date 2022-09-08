@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { Modal } from '@percona/platform-core';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { useStyles } from '@grafana/ui';
@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import { getAddDbCluster } from 'app/percona/shared/core/selectors';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { getInitialValues, updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
+import { UnsafeConfigurationWarning } from './UnsafeConfigurationsWarning/UnsafeConfigurationWarning';
 
 export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   kubernetes,
@@ -25,6 +26,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   const styles = useStyles(getStyles);
   const { loading } = useSelector(getAddDbCluster);
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
+  const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
 
   const initialValues = useMemo(() => getInitialValues(kubernetes, preSelectedKubernetesCluster), [
     kubernetes,
@@ -53,7 +55,12 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
           AddDBClusterFields.cpu,
           AddDBClusterFields.disk,
         ],
-        render: (renderProps) => <DBClusterAdvancedOptions {...renderProps} />,
+        render: (renderProps) => (
+          <DBClusterAdvancedOptions
+            setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}
+            {...renderProps}
+          />
+        ),
         dataTestId: 'dbcluster-advanced-options-step',
       },
     ],
@@ -65,6 +72,7 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
       <Modal title={Messages.dbcluster.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>
         <div className={styles.stepProgressWrapper}>
           {showPMMAddressWarning && <PMMServerUrlWarning />}
+          {showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}
           <StepProgress
             steps={steps}
             initialValues={updatedItialValues}
