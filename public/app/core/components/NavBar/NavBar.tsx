@@ -175,7 +175,7 @@ export const NavBar = React.memo(() => {
         <NavBarContext.Provider
           value={{
             // Show MySQL item during onboarding tour
-            menuIdOpen: isTourOpen && currentStep <= 1 ? 'mysql' : menuIdOpen,
+            menuIdOpen: isTourOpen && currentStep === 1 ? 'mysql' : menuIdOpen,
             setMenuIdOpen: setMenuIdOpen,
           }}
         >

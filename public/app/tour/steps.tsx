@@ -27,7 +27,23 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
       </SidebarStep>
     ),
     highlightedSelectors: ['#navbar-menu-portal-container [role="dialog"]', '.dropdown > [aria-label="MySQL"]'],
+    mutationObservables: ['.tour-test'],
     position: 'right',
+    // Without triggering a mutation observer only the menu item getts highlighted and not the open dialog
+    action: () => {
+      // Mutation observer wasn't working correctly with the dialog and without a delay in element addition
+      setTimeout(() => {
+        const tmp = document.createElement('div');
+        tmp.className = 'tour-test';
+        document.querySelector('body')?.appendChild(tmp);
+      }, 1);
+    },
+    actionAfter: () => {
+      const tmp = document.querySelector('.tour-test');
+      if (tmp) {
+        document.querySelector('body')?.removeChild(tmp);
+      }
+    },
   },
   {
     selector: '.dropdown > [aria-label="Query Analytics (QAN)"]',
