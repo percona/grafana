@@ -82,6 +82,7 @@ export const ScheduledBackups: FC = () => {
         retryInterval,
         retryTimes,
         mode,
+        dataModel,
       } = backup;
       const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
       setActionPending(true);
@@ -96,7 +97,8 @@ export const ScheduledBackups: FC = () => {
           retryTimes,
           retention,
           false,
-          mode
+          mode,
+          dataModel
         );
         getData();
       } catch (e) {
@@ -214,6 +216,7 @@ export const ScheduledBackups: FC = () => {
       active,
       retention,
       mode,
+      dataModel,
     } = backup;
     try {
       const cronExpression = getCronStringFromValues(
@@ -250,7 +253,8 @@ export const ScheduledBackups: FC = () => {
           resultRetryTimes!,
           retention!,
           active!,
-          mode
+          mode,
+          dataModel
         );
         appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.addSuccess]);
       }

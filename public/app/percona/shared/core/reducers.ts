@@ -33,6 +33,7 @@ const toSettingsModel = (response: SettingsPayload): Settings => ({
   awsPartitions: response.aws_partitions,
   updatesDisabled: response.updates_disabled,
   telemetryEnabled: response.telemetry_enabled,
+  telemetrySummaries: response.telemetry_summaries,
   metricsResolutions: response.metrics_resolutions,
   dataRetention: response.data_retention,
   sshKey: response.ssh_key,
@@ -67,6 +68,7 @@ const initialSettingsState: Settings = {
     hr: '15s',
     mr: '20s',
   },
+  telemetrySummaries: [],
   dataRetention: '',
   sshKey: '',
   awsPartitions: [],
@@ -266,6 +268,27 @@ export const addKubernetesAction = createAsyncThunk(
     await thunkAPI.dispatch(fetchKubernetesAction());
   }
 );
+export interface PerconaDBaaSState {
+  selectedKubernetesCluster: Kubernetes | null;
+}
+
+export const initialDBaaSState: PerconaDBaaSState = {
+  selectedKubernetesCluster: null,
+};
+
+const perconaDBaaSSlice = createSlice({
+  name: 'perconaDBaaS',
+  initialState: initialDBaaSState,
+  reducers: {
+    selectKubernetesCluster: (state, action: PayloadAction<Kubernetes | null>): PerconaDBaaSState => ({
+      ...state,
+      selectedKubernetesCluster: action.payload,
+    }),
+  },
+});
+
+export const { selectKubernetesCluster } = perconaDBaaSSlice.actions;
+export const perconaDBaaSReducers = perconaDBaaSSlice.reducer;
 
 export const addDbClusterAction = createAsyncThunk(
   'percona/addDbCluster',
@@ -407,6 +430,7 @@ export default {
     settings: settingsReducer,
     updateSettings: updateSettingsReducer,
     user: perconaUserReducers,
+    dbaas: perconaDBaaSReducers,
     kubernetes: kubernetesReducer,
     deleteKubernetes: deleteKubernetesReducer,
     addKubernetes: addKubernetesReducer,
