@@ -62,7 +62,7 @@ export const NavBar = React.memo(() => {
   const dispatch = useDispatch();
   const kiosk = getKioskMode();
   const { result } = useSelector(getPerconaSettings);
-  const { alertingEnabled } = result!;
+  const { alertingEnabled, sttEnabled, dbaasEnabled, backupEnabled } = result!;
   const { isPlatformUser, isAuthorized } = useSelector(getPerconaUser);
   const [showSwitcherModal, setShowSwitcherModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -136,8 +136,6 @@ export const NavBar = React.memo(() => {
   useEffect(() => {
     const updatedNavTree = cloneDeep(initialState);
 
-    const { sttEnabled, alertingEnabled, dbaasEnabled, backupEnabled } = result!;
-
     // @PERCONA
     if (isPlatformUser) {
       updatedNavTree.push(PMM_ENTITLEMENTS_PAGE);
@@ -148,10 +146,6 @@ export const NavBar = React.memo(() => {
     // @PERCONA
     if (isAuthorized) {
       buildInventoryAndSettings(updatedNavTree);
-
-      if (alertingEnabled) {
-        buildIntegratedAlertingMenuItem(updatedNavTree);
-      }
 
       if (sttEnabled) {
         updatedNavTree.push(PMM_STT_PAGE);
