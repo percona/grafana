@@ -26,8 +26,10 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   section: css`
     margin-top: 48px;
   `,
-  halfPage: css`
-    width: 50%;
+  retentionField: css`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: ${spacing.sm};
   `,
   headingStyle: css`
     margin-bottom: ${spacing.lg};

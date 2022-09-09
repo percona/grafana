@@ -12,8 +12,14 @@ export const getStyles = ({ colors, shape, spacing, v1: { spacing: spacingV1 } }
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: ${spacingV1.sm};
   `,
-  halfPage: css`
-    width: 50%;
+  advanceSection: css`
+    width: 100%;
+    display: grid;
+    gap: ${spacingV1.sm};
+    grid-template-columns: 1fr 1fr;
+  `,
+  collapsableSection: css`
+    grid-row-start: 2;
   `,
   wideField: css`
     grid-column: span 2;

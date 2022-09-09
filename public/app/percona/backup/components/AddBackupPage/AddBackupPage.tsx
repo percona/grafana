@@ -20,7 +20,7 @@ import { toFormBackup, getBackupModeOptions, getDataModelFromVendor, isDataModel
 import { AddBackupModalService } from './AddBackupPage.service';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
-import { DATA_MODEL_OPTIONS, MAX_BACKUP_NAME } from './AddBackupPage.constants';
+import { DATA_MODEL_OPTIONS, MAX_BACKUP_NAME, SCHEDULED_TYPE } from './AddBackupPage.constants';
 import { getStyles } from './AddBackupPage.styles';
 import { BackupMode, BackupType, DataModel } from '../../Backup.types';
 import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
@@ -43,7 +43,7 @@ import { cx } from '@emotion/css';
 
 const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
   const [queryParams] = useQueryParams();
-  const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || match.params.type === 'scheduled_task_id';
+  const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || match.params.type === SCHEDULED_TYPE;
   const [backup, setBackup] = useState<Backup | ScheduledBackup | null>(null);
 
   const [pending, setPending] = useState(false);
@@ -261,12 +261,14 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       )}
                     </span>
                   </div>
-                  <div className={styles.halfPage}>
+                  <div className={styles.advanceSection}>
                     {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}
-                    <CollapsableSection label={Messages.advanceSettings} isOpen={false}>
-                      <RetryModeSelector retryMode={values.retryMode} />
-                    </CollapsableSection>
-                    {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
+                    <div className={styles.collapsableSection}>
+                      <CollapsableSection label={Messages.advanceSettings} isOpen={false}>
+                        <RetryModeSelector retryMode={values.retryMode} />
+                      </CollapsableSection>
+                      {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
+                    </div>
                   </div>
                 </div>
               </div>

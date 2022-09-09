@@ -5,6 +5,8 @@ import { MONTHS, WEEKDAYS } from 'app/percona/shared/helpers/cron/constants';
 import { Messages } from './AddBackupPage.messages';
 import { getOptionFromDigit } from './AddBackupPage.utils';
 
+export const SCHEDULED_TYPE = 'scheduled_task_id';
+
 export const VENDOR_OPTIONS: Array<SelectableValue<Databases>> = [
   {
     value: Databases.mysql,

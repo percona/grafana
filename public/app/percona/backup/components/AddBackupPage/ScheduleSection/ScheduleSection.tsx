@@ -145,7 +145,7 @@ export const ScheduleSection = ({ values }: ScheduleSectionProps) => {
           </Field>
         </span>
       </div>
-      <div className={styles.halfPage}>
+      <div className={styles.retentionField}>
         <NumberInputField
           name="retention"
           label={Messages.retention}
