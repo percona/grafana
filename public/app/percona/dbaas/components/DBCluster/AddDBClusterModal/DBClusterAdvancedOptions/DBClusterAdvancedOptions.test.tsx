@@ -26,7 +26,14 @@ jest.mock('@percona/platform-core', () => {
 describe('DBClusterAdvancedOptions::', () => {
   it('renders correctly', async () => {
     act(() => {
-      render(<Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />);
+      render(
+        <Form
+          onSubmit={jest.fn()}
+          render={(renderProps) => (
+            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+          )}
+        />
+      );
     });
 
     const radioState = await screen.findByTestId('topology-radio-state');
@@ -52,7 +59,9 @@ describe('DBClusterAdvancedOptions::', () => {
             [AddDBClusterFields.nodes]: 3,
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
+          render={(renderProps: FormRenderProps) => (
+            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+          )}
         />
       );
     });
@@ -66,7 +75,14 @@ describe('DBClusterAdvancedOptions::', () => {
 
   it('should set nodes to 1 when topology is single', async () => {
     act(() => {
-      render(<Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />);
+      render(
+        <Form
+          onSubmit={jest.fn()}
+          render={(renderProps) => (
+            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+          )}
+        />
+      );
     });
 
     const topology = screen.getByTestId('topology-radio-state');
@@ -84,7 +100,9 @@ describe('DBClusterAdvancedOptions::', () => {
             [AddDBClusterFields.resources]: DBClusterResources.small,
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
+          render={(renderProps: FormRenderProps) => (
+            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+          )}
         />
       );
     });
@@ -105,7 +123,9 @@ describe('DBClusterAdvancedOptions::', () => {
             [AddDBClusterFields.resources]: DBClusterResources.small,
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
+          render={(renderProps: FormRenderProps) => (
+            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+          )}
         />
       );
     });
@@ -133,7 +153,9 @@ describe('DBClusterAdvancedOptions::', () => {
             },
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
+          render={(renderProps: FormRenderProps) => (
+            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+          )}
         />
       );
     });
@@ -154,7 +176,9 @@ describe('DBClusterAdvancedOptions::', () => {
             },
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
+          render={(renderProps: FormRenderProps) => (
+            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+          )}
         />
       );
     });
