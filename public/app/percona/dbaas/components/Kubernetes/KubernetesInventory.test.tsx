@@ -6,6 +6,7 @@ import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
 import { KubernetesService } from './Kubernetes.service';
+import { Kubernetes } from './Kubernetes.types';
 import { KubernetesClusterStatus } from './KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesInventory } from './KubernetesInventory';
 import { KubernetesOperatorStatus } from './OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
@@ -69,6 +70,7 @@ describe('KubernetesInventory::', () => {
             settings: { loading: false, result: { isConnectedToPortal: true, dbaasEnabled: true } },
             kubernetes: {
               loading: false,
+              result: [] as Kubernetes[],
             },
             addKubernetes: { loading: false },
             deleteKubernetes: { loading: false },
