@@ -26,11 +26,11 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
 import { api } from 'app/percona/shared/helpers/api';
 
-import { UserService } from '../services/user/User.service';
-import { UserDetailsResponse } from '../services/user/User.types';
+import { SETTINGS_TIMEOUT } from '../constants';
+import { ServerInfo } from '../types';
 
-import { SETTINGS_TIMEOUT } from './constants';
-import { ServerInfo } from './types';
+import perconaUserReducers from './user';
+export * from './user';
 
 const initialSettingsState: Settings = {
   updatesDisabled: true,
@@ -68,55 +68,6 @@ const initialSettingsState: Settings = {
   },
   isConnectedToPortal: false,
 };
-
-export interface UserDetails {
-  userId: number;
-  productTourCompleted: boolean;
-}
-
-export interface PerconaUserState extends UserDetails {
-  isAuthorized: boolean;
-  isPlatformUser: boolean;
-}
-
-export const initialUserState: PerconaUserState = {
-  userId: 0,
-  productTourCompleted: true,
-  isAuthorized: false,
-  isPlatformUser: false,
-};
-
-const perconaUserSlice = createSlice({
-  name: 'perconaUser',
-  initialState: initialUserState,
-  reducers: {
-    setAuthorized: (state, action: PayloadAction<boolean>): PerconaUserState => ({
-      ...state,
-      isAuthorized: action.payload,
-    }),
-    setIsPlatformUser: (state, action: PayloadAction<boolean>): PerconaUserState => ({
-      ...state,
-      isPlatformUser: action.payload,
-    }),
-    setUserDetails: (state, action: PayloadAction<UserDetails>) => ({
-      ...state,
-      ...action.payload,
-    }),
-  },
-});
-
-export const { setAuthorized, setIsPlatformUser, setUserDetails } = perconaUserSlice.actions;
-
-export const fetchUserStatusAction = createAsyncThunk(
-  'percona/fetchUserStatus',
-  (_, thunkAPI): Promise<void> =>
-    withSerializedError(
-      (async () => {
-        const isPlatformUser = await UserService.getUserStatus(undefined, true);
-        thunkAPI.dispatch(setIsPlatformUser(isPlatformUser));
-      })()
-    )
-);
 
 export const fetchSettingsAction = createAsyncThunk(
   'percona/fetchSettings',
@@ -171,8 +122,6 @@ export const updateSettingsAction = createAsyncThunk(
       }
     )
 );
-
-export const perconaUserReducers = perconaUserSlice.reducer;
 
 const toKubernetesListModel = (
   response: KubernetesListAPI,
@@ -389,31 +338,6 @@ export const fetchServerSaasHostAction = createAsyncThunk(
         thunkAPI.dispatch(setServerSaasHost(host));
       })()
     )
-);
-
-const toUserDetailsModel = (res: UserDetailsResponse): UserDetails => ({
-  userId: res.user_id,
-  productTourCompleted: !!res.product_tour_completed,
-});
-
-export const fetchUserDetailsAction = createAsyncThunk(
-  'percona/fetchUserDetails',
-  async (_, thunkAPI): Promise<UserDetails> => {
-    const res = await UserService.getUserDetails();
-    const details = toUserDetailsModel(res);
-    thunkAPI.dispatch(setUserDetails(details));
-    return details;
-  }
-);
-
-export const setProductTourCompleted = createAsyncThunk(
-  'percona/setProductTourCompleted',
-  async (productTourCompleted: boolean, thunkAPI): Promise<UserDetails> => {
-    const res = await UserService.setProductTourCompleted(productTourCompleted);
-    const details = toUserDetailsModel(res);
-    thunkAPI.dispatch(setUserDetails(details));
-    return details;
-  }
 );
 
 export const fetchTemplatesAction = createAsyncThunk(
