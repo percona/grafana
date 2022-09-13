@@ -142,7 +142,7 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(disk).not.toBeDisabled();
   });
 
-  it('should disabled single node topology when database is MongoDB', async () => {
+  it('should enable single node topology when database is MongoDB', async () => {
     act(() => {
       render(
         <Form
@@ -162,7 +162,7 @@ describe('DBClusterAdvancedOptions::', () => {
 
     const topology = await screen.findAllByTestId('topology-radio-button');
 
-    expect(topology[1]).toBeDisabled();
+    expect(topology[1]).not.toBeDisabled();
   });
 
   it('should enable single node topology when database is MySQL', async () => {
