@@ -10,6 +10,9 @@ export const getKubernetes = (state: StoreState) => state.percona.kubernetes;
 export const getDeleteKubernetes = (state: StoreState) => state.percona.deleteKubernetes;
 export const getAddKubernetes = (state: StoreState) => state.percona.addKubernetes;
 export const getAddDbCluster = (state: StoreState) => state.percona.addDbCluster;
-export const getPerconaDBClusters = (state: StoreState) => state.percona.dbClusters;
+export const getPerconaDBClusters = (state: StoreState) => state.percona.dbCluster;
+export const getPerconaDBClustersDetails = (state: StoreState) => state.percona.dbClusterDetails;
+export const getPerconaDBClusterDetailsByID = (id: string) => (state: StoreState) =>
+  state.percona.dbClusterDetails.result?.[id]!;
 export const getPerconaServer = (state: StoreState) => state.percona.server;
 export const getTemplates = (state: StoreState) => state.percona.templates;

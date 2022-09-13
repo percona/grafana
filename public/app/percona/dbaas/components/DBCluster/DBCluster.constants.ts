@@ -1,7 +1,13 @@
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
 import { Operators } from './AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
-import { DatabaseOperatorsMap, DBClusterServiceDatabasesMap } from './DBCluster.types';
+import {
+  ClusterDatabaseTypeMap,
+  DatabaseClusterTypeMap,
+  DatabaseOperatorsMap,
+  DBClusterServiceDatabasesMap,
+  DBClusterType,
+} from './DBCluster.types';
 import { PSMDBService } from './PSMDB.service';
 import { XtraDBService } from './XtraDB.service';
 
@@ -30,6 +36,16 @@ export const RESOURCES_PRECISION = 2;
 export const DATABASE_OPERATORS: Partial<DatabaseOperatorsMap> = {
   [Operators.pxc]: Databases.mysql,
   [Operators.psmdb]: Databases.mongodb,
+};
+
+export const DATABASE_CLUSTER_TYPE: Partial<DatabaseClusterTypeMap> = {
+  [DBClusterType.pxc]: Databases.mysql,
+  [DBClusterType.psmdb]: Databases.mongodb,
+};
+
+export const CLUSTER_TYPE_DATABASE: Partial<ClusterDatabaseTypeMap> = {
+  [Databases.mysql]: DBClusterType.pxc,
+  [Databases.mongodb]: DBClusterType.psmdb,
 };
 
 export const GET_CLUSTERS_CANCEL_TOKEN = 'getClusters';

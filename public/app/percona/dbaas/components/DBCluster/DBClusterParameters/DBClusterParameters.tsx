@@ -5,13 +5,18 @@ import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
 import { DBClusterStatus } from '../DBCluster.types';
 import { DBClusterConnectionItem } from '../DBClusterConnection/DBClusterConnectionItem/DBClusterConnectionItem';
+import { getPerconaDBClustersDetails } from 'app/percona/shared/core/selectors';
+import { useSelector } from 'react-redux';
 
 import { getStyles } from './DBClusterParameters.styles';
 import { DBClusterParametersProps } from './DBClusterParameters.types';
 
 export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster }) => {
   const styles = useStyles(getStyles);
-  const { status } = dbCluster;
+  // const { status } = dbCluster;
+  const { result: clusters = {}, loading: dbClusterLoading } = useSelector(getPerconaDBClustersDetails);
+  console.log(dbCluster);
+  const { status } = clusters[dbCluster.id!];
   const {
     label: exposeLabel,
     enabled: exposeEnabled,
@@ -20,7 +25,7 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
 
   return (
     <>
-      {status && status === DBClusterStatus.ready && (
+      {!dbClusterLoading && status && status === DBClusterStatus.ready && (
         <div className={styles.wrapper}>
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.clusterName}
@@ -29,17 +34,17 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.cpu}
-            value={dbCluster.cpu}
+            value={dbCluster.cpu!}
             dataTestId="cluster-parameters-cpu"
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.memory}
-            value={`${dbCluster.memory} GB`}
+            value={`${dbCluster.memory!} GB`}
             dataTestId="cluster-parameters-memory"
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.disk}
-            value={`${dbCluster.disk} GB`}
+            value={`${dbCluster.disk!} GB`}
             dataTestId="cluster-parameters-disk"
           />
           <DBClusterConnectionItem
