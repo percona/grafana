@@ -13,9 +13,7 @@ import { DBClusterParametersProps } from './DBClusterParameters.types';
 
 export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster }) => {
   const styles = useStyles(getStyles);
-  // const { status } = dbCluster;
   const { result: clusters = {}, loading: dbClusterLoading } = useSelector(getPerconaDBClustersDetails);
-  console.log(dbCluster);
   const { status = DBClusterStatus.unknown } =
     Object.keys(clusters).length && dbCluster.id ? clusters[dbCluster.id] : {};
   const {

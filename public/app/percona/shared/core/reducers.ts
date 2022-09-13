@@ -330,7 +330,7 @@ export const fetchDBClusterDetailsAction = createAsyncThunk(
       (async () => {
         const requests = args.dbClusters.map((d, idx) =>
           apiManagement.post<any, any>(
-            '/DBaaS/PXCClusters/Get',
+            '/DBaaS/DBClusters/Get',
             {
               name: d.clusterName,
               kubernetes_cluster_name: d.kubernetesClusterName,
@@ -422,8 +422,8 @@ const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesActi
 const addDbClusterReducer = createAsyncSlice('addDbCluster', addDbClusterAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice('instalKuberneteslOperator', instalKuberneteslOperatorAction)
   .reducer;
-const DBClusterReducer = createAsyncSlice('DBCluster', fetchDBClustersAction).reducer;
-const DBClusterDetailsReducer = createAsyncSlice('DBClustersDetail', fetchDBClusterDetailsAction).reducer;
+const dbClustersReducer = createAsyncSlice('dbClusters', fetchDBClustersAction).reducer;
+const dbClustersDetailsReducer = createAsyncSlice('dbClustersDetails', fetchDBClusterDetailsAction).reducer;
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 const templatesReducer = createAsyncSlice('templates', fetchTemplatesAction).reducer;
@@ -439,8 +439,8 @@ export default {
     addKubernetes: addKubernetesReducer,
     addDbCluster: addDbClusterReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
-    dbCluster: DBClusterReducer,
-    dbClusterDetails: DBClusterDetailsReducer,
+    dbCluster: dbClustersReducer,
+    dbClusterDetails: dbClustersDetailsReducer,
     server: perconaServerReducers,
     templates: templatesReducer,
   }),

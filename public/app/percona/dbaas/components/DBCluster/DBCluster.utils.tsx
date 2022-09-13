@@ -111,14 +111,15 @@ export const formatDBClusterDetails = (results: any[], db_clusters: Array<Partia
     let cluster = db_clusters[index];
     let database = cluster.databaseType!;
 
-    let dbCluster = newDBClusterService(database).toModel(cluster, r, cluster.kubernetesClusterName!, database);
+    let dbCluster = newDBClusterService(database).toModel(
+      cluster,
+      r[database === Databases.mongodb ? 'psmdb_cluster' : 'pxc_cluster'],
+      cluster.kubernetesClusterName!,
+      database
+    );
 
-    console.log(dbCluster, r);
-    acc[dbCluster.id!] = dbCluster;
-    return acc;
-  }, []);
-
-  console.log(clustersList);
+    return { ...acc, [dbCluster.id!]: dbCluster };
+  }, {});
 
   return clustersList;
 };

@@ -68,6 +68,14 @@ export const DBCluster: FC = () => {
   const [loading, setLoading] = useState(kubernetesLoading);
   const addDisabled = kubernetes.length === 0 || isKubernetesListUnavailable(kubernetes) || loading;
 
+  const getDBClusterDetails = useCallback(async () => {
+    const tokens: CancelToken[] = kubernetes.map((k) =>
+      generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}-details`)
+    );
+    console.log(dbClusters);
+    dispatch(fetchDBClusterDetailsAction({ dbClusters, tokens }));
+  }, [dbClusters, dispatch, generateToken, kubernetes]);
+
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
       if (!kubernetes.length) {
@@ -91,30 +99,7 @@ export const DBCluster: FC = () => {
 
       setLoading(false);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [kubernetes]
-  );
-
-  const getDBClusterDetails = useCallback(
-    async (triggerLoading = true) => {
-      if (triggerLoading) {
-        setLoading(true);
-      }
-
-      const tokens: CancelToken[] = kubernetes.map((k) =>
-        generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}-details`)
-      );
-
-      const result = await catchFromAsyncThunkAction(dispatch(fetchDBClusterDetailsAction({ dbClusters, tokens })));
-      setLoading(false);
-
-      // undefined means request was cancelled
-      if (result === undefined) {
-        return;
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [getDBClusters]
+    [catchFromAsyncThunkAction, dispatch, generateToken, kubernetes]
   );
 
   const columns = useMemo(
@@ -218,10 +203,14 @@ export const DBCluster: FC = () => {
     let timeout: NodeJS.Timeout;
     if (!dbClustersLoading) {
       timeout = setTimeout(() => getDBClusters(false), RECHECK_INTERVAL);
+
+      if (dbClusters.length) {
+        getDBClusterDetails();
+      }
     }
     return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dbClustersLoading]);
+  }, [dbClusters.length, dbClustersLoading]);
 
   useEffect(
     () =>
