@@ -43,7 +43,7 @@ jobs:
           flags: 'g'
 
       - name: "Send Slack notification"
-        uses: slackapi/slack-github-action@v1.14.0
+        uses: slackapi/slack-github-action@v1.22.0
         with:
           payload: >
             {
