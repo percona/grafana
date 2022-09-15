@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
+import { useSelector } from 'react-redux';
 
 import { useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
+import { getPerconaDBClustersDetails } from 'app/percona/shared/core/selectors';
 
 import { DBClusterStatus } from '../DBCluster.types';
 import { DBClusterConnectionItem } from '../DBClusterConnection/DBClusterConnectionItem/DBClusterConnectionItem';
-import { getPerconaDBClustersDetails } from 'app/percona/shared/core/selectors';
-import { useSelector } from 'react-redux';
 
 import { getStyles } from './DBClusterParameters.styles';
 import { DBClusterParametersProps } from './DBClusterParameters.types';

@@ -38,9 +38,9 @@ describe('DBClusterParameters::', () => {
               } as DBClusterDetails,
             },
           },
-        } as StoreState)}
+        } as unknown as StoreState)}
       >
-        <DBClusterParameters dbCluster={dbClustersStub[0]} />
+        <DBClusterParameters dbCluster={dbClustersStub[0]}/>
       </Provider>
     );
 
@@ -83,7 +83,7 @@ describe('DBClusterParameters::', () => {
               } as DBClusterDetails,
             },
           },
-        } as StoreState)}
+        } as unknown as StoreState)}
       >
         <DBClusterParameters dbCluster={dbClustersStub[2]} />
       </Provider>

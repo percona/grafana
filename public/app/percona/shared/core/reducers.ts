@@ -26,11 +26,11 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
 import {api, apiManagement} from 'app/percona/shared/helpers/api';
 
+import { CLUSTER_TYPE_DATABASE } from '../../dbaas/components/DBCluster/DBCluster.constants';
 import { UserService } from '../services/user/User.service';
 
 import { SETTINGS_TIMEOUT } from './constants';
 import { ServerInfo } from './types';
-import { CLUSTER_TYPE_DATABASE } from '../../dbaas/components/DBCluster/DBCluster.constants';
 
 const initialSettingsState: Settings = {
   updatesDisabled: true,
