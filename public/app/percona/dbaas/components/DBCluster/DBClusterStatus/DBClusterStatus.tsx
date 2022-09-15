@@ -1,11 +1,13 @@
 /* eslint-disable react/display-name */
 import { cx } from '@emotion/css';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Icon, useStyles2, Tooltip } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { ProgressBar } from 'app/percona/dbaas/components/ProgressBar/ProgressBar';
 import { ProgressBarStatus } from 'app/percona/dbaas/components/ProgressBar/ProgressBar.types';
+import { getPerconaDBClustersDetails } from 'app/percona/shared/core/selectors';
 
 import { DBClusterStatus as Status } from '../DBCluster.types';
 
@@ -13,15 +15,17 @@ import { COMPLETE_PROGRESS_DELAY, STATUS_DATA_QA } from './DBClusterStatus.const
 import { getStyles } from './DBClusterStatus.styles';
 import { DBClusterStatusProps } from './DBClusterStatus.types';
 import { getProgressMessage, getShowProgressBarValue } from './DBClusterStatus.utils';
-import { useSelector } from 'react-redux';
-import { getPerconaDBClustersDetails } from 'app/percona/shared/core/selectors';
 
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelectedCluster, setLogsModalVisible }) => {
   const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
-  const { status, totalSteps = 0, finishedSteps = 0, message } =
-    Object.keys(clusters).length && dbCluster.id
-      ? clusters[dbCluster.id]
-      : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
+  const {
+    status,
+    totalSteps = 0,
+    finishedSteps = 0,
+    message,
+  } = Object.keys(clusters).length && dbCluster.id
+    ? clusters[dbCluster.id]
+    : { status: Status.unknown, totalSteps: 0, finishedSteps: 0, message: '' };
   const styles = useStyles2(getStyles);
   const prevStatus = useRef<Status>();
   const statusError = status === Status.failed || status === Status.invalid;
