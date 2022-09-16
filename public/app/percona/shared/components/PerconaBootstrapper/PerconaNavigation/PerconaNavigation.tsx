@@ -11,7 +11,6 @@ import { getPerconaSettings, getPerconaUser } from '../../../core/selectors';
 
 import {
   getPmmSettingsPage,
-  NAV_FOLDER_MAP,
   PMM_ADD_INSTANCE_PAGE,
   PMM_BACKUP_PAGE,
   PMM_DBAAS_PAGE,
@@ -22,6 +21,7 @@ import {
   PMM_TICKETS_PAGE,
 } from './PerconaNavigation.constants';
 import {
+  addFolderLinks,
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
   removeAlertingMenuItem,
@@ -48,18 +48,15 @@ const PerconaNavigation: React.FC = () => {
     fetchFolders().then(setFolders);
   }, []);
 
-  // @PERCONA
   useEffect(() => {
     const updatedNavTree = cloneDeep(initialState);
 
-    // @PERCONA
     if (isPlatformUser) {
       updatedNavTree.push(PMM_ENTITLEMENTS_PAGE);
       updatedNavTree.push(PMM_TICKETS_PAGE);
       updatedNavTree.push(PMM_ENVIRONMENT_OVERVIEW_PAGE);
     }
 
-    // @PERCONA
     if (isAuthorized) {
       buildInventoryAndSettings(updatedNavTree);
 
@@ -84,19 +81,7 @@ const PerconaNavigation: React.FC = () => {
       }
     }
 
-    for (const rootNode of updatedNavTree) {
-      const folder = folders.find((f) => rootNode.id && NAV_FOLDER_MAP[rootNode.id] === f.title);
-
-      if (folder) {
-        rootNode.children?.push({
-          id: rootNode.id + '-other-dashboards',
-          icon: 'search',
-          text: 'Other dashboards',
-          showIconInNavbar: true,
-          url: `/graph/dashboards/f/${folder.uid}/${rootNode.id}`,
-        });
-      }
-    }
+    addFolderLinks(updatedNavTree, folders);
 
     dispatch(updateNavTree({ items: updatedNavTree }));
     // eslint-disable-next-line react-hooks/exhaustive-deps

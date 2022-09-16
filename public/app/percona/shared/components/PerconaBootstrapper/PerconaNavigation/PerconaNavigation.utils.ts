@@ -1,7 +1,8 @@
 import { NavModelItem } from '@grafana/data';
 import { config } from 'app/core/config';
+import { FolderDTO } from 'app/types';
 
-import { PMM_ADD_INSTANCE_PAGE, PMM_ALERTING_PERCONA_ALERTS } from './PerconaNavigation.constants';
+import { NAV_FOLDER_MAP, PMM_ADD_INSTANCE_PAGE, PMM_ALERTING_PERCONA_ALERTS } from './PerconaNavigation.constants';
 
 const DIVIDER = {
   id: 'divider',
@@ -101,4 +102,20 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
   }
 
   return mainLinks;
+};
+
+export const addFolderLinks = (navTree: NavModelItem[], folders: FolderDTO[]) => {
+  for (const rootNode of navTree) {
+    const folder = folders.find((f) => rootNode.id && NAV_FOLDER_MAP[rootNode.id] === f.title);
+
+    if (folder) {
+      rootNode.children?.push({
+        id: rootNode.id + '-other-dashboards',
+        icon: 'search',
+        text: 'Other dashboards',
+        showIconInNavbar: true,
+        url: `/graph/dashboards/f/${folder.uid}/${rootNode.id}`,
+      });
+    }
+  }
 };
