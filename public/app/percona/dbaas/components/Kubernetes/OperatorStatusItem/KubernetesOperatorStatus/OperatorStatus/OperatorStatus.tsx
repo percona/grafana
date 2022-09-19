@@ -1,16 +1,18 @@
 import React, { FC } from 'react';
 
-import { Badge, BadgeColor } from '@grafana/ui';
+import { Badge, BadgeColor, useStyles2 } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
 import { KubernetesOperatorStatus as Status, KubernetesOperatorStatusColors } from '../KubernetesOperatorStatus.types';
 
 import { STATUS_DATA_QA } from './OperatorStatus.constants';
+import { getStyles } from './OperatorStatus.styles';
 import { OperatorStatusProps } from './OperatorStatus.types';
 
 const { operatorStatus } = Messages.kubernetes;
 
 export const OperatorStatus: FC<OperatorStatusProps> = ({ operator }) => {
+  const styles = useStyles2(getStyles);
   const { status, availableVersion } = operator;
   const showVersionAvailable = (status === Status.ok || status === Status.unsupported) && !!availableVersion;
 
@@ -22,12 +24,15 @@ export const OperatorStatus: FC<OperatorStatusProps> = ({ operator }) => {
       text={
         <>
           {operatorStatus[status]}
-          {showVersionAvailable && <span> {operatorStatus.getNewVersionAvailable(availableVersion)}</span>}
+          {showVersionAvailable && (
+            <span className={styles.versionAvailable}>{operatorStatus.getNewVersionAvailable(availableVersion)}</span>
+          )}
         </>
       }
       color={statusColor}
       data-testid={`cluster-status-${STATUS_DATA_QA[status]}`}
       icon={externalLink ? 'external-link-alt' : undefined}
+      className={status === Status.unsupported ? styles.wrapperUnsupported : undefined}
     />
   );
 };

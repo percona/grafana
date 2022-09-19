@@ -1,24 +1,33 @@
 import { css } from '@emotion/css';
+import tinycolor from 'tinycolor2';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ typography, v1 }: GrafanaTheme2) => ({
-  status: css`
-    background-color: ${v1.palette.gray1};
-    border-radius: 20px;
-    color: ${v1.palette.gray85};
-    cursor: default;
-    font-size: ${typography.size.sm};
-    padding: 3px 15px;
-    display: flex;
-  `,
+export const getStyles = ({ v1, isDark }: GrafanaTheme2) => {
+  let sourceColor = v1.palette.gray1;
+  let borderColor;
+  let bgColor;
+  let textColor;
 
-  badgeTextWrapper: css`
-    display: flex;
-    align-items: flex-start;
-  `,
+  if (isDark) {
+    bgColor = tinycolor(sourceColor).setAlpha(0.15).toString();
+    borderColor = tinycolor(sourceColor).darken(30).toString();
+    textColor = tinycolor(sourceColor).lighten(15).toString();
+  } else {
+    bgColor = tinycolor(sourceColor).setAlpha(0.15).toString();
+    borderColor = tinycolor(sourceColor).lighten(20).toString();
+    textColor = tinycolor(sourceColor).darken(15).toString();
+  }
 
-  versionAvailable: css`
-    margin-left: ${v1.spacing.xs};
-  `,
-});
+  return {
+    wrapperUnsupported: css`
+      background: ${bgColor};
+      border: 1px solid ${borderColor};
+      color: ${textColor};
+    `,
+
+    versionAvailable: css`
+      margin-left: ${v1.spacing.xs};
+    `,
+  };
+};

@@ -12,7 +12,7 @@ export enum KubernetesOperatorStatus {
 
 export const KubernetesOperatorStatusColors: Record<KubernetesOperatorStatus, BadgeColor> = {
   [KubernetesOperatorStatus.ok]: 'green',
-  [KubernetesOperatorStatus.unsupported]: 'purple', //should be grey
+  [KubernetesOperatorStatus.unsupported]: 'purple',
   [KubernetesOperatorStatus.unavailable]: 'blue',
   [KubernetesOperatorStatus.invalid]: 'red',
 };
