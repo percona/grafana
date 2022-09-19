@@ -1,51 +1,33 @@
-import { cx } from '@emotion/css';
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
-import { useStyles2, Icon } from '@grafana/ui';
+import { Badge, BadgeColor } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
-import { KubernetesOperatorStatus as Status } from '../KubernetesOperatorStatus.types';
+import { KubernetesOperatorStatus as Status, KubernetesOperatorStatusColors } from '../KubernetesOperatorStatus.types';
 
 import { STATUS_DATA_QA } from './OperatorStatus.constants';
-import { getStyles } from './OperatorStatus.styles';
 import { OperatorStatusProps } from './OperatorStatus.types';
 
 const { operatorStatus } = Messages.kubernetes;
 
 export const OperatorStatus: FC<OperatorStatusProps> = ({ operator }) => {
-  const styles = useStyles2(getStyles);
   const { status, availableVersion } = operator;
   const showVersionAvailable = (status === Status.ok || status === Status.unsupported) && !!availableVersion;
-  const statusStyles = useMemo(
-    () => ({
-      [styles.statusActive]: status === Status.ok,
-      [styles.statusVersionAvailable]: showVersionAvailable,
-      [styles.statusFailed]: status === Status.invalid,
-      [styles.statusUnsupported]: status === Status.unsupported,
-      [styles.statusUnavailable]: status === Status.unavailable,
-    }),
-    [
-      status,
-      showVersionAvailable,
-      styles.statusActive,
-      styles.statusVersionAvailable,
-      styles.statusFailed,
-      styles.statusUnsupported,
-      styles.statusUnavailable,
-    ]
-  );
+
+  const statusColor: BadgeColor = showVersionAvailable ? 'orange' : KubernetesOperatorStatusColors[status];
+  const externalLink: boolean = status === Status.unavailable || showVersionAvailable;
 
   return (
-    <span className={cx(styles.status, statusStyles)} data-testid={`cluster-status-${STATUS_DATA_QA[status]}`}>
-      {operatorStatus[status]}
-      {showVersionAvailable && (
-        <span className={styles.versionAvailable} data-testid="operator-version-available">
-          {operatorStatus.getNewVersionAvailable(availableVersion)}
-        </span>
-      )}
-      {(status === Status.unavailable || showVersionAvailable) && (
-        <Icon name="external-link-alt" className={styles.installLinkIcon} />
-      )}
-    </span>
+    <Badge
+      text={
+        <>
+          {operatorStatus[status]}
+          {showVersionAvailable && <span> {operatorStatus.getNewVersionAvailable(availableVersion)}</span>}
+        </>
+      }
+      color={statusColor}
+      data-testid={`cluster-status-${STATUS_DATA_QA[status]}`}
+      icon={externalLink ? 'external-link-alt' : undefined}
+    />
   );
 };
