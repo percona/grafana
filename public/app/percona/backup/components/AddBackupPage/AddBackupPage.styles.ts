@@ -59,7 +59,14 @@ export const getStyles = ({ colors, shape, spacing, v1: { spacing: spacingV1 } }
     border: 1px solid ${colors.border.weak};
     border-radius: ${shape.borderRadius()};
     margin: ${spacing(0, 2, 2)};
+    overflow: hidden;
     flex: 1;
+  `,
+  form: css`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   `,
   headingStyle: css`
     margin-bottom: ${spacingV1.lg};
