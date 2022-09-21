@@ -29,10 +29,10 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
   const { loading } = useSelector(getAddDbCluster);
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
 
-  const initialValues = useMemo(() => getInitialValues(kubernetes, preSelectedKubernetesCluster), [
-    kubernetes,
-    preSelectedKubernetesCluster,
-  ]);
+  const initialValues = useMemo(
+    () => getInitialValues(kubernetes, preSelectedKubernetesCluster),
+    [kubernetes, preSelectedKubernetesCluster]
+  );
 
   const updatedItialValues = useMemo(
     () => (isVisible ? updateDatabaseClusterNameInitialValue(initialValues) : initialValues),

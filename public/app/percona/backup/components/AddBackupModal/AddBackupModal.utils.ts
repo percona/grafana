@@ -47,7 +47,7 @@ const getBackupType = (backup: Backup | ScheduledBackup | null): BackupType => {
   }
 
   return BackupType.DEMAND;
-}
+};
 
 export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMode?: boolean): AddBackupFormProps => {
   if (!backup) {
