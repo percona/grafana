@@ -9,7 +9,6 @@ import { KubernetesOperatorStatus } from '../OperatorStatusItem/KubernetesOperat
 
 import { OperatorStatusRow } from './OperatorStatusRow';
 
-
 describe('OperatorStatusRow::', () => {
   it('createDBCluster button should be disabled when kubernetesClusterStatus is invalid', async () => {
     const element = {

@@ -49,9 +49,6 @@ import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModa
 import { EditDBClusterModal } from './EditDBClusterModal/EditDBClusterModal';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
 
-
-
-
 export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);

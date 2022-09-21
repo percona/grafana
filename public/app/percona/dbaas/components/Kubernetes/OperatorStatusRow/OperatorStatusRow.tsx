@@ -13,11 +13,7 @@ import { KubernetesClusterStatus } from '../KubernetesClusterStatus/KubernetesCl
 import { KubernetesOperatorStatus } from '../OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { OperatorStatusItem } from '../OperatorStatusItem/OperatorStatusItem';
 
-
 import { getStyles } from './OperatorStatusRow.styles';
-
-
-
 
 interface OperatorStatusRowProps {
   element: Kubernetes;
