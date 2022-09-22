@@ -4,7 +4,7 @@ import tinycolor from 'tinycolor2';
 import { GrafanaTheme2 } from '@grafana/data';
 
 export const getStyles = ({ v1, isDark }: GrafanaTheme2) => {
-  let sourceColor = v1.palette.gray1;
+  const sourceColor = v1.palette.gray1;
   let borderColor;
   let bgColor;
   let textColor;
@@ -25,7 +25,6 @@ export const getStyles = ({ v1, isDark }: GrafanaTheme2) => {
       border: 1px solid ${borderColor};
       color: ${textColor};
     `,
-
     versionAvailable: css`
       margin-left: ${v1.spacing.xs};
     `,
