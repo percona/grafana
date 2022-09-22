@@ -25,7 +25,9 @@ export const OperatorStatus: FC<OperatorStatusProps> = ({ operator }) => {
         <>
           {operatorStatus[status]}
           {showVersionAvailable && (
-            <span className={styles.versionAvailable}>{operatorStatus.getNewVersionAvailable(availableVersion)}</span>
+            <span data-testid="operator-version-available" className={styles.versionAvailable}>
+              {operatorStatus.getNewVersionAvailable(availableVersion)}
+            </span>
           )}
         </>
       }
