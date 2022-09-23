@@ -1,6 +1,5 @@
 import { useTour } from '@reactour/tour';
 import React, { useState, useEffect } from 'react';
-import { useLocalStorage } from 'react-use';
 
 import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
 import { contextSrv } from 'app/core/services/context_srv';
@@ -10,10 +9,11 @@ import {
   fetchServerInfoAction,
   fetchServerSaasHostAction,
   fetchUserStatusAction,
+  fetchUserDetailsAction,
+  setProductTourCompleted,
 } from 'app/percona/shared/core/reducers';
-import { PERCONA_TOUR_FLAG } from 'app/tour/constants';
+import { useAppDispatch } from 'app/store/store';
 import getSteps from 'app/tour/steps';
-import { useDispatch } from 'app/types';
 
 import { isPmmAdmin } from '../../helpers/permissions';
 
@@ -23,10 +23,10 @@ import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { setCurrentStep, setIsOpen, setSteps } = useTour();
   const [modalIsOpen, setModalIsOpen] = useState(true);
-  const [showTour, setShowTour] = useLocalStorage<boolean>(PERCONA_TOUR_FLAG, !navigator.webdriver);
+  const [showTour, setShowTour] = useState(false);
   const styles = useStyles2(getStyles);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
 
@@ -37,6 +37,7 @@ export const PerconaBootstrapper = () => {
   const finishTour = () => {
     setModalIsOpen(false);
     setShowTour(false);
+    dispatch(setProductTourCompleted(true));
   };
 
   const startTour = () => {
@@ -60,8 +61,18 @@ export const PerconaBootstrapper = () => {
       }
     };
 
+    const getUserDetails = async () => {
+      try {
+        const details = await dispatch(fetchUserDetailsAction()).unwrap();
+        setShowTour(!details.productTourCompleted);
+      } catch (e) {
+        setShowTour(false);
+      }
+    };
+
     const bootstrap = async () => {
       await getSettings();
+      await getUserDetails();
       await dispatch(fetchUserStatusAction());
       await dispatch(fetchServerInfoAction());
       await dispatch(fetchServerSaasHostAction());
