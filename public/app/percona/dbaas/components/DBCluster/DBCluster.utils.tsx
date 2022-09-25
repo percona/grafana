@@ -1,23 +1,18 @@
-import { SelectableValue } from '@grafana/data';
-import { Databases } from 'app/percona/shared/core';
+import {SelectableValue} from '@grafana/data';
+import {Databases} from 'app/percona/shared/core';
 
-import { Kubernetes } from '../Kubernetes/Kubernetes.types';
-
-import { SERVICE_MAP, THOUSAND } from './DBCluster.constants';
-import { DBClusterService } from './DBCluster.service';
+import {SERVICE_MAP, THOUSAND} from './DBCluster.constants';
+import {DBClusterService} from './DBCluster.service';
 import {
   DBCluster,
   DBClusterExpectedResources,
-  DBClusterPayload,
   DBClusterStatus,
   ResourcesUnits,
   ResourcesWithUnits,
 } from './DBCluster.types';
 
 export const isClusterChanging = ({ status }: DBCluster) => {
-  const isChanging = status === DBClusterStatus.changing || status === DBClusterStatus.deleting;
-
-  return isChanging;
+  return status === DBClusterStatus.changing || status === DBClusterStatus.deleting;
 };
 
 export const newDBClusterService = (type: Databases): DBClusterService => {
@@ -82,20 +77,3 @@ export const formatDBClusterVersion = (version?: string) => (version ? version.s
 
 export const formatDBClusterVersionWithBuild = (version?: string) => (version ? version.split(':')[1] : '');
 
-const clustersToModel = (database: Databases, clusters: DBClusterPayload[], kubernetes: Kubernetes[], index: number) =>
-  clusters.map((cluster) => {
-    return newDBClusterService(database).toModel(cluster, kubernetes[index].kubernetesClusterName, database);
-  });
-
-export const formatDBClusters = (results: any[], kubernetes: Kubernetes[]) => {
-  const clustersList: DBCluster[] = results.reduce((acc: DBCluster[], r, index) => {
-    const pxcClusters: DBClusterPayload[] = r.pxc_clusters ?? [];
-    const psmdbClusters: DBClusterPayload[] = r.psmdb_clusters ?? [];
-    const pxcClustersModel = clustersToModel(Databases.mysql, pxcClusters, kubernetes, index);
-    const psmdbClustersModel = clustersToModel(Databases.mongodb, psmdbClusters, kubernetes, index);
-
-    return acc.concat([...pxcClustersModel, ...psmdbClustersModel]);
-  }, []);
-
-  return clustersList;
-};

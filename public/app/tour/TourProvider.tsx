@@ -1,14 +1,18 @@
-import React from 'react';
 import { TourProvider } from '@reactour/tour';
-import getSteps from './steps';
-import { isPmmAdmin } from '../percona/shared/helpers/permissions';
+import React from 'react';
+
+import { config } from '@grafana/runtime';
+import { getTheme } from '@grafana/ui';
+import { setProductTourCompleted } from 'app/percona/shared/core/reducers/user/user';
+import { useAppDispatch } from 'app/store/store';
+
 import { contextSrv } from '../core/services/context_srv';
+import { isPmmAdmin } from '../percona/shared/helpers/permissions';
+
 import Close from './Close';
 import Navigation from './Navigation';
-import { useAppDispatch } from 'app/store/store';
-import { setProductTourCompleted } from 'app/percona/shared/core/reducers';
-import { getTheme } from '@grafana/ui';
-import { config } from '@grafana/runtime';
+import getSteps from './steps';
+
 
 const PerconaTourProvider: React.FC = ({ children }) => {
   const dispatch = useAppDispatch();

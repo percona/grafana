@@ -5,13 +5,10 @@ import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
 import { contextSrv } from 'app/core/services/context_srv';
 import {
   fetchSettingsAction,
-  setAuthorized,
   fetchServerInfoAction,
   fetchServerSaasHostAction,
-  fetchUserStatusAction,
-  fetchUserDetailsAction,
-  setProductTourCompleted,
 } from 'app/percona/shared/core/reducers';
+import { setAuthorized, fetchUserDetailsAction, fetchUserStatusAction, setProductTourCompleted } from 'app/percona/shared/core/reducers/user/user'
 import { useAppDispatch } from 'app/store/store';
 import getSteps from 'app/tour/steps';
 
