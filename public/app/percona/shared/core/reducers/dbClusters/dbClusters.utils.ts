@@ -3,15 +3,15 @@ import { newDBClusterService } from '../../../../dbaas/components/DBCluster/DBCl
 import { Kubernetes } from '../../../../dbaas/components/Kubernetes/Kubernetes.types';
 import { Databases } from '../../types';
 
-import { DBClusterApiResult } from './dbClusters.types';
+import { DBClusterListApi } from './dbClusters.types';
 
 const clustersToModel = (database: Databases, clusters: DBClusterPayload[], kubernetes: Kubernetes[], index: number) =>
   clusters.map((cluster) => {
     return newDBClusterService(database).toModel(cluster, kubernetes[index].kubernetesClusterName, database);
   });
 
-export const formatDBClusters = (results: DBClusterApiResult[], kubernetes: Kubernetes[]) => {
-  const clustersList: DBCluster[] = results.reduce((acc: DBCluster[], r, index) => {
+export const formatDBClusters = (results: DBClusterListApi[], kubernetes: Kubernetes[]) => {
+  return results.reduce((acc: DBCluster[], r, index) => {
     const pxcClusters: DBClusterPayload[] = r.pxc_clusters ?? [];
     const psmdbClusters: DBClusterPayload[] = r.psmdb_clusters ?? [];
     const pxcClustersModel = clustersToModel(Databases.mysql, pxcClusters, kubernetes, index);
@@ -19,6 +19,4 @@ export const formatDBClusters = (results: DBClusterApiResult[], kubernetes: Kube
 
     return acc.concat([...pxcClustersModel, ...psmdbClustersModel]);
   }, []);
-
-  return clustersList;
 };
