@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CancelToken } from "axios";
+import { CancelToken } from 'axios';
 
-import { withSerializedError } from "../../../../../features/alerting/unified/utils/redux";
-import { DBCluster } from "../../../../dbaas/components/DBCluster/DBCluster.types";
-import { Kubernetes } from "../../../../dbaas/components/Kubernetes/Kubernetes.types";
-import { apiManagement } from "../../../helpers/api";
+import { withSerializedError } from '../../../../../features/alerting/unified/utils/redux';
+import { DBCluster } from '../../../../dbaas/components/DBCluster/DBCluster.types';
+import { Kubernetes } from '../../../../dbaas/components/Kubernetes/Kubernetes.types';
+import { apiManagement } from '../../../helpers/api';
 
-import { PerconaDBClustersState } from "./dbClusters.types";
-import { formatDBClusters } from "./dbClusters.utils";
+import { DBClusterListApi, PerconaDBClustersState } from './dbClusters.types';
+import { formatDBClusters } from './dbClusters.utils';
 
 export const initialDBClustersState: PerconaDBClustersState = {
   result: [],
@@ -34,8 +34,8 @@ const perconaDBClustersSlice = createSlice({
       return {
         ...state,
         loading: true,
-      }
-    }
+      };
+    },
   },
 });
 
@@ -46,7 +46,7 @@ export const fetchDBClustersAction = createAsyncThunk(
       (async () => {
         thunkAPI.dispatch(setDBClustersLoading());
         const requests = args.kubernetes.map((k, idx) =>
-          apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', k, true, args.tokens[idx])
+          apiManagement.post<DBClusterListApi, Kubernetes>('/DBaaS/DBClusters/List', k, true, args.tokens[idx])
         );
         const promiseResults = await Promise.all(requests);
         const dbClusters = formatDBClusters(promiseResults, args.kubernetes);
@@ -54,7 +54,6 @@ export const fetchDBClustersAction = createAsyncThunk(
       })()
     )
 );
-
 
 export const { resetDBClustersToInitial, setDBClusters, setDBClustersLoading } = perconaDBClustersSlice.actions;
 export default perconaDBClustersSlice.reducer;

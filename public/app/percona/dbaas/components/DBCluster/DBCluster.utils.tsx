@@ -1,8 +1,9 @@
-import {SelectableValue} from '@grafana/data';
-import {Databases} from 'app/percona/shared/core';
+/* eslint-disable  @typescript-eslint/consistent-type-assertions */
+import { SelectableValue } from '@grafana/data';
+import { Databases } from 'app/percona/shared/core';
 
-import {SERVICE_MAP, THOUSAND} from './DBCluster.constants';
-import {DBClusterService} from './DBCluster.service';
+import { SERVICE_MAP, THOUSAND } from './DBCluster.constants';
+import { DBClusterService } from './DBCluster.service';
 import {
   DBCluster,
   DBClusterExpectedResources,
@@ -76,4 +77,3 @@ export const getExpectedResourcesDifference = (
 export const formatDBClusterVersion = (version?: string) => (version ? version.split(':')[1].split('-')[0] : '');
 
 export const formatDBClusterVersionWithBuild = (version?: string) => (version ? version.split(':')[1] : '');
-

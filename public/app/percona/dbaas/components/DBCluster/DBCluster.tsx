@@ -13,11 +13,7 @@ import { TechnicalPreview } from 'app/percona/shared/components/Elements/Technic
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import {
-  addDbClusterAction,
-  fetchKubernetesAction,
-  selectKubernetesCluster,
-} from 'app/percona/shared/core/reducers';
+import { addDbClusterAction, fetchKubernetesAction, selectKubernetesCluster } from 'app/percona/shared/core/reducers';
 import {
   getKubernetes,
   getDBaaS,
@@ -26,10 +22,10 @@ import {
 } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 
-import {fetchDBClustersAction, resetDBClustersToInitial} from "../../../shared/core/reducers/dbClusters/dbClusters";
+import { fetchDBClustersAction, resetDBClustersToInitial } from '../../../shared/core/reducers/dbClusters/dbClusters';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
-import {isKubernetesListUnavailable} from "../Kubernetes/Kubernetes.utils";
+import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 
 import { AddDBClusterModal } from './AddDBClusterModal/AddDBClusterModal';
 import { RECHECK_INTERVAL } from './AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';

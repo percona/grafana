@@ -8,7 +8,12 @@ import {
   fetchServerInfoAction,
   fetchServerSaasHostAction,
 } from 'app/percona/shared/core/reducers';
-import { setAuthorized, fetchUserDetailsAction, fetchUserStatusAction, setProductTourCompleted } from 'app/percona/shared/core/reducers/user/user'
+import {
+  setAuthorized,
+  fetchUserDetailsAction,
+  fetchUserStatusAction,
+  setProductTourCompleted,
+} from 'app/percona/shared/core/reducers/user/user';
 import { useAppDispatch } from 'app/store/store';
 import getSteps from 'app/tour/steps';
 
@@ -24,7 +29,7 @@ export const PerconaBootstrapper = () => {
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [showTour, setShowTour] = useState(false);
   const styles = useStyles2(getStyles);
-  const isLoggedIn = !!contextSrv.user.isSignedIn;
+  const isLoggedIn = contextSrv.user.isSignedIn;
 
   const dismissModal = () => {
     setModalIsOpen(false);
