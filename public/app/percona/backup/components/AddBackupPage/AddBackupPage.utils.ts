@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { SelectableValue } from '@grafana/data';
 import { BackupMode, BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
+
 import { formatBackupMode } from '../../Backup.utils';
 import { Backup } from '../BackupInventory/BackupInventory.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
+
 import { AddBackupFormProps } from './AddBackupPage.types';
 
 export const PERIOD_OPTIONS: Array<SelectableValue<PeriodType>> = [

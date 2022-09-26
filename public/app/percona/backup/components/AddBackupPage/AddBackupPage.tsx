@@ -1,6 +1,5 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, CollapsableSection, CustomScrollbar, PageToolbar, useStyles2 } from '@grafana/ui';
-import { Link } from 'react-router-dom';
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+import { cx } from '@emotion/css';
 import {
   LoaderButton,
   logger,
@@ -10,36 +9,41 @@ import {
   TextInputField,
   validators,
 } from '@percona/platform-core';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
+import { Link } from 'react-router-dom';
+
 import { AppEvents, SelectableValue } from '@grafana/data';
-import { AddBackupFormProps, SelectableService } from './AddBackupPage.types';
-import { RetryModeSelector } from './RetryModeSelector';
-import { Messages } from './AddBackupPage.messages';
-import { Messages as MessagesBackup } from '../../Backup.messages';
-import { toFormBackup, getBackupModeOptions, getDataModelFromVendor, isDataModelDisabled } from './AddBackupPage.utils';
-import { AddBackupModalService } from './AddBackupPage.service';
-import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
-import { DATA_MODEL_OPTIONS, MAX_BACKUP_NAME, SCHEDULED_TYPE } from './AddBackupPage.constants';
-import { getStyles } from './AddBackupPage.styles';
-import { BackupMode, BackupType, DataModel } from '../../Backup.types';
-import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
+import { locationService } from '@grafana/runtime';
+import { Button, CollapsableSection, CustomScrollbar, PageToolbar, useStyles2 } from '@grafana/ui';
+import appEvents from 'app/core/app_events';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-import { BackupService } from '../../Backup.service';
-import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN } from '../BackupInventory/BackupInventory.constants';
-import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
+import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { locationService } from '@grafana/runtime';
-import appEvents from 'app/core/app_events';
+import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
+import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
+
+import { Messages as MessagesBackup } from '../../Backup.messages';
+import { BackupService } from '../../Backup.service';
+import { BackupMode, BackupType, DataModel } from '../../Backup.types';
+import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
+import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN } from '../BackupInventory/BackupInventory.constants';
 import { BackupInventoryService } from '../BackupInventory/BackupInventory.service';
 import { Backup } from '../BackupInventory/BackupInventory.types';
+import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../ScheduledBackups/ScheduledBackups.constants';
 import { ScheduledBackupsService } from '../ScheduledBackups/ScheduledBackups.service';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
-import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../ScheduledBackups/ScheduledBackups.constants';
+
+import { DATA_MODEL_OPTIONS, MAX_BACKUP_NAME, SCHEDULED_TYPE } from './AddBackupPage.constants';
+import { Messages } from './AddBackupPage.messages';
+import { AddBackupModalService } from './AddBackupPage.service';
+import { getStyles } from './AddBackupPage.styles';
+import { AddBackupFormProps, SelectableService } from './AddBackupPage.types';
+import { toFormBackup, getBackupModeOptions, getDataModelFromVendor, isDataModelDisabled } from './AddBackupPage.utils';
 import { PageSwitcher } from './PageSwitcher/PageSwitcher';
+import { RetryModeSelector } from './RetryModeSelector';
 import { ScheduleSection } from './ScheduleSection/ScheduleSection';
-import { cx } from '@emotion/css';
 
 const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
   const [queryParams] = useQueryParams();

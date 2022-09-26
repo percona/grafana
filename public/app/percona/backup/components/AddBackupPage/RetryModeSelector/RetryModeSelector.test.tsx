@@ -1,8 +1,10 @@
-import React from 'react';
-import { RetryModeSelector } from './RetryModeSelector';
 import { FormWrapper } from '@percona/platform-core';
-import { RetryMode } from 'app/percona/backup/Backup.types';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
+
+import { RetryMode } from 'app/percona/backup/Backup.types';
+
+import { RetryModeSelector } from './RetryModeSelector';
 
 describe('RetryModeSelector', () => {
   it('should render', () => {

@@ -1,9 +1,11 @@
 import { CheckboxField, NumberInputField, SelectField, validators } from '@percona/platform-core';
-import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import React from 'react';
 import { Field } from 'react-final-form';
-import { Messages } from '../AddBackupPage.messages';
+
+import { useStyles2 } from '@grafana/ui';
+import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
+
 import {
   DAY_OPTIONS,
   HOUR_OPTIONS,
@@ -14,8 +16,9 @@ import {
   MONTH_OPTIONS,
   WEEKDAY_OPTIONS,
 } from '../AddBackupPage.constants';
+import { Messages } from '../AddBackupPage.messages';
 import { isCronFieldDisabled, PERIOD_OPTIONS } from '../AddBackupPage.utils';
-import { useStyles2 } from '@grafana/ui';
+
 import { getStyles } from './ScheduleSection.styles';
 import { ScheduleSectionProps } from './ScheduleSection.type';
 

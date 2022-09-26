@@ -1,10 +1,13 @@
-import { useStyles2 } from '@grafana/ui';
 import { RadioButton } from '@percona/platform-core/dist/components/RadioButtonGroup/RadioButton';
-import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { BackupType } from 'app/percona/backup/Backup.types';
 import React from 'react';
 import { Field } from 'react-final-form';
+
+import { useStyles2 } from '@grafana/ui';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
+import { BackupType } from 'app/percona/backup/Backup.types';
+
 import { Messages } from '../AddBackupPage.messages';
+
 import { getStyles } from './PageSwitcher.styles';
 import { PageSwitcherProps } from './PageSwitcher.types';
 

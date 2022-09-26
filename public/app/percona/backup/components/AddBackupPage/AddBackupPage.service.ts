@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { SelectableValue } from '@grafana/data';
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { Databases } from 'app/percona/shared/core';
+
 import { StorageLocationsService } from '../StorageLocations/StorageLocations.service';
+
 import { SelectableService } from './AddBackupPage.types';
 
 export const AddBackupModalService = {
