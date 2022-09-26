@@ -166,6 +166,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
               <LoaderButton
                 data-testid="backup-add-button"
                 size="md"
+                type="submit"
                 variant="primary"
                 disabled={!valid || pristine}
                 loading={submitting}
