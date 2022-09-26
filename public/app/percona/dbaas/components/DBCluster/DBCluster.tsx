@@ -77,7 +77,6 @@ export const DBCluster: FC = () => {
         generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}`)
       );
 
-      console.log('getDBClusters');
       const result = await catchFromAsyncThunkAction(dispatch(fetchDBClustersAction({ kubernetes, tokens })));
 
       // undefined means request was cancelled
@@ -193,7 +192,6 @@ export const DBCluster: FC = () => {
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-    console.log(dbClustersLoading);
     if (!dbClustersLoading) {
       timeout = setTimeout(getDBClusters, RECHECK_INTERVAL, false);
     }
