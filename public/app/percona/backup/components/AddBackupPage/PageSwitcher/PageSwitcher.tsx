@@ -21,8 +21,9 @@ export const PageSwitcher = ({ editing, setModalTitle }: PageSwitcherProps) => {
           <RadioButton
             {...input}
             onChange={() => {
-              setModalTitle(Messages.getModalTitle(false, editing));
               setQueryParams({ scheduled: null });
+              setModalTitle(Messages.getModalTitle(false, editing));
+              input.onChange({ target: { value: input.value } });
             }}
           >
             {Messages.onDemand}
@@ -34,8 +35,9 @@ export const PageSwitcher = ({ editing, setModalTitle }: PageSwitcherProps) => {
           <RadioButton
             {...input}
             onChange={() => {
-              setModalTitle(Messages.getModalTitle(true, editing));
               setQueryParams({ scheduled: true });
+              setModalTitle(Messages.getModalTitle(true, editing));
+              input.onChange({ target: { value: input.value } });
             }}
           >
             {Messages.schedule}

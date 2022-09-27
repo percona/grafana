@@ -49,11 +49,11 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const [queryParams] = useQueryParams();
   const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || match.params.type === SCHEDULED_TYPE;
   const [backup, setBackup] = useState<Backup | ScheduledBackup | null>(null);
-
   const [pending, setPending] = useState(false);
   const styles = useStyles2(getStyles);
   const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
-  const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup, scheduleMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup]);
   const { Form } = withTypes<AddBackupFormProps>();
   const editing = !!backup;
 
