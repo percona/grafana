@@ -1,5 +1,6 @@
 import { NavModelItem, NavSection } from '@grafana/data';
 import config from 'app/core/config';
+import { Databases } from 'app/percona/shared/core';
 
 export const PMM_STT_PAGE: NavModelItem = {
   id: 'database-checks',
@@ -251,4 +252,12 @@ export const NAV_FOLDER_MAP: Record<string, string> = {
   mysql: 'MySQL',
   mongo: 'MongoDB',
   postgre: 'PostgreSQL',
+};
+
+export const NAV_ID_TO_SERVICE: Record<string, Databases[]> = {
+  mysql: [Databases.mysql, Databases.mariadb],
+  mongo: [Databases.mongodb],
+  postgre: [Databases.postgresql],
+  proxysql: [Databases.proxysql],
+  haproxy: [Databases.haproxy],
 };

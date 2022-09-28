@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { initialState, updateNavTree } from 'app/core/reducers/navBarTree';
 import { updateNavIndex } from 'app/core/reducers/navModel';
 import { fetchFolders } from 'app/features/manage-dashboards/state/actions';
+import { fetchServicesAction } from 'app/percona/shared/core/reducers/services/services';
 import { useAppDispatch } from 'app/store/store';
 import { FolderDTO, useSelector } from 'app/types';
 
-import { getPerconaSettings, getPerconaUser } from '../../../core/selectors';
+import { getPerconaSettings, getPerconaUser, getServices } from '../../../core/selectors';
 
 import {
   getPmmSettingsPage,
@@ -24,6 +25,7 @@ import {
   addFolderLinks,
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
+  filterByServices,
   removeAlertingMenuItem,
 } from './PerconaNavigation.utils';
 
@@ -33,6 +35,7 @@ const PerconaNavigation: React.FC = () => {
   const { alertingEnabled, sttEnabled, dbaasEnabled, backupEnabled } = result!;
   const { isPlatformUser, isAuthorized } = useSelector(getPerconaUser);
   const dispatch = useAppDispatch();
+  const { services } = useSelector(getServices);
 
   dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
   dispatch(updateNavIndex(PMM_STT_PAGE));
@@ -46,7 +49,8 @@ const PerconaNavigation: React.FC = () => {
 
   useEffect(() => {
     fetchFolders().then(setFolders);
-  }, []);
+    dispatch(fetchServicesAction({}));
+  }, [dispatch]);
 
   useEffect(() => {
     const updatedNavTree = cloneDeep(initialState);
@@ -83,9 +87,9 @@ const PerconaNavigation: React.FC = () => {
 
     addFolderLinks(updatedNavTree, folders);
 
-    dispatch(updateNavTree({ items: updatedNavTree }));
+    dispatch(updateNavTree({ items: filterByServices(updatedNavTree, services) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, folders, isAuthorized, isPlatformUser]);
+  }, [result, folders, services, isAuthorized, isPlatformUser]);
 
   return null;
 };
