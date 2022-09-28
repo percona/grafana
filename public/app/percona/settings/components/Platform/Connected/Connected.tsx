@@ -1,4 +1,5 @@
 import { LoaderButton, logger, TextInputField } from '@percona/platform-core';
+import { AxiosError } from 'axios';
 import React, { FC, useCallback, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +16,7 @@ import { PlatformService } from '../Platform.service';
 
 import { Messages } from './Connected.messages';
 import { getStyles } from './Connected.styles';
+import { ForceDisconnectErrorBody } from './Connected.types';
 import { ModalBody } from './ModalBody/ModalBody';
 
 export const Connected: FC = () => {
@@ -46,13 +48,21 @@ export const Connected: FC = () => {
     closeModal();
     try {
       await PlatformService.forceDisconnect();
-      appEvents.emit(AppEvents.alertSuccess, [Messages.forceDisconnectSucceeded]);
-      setDisconnecting(false);
-      dispatch(fetchServerInfoAction());
-      dispatch(fetchSettingsAction());
     } catch (e) {
-      logger.error(e);
-      setDisconnecting(false);
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const error = e as AxiosError<ForceDisconnectErrorBody>;
+
+      if (error.response?.data?.code === 9) {
+        appEvents.emit(AppEvents.alertSuccess, [Messages.forceDisconnectSucceeded]);
+        setDisconnecting(false);
+        dispatch(fetchServerInfoAction());
+        dispatch(fetchSettingsAction());
+      } else {
+        const message = error.response?.data?.message;
+        logger.error(e);
+        appEvents.emit(AppEvents.alertError, [message ?? 'Unknown error']);
+        setDisconnecting(false);
+      }
     }
   };
 
