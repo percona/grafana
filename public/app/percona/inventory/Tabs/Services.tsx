@@ -12,8 +12,11 @@ import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table'
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { fetchServicesAction, removeServicesAction } from 'app/percona/shared/core/reducers/services/services';
-import { RemoveServiceParams } from 'app/percona/shared/core/reducers/services/services.types';
+import {
+  fetchServicesAction,
+  removeServicesAction,
+  RemoveServiceParams,
+} from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
@@ -40,7 +43,7 @@ export const Services = () => {
   const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
-  const { isLoading: loading, services } = useSelector(getServices);
+  const { isLoading, services } = useSelector(getServices);
   const data = useMemo(() => InventoryDataService.getServiceModel(services), [services]);
 
   const loadData = useCallback(async () => {
@@ -164,7 +167,7 @@ export const Services = () => {
                 pageSize={25}
                 emptyMessage="No services Available"
                 emptyMessageClassName={styles.emptyMessage}
-                pendingRequest={loading}
+                pendingRequest={isLoading}
                 overlayClassName={styles.overlay}
               />
             </div>

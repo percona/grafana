@@ -29,7 +29,7 @@ import { api } from 'app/percona/shared/helpers/api';
 import { SETTINGS_TIMEOUT } from '../constants';
 import { ServerInfo } from '../types';
 
-import servicesReducer from './services/services';
+import servicesReducer from './services';
 import perconaUserReducers from './user';
 export * from './user';
 

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { initialState, updateNavTree } from 'app/core/reducers/navBarTree';
 import { updateNavIndex } from 'app/core/reducers/navModel';
 import { fetchFolders } from 'app/features/manage-dashboards/state/actions';
-import { fetchServicesAction } from 'app/percona/shared/core/reducers/services/services';
+import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { useAppDispatch } from 'app/store/store';
 import { FolderDTO, useSelector } from 'app/types';
 
