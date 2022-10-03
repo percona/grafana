@@ -47,6 +47,7 @@ import {
   getBackupModeOptions,
   getDataModelFromVendor,
   isDataModelDisabled,
+  getLabelForStorageOption,
 } from './AddBackupModal.utils';
 import { RetryModeSelector } from './RetryModeSelector';
 
@@ -63,7 +64,11 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
   const { result: locations = [], loading: locationsLoading } = useSelector(getBackupLocations);
   const { Form } = withTypes<AddBackupFormProps>();
   const locationsOptions = locations.map(
-    ({ locationID, name, type }): SelectableValue<string> => ({ label: name, value: locationID, description: type })
+    ({ locationID, name, type }): SelectableValue<string> => ({
+      label: name,
+      value: locationID,
+      description: getLabelForStorageOption(type),
+    })
   );
 
   const handleSubmit = (values: AddBackupFormProps) =>
