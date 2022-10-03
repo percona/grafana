@@ -11,6 +11,7 @@ import { appEvents } from 'app/core/app_events';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaServer, getPerconaUser } from 'app/percona/shared/core/selectors';
 
+import { FORCE_DISCONNECT_PORTAL_ERROR_CODE } from '../Platform.constants';
 import { Messages as PlatformMessages } from '../Platform.messages';
 import { PlatformService } from '../Platform.service';
 
@@ -52,7 +53,7 @@ export const Connected: FC = () => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const error = e as AxiosError<ForceDisconnectErrorBody>;
 
-      if (error.response?.data?.code === 9) {
+      if (error.response?.data?.code === FORCE_DISCONNECT_PORTAL_ERROR_CODE) {
         appEvents.emit(AppEvents.alertSuccess, [Messages.forceDisconnectSucceeded]);
         setDisconnecting(false);
         dispatch(fetchServerInfoAction());
