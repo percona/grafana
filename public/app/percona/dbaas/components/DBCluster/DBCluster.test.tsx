@@ -33,6 +33,15 @@ jest.mock('@percona/platform-core', () => {
 });
 
 describe('DBCluster::', () => {
+  let errorSpy: jest.SpyInstance;
+  beforeEach(() => {
+    errorSpy = jest.spyOn(console, 'error').mockImplementation();
+  });
+
+  afterEach(() => {
+    errorSpy.mockRestore();
+  });
+
   it('renders correctly without clusters', async () => {
     render(
       <Provider
