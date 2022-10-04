@@ -43,6 +43,7 @@ export const BackupService = {
         description,
         strRetryInterval,
         resultRetryTimes!,
+        dataModel,
         token
       );
     } else {
@@ -89,6 +90,7 @@ export const BackupService = {
     description: string,
     retryInterval: string,
     retryTimes: number,
+    dataModel: DataModel,
     token?: CancelToken
   ) {
     return api.post(
@@ -100,6 +102,7 @@ export const BackupService = {
         description,
         retry_interval: retryInterval,
         retries: retryTimes,
+        data_model: dataModel,
       },
       false,
       token
