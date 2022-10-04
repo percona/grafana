@@ -60,7 +60,7 @@ interface RemoteCommonPayload {
   username?: string;
   password?: string;
   environment?: string;
-  custom_labels?: any;
+  custom_labels?: Record<string, string>;
   skip_connection_check?: boolean;
 }
 interface TLSCommon {
@@ -138,6 +138,7 @@ export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {
   authentication_mechanism: string;
   authentication_database: string;
   agent_password: string;
+  max_query_length: number;
 }
 
 export interface HaProxyPayload extends RemoteCommonPayload {
