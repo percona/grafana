@@ -37,9 +37,6 @@ import { RestoreBackupModal } from './RestoreBackupModal';
 
 //import { BackupService } from '../../Backup.service';
 
-
-
-
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
   const [deletePending, setDeletePending] = useState(false);
@@ -53,7 +50,6 @@ export const BackupInventory: FC = () => {
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
 
-  console.log(data);
   const columns = useMemo(
     (): Array<Column<Backup>> => [
       {
