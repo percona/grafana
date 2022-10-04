@@ -331,10 +331,7 @@ export const BackupInventory: FC = () => {
               showForce={!!selectedBackup && backupLocationMap.current[selectedBackup.id]?.type !== LocationType.CLIENT}
             >
               {!!selectedBackup && backupLocationMap.current[selectedBackup.id]?.type === LocationType.CLIENT && (
-                <Alert title="">
-                  For security reasons, we won&apos;t delete this backup from the filesystem. Please make sure to
-                  manually remove it.
-                </Alert>
+                <Alert title="">{Messages.backupInventory.deleteWarning}</Alert>
               )}
             </DeleteModal>
           )}
