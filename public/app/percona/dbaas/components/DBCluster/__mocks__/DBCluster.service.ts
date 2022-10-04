@@ -10,4 +10,7 @@ export class DBClusterService {
   static async getAllocatedResources(): Promise<DBClusterAllocatedResources> {
     return Promise.resolve(dbCLusterAllocatedResourcesStub);
   }
+  static async getDBClusters() {
+    return Promise.resolve();
+  }
 }

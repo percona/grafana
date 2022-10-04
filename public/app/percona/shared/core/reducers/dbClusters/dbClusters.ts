@@ -2,11 +2,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 
 import { withSerializedError } from '../../../../../features/alerting/unified/utils/redux';
+import { DBClusterService } from '../../../../dbaas/components/DBCluster/DBCluster.service';
 import { DBCluster } from '../../../../dbaas/components/DBCluster/DBCluster.types';
 import { Kubernetes } from '../../../../dbaas/components/Kubernetes/Kubernetes.types';
-import { apiManagement } from '../../../helpers/api';
 
-import { DBClusterListApi, PerconaDBClustersState } from './dbClusters.types';
+import { PerconaDBClustersState } from './dbClusters.types';
 import { formatDBClusters } from './dbClusters.utils';
 
 export const initialDBClustersState: PerconaDBClustersState = {
@@ -45,9 +45,7 @@ export const fetchDBClustersAction = createAsyncThunk(
     withSerializedError(
       (async () => {
         thunkAPI.dispatch(setDBClustersLoading());
-        const requests = args.kubernetes.map((k, idx) =>
-          apiManagement.post<DBClusterListApi, Kubernetes>('/DBaaS/DBClusters/List', k, true, args.tokens[idx])
-        );
+        const requests = args.kubernetes.map((k, idx) => DBClusterService.getDBClusters(k, args.tokens[idx]));
         const promiseResults = await Promise.all(requests);
         const dbClusters = formatDBClusters(promiseResults, args.kubernetes);
         thunkAPI.dispatch(setDBClusters(dbClusters));
