@@ -270,8 +270,9 @@ export const BackupInventory: FC = () => {
   }, []);
 
   useEffect(() => {
-    triggerTimeout(getData, DATA_INTERVAL, true);
-  }, [getData, triggerTimeout]);
+    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getData]);
 
   return (
     <OldPage navModel={navModel}>
