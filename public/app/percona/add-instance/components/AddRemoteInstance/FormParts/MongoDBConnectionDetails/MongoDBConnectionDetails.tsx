@@ -15,7 +15,7 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
   const tlsFlag = formValues && formValues['tls'];
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
-  const userPassValidators = useMemo(() => (tlsFlag ? [] : [Validators.min(-1)]), [tlsFlag]);
+  const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
   const maxQueryLengthValidators = useMemo(() => [Validators.min(-1)], []);
 
   return (
