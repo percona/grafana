@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { ServicesService } from 'app/percona/shared/services/services/Services.service';
-import { ServiceListPayload } from 'app/percona/shared/services/services/Services.types';
+import { ServiceListPayload, ServiceType } from 'app/percona/shared/services/services/Services.types';
 import { createAsyncThunk } from 'app/types';
 
 import { filterFulfilled, processPromiseResults } from '../../../helpers/promises';
@@ -10,6 +10,7 @@ import { RemoveServicesParams, ListServicesParams, ServicesState } from './servi
 import { toRemoveServiceBody, toListServicesBody } from './services.utils';
 
 const initialState: ServicesState = {
+  activeTypes: [],
   services: {},
   isLoading: false,
 };
@@ -27,18 +28,43 @@ const servicesSlice = createSlice({
       isLoading: action.payload,
     }),
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchServicesAction.pending, (state) => ({
+      ...state,
+      isLoading: true,
+    }));
+    builder.addCase(fetchServicesAction.rejected, (state) => ({
+      ...state,
+      isLoading: false,
+    }));
+    builder.addCase(fetchServicesAction.fulfilled, (state, action) => ({
+      ...state,
+      services: action.payload,
+      isLoading: false,
+    }));
+    builder.addCase(fetchActiveServiceTypesAction.fulfilled, (state, action) => ({
+      ...state,
+      activeTypes: action.payload,
+    }));
+  },
 });
 
 export const { setServices, setLoading } = servicesSlice.actions;
 
-export const fetchServicesAction = createAsyncThunk(
+export const fetchActiveServiceTypesAction = createAsyncThunk<ServiceType[]>(
+  'percona/fetchActiveServiceTypes',
+  async () => {
+    const response = await ServicesService.getActive();
+    return response.service_types;
+  }
+);
+
+export const fetchServicesAction = createAsyncThunk<ServiceListPayload, Partial<ListServicesParams>>(
   'percona/fetchServices',
-  async (params: Partial<ListServicesParams> = {}, thunkAPI): Promise<void> => {
-    thunkAPI.dispatch(setLoading(true));
+  async (params = {}) => {
     const body = toListServicesBody(params);
     const response = await ServicesService.getServices(body, params.token);
-    thunkAPI.dispatch(setServices(response));
-    thunkAPI.dispatch(setLoading(false));
+    return response;
   }
 );
 

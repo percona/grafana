@@ -16,6 +16,7 @@ import {
   fetchServicesAction,
   removeServicesAction,
   RemoveServiceParams,
+  fetchActiveServiceTypesAction,
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -49,6 +50,7 @@ export const Services = () => {
   const loadData = useCallback(async () => {
     try {
       await dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
+      await dispatch(fetchActiveServiceTypesAction());
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -70,7 +72,7 @@ export const Services = () => {
           serviceId: s.original.service_id,
           force: forceMode,
         }));
-        const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
+        const successfullyDeleted = await dispatch(removeServicesAction({ services: params }));
 
         appEvents.emit(AppEvents.alertSuccess, [
           `${successfullyDeleted} of ${services.length} services successfully deleted`,

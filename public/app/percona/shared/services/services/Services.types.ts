@@ -53,3 +53,7 @@ export interface RemoveServiceBody {
   service_id: string;
   force: boolean;
 }
+
+export interface ListTypesPayload {
+  service_types: ServiceType[];
+}

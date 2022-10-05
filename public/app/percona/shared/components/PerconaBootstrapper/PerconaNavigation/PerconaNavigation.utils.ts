@@ -1,6 +1,6 @@
 import { NavModelItem } from '@grafana/data';
 import { config } from 'app/core/config';
-import { ServiceListPayload } from 'app/percona/shared/services/services/Services.types';
+import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 import { FolderDTO } from 'app/types';
 
 import {
@@ -126,11 +126,11 @@ export const addFolderLinks = (navTree: NavModelItem[], folders: FolderDTO[]) =>
   }
 };
 
-export const filterByServices = (navTree: NavModelItem[], services: ServiceListPayload): NavModelItem[] => {
+export const filterByServices = (navTree: NavModelItem[], activeServices: ServiceType[]): NavModelItem[] => {
   const showNavLink = (node: NavModelItem) => {
     if (node.id) {
-      const serviceIds = NAV_ID_TO_SERVICE[node.id];
-      return !serviceIds || !serviceIds.length || serviceIds.some((id) => services[id]);
+      const serviceType = NAV_ID_TO_SERVICE[node.id];
+      return !serviceType || activeServices.some((s) => s === serviceType);
     }
 
     return true;
