@@ -28,7 +28,7 @@ export const Messages = {
       },
       postgresqlDetails: {
         database: 'Database',
-        maxQueryLength: 'Max query example length',
+        maxQueryLength: 'Max query length',
       },
       labels: {
         environment: 'Environment',
@@ -77,7 +77,7 @@ export const Messages = {
       },
       postgresqlDetails: {
         database: 'Database (default: postgres)',
-        maxQueryLength: 'Max query example length (default: 0 = 2048 characters)',
+        maxQueryLength: 'Max query length',
       },
       labels: {
         environment: 'Environment',
@@ -110,8 +110,7 @@ export const Messages = {
       },
       postgresqlDetails: {
         database: 'Database name',
-        maxQueryLength:
-          "We can't store Full Example/Fingerprint by default as this might affect the performance of QAN/PMM for longer fingerprints",
+        maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
       },
       haproxy: {
         port: 'HAProxy prometheus exporter port',
