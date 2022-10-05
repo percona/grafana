@@ -1,6 +1,5 @@
 import { NavModelItem, NavSection } from '@grafana/data';
 import config from 'app/core/config';
-import { Databases } from 'app/percona/shared/core';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 
 export const PMM_STT_PAGE: NavModelItem = {

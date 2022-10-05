@@ -72,7 +72,7 @@ export const Services = () => {
           serviceId: s.original.service_id,
           force: forceMode,
         }));
-        const successfullyDeleted = await dispatch(removeServicesAction({ services: params }));
+        const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
 
         appEvents.emit(AppEvents.alertSuccess, [
           `${successfullyDeleted} of ${services.length} services successfully deleted`,
