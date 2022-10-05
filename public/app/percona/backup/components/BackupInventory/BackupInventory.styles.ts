@@ -7,9 +7,4 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
     justify-content: flex-end;
     margin-bottom: ${spacing.sm};
   `,
-  createdAtWrapper: css`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  `,
 });

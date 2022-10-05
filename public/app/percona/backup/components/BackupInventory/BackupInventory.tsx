@@ -81,7 +81,7 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.created,
         accessor: 'created',
         width: '200px',
-        Cell: ({ value }) => <DetailedDate date={value} className={styles.createdAtWrapper} />,
+        Cell: ({ value }) => <DetailedDate date={value} />,
       },
       {
         Header: Messages.backupInventory.table.columns.type,

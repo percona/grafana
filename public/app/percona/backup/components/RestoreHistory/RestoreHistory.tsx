@@ -23,8 +23,6 @@ import { RestoreHistoryService } from './RestoreHistory.service';
 import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryDetails } from './RestoreHistoryDetails';
 import { RestoreHistoryActions } from './RestoreHistoryActions';
-import { useStyles2 } from '@grafana/ui';
-import { getStyles } from './RestoreHistory.styles';
 
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(true);
@@ -32,7 +30,6 @@ export const RestoreHistory: FC = () => {
   const navModel = usePerconaNavModel('restore-history');
   const [generateToken] = useCancelToken();
   const [triggerTimeout] = useRecurringCall();
-  const styles = useStyles2(getStyles);
   const columns = useMemo(
     (): Array<Column<Restore>> => [
       {
@@ -54,7 +51,7 @@ export const RestoreHistory: FC = () => {
       {
         Header: Messages.restoreHistory.table.columns.started,
         accessor: 'started',
-        Cell: ({ value }) => <DetailedDate date={value} className={styles.startedAtWrapper} />,
+        Cell: ({ value }) => <DetailedDate date={value} />,
         width: '200px',
       },
       {
