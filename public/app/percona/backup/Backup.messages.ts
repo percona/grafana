@@ -12,6 +12,7 @@ export const Messages = {
       noData: 'No backups found',
       columns: {
         name: 'Backup name',
+        service: 'Service Name',
         created: 'Created',
         location: 'Location',
         vendor: 'Vendor',

@@ -64,6 +64,10 @@ export const BackupInventory: FC = () => {
         Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
+        Header: Messages.backupInventory.table.columns.service,
+        accessor: 'serviceName',
+      },
+      {
         Header: Messages.backupInventory.table.columns.vendor,
         accessor: ({ vendor }: Backup) => DATABASE_LABELS[vendor],
         width: '150px',
