@@ -55,7 +55,7 @@ export const fetchActiveServiceTypesAction = createAsyncThunk<ServiceType[]>(
   'percona/fetchActiveServiceTypes',
   async () => {
     const response = await ServicesService.getActive();
-    return response.service_types;
+    return response.service_types || [];
   }
 );
 

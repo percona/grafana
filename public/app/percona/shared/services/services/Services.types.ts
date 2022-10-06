@@ -55,5 +55,5 @@ export interface RemoveServiceBody {
 }
 
 export interface ListTypesPayload {
-  service_types: ServiceType[];
+  service_types?: ServiceType[];
 }
