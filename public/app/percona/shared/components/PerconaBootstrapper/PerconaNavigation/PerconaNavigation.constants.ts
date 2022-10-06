@@ -261,3 +261,6 @@ export const NAV_ID_TO_SERVICE: Record<string, ServiceType> = {
   proxysql: ServiceType.proxysql,
   haproxy: ServiceType.haproxy,
 };
+
+// 5 mins
+export const ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS = 300000;

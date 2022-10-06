@@ -12,6 +12,7 @@ import { FolderDTO, useSelector } from 'app/types';
 import { getPerconaSettings, getPerconaUser, getServices } from '../../../core/selectors';
 
 import {
+  ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS,
   getPmmSettingsPage,
   PMM_ADD_INSTANCE_PAGE,
   PMM_BACKUP_PAGE,
@@ -50,10 +51,18 @@ const PerconaNavigation: React.FC = () => {
   dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
 
   useEffect(() => {
+    let interval: NodeJS.Timer;
+
     if (isLoggedIn) {
       fetchFolders().then(setFolders);
       dispatch(fetchActiveServiceTypesAction());
+
+      interval = setInterval(() => {
+        dispatch(fetchActiveServiceTypesAction());
+      }, ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS);
     }
+
+    return () => clearInterval(interval);
   }, [dispatch, isLoggedIn]);
 
   useEffect(() => {
