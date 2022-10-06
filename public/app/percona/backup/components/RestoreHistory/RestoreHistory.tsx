@@ -21,8 +21,8 @@ import { Status } from '../Status';
 import { DATA_INTERVAL, LIST_RESTORES_CANCEL_TOKEN } from './RestoreHistory.constants';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { Restore } from './RestoreHistory.types';
-import { RestoreHistoryDetails } from './RestoreHistoryDetails';
 import { RestoreHistoryActions } from './RestoreHistoryActions';
+import { RestoreHistoryDetails } from './RestoreHistoryDetails';
 
 export const RestoreHistory: FC = () => {
   const [pending, setPending] = useState(true);

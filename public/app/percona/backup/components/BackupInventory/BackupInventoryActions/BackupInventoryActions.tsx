@@ -2,14 +2,14 @@ import React, { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 import { BackupStatus } from 'app/percona/backup/Backup.types';
+import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
+import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
 
 import { DBIcon } from '../../DBIcon';
 
 import { Messages } from './BackupInventoryActions.messages';
 import { getStyles } from './BackupInventoryActions.styles';
 import { BackupInventoryActionsProps } from './BackupInventoryActions.types';
-import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
-import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
 
 export const BackupInventoryActions: FC<BackupInventoryActionsProps> = ({
   row,

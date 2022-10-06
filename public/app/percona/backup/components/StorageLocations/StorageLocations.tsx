@@ -1,4 +1,4 @@
-/* eslint-disable react/display-name */
+/* eslint-disable react/display-name, @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any */
 import { logger } from '@percona/platform-core';
 import React, { FC, useState, useEffect, useCallback } from 'react';
 import { Column, Row } from 'react-table';
@@ -55,12 +55,7 @@ export const StorageLocations: FC = () => {
         Header: Messages.storageLocations.table.columns.actions,
         accessor: 'locationID',
         Cell: ({ row }) => (
-          <StorageLocationsActions
-            row={row}
-            onUpdate={handleUpdate}
-            onDelete={onDeleteCLick}
-            location={row.original as StorageLocation}
-          />
+          <StorageLocationsActions row={row} onUpdate={handleUpdate} onDelete={onDeleteCLick} location={row.original} />
         ),
         width: '100px',
       },
@@ -157,8 +152,6 @@ export const StorageLocations: FC = () => {
           <div className={styles.addWrapper}>
             <Button
               size="md"
-              icon="plus-square"
-              fill="text"
               variant="primary"
               data-testid="storage-location-add-modal-button"
               onClick={() => {

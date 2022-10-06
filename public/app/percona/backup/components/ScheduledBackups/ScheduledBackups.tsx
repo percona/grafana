@@ -17,21 +17,21 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { Messages } from '../../Backup.messages';
-import { DetailedDate } from '../DetailedDate';
-import { AddBackupModal } from '../AddBackupModal';
-import { ScheduledBackup } from './ScheduledBackups.types';
-import { ScheduledBackupsService } from './ScheduledBackups.service';
-import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
-import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
-import { getStyles } from './ScheduledBackups.styles';
-import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 
+import { Messages } from '../../Backup.messages';
 import { RetryMode } from '../../Backup.types';
 import { formatBackupMode } from '../../Backup.utils';
+import { AddBackupModal } from '../AddBackupModal';
+import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
+import { DetailedDate } from '../DetailedDate';
 
+import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
+import { ScheduledBackupsService } from './ScheduledBackups.service';
+import { getStyles } from './ScheduledBackups.styles';
+import { ScheduledBackup } from './ScheduledBackups.types';
 import { ScheduledBackupsActions } from './ScheduledBackupsActions';
+import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
@@ -162,6 +162,7 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.lastBackup,
         accessor: 'lastBackup',
         Cell: ({ value }) => (value ? <DetailedDate date={value} /> : ''),
+        width: '200px',
       },
       {
         Header: Messages.scheduledBackups.table.columns.actions,

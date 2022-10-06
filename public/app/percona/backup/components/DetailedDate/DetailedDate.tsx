@@ -1,3 +1,4 @@
+import { cx } from '@emotion/css';
 import moment from 'moment/moment';
 import React, { FC } from 'react';
 
@@ -6,7 +7,6 @@ import { useStyles } from '@grafana/ui';
 import { DAY_FORMAT, HOUR_FORMAT } from './DetailedDate.constants';
 import { getStyles } from './DetailedDate.styles';
 import { DetailedDateProps } from './DetailedDate.types';
-import { cx } from '@emotion/css';
 
 export const DetailedDate: FC<DetailedDateProps> = ({
   date,

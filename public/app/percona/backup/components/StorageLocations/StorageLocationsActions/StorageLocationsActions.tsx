@@ -1,12 +1,14 @@
 import React, { FC } from 'react';
+
 import { useStyles2 } from '@grafana/ui';
+import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
+import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
+
 import { DBIcon } from '../../DBIcon';
 
 import { Messages } from './StorageLocationsActions.messages';
 import { getStyles } from './StorageLocationsActions.styles';
 import { StorageLocatationsActionProps } from './StorageLocationsActions.types';
-import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
-import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
 
 export const StorageLocationsActions: FC<StorageLocatationsActionProps> = ({ row, location, onUpdate, onDelete }) => {
   const styles = useStyles2(getStyles);

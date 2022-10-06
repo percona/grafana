@@ -1,8 +1,10 @@
+import { CancelToken } from 'axios';
+
 import { DBServiceList, ServiceListPayload } from 'app/percona/inventory/Inventory.types';
 import { api } from 'app/percona/shared/helpers/api';
 
-import { CancelToken } from 'axios';
 import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
+
 import { Backup, BackupResponse } from './BackupInventory.types';
 
 const BASE_URL = '/v1/management/backup';

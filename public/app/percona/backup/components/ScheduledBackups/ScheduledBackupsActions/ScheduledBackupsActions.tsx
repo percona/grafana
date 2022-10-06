@@ -1,10 +1,13 @@
 import React, { FC } from 'react';
+
 import { Icon, Spinner, Switch, useStyles2 } from '@grafana/ui';
+import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
+import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
+
+import { Messages } from './ScheduledBackupsActions.messages';
 import { getStyles } from './ScheduledBackupsActions.styles';
 import { ScheduledBackupsActionsProps } from './ScheduledBackupsActions.types';
-import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
-import { Messages } from './ScheduledBackupsActions.messages';
-import { ExpandableRowButton } from 'app/percona/shared/components/Elements/ExpandableRowButton/ExpandableRowButton';
+
 export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
   row,
   backup,

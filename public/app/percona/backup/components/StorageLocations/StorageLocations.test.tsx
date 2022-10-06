@@ -1,8 +1,9 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { StoreState } from 'app/types';
-import { configureStore } from 'app/store/configureStore';
+import React from 'react';
 import { Provider } from 'react-redux';
+
+import { configureStore } from 'app/store/configureStore';
+import { StoreState } from 'app/types';
 
 import { StorageLocations } from './StorageLocations';
 import { StorageLocationsService } from './StorageLocations.service';

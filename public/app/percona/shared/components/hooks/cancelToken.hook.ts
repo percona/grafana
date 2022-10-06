@@ -1,5 +1,5 @@
-import { useRef, useEffect, useCallback } from 'react';
 import axios, { CancelTokenSource } from 'axios';
+import { useRef, useEffect, useCallback } from 'react';
 
 export const useCancelToken = () => {
   const tokens = useRef<Record<string, CancelTokenSource>>({});
