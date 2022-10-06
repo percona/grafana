@@ -68,6 +68,7 @@ describe('StorageLocations', () => {
   });
 
   it('should open the modal by clicking the "Add" button', async () => {
+    jest.spyOn(console, 'error').mockImplementation();
     render(
       <Provider
         store={configureStore({
