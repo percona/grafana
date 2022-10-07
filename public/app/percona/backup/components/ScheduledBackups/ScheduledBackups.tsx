@@ -245,7 +245,7 @@ export const ScheduledBackups: FC = () => {
               })}
               icon="plus"
             >
-              New Scheduled Backup
+              {Messages.scheduledBackups.newScheduledBackup}
             </LinkButton>
           </div>
           <Table

@@ -20,6 +20,7 @@ import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 
+import { NEW_BACKUP_URL } from '../../Backup.constants';
 import { Messages } from '../../Backup.messages';
 import { formatBackupMode } from '../../Backup.utils';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
@@ -196,7 +197,11 @@ export const BackupInventory: FC = () => {
   );
 
   const onBackupClick = (backup: Backup | null) => {
-    locationService.push(`/backup${backup?.id}/edit`);
+    if (backup) {
+      locationService.push(`/backup${backup.id}/edit`);
+    } else {
+      locationService.push(NEW_BACKUP_URL);
+    }
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -213,8 +218,8 @@ export const BackupInventory: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            <LinkButton href="/backup/new" icon="plus">
-              New backup
+            <LinkButton href={NEW_BACKUP_URL} icon="plus">
+              {Messages.backupInventory.newBackup}
             </LinkButton>
           </div>
           <Table

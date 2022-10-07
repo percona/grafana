@@ -11,11 +11,10 @@ import {
 } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
-import { Link } from 'react-router-dom';
 
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { Button, CollapsableSection, CustomScrollbar, PageToolbar, useStyles2 } from '@grafana/ui';
+import { CollapsableSection, CustomScrollbar, LinkButton, PageToolbar, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
@@ -24,6 +23,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 
+import { BACKUP_INVENTORY_URL, BACKUP_SCHEDULED_URL } from '../../Backup.constants';
 import { Messages as MessagesBackup } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
 import { BackupMode, BackupType, DataModel } from '../../Backup.types';
@@ -98,11 +98,11 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
             : MessagesBackup.scheduledBackups.addSuccess,
         ]);
         setBackupErrors([]);
-        locationService.push('/backup/scheduled');
+        locationService.push(BACKUP_SCHEDULED_URL);
       } else {
         appEvents.emit(AppEvents.alertSuccess, [MessagesBackup.backupInventory.addSuccess]);
         setBackupErrors([]);
-        locationService.push('/backup/inventory');
+        locationService.push(BACKUP_INVENTORY_URL);
       }
     } catch (e) {
       if (isApiCancelError(e)) {
@@ -121,8 +121,6 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       retryTimes: parseInt(`${values.retryTimes}`, 10),
     });
   };
-
-  const onClose = () => {};
 
   useEffect(() => setModalTitle(Messages.getModalTitle(scheduleMode, editing)), [editing, scheduleMode]);
 
@@ -158,11 +156,14 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
           <form onSubmit={handleSubmit} className={styles.form}>
             <PageToolbar title={modalTitle} pageIcon="history">
-              <Link to={scheduleMode ? '/backup/scheduled' : '/backup/inventory'}>
-                <Button data-testid="cancel-button" variant="secondary" fill="outline" onClick={onClose}>
-                  {Messages.cancelAction}
-                </Button>
-              </Link>
+              <LinkButton
+                href={scheduleMode ? BACKUP_SCHEDULED_URL : BACKUP_INVENTORY_URL}
+                data-testid="cancel-button"
+                variant="secondary"
+                fill="outline"
+              >
+                {Messages.cancelAction}
+              </LinkButton>
               <LoaderButton
                 data-testid="backup-add-button"
                 size="md"

@@ -8,6 +8,7 @@ export const Messages = {
   add: 'Add',
   backupManagement: 'Backup Management',
   backupInventory: {
+    newBackup: 'New backup',
     table: {
       noData: 'No backups found',
       columns: {
@@ -66,6 +67,7 @@ export const Messages = {
     getDeleteSuccess: (name: string) => `Backup location "${name}" successfully deleted.`,
   },
   scheduledBackups: {
+    newScheduledBackup: 'New Scheduled Backup',
     table: {
       noData: 'No scheduled backups found',
       columns: {
