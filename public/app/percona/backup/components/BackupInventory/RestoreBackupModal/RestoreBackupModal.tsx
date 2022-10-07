@@ -4,10 +4,12 @@ import { Field, withTypes } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
+import { BackupMode } from 'app/percona/backup/Backup.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
+import { BackupInventoryService } from '../BackupInventory.service';
 
 import { Messages } from './RestoreBackupModal.messages';
 import { RestoreBackupModalService } from './RestoreBackupModal.service';
@@ -63,6 +65,21 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   disabled={values.vendor !== DATABASE_LABELS[Databases.mysql]}
                 />
                 <TextInputField disabled name="vendor" label={Messages.vendor} />
+                {backup!.mode === BackupMode.PITR && (
+                  <Field name="timerange">
+                    {({ input }) => (
+                      <div>
+                        <AsyncSelectField
+                          label={Messages.timeRange}
+                          loadOptions={() => BackupInventoryService.listPitrTimeranges(backup!.id)}
+                          {...input}
+                          defaultOptions
+                          data-testid="time-range-select-input"
+                        />
+                      </div>
+                    )}
+                  </Field>
+                )}
               </div>
               <div>
                 <Field name="service" validate={validators.required}>
@@ -79,9 +96,11 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                     </div>
                   )}
                 </Field>
+
                 <TextInputField disabled name="dataModel" label={Messages.dataModel} />
               </div>
             </div>
+
             {!!restoreErrors.length && <BackupErrorSection backupErrors={restoreErrors} />}
             <HorizontalGroup justify="center" spacing="md">
               <LoaderButton

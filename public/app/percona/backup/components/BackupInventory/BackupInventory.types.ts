@@ -32,3 +32,12 @@ export interface RawBackup {
 export interface BackupResponse {
   artifacts: RawBackup[];
 }
+
+export interface RawTimeranges {
+  start_timestamp: string;
+  end_timestamp: string;
+}
+
+export interface TimerangesResponse {
+  timeranges: RawTimeranges[];
+}
