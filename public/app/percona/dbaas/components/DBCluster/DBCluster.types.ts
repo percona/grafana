@@ -15,6 +15,7 @@ export enum DBClusterType {
 }
 
 export interface DBCluster {
+  id?: string;
   clusterName: string;
   kubernetesClusterName: string;
   databaseType: Databases;
@@ -45,6 +46,11 @@ export enum DBClusterStatus {
   unknown = 'DB_CLUSTER_STATE_UNKNOWN',
 }
 
+export type DBClusterDetails = {
+  [key in string]: DBCluster;
+};
+
+
 export type DBClusterStatusMap = {
   [key in DBClusterStatus]: string;
 };
@@ -59,6 +65,14 @@ export type OperatorDatabasesMap = {
 
 export type DatabaseOperatorsMap = {
   [key in Operators]: Databases;
+};
+
+export type DatabaseClusterTypeMap = {
+  [key in DBClusterType]: Databases;
+};
+
+export type ClusterDatabaseTypeMap = {
+  [key in Databases]: DBClusterType;
 };
 
 export type ActiveOperatorsMap = {
@@ -127,6 +141,15 @@ export enum CpuUnits {
 export interface DatabaseVersion extends SelectableValue {
   default: boolean;
   disabled: boolean;
+}
+
+export interface DBClusterListPayload {
+  id: string;
+  kubernetes_cluster_name: string;
+  name: string;
+  cluster_type: DBClusterType;
+  installed_image: string;
+  available_image?: string;
 }
 
 export interface DBClusterPayload {
@@ -260,8 +283,9 @@ export interface DBClusterChangeComponentVersionAPI {
 }
 
 export interface DBClusterListResponse {
-  pxc_clusters: DBClusterPayload[];
-  psmdb_clusters: DBClusterPayload[];
+  // pxc_clusters: DBClusterPayload[];
+  // psmdb_clusters: DBClusterPayload[];
+  db_clusters: DBClusterListPayload[];
 }
 
 export interface DBClusterSuspendResumeRequest {

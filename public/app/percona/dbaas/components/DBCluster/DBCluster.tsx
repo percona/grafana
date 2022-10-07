@@ -14,7 +14,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
-  addDbClusterAction,
+  addDbClusterAction, fetchDBClusterDetailsAction,
   fetchDBClustersAction,
   fetchKubernetesAction,
   selectKubernetesCluster,
@@ -67,8 +67,20 @@ export const DBCluster: FC = () => {
   const [loading, setLoading] = useState(kubernetesLoading);
   const addDisabled = kubernetes.length === 0 || isKubernetesListUnavailable(kubernetes) || loading;
 
+  const getDBClusterDetails = useCallback(async () => {
+    const tokens: CancelToken[] = kubernetes.map((k) =>
+      generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}-details`)
+    );
+    try {
+      await dispatch(fetchDBClusterDetailsAction({ dbClusters, tokens })).unwrap();
+    } catch (e) {
+      logger.error(e);
+    }
+  }, [dbClusters, dispatch, generateToken, kubernetes]);
+
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
+      debugger;
       if (!kubernetes.length) {
         return;
       }
@@ -147,6 +159,7 @@ export const DBCluster: FC = () => {
   );
 
   const addCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
+    debugger;
     try {
       await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning })).unwrap();
       setAddModalVisible(false);
@@ -195,10 +208,14 @@ export const DBCluster: FC = () => {
     let timeout: NodeJS.Timeout;
     if (!dbClustersLoading) {
       timeout = setTimeout(() => getDBClusters(false), RECHECK_INTERVAL);
+
+      if (dbClusters.length) {
+        getDBClusterDetails();
+      }
     }
     return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dbClustersLoading]);
+  }, [dbClusters.length, dbClustersLoading]);
 
   useEffect(
     () =>
@@ -255,7 +272,7 @@ export const DBCluster: FC = () => {
                 isVisible={updateModalVisible}
                 setVisible={setUpdateModalVisible}
                 setLoading={setLoading}
-                onUpdateFinished={getDBClusters}
+                onUpdateFinished={getDBClusterDetails}
               />
             )}
             <Table

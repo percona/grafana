@@ -53,18 +53,18 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
   const editModalTitle = `${selectedCluster?.clusterName} ( ${selectedCluster?.databaseType} )`;
 
   if (!initialValues.current) {
-    const isCluster = selectedCluster.clusterSize > 1;
+    const isCluster = selectedCluster.clusterSize! > 1;
     const clusterParameters: EditDBClusterRenderProps = {
       topology: isCluster ? DBClusterTopology.cluster : DBClusterTopology.single,
-      nodes: isCluster ? selectedCluster.clusterSize : MIN_NODES,
+      nodes: isCluster ? selectedCluster.clusterSize! : MIN_NODES,
       single: 1,
       databaseType: {
         value: selectedCluster.databaseType,
         label: DATABASE_LABELS[selectedCluster.databaseType],
       },
-      cpu: selectedCluster.cpu,
-      disk: selectedCluster.disk,
-      memory: selectedCluster.memory,
+      cpu: selectedCluster.cpu!,
+      disk: selectedCluster.disk!,
+      memory: selectedCluster.memory!,
     };
 
     const isMatchSize = (type: DBClusterResources) =>

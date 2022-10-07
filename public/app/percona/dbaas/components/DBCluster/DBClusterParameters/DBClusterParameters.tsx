@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
+import {useSelector} from "react-redux";
 
 import { useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
+import {getPerconaDBClustersDetails} from "../../../../shared/core/selectors";
 import { DBClusterStatus } from '../DBCluster.types';
 import { DBClusterConnectionItem } from '../DBClusterConnection/DBClusterConnectionItem/DBClusterConnectionItem';
 
@@ -11,7 +13,11 @@ import { DBClusterParametersProps } from './DBClusterParameters.types';
 
 export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster }) => {
   const styles = useStyles(getStyles);
-  const { status } = dbCluster;
+  const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
+  const { status, cpu, memory, disk, expose } =
+    Object.keys(clusters).length && dbCluster.id
+      ? clusters[dbCluster.id]
+      : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
   const {
     label: exposeLabel,
     enabled: exposeEnabled,
@@ -29,22 +35,22 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.cpu}
-            value={dbCluster.cpu}
+            value={cpu}
             dataTestId="cluster-parameters-cpu"
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.memory}
-            value={`${dbCluster.memory} GB`}
+            value={`${memory} GB`}
             dataTestId="cluster-parameters-memory"
           />
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.disk}
-            value={`${dbCluster.disk} GB`}
+            value={`${disk} GB`}
             dataTestId="cluster-parameters-disk"
           />
           <DBClusterConnectionItem
             label={exposeLabel}
-            value={dbCluster.expose ? exposeEnabled : exposeDisabled}
+            value={expose ? exposeEnabled : exposeDisabled}
             dataTestId="cluster-parameters-expose"
           />
         </div>

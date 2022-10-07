@@ -49,7 +49,12 @@ export abstract class DBClusterService {
 
   abstract getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources>;
 
-  abstract toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster;
+  abstract toModel(
+    dbCluster: Partial<DBCluster>,
+    payload: DBClusterPayload,
+    kubernetesClusterName: string,
+    databaseType: Databases
+  ): DBCluster;
 
   static async getDBClusters(kubernetes: Kubernetes, token?: CancelToken): Promise<DBClusterListResponse> {
     return apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', kubernetes, true, token);

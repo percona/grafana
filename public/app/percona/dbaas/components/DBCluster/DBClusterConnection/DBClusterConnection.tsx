@@ -1,9 +1,11 @@
 import { logger } from '@percona/platform-core';
 import React, { FC, useEffect, useState } from 'react';
+import {useSelector} from "react-redux";
 
 import { useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
+import {getPerconaDBClustersDetails} from "../../../../shared/core/selectors";
 import { DBClusterConnection as ConnectionParams, DBClusterStatus, DBClusterConnectionAPI } from '../DBCluster.types';
 import { newDBClusterService } from '../DBCluster.utils';
 
@@ -17,12 +19,19 @@ export const DBClusterConnection: FC<DBClusterConnectionProps> = ({ dbCluster })
   const styles = useStyles(getStyles);
   const [loading, setLoading] = useState(true);
   const [connection, setConnection] = useState<ConnectionParams>(INITIAL_CONNECTION);
+  const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
+  const { status, databaseType } =
+    Object.keys(clusters).length && dbCluster.id
+      ? clusters[dbCluster.id]
+      : { status: DBClusterStatus.unknown, databaseType: undefined };
   const { host, password, port, username } = connection;
-  const { status, databaseType } = dbCluster;
   const isClusterReady = status && status === DBClusterStatus.ready;
 
   useEffect(() => {
     const getClusterConnection = async () => {
+      if (!databaseType) {
+        return;
+      }
       try {
         setLoading(true);
         const dbClusterService = newDBClusterService(databaseType);

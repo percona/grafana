@@ -1,23 +1,21 @@
-import { SelectableValue } from '@grafana/data';
-import { Databases } from 'app/percona/shared/core';
+import {SelectableValue} from '@grafana/data';
+import {Databases} from 'app/percona/shared/core';
 
-import { Kubernetes } from '../Kubernetes/Kubernetes.types';
+import {Kubernetes} from '../Kubernetes/Kubernetes.types';
 
-import { SERVICE_MAP, THOUSAND } from './DBCluster.constants';
-import { DBClusterService } from './DBCluster.service';
+import {DATABASE_CLUSTER_TYPE, SERVICE_MAP, THOUSAND} from './DBCluster.constants';
+import {DBClusterService} from './DBCluster.service';
 import {
-  DBCluster,
-  DBClusterExpectedResources,
-  DBClusterPayload,
+  DBCluster, DBClusterDetails,
+  DBClusterExpectedResources, DBClusterListPayload,
+  // DBClusterPayload,
   DBClusterStatus,
   ResourcesUnits,
   ResourcesWithUnits,
 } from './DBCluster.types';
 
 export const isClusterChanging = ({ status }: DBCluster) => {
-  const isChanging = status === DBClusterStatus.changing || status === DBClusterStatus.deleting;
-
-  return isChanging;
+  return status === DBClusterStatus.changing || status === DBClusterStatus.deleting;
 };
 
 export const newDBClusterService = (type: Databases): DBClusterService => {
@@ -78,24 +76,49 @@ export const getExpectedResourcesDifference = (
   };
 };
 
-export const formatDBClusterVersion = (version?: string) => (version ? version.split(':')[1].split('-')[0] : '');
+// export const formatDBClusterVersion = (version?: string) => (version ? version.split(':')[1].split('-')[0] : '');
+export const formatDBClusterVersion = (version?: string) => version;
 
 export const formatDBClusterVersionWithBuild = (version?: string) => (version ? version.split(':')[1] : '');
 
-const clustersToModel = (database: Databases, clusters: DBClusterPayload[], kubernetes: Kubernetes[], index: number) =>
-  clusters.map((cluster) => {
-    return newDBClusterService(database).toModel(cluster, kubernetes[index].kubernetesClusterName, database);
+const clustersToModel = (clusters: DBClusterListPayload[], kubernetes: Kubernetes[], index: number) =>
+  clusters.map((dbCluster) => {
+    let database = DATABASE_CLUSTER_TYPE[dbCluster.cluster_type] as Databases;
+    return {
+      id: dbCluster.id,
+      clusterName: dbCluster.name,
+      kubernetesClusterName: kubernetes[index].kubernetesClusterName,
+      databaseType: database,
+      installedImage: dbCluster.installed_image,
+      availableImage: dbCluster.available_image,
+    };
   });
 
 export const formatDBClusters = (results: any[], kubernetes: Kubernetes[]) => {
-  const clustersList: DBCluster[] = results.reduce((acc: DBCluster[], r, index) => {
-    const pxcClusters: DBClusterPayload[] = r.pxc_clusters ?? [];
-    const psmdbClusters: DBClusterPayload[] = r.psmdb_clusters ?? [];
-    const pxcClustersModel = clustersToModel(Databases.mysql, pxcClusters, kubernetes, index);
-    const psmdbClustersModel = clustersToModel(Databases.mongodb, psmdbClusters, kubernetes, index);
+  const clustersList: Array<Partial<DBCluster>> = results.reduce((acc: Array<Partial<DBCluster>>, r, index) => {
+    const dbClusters: DBClusterListPayload[] = r.db_clusters ?? [];
+    const dbClustersModel = clustersToModel(dbClusters, kubernetes, index);
 
-    return acc.concat([...pxcClustersModel, ...psmdbClustersModel]);
-  }, []);
+    return acc.concat([...dbClustersModel]);
+    }, []);
+
+    return clustersList;
+  };
+
+export const formatDBClusterDetails = (results: any[], db_clusters: Array<Partial<DBCluster>>) => {
+  const clustersList: DBClusterDetails = results.reduce((acc: DBClusterDetails, r, index) => {
+    let cluster = db_clusters[index];
+    let database = cluster.databaseType!;
+
+    let dbCluster = newDBClusterService(database).toModel(
+      cluster,
+      r[database === Databases.mongodb ? 'psmdb_cluster' : 'pxc_cluster'],
+      cluster.kubernetesClusterName!,
+      database
+    );
+
+    return { ...acc, [dbCluster.id!]: dbCluster };
+  }, {});
 
   return clustersList;
 };

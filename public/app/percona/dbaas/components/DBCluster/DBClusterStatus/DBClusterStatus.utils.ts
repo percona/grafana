@@ -3,8 +3,10 @@ import { DBClusterStatus } from '../DBCluster.types';
 
 const { progressError, processing, complete } = Messages.dbcluster.table.status;
 
-export const getShowProgressBarValue = (status: DBClusterStatus, previousStatus: DBClusterStatus | undefined) => {
-  // if the cluster just changed to ready we want to still show the progress bar
+export const getShowProgressBarValue = (
+  status: DBClusterStatus | undefined,
+  previousStatus: DBClusterStatus | undefined
+) => {  // if the cluster just changed to ready we want to still show the progress bar
   if (previousStatus === DBClusterStatus.changing && status === DBClusterStatus.ready) {
     return true;
   }
@@ -18,7 +20,10 @@ export const getShowProgressBarValue = (status: DBClusterStatus, previousStatus:
   return false;
 };
 
-export const getProgressMessage = (status: DBClusterStatus, previousStatus: DBClusterStatus | undefined) => {
+export const getProgressMessage = (
+  status: DBClusterStatus | undefined,
+  previousStatus: DBClusterStatus | undefined
+) => {
   if (status === DBClusterStatus.invalid || status === DBClusterStatus.failed) {
     return progressError;
   }

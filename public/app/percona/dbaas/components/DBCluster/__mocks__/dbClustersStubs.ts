@@ -14,6 +14,7 @@ import {
 
 export const dbClustersStub: DBCluster[] = [
   {
+    id: 'cluster_1',
     kubernetesClusterName: 'Kubernetes Cluster 1',
     clusterName: 'dbcluster1',
     databaseType: Databases.mysql,
@@ -21,7 +22,7 @@ export const dbClustersStub: DBCluster[] = [
     memory: 1024,
     cpu: 1,
     disk: 25,
-    status: DBClusterStatus.ready,
+    status: DBClusterStatus.unknown,
     finishedSteps: 5,
     totalSteps: 10,
     expose: true,
@@ -29,6 +30,7 @@ export const dbClustersStub: DBCluster[] = [
     availableImage: 'percona/percona-xtra-dbcluster:8.0',
   },
   {
+    id: 'cluster_2',
     kubernetesClusterName: 'Kubernetes Cluster 2',
     clusterName: 'dbcluster2',
     databaseType: Databases.mysql,
@@ -42,6 +44,7 @@ export const dbClustersStub: DBCluster[] = [
     installedImage: 'percona/percona-xtra-dbcluster:8.0',
   },
   {
+    id: 'cluster_3',
     kubernetesClusterName: 'Kubernetes Cluster 1',
     clusterName: 'mongodbcluster1',
     databaseType: Databases.mongodb,
@@ -49,12 +52,13 @@ export const dbClustersStub: DBCluster[] = [
     memory: 0,
     cpu: 0,
     disk: 25,
-    status: DBClusterStatus.ready,
+    status: DBClusterStatus.unknown,
     finishedSteps: 1,
     totalSteps: 2,
     expose: false,
   },
   {
+    id: 'cluster_4',
     kubernetesClusterName: 'Kubernetes Cluster 2',
     clusterName: 'dbcluster3',
     databaseType: Databases.mysql,
@@ -69,6 +73,7 @@ export const dbClustersStub: DBCluster[] = [
     expose: false,
   },
   {
+    id: 'cluster_5',
     kubernetesClusterName: 'Kubernetes Cluster 1',
     clusterName: 'dbcluster4',
     databaseType: Databases.mysql,

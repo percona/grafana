@@ -123,22 +123,28 @@ export class PSMDBService extends DBClusterService {
       }));
   }
 
-  toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster {
+  toModel(
+    dbCluster: Partial<DBCluster>,
+    payload: DBClusterPayload,
+    kubernetesClusterName: string,
+    databaseType: Databases
+  ): DBCluster {
     return {
-      clusterName: dbCluster.name,
-      kubernetesClusterName,
-      databaseType,
-      clusterSize: dbCluster.params.cluster_size,
-      memory: (dbCluster.params.replicaset?.compute_resources?.memory_bytes || 0) / BILLION,
-      cpu: (dbCluster.params.replicaset?.compute_resources?.cpu_m || 0) / THOUSAND,
-      disk: (dbCluster.params.replicaset?.disk_size || 0) / BILLION,
-      status: dbCluster.state || DBClusterStatus.changing,
-      message: dbCluster.operation?.message,
-      finishedSteps: dbCluster.operation?.finished_steps || 0,
-      totalSteps: dbCluster.operation?.total_steps || 0,
-      expose: dbCluster.exposed,
-      installedImage: dbCluster.installed_image,
-      availableImage: dbCluster.available_image,
+      id: dbCluster.id,
+      clusterName: dbCluster.clusterName!,
+      kubernetesClusterName: kubernetesClusterName,
+      databaseType: databaseType,
+      clusterSize: payload.params.cluster_size,
+      memory: (payload.params.replicaset?.compute_resources?.memory_bytes || 0) / BILLION,
+      cpu: (payload.params.replicaset?.compute_resources?.cpu_m || 0) / THOUSAND,
+      disk: (payload.params.replicaset?.disk_size || 0) / BILLION,
+      status: payload.state || DBClusterStatus.changing,
+      message: payload.operation?.message,
+      finishedSteps: payload.operation?.finished_steps || 0,
+      totalSteps: payload.operation?.total_steps || 0,
+      expose: payload.exposed,
+      installedImage: dbCluster.installedImage,
+      availableImage: dbCluster.availableImage,
     };
   }
 }
@@ -148,13 +154,13 @@ const toAPI = (dbCluster: DBCluster) => ({
   name: dbCluster.clusterName,
   expose: dbCluster.expose,
   params: {
-    cluster_size: dbCluster.clusterSize,
+    cluster_size: dbCluster.clusterSize!,
     replicaset: {
       compute_resources: {
-        cpu_m: dbCluster.cpu * THOUSAND,
-        memory_bytes: dbCluster.memory * BILLION,
+        cpu_m: dbCluster.cpu! * THOUSAND,
+        memory_bytes: dbCluster.memory! * BILLION,
       },
-      disk_size: dbCluster.disk * BILLION,
+      disk_size: dbCluster.disk! * BILLION,
     },
     image: dbCluster.databaseImage,
   },

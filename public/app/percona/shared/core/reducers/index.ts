@@ -4,8 +4,12 @@ import { CancelToken } from 'axios';
 
 import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { DBClusterTopology } from 'app/percona/dbaas/components/DBCluster/AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
-import { formatDBClusters, newDBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
+import {DBCluster, DBClusterDetails} from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
+import {
+  formatDBClusterDetails,
+  formatDBClusters,
+  newDBClusterService
+} from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
 import { KubernetesService } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.service';
 import {
@@ -24,8 +28,9 @@ import { TemplatesList } from 'app/percona/integrated-alerting/components/AlertR
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Settings.types';
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
-import { api } from 'app/percona/shared/helpers/api';
+import {api, apiManagement} from 'app/percona/shared/helpers/api';
 
+import {CLUSTER_TYPE_DATABASE} from "../../../dbaas/components/DBCluster/DBCluster.constants";
 import { SETTINGS_TIMEOUT } from '../constants';
 import { ServerInfo } from '../types';
 
@@ -270,7 +275,7 @@ export const instalKuberneteslOperatorAction = createAsyncThunk(
 
 export const fetchDBClustersAction = createAsyncThunk(
   'percona/fetchDBClusters',
-  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }): Promise<DBCluster[]> =>
+  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }): Promise<Array<Partial<DBCluster>>> =>
     withSerializedError(
       (async () => {
         const requests = args.kubernetes.map((k, idx) => KubernetesService.getDBClusters(k, args.tokens[idx]));
@@ -282,6 +287,30 @@ export const fetchDBClustersAction = createAsyncThunk(
       })()
     )
 );
+
+export const fetchDBClusterDetailsAction = createAsyncThunk(
+  'percona/fetchDBClustersDetail',
+  (args: { dbClusters: Array<Partial<DBCluster>>; tokens: CancelToken[] }): Promise<DBClusterDetails> =>
+    withSerializedError(
+      (async () => {
+        const requests = args.dbClusters.map((d, idx) =>
+          apiManagement.post<any, any>(
+            '/DBaaS/DBClusters/Get',
+            {
+              name: d.clusterName,
+              kubernetes_cluster_name: d.kubernetesClusterName,
+              cluster_type: CLUSTER_TYPE_DATABASE[d.databaseType!],
+            },
+            true,
+            args.tokens[idx]
+          )
+        );
+        const promiseResults = await Promise.all(requests);
+        return formatDBClusterDetails(promiseResults, args.dbClusters);
+      })()
+    )
+);
+
 export interface PerconaServerState extends ServerInfo {
   saasHost: string;
 }
@@ -362,6 +391,7 @@ const installKubernetesOperatorReducer = createAsyncSlice(
   instalKuberneteslOperatorAction
 ).reducer;
 const dbClustersReducer = createAsyncSlice('dbClusters', fetchDBClustersAction).reducer;
+const DBClusterDetailsReducer = createAsyncSlice('DBClustersDetail', fetchDBClusterDetailsAction).reducer;
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 const templatesReducer = createAsyncSlice('templates', fetchTemplatesAction).reducer;
@@ -378,6 +408,7 @@ export default {
     addDbCluster: addDbClusterReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbClusters: dbClustersReducer,
+    dbClusterDetails: DBClusterDetailsReducer,
     server: perconaServerReducers,
     templates: templatesReducer,
   }),

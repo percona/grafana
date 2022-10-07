@@ -1,12 +1,14 @@
 /* eslint-disable react/display-name */
 import { cx } from '@emotion/css';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import {useSelector} from "react-redux";
 
 import { Icon, useStyles2, Tooltip } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { ProgressBar } from 'app/percona/dbaas/components/ProgressBar/ProgressBar';
 import { ProgressBarStatus } from 'app/percona/dbaas/components/ProgressBar/ProgressBar.types';
 
+import {getPerconaDBClustersDetails} from "../../../../shared/core/selectors";
 import { DBClusterStatus as Status } from '../DBCluster.types';
 
 import { COMPLETE_PROGRESS_DELAY, STATUS_DATA_QA } from './DBClusterStatus.constants';
@@ -15,8 +17,27 @@ import { DBClusterStatusProps } from './DBClusterStatus.types';
 import { getProgressMessage, getShowProgressBarValue } from './DBClusterStatus.utils';
 
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelectedCluster, setLogsModalVisible }) => {
-  const { message, finishedSteps, totalSteps } = dbCluster;
-  const status = dbCluster.status as Status;
+  const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
+  console.log('clusters', clusters);
+  console.log('dbCluster', dbCluster);
+  debugger;
+  const a = Object.keys(clusters).length && dbCluster.id
+    ? clusters[dbCluster.id]
+    : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
+  debugger;
+  const { status, totalSteps=0, finishedSteps = 0, message } = a;
+  debugger;
+  // const {
+  //   status,
+  //   totalSteps = 0,
+  //   finishedSteps = 0,
+  //   message,
+  // } = Object.keys(clusters).length && dbCluster.id
+  //   ? clusters[dbCluster.id]
+  //   : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
+
+
+  debugger;
   const styles = useStyles2(getStyles);
   const prevStatus = useRef<Status>();
   const statusError = status === Status.failed || status === Status.invalid;
@@ -64,14 +85,17 @@ export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelect
       {showProgressBar ? (
         <ProgressBar
           status={statusError ? ProgressBarStatus.error : ProgressBarStatus.progress}
-          finishedSteps={finishedSteps || 0}
-          totalSteps={totalSteps || 0}
+          finishedSteps={finishedSteps}
+          totalSteps={totalSteps}
           message={getProgressMessage(status, prevStatus.current)}
           dataTestId="cluster-progress-bar"
         />
       ) : (
-        <span className={cx(styles.status, statusStyles)} data-testid={`cluster-status-${STATUS_DATA_QA[status]}`}>
-          {Messages.dbcluster.table.status[status]}
+        <span
+          className={cx(styles.status, statusStyles)}
+          data-testid={`cluster-status${status ? `-${STATUS_DATA_QA[status]}` : ''}`}
+        >
+          {status ? Messages.dbcluster.table.status[status] : ''}
         </span>
       )}
       {showMessage && showProgressBar && (
