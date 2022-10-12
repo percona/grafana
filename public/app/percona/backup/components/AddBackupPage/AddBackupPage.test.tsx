@@ -50,7 +50,7 @@ describe('AddBackupPage', () => {
       </AddBackupPageWrapper>
     );
 
-    expect(screen.getByText('Create Schedule backup')).toBeInTheDocument();
+    expect(screen.getByText('Create Scheduled backup')).toBeInTheDocument();
   });
   it('should switch page to schedule backup page when click on schedule backup button', () => {
     render(
@@ -65,7 +65,7 @@ describe('AddBackupPage', () => {
 
     const button = screen.queryAllByTestId('type-radio-button')[1];
     fireEvent.click(button);
-    expect(screen.getByText('Create Schedule backup')).toBeInTheDocument();
+    expect(screen.getByText('Create Scheduled backup')).toBeInTheDocument();
   });
   it('should switch back to demand backup page when click on demand backup button', () => {
     render(
