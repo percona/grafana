@@ -38,6 +38,11 @@ export interface RawTimeranges {
   end_timestamp: string;
 }
 
+export interface Timeranges {
+  startTimestamp: string;
+  endTimestamp: string;
+}
+
 export interface TimerangesResponse {
   timeranges: RawTimeranges[];
 }

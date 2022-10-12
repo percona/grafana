@@ -1,7 +1,7 @@
 import { SelectableValue } from '@grafana/data';
 import { ApiVerboseError } from 'app/percona/shared/core';
 
-import { Backup } from '../BackupInventory.types';
+import { Backup, Timeranges } from '../BackupInventory.types';
 
 export interface RestoreBackupModalProps {
   isVisible: boolean;
@@ -17,6 +17,7 @@ export interface RestoreBackupFormProps {
   vendor: string;
   service: SelectableValue<string>;
   dataModel: string;
+  timerange?: Timeranges;
 }
 
 export enum ServiceTypeSelect {

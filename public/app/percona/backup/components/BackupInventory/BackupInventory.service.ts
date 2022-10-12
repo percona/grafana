@@ -6,7 +6,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
 
-import { Backup, BackupResponse, TimerangesResponse } from './BackupInventory.types';
+import { Backup, BackupResponse, Timeranges, TimerangesResponse } from './BackupInventory.types';
 import { formatDate } from './BackupInventory.utils';
 
 const BASE_URL = '/v1/management/backup';
@@ -42,13 +42,13 @@ export const BackupInventoryService = {
       })
     );
   },
-  async listPitrTimeranges(artifactId: string): Promise<Array<SelectableValue<string>>> {
+  async listPitrTimeranges(artifactId: string): Promise<Array<SelectableValue<Timeranges>>> {
     const { timeranges } = await api.post<TimerangesResponse, Object>(`${BASE_URL}/Artifacts/ListPITRTimeranges`, {
       artifact_id: artifactId,
     });
     return timeranges.map((value) => ({
       label: `${formatDate(value.start_timestamp)} / ${formatDate(value.end_timestamp)}`,
-      value: value.end_timestamp,
+      value: { startTimestamp: value.start_timestamp, endTimestamp: value.end_timestamp },
     }));
   },
   async restore(serviceId: string, artifactId: string, token?: CancelToken) {

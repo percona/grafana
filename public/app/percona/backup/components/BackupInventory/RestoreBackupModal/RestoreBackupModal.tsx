@@ -3,7 +3,7 @@ import React, { FC, useMemo } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
-import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
+import { Button, DateTimePicker, HorizontalGroup, useStyles } from '@grafana/ui';
 import { BackupMode } from 'app/percona/backup/Backup.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
@@ -29,6 +29,9 @@ const serviceTypeOptions: Array<SelectableValue<ServiceTypeSelect>> = [
     label: 'Compatible services',
   },
 ];
+
+console.log(new Date('2022-10-12T11:59:09Z'));
+console.log(new Date());
 
 export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   backup,
@@ -66,20 +69,38 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                 />
                 <TextInputField disabled name="vendor" label={Messages.vendor} />
                 {backup!.mode === BackupMode.PITR && (
-                  <Field name="timerange">
-                    {({ input }) => (
-                      <div>
-                        <AsyncSelectField
-                          label={Messages.timeRange}
-                          loadOptions={() => BackupInventoryService.listPitrTimeranges(backup!.id)}
-                          {...input}
-                          defaultOptions
-                          data-testid="time-range-select-input"
-                        />
-                      </div>
-                    )}
-                  </Field>
+                  <>
+                    <Field name="timerange">
+                      {({ input }) => (
+                        <div>
+                          <AsyncSelectField
+                            label={Messages.timeRange}
+                            loadOptions={() => BackupInventoryService.listPitrTimeranges(backup!.id)}
+                            {...input}
+                            defaultOptions
+                            data-testid="time-range-select-input"
+                          />
+                        </div>
+                      )}
+                    </Field>
+                    {
+                      <DateTimePicker
+                        onChange={(e) => {
+                          console.log(e);
+                        }}
+                        calendarProps={{ minDate: new Date() }}
+                        timepickerProps={{
+                          disabledHours: () => {
+                            return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 22, 23];
+                          },
+                          hideDisabledOptions: true,
+                        }}
+                      />
+                    }
+                  </>
                 )}
+                <input type="time" id="appt" name="appt" min="09" max="18:00" required />
+                {JSON.stringify(values)}
               </div>
               <div>
                 <Field name="service" validate={validators.required}>
