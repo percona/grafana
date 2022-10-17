@@ -31,7 +31,11 @@ describe('DBClusterAdvancedOptions::', () => {
         <Form
           onSubmit={jest.fn()}
           render={(renderProps) => (
-            <DBClusterAdvancedOptions renderProps={renderProps} selectedCluster={dbClustersStub[0]} setShowUnsafeConfigurationWarning={jest.fn()} />
+            <DBClusterAdvancedOptions
+              renderProps={renderProps}
+              selectedCluster={dbClustersStub[0]}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+            />
           )}
         />
       );
@@ -56,7 +60,11 @@ describe('DBClusterAdvancedOptions::', () => {
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions renderProps={renderProps} selectedCluster={dbClustersStub[0]} setShowUnsafeConfigurationWarning={jest.fn()} />
+            <DBClusterAdvancedOptions
+              renderProps={renderProps}
+              selectedCluster={dbClustersStub[0]}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+            />
           )}
         />
       );
@@ -80,7 +88,11 @@ describe('DBClusterAdvancedOptions::', () => {
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions renderProps={renderProps} selectedCluster={dbClustersStub[0]} setShowUnsafeConfigurationWarning={jest.fn()} />
+            <DBClusterAdvancedOptions
+              renderProps={renderProps}
+              selectedCluster={dbClustersStub[0]}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+            />
           )}
         />
       );
@@ -103,7 +115,11 @@ describe('DBClusterAdvancedOptions::', () => {
         <Form
           onSubmit={jest.fn()}
           render={(renderProps) => (
-            <DBClusterAdvancedOptions renderProps={renderProps} selectedCluster={dbClustersStub[0]} setShowUnsafeConfigurationWarning={jest.fn()} />
+            <DBClusterAdvancedOptions
+              renderProps={renderProps}
+              selectedCluster={dbClustersStub[0]}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+            />
           )}
         />
       );
@@ -133,7 +149,7 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(button).not.toBeDisabled();
   });
 
-  it('should disabled single node topology when database is MongoDB', async () => {
+  it('should enable single node topology when database is MongoDB', async () => {
     act(() => {
       render(
         <Form
@@ -145,7 +161,11 @@ describe('DBClusterAdvancedOptions::', () => {
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions renderProps={renderProps} selectedCluster={dbClustersStub[2]} setShowUnsafeConfigurationWarning={jest.fn()} />
+            <DBClusterAdvancedOptions
+              renderProps={renderProps}
+              selectedCluster={dbClustersStub[2]}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+            />
           )}
         />
       );
@@ -167,7 +187,11 @@ describe('DBClusterAdvancedOptions::', () => {
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions renderProps={renderProps} selectedCluster={dbClustersStub[0]} setShowUnsafeConfigurationWarning={jest.fn()}/>
+            <DBClusterAdvancedOptions
+              renderProps={renderProps}
+              selectedCluster={dbClustersStub[0]}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+            />
           )}
         />
       );

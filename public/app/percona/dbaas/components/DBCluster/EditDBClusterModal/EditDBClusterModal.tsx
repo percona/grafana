@@ -6,8 +6,7 @@ import { useStyles } from '@grafana/ui';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 
 import { MIN_NODES } from '../AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
-import {UnsafeConfigurationWarning} from "../AddDBClusterModal/UnsafeConfigurationsWarning/UnsafeConfigurationWarning";
-import { DBCluster } from '../DBCluster.types';
+import { UnsafeConfigurationWarning } from '../AddDBClusterModal/UnsafeConfigurationsWarning/UnsafeConfigurationWarning';
 import { newDBClusterService } from '../DBCluster.utils';
 
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
@@ -25,7 +24,7 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
   const styles = useStyles(getStyles);
   const initialValues = useRef<EditDBClusterRenderProps>();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
-  const onSubmit = async ({ topology, nodes, single, memory, cpu, disk }: Record<string, any>) => {
+  const onSubmit = async ({ topology, nodes, single, memory, cpu, disk }: Record<string, string>) => {
     if (!selectedCluster) {
       setVisible(false);
 
@@ -40,10 +39,10 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
         databaseType: selectedCluster.databaseType,
         clusterName: selectedCluster.clusterName,
         kubernetesClusterName: selectedCluster.kubernetesClusterName,
-        clusterSize: topology === DBClusterTopology.cluster ? nodes : single,
-        cpu,
-        memory,
-        disk,
+        clusterSize: topology === DBClusterTopology.cluster ? +nodes : +single,
+        cpu: +cpu,
+        memory: +memory,
+        disk: +disk,
       });
       setVisible(false);
       onDBClusterChanged();
@@ -90,16 +89,21 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
   return (
     <div className={styles.modalWrapper}>
       <Modal title={editModalTitle} isVisible={isVisible} onClose={() => setVisible(false)}>
-        { showUnsafeConfigurationWarning && <UnsafeConfigurationWarning /> }
+        {showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}
         <FormFinal
           onSubmit={onSubmit}
           initialValues={initialValues.current}
           render={(renderProps) => (
             <form onSubmit={renderProps.handleSubmit}>
-              <DBClusterAdvancedOptions selectedCluster={selectedCluster as DBCluster} renderProps={renderProps} setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning} />
+              <DBClusterAdvancedOptions
+                selectedCluster={selectedCluster}
+                renderProps={renderProps}
+                setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}
+              />
             </form>
           )}
         />
       </Modal>
     </div>
-  )};
+  );
+};
