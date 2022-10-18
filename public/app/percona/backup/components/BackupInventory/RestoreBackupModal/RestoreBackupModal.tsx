@@ -52,85 +52,88 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     }
   };
 
-  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>({
-    startTimestamp: '2022-10-18T11:16:07Z',
-    endTimestamp: '2022-10-18T11:51:08Z',
-  });
-  const [selectedDay, setSelectedDay] = useState<Date>();
+  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
+  //   {
+  //   startTimestamp: '2022-10-16T11:16:07Z',
+  //   endTimestamp: '2022-10-18T11:51:08Z',
+  // }
+  const [selectedDay, setSelectedDay] = useState<Date | undefined>(
+    selectedTimerange ? new Date(selectedTimerange.endTimestamp) : undefined
+  );
   const calculateDisableHours = useCallback(() => {
     const hoursInDay = [];
     if (moment(selectedTimerange?.startTimestamp).dayOfYear() === moment(selectedTimerange?.endTimestamp).dayOfYear()) {
       for (let i = 0; i < 24; i++) {
-        if (moment(selectedTimerange?.startTimestamp).hours() < i) {
+        if (i < moment(selectedTimerange?.startTimestamp).hours()) {
           hoursInDay.push(i);
         }
-        if (moment(selectedTimerange?.endTimestamp).hours() > i) {
+        if (i > moment(selectedTimerange?.endTimestamp).hours()) {
           hoursInDay.push(i);
         }
       }
     } else {
-      // if (!selectedDay) {
-      //   for (let i = 0; i < 24; i++) {
-      //     if (moment(selectedTimerange?.endTimestamp).hours() < i) {
-      //       hoursInDay.push(i);
-      //     }
-      //   }
-      //   console.log(hoursInDay);
-      //   //return moment(selectedTimerange?.endTimestamp);
-      // } else {
-      //   for (let i = 0; i < 24; i++) {
-      //     if (moment(selectedTimerange?.endTimestamp).day() === moment(selectedDay).day()) {
-      //     }
-      //     if (moment(selectedTimerange?.endTimestamp).hours() < i) {
-      //       hoursInDay.push(i);
-      //     }
-      //   }
-      //}
+      if (moment(selectedDay).dayOfYear() === moment(selectedTimerange?.startTimestamp).dayOfYear()) {
+        for (let i = 0; i < 24; i++) {
+          if (i < moment(selectedTimerange?.startTimestamp).hours()) {
+            hoursInDay.push(i);
+          }
+        }
+      }
+      if (moment(selectedDay).dayOfYear() === moment(selectedTimerange?.endTimestamp).dayOfYear()) {
+        for (let i = 0; i < 24; i++) {
+          if (i > moment(selectedTimerange?.startTimestamp).hours()) {
+            hoursInDay.push(i);
+          }
+        }
+      }
     }
 
     return hoursInDay;
-  }, [selectedTimerange]);
+  }, [selectedDay, selectedTimerange]);
 
   const calculateDisableMinutes = useCallback(
     (hour) => {
       const disabledMinutes = [];
-      if (hour === moment(selectedTimerange?.startTimestamp).hour()) {
-        for (let i = 0; i < 60; i++) {
-          if (i < moment(selectedTimerange?.startTimestamp).minute()) {
-            console.log(moment(selectedTimerange?.startTimestamp).minute());
-            console.log(i);
-            disabledMinutes.push(i);
+      if (moment(selectedDay).dayOfYear() === moment(selectedTimerange?.startTimestamp).dayOfYear()) {
+        if (hour === moment(selectedTimerange?.startTimestamp).hour()) {
+          for (let i = 0; i < 60; i++) {
+            if (i < moment(selectedTimerange?.startTimestamp).minute()) {
+              disabledMinutes.push(i);
+            }
           }
         }
       }
-      if (hour === moment(selectedTimerange?.endTimestamp).hour()) {
-        for (let i = 0; i < 60; i++) {
-          if (i > moment(selectedTimerange?.endTimestamp).minute()) {
-            disabledMinutes.push(i);
+      if (moment(selectedDay).dayOfYear() === moment(selectedTimerange?.endTimestamp).dayOfYear()) {
+        if (hour === moment(selectedTimerange?.endTimestamp).hour()) {
+          for (let i = 0; i < 60; i++) {
+            if (i > moment(selectedTimerange?.endTimestamp).minute()) {
+              disabledMinutes.push(i);
+            }
           }
         }
       }
+
       return disabledMinutes;
     },
-    [selectedTimerange]
+    [selectedDay, selectedTimerange?.endTimestamp, selectedTimerange?.startTimestamp]
   );
 
   const calculateDisableSeconds = useCallback(
     (hour, minute) => {
       const disabledSeconds = [];
       if (
+        moment(selectedDay).dayOfYear() === moment(selectedTimerange?.startTimestamp).dayOfYear() &&
         hour === moment(selectedTimerange?.startTimestamp).hour() &&
         minute === moment(selectedTimerange?.startTimestamp).minute()
       ) {
         for (let i = 0; i < 60; i++) {
           if (i < moment(selectedTimerange?.startTimestamp).second()) {
-            console.log(moment(selectedTimerange?.startTimestamp).minute());
-            console.log(i);
             disabledSeconds.push(i);
           }
         }
       }
       if (
+        moment(selectedDay).dayOfYear() === moment(selectedTimerange?.endTimestamp).dayOfYear() &&
         hour === moment(selectedTimerange?.endTimestamp).hour() &&
         minute === moment(selectedTimerange?.endTimestamp).minute()
       ) {
@@ -142,7 +145,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
       }
       return disabledSeconds;
     },
-    [selectedTimerange]
+    [selectedDay, selectedTimerange]
   );
 
   return (
