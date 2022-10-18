@@ -24,7 +24,7 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
   const styles = useStyles(getStyles);
   const initialValues = useRef<EditDBClusterRenderProps>();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
-  const onSubmit = async ({ topology, nodes, single, memory, cpu, disk }: Record<string, string>) => {
+  const onSubmit = async ({ topology, nodes, single, memory, cpu, disk }: Record<string, any>) => {
     if (!selectedCluster) {
       setVisible(false);
 
@@ -39,10 +39,10 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
         databaseType: selectedCluster.databaseType,
         clusterName: selectedCluster.clusterName,
         kubernetesClusterName: selectedCluster.kubernetesClusterName,
-        clusterSize: topology === DBClusterTopology.cluster ? +nodes : +single,
-        cpu: +cpu,
-        memory: +memory,
-        disk: +disk,
+        clusterSize: topology === DBClusterTopology.cluster ? nodes : single,
+        cpu: cpu,
+        memory: memory,
+        disk: disk,
       });
       setVisible(false);
       onDBClusterChanged();
