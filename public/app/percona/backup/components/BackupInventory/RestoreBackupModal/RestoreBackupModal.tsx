@@ -1,8 +1,9 @@
 import { Modal, LoaderButton, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
-import React, { FC, useMemo } from 'react';
+import moment from 'moment/moment';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
-import { SelectableValue } from '@grafana/data';
+import { SelectableValue, toUtc } from '@grafana/data';
 import { Button, DateTimePicker, HorizontalGroup, useStyles } from '@grafana/ui';
 import { BackupMode } from 'app/percona/backup/Backup.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
@@ -10,6 +11,7 @@ import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
 import { BackupInventoryService } from '../BackupInventory.service';
+import { Timeranges } from '../BackupInventory.types';
 
 import { Messages } from './RestoreBackupModal.messages';
 import { RestoreBackupModalService } from './RestoreBackupModal.service';
@@ -50,6 +52,20 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     }
   };
 
+  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
+  const [selectedDay, setSelectedDay] = useState<Date>();
+  const calculateDisableHours = useCallback(() => {
+    console.log(new Date());
+    console.log(selectedDay);
+    console.log(selectedTimerange);
+
+    if (!selectedDay) {
+      const hoursInDay = new Array(24);
+
+      //return moment(selectedTimerange?.endTimestamp)
+    }
+    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 22, 23];
+  }, [selectedDay, selectedTimerange]);
   return (
     <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>
       <Form
@@ -79,28 +95,33 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                             {...input}
                             defaultOptions
                             data-testid="time-range-select-input"
+                            onChange={(e) => {
+                              console.log(e);
+                              setSelectedTimerange(e.value);
+                            }}
                           />
                         </div>
                       )}
                     </Field>
-                    {
+                    {selectedTimerange && (
                       <DateTimePicker
+                        date={toUtc(selectedTimerange.endTimestamp)}
                         onChange={(e) => {
                           console.log(e);
                         }}
-                        calendarProps={{ minDate: new Date() }}
+                        calendarProps={{
+                          minDate: new Date(selectedTimerange.startTimestamp),
+                          maxDate: new Date(selectedTimerange.endTimestamp),
+                          onClickDay: (e) => setSelectedDay(e),
+                        }}
                         timepickerProps={{
-                          disabledHours: () => {
-                            return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 22, 23];
-                          },
+                          disabledHours: calculateDisableHours,
                           hideDisabledOptions: true,
                         }}
                       />
-                    }
+                    )}
                   </>
                 )}
-                <input type="time" id="appt" name="appt" min="09" max="18:00" required />
-                {JSON.stringify(values)}
               </div>
               <div>
                 <Field name="service" validate={validators.required}>
