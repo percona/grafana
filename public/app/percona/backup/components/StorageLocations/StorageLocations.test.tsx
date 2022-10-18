@@ -68,25 +68,26 @@ describe('StorageLocations', () => {
   });
 
   it('should open the modal by clicking the "Add" button', async () => {
-    jest.spyOn(console, 'error').mockImplementation();
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true },
-            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
-          },
-        } as StoreState)}
-      >
-        <StorageLocations />
-      </Provider>
+    await waitFor(() =>
+      render(
+        <Provider
+          store={configureStore({
+            percona: {
+              user: { isAuthorized: true },
+              settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+            },
+          } as StoreState)}
+        >
+          <StorageLocations />
+        </Provider>
+      )
     );
 
     await screen.findByText('first location');
 
     expect(screen.queryByText('Add Storage Location')).toBeFalsy();
 
-    fireEvent.click(screen.getAllByTestId('storage-location-add-modal-button')[0]);
+    await waitFor(() => fireEvent.click(screen.getAllByTestId('storage-location-add-modal-button')[0]));
 
     expect(screen.getByText('Add Storage Location')).toBeTruthy();
   });
