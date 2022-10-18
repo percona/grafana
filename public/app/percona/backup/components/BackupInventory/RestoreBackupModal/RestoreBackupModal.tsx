@@ -52,38 +52,27 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     }
   };
 
-  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
-  //   {
-  //   startTimestamp: '2022-10-16T11:16:07Z',
-  //   endTimestamp: '2022-10-18T11:51:08Z',
-  // }
+  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>({
+    startTimestamp: '2022-10-18T11:16:07Z',
+    endTimestamp: '2022-10-18T11:51:08Z',
+  });
+
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(
     selectedTimerange ? new Date(selectedTimerange.endTimestamp) : undefined
   );
   const calculateDisableHours = useCallback(() => {
     const hoursInDay = [];
-    if (moment(selectedTimerange?.startTimestamp).dayOfYear() === moment(selectedTimerange?.endTimestamp).dayOfYear()) {
+    if (moment(selectedDay).isSame(selectedTimerange?.startTimestamp, 'date')) {
       for (let i = 0; i < 24; i++) {
         if (i < moment(selectedTimerange?.startTimestamp).hours()) {
           hoursInDay.push(i);
         }
-        if (i > moment(selectedTimerange?.endTimestamp).hours()) {
+      }
+    }
+    if (moment(selectedDay).isSame(selectedTimerange?.endTimestamp, 'date')) {
+      for (let i = 0; i < 24; i++) {
+        if (i > moment(selectedTimerange?.startTimestamp).hours()) {
           hoursInDay.push(i);
-        }
-      }
-    } else {
-      if (moment(selectedDay).dayOfYear() === moment(selectedTimerange?.startTimestamp).dayOfYear()) {
-        for (let i = 0; i < 24; i++) {
-          if (i < moment(selectedTimerange?.startTimestamp).hours()) {
-            hoursInDay.push(i);
-          }
-        }
-      }
-      if (moment(selectedDay).dayOfYear() === moment(selectedTimerange?.endTimestamp).dayOfYear()) {
-        for (let i = 0; i < 24; i++) {
-          if (i > moment(selectedTimerange?.startTimestamp).hours()) {
-            hoursInDay.push(i);
-          }
         }
       }
     }
