@@ -40,9 +40,9 @@ export const EditDBClusterModal: FC<EditDBClusterModalProps> = ({
         clusterName: selectedCluster.clusterName,
         kubernetesClusterName: selectedCluster.kubernetesClusterName,
         clusterSize: topology === DBClusterTopology.cluster ? nodes : single,
-        cpu: cpu,
-        memory: memory,
-        disk: disk,
+        cpu,
+        memory,
+        disk,
       });
       setVisible(false);
       onDBClusterChanged();
