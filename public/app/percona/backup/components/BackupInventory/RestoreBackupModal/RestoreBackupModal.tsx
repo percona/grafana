@@ -52,20 +52,99 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     }
   };
 
-  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
+  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>({
+    startTimestamp: '2022-10-18T11:16:07Z',
+    endTimestamp: '2022-10-18T11:51:08Z',
+  });
   const [selectedDay, setSelectedDay] = useState<Date>();
   const calculateDisableHours = useCallback(() => {
-    console.log(new Date());
-    console.log(selectedDay);
-    console.log(selectedTimerange);
-
-    if (!selectedDay) {
-      const hoursInDay = new Array(24);
-
-      //return moment(selectedTimerange?.endTimestamp)
+    const hoursInDay = [];
+    if (moment(selectedTimerange?.startTimestamp).dayOfYear() === moment(selectedTimerange?.endTimestamp).dayOfYear()) {
+      for (let i = 0; i < 24; i++) {
+        if (moment(selectedTimerange?.startTimestamp).hours() < i) {
+          hoursInDay.push(i);
+        }
+        if (moment(selectedTimerange?.endTimestamp).hours() > i) {
+          hoursInDay.push(i);
+        }
+      }
+    } else {
+      // if (!selectedDay) {
+      //   for (let i = 0; i < 24; i++) {
+      //     if (moment(selectedTimerange?.endTimestamp).hours() < i) {
+      //       hoursInDay.push(i);
+      //     }
+      //   }
+      //   console.log(hoursInDay);
+      //   //return moment(selectedTimerange?.endTimestamp);
+      // } else {
+      //   for (let i = 0; i < 24; i++) {
+      //     if (moment(selectedTimerange?.endTimestamp).day() === moment(selectedDay).day()) {
+      //     }
+      //     if (moment(selectedTimerange?.endTimestamp).hours() < i) {
+      //       hoursInDay.push(i);
+      //     }
+      //   }
+      //}
     }
-    return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 22, 23];
-  }, [selectedDay, selectedTimerange]);
+
+    return hoursInDay;
+  }, [selectedTimerange]);
+
+  const calculateDisableMinutes = useCallback(
+    (hour) => {
+      const disabledMinutes = [];
+      if (hour === moment(selectedTimerange?.startTimestamp).hour()) {
+        for (let i = 0; i < 60; i++) {
+          if (i < moment(selectedTimerange?.startTimestamp).minute()) {
+            console.log(moment(selectedTimerange?.startTimestamp).minute());
+            console.log(i);
+            disabledMinutes.push(i);
+          }
+        }
+      }
+      if (hour === moment(selectedTimerange?.endTimestamp).hour()) {
+        for (let i = 0; i < 60; i++) {
+          if (i > moment(selectedTimerange?.endTimestamp).minute()) {
+            disabledMinutes.push(i);
+          }
+        }
+      }
+      return disabledMinutes;
+    },
+    [selectedTimerange]
+  );
+
+  const calculateDisableSeconds = useCallback(
+    (hour, minute) => {
+      const disabledSeconds = [];
+      if (
+        hour === moment(selectedTimerange?.startTimestamp).hour() &&
+        minute === moment(selectedTimerange?.startTimestamp).minute()
+      ) {
+        for (let i = 0; i < 60; i++) {
+          if (i < moment(selectedTimerange?.startTimestamp).second()) {
+            console.log(moment(selectedTimerange?.startTimestamp).minute());
+            console.log(i);
+            disabledSeconds.push(i);
+          }
+        }
+      }
+      if (
+        hour === moment(selectedTimerange?.endTimestamp).hour() &&
+        minute === moment(selectedTimerange?.endTimestamp).minute()
+      ) {
+        for (let i = 0; i < 60; i++) {
+          if (i > moment(selectedTimerange?.endTimestamp).second()) {
+            disabledSeconds.push(i);
+          }
+        }
+      }
+      return disabledSeconds;
+    },
+    [selectedTimerange]
+  );
+
   return (
     <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>
       <Form
@@ -116,6 +195,8 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                         }}
                         timepickerProps={{
                           disabledHours: calculateDisableHours,
+                          disabledMinutes: calculateDisableMinutes,
+                          disabledSeconds: calculateDisableSeconds,
                           hideDisabledOptions: true,
                         }}
                       />
