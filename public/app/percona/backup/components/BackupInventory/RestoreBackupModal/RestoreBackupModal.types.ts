@@ -9,7 +9,7 @@ export interface RestoreBackupModalProps {
   noService?: boolean;
   restoreErrors?: ApiVerboseError[];
   onClose: () => void;
-  onRestore: (serviceId: string, artifactId: string) => void;
+  onRestore: (serviceId: string, artifactId: string, pitrTimestamp: string) => void;
 }
 
 export interface RestoreBackupFormProps {

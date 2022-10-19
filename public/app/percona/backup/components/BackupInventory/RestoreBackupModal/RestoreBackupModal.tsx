@@ -3,7 +3,7 @@ import moment from 'moment/moment';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
-import { SelectableValue, toUtc } from '@grafana/data';
+import { DateTime, SelectableValue, toUtc } from '@grafana/data';
 import { Button, DateTimePicker, HorizontalGroup, useStyles } from '@grafana/ui';
 import { BackupMode } from 'app/percona/backup/Backup.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
@@ -32,9 +32,6 @@ const serviceTypeOptions: Array<SelectableValue<ServiceTypeSelect>> = [
   },
 ];
 
-console.log(new Date('2022-10-12T11:59:09Z'));
-console.log(new Date());
-
 export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   backup,
   isVisible,
@@ -45,18 +42,18 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
 }) => {
   const styles = useStyles(getStyles);
   const initialValues = useMemo(() => (backup ? toFormProps(backup) : undefined), [backup]);
-  const handleSubmit = ({ serviceType, service }: RestoreBackupFormProps) => {
-    if (backup) {
-      const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
-      onRestore(serviceId || '', backup.id);
-    }
-  };
 
   const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
-
+  const [selectedTimerangeFromDatepicker, setSelectedTimerangeFromDatepicker] = useState<DateTime>();
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(
     selectedTimerange ? new Date(selectedTimerange.endTimestamp) : undefined
   );
+  const handleSubmit = ({ serviceType, service }: RestoreBackupFormProps) => {
+    if (backup && selectedTimerangeFromDatepicker) {
+      const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
+      onRestore(serviceId || '', backup.id, selectedTimerangeFromDatepicker.toISOString());
+    }
+  };
   const calculateDisableHours = useCallback(() => {
     const disabledHours = [];
 
@@ -101,7 +98,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
 
       return disabledMinutes;
     },
-    [selectedDay, selectedTimerange?.endTimestamp, selectedTimerange?.startTimestamp]
+    [selectedDay, selectedTimerange]
   );
 
   const calculateDisableSeconds = useCallback(
@@ -153,7 +150,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                 <TextInputField disabled name="vendor" label={Messages.vendor} />
                 {backup!.mode === BackupMode.PITR && (
                   <>
-                    <Field name="timerange">
+                    <Field name="timerange" validate={validators.required}>
                       {({ input }) => (
                         <div>
                           <AsyncSelectField
@@ -163,32 +160,14 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                             defaultOptions
                             data-testid="time-range-select-input"
                             onChange={(e) => {
-                              console.log(e);
+                              setSelectedTimerangeFromDatepicker(undefined);
                               setSelectedTimerange(e.value);
+                              input.onChange(e);
                             }}
                           />
                         </div>
                       )}
                     </Field>
-                    {selectedTimerange && (
-                      <DateTimePicker
-                        date={toUtc(selectedTimerange.endTimestamp)}
-                        onChange={(e) => {
-                          console.log(e);
-                        }}
-                        calendarProps={{
-                          minDate: new Date(selectedTimerange.startTimestamp),
-                          maxDate: new Date(selectedTimerange.endTimestamp),
-                          onClickDay: (e) => setSelectedDay(e),
-                        }}
-                        timepickerProps={{
-                          disabledHours: calculateDisableHours,
-                          disabledMinutes: calculateDisableMinutes,
-                          disabledSeconds: calculateDisableSeconds,
-                          hideDisabledOptions: true,
-                        }}
-                      />
-                    )}
                   </>
                 )}
               </div>
@@ -209,6 +188,33 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                 </Field>
 
                 <TextInputField disabled name="dataModel" label={Messages.dataModel} />
+                {selectedTimerange && (
+                  <DateTimePicker
+                    date={
+                      selectedTimerangeFromDatepicker
+                        ? selectedTimerangeFromDatepicker
+                        : toUtc(selectedTimerange.endTimestamp)
+                    }
+                    onChange={(e) => {
+                      console.log(e);
+                      setSelectedTimerangeFromDatepicker(e);
+                    }}
+                    calendarProps={{
+                      minDate: new Date(selectedTimerange.startTimestamp),
+                      maxDate: new Date(selectedTimerange.endTimestamp),
+                      onClickDay: (e) => {
+                        console.log(e);
+                        setSelectedDay(e);
+                      },
+                    }}
+                    timepickerProps={{
+                      disabledHours: calculateDisableHours,
+                      disabledMinutes: calculateDisableMinutes,
+                      disabledSeconds: calculateDisableSeconds,
+                      hideDisabledOptions: true,
+                    }}
+                  />
+                )}
               </div>
             </div>
 
