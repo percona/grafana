@@ -1,20 +1,10 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { StorageLocation, LocationType, S3Location } from '../StorageLocations.types';
 
 import { AddStorageLocationFormProps } from './AddStorageLocationModal.types';
 
 export const toStorageLocation = (values: AddStorageLocationFormProps): StorageLocation => {
-  const {
-    name,
-    description,
-    type,
-    endpoint,
-    client,
-    server,
-    accessKey,
-    secretKey,
-    bucketName,
-    locationID = '',
-  } = values;
+  const { name, description, type, endpoint, client, accessKey, secretKey, bucketName, locationID = '' } = values;
   const locationMap: Record<typeof LocationType[keyof typeof LocationType], StorageLocation | S3Location> = {
     [LocationType.S3]: {
       locationID,
@@ -33,13 +23,6 @@ export const toStorageLocation = (values: AddStorageLocationFormProps): StorageL
       type,
       path: client,
     },
-    [LocationType.SERVER]: {
-      locationID,
-      name,
-      description,
-      type,
-      path: server,
-    },
   };
 
   return locationMap[type];
@@ -54,7 +37,6 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location | nul
       type: LocationType.S3,
       endpoint: '',
       client: '',
-      server: '',
       accessKey: '',
       secretKey: '',
       bucketName: '',
@@ -73,7 +55,6 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location | nul
       secretKey: (values as S3Location).secretKey,
       bucketName: (values as S3Location).bucketName,
       client: '',
-      server: '',
     },
     [LocationType.CLIENT]: {
       locationID,
@@ -85,19 +66,6 @@ export const toFormStorageLocation = (values: StorageLocation | S3Location | nul
       secretKey: '',
       bucketName: '',
       client: path,
-      server: '',
-    },
-    [LocationType.SERVER]: {
-      locationID,
-      name,
-      description,
-      type,
-      endpoint: '',
-      accessKey: '',
-      secretKey: '',
-      bucketName: '',
-      client: '',
-      server: path,
     },
   };
 

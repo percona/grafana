@@ -16,3 +16,4 @@ export const getPerconaDBClusterDetailsByID = (id: string) => (state: StoreState
   state.percona.dbClusterDetails.result?.[id]!;
 export const getPerconaServer = (state: StoreState) => state.percona.server;
 export const getTemplates = (state: StoreState) => state.percona.templates;
+export const getBackupLocations = (state: StoreState) => state.percona.backupLocations;

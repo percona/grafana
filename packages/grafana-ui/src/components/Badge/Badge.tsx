@@ -4,12 +4,11 @@ import tinycolor from 'tinycolor2';
 
 import { GrafanaTheme } from '@grafana/data';
 
-import { useTheme } from '../../themes/ThemeContext';
-import { stylesFactory } from '../../themes/stylesFactory';
+import { useTheme, stylesFactory } from '../../themes';
 import { IconName } from '../../types';
 import { Icon } from '../Icon/Icon';
 import { HorizontalGroup } from '../Layout/Layout';
-import { Tooltip } from '../Tooltip/Tooltip';
+import { Tooltip } from '../Tooltip';
 
 export type BadgeColor = 'blue' | 'red' | 'green' | 'orange' | 'purple';
 
@@ -48,13 +47,12 @@ const getStyles = stylesFactory((theme: GrafanaTheme, color: BadgeColor) => {
   let borderColor = '';
   let bgColor = '';
   let textColor = '';
+  bgColor = tinycolor(sourceColor).setAlpha(0.15).toString();
 
   if (theme.isDark) {
-    bgColor = tinycolor(sourceColor).setAlpha(0.15).toString();
     borderColor = tinycolor(sourceColor).darken(30).toString();
     textColor = tinycolor(sourceColor).lighten(15).toString();
   } else {
-    bgColor = tinycolor(sourceColor).setAlpha(0.15).toString();
     borderColor = tinycolor(sourceColor).lighten(20).toString();
     textColor = tinycolor(sourceColor).darken(15).toString();
   }

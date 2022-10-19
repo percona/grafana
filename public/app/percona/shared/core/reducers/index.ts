@@ -30,6 +30,7 @@ import { CLUSTER_TYPE_DATABASE } from '../../../dbaas/components/DBCluster/DBClu
 import { SETTINGS_TIMEOUT } from '../constants';
 import { ServerInfo } from '../types';
 
+import perconaBackupLocations from './backupLocations';
 import perconaDBClustersReducer from './dbClusters/dbClusters';
 import perconaUserReducers from './user';
 export * from './user';
@@ -393,5 +394,6 @@ export default {
     dbClusterDetails: DBClusterDetailsReducer,
     server: perconaServerReducers,
     templates: templatesReducer,
+    backupLocations: perconaBackupLocations,
   }),
 };

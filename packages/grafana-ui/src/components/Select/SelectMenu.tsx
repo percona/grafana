@@ -3,7 +3,7 @@ import React, { FC, RefCallback } from 'react';
 
 import { SelectableValue } from '@grafana/data';
 
-import { useTheme2 } from '../../themes/ThemeContext';
+import { useTheme2 } from '../../themes';
 import { IconName } from '../../types';
 import { CustomScrollbar } from '../CustomScrollbar/CustomScrollbar';
 import { Icon } from '../Icon/Icon';
@@ -64,6 +64,9 @@ export const SelectMenuOptions: FC<SelectMenuOptionProps<any>> = ({
       )}
       {...innerProps}
       aria-label="Select option"
+      // @PERCONA
+      // Added data-testid
+      data-testid={`${data.label ? data.label + '-' : ''}select-option`}
       title={data.title}
     >
       {data.icon && <Icon name={data.icon as IconName} className={styles.optionIcon} />}
