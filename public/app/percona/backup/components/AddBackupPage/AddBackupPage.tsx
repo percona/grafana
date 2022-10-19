@@ -24,8 +24,10 @@ import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
+import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backupLocations';
 import { getBackupLocations } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
+import { useAppDispatch } from 'app/store/store';
 
 import { Messages as MessagesBackup } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
@@ -60,6 +62,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const [backup, setBackup] = useState<Backup | ScheduledBackup | null>(null);
   const [pending, setPending] = useState(false);
   const styles = useStyles2(getStyles);
+  const dispatch = useAppDispatch();
   const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup]);
@@ -145,6 +148,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
 
   useEffect(() => {
     getBackupData();
+    dispatch(fetchStorageLocations());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
