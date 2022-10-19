@@ -1,6 +1,6 @@
 import { Modal, LoaderButton, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
 import moment from 'moment/moment';
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { DateTime, SelectableValue, toUtc } from '@grafana/data';
@@ -129,6 +129,13 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     },
     [selectedDay, selectedTimerange]
   );
+
+  useEffect(() => {
+    if (moment(selectedDay).isSame(selectedTimerange?.endTimestamp, 'date')) {
+      setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.endTimestamp));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDay, selectedTimerange]);
 
   return (
     <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>

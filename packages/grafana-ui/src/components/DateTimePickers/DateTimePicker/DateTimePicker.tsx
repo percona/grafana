@@ -214,6 +214,12 @@ const DateTimeCalendar: FC<DateTimeCalendarProps> = ({
     setInternalDate(date.toDate());
   }, []);
 
+  useEffect(() => {
+    if (date?.isValid()) {
+      setInternalDate(date.toDate());
+    }
+  }, [date]);
+
   return (
     <div className={cx(styles.container, { [styles.fullScreen]: isFullscreen })} onClick={stopPropagation}>
       <Calendar
