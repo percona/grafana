@@ -3,7 +3,7 @@ import { SelectableValue } from '@grafana/data';
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { Databases } from 'app/percona/shared/core';
 
-import { SelectableService } from './AddBackupModal.types';
+import { SelectableService } from './AddBackupPage.types';
 
 export const AddBackupModalService = {
   async loadServiceOptions(): Promise<Array<SelectableValue<SelectableService>>> {

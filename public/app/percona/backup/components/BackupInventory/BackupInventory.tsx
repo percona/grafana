@@ -5,7 +5,10 @@ import React, { FC, useMemo, useState, useEffect, useCallback, useRef } from 're
 import { useSelector } from 'react-redux';
 import { Column, Row } from 'react-table';
 
-import { Alert, Button, useStyles2 } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
+import { Alert, LinkButton, useStyles2 } from '@grafana/ui';
+import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
@@ -20,21 +23,13 @@ import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api
 import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from '../../Backup.messages';
-import { RetryMode } from '../../Backup.types';
 import { formatBackupMode } from '../../Backup.utils';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
-import { AddBackupModal } from '../AddBackupModal';
-import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
 import { LocationType, StorageLocation } from '../StorageLocations/StorageLocations.types';
 
-import {
-  BACKUP_CANCEL_TOKEN,
-  LIST_ARTIFACTS_CANCEL_TOKEN,
-  RESTORE_CANCEL_TOKEN,
-  DATA_INTERVAL,
-} from './BackupInventory.constants';
+import { LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN, DATA_INTERVAL } from './BackupInventory.constants';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
 import { Backup } from './BackupInventory.types';
@@ -43,17 +38,17 @@ import { BackupInventoryDetails } from './BackupInventoryDetails';
 import { BackupLogsModal } from './BackupLogsModal/BackupLogsModal';
 import { RestoreBackupModal } from './RestoreBackupModal';
 
+//import { BackupService } from '../../Backup.service';
+
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
   const [deletePending, setDeletePending] = useState(false);
   const [restoreModalVisible, setRestoreModalVisible] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
-  const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
   const dispatch = useAppDispatch();
-  const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
   const backupLocationMap = useRef<Record<string, StorageLocation | undefined>>({});
   const navModel = usePerconaNavModel('backup-inventory');
@@ -143,8 +138,6 @@ export const BackupInventory: FC = () => {
   const handleClose = () => {
     setSelectedBackup(null);
     setRestoreModalVisible(false);
-    setBackupModalVisible(false);
-    setBackupErrors([]);
     setRestoreErrors([]);
   };
 
@@ -197,6 +190,7 @@ export const BackupInventory: FC = () => {
         await BackupInventoryService.delete(selectedBackup!.id, force);
         setDeleteModalVisible(false);
         setSelectedBackup(null);
+        appEvents.emit(AppEvents.alertSuccess, [Messages.backupInventory.getDeleteMessage(selectedBackup?.name ?? '')]);
         getData(true);
       } catch (e) {
         logger.error(e);
@@ -226,45 +220,7 @@ export const BackupInventory: FC = () => {
   );
 
   const onBackupClick = (backup: Backup | null) => {
-    setSelectedBackup(backup);
-    setBackupModalVisible(true);
-  };
-
-  const handleBackup = async ({
-    service,
-    location,
-    backupName,
-    description,
-    retryMode,
-    retryInterval,
-    retryTimes,
-    dataModel,
-  }: AddBackupFormProps) => {
-    const strRetryInterval = `${retryInterval}s`;
-    let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
-    try {
-      await BackupInventoryService.backup(
-        service!.value?.id || '',
-        location!.value || '',
-        backupName,
-        description,
-        strRetryInterval,
-        resultRetryTimes!,
-        dataModel,
-        generateToken(BACKUP_CANCEL_TOKEN)
-      );
-      setBackupModalVisible(false);
-      setSelectedBackup(null);
-      setBackupErrors([]);
-      getData(true);
-    } catch (e) {
-      if (isApiCancelError(e)) {
-        return;
-      }
-
-      setBackupErrors(apiErrorParser(e));
-      logger.error(e);
-    }
+    locationService.push(`/backup${backup?.id}/edit`);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -286,14 +242,9 @@ export const BackupInventory: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            <Button
-              size="md"
-              variant="primary"
-              data-testid="backup-add-modal-button"
-              onClick={() => onBackupClick(null)}
-            >
-              {Messages.createNewBackup}
-            </Button>
+            <LinkButton href="/backup/new" icon="plus" data-testid="backup-add-modal-button">
+              New backup
+            </LinkButton>
           </div>
           <Table
             data={data}
@@ -314,19 +265,10 @@ export const BackupInventory: FC = () => {
               noService={!selectedBackup?.serviceId || !selectedBackup?.serviceName}
             />
           )}
-          {backupModalVisible && (
-            <AddBackupModal
-              backup={selectedBackup}
-              isVisible
-              onClose={handleClose}
-              onBackup={handleBackup}
-              backupErrors={backupErrors}
-            />
-          )}
           {deleteModalVisible && (
             <DeleteModal
               title={Messages.backupInventory.deleteModalTitle}
-              message={Messages.backupInventory.getDeleteMessage(selectedBackup?.name || '')}
+              message={Messages.backupInventory.getDeleteSuccess(selectedBackup?.name || '')}
               isVisible
               setVisible={setDeleteModalVisible}
               forceLabel={Messages.backupInventory.deleteFromStorage}

@@ -38,6 +38,8 @@ export const Messages = {
       "For security reasons, we won't delete this backup from the filesystem. Please make sure to manually remove it.",
     getLogsTitle: (name: string) => `Backup logs for ${name}`,
     getDeleteMessage: (name: string) => `Are you sure you want to delete "${name}"?`,
+    addSuccess: 'Backup successfully created',
+    getDeleteSuccess: (name: string) => `Backup "${name}" successfully deleted.`,
   },
   restoreHistory: {
     table: {
