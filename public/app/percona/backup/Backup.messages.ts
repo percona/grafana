@@ -1,10 +1,4 @@
 export const Messages = {
-  tabs: {
-    inventory: 'All backups',
-    scheduled: 'Scheduled Backups',
-    locations: 'Storage Locations',
-    restore: 'Restore History',
-  },
   add: 'Add',
   addStorageLocation: 'Add storage location',
   createNewBackup: 'Create backup',
