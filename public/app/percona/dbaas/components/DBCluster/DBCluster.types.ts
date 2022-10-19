@@ -282,8 +282,6 @@ export interface DBClusterChangeComponentVersionAPI {
 }
 
 export interface DBClusterListResponse {
-  // pxc_clusters: DBClusterPayload[];
-  // psmdb_clusters: DBClusterPayload[];
   db_clusters: DBClusterListPayload[];
 }
 

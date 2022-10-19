@@ -10,7 +10,6 @@ import {
   DBClusterDetails,
   DBClusterExpectedResources,
   DBClusterListPayload,
-  // DBClusterPayload,
   DBClusterStatus,
   ResourcesUnits,
   ResourcesWithUnits,
@@ -78,7 +77,6 @@ export const getExpectedResourcesDifference = (
   };
 };
 
-// export const formatDBClusterVersion = (version?: string) => (version ? version.split(':')[1].split('-')[0] : '');
 export const formatDBClusterVersion = (version?: string) => version;
 
 export const formatDBClusterVersionWithBuild = (version?: string) => (version ? version.split(':')[1] : '');
