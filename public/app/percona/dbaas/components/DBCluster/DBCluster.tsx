@@ -14,8 +14,8 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
-  addDbClusterAction, fetchDBClusterDetailsAction,
-  fetchDBClustersAction,
+  addDbClusterAction,
+  fetchDBClusterDetailsAction,
   fetchKubernetesAction,
   selectKubernetesCluster,
 } from 'app/percona/shared/core/reducers';
@@ -27,6 +27,7 @@ import {
 } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 
+import { fetchDBClustersAction } from '../../../shared/core/reducers/dbClusters/dbClusters';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
@@ -76,11 +77,11 @@ export const DBCluster: FC = () => {
     } catch (e) {
       logger.error(e);
     }
-  }, [dbClusters, dispatch, generateToken, kubernetes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbClusters, dbClusters.length, generateToken]);
 
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
-      debugger;
       if (!kubernetes.length) {
         return;
       }
@@ -159,7 +160,6 @@ export const DBCluster: FC = () => {
   );
 
   const addCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
-    debugger;
     try {
       await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning })).unwrap();
       setAddModalVisible(false);

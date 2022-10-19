@@ -1,4 +1,5 @@
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
+
 import { DBClusterStatus } from '../DBCluster.types';
 
 const { progressError, processing, complete } = Messages.dbcluster.table.status;
@@ -6,7 +7,8 @@ const { progressError, processing, complete } = Messages.dbcluster.table.status;
 export const getShowProgressBarValue = (
   status: DBClusterStatus | undefined,
   previousStatus: DBClusterStatus | undefined
-) => {  // if the cluster just changed to ready we want to still show the progress bar
+) => {
+  // if the cluster just changed to ready we want to still show the progress bar
   if (previousStatus === DBClusterStatus.changing && status === DBClusterStatus.ready) {
     return true;
   }

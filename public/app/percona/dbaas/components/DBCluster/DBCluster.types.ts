@@ -50,7 +50,6 @@ export type DBClusterDetails = {
   [key in string]: DBCluster;
 };
 
-
 export type DBClusterStatusMap = {
   [key in DBClusterStatus]: string;
 };

@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
-import {useSelector} from "react-redux";
+import { useSelector } from 'react-redux';
 
-import { useStyles } from '@grafana/ui';
+import { Spinner, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
-import {getPerconaDBClustersDetails} from "../../../../shared/core/selectors";
+import { getPerconaDBClusters, getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
 import { DBClusterStatus } from '../DBCluster.types';
 import { DBClusterConnectionItem } from '../DBClusterConnection/DBClusterConnectionItem/DBClusterConnectionItem';
 
@@ -13,9 +13,11 @@ import { DBClusterParametersProps } from './DBClusterParameters.types';
 
 export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster }) => {
   const styles = useStyles(getStyles);
-  const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
+  const { result: clusters = {}, loading } = useSelector(getPerconaDBClustersDetails);
+  const { result: dbClusters = [] } = useSelector(getPerconaDBClusters);
+
   const { status, cpu, memory, disk, expose } =
-    Object.keys(clusters).length && dbCluster.id
+    Object.keys(clusters).length && dbCluster.id && dbClusters.length === Object.keys(clusters).length
       ? clusters[dbCluster.id]
       : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
   const {
@@ -26,7 +28,7 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
 
   return (
     <>
-      {status && status === DBClusterStatus.ready && (
+      {status && status === DBClusterStatus.ready ? (
         <div className={styles.wrapper}>
           <DBClusterConnectionItem
             label={Messages.dbcluster.table.parameters.clusterName}
@@ -54,6 +56,12 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
             dataTestId="cluster-parameters-expose"
           />
         </div>
+      ) : status === DBClusterStatus.failed ||
+        status === DBClusterStatus.invalid ||
+        (status === DBClusterStatus.unknown && !loading) ? (
+        <></>
+      ) : (
+        <Spinner />
       )}
     </>
   );

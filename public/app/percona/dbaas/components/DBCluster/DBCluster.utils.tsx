@@ -1,13 +1,15 @@
-import {SelectableValue} from '@grafana/data';
-import {Databases} from 'app/percona/shared/core';
+import { SelectableValue } from '@grafana/data';
+import { Databases } from 'app/percona/shared/core';
 
-import {Kubernetes} from '../Kubernetes/Kubernetes.types';
+import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 
-import {DATABASE_CLUSTER_TYPE, SERVICE_MAP, THOUSAND} from './DBCluster.constants';
-import {DBClusterService} from './DBCluster.service';
+import { DATABASE_CLUSTER_TYPE, SERVICE_MAP, THOUSAND } from './DBCluster.constants';
+import { DBClusterService } from './DBCluster.service';
 import {
-  DBCluster, DBClusterDetails,
-  DBClusterExpectedResources, DBClusterListPayload,
+  DBCluster,
+  DBClusterDetails,
+  DBClusterExpectedResources,
+  DBClusterListPayload,
   // DBClusterPayload,
   DBClusterStatus,
   ResourcesUnits,
@@ -100,10 +102,10 @@ export const formatDBClusters = (results: any[], kubernetes: Kubernetes[]) => {
     const dbClustersModel = clustersToModel(dbClusters, kubernetes, index);
 
     return acc.concat([...dbClustersModel]);
-    }, []);
+  }, []);
 
-    return clustersList;
-  };
+  return clustersList;
+};
 
 export const formatDBClusterDetails = (results: any[], db_clusters: Array<Partial<DBCluster>>) => {
   const clustersList: DBClusterDetails = results.reduce((acc: DBClusterDetails, r, index) => {
