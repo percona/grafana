@@ -6,7 +6,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
 
-import { Backup, BackupResponse, Timeranges } from './BackupInventory.types';
+import { Backup, BackupResponse, Timeranges, TimerangesResponse } from './BackupInventory.types';
 import { formatDate } from './BackupInventory.utils';
 
 const BASE_URL = '/v1/management/backup';
@@ -43,19 +43,19 @@ export const BackupInventoryService = {
     );
   },
   async listPitrTimeranges(artifactId: string): Promise<Array<SelectableValue<Timeranges>>> {
-    // const { timeranges } = await api.post<TimerangesResponse, Object>(`${BASE_URL}/Artifacts/ListPITRTimeranges`, {
-    //   artifact_id: artifactId,
-    // });
-    const timeranges = [
-      {
-        start_timestamp: '2022-09-16T11:16:07Z',
-        end_timestamp: '2022-10-18T11:51:08Z',
-      },
-      {
-        start_timestamp: '2022-11-16T11:16:07Z',
-        end_timestamp: '2022-11-18T11:51:08Z',
-      },
-    ];
+    const { timeranges } = await api.post<TimerangesResponse, Object>(`${BASE_URL}/Artifacts/ListPITRTimeranges`, {
+      artifact_id: artifactId,
+    });
+    // const timeranges = [
+    //   {
+    //     start_timestamp: '2022-09-16T11:16:07Z',
+    //     end_timestamp: '2022-10-18T11:51:08Z',
+    //   },
+    //   {
+    //     start_timestamp: '2022-11-16T11:16:07Z',
+    //     end_timestamp: '2022-11-18T11:51:08Z',
+    //   },
+    // ];
     return timeranges.map((value) => ({
       label: `${formatDate(value.start_timestamp)} / ${formatDate(value.end_timestamp)}`,
       value: { startTimestamp: value.start_timestamp, endTimestamp: value.end_timestamp },

@@ -45,9 +45,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
 
   const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
   const [selectedTimerangeFromDatepicker, setSelectedTimerangeFromDatepicker] = useState<DateTime>();
-  const [selectedDay, setSelectedDay] = useState<Date | undefined>(
-    selectedTimerange ? new Date(selectedTimerange.endTimestamp) : undefined
-  );
+  const [selectedDay, setSelectedDay] = useState<Date | undefined>();
   const handleSubmit = ({ serviceType, service }: RestoreBackupFormProps) => {
     if (backup && selectedTimerangeFromDatepicker) {
       const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
@@ -134,8 +132,15 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     if (moment(selectedDay).isSame(selectedTimerange?.endTimestamp, 'date')) {
       setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.endTimestamp));
     }
+    if (moment(selectedDay).isSame(selectedTimerange?.startTimestamp, 'date')) {
+      setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.startTimestamp));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDay, selectedTimerange]);
+
+  useEffect(() => {
+    setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.endTimestamp));
+  }, [selectedTimerange]);
 
   return (
     <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>
@@ -167,7 +172,6 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                             defaultOptions
                             data-testid="time-range-select-input"
                             onChange={(e) => {
-                              setSelectedTimerangeFromDatepicker(undefined);
                               setSelectedTimerange(e.value);
                               input.onChange(e);
                             }}
@@ -197,11 +201,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                 <TextInputField disabled name="dataModel" label={Messages.dataModel} />
                 {selectedTimerange && (
                   <DateTimePicker
-                    date={
-                      selectedTimerangeFromDatepicker
-                        ? selectedTimerangeFromDatepicker
-                        : toUtc(selectedTimerange.endTimestamp)
-                    }
+                    date={selectedTimerangeFromDatepicker}
                     onChange={(e) => {
                       console.log(e);
                       setSelectedTimerangeFromDatepicker(e);
