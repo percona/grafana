@@ -1,4 +1,3 @@
-import { useTour } from '@reactour/tour';
 import React, { useState, useEffect } from 'react';
 
 import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
@@ -10,21 +9,24 @@ import {
   fetchServerSaasHostAction,
   fetchUserStatusAction,
   fetchUserDetailsAction,
-  setProductTourCompleted,
 } from 'app/percona/shared/core/reducers';
+import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
+import getAlertingTourSteps from 'app/percona/tour/steps/alerting';
+import getProductTourSteps from 'app/percona/tour/steps/product';
 import { useAppDispatch } from 'app/store/store';
-import getSteps from 'app/tour/steps';
 
+import usePerconaTour from '../../core/hooks/tour';
 import { isPmmAdmin } from '../../helpers/permissions';
 
 import { Messages } from './PerconaBootstrapper.messages';
 import { getStyles } from './PerconaBootstrapper.styles';
 import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
+import PerconaTourBootstrapper from './PerconaTour';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
   const dispatch = useAppDispatch();
-  const { setCurrentStep, setIsOpen, setSteps } = useTour();
+  const { setSteps, startTour: startPerconaTour, endTour: endPerconaTour } = usePerconaTour();
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [showTour, setShowTour] = useState(false);
   const styles = useStyles2(getStyles);
@@ -37,23 +39,24 @@ export const PerconaBootstrapper = () => {
   const finishTour = () => {
     setModalIsOpen(false);
     setShowTour(false);
-    dispatch(setProductTourCompleted(true));
+    endPerconaTour();
   };
 
   const startTour = () => {
     setModalIsOpen(false);
-    setCurrentStep(0);
-    setIsOpen(true);
+    startPerconaTour(TourType.Product);
   };
 
   useEffect(() => {
     const getSettings = async () => {
       try {
         const settings = await dispatch(fetchSettingsAction()).unwrap();
-        setSteps(getSteps(isPmmAdmin(contextSrv.user), settings));
+        setSteps(TourType.Product, getProductTourSteps(isPmmAdmin(contextSrv.user), settings));
+        setSteps(TourType.Alerting, getAlertingTourSteps());
         dispatch(setAuthorized(true));
       } catch (e) {
-        setSteps(getSteps(isPmmAdmin(contextSrv.user)));
+        setSteps(TourType.Product, getProductTourSteps(isPmmAdmin(contextSrv.user)));
+        setSteps(TourType.Alerting, getAlertingTourSteps());
         // @ts-ignore
         if (e.response?.status === 401) {
           setAuthorized(false);
@@ -81,11 +84,12 @@ export const PerconaBootstrapper = () => {
     if (isLoggedIn) {
       bootstrap();
     }
-  }, [dispatch, isLoggedIn, setCurrentStep, setIsOpen, setSteps]);
+  }, [dispatch, isLoggedIn, setSteps]);
 
   return (
     <>
       <PerconaNavigation />
+      <PerconaTourBootstrapper />
       {isLoggedIn && showTour && (
         <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title={Messages.title}>
           <div className={styles.iconContainer}>

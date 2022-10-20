@@ -31,6 +31,7 @@ import { ServerInfo } from '../types';
 
 import perconaBackupLocations from './backupLocations';
 import servicesReducer from './services';
+import tourReducer from './tour/tour';
 import perconaUserReducers from './user';
 export * from './user';
 
@@ -384,5 +385,6 @@ export default {
     templates: templatesReducer,
     services: servicesReducer,
     backupLocations: perconaBackupLocations,
+    tour: tourReducer,
   }),
 };

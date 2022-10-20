@@ -1,12 +1,12 @@
-import { StepType } from '@reactour/tour';
 import React from 'react';
 
 import { Settings } from 'app/percona/settings/Settings.types';
+import { TourStep } from 'app/percona/shared/core/reducers/tour';
+import SidebarStep from 'app/percona/tour/components/SidebarStep';
 
-import SidebarStep from './SidebarStep';
-import { Messages } from './steps.messages';
+import { Messages } from './product.messages';
 
-export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => [
+export const getProductTourSteps = (isPmmAdmin = true, settings?: Settings): TourStep[] => [
   {
     selector: '.dropdown > [aria-label="Dashboards"]',
     content: (
@@ -26,7 +26,9 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
         <p>{Messages.pmmDashboards.zoomIn}</p>
       </SidebarStep>
     ),
-    highlightedSelectors: ['.dropdown > [aria-label="MySQL"]', '#navbar-menu-portal-container [role="dialog"]'],
+    navMenuId: 'postgre',
+    highlightedSelectors: ['.dropdown > [aria-label="PostgreSQL"]', '#navbar-menu-portal-container [role="dialog"]'],
+    resizeObservables: ['#navbar-menu-portal-container'],
     position: 'right',
   },
   {
@@ -173,4 +175,4 @@ export const getSteps = (isPmmAdmin = true, settings?: Settings): StepType[] => 
     : []),
 ];
 
-export default getSteps;
+export default getProductTourSteps;
