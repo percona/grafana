@@ -55,15 +55,18 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   const calculateDisableHours = useCallback(() => {
     const disabledHours = [];
 
-    for (let i = 0; i < 24; i++) {
-      if (moment(selectedDay).isSame(selectedTimerange?.startTimestamp, 'date')) {
-        if (i < moment(selectedTimerange?.startTimestamp).hours()) {
-          disabledHours.push(i);
+    if (selectedTimerange) {
+      const { startTimestamp, endTimestamp } = selectedTimerange;
+      for (let i = 0; i < 24; i++) {
+        if (moment(selectedDay).isSame(startTimestamp, 'date')) {
+          if (i < moment(startTimestamp).hours()) {
+            disabledHours.push(i);
+          }
         }
-      }
-      if (moment(selectedDay).isSame(selectedTimerange?.endTimestamp, 'date')) {
-        if (i > moment(selectedTimerange?.endTimestamp).hours()) {
-          disabledHours.push(i);
+        if (moment(selectedDay).isSame(endTimestamp, 'date')) {
+          if (i > moment(endTimestamp).hours()) {
+            disabledHours.push(i);
+          }
         }
       }
     }
@@ -73,26 +76,21 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   const calculateDisableMinutes = useCallback(
     (hour) => {
       const disabledMinutes = [];
-
-      for (let i = 0; i < 60; i++) {
-        if (
-          moment(selectedDay).isSame(selectedTimerange?.startTimestamp, 'date') &&
-          hour === moment(selectedTimerange?.startTimestamp).hour()
-        ) {
-          if (i < moment(selectedTimerange?.startTimestamp).minute()) {
-            disabledMinutes.push(i);
+      if (selectedTimerange) {
+        const { startTimestamp, endTimestamp } = selectedTimerange;
+        for (let i = 0; i < 60; i++) {
+          if (moment(selectedDay).isSame(startTimestamp, 'date') && hour === moment(startTimestamp).hour()) {
+            if (i < moment(startTimestamp).minute()) {
+              disabledMinutes.push(i);
+            }
           }
-        }
-        if (
-          moment(selectedDay).isSame(selectedTimerange?.endTimestamp, 'date') &&
-          hour === moment(selectedTimerange?.endTimestamp).hour()
-        ) {
-          if (i > moment(selectedTimerange?.endTimestamp).minute()) {
-            disabledMinutes.push(i);
+          if (moment(selectedDay).isSame(endTimestamp, 'date') && hour === moment(endTimestamp).hour()) {
+            if (i > moment(endTimestamp).minute()) {
+              disabledMinutes.push(i);
+            }
           }
         }
       }
-
       return disabledMinutes;
     },
     [selectedDay, selectedTimerange]
@@ -101,24 +99,26 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   const calculateDisableSeconds = useCallback(
     (hour, minute) => {
       const disabledSeconds = [];
-
-      for (let i = 0; i < 60; i++) {
-        if (
-          moment(selectedDay).isSame(selectedTimerange?.startTimestamp, 'date') &&
-          hour === moment(selectedTimerange?.startTimestamp).hour() &&
-          minute === moment(selectedTimerange?.startTimestamp).minute()
-        ) {
-          if (i < moment(selectedTimerange?.startTimestamp).second()) {
-            disabledSeconds.push(i);
+      if (selectedTimerange) {
+        const { startTimestamp, endTimestamp } = selectedTimerange;
+        for (let i = 0; i < 60; i++) {
+          if (
+            moment(selectedDay).isSame(startTimestamp, 'date') &&
+            hour === moment(startTimestamp).hour() &&
+            minute === moment(startTimestamp).minute()
+          ) {
+            if (i < moment(startTimestamp).second()) {
+              disabledSeconds.push(i);
+            }
           }
-        }
-        if (
-          moment(selectedDay).isSame(selectedTimerange?.endTimestamp, 'date') &&
-          hour === moment(selectedTimerange?.endTimestamp).hour() &&
-          minute === moment(selectedTimerange?.endTimestamp).minute()
-        ) {
-          if (i > moment(selectedTimerange?.endTimestamp).second()) {
-            disabledSeconds.push(i);
+          if (
+            moment(selectedDay).isSame(endTimestamp, 'date') &&
+            hour === moment(endTimestamp).hour() &&
+            minute === moment(endTimestamp).minute()
+          ) {
+            if (i > moment(endTimestamp).second()) {
+              disabledSeconds.push(i);
+            }
           }
         }
       }
@@ -128,20 +128,24 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   );
 
   useEffect(() => {
-    if (moment(selectedDay).isSame(selectedTimerange?.endTimestamp, 'date')) {
-      setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.endTimestamp));
-    }
-    if (moment(selectedDay).isSame(selectedTimerange?.startTimestamp, 'date')) {
-      setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.startTimestamp));
+    if (selectedTimerange) {
+      const { startTimestamp, endTimestamp } = selectedTimerange;
+      if (moment(selectedDay).isSame(endTimestamp, 'date')) {
+        setSelectedTimerangeFromDatepicker(toUtc(endTimestamp));
+      }
+      if (moment(selectedDay).isSame(startTimestamp, 'date')) {
+        setSelectedTimerangeFromDatepicker(toUtc(startTimestamp));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDay, selectedTimerange]);
 
   useEffect(() => {
     if (selectedTimerange) {
-      setSelectedDay(new Date(selectedTimerange.endTimestamp));
+      const { endTimestamp } = selectedTimerange;
+      setSelectedDay(new Date(endTimestamp));
+      setSelectedTimerangeFromDatepicker(toUtc(endTimestamp));
     }
-    setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.endTimestamp));
   }, [selectedTimerange]);
 
   return (
