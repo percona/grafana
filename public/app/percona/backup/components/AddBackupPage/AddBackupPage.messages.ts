@@ -28,7 +28,7 @@ export const Messages = {
   scheduleName: 'Schedule',
   getModalTitle: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
-      return edit ? 'Edit Scheduled backup' : 'Create Schedule backup';
+      return edit ? 'Edit Scheduled backup' : 'Create Scheduled backup';
     }
 
     return 'Create Backup on demand';

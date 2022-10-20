@@ -22,6 +22,7 @@ import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/co
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
 
+import { NEW_BACKUP_URL } from '../../Backup.constants';
 import { Messages } from '../../Backup.messages';
 import { formatBackupMode } from '../../Backup.utils';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
@@ -37,8 +38,6 @@ import { BackupInventoryActions } from './BackupInventoryActions';
 import { BackupInventoryDetails } from './BackupInventoryDetails';
 import { BackupLogsModal } from './BackupLogsModal/BackupLogsModal';
 import { RestoreBackupModal } from './RestoreBackupModal';
-
-//import { BackupService } from '../../Backup.service';
 
 export const BackupInventory: FC = () => {
   const [pending, setPending] = useState(true);
@@ -136,8 +135,8 @@ export const BackupInventory: FC = () => {
   };
 
   const handleClose = () => {
-    setSelectedBackup(null);
     setRestoreModalVisible(false);
+    setSelectedBackup(null);
     setRestoreErrors([]);
   };
 
@@ -220,7 +219,11 @@ export const BackupInventory: FC = () => {
   );
 
   const onBackupClick = (backup: Backup | null) => {
-    locationService.push(`/backup${backup?.id}/edit`);
+    if (backup) {
+      locationService.push(`/backup${backup.id}/edit`);
+    } else {
+      locationService.push(NEW_BACKUP_URL);
+    }
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,8 +245,8 @@ export const BackupInventory: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            <LinkButton href="/backup/new" icon="plus" data-testid="backup-add-modal-button">
-              New backup
+            <LinkButton href={NEW_BACKUP_URL} size="md" variant="primary" data-testid="backup-add-button">
+              {Messages.createNewBackup}
             </LinkButton>
           </div>
           <Table

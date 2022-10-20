@@ -2,9 +2,9 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ colors, shape, spacing, v1: { spacing: spacingV1 } }: GrafanaTheme2) => ({
+export const getStyles = ({ breakpoints, colors, shape, spacing, v1: { spacing: spacingV1 } }: GrafanaTheme2) => ({
   pageWrapper: css`
-    max-width: 1440px;
+    max-width: ${breakpoints.values.xxl}px;
   `,
   formContainer: css`
     display: grid;

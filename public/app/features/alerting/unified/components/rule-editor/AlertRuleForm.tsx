@@ -42,8 +42,6 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
   const returnTo: string = (queryParams['returnTo'] as string | undefined) ?? '/alerting/list';
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
-  console.log(returnTo);
-
   const defaultValues: RuleFormValues = useMemo(() => {
     if (existing) {
       return rulerRuleToFormValues(existing);
@@ -58,8 +56,6 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
       group: result && !!result.alertingEnabled ? 'default-alert-group' : '',
     };
   }, [existing, queryParams, result]);
-
-  console.log(defaultValues);
 
   const formAPI = useForm<RuleFormValues>({
     mode: 'onSubmit',

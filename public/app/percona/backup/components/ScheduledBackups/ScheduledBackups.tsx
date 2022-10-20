@@ -247,10 +247,11 @@ export const ScheduledBackups: FC = () => {
               href={urlUtil.renderUrl('/backup/new', {
                 scheduled: true,
               })}
-              icon="plus"
-              data-testid="scheduled-backup-add-modal-button"
+              size="md"
+              variant="primary"
+              data-testid="scheduled-backup-add-button"
             >
-              New Scheduled Backup
+              {Messages.createScheduledBackup}
             </LinkButton>
           </div>
           <Table
