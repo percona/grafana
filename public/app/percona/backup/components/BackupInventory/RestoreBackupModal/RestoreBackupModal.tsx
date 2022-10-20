@@ -67,7 +67,6 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
         }
       }
     }
-
     return disabledHours;
   }, [selectedDay, selectedTimerange]);
 
@@ -139,6 +138,9 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   }, [selectedDay, selectedTimerange]);
 
   useEffect(() => {
+    if (selectedTimerange) {
+      setSelectedDay(new Date(selectedTimerange.endTimestamp));
+    }
     setSelectedTimerangeFromDatepicker(toUtc(selectedTimerange?.endTimestamp));
   }, [selectedTimerange]);
 
