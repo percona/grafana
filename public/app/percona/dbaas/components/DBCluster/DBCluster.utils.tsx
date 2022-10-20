@@ -97,9 +97,7 @@ const clustersToModel = (clusters: DBClusterListPayload[], kubernetes: Kubernete
 export const formatDBClusters = (results: any[], kubernetes: Kubernetes[]) => {
   const clustersList: Array<Partial<DBCluster>> = results.reduce((acc: Array<Partial<DBCluster>>, r, index) => {
     const dbClusters: DBClusterListPayload[] = r.db_clusters ?? [];
-    const dbClustersModel = clustersToModel(dbClusters, kubernetes, index);
-
-    return acc.concat([...dbClustersModel]);
+    return clustersToModel(dbClusters, kubernetes, index);
   }, []);
 
   return clustersList;
@@ -107,10 +105,10 @@ export const formatDBClusters = (results: any[], kubernetes: Kubernetes[]) => {
 
 export const formatDBClusterDetails = (results: any[], db_clusters: Array<Partial<DBCluster>>) => {
   const clustersList: DBClusterDetails = results.reduce((acc: DBClusterDetails, r, index) => {
-    let cluster = db_clusters[index];
-    let database = cluster.databaseType!;
+    const cluster = db_clusters[index];
+    const database = cluster.databaseType!;
 
-    let dbCluster = newDBClusterService(database).toModel(
+    const dbCluster = newDBClusterService(database).toModel(
       cluster,
       r[database === Databases.mongodb ? 'psmdb_cluster' : 'pxc_cluster'],
       cluster.kubernetesClusterName!,

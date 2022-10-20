@@ -374,7 +374,7 @@ const installKubernetesOperatorReducer = createAsyncSlice(
   instalKuberneteslOperatorAction
 ).reducer;
 
-const DBClusterDetailsReducer = createAsyncSlice('DBClustersDetail', fetchDBClusterDetailsAction).reducer;
+const DBClusterDetailsReducer = createAsyncSlice('dbClustersDetail', fetchDBClusterDetailsAction).reducer;
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 const templatesReducer = createAsyncSlice('templates', fetchTemplatesAction).reducer;
@@ -391,7 +391,7 @@ export default {
     addDbCluster: addDbClusterReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbClusters: perconaDBClustersReducer,
-    dbClusterDetails: DBClusterDetailsReducer,
+    dbClustersDetails: DBClusterDetailsReducer,
     server: perconaServerReducers,
     templates: templatesReducer,
     backupLocations: perconaBackupLocations,

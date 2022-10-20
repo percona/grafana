@@ -86,7 +86,7 @@ export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelect
           className={cx(styles.status, statusStyles)}
           data-testid={`cluster-status${status ? `-${STATUS_DATA_QA[status]}` : ''}`}
         >
-          {status ? Messages.dbcluster.table.status[status] : ''}
+          {Messages.dbcluster.table.status[status]}
         </span>
       ) : loading ? (
         <Spinner />

@@ -20,6 +20,7 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
     Object.keys(clusters).length && dbCluster.id && dbClusters.length === Object.keys(clusters).length
       ? clusters[dbCluster.id]
       : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
+
   const {
     label: exposeLabel,
     enabled: exposeEnabled,
