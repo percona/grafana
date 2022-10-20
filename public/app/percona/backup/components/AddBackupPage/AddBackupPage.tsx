@@ -39,6 +39,7 @@ import { Backup } from '../BackupInventory/BackupInventory.types';
 import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../ScheduledBackups/ScheduledBackups.constants';
 import { ScheduledBackupsService } from '../ScheduledBackups/ScheduledBackups.service';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
+import { LocationType } from '../StorageLocations/StorageLocations.types';
 
 import { DATA_MODEL_OPTIONS, MAX_BACKUP_NAME, SCHEDULED_TYPE } from './AddBackupPage.constants';
 import { Messages } from './AddBackupPage.messages';
@@ -72,6 +73,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     ({ locationID, name, type }): SelectableValue<string> => ({
       label: name,
       value: locationID,
+      type,
       description: getLabelForStorageOption(type),
     })
   );
@@ -190,7 +192,11 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                 size="md"
                 type="submit"
                 variant="primary"
-                disabled={!valid || pristine}
+                disabled={
+                  !valid ||
+                  pristine ||
+                  (values.vendor === Databases.mysql && values.location?.type === LocationType.CLIENT)
+                }
                 loading={submitting}
               >
                 {Messages.getSubmitButtonText(values.type === BackupType.SCHEDULED, editing)}
