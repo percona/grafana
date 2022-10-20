@@ -1,5 +1,6 @@
 import { NavModelItem, NavSection } from '@grafana/data';
 import config from 'app/core/config';
+import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 
 export const PMM_STT_PAGE: NavModelItem = {
   id: 'database-checks',
@@ -75,20 +76,20 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
   children: [
     {
       id: 'backup-inventory',
-      text: 'Backup Inventory',
+      text: 'All backups',
       url: `${config.appSubUrl}/backup/inventory`,
-      hideFromMenu: true,
-    },
-    {
-      id: 'restore-history',
-      text: 'Restore History',
-      url: `${config.appSubUrl}/backup/restore`,
       hideFromMenu: true,
     },
     {
       id: 'scheduled-backups',
       text: 'Scheduled Backups',
       url: `${config.appSubUrl}/backup/scheduled`,
+      hideFromMenu: true,
+    },
+    {
+      id: 'restore-history',
+      text: 'Restore History',
+      url: `${config.appSubUrl}/backup/restore`,
       hideFromMenu: true,
     },
     {
@@ -240,3 +241,26 @@ export const PMM_ENVIRONMENT_OVERVIEW_PAGE: NavModelItem = {
   url: `${config.appSubUrl}/environment-overview`,
   section: NavSection.Core,
 };
+
+/**
+ * Mapping of menu items id to folders name.
+ *
+ * Folders are created based on the folder name in grafana-dashboards.
+ */
+export const NAV_FOLDER_MAP: Record<string, string> = {
+  system: 'OS',
+  mysql: 'MySQL',
+  mongo: 'MongoDB',
+  postgre: 'PostgreSQL',
+};
+
+export const NAV_ID_TO_SERVICE: Record<string, ServiceType> = {
+  mysql: ServiceType.mysql,
+  mongo: ServiceType.mongodb,
+  postgre: ServiceType.posgresql,
+  proxysql: ServiceType.proxysql,
+  haproxy: ServiceType.haproxy,
+};
+
+// 5 mins
+export const ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS = 300000;
