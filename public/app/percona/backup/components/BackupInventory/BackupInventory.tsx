@@ -131,8 +131,8 @@ export const BackupInventory: FC = () => {
   };
 
   const handleClose = () => {
-    setSelectedBackup(null);
     setRestoreModalVisible(false);
+    setSelectedBackup(null);
     setRestoreErrors([]);
   };
 
