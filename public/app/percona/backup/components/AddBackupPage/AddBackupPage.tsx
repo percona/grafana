@@ -11,6 +11,7 @@ import {
 } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
+import { useSelector } from 'react-redux';
 
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
@@ -19,8 +20,10 @@ import appEvents from 'app/core/app_events';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
+import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
+import { getBackupLocations } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { BACKUP_INVENTORY_URL, BACKUP_SCHEDULED_URL } from '../../Backup.constants';
@@ -40,7 +43,13 @@ import { Messages } from './AddBackupPage.messages';
 import { AddBackupModalService } from './AddBackupPage.service';
 import { getStyles } from './AddBackupPage.styles';
 import { AddBackupFormProps, SelectableService } from './AddBackupPage.types';
-import { toFormBackup, getBackupModeOptions, getDataModelFromVendor, isDataModelDisabled } from './AddBackupPage.utils';
+import {
+  toFormBackup,
+  getBackupModeOptions,
+  getDataModelFromVendor,
+  isDataModelDisabled,
+  getLabelForStorageOption,
+} from './AddBackupPage.utils';
 import { PageSwitcher } from './PageSwitcher/PageSwitcher';
 import { RetryModeSelector } from './RetryModeSelector';
 import { ScheduleSection } from './ScheduleSection/ScheduleSection';
@@ -54,7 +63,15 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup]);
+  const { result: locations = [], loading: locationsLoading } = useSelector(getBackupLocations);
   const { Form } = withTypes<AddBackupFormProps>();
+  const locationsOptions = locations.map(
+    ({ locationID, name, type }): SelectableValue<string> => ({
+      label: name,
+      value: locationID,
+      description: getLabelForStorageOption(type),
+    })
+  );
   const editing = !!backup;
 
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
@@ -230,12 +247,12 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                         <Field name="location" validate={validators.required}>
                           {({ input }) => (
                             <div>
-                              <AsyncSelectField
+                              <SelectField
                                 label={Messages.location}
                                 isSearchable={false}
                                 disabled={editing}
-                                loadOptions={AddBackupModalService.loadLocationOptions}
-                                defaultOptions
+                                options={locationsOptions}
+                                isLoading={locationsLoading}
                                 {...input}
                                 className={styles.selectField}
                                 data-testid="location-select-input"

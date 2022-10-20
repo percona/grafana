@@ -1,11 +1,14 @@
 export const Messages = {
   tabs: {
-    inventory: 'Backup Inventory',
+    inventory: 'All backups',
     scheduled: 'Scheduled Backups',
     locations: 'Storage Locations',
     restore: 'Restore History',
   },
   add: 'Add',
+  addStorageLocation: 'Add storage location',
+  createNewBackup: 'Create backup',
+  createScheduledBackup: 'Create scheduled backup',
   backupManagement: 'Backup Management',
   backupInventory: {
     newBackup: 'New backup',
@@ -15,7 +18,7 @@ export const Messages = {
         name: 'Backup name',
         created: 'Created',
         location: 'Location',
-        vendor: 'Vendor',
+        vendor: 'DB Technology',
         status: 'Status',
         actions: 'Actions',
         type: 'Type',
@@ -37,6 +40,8 @@ export const Messages = {
     },
     deleteModalTitle: 'Delete backup artifact',
     deleteFromStorage: 'Delete from storage',
+    deleteWarning:
+      "For security reasons, we won't delete this backup from the filesystem. Please make sure to manually remove it.",
     getLogsTitle: (name: string) => `Backup logs for ${name}`,
     getDeleteMessage: (name: string) => `Are you sure you want to delete "${name}"?`,
     addSuccess: 'Backup successfully created',
@@ -47,6 +52,7 @@ export const Messages = {
       noData: 'No restores found',
       columns: {
         started: 'Started at',
+        actions: 'Actions',
       },
     },
   },
@@ -72,7 +78,7 @@ export const Messages = {
       noData: 'No scheduled backups found',
       columns: {
         name: 'Name',
-        vendor: 'Vendor',
+        vendor: 'DB Technology',
         start: 'Start at',
         retention: 'Retention',
         frequency: 'Frequency',

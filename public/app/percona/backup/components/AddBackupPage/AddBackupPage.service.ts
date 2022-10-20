@@ -3,8 +3,6 @@ import { SelectableValue } from '@grafana/data';
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { Databases } from 'app/percona/shared/core';
 
-import { StorageLocationsService } from '../StorageLocations/StorageLocations.service';
-
 import { SelectableService } from './AddBackupPage.types';
 
 export const AddBackupModalService = {
@@ -29,10 +27,5 @@ export const AddBackupModalService = {
     });
 
     return result;
-  },
-  async loadLocationOptions(): Promise<Array<SelectableValue<string>>> {
-    const { locations = [] } = await StorageLocationsService.list();
-
-    return locations.map(({ location_id, name }): SelectableValue<string> => ({ label: name, value: location_id }));
   },
 };
