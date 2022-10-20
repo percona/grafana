@@ -16,6 +16,7 @@ import { Messages } from './AddBackupPage.messages';
 jest.mock('../ScheduledBackups/ScheduledBackups.service');
 jest.mock('../BackupInventory/BackupInventory.service');
 jest.mock('./AddBackupPage.service');
+jest.mock('app/percona/backup/components/StorageLocations/StorageLocations.service');
 
 const AddBackupPageWrapper: React.FC = ({ children }) => {
   return (
