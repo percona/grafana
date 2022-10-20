@@ -23,6 +23,7 @@ import { validators as customValidators } from 'app/percona/shared/helpers/valid
 
 import { BackupMode, DataModel } from '../../Backup.types';
 import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
+import { LocationType } from '../StorageLocations/StorageLocations.types';
 
 import {
   DATA_MODEL_OPTIONS,
@@ -67,6 +68,7 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
     ({ locationID, name, type }): SelectableValue<string> => ({
       label: name,
       value: locationID,
+      type,
       description: getLabelForStorageOption(type),
     })
   );
@@ -297,7 +299,11 @@ export const AddBackupModal: FC<AddBackupModalProps> = ({
                 data-testid="backup-add-button"
                 size="md"
                 variant="primary"
-                disabled={!valid || pristine}
+                disabled={
+                  !valid ||
+                  pristine ||
+                  (values.vendor === Databases.mysql && values.location?.type === LocationType.CLIENT)
+                }
                 loading={submitting}
                 type="submit"
               >
