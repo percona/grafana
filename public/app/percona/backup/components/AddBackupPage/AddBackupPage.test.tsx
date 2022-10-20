@@ -13,6 +13,10 @@ import { LocationType } from '../StorageLocations/StorageLocations.types';
 import AddBackupPage from './AddBackupPage';
 import { Messages } from './AddBackupPage.messages';
 
+jest.mock('../ScheduledBackups/ScheduledBackups.service');
+jest.mock('../BackupInventory/BackupInventory.service');
+jest.mock('./AddBackupPage.service');
+
 const AddBackupPageWrapper: React.FC = ({ children }) => {
   return (
     <Provider
@@ -99,7 +103,8 @@ describe('AddBackupPage', () => {
     expect(screen.queryByText('Incremental')).toBeInTheDocument();
     expect(screen.queryByText('Full')).toBeInTheDocument();
   });
-  it('should render demand page backup without params', () => {
+
+  it('should render demand page backup without params', async () => {
     render(
       <AddBackupPageWrapper>
         <AddBackupPage
@@ -110,9 +115,11 @@ describe('AddBackupPage', () => {
       </AddBackupPageWrapper>
     );
 
+    await waitFor(() => expect(screen.getAllByText('Choose')).toHaveLength(2));
     expect(screen.getByText('Create Backup on demand')).toBeInTheDocument();
   });
-  it('should render schedule page backup with schedule params', () => {
+
+  it('should render schedule page backup with schedule params', async () => {
     render(
       <AddBackupPageWrapper>
         <AddBackupPage
@@ -123,9 +130,11 @@ describe('AddBackupPage', () => {
       </AddBackupPageWrapper>
     );
 
+    await waitFor(() => expect(screen.getAllByText('Choose')).toHaveLength(2));
     expect(screen.getByText('Create Scheduled backup')).toBeInTheDocument();
   });
-  it('should switch page to schedule backup page when click on schedule backup button', () => {
+
+  it('should switch page to schedule backup page when click on schedule backup button', async () => {
     render(
       <AddBackupPageWrapper>
         <AddBackupPage
@@ -136,11 +145,13 @@ describe('AddBackupPage', () => {
       </AddBackupPageWrapper>
     );
 
+    await waitFor(() => expect(screen.getAllByText('Choose')).toHaveLength(2));
     const button = screen.queryAllByTestId('type-radio-button')[1];
     fireEvent.click(button);
     expect(screen.getByText('Create Scheduled backup')).toBeInTheDocument();
   });
-  it('should switch back to demand backup page when click on demand backup button', () => {
+
+  it('should switch back to demand backup page when click on demand backup button', async () => {
     render(
       <AddBackupPageWrapper>
         <AddBackupPage
@@ -151,6 +162,7 @@ describe('AddBackupPage', () => {
       </AddBackupPageWrapper>
     );
 
+    await waitFor(() => expect(screen.getAllByText('Choose')).toHaveLength(2));
     const button = screen.queryAllByTestId('type-radio-button')[0];
     fireEvent.click(button);
     expect(screen.getByText('Create Backup on demand')).toBeInTheDocument();

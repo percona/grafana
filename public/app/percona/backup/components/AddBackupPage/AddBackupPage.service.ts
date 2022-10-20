@@ -5,7 +5,7 @@ import { Databases } from 'app/percona/shared/core';
 
 import { SelectableService } from './AddBackupPage.types';
 
-export const AddBackupModalService = {
+export const AddBackupPageService = {
   async loadServiceOptions(): Promise<Array<SelectableValue<SelectableService>>> {
     const supportedServices: Databases[] = [Databases.mysql, Databases.mongodb];
     const services = await InventoryService.getDbServices();

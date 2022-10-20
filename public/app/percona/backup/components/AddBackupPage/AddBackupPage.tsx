@@ -40,7 +40,7 @@ import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 
 import { DATA_MODEL_OPTIONS, MAX_BACKUP_NAME, SCHEDULED_TYPE } from './AddBackupPage.constants';
 import { Messages } from './AddBackupPage.messages';
-import { AddBackupModalService } from './AddBackupPage.service';
+import { AddBackupPageService } from './AddBackupPage.service';
 import { getStyles } from './AddBackupPage.styles';
 import { AddBackupFormProps, SelectableService } from './AddBackupPage.types';
 import {
@@ -213,7 +213,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                               label={Messages.serviceName}
                               isSearchable={false}
                               disabled={editing}
-                              loadOptions={AddBackupModalService.loadServiceOptions}
+                              loadOptions={AddBackupPageService.loadServiceOptions}
                               defaultOptions
                               {...input}
                               onChange={(service: SelectableValue<SelectableService>) => {

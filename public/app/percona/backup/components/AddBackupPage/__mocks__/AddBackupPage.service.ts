@@ -16,5 +16,5 @@ export const serviceStubs: Array<SelectableValue<SelectableService>> = [
 ];
 
 export const AddBackupPageService =
-  jest.genMockFromModule<typeof service>('../AddBackupPage.service').AddBackupModalService;
+  jest.genMockFromModule<typeof service>('../AddBackupPage.service').AddBackupPageService;
 AddBackupPageService.loadServiceOptions = () => Promise.resolve(serviceStubs);
