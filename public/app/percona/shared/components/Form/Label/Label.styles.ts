@@ -4,6 +4,9 @@ import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ colors, spacing, typography }: GrafanaTheme) => ({
   label: css`
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     display: block;
     text-align: left;
     font-size: ${typography.size.md};
