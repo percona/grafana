@@ -1,6 +1,7 @@
 export const Messages = {
   title: 'Restore from backup',
   serviceSelection: 'Service selection',
+  timeRange: 'Time range',
   vendor: 'Vendor',
   serviceName: 'Service name',
   dataModel: 'Data model',

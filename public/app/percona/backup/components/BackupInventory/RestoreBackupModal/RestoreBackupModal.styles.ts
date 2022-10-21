@@ -1,29 +1,19 @@
 import { css } from '@emotion/css';
 
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ palette, typography, spacing }: GrafanaTheme) => ({
-  formHalvesContainer: css`
-    display: flex;
-    margin-bottom: ${spacing.formInputMargin};
-
+export const getStyles = ({ v1: { palette, typography, spacing } }: GrafanaTheme2) => ({
+  modalWrapper: css`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+    gap: 0px ${spacing.sm};
     & > div {
-      flex: 0 1 50%;
-
-      &:first-child {
-        padding-right: ${spacing.md};
-      }
-
-      &:last-child {
-        padding-left: ${spacing.md};
-      }
+      height: 100%;
     }
   `,
   radioGroup: css`
-    & > div:nth-last-of-type(2) {
-      flex-wrap: nowrap;
-    }
-
     & input[type='radio'] + label {
       height: auto;
       white-space: nowrap;
