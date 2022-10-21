@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { cx } from '@emotion/css';
 import React, { FC, useMemo } from 'react';
 
