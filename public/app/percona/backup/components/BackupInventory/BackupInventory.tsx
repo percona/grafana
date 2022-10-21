@@ -185,7 +185,7 @@ export const BackupInventory: FC = () => {
         await BackupInventoryService.delete(selectedBackup!.id, force);
         setDeleteModalVisible(false);
         setSelectedBackup(null);
-        appEvents.emit(AppEvents.alertSuccess, [Messages.backupInventory.getDeleteMessage(selectedBackup?.name ?? '')]);
+        appEvents.emit(AppEvents.alertSuccess, [Messages.backupInventory.getDeleteSuccess(selectedBackup?.name ?? '')]);
         getData(true);
       } catch (e) {
         logger.error(e);
@@ -267,7 +267,7 @@ export const BackupInventory: FC = () => {
           {deleteModalVisible && (
             <DeleteModal
               title={Messages.backupInventory.deleteModalTitle}
-              message={Messages.backupInventory.getDeleteSuccess(selectedBackup?.name || '')}
+              message={Messages.backupInventory.getDeleteMessage(selectedBackup?.name || '')}
               isVisible
               setVisible={setDeleteModalVisible}
               forceLabel={Messages.backupInventory.deleteFromStorage}
