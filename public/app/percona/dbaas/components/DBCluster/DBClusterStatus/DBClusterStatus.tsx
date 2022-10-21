@@ -8,7 +8,7 @@ import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { ProgressBar } from 'app/percona/dbaas/components/ProgressBar/ProgressBar';
 import { ProgressBarStatus } from 'app/percona/dbaas/components/ProgressBar/ProgressBar.types';
 
-import { getPerconaDBClusters, getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
+import { getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
 import { DBClusterStatus as Status } from '../DBCluster.types';
 
 import { COMPLETE_PROGRESS_DELAY, STATUS_DATA_QA } from './DBClusterStatus.constants';
@@ -18,16 +18,18 @@ import { getProgressMessage, getShowProgressBarValue } from './DBClusterStatus.u
 
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelectedCluster, setLogsModalVisible }) => {
   const { result: clusters = {}, loading } = useSelector(getPerconaDBClustersDetails);
-  const { result: dbClusters = [] } = useSelector(getPerconaDBClusters);
+
+  const clusterInfo =
+    Object.keys(clusters).length && dbCluster.id
+      ? clusters[dbCluster.id]
+      : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
 
   const {
     status,
     totalSteps = 0,
     finishedSteps = 0,
     message,
-  } = Object.keys(clusters).length && dbCluster.id && dbClusters.length === Object.keys(clusters).length
-    ? clusters[dbCluster.id]
-    : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
+  } = clusterInfo ? clusterInfo : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
 
   const styles = useStyles2(getStyles);
   const prevStatus = useRef<Status>();

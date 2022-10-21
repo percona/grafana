@@ -20,22 +20,6 @@ describe('DBClusterParameters::', () => {
       <Provider
         store={configureStore({
           percona: {
-            dbClusters: {
-              loading: false,
-              result: [
-                {
-                  clusterName: 'cluster_1',
-                  kubernetesClusterName: 'cluster_1',
-                  databaseType: 'mongodb',
-                  clusterSize: 1,
-                  memory: 1000,
-                  cpu: 1000,
-                  disk: 1000,
-                  status: DBClusterStatus.unknown,
-                  message: 'Error',
-                },
-              ],
-            },
             dbClustersDetails: {
               loading: false,
               result: {

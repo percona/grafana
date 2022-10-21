@@ -1,6 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import { Provider } from 'react-redux';
 
+import { configureStore } from '../../../../../store/configureStore';
+import { StoreState } from '../../../../../types';
+import { DBClusterDetails, DBClusterStatus as Status } from '../DBCluster.types';
 import { dbClustersStub, mongoDBClusterConnectionStub } from '../__mocks__/dbClustersStubs';
 
 import { DBClusterConnection } from './DBClusterConnection';
@@ -21,17 +25,69 @@ jest.mock('@percona/platform-core', () => {
 
 describe('DBClusterConnection::', () => {
   it('renders correctly connection items', async () => {
-    await waitFor(() => render(<DBClusterConnection dbCluster={dbClustersStub[0]} />));
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            dbClustersDetails: {
+              loading: false,
+              result: {
+                cluster_1: {
+                  clusterName: 'cluster_1',
+                  kubernetesClusterName: 'cluster_1',
+                  databaseType: 'mongodb',
+                  clusterSize: 1,
+                  memory: 1000,
+                  cpu: 1000,
+                  disk: 1000,
+                  status: Status.ready,
+                  message: 'Ready',
+                },
+              } as DBClusterDetails,
+            },
+          },
+        } as StoreState)}
+      >
+        <DBClusterConnection dbCluster={dbClustersStub[0]} />
+      </Provider>
+    );
 
-    expect(screen.getByTestId('cluster-connection-host')).toBeInTheDocument();
+    await waitFor(() => screen.getByTestId('cluster-connection-host'));
+
     expect(screen.getByTestId('cluster-connection-port')).toBeInTheDocument();
     expect(screen.getByTestId('cluster-connection-username')).toBeInTheDocument();
     expect(screen.getByTestId('cluster-connection-password')).toBeInTheDocument();
   });
   it('renders correctly connection items with MongoDB cluster', async () => {
-    await waitFor(() => render(<DBClusterConnection dbCluster={dbClustersStub[2]} />));
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            dbClustersDetails: {
+              loading: false,
+              result: {
+                cluster_3: {
+                  clusterName: 'cluster_3',
+                  kubernetesClusterName: 'cluster_1',
+                  databaseType: 'mongodb',
+                  clusterSize: 1,
+                  memory: 1000,
+                  cpu: 1000,
+                  disk: 1000,
+                  status: Status.ready,
+                  message: 'Ready',
+                },
+              } as DBClusterDetails,
+            },
+          },
+        } as StoreState)}
+      >
+        <DBClusterConnection dbCluster={dbClustersStub[2]} />
+      </Provider>
+    );
 
-    expect(screen.getByTestId('cluster-connection-host')).toBeInTheDocument();
+    await waitFor(() => screen.getByTestId('cluster-connection-host'));
+
     expect(screen.getByTestId('cluster-connection-host')).toHaveTextContent(mongoDBClusterConnectionStub.host);
     expect(screen.getByTestId('cluster-connection-port')).toBeInTheDocument();
     expect(screen.getByTestId('cluster-connection-username')).toBeInTheDocument();

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { Spinner, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
-import { getPerconaDBClusters, getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
+import { getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
 import { DBClusterStatus } from '../DBCluster.types';
 import { DBClusterConnectionItem } from '../DBClusterConnection/DBClusterConnectionItem/DBClusterConnectionItem';
 
@@ -14,12 +14,15 @@ import { DBClusterParametersProps } from './DBClusterParameters.types';
 export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster }) => {
   const styles = useStyles(getStyles);
   const { result: clusters = {}, loading } = useSelector(getPerconaDBClustersDetails);
-  const { result: dbClusters = [] } = useSelector(getPerconaDBClusters);
 
-  const { status, cpu, memory, disk, expose } =
-    Object.keys(clusters).length && dbCluster.id && dbClusters.length === Object.keys(clusters).length
+  const clusterInfo =
+    Object.keys(clusters).length && dbCluster.id
       ? clusters[dbCluster.id]
       : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
+
+  const { status, cpu, memory, disk, expose } = clusterInfo
+    ? clusterInfo
+    : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
 
   const {
     label: exposeLabel,

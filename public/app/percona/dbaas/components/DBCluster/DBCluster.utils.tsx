@@ -77,7 +77,17 @@ export const getExpectedResourcesDifference = (
   };
 };
 
-export const formatDBClusterVersion = (version?: string) => version;
+export const formatDBClusterVersion = (version?: string) => {
+  if (version) {
+    const arr = version.split(':');
+    if (arr.length > 1) {
+      return arr[1].split('-')[0];
+    } else {
+      return arr[0].split('-')[0];
+    }
+  }
+  return '';
+};
 
 export const formatDBClusterVersionWithBuild = (version?: string) => (version ? version.split(':')[1] : '');
 

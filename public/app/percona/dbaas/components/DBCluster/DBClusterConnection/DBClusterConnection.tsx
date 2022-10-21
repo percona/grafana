@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { Spinner, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 
-import { getPerconaDBClusters, getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
+import { getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
 import { DBClusterConnection as ConnectionParams, DBClusterStatus, DBClusterConnectionAPI } from '../DBCluster.types';
 import { newDBClusterService } from '../DBCluster.utils';
 
@@ -20,12 +20,16 @@ export const DBClusterConnection: FC<DBClusterConnectionProps> = ({ dbCluster })
   const [loading, setLoading] = useState(true);
   const [connection, setConnection] = useState<ConnectionParams>(INITIAL_CONNECTION);
   const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
-  const { result: dbClusters = [] } = useSelector(getPerconaDBClusters);
 
-  const { status, databaseType } =
-    Object.keys(clusters).length && dbCluster.id && dbClusters.length === Object.keys(clusters).length
+  const clusterInfo =
+    Object.keys(clusters).length && dbCluster.id
       ? clusters[dbCluster.id]
       : { status: DBClusterStatus.unknown, databaseType: undefined };
+
+  const { status, databaseType } = clusterInfo
+    ? clusterInfo
+    : { status: DBClusterStatus.unknown, databaseType: undefined };
+
   const { host, password, port, username } = connection;
   const isClusterReady = status && status === DBClusterStatus.ready;
 
