@@ -1,3 +1,5 @@
+import moment from 'moment/moment';
+
 import { formatDataModel } from 'app/percona/backup/Backup.utils';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 
@@ -13,3 +15,9 @@ export const toFormProps: ToFormProps = ({ vendor, serviceId, serviceName, dataM
   service: { label: serviceName, value: serviceId },
   dataModel: formatDataModel(dataModel),
 });
+
+export const isSameDay = (firstDay: Date | string, secondDay: Date | string) =>
+  moment(firstDay).isSame(secondDay, 'date');
+export const getHours = (date: string) => moment(date).hours();
+export const getMinutes = (date: string) => moment(date).minute();
+export const getSeconds = (date: string) => moment(date).second();
