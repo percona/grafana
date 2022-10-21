@@ -24,9 +24,9 @@ import { TemplatesList } from 'app/percona/integrated-alerting/components/AlertR
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Settings.types';
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
-import { api, apiManagement } from 'app/percona/shared/helpers/api';
+import { api } from 'app/percona/shared/helpers/api';
 
-import { CLUSTER_TYPE_DATABASE } from '../../../dbaas/components/DBCluster/DBCluster.constants';
+import { DBClusterService } from '../../../dbaas/components/DBCluster/DBCluster.service';
 import { SETTINGS_TIMEOUT } from '../constants';
 import { ServerInfo } from '../types';
 
@@ -34,6 +34,7 @@ import perconaBackupLocations from './backupLocations';
 import perconaDBClustersReducer from './dbClusters/dbClusters';
 import servicesReducer from './services';
 import perconaUserReducers from './user';
+
 export * from './user';
 
 const initialSettingsState: Settings = {
@@ -277,18 +278,7 @@ export const fetchDBClusterDetailsAction = createAsyncThunk(
   (args: { dbClusters: Array<Partial<DBCluster>>; tokens: CancelToken[] }): Promise<DBClusterDetails> =>
     withSerializedError(
       (async () => {
-        const requests = args.dbClusters.map((d, idx) =>
-          apiManagement.post<any, any>(
-            '/DBaaS/DBClusters/Get',
-            {
-              name: d.clusterName,
-              kubernetes_cluster_name: d.kubernetesClusterName,
-              cluster_type: CLUSTER_TYPE_DATABASE[d.databaseType!],
-            },
-            true,
-            args.tokens[idx]
-          )
-        );
+        const requests = args.dbClusters.map((d, idx) => DBClusterService.getDBClustersDetails(d, idx, args));
         const promiseResults = await Promise.all(requests);
         return formatDBClusterDetails(promiseResults, args.dbClusters);
       })()

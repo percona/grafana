@@ -6,7 +6,7 @@ import { apiManagement } from 'app/percona/shared/helpers/api';
 import { Kubernetes } from '../Kubernetes/Kubernetes.types';
 import { ManageComponentsVersionsRenderProps } from '../Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersionsModal.types';
 
-import { BILLION, RESOURCES_PRECISION, THOUSAND } from './DBCluster.constants';
+import { BILLION, CLUSTER_TYPE_DATABASE, RESOURCES_PRECISION, THOUSAND } from './DBCluster.constants';
 import {
   DBCluster,
   DBClusterPayload,
@@ -58,6 +58,23 @@ export abstract class DBClusterService {
 
   static async getDBClusters(kubernetes: Kubernetes, token?: CancelToken): Promise<DBClusterListResponse> {
     return apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', kubernetes, true, token);
+  }
+
+  static async getDBClustersDetails(
+    d: Partial<DBCluster>,
+    idx: number,
+    args: { dbClusters: Array<Partial<DBCluster>>; tokens: CancelToken[] }
+  ): Promise<any> {
+    return apiManagement.post<any, any>(
+      '/DBaaS/DBClusters/Get',
+      {
+        name: d.clusterName,
+        kubernetes_cluster_name: d.kubernetesClusterName,
+        cluster_type: CLUSTER_TYPE_DATABASE[d.databaseType!],
+      },
+      true,
+      args.tokens[idx]
+    );
   }
 
   static async getLogs({ kubernetesClusterName, clusterName }: DBCluster): Promise<DBClusterLogsAPI> {
