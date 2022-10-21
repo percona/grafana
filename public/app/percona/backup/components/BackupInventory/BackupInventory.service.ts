@@ -43,25 +43,15 @@ export const BackupInventoryService = {
     );
   },
   async listPitrTimeranges(artifactId: string): Promise<Array<SelectableValue<Timeranges>>> {
-    const { timeranges } = await api.post<TimerangesResponse, Object>(`${BASE_URL}/Artifacts/ListPITRTimeranges`, {
+    const { timeranges = [] } = await api.post<TimerangesResponse, Object>(`${BASE_URL}/Artifacts/ListPITRTimeranges`, {
       artifact_id: artifactId,
     });
-    // const timeranges = [
-    //   {
-    //     start_timestamp: '2022-09-16T11:16:07Z',
-    //     end_timestamp: '2022-10-18T11:51:08Z',
-    //   },
-    //   {
-    //     start_timestamp: '2022-11-16T11:16:07Z',
-    //     end_timestamp: '2022-11-18T11:51:08Z',
-    //   },
-    // ];
     return timeranges.map((value) => ({
       label: `${formatDate(value.start_timestamp)} / ${formatDate(value.end_timestamp)}`,
       value: { startTimestamp: value.start_timestamp, endTimestamp: value.end_timestamp },
     }));
   },
-  async restore(serviceId: string, artifactId: string, pitrTimestamp: string, token?: CancelToken) {
+  async restore(serviceId: string, artifactId: string, pitrTimestamp?: string, token?: CancelToken) {
     return api.post(
       `${BASE_URL}/Backups/Restore`,
       {

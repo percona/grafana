@@ -149,7 +149,7 @@ export const BackupInventory: FC = () => {
     setLogsModalVisible(false);
   };
 
-  const handleRestore = async (serviceId: string, artifactId: string, pitrTimestamp: string) => {
+  const handleRestore = async (serviceId: string, artifactId: string, pitrTimestamp?: string) => {
     try {
       await BackupInventoryService.restore(serviceId, artifactId, pitrTimestamp, generateToken(RESTORE_CANCEL_TOKEN));
       setRestoreErrors([]);

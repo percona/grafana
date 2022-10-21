@@ -48,9 +48,13 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   const [selectedTimerangeFromDatepicker, setSelectedTimerangeFromDatepicker] = useState<DateTime>();
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
   const handleSubmit = ({ serviceType, service }: RestoreBackupFormProps) => {
-    if (backup && selectedTimerangeFromDatepicker) {
+    if (backup) {
       const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
-      onRestore(serviceId || '', backup.id, selectedTimerangeFromDatepicker.toISOString());
+      if (backup.mode === BackupMode.PITR && selectedTimerangeFromDatepicker) {
+        onRestore(serviceId || '', backup.id, selectedTimerangeFromDatepicker.toISOString());
+      } else {
+        onRestore(serviceId || '', backup.id);
+      }
     }
   };
   const calculateDisableHours = useCallback(() => {
@@ -157,7 +161,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
         render={({ handleSubmit, valid, submitting, values }) => (
           <form onSubmit={handleSubmit}>
             <div className={styles.modalWrapper}>
-              {backup!.mode === BackupMode.PITR && (
+              {backup?.mode === BackupMode.PITR && (
                 <>
                   <Field name="timerange" validate={validators.required}>
                     {({ input }) => (
@@ -183,17 +187,11 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   <Label label="test" />
                   <DateTimePicker
                     date={selectedTimerangeFromDatepicker}
-                    onChange={(e) => {
-                      console.log(e);
-                      setSelectedTimerangeFromDatepicker(e);
-                    }}
+                    onChange={setSelectedTimerangeFromDatepicker}
                     calendarProps={{
                       minDate: new Date(selectedTimerange.startTimestamp),
                       maxDate: new Date(selectedTimerange.endTimestamp),
-                      onClickDay: (e) => {
-                        console.log(e);
-                        setSelectedDay(e);
-                      },
+                      onClickDay: setSelectedDay,
                     }}
                     timepickerProps={{
                       disabledHours: calculateDisableHours,
