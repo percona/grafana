@@ -186,8 +186,9 @@ export const BackupInventory: FC = () => {
   const handleDelete = useCallback(
     async (force = false) => {
       try {
-        setDeleteModalVisible(false);
+        setDeletePending(true);
         await BackupInventoryService.delete(selectedBackup!.id, force);
+        setDeleteModalVisible(false);
         setSelectedBackup(null);
         appEvents.emit(AppEvents.alertSuccess, [Messages.backupInventory.getDeleteSuccess(selectedBackup?.name ?? '')]);
         getData(true);
