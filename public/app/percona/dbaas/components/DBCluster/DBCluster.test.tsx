@@ -13,7 +13,7 @@ import { KubernetesOperatorStatus } from '../Kubernetes/OperatorStatusItem/Kuber
 
 import { updateDatabaseClusterNameInitialValue } from './AddDBClusterModal/AddDBClusterModal.utils';
 import { DBCluster } from './DBCluster';
-import { DBClusterStatus } from './DBCluster.types';
+import { DBClusterDetails, DBClusterStatus } from './DBCluster.types';
 import { formatDBClusterVersion } from './DBCluster.utils';
 
 jest.mock('./AddDBClusterModal/AddDBClusterModal.utils', () => ({
@@ -114,6 +114,7 @@ describe('DBCluster::', () => {
               loading: false,
               result: [
                 {
+                  id: 'cluster_1',
                   clusterName: 'cluster_1',
                   kubernetesClusterName: 'cluster_1',
                   databaseType: 'mongodb',
@@ -125,6 +126,22 @@ describe('DBCluster::', () => {
                   message: 'Error',
                 },
               ],
+            },
+            dbClustersDetails: {
+              loading: false,
+              result: {
+                cluster_1: {
+                  clusterName: 'cluster_1',
+                  kubernetesClusterName: 'cluster_1',
+                  databaseType: 'mongodb',
+                  clusterSize: 1,
+                  memory: 1000,
+                  cpu: 1000,
+                  disk: 1000,
+                  status: DBClusterStatus.failed,
+                  message: 'Error',
+                },
+              } as DBClusterDetails,
             },
           },
         } as StoreState)}

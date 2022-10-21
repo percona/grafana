@@ -19,17 +19,14 @@ import { getProgressMessage, getShowProgressBarValue } from './DBClusterStatus.u
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setSelectedCluster, setLogsModalVisible }) => {
   const { result: clusters = {}, loading } = useSelector(getPerconaDBClustersDetails);
 
-  const clusterInfo =
-    Object.keys(clusters).length && dbCluster.id
-      ? clusters[dbCluster.id]
-      : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
-
   const {
     status,
     totalSteps = 0,
     finishedSteps = 0,
     message,
-  } = clusterInfo ? clusterInfo : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
+  } = Object.keys(clusters).length && dbCluster.id && !!clusters[dbCluster.id]
+    ? clusters[dbCluster.id]
+    : { status: undefined, totalSteps: 0, finishedSteps: 0, message: '' };
 
   const styles = useStyles2(getStyles);
   const prevStatus = useRef<Status>();

@@ -15,14 +15,10 @@ export const DBClusterParameters: FC<DBClusterParametersProps> = ({ dbCluster })
   const styles = useStyles(getStyles);
   const { result: clusters = {}, loading } = useSelector(getPerconaDBClustersDetails);
 
-  const clusterInfo =
-    Object.keys(clusters).length && dbCluster.id
+  const { status, cpu, memory, disk, expose } =
+    Object.keys(clusters).length && dbCluster.id && !!clusters[dbCluster.id]
       ? clusters[dbCluster.id]
       : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
-
-  const { status, cpu, memory, disk, expose } = clusterInfo
-    ? clusterInfo
-    : { status: DBClusterStatus.unknown, cpu: '', memory: '', disk: '', expose: false };
 
   const {
     label: exposeLabel,

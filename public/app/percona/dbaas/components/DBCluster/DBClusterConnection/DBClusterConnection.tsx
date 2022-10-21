@@ -21,14 +21,10 @@ export const DBClusterConnection: FC<DBClusterConnectionProps> = ({ dbCluster })
   const [connection, setConnection] = useState<ConnectionParams>(INITIAL_CONNECTION);
   const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
 
-  const clusterInfo =
-    Object.keys(clusters).length && dbCluster.id
+  const { status, databaseType } =
+    Object.keys(clusters).length && dbCluster.id && !!clusters[dbCluster.id]
       ? clusters[dbCluster.id]
       : { status: DBClusterStatus.unknown, databaseType: undefined };
-
-  const { status, databaseType } = clusterInfo
-    ? clusterInfo
-    : { status: DBClusterStatus.unknown, databaseType: undefined };
 
   const { host, password, port, username } = connection;
   const isClusterReady = status && status === DBClusterStatus.ready;
