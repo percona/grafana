@@ -1,4 +1,4 @@
-import moment from 'moment/moment';
+import { getHours, getMinutes, getSeconds, isSameDay } from 'date-fns';
 
 import { formatDataModel } from 'app/percona/backup/Backup.utils';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
@@ -16,8 +16,9 @@ export const toFormProps: ToFormProps = ({ vendor, serviceId, serviceName, dataM
   dataModel: formatDataModel(dataModel),
 });
 
-export const isSameDay = (firstDay: Date | string, secondDay: Date | string) =>
-  moment(firstDay).isSame(secondDay, 'date');
-export const getHours = (date: string) => moment(date).hours();
-export const getMinutes = (date: string) => moment(date).minute();
-export const getSeconds = (date: string) => moment(date).second();
+export const isSameDayFromDate = (firstDay: Date | string, secondDay: Date | string) =>
+  isSameDay(new Date(firstDay), new Date(secondDay));
+
+export const getHoursFromDate = (date: string) => getHours(new Date(date));
+export const getMinutesFromDate = (date: string) => getMinutes(new Date(date));
+export const getSecondsFromDate = (date: string) => getSeconds(new Date(date));

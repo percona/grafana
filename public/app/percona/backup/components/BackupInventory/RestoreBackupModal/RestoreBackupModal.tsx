@@ -17,7 +17,13 @@ import { Messages } from './RestoreBackupModal.messages';
 import { RestoreBackupModalService } from './RestoreBackupModal.service';
 import { getStyles } from './RestoreBackupModal.styles';
 import { RestoreBackupModalProps, RestoreBackupFormProps, ServiceTypeSelect } from './RestoreBackupModal.types';
-import { getHours, getMinutes, getSeconds, isSameDay, toFormProps } from './RestoreBackupModal.utils';
+import {
+  getHoursFromDate,
+  getMinutesFromDate,
+  getSecondsFromDate,
+  isSameDayFromDate,
+  toFormProps,
+} from './RestoreBackupModal.utils';
 
 const { Form } = withTypes<RestoreBackupFormProps>();
 
@@ -63,13 +69,13 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     if (selectedTimerange && selectedDay) {
       const { startTimestamp, endTimestamp } = selectedTimerange;
       for (let i = 0; i < 24; i++) {
-        if (isSameDay(selectedDay, startTimestamp)) {
-          if (i < getHours(startTimestamp)) {
+        if (isSameDayFromDate(selectedDay, startTimestamp)) {
+          if (i < getHoursFromDate(startTimestamp)) {
             disabledHours.push(i);
           }
         }
-        if (isSameDay(selectedDay, endTimestamp)) {
-          if (i > getHours(endTimestamp)) {
+        if (isSameDayFromDate(selectedDay, endTimestamp)) {
+          if (i > getHoursFromDate(endTimestamp)) {
             disabledHours.push(i);
           }
         }
@@ -84,13 +90,13 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
       if (selectedTimerange && selectedDay) {
         const { startTimestamp, endTimestamp } = selectedTimerange;
         for (let i = 0; i < 60; i++) {
-          if (isSameDay(selectedDay, startTimestamp) && hour === getHours(startTimestamp)) {
-            if (i < getMinutes(startTimestamp)) {
+          if (isSameDayFromDate(selectedDay, startTimestamp) && hour === getHoursFromDate(startTimestamp)) {
+            if (i < getMinutesFromDate(startTimestamp)) {
               disabledMinutes.push(i);
             }
           }
-          if (isSameDay(selectedDay, endTimestamp) && hour === getHours(startTimestamp)) {
-            if (i > getMinutes(endTimestamp)) {
+          if (isSameDayFromDate(selectedDay, endTimestamp) && hour === getHoursFromDate(endTimestamp)) {
+            if (i > getMinutesFromDate(endTimestamp)) {
               disabledMinutes.push(i);
             }
           }
@@ -108,20 +114,20 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
         const { startTimestamp, endTimestamp } = selectedTimerange;
         for (let i = 0; i < 60; i++) {
           if (
-            isSameDay(selectedDay, startTimestamp) &&
-            hour === getHours(startTimestamp) &&
-            minute === getMinutes(startTimestamp)
+            isSameDayFromDate(selectedDay, startTimestamp) &&
+            hour === getHoursFromDate(startTimestamp) &&
+            minute === getMinutesFromDate(startTimestamp)
           ) {
-            if (i < getSeconds(startTimestamp)) {
+            if (i < getSecondsFromDate(startTimestamp)) {
               disabledSeconds.push(i);
             }
           }
           if (
-            isSameDay(selectedDay, endTimestamp) &&
-            hour === getHours(endTimestamp) &&
-            minute === getMinutes(endTimestamp)
+            isSameDayFromDate(selectedDay, endTimestamp) &&
+            hour === getHoursFromDate(endTimestamp) &&
+            minute === getMinutesFromDate(endTimestamp)
           ) {
-            if (i > getSeconds(endTimestamp)) {
+            if (i > getSecondsFromDate(endTimestamp)) {
               disabledSeconds.push(i);
             }
           }
@@ -135,10 +141,10 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   useEffect(() => {
     if (selectedTimerange && selectedDay) {
       const { startTimestamp, endTimestamp } = selectedTimerange;
-      if (isSameDay(selectedDay, startTimestamp)) {
+      if (isSameDayFromDate(selectedDay, startTimestamp)) {
         setSelectedTimerangeFromDatepicker(toUtc(startTimestamp));
       }
-      if (isSameDay(selectedDay, endTimestamp)) {
+      if (isSameDayFromDate(selectedDay, endTimestamp)) {
         setSelectedTimerangeFromDatepicker(toUtc(endTimestamp));
       }
     }
