@@ -52,6 +52,63 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
   const [selectedTimerangeFromDatepicker, setSelectedTimerangeFromDatepicker] = useState<DateTime>();
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
+
+  const isSameStartDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return isSameDayFromDate(selectedDay, selectedTimerange.startTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
+  const isSameEndDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return isSameDayFromDate(selectedDay, selectedTimerange.endTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
+  const hoursFromStartDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return getHoursFromDate(selectedTimerange.startTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
+  const hoursFromEndDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return getHoursFromDate(selectedTimerange.endTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
+  const minutesFromStartDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return getMinutesFromDate(selectedTimerange.startTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
+  const minutesFromEndDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return getMinutesFromDate(selectedTimerange.endTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
+  const secondsFromStartDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return getSecondsFromDate(selectedTimerange.startTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
+  const secondsFromEndDate = useMemo(() => {
+    if (selectedDay && selectedTimerange) {
+      return getSecondsFromDate(selectedTimerange.endTimestamp);
+    }
+    return false;
+  }, [selectedDay, selectedTimerange]);
+
   const handleSubmit = ({ serviceType, service }: RestoreBackupFormProps) => {
     if (backup) {
       const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
@@ -65,91 +122,82 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
 
   const calculateDisableHours = useCallback(() => {
     const disabledHours = [];
-
-    if (selectedTimerange && selectedDay) {
-      const { startTimestamp, endTimestamp } = selectedTimerange;
-      for (let i = 0; i < 24; i++) {
-        if (isSameDayFromDate(selectedDay, startTimestamp)) {
-          if (i < getHoursFromDate(startTimestamp)) {
-            disabledHours.push(i);
-          }
+    for (let i = 0; i < 24; i++) {
+      if (isSameStartDate) {
+        if (i < hoursFromStartDate) {
+          disabledHours.push(i);
         }
-        if (isSameDayFromDate(selectedDay, endTimestamp)) {
-          if (i > getHoursFromDate(endTimestamp)) {
-            disabledHours.push(i);
-          }
+      }
+      if (isSameEndDate) {
+        if (i > hoursFromEndDate) {
+          disabledHours.push(i);
         }
       }
     }
     return disabledHours;
-  }, [selectedDay, selectedTimerange]);
+  }, [hoursFromEndDate, hoursFromStartDate, isSameEndDate, isSameStartDate]);
 
   const calculateDisableMinutes = useCallback(
     (hour) => {
       const disabledMinutes = [];
-      if (selectedTimerange && selectedDay) {
-        const { startTimestamp, endTimestamp } = selectedTimerange;
-        for (let i = 0; i < 60; i++) {
-          if (isSameDayFromDate(selectedDay, startTimestamp) && hour === getHoursFromDate(startTimestamp)) {
-            if (i < getMinutesFromDate(startTimestamp)) {
-              disabledMinutes.push(i);
-            }
+      for (let i = 0; i < 60; i++) {
+        if (isSameStartDate && hour === hoursFromStartDate) {
+          if (i < minutesFromStartDate) {
+            disabledMinutes.push(i);
           }
-          if (isSameDayFromDate(selectedDay, endTimestamp) && hour === getHoursFromDate(endTimestamp)) {
-            if (i > getMinutesFromDate(endTimestamp)) {
-              disabledMinutes.push(i);
-            }
+        }
+        if (isSameEndDate && hour === hoursFromEndDate) {
+          if (i > minutesFromEndDate) {
+            disabledMinutes.push(i);
           }
         }
       }
       return disabledMinutes;
     },
-    [selectedDay, selectedTimerange]
+    [hoursFromEndDate, hoursFromStartDate, isSameEndDate, isSameStartDate, minutesFromEndDate, minutesFromStartDate]
   );
 
   const calculateDisableSeconds = useCallback(
     (hour, minute) => {
       const disabledSeconds = [];
-      if (selectedTimerange && selectedDay) {
-        const { startTimestamp, endTimestamp } = selectedTimerange;
-        for (let i = 0; i < 60; i++) {
-          if (
-            isSameDayFromDate(selectedDay, startTimestamp) &&
-            hour === getHoursFromDate(startTimestamp) &&
-            minute === getMinutesFromDate(startTimestamp)
-          ) {
-            if (i < getSecondsFromDate(startTimestamp)) {
-              disabledSeconds.push(i);
-            }
+
+      for (let i = 0; i < 60; i++) {
+        if (isSameStartDate && hour === hoursFromStartDate && minute === minutesFromStartDate) {
+          if (i < secondsFromStartDate) {
+            disabledSeconds.push(i);
           }
-          if (
-            isSameDayFromDate(selectedDay, endTimestamp) &&
-            hour === getHoursFromDate(endTimestamp) &&
-            minute === getMinutesFromDate(endTimestamp)
-          ) {
-            if (i > getSecondsFromDate(endTimestamp)) {
-              disabledSeconds.push(i);
-            }
+        }
+        if (isSameEndDate && hour === hoursFromEndDate && minute === minutesFromEndDate) {
+          if (i > secondsFromEndDate) {
+            disabledSeconds.push(i);
           }
         }
       }
       return disabledSeconds;
     },
-    [selectedDay, selectedTimerange]
+    [
+      hoursFromEndDate,
+      hoursFromStartDate,
+      isSameEndDate,
+      isSameStartDate,
+      minutesFromEndDate,
+      minutesFromStartDate,
+      secondsFromEndDate,
+      secondsFromStartDate,
+    ]
   );
 
   useEffect(() => {
     if (selectedTimerange && selectedDay) {
       const { startTimestamp, endTimestamp } = selectedTimerange;
-      if (isSameDayFromDate(selectedDay, startTimestamp)) {
+      if (isSameStartDate) {
         setSelectedTimerangeFromDatepicker(toUtc(startTimestamp));
       }
-      if (isSameDayFromDate(selectedDay, endTimestamp)) {
+      if (isSameEndDate) {
         setSelectedTimerangeFromDatepicker(toUtc(endTimestamp));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDay, selectedTimerange]);
+  }, [isSameEndDate, isSameStartDate, selectedDay, selectedTimerange]);
 
   useEffect(() => {
     if (selectedTimerange) {
