@@ -114,6 +114,7 @@ export const RestoreHistory: FC = () => {
             totalItems={data.length}
             emptyMessage={Messages.restoreHistory.table.noData}
             pendingRequest={pending}
+            autoResetExpanded={false}
             renderExpandedRow={renderSelectedSubRow}
           />
         </FeatureLoader>
