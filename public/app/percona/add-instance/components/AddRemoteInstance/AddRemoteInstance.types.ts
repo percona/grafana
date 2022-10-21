@@ -98,6 +98,7 @@ export interface PostgreSQLPayload extends RemoteCommonPayload, TLSCommon {
   tls_cert: string;
   tls_key: string;
   agent_password: string;
+  max_query_length: number;
 }
 
 export interface MySQLPayload extends RemoteCommonPayload, TLSCommon {
@@ -119,6 +120,7 @@ export interface MySQLPayload extends RemoteCommonPayload, TLSCommon {
   tls_cert: string;
   tls_key: string;
   tls_ca: string;
+  max_query_length: number;
 }
 
 export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {

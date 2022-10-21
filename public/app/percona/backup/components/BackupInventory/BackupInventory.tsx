@@ -1,21 +1,23 @@
 /* eslint-disable react/display-name */
 import { logger } from '@percona/platform-core';
 import { CancelToken } from 'axios';
-import React, { FC, useMemo, useState, useEffect, useCallback } from 'react';
+import React, { FC, useMemo, useState, useEffect, useCallback, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { Column, Row } from 'react-table';
 
-import { Button, useStyles } from '@grafana/ui';
+import { Alert, Button, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
-import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backupLocations';
+import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
+import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from '../../Backup.messages';
 import { RetryMode } from '../../Backup.types';
@@ -25,6 +27,7 @@ import { AddBackupModal } from '../AddBackupModal';
 import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
+import { LocationType, StorageLocation } from '../StorageLocations/StorageLocations.types';
 
 import {
   BACKUP_CANCEL_TOKEN,
@@ -49,19 +52,33 @@ export const BackupInventory: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
+  const dispatch = useAppDispatch();
   const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
+  const backupLocationMap = useRef<Record<string, StorageLocation | undefined>>({});
   const navModel = usePerconaNavModel('backup-inventory');
   const [triggerTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
+  const { result: locations = [] } = useSelector(getBackupLocations);
+
   const columns = useMemo(
     (): Array<Column<Backup>> => [
+      {
+        Header: Messages.backupInventory.table.columns.status,
+        accessor: 'status',
+        width: '100px',
+        Cell: ({ value, row }) => (
+          <Status
+            showLogsAction={row.original.vendor === Databases.mongodb}
+            status={value}
+            onLogClick={() => onLogClick(row.original)}
+          />
+        ),
+      },
       {
         Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
         id: 'name',
-        width: '250px',
-        Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
         Header: Messages.backupInventory.table.columns.vendor,
@@ -71,6 +88,7 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.created,
         accessor: 'created',
+        width: '200px',
         Cell: ({ value }) => <DetailedDate date={value} />,
       },
       {
@@ -81,35 +99,27 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
-      },
-      {
-        Header: Messages.backupInventory.table.columns.status,
-        accessor: 'status',
-        Cell: ({ value, row }) => (
-          <Status
-            showLogsAction={row.original.vendor === Databases.mongodb}
-            status={value}
-            onLogClick={() => onLogClick(row.original)}
-          />
-        ),
+        width: '250px',
       },
       {
         Header: Messages.backupInventory.table.columns.actions,
         accessor: 'id',
         Cell: ({ row }) => (
           <BackupInventoryActions
+            row={row}
             onRestore={onRestoreClick}
             onBackup={onBackupClick}
             backup={row.original}
             onDelete={onDeleteClick}
           />
         ),
-        width: '150px',
+        width: '100px',
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
 
   const onRestoreClick = (backup: Backup) => {
     setSelectedBackup(backup);
@@ -150,21 +160,32 @@ export const BackupInventory: FC = () => {
     }
   };
 
-  const getData = useCallback(async (showLoading = false) => {
-    showLoading && setPending(true);
+  const getData = useCallback(
+    async (showLoading = false) => {
+      showLoading && setPending(true);
 
-    try {
-      const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
-      setData(backups);
-    } catch (e) {
-      if (isApiCancelError(e)) {
-        return;
+      try {
+        const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
+
+        backups.forEach((backup) => {
+          if (!backupLocationMap.current[backup.id]) {
+            backupLocationMap.current[backup.id] = locations.find(
+              (location) => location.locationID === backup.locationId
+            );
+          }
+        });
+        setData(backups);
+      } catch (e) {
+        if (isApiCancelError(e)) {
+          return;
+        }
+        logger.error(e);
       }
-      logger.error(e);
-    }
-    setPending(false);
+      setPending(false);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    [locations]
+  );
 
   const handleDelete = useCallback(
     async (force = false) => {
@@ -246,9 +267,14 @@ export const BackupInventory: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('backupEnabled'), []);
 
   useEffect(() => {
-    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
+    dispatch(fetchStorageLocations());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getData]);
 
   return (
     <OldPage navModel={navModel}>
@@ -258,12 +284,11 @@ export const BackupInventory: FC = () => {
           <div className={styles.addWrapper}>
             <Button
               size="md"
-              icon="plus-square"
-              fill="text"
+              variant="primary"
               data-testid="backup-add-modal-button"
               onClick={() => onBackupClick(null)}
             >
-              {Messages.add}
+              {Messages.createNewBackup}
             </Button>
           </div>
           <Table
@@ -304,8 +329,12 @@ export const BackupInventory: FC = () => {
               onDelete={handleDelete}
               initialForceValue={true}
               loading={deletePending}
-              showForce
-            />
+              showForce={!!selectedBackup && backupLocationMap.current[selectedBackup.id]?.type !== LocationType.CLIENT}
+            >
+              {!!selectedBackup && backupLocationMap.current[selectedBackup.id]?.type === LocationType.CLIENT && (
+                <Alert title="">{Messages.backupInventory.deleteWarning}</Alert>
+              )}
+            </DeleteModal>
           )}
           {logsModalVisible && (
             <BackupLogsModal

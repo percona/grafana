@@ -29,6 +29,7 @@ import {
   Labels,
   MainDetails,
   MongoDBConnectionDetails,
+  MySQLConnectionDetails,
   PostgreSQLConnectionDetails,
 } from './FormParts';
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
@@ -92,6 +93,8 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
           return <PostgreSQLConnectionDetails remoteInstanceCredentials={remoteInstanceCredentials} />;
         case Databases.mongodb:
           return <MongoDBConnectionDetails remoteInstanceCredentials={remoteInstanceCredentials} />;
+        case Databases.mysql:
+          return <MySQLConnectionDetails remoteInstanceCredentials={remoteInstanceCredentials} />;
         default:
           return <MainDetails form={form} remoteInstanceCredentials={remoteInstanceCredentials} />;
       }

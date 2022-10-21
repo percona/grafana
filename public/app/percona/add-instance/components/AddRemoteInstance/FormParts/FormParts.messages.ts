@@ -28,6 +28,10 @@ export const Messages = {
       },
       postgresqlDetails: {
         database: 'Database',
+        maxQueryLength: 'Max query length',
+      },
+      mysqlDetails: {
+        maxQueryLength: 'Max query length',
       },
       mongodbDetails: {
         maxQueryLength: 'Max query length',
@@ -79,6 +83,10 @@ export const Messages = {
       },
       postgresqlDetails: {
         database: 'Database (default: postgres)',
+        maxQueryLength: 'Max query length',
+      },
+      mysqlDetails: {
+        maxQueryLength: 'Max query length',
       },
       mongodbDetails: {
         maxQueryLength: 'Max query length',
@@ -114,6 +122,10 @@ export const Messages = {
       },
       postgresqlDetails: {
         database: 'Database name',
+        maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
+      },
+      mysqlDetails: {
+        maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
       },
       mongodbDetails: {
         maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
