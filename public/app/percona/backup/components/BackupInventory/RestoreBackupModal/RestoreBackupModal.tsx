@@ -114,11 +114,13 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
     if (backup) {
       const serviceId = serviceType === ServiceTypeSelect.SAME ? backup.serviceId : service.value;
       if (backup.mode === BackupMode.PITR && selectedTimerangeFromDatepicker) {
-        onRestore(serviceId || '', backup.id, selectedTimerangeFromDatepicker.toISOString());
+        return onRestore(serviceId || '', backup.id, selectedTimerangeFromDatepicker.toISOString());
       } else {
-        onRestore(serviceId || '', backup.id);
+        return onRestore(serviceId || '', backup.id);
       }
     }
+
+    return;
   };
 
   const calculateDisableHours = useCallback(() => {
