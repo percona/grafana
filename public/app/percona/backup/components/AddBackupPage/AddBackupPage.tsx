@@ -298,7 +298,11 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                     <div className={styles.advanceSection}>
                       {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}
                       <div className={styles.collapsableSection}>
-                        <CollapsableSection label={Messages.advanceSettings} isOpen={false}>
+                        <CollapsableSection
+                          label={Messages.advanceSettings}
+                          isOpen={false}
+                          buttonDataTestId="add-backup-advanced-settings"
+                        >
                           <RetryModeSelector retryMode={values.retryMode} />
                         </CollapsableSection>
                         {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
