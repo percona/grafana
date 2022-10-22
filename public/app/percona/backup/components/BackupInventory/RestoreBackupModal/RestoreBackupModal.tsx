@@ -1,3 +1,4 @@
+import { cx } from '@emotion/css';
 import { Modal, LoaderButton, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
@@ -208,107 +209,110 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   }, [selectedTimerange]);
 
   return (
-    <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>
-      <Form
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-        render={({ handleSubmit, valid, submitting, values }) => (
-          <form onSubmit={handleSubmit}>
-            <div className={styles.modalWrapper}>
-              {backup?.mode === BackupMode.PITR && (
-                <>
-                  <Field name="timerange" validate={validators.required}>
-                    {({ input }) => (
-                      <div>
-                        <AsyncSelectField
-                          label={Messages.timeRange}
-                          loadOptions={() => BackupInventoryService.listPitrTimeranges(backup!.id)}
-                          {...input}
-                          defaultOptions
-                          data-testid="time-range-select-input"
-                          onChange={(e) => {
-                            setSelectedTimerange(e.value);
-                            input.onChange(e);
-                          }}
-                        />
-                      </div>
-                    )}
-                  </Field>
-                </>
-              )}
-              {selectedTimerange && (
-                <div>
-                  <Label label="Timestamp" />
-                  <DateTimePicker
-                    date={selectedTimerangeFromDatepicker}
-                    onChange={setSelectedTimerangeFromDatepicker}
-                    calendarProps={{
-                      minDate: new Date(selectedTimerange.startTimestamp),
-                      maxDate: new Date(selectedTimerange.endTimestamp),
-                      onClickDay: setSelectedDay,
-                    }}
-                    timepickerProps={{
-                      disabledHours: calculateDisableHours,
-                      disabledMinutes: calculateDisableMinutes,
-                      disabledSeconds: calculateDisableSeconds,
-                      hideDisabledOptions: true,
-                    }}
-                    inputWrapperClassName={styles.inputWrapper}
-                    growInlineField
-                    shrinkInlineField
-                  />
-                </div>
-              )}
-              {backup?.mode === BackupMode.PITR && !selectedTimerange && <div />}
-              <RadioButtonGroupField
-                className={styles.radioGroup}
-                options={serviceTypeOptions}
-                name="serviceType"
-                label={Messages.serviceSelection}
-                fullWidth
-                disabled={values.vendor !== DATABASE_LABELS[Databases.mysql]}
-              />
-              <TextInputField disabled name="vendor" label={Messages.vendor} />
-
-              <Field name="service" validate={validators.required}>
-                {({ input }) => (
+    <span className={cx(styles.modalContainer, { rangeSelected: !!selectedTimerange })}>
+      <Modal isVisible={isVisible} title={Messages.title} onClose={onClose}>
+        <Form
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          render={({ handleSubmit, valid, submitting, values }) => (
+            <form onSubmit={handleSubmit}>
+              <div className={styles.modalWrapper}>
+                {backup?.mode === BackupMode.PITR && (
+                  <>
+                    <Field name="timerange" validate={validators.required}>
+                      {({ input }) => (
+                        <div>
+                          <AsyncSelectField
+                            className={styles.timeRangeSelect}
+                            label={Messages.timeRange}
+                            loadOptions={() => BackupInventoryService.listPitrTimeranges(backup!.id)}
+                            {...input}
+                            defaultOptions
+                            data-testid="time-range-select-input"
+                            onChange={(e) => {
+                              setSelectedTimerange(e.value);
+                              input.onChange(e);
+                            }}
+                          />
+                        </div>
+                      )}
+                    </Field>
+                  </>
+                )}
+                {selectedTimerange && (
                   <div>
-                    <AsyncSelectField
-                      label={Messages.serviceName}
-                      disabled={values.serviceType === ServiceTypeSelect.SAME}
-                      loadOptions={() => RestoreBackupModalService.loadLocationOptions(backup!.id)}
-                      defaultOptions
-                      {...input}
-                      data-testid="service-select-input"
+                    <Label label="Timestamp" />
+                    <DateTimePicker
+                      date={selectedTimerangeFromDatepicker}
+                      onChange={setSelectedTimerangeFromDatepicker}
+                      calendarProps={{
+                        minDate: new Date(selectedTimerange.startTimestamp),
+                        maxDate: new Date(selectedTimerange.endTimestamp),
+                        onClickDay: setSelectedDay,
+                      }}
+                      timepickerProps={{
+                        disabledHours: calculateDisableHours,
+                        disabledMinutes: calculateDisableMinutes,
+                        disabledSeconds: calculateDisableSeconds,
+                        hideDisabledOptions: true,
+                      }}
+                      inputWrapperClassName={styles.inputWrapper}
+                      growInlineField
+                      shrinkInlineField
                     />
                   </div>
                 )}
-              </Field>
+                {backup?.mode === BackupMode.PITR && !selectedTimerange && <div />}
+                <RadioButtonGroupField
+                  className={styles.radioGroup}
+                  options={serviceTypeOptions}
+                  name="serviceType"
+                  label={Messages.serviceSelection}
+                  fullWidth
+                  disabled={values.vendor !== DATABASE_LABELS[Databases.mysql]}
+                />
+                <TextInputField disabled name="vendor" label={Messages.vendor} />
 
-              <TextInputField disabled name="dataModel" label={Messages.dataModel} />
-            </div>
-            {!!restoreErrors.length && <BackupErrorSection backupErrors={restoreErrors} />}
-            <HorizontalGroup justify="center" spacing="md">
-              <LoaderButton
-                data-testid="restore-button"
-                size="md"
-                variant="primary"
-                disabled={!valid || (values.serviceType === ServiceTypeSelect.SAME && noService)}
-                loading={submitting}
-                type="submit"
-              >
-                {Messages.restore}
-              </LoaderButton>
-              <Button data-testid="restore-cancel-button" variant="secondary" onClick={onClose}>
-                {Messages.close}
-              </Button>
-            </HorizontalGroup>
-            <div className={styles.errorLine} data-testid="backup-modal-error">
-              {values.serviceType === ServiceTypeSelect.SAME && noService && Messages.noService}
-            </div>
-          </form>
-        )}
-      />
-    </Modal>
+                <Field name="service" validate={validators.required}>
+                  {({ input }) => (
+                    <div>
+                      <AsyncSelectField
+                        label={Messages.serviceName}
+                        disabled={values.serviceType === ServiceTypeSelect.SAME}
+                        loadOptions={() => RestoreBackupModalService.loadLocationOptions(backup!.id)}
+                        defaultOptions
+                        {...input}
+                        data-testid="service-select-input"
+                      />
+                    </div>
+                  )}
+                </Field>
+
+                <TextInputField disabled name="dataModel" label={Messages.dataModel} />
+              </div>
+              {!!restoreErrors.length && <BackupErrorSection backupErrors={restoreErrors} />}
+              <HorizontalGroup justify="center" spacing="md">
+                <LoaderButton
+                  data-testid="restore-button"
+                  size="md"
+                  variant="primary"
+                  disabled={!valid || (values.serviceType === ServiceTypeSelect.SAME && noService)}
+                  loading={submitting}
+                  type="submit"
+                >
+                  {Messages.restore}
+                </LoaderButton>
+                <Button data-testid="restore-cancel-button" variant="secondary" onClick={onClose}>
+                  {Messages.close}
+                </Button>
+              </HorizontalGroup>
+              <div className={styles.errorLine} data-testid="backup-modal-error">
+                {values.serviceType === ServiceTypeSelect.SAME && noService && Messages.noService}
+              </div>
+            </form>
+          )}
+        />
+      </Modal>
+    </span>
   );
 };

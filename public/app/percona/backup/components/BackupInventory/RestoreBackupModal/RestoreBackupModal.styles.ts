@@ -34,4 +34,20 @@ export const getStyles = ({ v1: { palette, typography, spacing } }: GrafanaTheme
   inputWrapper: css`
     height: 37px;
   `,
+  timeRangeSelect: css`
+    margin-bottom: ${spacing.formInputMargin};
+    height: 37px;
+  `,
+  modalContainer: css`
+    &.rangeSelected {
+      [data-testid='modal-content'] {
+        height: 420px;
+      }
+      form {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `,
 });
