@@ -25,11 +25,24 @@ export interface Props {
   // @PERCONA
   calendarProps?: CalendarProps;
   timepickerProps?: TimePickerProps;
+  inputWrapperClassName?: string;
+  growInlineField?: boolean;
+  shrinkInlineField?: boolean;
 }
 
 const stopPropagation = (event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation();
 
-export const DateTimePicker: FC<Props> = ({ date, maxDate, label, onChange, calendarProps, timepickerProps }) => {
+export const DateTimePicker: FC<Props> = ({
+  date,
+  maxDate,
+  label,
+  onChange,
+  calendarProps,
+  timepickerProps,
+  inputWrapperClassName,
+  growInlineField,
+  shrinkInlineField,
+}) => {
   const [isOpen, setOpen] = useState(false);
 
   const theme = useTheme2();
@@ -55,7 +68,16 @@ export const DateTimePicker: FC<Props> = ({ date, maxDate, label, onChange, cale
 
   return (
     <div data-testid="date-time-picker" style={{ position: 'relative' }}>
-      <DateTimeInput date={date} onChange={onChange} isFullscreen={isFullscreen} onOpen={onOpen} label={label} />
+      <DateTimeInput
+        growInlineField={growInlineField}
+        shrinkInlineField={shrinkInlineField}
+        inputWrapperClassName={inputWrapperClassName}
+        date={date}
+        onChange={onChange}
+        isFullscreen={isFullscreen}
+        onOpen={onOpen}
+        label={label}
+      />
       {isOpen ? (
         isFullscreen ? (
           <ClickOutsideWrapper onClick={() => setOpen(false)}>
@@ -108,6 +130,9 @@ interface InputProps {
   isFullscreen: boolean;
   onChange: (date: DateTime) => void;
   onOpen: (event: FormEvent<HTMLElement>) => void;
+  inputWrapperClassName?: string;
+  growInlineField?: boolean;
+  shrinkInlineField?: boolean;
 }
 
 type InputState = {
@@ -115,7 +140,16 @@ type InputState = {
   invalid: boolean;
 };
 
-const DateTimeInput: FC<InputProps> = ({ date, label, onChange, isFullscreen, onOpen }) => {
+const DateTimeInput: FC<InputProps> = ({
+  date,
+  label,
+  onChange,
+  isFullscreen,
+  onOpen,
+  inputWrapperClassName,
+  growInlineField,
+  shrinkInlineField,
+}) => {
   const [internalDate, setInternalDate] = useState<InputState>(() => {
     return { value: date ? dateTimeFormat(date) : dateTimeFormat(dateTime()), invalid: false };
   });
@@ -153,7 +187,17 @@ const DateTimeInput: FC<InputProps> = ({ date, label, onChange, isFullscreen, on
     }
   }, [internalDate.value, onChange]);
 
-  const icon = <Button aria-label="Time picker" icon="calendar-alt" variant="secondary" onClick={onOpen} />;
+  const icon = (
+    <Button
+      className={css`
+        height: 100%;
+      `}
+      aria-label="Time picker"
+      icon="calendar-alt"
+      variant="secondary"
+      onClick={onOpen}
+    />
+  );
   return (
     <InlineField
       label={label}
@@ -162,6 +206,8 @@ const DateTimeInput: FC<InputProps> = ({ date, label, onChange, isFullscreen, on
       className={css`
         margin-bottom: 0;
       `}
+      grow={growInlineField}
+      shrink={shrinkInlineField}
     >
       <Input
         onClick={stopPropagation}
@@ -172,6 +218,7 @@ const DateTimeInput: FC<InputProps> = ({ date, label, onChange, isFullscreen, on
         onBlur={onBlur}
         data-testid="date-time-input"
         placeholder="Select date/time"
+        className={inputWrapperClassName}
       />
     </InlineField>
   );

@@ -11,6 +11,7 @@ export const getStyles = ({ v1: { palette, typography, spacing } }: GrafanaTheme
     gap: 0px ${spacing.sm};
     & > div {
       height: 100%;
+      margin-bottom: 0 !important;
     }
   `,
   radioGroup: css`
@@ -29,5 +30,8 @@ export const getStyles = ({ v1: { palette, typography, spacing } }: GrafanaTheme
     margin-top: ${spacing.sm};
     padding: ${spacing.formLabelPadding};
     text-align: center;
+  `,
+  inputWrapper: css`
+    height: 37px;
   `,
 });

@@ -238,7 +238,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
               )}
               {selectedTimerange && (
                 <div>
-                  <Label label="test" />
+                  <Label label="Timestamp" />
                   <DateTimePicker
                     date={selectedTimerangeFromDatepicker}
                     onChange={setSelectedTimerangeFromDatepicker}
@@ -253,9 +253,13 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                       disabledSeconds: calculateDisableSeconds,
                       hideDisabledOptions: true,
                     }}
+                    inputWrapperClassName={styles.inputWrapper}
+                    growInlineField
+                    shrinkInlineField
                   />
                 </div>
               )}
+              {backup?.mode === BackupMode.PITR && !selectedTimerange && <div />}
               <RadioButtonGroupField
                 className={styles.radioGroup}
                 options={serviceTypeOptions}
