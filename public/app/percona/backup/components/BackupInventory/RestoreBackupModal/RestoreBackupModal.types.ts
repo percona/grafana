@@ -1,6 +1,7 @@
 import { SelectableValue } from '@grafana/data';
 import { ApiVerboseError } from 'app/percona/shared/core';
 
+import { StorageLocation } from '../../StorageLocations/StorageLocations.types';
 import { Backup, Timeranges } from '../BackupInventory.types';
 
 export interface RestoreBackupModalProps {
@@ -8,6 +9,7 @@ export interface RestoreBackupModalProps {
   backup: Backup | null;
   noService?: boolean;
   restoreErrors?: ApiVerboseError[];
+  location?: StorageLocation;
   onClose: () => void;
   onRestore: (serviceId: string, artifactId: string, pitrTimestamp?: string) => Promise<void>;
 }

@@ -11,6 +11,7 @@ import { Label } from 'app/percona/shared/components/Form/Label';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
+import { LocationType } from '../../StorageLocations/StorageLocations.types';
 import { BackupInventoryService } from '../BackupInventory.service';
 import { Timeranges } from '../BackupInventory.types';
 
@@ -46,6 +47,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   restoreErrors = [],
   onClose,
   onRestore,
+  location,
 }) => {
   const styles = useStyles2(getStyles);
   const initialValues = useMemo(() => (backup ? toFormProps(backup) : undefined), [backup]);
@@ -53,6 +55,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
   const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
   const [selectedTimerangeFromDatepicker, setSelectedTimerangeFromDatepicker] = useState<DateTime>();
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
+  const showTimeRanges = backup?.mode === BackupMode.PITR && location?.type === LocationType.S3;
 
   const isSameStartDate = useMemo(() => {
     if (selectedDay && selectedTimerange) {
@@ -219,7 +222,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
           render={({ handleSubmit, valid, submitting, values }) => (
             <form onSubmit={handleSubmit}>
               <div className={styles.modalWrapper}>
-                {backup?.mode === BackupMode.PITR && (
+                {showTimeRanges && (
                   <>
                     <Field name="timerange" validate={validators.required}>
                       {({ input }) => (
@@ -264,7 +267,7 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                     />
                   </div>
                 )}
-                {backup?.mode === BackupMode.PITR && !selectedTimerange && <div />}
+                {showTimeRanges && !selectedTimerange && <div />}
                 <RadioButtonGroupField
                   className={styles.radioGroup}
                   options={serviceTypeOptions}

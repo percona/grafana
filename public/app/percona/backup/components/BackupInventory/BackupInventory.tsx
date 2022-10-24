@@ -262,6 +262,7 @@ export const BackupInventory: FC = () => {
           {restoreModalVisible && (
             <RestoreBackupModal
               backup={selectedBackup}
+              location={selectedBackup ? backupLocationMap.current[selectedBackup.id] : undefined}
               isVisible
               restoreErrors={restoreErrors}
               onClose={handleClose}
