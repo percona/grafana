@@ -10,15 +10,16 @@ import { appEvents } from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
-import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
+import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backupLocations';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
+import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from '../../Backup.messages';
 import { RetryMode } from '../../Backup.types';
@@ -44,6 +45,7 @@ export const ScheduledBackups: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const navModel = usePerconaNavModel('scheduled-backups');
   const [generateToken] = useCancelToken();
+  const dispatch = useAppDispatch();
   const styles = useStyles(getStyles);
 
   const retentionValue = useCallback((n: number) => {
@@ -134,7 +136,6 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.name,
         accessor: 'name',
         id: 'name',
-        Cell: ({ row, value }) => <ExpandableCell row={row} value={value} />,
       },
       {
         Header: Messages.scheduledBackups.table.columns.vendor,
@@ -164,6 +165,7 @@ export const ScheduledBackups: FC = () => {
         Header: Messages.scheduledBackups.table.columns.lastBackup,
         accessor: 'lastBackup',
         Cell: ({ value }) => (value ? <DetailedDate date={value} /> : ''),
+        width: '200px',
       },
       {
         Header: Messages.scheduledBackups.table.columns.actions,
@@ -171,6 +173,7 @@ export const ScheduledBackups: FC = () => {
         width: '150px',
         Cell: ({ row }) => (
           <ScheduledBackupsActions
+            row={row}
             pending={actionPending}
             backup={row.original}
             onToggle={handleToggle}
@@ -312,6 +315,7 @@ export const ScheduledBackups: FC = () => {
 
   useEffect(() => {
     getData();
+    dispatch(fetchStorageLocations());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -321,14 +325,8 @@ export const ScheduledBackups: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            <Button
-              size="md"
-              icon="plus-square"
-              fill="text"
-              data-testid="scheduled-backup-add-modal-button"
-              onClick={onAddClick}
-            >
-              {Messages.add}
+            <Button size="md" variant="primary" data-testid="scheduled-backup-add-modal-button" onClick={onAddClick}>
+              {Messages.createScheduledBackup}
             </Button>
           </div>
           <Table
