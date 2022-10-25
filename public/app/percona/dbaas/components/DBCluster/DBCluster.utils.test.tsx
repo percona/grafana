@@ -9,45 +9,31 @@ import {
   formatDBClusterVersion,
   formatDBClusterVersionWithBuild,
 } from './DBCluster.utils';
-import { dbClustersStub, resourcesA, resourcesB, resourcesC } from './__mocks__/dbClustersStubs';
+import { resourcesA, resourcesB, resourcesC } from './__mocks__/dbClustersStubs';
 
 describe('DBCluster.utils::', () => {
   it('returns true if cluster is changing', () => {
-    const result = isClusterChanging({
-      ...dbClustersStub[0],
-      status: DBClusterStatus.changing,
-    });
+    const result = isClusterChanging(DBClusterStatus.changing);
 
     expect(result).toBeTruthy();
   });
   it('returns true if cluster is deleting', () => {
-    const result = isClusterChanging({
-      ...dbClustersStub[0],
-      status: DBClusterStatus.deleting,
-    });
+    const result = isClusterChanging(DBClusterStatus.deleting);
 
     expect(result).toBeTruthy();
   });
   it('returns false if cluster is ready', () => {
-    const result = isClusterChanging({
-      ...dbClustersStub[0],
-      status: DBClusterStatus.ready,
-    });
+    const result = isClusterChanging(DBClusterStatus.ready);
 
     expect(result).toBeFalsy();
   });
   it('returns false if cluster is invalid', () => {
-    const result = isClusterChanging({
-      ...dbClustersStub[0],
-      status: DBClusterStatus.invalid,
-    });
+    const result = isClusterChanging(DBClusterStatus.invalid);
 
     expect(result).toBeFalsy();
   });
   it('returns false if cluster has no status', () => {
-    const result = isClusterChanging({
-      ...dbClustersStub[0],
-    });
+    const result = isClusterChanging(undefined);
 
     expect(result).toBeFalsy();
   });

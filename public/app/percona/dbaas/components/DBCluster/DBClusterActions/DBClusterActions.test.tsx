@@ -1,6 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import React from 'react';
+import React, { ReactChild } from 'react';
+import { Provider } from 'react-redux';
 
+import { configureStore } from '../../../../../store/configureStore';
+import { StoreState } from '../../../../../types';
+import { DBClusterDetails, DBClusterStatus } from '../DBCluster.types';
 import { dbClustersStub } from '../__mocks__/dbClustersStubs';
 
 import { DBClusterActions } from './DBClusterActions';
@@ -8,9 +12,38 @@ import { DBClusterActions } from './DBClusterActions';
 jest.mock('app/core/app_events');
 jest.mock('../XtraDB.service');
 
+const setup = (child: ReactChild) =>
+  render(
+    <Provider
+      store={configureStore({
+        percona: {
+          dbClustersDetails: {
+            loading: false,
+            result: {
+              cluster_1: {
+                clusterName: 'cluster_1',
+                kubernetesClusterName: 'cluster_1',
+                databaseType: 'mongodb',
+                clusterSize: 1,
+                memory: 1000,
+                cpu: 1000,
+                disk: 1000,
+                status: DBClusterStatus.ready,
+                message: 'Ready',
+                expose: true,
+              },
+            } as DBClusterDetails,
+          },
+        },
+      } as unknown as StoreState)}
+    >
+      {child}
+    </Provider>
+  );
+
 describe('DBClusterActions::', () => {
   it('renders correctly', async () => {
-    render(
+    setup(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
         setSelectedCluster={jest.fn()}
@@ -26,7 +59,7 @@ describe('DBClusterActions::', () => {
   });
 
   it('doesnt disable button if cluster is ready', () => {
-    render(
+    setup(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
         setSelectedCluster={jest.fn()}
@@ -44,7 +77,7 @@ describe('DBClusterActions::', () => {
   it('calls delete action correctly', async () => {
     const setSelectedCluster = jest.fn();
     const setDeleteModalVisible = jest.fn();
-    render(
+    setup(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
         setSelectedCluster={setSelectedCluster}
@@ -69,7 +102,7 @@ describe('DBClusterActions::', () => {
   it('delete action is disabled if cluster is deleting', async () => {
     const setSelectedCluster = jest.fn();
     const setDeleteModalVisible = jest.fn();
-    render(
+    setup(
       <DBClusterActions
         dbCluster={dbClustersStub[3]}
         setSelectedCluster={setSelectedCluster}
@@ -91,9 +124,9 @@ describe('DBClusterActions::', () => {
     expect(setDeleteModalVisible).toHaveBeenCalled();
   });
 
-  xit('calls restart action correctly', async () => {
+  it('calls restart action correctly', async () => {
     const getDBClusters = jest.fn();
-    render(
+    setup(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
         setSelectedCluster={jest.fn()}

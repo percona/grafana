@@ -15,8 +15,8 @@ import {
   ResourcesWithUnits,
 } from './DBCluster.types';
 
-export const isClusterChanging = ({ status }: DBCluster) => {
-  return status === DBClusterStatus.changing || status === DBClusterStatus.deleting;
+export const isClusterChanging = (status?: DBClusterStatus) => {
+  return (status && status === DBClusterStatus.changing) || status === DBClusterStatus.deleting;
 };
 
 export const newDBClusterService = (type: Databases): DBClusterService => {

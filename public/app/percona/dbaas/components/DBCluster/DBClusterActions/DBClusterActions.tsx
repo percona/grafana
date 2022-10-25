@@ -1,9 +1,11 @@
 import { logger } from '@percona/platform-core';
 import React, { FC, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
 
+import { getPerconaDBClustersDetails } from '../../../../shared/core/selectors';
 import { DBCluster, DBClusterStatus } from '../DBCluster.types';
 import { isClusterChanging, newDBClusterService } from '../DBCluster.utils';
 
@@ -19,15 +21,22 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
   setUpdateModalVisible,
   getDBClusters,
 }) => {
+  const { result: clusters = {} } = useSelector(getPerconaDBClustersDetails);
+
+  const { status } =
+    Object.keys(clusters).length && dbCluster.id && !!clusters[dbCluster.id]
+      ? clusters[dbCluster.id]
+      : { status: undefined };
+
   const getActions = useCallback(
     (dbCluster: DBCluster) => [
       {
         content: Messages.dbcluster.table.actions.updateCluster,
         disabled:
           !dbCluster.availableImage ||
-          dbCluster.status === DBClusterStatus.upgrading ||
-          dbCluster.status === DBClusterStatus.deleting ||
-          dbCluster.status === DBClusterStatus.changing,
+          status === DBClusterStatus.upgrading ||
+          status === DBClusterStatus.deleting ||
+          status === DBClusterStatus.changing,
         action: () => {
           setSelectedCluster(dbCluster);
           setUpdateModalVisible(true);
@@ -35,7 +44,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       },
       {
         content: Messages.dbcluster.table.actions.deleteCluster,
-        disabled: dbCluster.status === DBClusterStatus.deleting,
+        disabled: status === DBClusterStatus.deleting,
         action: () => {
           setSelectedCluster(dbCluster);
           setDeleteModalVisible(true);
@@ -43,7 +52,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       },
       {
         content: Messages.dbcluster.table.actions.editCluster,
-        disabled: dbCluster.status !== DBClusterStatus.ready,
+        disabled: status !== DBClusterStatus.ready,
         action: () => {
           setSelectedCluster(dbCluster);
           setEditModalVisible(true);
@@ -51,7 +60,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       },
       {
         content: Messages.dbcluster.table.actions.restartCluster,
-        disabled: isClusterChanging(dbCluster),
+        disabled: isClusterChanging(status),
         action: async () => {
           try {
             const dbClusterService = newDBClusterService(dbCluster.databaseType);
@@ -65,15 +74,15 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       },
       {
         content:
-          dbCluster.status === DBClusterStatus.ready
+          status === DBClusterStatus.ready
             ? Messages.dbcluster.table.actions.suspend
             : Messages.dbcluster.table.actions.resume,
-        disabled: dbCluster.status !== DBClusterStatus.ready && dbCluster.status !== DBClusterStatus.suspended,
+        disabled: status !== DBClusterStatus.ready && status !== DBClusterStatus.suspended,
         action: async () => {
           try {
             const dbClusterService = newDBClusterService(dbCluster.databaseType);
 
-            if (dbCluster.status === DBClusterStatus.ready) {
+            if (status === DBClusterStatus.ready) {
               await dbClusterService.suspendDBCluster(dbCluster);
             } else {
               await dbClusterService.resumeDBCluster(dbCluster);
@@ -100,6 +109,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       setEditModalVisible,
       setLogsModalVisible,
       setUpdateModalVisible,
+      status,
     ]
   );
 

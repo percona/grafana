@@ -1,4 +1,4 @@
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
@@ -199,59 +199,61 @@ describe('DBCluster::', () => {
   });
 
   it('should open AddModal if kubernetesCluster was selected', async () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, dbaasEnabled: true } },
-            kubernetes: {
-              loading: false,
-            },
-            dbaas: {
-              selectedKubernetesCluster: {
-                kubernetesClusterName: 'testPreselectedCluster',
-                operators: {
-                  psmdb: {
-                    availableVersion: '1.12.0',
-                    status: KubernetesOperatorStatus.ok,
-                    version: '1.11.0',
+    await waitFor(() =>
+      render(
+        <Provider
+          store={configureStore({
+            percona: {
+              user: { isAuthorized: true },
+              settings: { loading: false, result: { isConnectedToPortal: true, dbaasEnabled: true } },
+              kubernetes: {
+                loading: false,
+              },
+              dbaas: {
+                selectedKubernetesCluster: {
+                  kubernetesClusterName: 'testPreselectedCluster',
+                  operators: {
+                    psmdb: {
+                      availableVersion: '1.12.0',
+                      status: KubernetesOperatorStatus.ok,
+                      version: '1.11.0',
+                    },
+                    pxc: {
+                      availableVersion: undefined,
+                      status: KubernetesOperatorStatus.ok,
+                      version: '1.11.0',
+                    },
                   },
-                  pxc: {
-                    availableVersion: undefined,
-                    status: KubernetesOperatorStatus.ok,
-                    version: '1.11.0',
-                  },
+                  status: KubernetesClusterStatus.ok,
                 },
-                status: KubernetesClusterStatus.ok,
+              },
+              addKubernetes: { loading: false },
+              deleteKubernetes: { loading: false },
+              dbClusters: {
+                loading: false,
+                result: [
+                  {
+                    clusterName: 'cluster_1',
+                    kubernetesClusterName: 'cluster_1',
+                    databaseType: 'mongodb',
+                    clusterSize: 1,
+                    memory: 1000,
+                    cpu: 1000,
+                    disk: 1000,
+                    status: DBClusterStatus.failed,
+                    message: 'Error',
+                    installedImage: 'percona/percona-xtra-dbcluster:8.0',
+                  },
+                ],
               },
             },
-            addKubernetes: { loading: false },
-            deleteKubernetes: { loading: false },
-            dbClusters: {
-              loading: false,
-              result: [
-                {
-                  clusterName: 'cluster_1',
-                  kubernetesClusterName: 'cluster_1',
-                  databaseType: 'mongodb',
-                  clusterSize: 1,
-                  memory: 1000,
-                  cpu: 1000,
-                  disk: 1000,
-                  status: DBClusterStatus.failed,
-                  message: 'Error',
-                  installedImage: 'percona/percona-xtra-dbcluster:8.0',
-                },
-              ],
-            },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <DBCluster />
-        </Router>
-      </Provider>
+          } as StoreState)}
+        >
+          <Router history={locationService.getHistory()}>
+            <DBCluster />
+          </Router>
+        </Provider>
+      )
     );
 
     expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalled();
