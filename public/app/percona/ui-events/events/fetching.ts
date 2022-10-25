@@ -1,0 +1,56 @@
+import { EventStore, EventType } from "app/percona/ui-events/EventStore.service";
+import { Action } from "app/percona/ui-events/reducer";
+
+interface FetchingPayload {
+  action: {
+    payload: {
+      id: string,
+      type: string,
+      data: any,
+    };
+    type: string,
+  };
+  key: string;
+}
+
+export interface FetchingEvent {
+  component: string;
+  loadTime: number;
+  location: string;
+  location_params: string;
+}
+
+const startFetchingEvent = "templating/keyed/shared/variableStateFetching";
+const endFetchingEvent = "templating/keyed/shared/variableStateCompleted";
+
+const supportedEvents = [startFetchingEvent, endFetchingEvent];
+
+const fetchingEvents = new Map();
+
+export const processFetchingEvents = (state: any = {}, action: Action) => {
+
+  if (!supportedEvents.find(each => action.type.startsWith(each))) {
+    return;
+  }
+
+  let payload = action.payload as FetchingPayload;
+
+  let component = `${payload.key}-${payload.action.payload.id}`;
+
+  if (action.type === startFetchingEvent) {
+    fetchingEvents.set(component, Date.now());
+  } else if (action.type === endFetchingEvent) {
+    const start = fetchingEvents.get(component);
+    const now = Date.now();
+    if (start !== undefined) {
+      fetchingEvents.delete(component);
+      const event: FetchingEvent = {
+        component,
+        loadTime: now - start,
+        location: window.location.pathname,
+        location_params: window.location.search
+      };
+      EventStore.add(EventType.Fetching, event);
+    }
+  }
+};

@@ -1,0 +1,37 @@
+import { EventStore, EventType } from "app/percona/ui-events/EventStore.service";
+import { Action } from "app/percona/ui-events/reducer";
+
+interface NotificationPayload {
+  component: string;
+  icon: string;
+  id: string;
+  severity: string;
+  showing: boolean;
+  text: string;
+  timestamp: number;
+  title: string;
+  traceId: string;
+}
+
+export interface NotificationErrorEvent {
+  title: string;
+  text: string;
+  location: string;
+  location_params: string;
+}
+
+export const processNotificationEvents = (state: any = {}, action: Action) => {
+  if (!action.type.startsWith("appNotifications/")) {
+    return;
+  }
+
+  const payload = action.payload as NotificationPayload;
+
+  const event: NotificationErrorEvent = {
+    text: payload.text,
+    title: payload.title,
+    location: window.location.pathname,
+    location_params: window.location.search
+  };
+  EventStore.add(EventType.NotificationError, event);
+};
