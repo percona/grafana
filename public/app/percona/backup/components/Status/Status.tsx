@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { cx } from '@emotion/css';
 import React, { FC, useMemo } from 'react';
 
-import { useTheme } from '@grafana/ui';
+import { Tooltip, useTheme, Icon, IconName } from '@grafana/ui';
 import { Ellipsis } from 'app/percona/shared/components/Elements/Icons';
 
 import { BackupStatus, RestoreStatus } from '../../Backup.types';
@@ -37,6 +38,7 @@ export const Status: FC<StatusProps> = ({ status, showLogsAction = false, onLogC
     [status, styles.statusSuccess, styles.statusError]
   );
   const isPending = pendingStates.includes(status);
+  const backupSucceeded = successfulStates.includes(status);
 
   return (
     <div className={styles.statusContainer}>
@@ -46,7 +48,13 @@ export const Status: FC<StatusProps> = ({ status, showLogsAction = false, onLogC
         </span>
       ) : (
         <span data-testid="statusMsg" className={cx(statusStyles)}>
-          {statusMsg}
+          <Tooltip placement="top" content={statusMsg}>
+            {backupSucceeded ? (
+              <Icon name="check-circle" size="xl" data-testid="success-icon" />
+            ) : (
+              <Icon name={'times-circle' as IconName} size="xl" data-testid="fail-icon" />
+            )}
+          </Tooltip>
         </span>
       )}
       {showLogsAction && (
