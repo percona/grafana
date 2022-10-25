@@ -8,5 +8,5 @@ export const Messages = {
   restore: 'Restore',
   close: 'Close',
   noService: 'This service no longer exists. Please choose a compatible one.',
-  physicalMongoWarning: 'Restoring this backup will cause MongoDB to go down. Please address it manually afterwards.',
+  physicalMongoWarning: 'Restoring this backup will cause MongoDB to go down. Please restart it manually afterwards.',
 };
