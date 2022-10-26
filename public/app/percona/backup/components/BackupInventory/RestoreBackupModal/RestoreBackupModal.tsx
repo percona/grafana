@@ -300,6 +300,9 @@ export const RestoreBackupModal: FC<RestoreBackupModalProps> = ({
                   {Messages.physicalMongoWarning}
                 </Alert>
               )}
+              <Alert title="" severity="warning">
+                {Messages.scheduledWarning}
+              </Alert>
               {!!restoreErrors.length && <BackupErrorSection backupErrors={restoreErrors} />}
               <HorizontalGroup justify="center" spacing="md">
                 <LoaderButton
