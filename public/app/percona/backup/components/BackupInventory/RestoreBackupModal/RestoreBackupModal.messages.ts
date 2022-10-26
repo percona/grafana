@@ -10,4 +10,5 @@ export const Messages = {
   noService: 'This service no longer exists. Please choose a compatible one.',
   physicalMongoWarning: 'Restoring this backup will cause MongoDB to go down. Please restart it manually afterwards.',
   scheduledWarning: 'All scheduled backups for this service will be disabled. Please enable them after the restore.',
+  localRestoreDisabled: 'Restoring locally saved backups is not yet supported. Please restore this backup manually.',
 };
