@@ -139,6 +139,8 @@ func (s *Service) handleExpressions(ctx context.Context, user *models.SignedInUs
 
 func (s *Service) handleQueryData(ctx context.Context, user *models.SignedInUser, parsedReq *parsedRequest) (*backend.QueryDataResponse, error) {
 	ds := parsedReq.parsedQueries[0].datasource
+	xPerconaToken := parsedReq.httpRequest.Header.Get("X-Percona-Token")
+
 	if err := s.pluginRequestValidator.Validate(ds.Url, nil); err != nil {
 		return nil, datasources.ErrDataSourceAccessDenied
 	}
@@ -165,6 +167,9 @@ func (s *Service) handleQueryData(ctx context.Context, user *models.SignedInUser
 			httpclientprovider.ForwardedCookiesMiddleware(parsedReq.httpRequest.Cookies(), ds.AllowedCookies()),
 		)
 	}
+
+	req.Headers["X-Percona-Token"] = xPerconaToken
+	middlewares = append(middlewares, httpclientprovider.ForwardedPerconaTokenMiddleware(xPerconaToken))
 
 	if s.oAuthTokenService.IsOAuthPassThruEnabled(ds) {
 		if token := s.oAuthTokenService.GetCurrentOAuthToken(ctx, user); token != nil {
