@@ -1,10 +1,16 @@
-import { StepType } from '@reactour/tour';
+import { ReactElement } from 'react';
 
-export interface TourStep extends StepType {
+export interface TourStep {
   navMenuId?: string;
-  // copied from @react-tour-popover
-  // only part of available api, was causing cycling types error otherwise
+  // Props used from StepType from @reactour/tour
+  // Extending the whole type causing a TS error:
+  // Type instantiation is excessively deep and possibly infinite.
+  selector: string;
+  content: ReactElement;
   position?: 'top' | 'right' | 'bottom' | 'left' | 'center' | [number, number];
+  highlightedSelectors?: string[];
+  resizeObservables?: string[];
+  mutationObservables?: string[];
 }
 
 export enum TourType {
