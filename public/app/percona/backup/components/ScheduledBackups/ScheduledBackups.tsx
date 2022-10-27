@@ -4,8 +4,9 @@ import cronstrue from 'cronstrue';
 import React, { FC, useState, useMemo, useEffect, useCallback } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
-import { AppEvents } from '@grafana/data';
-import { Button, useStyles } from '@grafana/ui';
+import { AppEvents, urlUtil } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
+import { LinkButton, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
@@ -18,14 +19,11 @@ import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backupLocations';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from '../../Backup.messages';
-import { RetryMode } from '../../Backup.types';
+import { BackupService } from '../../Backup.service';
 import { formatBackupMode } from '../../Backup.utils';
-import { AddBackupModal } from '../AddBackupModal';
-import { AddBackupFormProps } from '../AddBackupModal/AddBackupModal.types';
 import { DetailedDate } from '../DetailedDate';
 
 import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
@@ -41,7 +39,6 @@ export const ScheduledBackups: FC = () => {
   const [actionPending, setActionPending] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
-  const [backupModalVisible, setBackupModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const navModel = usePerconaNavModel('scheduled-backups');
   const [generateToken] = useCancelToken();
@@ -92,7 +89,7 @@ export const ScheduledBackups: FC = () => {
       const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
       setActionPending(true);
       try {
-        await ScheduledBackupsService.schedule(
+        await BackupService.scheduleBackup(
           serviceId,
           locationId,
           cronExpression,
@@ -199,79 +196,6 @@ export const ScheduledBackups: FC = () => {
     []
   );
 
-  const handleClose = () => {
-    setBackupModalVisible(false);
-  };
-
-  const handleBackup = async (backup: AddBackupFormProps) => {
-    const {
-      id,
-      service,
-      location,
-      period,
-      month,
-      day,
-      weekDay,
-      startHour,
-      startMinute,
-      backupName,
-      description,
-      retryMode,
-      retryInterval,
-      retryTimes,
-      active,
-      retention,
-      mode,
-      dataModel,
-    } = backup;
-    try {
-      const cronExpression = getCronStringFromValues(
-        period!.value!,
-        month!.map((m) => m.value!),
-        day!.map((m) => m.value!),
-        weekDay!.map((m) => m.value!),
-        startHour!.map((m) => m.value!),
-        startMinute!.map((m) => m.value!)
-      );
-      const strRetryInterval = `${retryInterval}s`;
-      let resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
-
-      if (id) {
-        await ScheduledBackupsService.change(
-          id,
-          active!,
-          cronExpression,
-          backupName,
-          description,
-          strRetryInterval,
-          resultRetryTimes!,
-          retention!
-        );
-        appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.getEditSuccess(backupName)]);
-      } else {
-        await ScheduledBackupsService.schedule(
-          service!.value?.id!,
-          location!.value!,
-          cronExpression,
-          backupName,
-          description,
-          strRetryInterval,
-          resultRetryTimes!,
-          retention!,
-          active!,
-          mode,
-          dataModel
-        );
-        appEvents.emit(AppEvents.alertSuccess, [Messages.scheduledBackups.addSuccess]);
-      }
-      setBackupModalVisible(false);
-      setSelectedBackup(null);
-      getData();
-    } catch (e) {
-      logger.error(e);
-    }
-  };
-
   const onDeleteClick = (backup: ScheduledBackup) => {
     setDeleteModalVisible(true);
     setSelectedBackup(backup);
@@ -293,13 +217,7 @@ export const ScheduledBackups: FC = () => {
   };
 
   const onEditClick = (backup: ScheduledBackup) => {
-    setSelectedBackup(backup);
-    setBackupModalVisible(true);
-  };
-
-  const onAddClick = () => {
-    setSelectedBackup(null);
-    setBackupModalVisible(true);
+    locationService.push(`/backup${backup.id}/edit`);
   };
 
   const getCellProps = useCallback(
@@ -325,9 +243,16 @@ export const ScheduledBackups: FC = () => {
         <TechnicalPreview />
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
-            <Button size="md" variant="primary" data-testid="scheduled-backup-add-modal-button" onClick={onAddClick}>
+            <LinkButton
+              href={urlUtil.renderUrl('/backup/new', {
+                scheduled: true,
+              })}
+              size="md"
+              variant="primary"
+              data-testid="scheduled-backup-add-button"
+            >
               {Messages.createScheduledBackup}
-            </Button>
+            </LinkButton>
           </div>
           <Table
             columns={columns}
@@ -337,13 +262,6 @@ export const ScheduledBackups: FC = () => {
             pendingRequest={pending}
             renderExpandedRow={renderSelectedSubRow}
             getCellProps={getCellProps}
-          />
-          <AddBackupModal
-            scheduleMode
-            backup={selectedBackup}
-            isVisible={backupModalVisible}
-            onClose={handleClose}
-            onBackup={handleBackup}
           />
           <DeleteModal
             title={Messages.scheduledBackups.deleteModalTitle}
