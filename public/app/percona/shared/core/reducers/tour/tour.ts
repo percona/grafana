@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { setProductTourCompleted } from '../user';
+import { setAlertingTourCompleted, setProductTourCompleted } from '../user';
 
 import { SetStepsActionPayload, TourState, TourType } from './tour.types';
 
@@ -32,12 +32,10 @@ const tourSlice = createSlice({
 });
 
 export const endTourAction = createAsyncThunk('percona/endTour', (tour: TourType, { dispatch }) => {
-  console.log('Ending tour - ', tour);
-
   if (tour === TourType.Product) {
     dispatch(setProductTourCompleted(true));
   } else if (tour === TourType.Alerting) {
-    dispatch(setProductTourCompleted(true));
+    dispatch(setAlertingTourCompleted(true));
   }
 });
 

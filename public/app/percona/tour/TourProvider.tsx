@@ -18,8 +18,9 @@ const PerconaTourProvider: React.FC = ({ children }) => {
       showBadge={false}
       badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
       disableFocusLock
-      onClickClose={({ setIsOpen }) => {
+      onClickClose={({ setIsOpen, setCurrentStep }) => {
         endTour();
+        setCurrentStep(0);
         setIsOpen(false);
       }}
       onClickMask={({ setCurrentStep, setIsOpen }) => {

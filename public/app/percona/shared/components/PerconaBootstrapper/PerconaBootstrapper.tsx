@@ -52,11 +52,11 @@ export const PerconaBootstrapper = () => {
       try {
         const settings = await dispatch(fetchSettingsAction()).unwrap();
         setSteps(TourType.Product, getProductTourSteps(isPmmAdmin(contextSrv.user), settings));
-        setSteps(TourType.Alerting, getAlertingTourSteps());
+        setSteps(TourType.Alerting, getAlertingTourSteps(isPmmAdmin(contextSrv.user)));
         dispatch(setAuthorized(true));
       } catch (e) {
         setSteps(TourType.Product, getProductTourSteps(isPmmAdmin(contextSrv.user)));
-        setSteps(TourType.Alerting, getAlertingTourSteps());
+        setSteps(TourType.Alerting, getAlertingTourSteps(isPmmAdmin(contextSrv.user)));
         // @ts-ignore
         if (e.response?.status === 401) {
           setAuthorized(false);
