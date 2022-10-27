@@ -4,13 +4,15 @@ import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
 import { contextSrv } from 'app/core/services/context_srv';
 import {
   fetchSettingsAction,
-  setAuthorized,
   fetchServerInfoAction,
   fetchServerSaasHostAction,
-  fetchUserStatusAction,
-  fetchUserDetailsAction,
 } from 'app/percona/shared/core/reducers';
 import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
+import {
+  setAuthorized,
+  fetchUserDetailsAction,
+  fetchUserStatusAction,
+} from 'app/percona/shared/core/reducers/user/user';
 import getAlertingTourSteps from 'app/percona/tour/steps/alerting';
 import getProductTourSteps from 'app/percona/tour/steps/product';
 import { useAppDispatch } from 'app/store/store';
@@ -30,7 +32,7 @@ export const PerconaBootstrapper = () => {
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [showTour, setShowTour] = useState(false);
   const styles = useStyles2(getStyles);
-  const isLoggedIn = !!contextSrv.user.isSignedIn;
+  const isLoggedIn = contextSrv.user.isSignedIn;
 
   const dismissModal = () => {
     setModalIsOpen(false);

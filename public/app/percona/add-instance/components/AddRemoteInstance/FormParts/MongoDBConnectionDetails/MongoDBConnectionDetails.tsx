@@ -1,7 +1,7 @@
 import { PasswordInputField, TextInputField, validators } from '@percona/platform-core';
 import React, { FC, useMemo } from 'react';
 
-import { useTheme } from '@grafana/ui';
+import { useStyles } from '@grafana/ui';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import Validators from 'app/percona/shared/helpers/validators';
 
@@ -9,9 +9,8 @@ import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
 
-export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
+  const styles = useStyles(getStyles);
   const formValues = form && form.getState().values;
   const tlsFlag = formValues && formValues['tls'];
 
@@ -66,23 +65,14 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
         placeholder={Messages.form.placeholders.mainDetails.password}
         validators={userPassValidators}
       />
-      <div className={styles.labelWrapper} data-testid="database-label">
-        <span>{Messages.form.labels.postgresqlDetails.database}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.postgresqlDetails.database} icon="info-circle" />
-      </div>
-      <TextInputField
-        key="database"
-        name="database"
-        placeholder={Messages.form.placeholders.postgresqlDetails.database}
-      />
       <div className={styles.labelWrapper} data-testid="max-query-length-label">
-        <span>{Messages.form.labels.postgresqlDetails.maxQueryLength}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.postgresqlDetails.maxQueryLength} icon="info-circle" />
+        <span>{Messages.form.labels.mongodbDetails.maxQueryLength}</span>
+        <LinkTooltip tooltipContent={Messages.form.tooltips.mongodbDetails.maxQueryLength} icon="info-circle" />
       </div>
       <TextInputField
         key="maxQueryLength"
         name="maxQueryLength"
-        placeholder={Messages.form.placeholders.postgresqlDetails.maxQueryLength}
+        placeholder={Messages.form.placeholders.mongodbDetails.maxQueryLength}
         validators={maxQueryLengthValidators}
       />
     </div>

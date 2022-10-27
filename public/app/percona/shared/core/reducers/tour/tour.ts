@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { setAlertingTourCompleted, setProductTourCompleted } from '../user';
+import { setAlertingTourCompleted, setProductTourCompleted } from '../user/user';
 
 import { SetStepsActionPayload, TourState, TourType } from './tour.types';
 
