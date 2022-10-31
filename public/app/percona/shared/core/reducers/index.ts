@@ -4,8 +4,7 @@ import { CancelToken } from 'axios';
 
 import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { DBClusterTopology } from 'app/percona/dbaas/components/DBCluster/AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { DBCluster } from 'app/percona/dbaas/components/DBCluster/DBCluster.types';
-import { formatDBClusters, newDBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
+import { newDBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
 import { KubernetesService } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.service';
 import {
@@ -29,8 +28,10 @@ import { api } from 'app/percona/shared/helpers/api';
 import { SETTINGS_TIMEOUT } from '../constants';
 import { ServerInfo } from '../types';
 
-import perconaUserReducers from './user';
-export * from './user';
+import perconaBackupLocations from './backupLocations';
+import perconaDBClustersReducer from './dbClusters/dbClusters';
+import servicesReducer from './services';
+import perconaUserReducers from './user/user';
 
 const initialSettingsState: Settings = {
   updatesDisabled: true,
@@ -268,20 +269,6 @@ export const instalKuberneteslOperatorAction = createAsyncThunk(
   }
 );
 
-export const fetchDBClustersAction = createAsyncThunk(
-  'percona/fetchDBClusters',
-  (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }): Promise<DBCluster[]> =>
-    withSerializedError(
-      (async () => {
-        const requests = args.kubernetes.map((k, idx) => KubernetesService.getDBClusters(k, args.tokens[idx]));
-        // const requests = args.kubernetes.map((k, idx) =>
-        //   apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', k, true, args.tokens[idx])
-        // );
-        const promiseResults = await Promise.all(requests);
-        return formatDBClusters(promiseResults, args.kubernetes);
-      })()
-    )
-);
 export interface PerconaServerState extends ServerInfo {
   saasHost: string;
 }
@@ -361,7 +348,6 @@ const installKubernetesOperatorReducer = createAsyncSlice(
   'instalKuberneteslOperator',
   instalKuberneteslOperatorAction
 ).reducer;
-const dbClustersReducer = createAsyncSlice('dbClusters', fetchDBClustersAction).reducer;
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 const templatesReducer = createAsyncSlice('templates', fetchTemplatesAction).reducer;
@@ -377,8 +363,10 @@ export default {
     addKubernetes: addKubernetesReducer,
     addDbCluster: addDbClusterReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
-    dbClusters: dbClustersReducer,
+    dbClusters: perconaDBClustersReducer,
     server: perconaServerReducers,
     templates: templatesReducer,
+    services: servicesReducer,
+    backupLocations: perconaBackupLocations,
   }),
 };
