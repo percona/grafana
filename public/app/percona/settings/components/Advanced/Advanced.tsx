@@ -1,6 +1,6 @@
 import { cx } from '@emotion/css';
 import { TextInputField, NumberInputField } from '@percona/platform-core';
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useSelector } from 'react-redux';
 
@@ -330,7 +330,7 @@ export const Advanced: FC = () => {
                       link={dbaasLink}
                       dataTestId="advanced-dbaas"
                       component={SwitchRow}
-                      onChange={(event: ChangeEvent, input: any) => {
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>, input: any) => {
                         dBaaSToggleOnChange(event, input, mutators);
                       }}
                     />

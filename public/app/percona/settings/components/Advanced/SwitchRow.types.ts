@@ -10,5 +10,5 @@ export interface SwitchRowProps {
   className?: string;
   dataTestId?: string;
   input: any;
-  onChange?: (event: ChangeEvent, input: HTMLInputElement) => void;
+  onChange?: (event: ChangeEvent, input: any) => void;
 }
