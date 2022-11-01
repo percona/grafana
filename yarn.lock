@@ -8448,9 +8448,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@percona/platform-core@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@percona/platform-core@npm:1.0.8"
+"@percona/platform-core@npm:1.0.10":
+  version: 1.0.10
+  resolution: "@percona/platform-core@npm:1.0.10"
   dependencies:
     "@popperjs/core": ^2.9.2
     react-popper: ^2.2.5
@@ -8465,7 +8465,7 @@ __metadata:
     react: 17.0.1
     react-dom: 17.0.1
     react-final-form: ^6.5.3
-  checksum: 4386d0580999fbc56f39bfd26a28544d2be349396fbbcdfcc7cb7b616381de8176b02cc697d632599998903cb395f2052a247ea79378cfe83650dc958393d434
+  checksum: c04a9fe0399eb823b8d9f3a3d18daa0d0c837ea27e0d29848470af6e89340cbdd14de797231ef8bc5ba870ecfc4a7cdd86356608a1aafc866c3f18e1483e5e13
   languageName: node
   linkType: hard
 
@@ -23710,7 +23710,7 @@ __metadata:
     "@opentelemetry/api": 1.1.0
     "@opentelemetry/exporter-collector": 0.25.0
     "@opentelemetry/semantic-conventions": 1.5.0
-    "@percona/platform-core": 1.0.8
+    "@percona/platform-core": 1.0.10
     "@pmmmwh/react-refresh-webpack-plugin": 0.5.7
     "@popperjs/core": 2.11.5
     "@react-aria/button": 3.5.1
@@ -41112,7 +41112,7 @@ __metadata:
 
 "typescript@patch:typescript@4.1.2#~builtin<compat/typescript>":
   version: 4.1.2
-  resolution: "typescript@patch:typescript@npm%3A4.1.2#~builtin<compat/typescript>::version=4.1.2&hash=f456af"
+  resolution: "typescript@patch:typescript@npm%3A4.1.2#~builtin<compat/typescript>::version=4.1.2&hash=a1c5e5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -41122,7 +41122,7 @@ __metadata:
 
 "typescript@patch:typescript@4.6.4#~builtin<compat/typescript>":
   version: 4.6.4
-  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=f456af"
+  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=a1c5e5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -41132,7 +41132,7 @@ __metadata:
 
 "typescript@patch:typescript@4.7.4#~builtin<compat/typescript>, typescript@patch:typescript@>=2.7#~builtin<compat/typescript>":
   version: 4.7.4
-  resolution: "typescript@patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=f456af"
+  resolution: "typescript@patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=a1c5e5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -41142,7 +41142,7 @@ __metadata:
 
 "typescript@patch:typescript@~4.6.3#~builtin<compat/typescript>":
   version: 4.6.3
-  resolution: "typescript@patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=f456af"
+  resolution: "typescript@patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=a1c5e5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
