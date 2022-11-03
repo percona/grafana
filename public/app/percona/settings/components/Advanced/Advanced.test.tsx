@@ -246,12 +246,12 @@ describe('Advanced::', () => {
 
     const input = screen.getByTestId('advanced-dbaas').querySelector('input');
 
-    expect(screen.getByTestId('advanced-dbaas').querySelector('input')).not.toBeChecked();
+    expect(input).not.toBeChecked();
     expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('');
     if (input) {
       fireEvent.click(input);
     }
-    expect(screen.getByTestId('advanced-dbaas').querySelector('input')).toBeChecked();
+    expect(input).toBeChecked();
     expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('pmmtest.percona.com');
   });
 });
