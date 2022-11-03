@@ -24,6 +24,7 @@ const PerconaTourProvider: React.FC = ({ children }) => {
         setIsOpen(false);
       }}
       onClickMask={({ setCurrentStep, setIsOpen }) => {
+        endTour();
         setCurrentStep(0);
         setIsOpen(false);
       }}

@@ -25,7 +25,7 @@ import PerconaTourBootstrapper from './PerconaTour';
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = () => {
   const dispatch = useAppDispatch();
-  const { setSteps, startTour: startPerconaTour, endTour: endPerconaTour } = usePerconaTour();
+  const { setSteps, startTour: startPerconaTour, endTour } = usePerconaTour();
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [showTour, setShowTour] = useState(false);
   const styles = useStyles2(getStyles);
@@ -38,7 +38,7 @@ export const PerconaBootstrapper = () => {
   const finishTour = () => {
     setModalIsOpen(false);
     setShowTour(false);
-    endPerconaTour();
+    endTour();
   };
 
   const startTour = () => {

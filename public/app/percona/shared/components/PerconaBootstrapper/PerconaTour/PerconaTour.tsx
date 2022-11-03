@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { contextSrv } from 'app/core/core';
@@ -16,7 +16,6 @@ const PerconaTourBootstrapper: React.FC = () => {
   const user = useSelector(getPerconaUser);
   const { result: settings } = useSelector(getPerconaSettings);
   const { activeTypes } = useSelector(getServices);
-  const [shouldAlertingTourOpen, setShouldAlertingTourOpen] = useState(false);
 
   useEffect(() => {
     setSteps(TourType.Alerting, getAlertingTourSteps(isPmmAdmin(contextSrv.user)));
@@ -31,16 +30,10 @@ const PerconaTourBootstrapper: React.FC = () => {
       return;
     }
 
-    if (!shouldAlertingTourOpen && !user.alertingTourCompleted && location.pathname.startsWith('/alerting')) {
+    if (!user.alertingTourCompleted && location.pathname.startsWith('/alerting')) {
       startTour(TourType.Alerting);
-
-      // prevent the alerting tour from opening when navigating through alerting
-      // if the user dismissed it by clicking on the backdrop
-      setShouldAlertingTourOpen(true);
-    } else if (!location.pathname.startsWith('/alerting')) {
-      setShouldAlertingTourOpen(false);
     }
-  }, [startTour, user, shouldAlertingTourOpen, location.pathname]);
+  }, [startTour, user, location.pathname]);
 
   return null;
 };
