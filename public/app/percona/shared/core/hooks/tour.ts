@@ -33,7 +33,7 @@ const usePerconaTour = () => {
 
       // wait for the first step element to visible
       if (firstStep?.selector) {
-        await waitForVisible(firstStep?.selector);
+        await waitForVisible(firstStep.selector);
       }
       dispatch(TourActions.startTour(tour));
       reactTour.setIsOpen(true);
