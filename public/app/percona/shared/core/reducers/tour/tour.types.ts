@@ -3,8 +3,8 @@ import { ReactElement } from 'react';
 export interface TourStep {
   navMenuId?: string;
   // Props used from StepType from @reactour/tour
-  // Extending the whole type causing a TS error:
-  // Type instantiation is excessively deep and possibly infinite.
+  // Extending the whole type is causing a TS error:
+  // "Type instantiation is excessively deep and possibly infinite."
   selector: string;
   content: ReactElement;
   position?: 'top' | 'right' | 'bottom' | 'left' | 'center' | [number, number];
