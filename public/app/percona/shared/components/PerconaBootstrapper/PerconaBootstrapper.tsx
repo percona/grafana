@@ -13,12 +13,9 @@ import {
   fetchUserDetailsAction,
   fetchUserStatusAction,
 } from 'app/percona/shared/core/reducers/user/user';
-import getAlertingTourSteps from 'app/percona/tour/steps/alerting';
-import getProductTourSteps from 'app/percona/tour/steps/product';
 import { useAppDispatch } from 'app/store/store';
 
 import usePerconaTour from '../../core/hooks/tour';
-import { isPmmAdmin } from '../../helpers/permissions';
 
 import { Messages } from './PerconaBootstrapper.messages';
 import { getStyles } from './PerconaBootstrapper.styles';
@@ -52,13 +49,9 @@ export const PerconaBootstrapper = () => {
   useEffect(() => {
     const getSettings = async () => {
       try {
-        const settings = await dispatch(fetchSettingsAction()).unwrap();
-        setSteps(TourType.Product, getProductTourSteps(isPmmAdmin(contextSrv.user), settings));
-        setSteps(TourType.Alerting, getAlertingTourSteps(isPmmAdmin(contextSrv.user)));
+        await dispatch(fetchSettingsAction()).unwrap();
         dispatch(setAuthorized(true));
       } catch (e) {
-        setSteps(TourType.Product, getProductTourSteps(isPmmAdmin(contextSrv.user)));
-        setSteps(TourType.Alerting, getAlertingTourSteps(isPmmAdmin(contextSrv.user)));
         // @ts-ignore
         if (e.response?.status === 401) {
           setAuthorized(false);

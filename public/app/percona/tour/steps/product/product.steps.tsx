@@ -2,11 +2,17 @@ import React from 'react';
 
 import { Settings } from 'app/percona/settings/Settings.types';
 import { TourStep } from 'app/percona/shared/core/reducers/tour';
+import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 import SidebarStep from 'app/percona/tour/components/SidebarStep';
 
 import { Messages } from './product.messages';
+import { getPMMDashboardsStep } from './product.utils';
 
-export const getProductTourSteps = (isPmmAdmin = true, settings?: Settings): TourStep[] => [
+export const getProductTourSteps = (
+  isPmmAdmin = true,
+  settings?: Settings,
+  activeServices?: ServiceType[]
+): TourStep[] => [
   {
     selector: '.dropdown > [aria-label="Dashboards"]',
     content: (
@@ -17,20 +23,7 @@ export const getProductTourSteps = (isPmmAdmin = true, settings?: Settings): Tou
       </SidebarStep>
     ),
   },
-  {
-    selector: '#navbar-menu-portal-container [role="dialog"]',
-    content: (
-      <SidebarStep title={Messages.pmmDashboards.title}>
-        <p>{Messages.pmmDashboards.grafanaTechnology}</p>
-        <p>{Messages.pmmDashboards.observe}</p>
-        <p>{Messages.pmmDashboards.zoomIn}</p>
-      </SidebarStep>
-    ),
-    navMenuId: 'postgre',
-    highlightedSelectors: ['.dropdown > [aria-label="PostgreSQL"]', '#navbar-menu-portal-container [role="dialog"]'],
-    resizeObservables: ['#navbar-menu-portal-container'],
-    position: 'right',
-  },
+  getPMMDashboardsStep(activeServices || []),
   {
     selector: '.dropdown > [aria-label="Query Analytics (QAN)"]',
     content: (

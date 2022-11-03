@@ -29,26 +29,26 @@ const usePerconaTour = () => {
 
   const startTour = useCallback(
     async (tour: TourType) => {
+      const firstStep = steps[tour][0];
+
       // wait for the first step element to visible
-      if (tourSteps[0]?.selector) {
-        await waitForVisible(tourSteps[0]?.selector);
+      if (firstStep?.selector) {
+        await waitForVisible(firstStep?.selector);
       }
       dispatch(TourActions.startTour(tour));
       reactTour.setIsOpen(true);
       reactTour.setCurrentStep(0);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tourSteps, dispatch]
+    [steps, dispatch]
   );
 
   const endTour = useCallback(() => {
-    if (tour) {
-      dispatch(TourActions.endTourAction(tour));
-    }
+    dispatch(TourActions.endTourAction());
     reactTour.setIsOpen(false);
     reactTour.setCurrentStep(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, tour]);
+  }, [dispatch]);
 
   const nextStep = useCallback(() => {
     reactTour.setCurrentStep((step: number) => (step === reactTour.steps.length - 1 ? step : step + 1));
