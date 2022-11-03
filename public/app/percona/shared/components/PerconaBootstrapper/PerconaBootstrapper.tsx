@@ -38,7 +38,7 @@ export const PerconaBootstrapper = () => {
   const finishTour = () => {
     setModalIsOpen(false);
     setShowTour(false);
-    endTour();
+    endTour(TourType.Product);
   };
 
   const startTour = () => {

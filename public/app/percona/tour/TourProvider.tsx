@@ -9,7 +9,7 @@ import Close from './components/Close';
 import Navigation from './components/Navigation';
 
 const PerconaTourProvider: React.FC = ({ children }) => {
-  const { steps, endTour } = usePerconaTour();
+  const { tour, steps, endTour } = usePerconaTour();
 
   return (
     <TourProvider
@@ -19,12 +19,12 @@ const PerconaTourProvider: React.FC = ({ children }) => {
       badgeContent={({ totalSteps, currentStep }) => `${currentStep + 1}/${totalSteps}`}
       disableFocusLock
       onClickClose={({ setIsOpen, setCurrentStep }) => {
-        endTour();
+        tour && endTour(tour);
         setCurrentStep(0);
         setIsOpen(false);
       }}
       onClickMask={({ setCurrentStep, setIsOpen }) => {
-        endTour();
+        tour && endTour(tour);
         setCurrentStep(0);
         setIsOpen(false);
       }}

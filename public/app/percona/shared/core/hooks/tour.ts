@@ -43,12 +43,15 @@ const usePerconaTour = () => {
     [steps, dispatch]
   );
 
-  const endTour = useCallback(() => {
-    dispatch(TourActions.endTourAction());
-    reactTour.setIsOpen(false);
-    reactTour.setCurrentStep(0);
+  const endTour = useCallback(
+    (tour: TourType) => {
+      dispatch(TourActions.endTourAction(tour));
+      reactTour.setIsOpen(false);
+      reactTour.setCurrentStep(0);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+    [dispatch]
+  );
 
   const nextStep = useCallback(() => {
     reactTour.setCurrentStep((step: number) => (step === reactTour.steps.length - 1 ? step : step + 1));
@@ -59,6 +62,7 @@ const usePerconaTour = () => {
   }, [reactTour]);
 
   return {
+    tour,
     isOpen: reactTour.isOpen,
     steps: tourSteps,
     currentStep: reactTour.currentStep,

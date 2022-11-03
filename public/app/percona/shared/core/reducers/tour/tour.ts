@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { StoreState } from 'app/types';
-
 import { setAlertingTourCompleted, setProductTourCompleted } from '../user/user';
 
 import { SetStepsActionPayload, TourState, TourType } from './tour.types';
@@ -38,10 +36,7 @@ const tourSlice = createSlice({
   },
 });
 
-export const endTourAction = createAsyncThunk('percona/endTour', (_, { dispatch, getState }) => {
-  /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
-  const { tour } = (getState() as StoreState).percona.tour;
-
+export const endTourAction = createAsyncThunk('percona/endTour', (tour: TourType, { dispatch }) => {
   if (tour === TourType.Product) {
     dispatch(setProductTourCompleted(true));
   } else if (tour === TourType.Alerting) {

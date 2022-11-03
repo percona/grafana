@@ -5,10 +5,10 @@ import { Button, IconButton } from '@grafana/ui';
 import usePerconaTour from 'app/percona/shared/core/hooks/tour';
 
 const NextButton: React.FC<BtnFnProps> = () => {
-  const { endTour, nextStep, isLastStep } = usePerconaTour();
+  const { tour, endTour, nextStep, isLastStep } = usePerconaTour();
 
   return isLastStep ? (
-    <Button onClick={endTour}>Done</Button>
+    <Button onClick={() => tour && endTour(tour)}>Done</Button>
   ) : (
     <IconButton onClick={nextStep} name="arrow-right" size="lg" />
   );
