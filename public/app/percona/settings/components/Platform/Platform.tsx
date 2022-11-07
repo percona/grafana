@@ -47,6 +47,11 @@ export const Platform: FC = () => {
         setConnecting(false);
         dispatch(fetchServerInfoAction());
         dispatch(fetchSettingsAction());
+        setInitialValues((oldValues) => ({
+          ...oldValues,
+          pmmServerName: '',
+          accessToken: '',
+        }));
       }, CONNECT_DELAY);
     } catch (e) {
       logger.error(e);
