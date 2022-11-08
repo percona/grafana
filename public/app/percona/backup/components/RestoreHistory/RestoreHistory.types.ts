@@ -18,5 +18,5 @@ export interface Restore extends Omit<Backup, 'created' | 'status' | 'mode'> {
   started: number;
   finished: number | null;
   status: RestoreStatus;
-  pitrTimestamp: number | null;
+  pitrTimestamp?: number;
 }

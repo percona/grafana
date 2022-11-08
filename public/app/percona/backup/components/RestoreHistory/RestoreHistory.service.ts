@@ -37,7 +37,7 @@ export const RestoreHistoryService = {
         status,
         started: new Date(started_at).getTime(),
         finished: finished_at ? new Date(finished_at).getTime() : null,
-        pitrTimestamp: pitr_timestamp ? new Date(pitr_timestamp).getTime() : null,
+        pitrTimestamp: pitr_timestamp ? new Date(pitr_timestamp).getTime() : undefined,
       })
     );
   },
