@@ -23,7 +23,7 @@ export const RestoreHistoryDetails: FC<RestoreHistoryDetailsProps> = ({ name, da
       </span>
       {pitrTimestamp ? (
         <span data-testid="restore-details-pitr">
-          <span className={styles.detailLabel}>{Messages.finished}</span>
+          <span className={styles.detailLabel}>{Messages.pitr}</span>
           <DetailedDate date={pitrTimestamp} dataTestId="restore-details-date" />
         </span>
       ) : null}
