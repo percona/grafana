@@ -43,7 +43,6 @@ const {
 
 export const EditK8sClusterPage = () => {
   const styles = useStyles(getStyles);
-  // const history = useHistory();
   const dispatch = useDispatch();
   const history = useHistory();
   const { result: addK8SClusterResult, loading: addK8SClusterLoading } = useSelector(getAddKubernetes);
@@ -82,14 +81,7 @@ export const EditK8sClusterPage = () => {
           changeValue(state, 'name', () => nameValue);
         },
       }}
-      render={({
-        handleSubmit,
-        valid,
-        pristine,
-        values: { isEKS },
-        form,
-        submitting,
-      }: FormRenderProps<NewKubernetesCluster>) => (
+      render={({ handleSubmit, valid, pristine, values: { isEKS }, form }: FormRenderProps<NewKubernetesCluster>) => (
         <form onSubmit={handleSubmit}>
           <>
             <PageToolbar

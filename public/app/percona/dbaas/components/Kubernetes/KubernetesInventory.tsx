@@ -106,10 +106,7 @@ export const KubernetesInventory: FC<KubernetesInventoryProps> = ({ setMode }) =
     () => (
       <AddClusterButton
         label={Messages.kubernetes.addAction}
-        action={
-          // () => setAddModalVisible(!addModalVisible)
-          () => setMode('register')
-        }
+        action={() => setMode('register')}
         data-testid="kubernetes-new-cluster-button"
       />
     ),
@@ -145,11 +142,6 @@ export const KubernetesInventory: FC<KubernetesInventoryProps> = ({ setMode }) =
                 selectedCluster={selectedCluster}
               />
             )}
-            {/*<EditK8sClusterPage*/}
-            {/*  isVisible={addModalVisible}*/}
-            {/*  addKubernetes={addKubernetes}*/}
-            {/*  setAddModalVisible={setAddModalVisible}*/}
-            {/*/>*/}
             <Modal
               title={Messages.kubernetes.deleteModal.title}
               isVisible={deleteModalVisible}

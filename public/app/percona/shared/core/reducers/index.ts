@@ -326,7 +326,6 @@ export const fetchTemplatesAction = createAsyncThunk(
 
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
-// const addKubernetesReducer = createAsyncSlice('', addKubernetesAction).reducer;
 const addDbClusterReducer = createAsyncSlice('addDbCluster', addDbClusterAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice(
   'instalKuberneteslOperator',
