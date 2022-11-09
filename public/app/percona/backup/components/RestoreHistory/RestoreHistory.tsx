@@ -54,7 +54,7 @@ export const RestoreHistory: FC = () => {
         width: '200px',
       },
       {
-        Header: Messages.restoreHistory.table.columns.started,
+        Header: Messages.restoreHistory.table.columns.finished,
         accessor: 'finished',
         Cell: ({ value }) => (value ? <DetailedDate dataTestId="restore-finished" date={value} /> : null),
         width: '200px',
