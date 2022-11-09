@@ -22,7 +22,7 @@ export const RestoreHistoryDetails: FC<RestoreHistoryDetailsProps> = ({ name, da
         <span className={styles.detailLabel}>{Messages.dataModel}</span> <span>{dataModelMsg}</span>
       </span>
       {pitrTimestamp ? (
-        <span data-testid="restore-details-pitr">
+        <span className={styles.pitrContainer} data-testid="restore-details-pitr">
           <span className={styles.detailLabel}>{Messages.pitr}</span>
           <DetailedDate date={pitrTimestamp} dataTestId="restore-details-date" />
         </span>
