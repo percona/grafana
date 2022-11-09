@@ -13,7 +13,6 @@ import {
   Kubernetes,
   KubernetesAPI,
   KubernetesListAPI,
-  NewKubernetesCluster,
   Operator,
   OperatorsList,
 } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.types';
@@ -30,6 +29,7 @@ import { ServerInfo } from '../types';
 
 import perconaBackupLocations from './backupLocations';
 import perconaDBClustersReducer from './dbClusters/dbClusters';
+import perconaK8SCluster from './k8sCluster/k8sCluster';
 import servicesReducer from './services';
 import perconaUserReducers from './user/user';
 
@@ -180,22 +180,6 @@ export const deleteKubernetesAction = createAsyncThunk(
   }
 );
 
-export const addKubernetesAction = createAsyncThunk(
-  'percona/addKubernetes',
-  async (
-    args: { kubernetesToAdd: NewKubernetesCluster; setPMMAddress?: boolean; token?: CancelToken },
-    thunkAPI
-  ): Promise<void> => {
-    if (args.setPMMAddress) {
-      await thunkAPI.dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } }));
-      await new Promise((resolve) => setTimeout(resolve, SETTINGS_TIMEOUT));
-    }
-    await withAppEvents(KubernetesService.addKubernetes(args.kubernetesToAdd, args.token), {
-      successMessage: 'Cluster was successfully registered',
-    });
-    await thunkAPI.dispatch(fetchKubernetesAction());
-  }
-);
 export interface PerconaDBaaSState {
   selectedKubernetesCluster: Kubernetes | null;
 }
@@ -342,7 +326,7 @@ export const fetchTemplatesAction = createAsyncThunk(
 
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
-const addKubernetesReducer = createAsyncSlice('addKubernetes', addKubernetesAction).reducer;
+// const addKubernetesReducer = createAsyncSlice('', addKubernetesAction).reducer;
 const addDbClusterReducer = createAsyncSlice('addDbCluster', addDbClusterAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice(
   'instalKuberneteslOperator',
@@ -360,7 +344,7 @@ export default {
     dbaas: perconaDBaaSReducers,
     kubernetes: kubernetesReducer,
     deleteKubernetes: deleteKubernetesReducer,
-    addKubernetes: addKubernetesReducer,
+    addKubernetes: perconaK8SCluster,
     addDbCluster: addDbClusterReducer,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbClusters: perconaDBClustersReducer,
