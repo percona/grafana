@@ -32,15 +32,15 @@ export const Messages = {
     title: 'Silences',
     create: 'Create silences when you want to stop notifications from one or more alerting rules.',
     silences:
-      'Silences will prevent notifications from getting created, but they will not prevent alerting rules from being evaluated or recorded in the Fired alerts tab. A silence only lasts for a specified window of time.',
+      'Silences will prevent notifications from getting created, but they will not prevent alerting rules from being evaluated or recorded in the Fired Alerts tab. A silence only lasts for a specified window of time.',
   },
   alertGroups: {
     title: 'Alert Groups',
-    alert: 'Alert groups show grouped alerts.',
+    alert: 'Alert Groups show grouped alerts.',
     grouping: "Group common alerts into a single alert group to ensure that PMM doesn't fire duplicate alerts.",
   },
   admin: {
     title: 'Admin',
-    configure: 'Use this to configure Alertmanager in raw JSON format.',
+    configure: 'Use this to configure Alertmanagers in raw JSON format.',
   },
 };

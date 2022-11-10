@@ -15,7 +15,7 @@ export const getPMMDashboardsStep = (services: ServiceType[]): TourStep => {
   } else if (services.includes(ServiceType.mongodb)) {
     return getStep('MongoDB', 'mongo');
   } else if (services.includes(ServiceType.proxysql)) {
-    return getStep('HAProxy', 'haproxy');
+    return getStep('ProxySQL', 'proxysql');
   } else if (services.includes(ServiceType.haproxy)) {
     return getStep('HAProxy', 'haproxy');
   }
