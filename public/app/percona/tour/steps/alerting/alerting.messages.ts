@@ -8,7 +8,7 @@ export const Messages = {
     title: 'Alert Rule Templates',
     effortlessly: 'Templates help you create complex alert rules effortlessly.',
     offers:
-      'PMM offers a set of default templates for common events and expressions, but you can also create custom templates to fit your unique requirements.',
+      'Percona offers a set of default templates for common events and expressions, but you can also create custom templates to fit your unique requirements.',
   },
   alertRules: {
     title: 'Alert Rules',
@@ -36,11 +36,11 @@ export const Messages = {
   },
   alertGroups: {
     title: 'Alert Groups',
-    alert: 'Alert groups show grouped alerts from an Alertmanager instance.',
-    grouping: 'Grouping common alerts into a single alert group prevents duplicate alerts from being fired.',
+    alert: 'Alert groups show grouped alerts.',
+    grouping: "Group common alerts into a single alert group to ensure that PMM doesn't fire duplicate alerts.",
   },
   admin: {
     title: 'Admin',
-    question: '??',
+    configure: 'Use this to configure Alertmanager in raw JSON format.',
   },
 };
