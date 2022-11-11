@@ -11,5 +11,6 @@ export const errorStates = [
   BackupStatus.BACKUP_STATUS_ERROR,
   RestoreStatus.RESTORE_STATUS_ERROR,
   BackupStatus.BACKUP_STATUS_INVALID,
+  BackupStatus.BACKUP_STATUS_FAILED_NOT_SUPPORTED_BY_AGENT,
   RestoreStatus.RESTORE_STATUS_INVALID,
 ];
