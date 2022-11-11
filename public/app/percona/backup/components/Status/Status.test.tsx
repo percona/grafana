@@ -46,6 +46,11 @@ describe('Status', () => {
       render(<Status status={BackupStatus.BACKUP_STATUS_ERROR} />);
       expect(screen.getByTestId('fail-icon')).toBeInTheDocument();
     });
+
+    it('should show fail if unrecognized status', async () => {
+      render(<Status status={'NO_ERROR' as BackupStatus} />);
+      expect(screen.getByTestId('fail-icon')).toBeInTheDocument();
+    });
   });
 
   describe('logs action', () => {

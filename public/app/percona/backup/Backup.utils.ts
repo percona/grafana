@@ -19,7 +19,7 @@ export const formatStatus = (status: BackupStatus | RestoreStatus): string => {
     [RestoreStatus.RESTORE_STATUS_ERROR]: statusMsg.error,
   };
 
-  return map[status] ?? '';
+  return map[status] ?? statusMsg.error;
 };
 
 export const formatDataModel = (model: DataModel): string => {
