@@ -5,7 +5,6 @@ import { DBCluster } from '../../DBCluster.types';
 export interface DBClusterAdvancedOptionsProps {
   selectedCluster: DBCluster;
   renderProps: FormRenderProps;
-  setShowUnsafeConfigurationWarning: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export enum DBClusterTopology {

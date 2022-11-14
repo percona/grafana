@@ -35,15 +35,7 @@ import { getStyles } from './DBClusterAdvancedOptions.styles';
 import { DBClusterTopology, DBClusterResources } from './DBClusterAdvancedOptions.types';
 import { canGetExpectedResources, resourceValidator } from './DBClusterAdvancedOptions.utils';
 
-export interface DBClusterAdvancedOptionsProps extends FormRenderProps {
-  setShowUnsafeConfigurationWarning: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
-  setShowUnsafeConfigurationWarning,
-  values,
-  form,
-}) => {
+export const DBClusterAdvancedOptions: FC<FormRenderProps> = ({ values, form }) => {
   let allocatedTimer: NodeJS.Timeout;
   let expectedTimer: NodeJS.Timeout;
   const styles = useStyles(getStyles);
@@ -79,7 +71,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   const isDatabaseVersionDisabled = useMemo(() => isOptionEmpty(databaseType), [databaseType]);
   const topologies = useMemo(
     () =>
-      databaseType?.value !== Databases.mysql && databaseType?.value !== Databases.mongodb
+      databaseType?.value !== Databases.mysql
         ? [TOPOLOGY_OPTIONS[0], { ...TOPOLOGY_OPTIONS[1], disabled: true }]
         : TOPOLOGY_OPTIONS,
     [databaseType]
@@ -180,13 +172,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   }, [memory, cpu, disk, kubernetesCluster, topology, nodes, single, databaseType]);
 
   useEffect(() => {
-    if (databaseType?.value === Databases.mongodb) {
-      if (topology === DBClusterTopology.cluster) {
-        setShowUnsafeConfigurationWarning(false);
-      } else {
-        setShowUnsafeConfigurationWarning(true);
-      }
-    }
     if (topology === DBClusterTopology.cluster && nodes < MIN_NODES) {
       change(AddDBClusterFields.nodes, MIN_NODES);
     }

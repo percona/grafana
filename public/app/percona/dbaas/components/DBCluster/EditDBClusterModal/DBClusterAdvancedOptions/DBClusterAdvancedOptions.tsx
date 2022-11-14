@@ -33,11 +33,7 @@ import {
 import { getStyles } from './DBClusterAdvancedOptions.styles';
 import { DBClusterTopology, DBClusterResources, DBClusterAdvancedOptionsProps } from './DBClusterAdvancedOptions.types';
 
-export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
-  selectedCluster,
-  renderProps,
-  setShowUnsafeConfigurationWarning,
-}) => {
+export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({ selectedCluster, renderProps }) => {
   const { values, form, valid, pristine, submitting } = renderProps;
   const styles = useStyles(getStyles);
   const initialExpected = useRef<DBClusterExpectedResources>();
@@ -68,7 +64,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
 
   const topologies = useMemo(
     () =>
-      selectedCluster.databaseType !== Databases.mysql && selectedCluster?.databaseType !== Databases.mongodb
+      selectedCluster.databaseType !== Databases.mysql
         ? [TOPOLOGY_OPTIONS[0], { ...TOPOLOGY_OPTIONS[1], disabled: true }]
         : TOPOLOGY_OPTIONS,
     [selectedCluster]
@@ -170,14 +166,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   }, [memory, cpu, selectedCluster, topology, nodes, single]);
 
   useEffect(() => {
-    if (selectedCluster.databaseType === Databases.mongodb) {
-      if (topology === DBClusterTopology.cluster) {
-        setShowUnsafeConfigurationWarning(false);
-      } else {
-        setShowUnsafeConfigurationWarning(true);
-      }
-    }
-
     if (topology === DBClusterTopology.cluster && nodes < MIN_NODES) {
       change(EditDBClusterFields.nodes, MIN_NODES);
     }

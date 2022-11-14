@@ -26,14 +26,7 @@ jest.mock('@percona/platform-core', () => {
 describe('DBClusterAdvancedOptions::', () => {
   it('renders correctly', async () => {
     act(() => {
-      render(
-        <Form
-          onSubmit={jest.fn()}
-          render={(renderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
-        />
-      );
+      render(<Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />);
     });
 
     const radioState = await screen.findByTestId('topology-radio-state');
@@ -62,9 +55,7 @@ describe('DBClusterAdvancedOptions::', () => {
             [AddDBClusterFields.nodes]: 3,
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
+          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
         />
       );
     });
@@ -78,14 +69,7 @@ describe('DBClusterAdvancedOptions::', () => {
 
   it('should set nodes to 1 when topology is single', async () => {
     act(() => {
-      render(
-        <Form
-          onSubmit={jest.fn()}
-          render={(renderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
-        />
-      );
+      render(<Form onSubmit={jest.fn()} render={(renderProps) => <DBClusterAdvancedOptions {...renderProps} />} />);
     });
 
     const topology = screen.getByTestId('topology-radio-state');
@@ -103,9 +87,7 @@ describe('DBClusterAdvancedOptions::', () => {
             [AddDBClusterFields.resources]: DBClusterResources.small,
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
+          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
         />
       );
     });
@@ -126,9 +108,7 @@ describe('DBClusterAdvancedOptions::', () => {
             [AddDBClusterFields.resources]: DBClusterResources.small,
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
+          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
         />
       );
     });
@@ -145,7 +125,7 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(disk).not.toBeDisabled();
   });
 
-  it('should enable single node topology when database is MongoDB', async () => {
+  it('should disabled single node topology when database is MongoDB', async () => {
     act(() => {
       render(
         <Form
@@ -156,16 +136,14 @@ describe('DBClusterAdvancedOptions::', () => {
             },
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
+          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
         />
       );
     });
 
     const topology = await screen.findAllByTestId('topology-radio-button');
 
-    expect(topology[1]).not.toBeDisabled();
+    expect(topology[1]).toBeDisabled();
   });
 
   it('should enable single node topology when database is MySQL', async () => {
@@ -179,9 +157,7 @@ describe('DBClusterAdvancedOptions::', () => {
             },
           }}
           onSubmit={jest.fn()}
-          render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
+          render={(renderProps: FormRenderProps) => <DBClusterAdvancedOptions {...renderProps} />}
         />
       );
     });
