@@ -1,18 +1,19 @@
 import {
-  CheckboxField,
+  LoaderButton,
   PasswordInputField,
   TextareaInputField,
   TextInputField,
-  LoaderButton,
   validators,
 } from '@percona/platform-core';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { Button, LinkButton, PageToolbar, useStyles } from '@grafana/ui/src';
 
+import { PageSwitcher } from '../../../../shared/components/PageSwitcher/PageSwitcher';
+import { PageSwitcherValue } from '../../../../shared/components/PageSwitcher/PageSwitcher.types';
 import { useCancelToken } from '../../../../shared/components/hooks/cancelToken.hook';
 import { useShowPMMAddressWarning } from '../../../../shared/components/hooks/showPMMAddressWarning';
 import { addKubernetesAction, resetAddK8SClusterState } from '../../../../shared/core/reducers/k8sCluster/k8sCluster';
@@ -29,8 +30,6 @@ import { PageHeader } from './PageHeader/PageHeader';
 
 const { required } = validators;
 const {
-  isEKSCheckboxLabel,
-  isEKSCheckboxTooltip,
   awsAccessKeyIDLabel,
   awsAccessKeyIDTooltip,
   awsSecretAccessKeyLabel,
@@ -39,6 +38,8 @@ const {
   paste,
   fields,
   cancelButton,
+  genericRadioButton,
+  eksRadioButton,
 } = K8sFormMessages;
 
 export const EditK8sClusterPage = () => {
@@ -48,6 +49,14 @@ export const EditK8sClusterPage = () => {
   const { result: addK8SClusterResult, loading: addK8SClusterLoading } = useSelector(getAddKubernetes);
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [generateToken] = useCancelToken();
+
+  const pageSwitcherValues: Array<PageSwitcherValue<boolean>> = useMemo(
+    () => [
+      { name: 'isEKS', value: false, label: genericRadioButton },
+      { name: 'isEKS', value: true, label: eksRadioButton },
+    ],
+    []
+  );
 
   const addKubernetes = useCallback(async (cluster: NewKubernetesCluster, setPMMAddress = false) => {
     await dispatch(
@@ -81,12 +90,13 @@ export const EditK8sClusterPage = () => {
           changeValue(state, 'name', () => nameValue);
         },
       }}
-      render={({ handleSubmit, valid, pristine, values: { isEKS }, form }: FormRenderProps<NewKubernetesCluster>) => (
+      initialValues={{ isEKS: false }}
+      render={({ handleSubmit, valid, pristine, form, values: { isEKS } }: FormRenderProps<NewKubernetesCluster>) => (
         <form onSubmit={handleSubmit}>
           <>
             <PageToolbar
-              title={'KubernetesCluster'}
-              parent={'DBaaS'}
+              title="KubernetesCluster"
+              parent="DBaaS"
               titleHref={K8S_INVENTORY_URL}
               parentHref={DBAAS_INVENTORY_URL}
               className={styles.pageToolbarWrapper}
@@ -108,12 +118,7 @@ export const EditK8sClusterPage = () => {
             <PageHeader header={'Register new Kubernetes Cluster'} />
             {showPMMAddressWarning && <PMMServerUrlWarning className={styles.pmmUrlWarning} />}
             <div className={styles.pageContent}>
-              <TextInputField
-                name="name"
-                label={fields.clusterName}
-                validators={[required]}
-                fieldClassName={styles.k8sField}
-              />
+              <PageSwitcher values={pageSwitcherValues} />
               <TextareaInputField
                 name="kubeConfig"
                 label={
@@ -141,13 +146,6 @@ export const EditK8sClusterPage = () => {
                 }}
                 fieldClassName={styles.k8ConfigField}
               />
-              <CheckboxField
-                name="isEKS"
-                label={isEKSCheckboxLabel}
-                fieldClassName={styles.checkbox}
-                tooltipIcon="info-circle"
-                tooltipText={isEKSCheckboxTooltip}
-              />
               {isEKS && (
                 <>
                   <TextInputField
@@ -170,6 +168,12 @@ export const EditK8sClusterPage = () => {
                   />
                 </>
               )}
+              <TextInputField
+                name="name"
+                label={fields.clusterName}
+                validators={[required]}
+                fieldClassName={styles.k8sField}
+              />
             </div>
           </>
         </form>

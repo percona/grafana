@@ -11,7 +11,6 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
   urlWarningWrapper: css`
     margin-bottom: ${spacing.md};
   `,
-
   pasteButton: css`
     background-color: red;
   `,
@@ -20,26 +19,21 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     align-items: flex-start;
     padding-right: ${spacing.lg};
   `,
-
   pmmUrlWarning: css`
     // TODO should be moved into PMMUrlServerWarning in https://jira.percona.com/browse/PMM-10873
     margin: ${spacing.md} ${spacing.md} ${spacing.md} ${spacing.lg};
   `,
-
   pageContent: css`
-    padding: ${spacing.lg};
-    padding-top: ${spacing.xl};
+    padding: 0 ${spacing.lg};
   `,
-
   k8sField: css`
     max-width: 498px;
     &:not(:last-child) {
       margin-bottom: 0px;
     }
   `,
-
   k8ConfigField: css`
-    max-width: 793px;
+    max-width: 800px;
     > div:first-child {
       label {
         display: flex;
@@ -52,9 +46,8 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
       margin-bottom: 0px;
     }
   `,
-
   awsField: css`
-    max-width: 793px;
+    max-width: 800px;
     &:not(:last-child) {
       margin-bottom: 6px;
     }

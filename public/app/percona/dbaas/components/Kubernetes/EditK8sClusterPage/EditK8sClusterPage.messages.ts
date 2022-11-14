@@ -16,4 +16,6 @@ export const Messages = {
     kubeConfig: 'Kubeconfig file',
   },
   paste: 'Paste from clipboard',
+  genericRadioButton: 'Generic',
+  eksRadioButton: 'Amazon Elastic Kubernetes\nService',
 };
