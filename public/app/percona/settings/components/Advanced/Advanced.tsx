@@ -1,6 +1,5 @@
 import { cx } from '@emotion/css';
 import { TextInputField, NumberInputField } from '@percona/platform-core';
-import { FormApi } from 'final-form';
 import React, { FC, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useSelector } from 'react-redux';
@@ -32,7 +31,12 @@ import {
 } from './Advanced.constants';
 import { getStyles } from './Advanced.styles';
 import { AdvancedFormProps } from './Advanced.types';
-import { convertCheckIntervalsToHours, convertHoursStringToSeconds, convertSecondsToDays } from './Advanced.utils';
+import {
+  convertCheckIntervalsToHours,
+  convertHoursStringToSeconds,
+  convertSecondsToDays,
+  dBaaSToggleOnChange,
+} from './Advanced.utils';
 import { SwitchRow } from './SwitchRow';
 
 const {
@@ -116,7 +120,7 @@ export const Advanced: FC = () => {
   };
   const [loading, setLoading] = useState(false);
 
-  const applyChanges = async (values: AdvancedFormProps, form: FormApi<AdvancedFormProps>) => {
+  const applyChanges = async (values: AdvancedFormProps) => {
     const {
       retention,
       telemetry,
@@ -177,7 +181,17 @@ export const Advanced: FC = () => {
             <Form
               onSubmit={applyChanges}
               initialValues={initialValues}
-              render={({ form: { change }, values, handleSubmit, valid, pristine }) => (
+              mutators={{
+                setPublicAddress: ([publicAddressValue], state, { changeValue }) => {
+                  if (
+                    !state?.lastFormState?.values['publicAddress'] &&
+                    state?.lastFormState?.values['dbaas'] === true
+                  ) {
+                    changeValue(state, 'publicAddress', () => publicAddressValue);
+                  }
+                },
+              }}
+              render={({ form: { change, mutators }, values, handleSubmit, valid, pristine }) => (
                 <form onSubmit={handleSubmit}>
                   <div className={styles.advancedRow}>
                     <div className={styles.advancedCol}>
@@ -249,6 +263,16 @@ export const Advanced: FC = () => {
                     dataTestId="advanced-alerting"
                     component={SwitchRow}
                   />
+                  <Field
+                    name="backup"
+                    type="checkbox"
+                    label={backupLabel}
+                    tooltip={backupTooltip}
+                    tooltipLinkText={tooltipLinkText}
+                    link={backupLink}
+                    dataTestId="advanced-backup"
+                    component={SwitchRow}
+                  />
                   <div className={styles.advancedRow}>
                     <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                       <div className={settingsStyles.labelWrapper} data-testid="public-address-label">
@@ -316,16 +340,9 @@ export const Advanced: FC = () => {
                       link={dbaasLink}
                       dataTestId="advanced-dbaas"
                       component={SwitchRow}
-                    />
-                    <Field
-                      name="backup"
-                      type="checkbox"
-                      label={backupLabel}
-                      tooltip={backupTooltip}
-                      tooltipLinkText={tooltipLinkText}
-                      link={backupLink}
-                      dataTestId="advanced-backup"
-                      component={SwitchRow}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>, input: any) => {
+                        dBaaSToggleOnChange(event, input, mutators);
+                      }}
                     />
                     <Field
                       name="azureDiscover"
