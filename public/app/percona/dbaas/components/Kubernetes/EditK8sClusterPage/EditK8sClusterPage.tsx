@@ -10,7 +10,7 @@ import { Form, FormRenderProps } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { Button, LinkButton, PageToolbar, useStyles } from '@grafana/ui/src';
+import { Button, Icon, LinkButton, PageToolbar, Tooltip, useStyles } from '@grafana/ui/src';
 
 import { PageSwitcher } from '../../../../shared/components/PageSwitcher/PageSwitcher';
 import { PageSwitcherValue } from '../../../../shared/components/PageSwitcher/PageSwitcher.types';
@@ -40,6 +40,7 @@ const {
   cancelButton,
   genericRadioButton,
   eksRadioButton,
+  isEKSRadioTooltip,
 } = K8sFormMessages;
 
 export const EditK8sClusterPage = () => {
@@ -118,7 +119,12 @@ export const EditK8sClusterPage = () => {
             <PageHeader header={'Register new Kubernetes Cluster'} />
             {showPMMAddressWarning && <PMMServerUrlWarning className={styles.pmmUrlWarning} />}
             <div className={styles.pageContent}>
-              <PageSwitcher values={pageSwitcherValues} />
+              <div className={styles.radioGroup}>
+                <PageSwitcher values={pageSwitcherValues} />
+                <Tooltip content={isEKSRadioTooltip}>
+                  <Icon data-testid="eks-info-icon" name="info-circle" className={styles.radioInfoIcon} />
+                </Tooltip>
+              </div>
               <TextareaInputField
                 name="kubeConfig"
                 label={

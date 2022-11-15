@@ -30,6 +30,7 @@ describe('EditK8sClusterPage::', () => {
     expect(screen.getByTestId('name-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('kubeConfig-textarea-input')).toBeInTheDocument();
     expect(screen.getAllByTestId('isEKS-radio-button')).toHaveLength(2);
+    expect(screen.getByTestId('eks-info-icon')).toBeInTheDocument();
     expect(screen.queryByTestId('pmm-server-url-warning')).toBeFalsy();
     expect(screen.queryByTestId('kubernetes-paste-from-clipboard-button')).toBeInTheDocument();
   });

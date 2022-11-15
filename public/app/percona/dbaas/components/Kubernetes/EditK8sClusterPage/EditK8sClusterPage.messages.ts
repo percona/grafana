@@ -1,6 +1,5 @@
 export const Messages = {
-  isEKSCheckboxLabel: 'Using Amazon Elastic Kubernetes Service (EKS)',
-  isEKSCheckboxTooltip: `If using Amazon EKS and kubeconfig does not contain AWS access key ID
+  isEKSRadioTooltip: `If using Amazon EKS and kubeconfig does not contain AWS access key ID
   and AWS secret access key please provide them below`,
   awsAccessKeyIDLabel: 'AWS Access Key ID',
   awsSecretAccessKeyLabel: 'AWS Secret Access Key',

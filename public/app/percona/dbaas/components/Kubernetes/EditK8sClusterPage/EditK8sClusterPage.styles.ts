@@ -26,6 +26,13 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
   pageContent: css`
     padding: 0 ${spacing.lg};
   `,
+  radioInfoIcon: css`
+    margin-left: ${spacing.md};
+  `,
+  radioGroup: css`
+    display: flex;
+    align-items: center;
+  `,
   k8sField: css`
     max-width: 498px;
     &:not(:last-child) {
