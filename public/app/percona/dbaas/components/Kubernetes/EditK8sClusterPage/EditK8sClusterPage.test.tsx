@@ -29,7 +29,7 @@ describe('EditK8sClusterPage::', () => {
 
     expect(screen.getByTestId('name-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('kubeConfig-textarea-input')).toBeInTheDocument();
-    expect(screen.getByTestId('isEKS-checkbox-input')).toBeInTheDocument();
+    expect(screen.getAllByTestId('isEKS-radio-button')).toHaveLength(2);
     expect(screen.queryByTestId('pmm-server-url-warning')).toBeFalsy();
     expect(screen.queryByTestId('kubernetes-paste-from-clipboard-button')).toBeInTheDocument();
   });
@@ -50,7 +50,7 @@ describe('EditK8sClusterPage::', () => {
     );
     expect(await screen.findByTestId('pmm-server-url-warning')).toBeInTheDocument();
   });
-  it('clicking isEKS checkbox shows AWS credentials fields', () => {
+  it('clicking isEKS radio shows AWS credentials fields', () => {
     render(
       <Provider
         store={configureStore({
@@ -69,7 +69,8 @@ describe('EditK8sClusterPage::', () => {
     expect(screen.queryByTestId('awsAccessKeyID-text-input')).not.toBeInTheDocument();
     expect(screen.queryByTestId('awsSecretAccessKey-password-input')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId('isEKS-checkbox-input'));
+    const showEKSRadio = screen.getAllByTestId('isEKS-radio-button')[1];
+    fireEvent.click(showEKSRadio);
 
     expect(screen.queryByTestId('awsAccessKeyID-text-input')).toBeInTheDocument();
     expect(screen.queryByTestId('awsSecretAccessKey-password-input')).toBeInTheDocument();

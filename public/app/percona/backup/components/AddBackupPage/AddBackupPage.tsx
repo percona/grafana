@@ -117,7 +117,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     setModalTitle(Messages.getModalTitle(false, editing));
   }, [editing, setQueryParams]);
 
-  const onSheduledChange = useCallback(() => {
+  const onScheduledChange = useCallback(() => {
     setQueryParams({ scheduled: true });
     setModalTitle(Messages.getModalTitle(true, editing));
   }, [editing, setQueryParams]);
@@ -167,9 +167,9 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const pageSwitcherValues: Array<PageSwitcherValue<BackupType>> = useMemo(
     () => [
       { name: 'type', value: BackupType.DEMAND, onChange: onDemandChange, label: Messages.onDemand },
-      { name: 'type', value: BackupType.SCHEDULED, onChange: onSheduledChange, label: Messages.schedule },
+      { name: 'type', value: BackupType.SCHEDULED, onChange: onScheduledChange, label: Messages.schedule },
     ],
-    [onDemandChange, onSheduledChange]
+    [onDemandChange, onScheduledChange]
   );
 
   return (
