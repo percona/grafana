@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom';
 
 import { Alert } from '@grafana/ui';
 
-interface PMMServerUrlWarningProps {
-  className?: string;
-}
 export const PMMServerUrlWarning: FC<PMMServerUrlWarningProps> = ({ className }) => (
   <Alert className={className} title="PMM Public Address" severity="info" data-testid="pmm-server-url-warning">
     <p>
