@@ -34,7 +34,7 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     align-items: center;
   `,
   k8sField: css`
-    max-width: 498px;
+    max-width: 500px;
     &:not(:last-child) {
       margin-bottom: 0px;
     }
@@ -54,7 +54,7 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     }
   `,
   awsField: css`
-    max-width: 800px;
+    max-width: 500px;
     &:not(:last-child) {
       margin-bottom: 6px;
     }
