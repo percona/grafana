@@ -3,7 +3,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 
-import { locationService } from '@grafana/runtime';
+import { locationService } from '@grafana/runtime/src';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -11,18 +11,18 @@ import { KubernetesClusterStatus } from '../../Kubernetes/KubernetesClusterStatu
 import { KubernetesOperatorStatus } from '../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { kubernetesStub } from '../../Kubernetes/__mocks__/kubernetesStubs';
 
-import { AddDBClusterModal } from './AddDBClusterModal';
-import { updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
+import { EditDBClusterPage } from './EditDBClusterPage';
+import { updateDatabaseClusterNameInitialValue } from './EditDBClusterPage.utils';
 import { onDBClusterAddedStub, setVisibleStub } from './__mocks__/addDBClusterModalStubs';
 
-jest.mock('./AddDBClusterModal.utils', () => ({
-  ...jest.requireActual('./AddDBClusterModal.utils'),
+jest.mock('./EditDBClusterPage.utils', () => ({
+  ...jest.requireActual('./EditDBClusterPage.utils'),
   updateDatabaseClusterNameInitialValue: jest.fn(),
 }));
 
 jest.mock('app/core/app_events');
 
-describe('AddDBClusterModal::', () => {
+describe('EditDBClusterPage::', () => {
   const openStep = (step: string) => {
     const stepNode = screen.getByTestId(`${step}`).querySelector('[data-testid="step-header"]');
     if (stepNode) {
@@ -46,7 +46,7 @@ describe('AddDBClusterModal::', () => {
         } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
-          <AddDBClusterModal
+          <EditDBClusterPage
             kubernetes={kubernetesStub}
             isVisible
             setVisible={setVisibleStub}
@@ -79,7 +79,7 @@ describe('AddDBClusterModal::', () => {
         } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
-          <AddDBClusterModal
+          <EditDBClusterPage
             kubernetes={kubernetesStub}
             isVisible
             setVisible={setVisibleStub}
@@ -107,7 +107,7 @@ describe('AddDBClusterModal::', () => {
         } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
-          <AddDBClusterModal
+          <EditDBClusterPage
             kubernetes={kubernetesStub}
             isVisible
             setVisible={setVisibleStub}
@@ -135,7 +135,7 @@ describe('AddDBClusterModal::', () => {
         } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
-          <AddDBClusterModal
+          <EditDBClusterPage
             kubernetes={kubernetesStub}
             isVisible
             setVisible={setVisibleStub}
@@ -185,7 +185,7 @@ describe('AddDBClusterModal::', () => {
         } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
-          <AddDBClusterModal
+          <EditDBClusterPage
             kubernetes={kubernetesStub}
             isVisible
             setVisible={setVisibleStub}

@@ -11,13 +11,13 @@ import { StoreState } from 'app/types';
 import { KubernetesClusterStatus } from '../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from '../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 
-import { updateDatabaseClusterNameInitialValue } from './AddDBClusterModal/AddDBClusterModal.utils';
+import { updateDatabaseClusterNameInitialValue } from './EditDBClusterPage/EditDBClusterPage.utils';
 import { DBCluster } from './DBCluster';
 import { DBClusterStatus } from './DBCluster.types';
 import { formatDBClusterVersion } from './DBCluster.utils';
 
-jest.mock('./AddDBClusterModal/AddDBClusterModal.utils', () => ({
-  ...jest.requireActual('./AddDBClusterModal/AddDBClusterModal.utils'),
+jest.mock('./EditDBClusterPage/EditDBClusterPage.utils', () => ({
+  ...jest.requireActual('./EditDBClusterPage/EditDBClusterPage.utils'),
   updateDatabaseClusterNameInitialValue: jest.fn(),
 }));
 jest.mock('app/core/app_events');

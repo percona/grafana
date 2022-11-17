@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme } from '@grafana/data/src';
 
 export const getStyles = ({ spacing, typography, colors, palette }: GrafanaTheme) => ({
   modalWrapper: css`

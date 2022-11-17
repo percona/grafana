@@ -1,7 +1,7 @@
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 import { getActiveOperators, getDatabaseOptionFromOperator } from '../../Kubernetes/Kubernetes.utils';
 
-import { AddDBClusterFields, AddDbClusterFormValues } from './AddDBClusterModal.types';
+import { AddDBClusterFields, AddDbClusterFormValues } from './EditDBClusterPage.types';
 import { INITIAL_VALUES } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import { getKubernetesOptions } from './DBClusterBasicOptions/DBClusterBasicOptions.utils';
 

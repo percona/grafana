@@ -4,7 +4,7 @@ import { Form, FormRenderProps } from 'react-final-form';
 
 import { Messages } from '../../../../DBaaS.messages';
 import { kubernetesStub } from '../../../Kubernetes/__mocks__/kubernetesStubs';
-import { AddDBClusterFields } from '../AddDBClusterModal.types';
+import { AddDBClusterFields } from '../EditDBClusterPage.types';
 
 import { DBClusterBasicOptions } from './DBClusterBasicOptions';
 import { kubernetesClusterNameValidator } from './DBClusterBasicOptions.utils';

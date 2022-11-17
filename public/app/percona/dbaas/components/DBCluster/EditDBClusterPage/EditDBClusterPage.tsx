@@ -1,35 +1,46 @@
 /* eslint-disable react/display-name */
-import { Modal } from '@percona/platform-core';
 import React, { FC, useMemo, useState } from 'react';
 import { FormRenderProps } from 'react-final-form';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { logger } from '@percona/platform-core';
 
-import { useStyles } from '@grafana/ui';
+import { useStyles } from '@grafana/ui/src';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { StepProgress } from 'app/percona/dbaas/components/StepProgress/StepProgress';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
-import { getAddDbCluster } from 'app/percona/shared/core/selectors';
+import { getAddDbCluster, getKubernetes } from 'app/percona/shared/core/selectors';
 
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 
-import { getStyles } from './AddDBClusterModal.styles';
-import { AddDBClusterModalProps, AddDBClusterFields } from './AddDBClusterModal.types';
-import { getInitialValues, updateDatabaseClusterNameInitialValue } from './AddDBClusterModal.utils';
+import { getStyles } from './EditDBClusterPage.styles';
+import { AddDBClusterModalProps, AddDBClusterFields } from './EditDBClusterPage.types';
+import { getInitialValues, updateDatabaseClusterNameInitialValue } from './EditDBClusterPage.utils';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
 import { UnsafeConfigurationWarning } from './UnsafeConfigurationsWarning/UnsafeConfigurationWarning';
+import { addDbClusterAction } from '../../../../shared/core/reducers';
 
-export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
+export const EditDBClusterPage: FC<AddDBClusterModalProps> = ({
   kubernetes,
-  isVisible,
-  setVisible,
   onSubmit,
   preSelectedKubernetesCluster,
+  mode,
 }) => {
+  const dispatch = useDispatch();
   const styles = useStyles(getStyles);
   const { loading } = useSelector(getAddDbCluster);
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
+
+  const addCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
+    try {
+      await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning })).unwrap();
+      // setAddModalVisible(false);
+      getDBClusters(true);
+    } catch (e) {
+      logger.error(e);
+    }
+  };
 
   const initialValues = useMemo(
     () => getInitialValues(kubernetes, preSelectedKubernetesCluster),
@@ -72,19 +83,19 @@ export const AddDBClusterModal: FC<AddDBClusterModalProps> = ({
 
   return (
     <div className={styles.modalWrapper} key="add-db-cluster-modal">
-      <Modal title={Messages.dbcluster.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>
-        <div className={styles.stepProgressWrapper}>
-          {showPMMAddressWarning && <PMMServerUrlWarning />}
-          {showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}
-          <StepProgress
-            steps={steps}
-            initialValues={updatedItialValues}
-            submitButtonMessage={Messages.dbcluster.addModal.confirm}
-            onSubmit={(values) => onSubmit(values, showPMMAddressWarning)}
-            loading={loading}
-          />
-        </div>
-      </Modal>
+      {/*<Modal title={Messages.dbcluster.addModal.title} isVisible={isVisible} onClose={() => setVisible(false)}>*/}
+      <div className={styles.stepProgressWrapper}>
+        {showPMMAddressWarning && <PMMServerUrlWarning />}
+        {showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}
+        <StepProgress
+          steps={steps}
+          initialValues={updatedItialValues}
+          submitButtonMessage={Messages.dbcluster.addModal.confirm}
+          onSubmit={(values) => onSubmit(values, showPMMAddressWarning)}
+          loading={loading}
+        />
+      </div>
+      {/*</Modal>*/}
     </div>
   );
 };

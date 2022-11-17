@@ -497,6 +497,26 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
+      path: '/dbaas/dbclusters/registration',
+      // eslint-disable-next-line react/display-name
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "DbaaSKubernetesPage" */ 'app/percona/dbaas/components/DBCluster/DBClusterRouting/DBClusterRouting'
+          )
+      ),
+    },
+    {
+      path: '/dbaas/dbclusters/edit',
+      // eslint-disable-next-line react/display-name
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "DbaaSKubernetesPage" */ 'app/percona/dbaas/components/DBCluster/DBClusterRouting/DBClusterRouting'
+          )
+      ),
+    },
+    {
       path: '/backup',
       // eslint-disable-next-line react/display-name
       component: () => <Redirect to="/backup/inventory" />,

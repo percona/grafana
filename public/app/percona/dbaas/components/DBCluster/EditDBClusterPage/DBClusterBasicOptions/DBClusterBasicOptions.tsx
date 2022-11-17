@@ -10,7 +10,7 @@ import { Kubernetes, Operator } from '../../../Kubernetes/Kubernetes.types';
 import { getDatabaseOptionFromOperator } from '../../../Kubernetes/Kubernetes.utils';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { DATABASE_OPTIONS } from '../../DBCluster.constants';
-import { AddDBClusterFields } from '../AddDBClusterModal.types';
+import { AddDBClusterFields } from '../EditDBClusterPage.types';
 import { DBClusterTopology } from '../DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 
 import { CLUSTER_NAME_MAX_LENGTH } from './DBClusterBasicOptions.constants';

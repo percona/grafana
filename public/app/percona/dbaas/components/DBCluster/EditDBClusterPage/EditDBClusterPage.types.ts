@@ -3,13 +3,13 @@ import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 
 import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import { DatabaseOptionInitial, KubernetesOption } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
+import { DBClusterPageMode } from '../DBClusterRouting/DBClusterRouting';
 
 export interface AddDBClusterModalProps {
   kubernetes: Kubernetes[];
-  isVisible: boolean;
-  setVisible: (value: boolean) => void;
   onSubmit: (values: Record<string, any>, showPMMAddressWarning: boolean) => void;
   preSelectedKubernetesCluster: Kubernetes | null;
+  mode: DBClusterPageMode;
 }
 
 export enum AddDBClusterFields {

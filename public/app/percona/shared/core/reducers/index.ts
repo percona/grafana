@@ -3,7 +3,7 @@ import { combineReducers, createAsyncThunk, createSlice, PayloadAction } from '@
 import { CancelToken } from 'axios';
 
 import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
-import { DBClusterTopology } from 'app/percona/dbaas/components/DBCluster/AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
+import { DBClusterTopology } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import { newDBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
 import { KubernetesService } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.service';

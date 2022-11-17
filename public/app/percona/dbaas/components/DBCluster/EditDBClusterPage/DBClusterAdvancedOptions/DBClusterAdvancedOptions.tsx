@@ -4,7 +4,7 @@ import React, { FC, useCallback, useState, useMemo, useEffect } from 'react';
 import { FormRenderProps, Field } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data/src';
-import { Icon, useStyles } from '@grafana/ui';
+import { Icon, useStyles } from '@grafana/ui/src';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { Databases } from 'app/percona/shared/core';
@@ -17,7 +17,7 @@ import { DBClusterService } from '../../DBCluster.service';
 import { DBClusterAllocatedResources, DBClusterExpectedResources } from '../../DBCluster.types';
 import { isOptionEmpty, newDBClusterService } from '../../DBCluster.utils';
 import { ResourcesBar } from '../../ResourcesBar/ResourcesBar';
-import { AddDBClusterFields } from '../AddDBClusterModal.types';
+import { AddDBClusterFields } from '../EditDBClusterPage.types';
 import { useDatabaseVersions } from '../DBClusterBasicOptions/DBClusterBasicOptions.hooks';
 import { optionRequired } from '../DBClusterBasicOptions/DBClusterBasicOptions.utils';
 

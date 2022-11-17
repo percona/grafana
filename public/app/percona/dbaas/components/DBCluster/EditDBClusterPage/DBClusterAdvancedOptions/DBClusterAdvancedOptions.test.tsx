@@ -4,7 +4,7 @@ import { Form, FormRenderProps } from 'react-final-form';
 
 import { Databases } from 'app/percona/shared/core';
 
-import { AddDBClusterFields } from '../AddDBClusterModal.types';
+import { AddDBClusterFields } from '../EditDBClusterPage.types';
 
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions';
 import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions.types';

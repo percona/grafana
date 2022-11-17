@@ -12,11 +12,11 @@ import { CPU, Disk, Memory } from '../../../DBaaSIcons';
 import {
   RECHECK_INTERVAL,
   EXPECTED_DELAY,
-} from '../../AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
+} from '../../EditDBClusterPage/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import {
   canGetExpectedResources,
   resourceValidator,
-} from '../../AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.utils';
+} from '../../EditDBClusterPage/DBClusterAdvancedOptions/DBClusterAdvancedOptions.utils';
 import { DBClusterService } from '../../DBCluster.service';
 import { DBClusterAllocatedResources, DBClusterExpectedResources } from '../../DBCluster.types';
 import { getExpectedResourcesDifference, newDBClusterService } from '../../DBCluster.utils';

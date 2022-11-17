@@ -1,6 +1,6 @@
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 
-import { Operators } from './AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
+import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { DatabaseOperatorsMap, DBClusterServiceDatabasesMap } from './DBCluster.types';
 import { PSMDBService } from './PSMDB.service';
 import { XtraDBService } from './XtraDB.service';

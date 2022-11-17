@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { logger } from '@percona/platform-core';
+
 import { CancelToken } from 'axios';
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,7 +13,7 @@ import { TechnicalPreview } from 'app/percona/shared/components/Elements/Technic
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { addDbClusterAction, fetchKubernetesAction, selectKubernetesCluster } from 'app/percona/shared/core/reducers';
+import { fetchKubernetesAction, selectKubernetesCluster } from 'app/percona/shared/core/reducers';
 import {
   getKubernetes,
   getDBaaS,
@@ -27,8 +27,6 @@ import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 
-import { AddDBClusterModal } from './AddDBClusterModal/AddDBClusterModal';
-import { RECHECK_INTERVAL } from './AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import {
   clusterStatusRender,
   connectionRender,
@@ -39,20 +37,21 @@ import {
 } from './ColumnRenderers/ColumnRenderers';
 import { GET_CLUSTERS_CANCEL_TOKEN } from './DBCluster.constants';
 import { getStyles } from './DBCluster.styles';
-import { DBCluster as DBClusterInterface } from './DBCluster.types';
+import { DBCluster as DBClusterInterface, DBClusterProps } from './DBCluster.types';
 import { DBClusterLogsModal } from './DBClusterLogsModal/DBClusterLogsModal';
 import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModal';
 import { EditDBClusterModal } from './EditDBClusterModal/EditDBClusterModal';
+import { RECHECK_INTERVAL } from './EditDBClusterPage/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
 
-export const DBCluster: FC = () => {
+export const DBCluster: FC<DBClusterProps> = ({ setMode }) => {
   const styles = useStyles(getStyles);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
-  const { selectedKubernetesCluster } = useSelector(getDBaaS);
-  const [addModalVisible, setAddModalVisible] = useState(!!selectedKubernetesCluster);
+
+  // const [addModalVisible, setAddModalVisible] = useState(!!selectedKubernetesCluster);
   const [selectedCluster, setSelectedCluster] = useState<DBClusterInterface>();
   const navModel = usePerconaNavModel('dbclusters');
   const dispatch = useAppDispatch();
@@ -135,22 +134,12 @@ export const DBCluster: FC = () => {
       <AddClusterButton
         label={Messages.dbcluster.addAction}
         disabled={addDisabled}
-        action={() => setAddModalVisible(!addModalVisible)}
+        action={() => setMode('register')}
         data-testid="dbcluster-add-cluster-button"
       />
     ),
-    [addModalVisible, addDisabled]
+    [addDisabled, setMode]
   );
-
-  const addCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
-    try {
-      await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning })).unwrap();
-      setAddModalVisible(false);
-      getDBClusters(true);
-    } catch (e) {
-      logger.error(e);
-    }
-  };
 
   const getRowKey = useCallback(({ original }) => `${original.kubernetesClusterName}${original.clusterName}`, []);
 
@@ -162,21 +151,6 @@ export const DBCluster: FC = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('dbaasEnabled'), []);
-
-  useEffect(() => {
-    if (!selectedKubernetesCluster) {
-      dispatch(
-        fetchKubernetesAction({
-          kubernetes: generateToken(GET_KUBERNETES_CANCEL_TOKEN),
-          operator: generateToken(CHECK_OPERATOR_UPDATE_CANCEL_TOKEN),
-        })
-      );
-    }
-    return () => {
-      dispatch(resetDBClustersToInitial());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -219,13 +193,13 @@ export const DBCluster: FC = () => {
             <div className={styles.actionPanel}>
               <AddNewClusterButton />
             </div>
-            <AddDBClusterModal
-              kubernetes={kubernetes}
-              isVisible={addModalVisible}
-              setVisible={setAddModalVisible}
-              onSubmit={addCluster}
-              preSelectedKubernetesCluster={selectedKubernetesCluster}
-            />
+            {/*<EditDBClusterPage*/}
+            {/*  kubernetes={kubernetes}*/}
+            {/*  isVisible={addModalVisible}*/}
+            {/*  setVisible={setAddModalVisible}*/}
+            {/*  onSubmit={addCluster}*/}
+            {/*  preSelectedKubernetesCluster={selectedKubernetesCluster}*/}
+            {/*/>*/}
             <DeleteDBClusterModal
               isVisible={deleteModalVisible}
               setVisible={setDeleteModalVisible}

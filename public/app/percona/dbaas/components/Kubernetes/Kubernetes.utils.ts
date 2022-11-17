@@ -2,7 +2,7 @@
 import {
   DatabaseOption,
   Operators,
-} from '../DBCluster/AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
+} from '../DBCluster/EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { DATABASE_OPERATORS, DATABASE_OPTIONS } from '../DBCluster/DBCluster.constants';
 import { ActiveOperatorsMap } from '../DBCluster/DBCluster.types';
 
