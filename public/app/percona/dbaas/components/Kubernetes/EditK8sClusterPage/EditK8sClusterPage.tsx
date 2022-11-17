@@ -12,12 +12,14 @@ import { useHistory } from 'react-router-dom';
 
 import { Button, Icon, LinkButton, PageToolbar, Tooltip, useStyles } from '@grafana/ui/src';
 
+import { FeatureLoader } from '../../../../shared/components/Elements/FeatureLoader';
 import { PageSwitcher } from '../../../../shared/components/PageSwitcher/PageSwitcher';
 import { PageSwitcherValue } from '../../../../shared/components/PageSwitcher/PageSwitcher.types';
 import { useCancelToken } from '../../../../shared/components/hooks/cancelToken.hook';
 import { useShowPMMAddressWarning } from '../../../../shared/components/hooks/showPMMAddressWarning';
 import { addKubernetesAction, resetAddK8SClusterState } from '../../../../shared/core/reducers/k8sCluster/k8sCluster';
-import { getAddKubernetes } from '../../../../shared/core/selectors';
+import { getAddKubernetes, getPerconaSettingFlag } from '../../../../shared/core/selectors';
+import { Messages as DBaaSMessages } from '../../../DBaaS.messages';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 import { DELETE_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes.constants';
 import { NewKubernetesCluster } from '../Kubernetes.types';
@@ -30,6 +32,7 @@ import { PageHeader } from './PageHeader/PageHeader';
 
 const { required } = validators;
 const {
+  pageTitle,
   awsAccessKeyIDLabel,
   awsAccessKeyIDTooltip,
   awsSecretAccessKeyLabel,
@@ -43,6 +46,8 @@ const {
   isEKSRadioTooltip,
 } = K8sFormMessages;
 
+const { dbaas, kubernetes } = DBaaSMessages;
+
 export const EditK8sClusterPage = () => {
   const styles = useStyles(getStyles);
   const dispatch = useDispatch();
@@ -50,6 +55,9 @@ export const EditK8sClusterPage = () => {
   const { result: addK8SClusterResult, loading: addK8SClusterLoading } = useSelector(getAddKubernetes);
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [generateToken] = useCancelToken();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('dbaasEnabled'), []);
 
   const pageSwitcherValues: Array<PageSwitcherValue<boolean>> = useMemo(
     () => [
@@ -96,8 +104,8 @@ export const EditK8sClusterPage = () => {
         <form onSubmit={handleSubmit}>
           <>
             <PageToolbar
-              title="KubernetesCluster"
-              parent="DBaaS"
+              title={pageTitle}
+              parent={dbaas}
               titleHref={K8S_INVENTORY_URL}
               parentHref={DBAAS_INVENTORY_URL}
               className={styles.pageToolbarWrapper}
@@ -116,71 +124,73 @@ export const EditK8sClusterPage = () => {
                 {confirm}
               </LoaderButton>
             </PageToolbar>
-            <PageHeader header={'Register new Kubernetes Cluster'} />
-            {showPMMAddressWarning && <PMMServerUrlWarning className={styles.pmmUrlWarning} />}
-            <div className={styles.pageContent}>
-              <div className={styles.radioGroup}>
-                <PageSwitcher values={pageSwitcherValues} />
-                <Tooltip content={isEKSRadioTooltip}>
-                  <Icon data-testid="eks-info-icon" name="info-circle" className={styles.radioInfoIcon} />
-                </Tooltip>
-              </div>
-              <TextareaInputField
-                name="kubeConfig"
-                label={
+            <PageHeader header={kubernetes.addAction} />
+            <FeatureLoader featureName={dbaas} featureSelector={featureSelector}>
+              {showPMMAddressWarning && <PMMServerUrlWarning className={styles.pmmUrlWarning} />}
+              <div className={styles.pageContent}>
+                <div className={styles.radioGroup}>
+                  <PageSwitcher values={pageSwitcherValues} />
+                  <Tooltip content={isEKSRadioTooltip}>
+                    <Icon data-testid="eks-info-icon" name="info-circle" className={styles.radioInfoIcon} />
+                  </Tooltip>
+                </div>
+                <TextareaInputField
+                  name="kubeConfig"
+                  label={
+                    <>
+                      <div>{fields.kubeConfig}</div>
+                      <Button
+                        data-testid="kubernetes-paste-from-clipboard-button"
+                        variant="primary"
+                        fill="outline"
+                        onClick={() => {
+                          pasteFromClipboard(form.mutators.setKubeConfigAndName);
+                        }}
+                        type="button"
+                        icon="percona-asterisk"
+                      >
+                        {paste}
+                      </Button>
+                    </>
+                  }
+                  validators={[required]}
+                  inputProps={{
+                    onChange: (event) => {
+                      onKubeConfigValueChange(event?.target?.value, form.mutators.setKubeConfigAndName);
+                    },
+                  }}
+                  fieldClassName={styles.k8ConfigField}
+                />
+                {isEKS && (
                   <>
-                    <div>{fields.kubeConfig}</div>
-                    <Button
-                      data-testid="kubernetes-paste-from-clipboard-button"
-                      variant="primary"
-                      fill="outline"
-                      onClick={() => {
-                        pasteFromClipboard(form.mutators.setKubeConfigAndName);
-                      }}
-                      type="button"
-                      icon="percona-asterisk"
-                    >
-                      {paste}
-                    </Button>
+                    <TextInputField
+                      name="awsAccessKeyID"
+                      label={awsAccessKeyIDLabel}
+                      tooltipIcon="info-circle"
+                      tooltipText={awsAccessKeyIDTooltip}
+                      tooltipLink={AWS_CREDENTIALS_DOC_LINK}
+                      validators={[required]}
+                      fieldClassName={styles.awsField}
+                    />
+                    <PasswordInputField
+                      name="awsSecretAccessKey"
+                      label={awsSecretAccessKeyLabel}
+                      tooltipIcon="info-circle"
+                      tooltipText={awsSecretAccessKeyTooltip}
+                      tooltipLink={AWS_CREDENTIALS_DOC_LINK}
+                      validators={[required]}
+                      fieldClassName={styles.awsField}
+                    />
                   </>
-                }
-                validators={[required]}
-                inputProps={{
-                  onChange: (event) => {
-                    onKubeConfigValueChange(event?.target?.value, form.mutators.setKubeConfigAndName);
-                  },
-                }}
-                fieldClassName={styles.k8ConfigField}
-              />
-              {isEKS && (
-                <>
-                  <TextInputField
-                    name="awsAccessKeyID"
-                    label={awsAccessKeyIDLabel}
-                    tooltipIcon="info-circle"
-                    tooltipText={awsAccessKeyIDTooltip}
-                    tooltipLink={AWS_CREDENTIALS_DOC_LINK}
-                    validators={[required]}
-                    fieldClassName={styles.awsField}
-                  />
-                  <PasswordInputField
-                    name="awsSecretAccessKey"
-                    label={awsSecretAccessKeyLabel}
-                    tooltipIcon="info-circle"
-                    tooltipText={awsSecretAccessKeyTooltip}
-                    tooltipLink={AWS_CREDENTIALS_DOC_LINK}
-                    validators={[required]}
-                    fieldClassName={styles.awsField}
-                  />
-                </>
-              )}
-              <TextInputField
-                name="name"
-                label={fields.clusterName}
-                validators={[required]}
-                fieldClassName={styles.k8sField}
-              />
-            </div>
+                )}
+                <TextInputField
+                  name="name"
+                  label={fields.clusterName}
+                  validators={[required]}
+                  fieldClassName={styles.k8sField}
+                />
+              </div>
+            </FeatureLoader>
           </>
         </form>
       )}

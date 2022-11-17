@@ -1,4 +1,5 @@
 export const Messages = {
+  pageTitle: 'Kubernetes Cluster',
   isEKSRadioTooltip: `If using Amazon EKS and kubeconfig does not contain AWS access key ID
   and AWS secret access key please provide them below`,
   awsAccessKeyIDLabel: 'AWS Access Key ID',
@@ -8,7 +9,6 @@ export const Messages = {
   awsSecretAccessKeyTooltip: `AWS Secret Access Key of the root user or an IAM user with access
   to the EKS cluster`,
   cancelButton: 'Cancel',
-  title: 'Register Kubernetes Cluster',
   confirm: 'Register',
   fields: {
     clusterName: 'Kubernetes Cluster Name',
