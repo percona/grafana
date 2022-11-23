@@ -17,7 +17,7 @@ describe('EditK8sClusterPage::', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { publicAddress: 'localhost' } },
+            settings: { loading: false, result: { publicAddress: 'localhost', dbaasEnabled: true } },
           },
         } as StoreState)}
       >
@@ -40,7 +40,7 @@ describe('EditK8sClusterPage::', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { publicAddress: '' } },
+            settings: { loading: false, result: { publicAddress: '', dbaasEnabled: true } },
           },
         } as StoreState)}
       >
@@ -57,7 +57,7 @@ describe('EditK8sClusterPage::', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { publicAddress: 'localhost' } },
+            settings: { loading: false, result: { publicAddress: 'localhost', dbaasEnabled: true } },
           },
         } as StoreState)}
       >
