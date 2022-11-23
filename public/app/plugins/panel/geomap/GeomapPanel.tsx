@@ -23,7 +23,7 @@ import { MeasureOverlay } from './components/MeasureOverlay';
 import { MeasureVectorLayer } from './components/MeasureVectorLayer';
 import { GeomapHoverPayload } from './event';
 import { getGlobalStyles } from './globalStyles';
-import { defaultMarkersConfig } from './layers/data/markersLayer';
+import { defaultMarkersConfig, MARKERS_LAYER_ID } from './layers/data/markersLayer';
 import { DEFAULT_BASEMAP_CONFIG } from './layers/registry';
 import { ControlsOptions, GeomapPanelOptions, MapLayerState, MapViewConfig, TooltipMode } from './types';
 import { getActions } from './utils/actions';
