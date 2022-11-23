@@ -198,6 +198,10 @@ import u1187 from '../../../../../public/img/icons/mono/percona-database-postgre
 import u1188 from '../../../../../public/img/icons/mono/percona-database-mongodb.svg';
 import u1189 from '../../../../../public/img/icons/mono/percona-database-proxysql.svg';
 import u1190 from '../../../../../public/img/icons/mono/percona-database-haproxy.svg';
+import u1191 from '../../../../../public/img/icons/mono/percona-bell.svg';
+import u1192 from '../../../../../public/img/icons/mono/percona-bell-slash.svg';
+import u1193 from '../../../../../public/img/icons/unicons/ticket.svg';
+import u1194 from '../../../../../public/img/icons/unicons/cloud.svg';
 // do not edit this list directly
 // the list of icons live here: @grafana/ui/components/Icon/cached.json
 
@@ -411,6 +415,10 @@ export function initIconCache() {
   cacheItem(u1188, 'mono/percona-database-mongodb.svg');
   cacheItem(u1189, 'mono/percona-database-proxysql.svg');
   cacheItem(u1190, 'mono/percona-database-haproxy.svg');
+  cacheItem(u1191, 'mono/percona-bell.svg');
+  cacheItem(u1192, 'mono/percona-bell-slash.svg');
+  cacheItem(u1193, 'unicons/ticket.svg');
+  cacheItem(u1194, 'unicons/cloud.svg');
   // do not edit this list directly
   // the list of icons live here: @grafana/ui/components/Icon/cached.json
 }

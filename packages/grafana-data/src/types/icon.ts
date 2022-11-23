@@ -215,6 +215,10 @@ export const availableIconsIndex = {
   'percona-database-mongodb': true,
   'percona-database-proxysql': true,
   'percona-database-haproxy': true,
+  ticket: true,
+  clouds: true,
+  'percona-bell': true,
+  'percona-bell-slash': true,
 };
 
 export type IconName = keyof typeof availableIconsIndex;

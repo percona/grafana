@@ -189,5 +189,9 @@
   "mono/percona-database-postgresql",
   "mono/percona-database-mongodb",
   "mono/percona-database-proxysql",
-  "mono/percona-database-haproxy"
+  "mono/percona-database-haproxy",
+  "mono/percona-bell",
+  "mono/percona-bell-slash",
+  "unicons/ticket",
+  "unicons/cloud"
 ]
