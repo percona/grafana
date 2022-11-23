@@ -202,6 +202,8 @@ import u1191 from '../../../../../public/img/icons/mono/percona-bell.svg';
 import u1192 from '../../../../../public/img/icons/mono/percona-bell-slash.svg';
 import u1193 from '../../../../../public/img/icons/unicons/ticket.svg';
 import u1194 from '../../../../../public/img/icons/unicons/cloud.svg';
+import u1195 from '../../../../../public/img/icons/unicons/angle-double-left.svg';
+import u1196 from '../../../../../public/img/icons/unicons/times-circle.svg';
 // do not edit this list directly
 // the list of icons live here: @grafana/ui/components/Icon/cached.json
 
@@ -419,6 +421,8 @@ export function initIconCache() {
   cacheItem(u1192, 'mono/percona-bell-slash.svg');
   cacheItem(u1193, 'unicons/ticket.svg');
   cacheItem(u1194, 'unicons/cloud.svg');
+  cacheItem(u1195, 'unicons/angle-double-left.svg');
+  cacheItem(u1196, 'unicons/times-circle.svg');
   // do not edit this list directly
   // the list of icons live here: @grafana/ui/components/Icon/cached.json
 }
