@@ -3,12 +3,11 @@ import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 
 import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import { DatabaseOptionInitial, KubernetesOption } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
-import { DBClusterPageMode } from '../DBClusterRouting/DBClusterRouting';
 
-export interface AddDBClusterModalProps {
+export type DBClusterPageMode = 'create' | 'edit' | 'list';
+
+export interface EditDBClusterPageProps {
   kubernetes: Kubernetes[];
-  onSubmit: (values: Record<string, any>, showPMMAddressWarning: boolean) => void;
-  preSelectedKubernetesCluster: Kubernetes | null;
   mode: DBClusterPageMode;
 }
 
@@ -39,3 +38,10 @@ export interface AddDbClusterFormValues {
   [AddDBClusterFields.kubernetesCluster]?: KubernetesOption;
   [AddDBClusterFields.name]?: string;
 }
+
+export interface DBClusterFormSubmitProps {
+  mode: DBClusterPageMode;
+  showPMMAddressWarning: boolean;
+}
+
+export type AddCluster = (values: Record<string, any>, showPMMAddressWarning: boolean) => Promise<void>;

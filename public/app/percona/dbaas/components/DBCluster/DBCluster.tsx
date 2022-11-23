@@ -3,6 +3,7 @@
 import { CancelToken } from 'axios';
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { useStyles } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
@@ -13,18 +14,14 @@ import { TechnicalPreview } from 'app/percona/shared/components/Elements/Technic
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { fetchKubernetesAction, selectKubernetesCluster } from 'app/percona/shared/core/reducers';
-import {
-  getKubernetes,
-  getDBaaS,
-  getPerconaDBClusters,
-  getPerconaSettingFlag,
-} from 'app/percona/shared/core/selectors';
+import { selectKubernetesCluster } from 'app/percona/shared/core/reducers';
+import { getPerconaDBClusters, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 
-import { fetchDBClustersAction, resetDBClustersToInitial } from '../../../shared/core/reducers/dbClusters/dbClusters';
+import { fetchDBClustersAction } from '../../../shared/core/reducers/dbClusters/dbClusters';
+import { useUpdateOfKubernetesList } from '../../hooks/useKubernetesList';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
-import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
+// import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 
 import {
@@ -37,30 +34,33 @@ import {
 } from './ColumnRenderers/ColumnRenderers';
 import { GET_CLUSTERS_CANCEL_TOKEN } from './DBCluster.constants';
 import { getStyles } from './DBCluster.styles';
-import { DBCluster as DBClusterInterface, DBClusterProps } from './DBCluster.types';
+import { DBCluster as DBClusterInterface } from './DBCluster.types';
 import { DBClusterLogsModal } from './DBClusterLogsModal/DBClusterLogsModal';
 import { DeleteDBClusterModal } from './DeleteDBClusterModal/DeleteDBClusterModal';
 import { EditDBClusterModal } from './EditDBClusterModal/EditDBClusterModal';
 import { RECHECK_INTERVAL } from './EditDBClusterPage/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
+import { DB_CLUSTER_CREATION_URL } from './EditDBClusterPage/EditDBClusterPage.constants';
 import { UpdateDBClusterModal } from './UpdateDBClusterModal/UpdateDBClusterModal';
 
-export const DBCluster: FC<DBClusterProps> = ({ setMode }) => {
+export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
+  const history = useHistory();
+  const [kubernetes = [], kubernetesLoading] = useUpdateOfKubernetesList();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
 
   // const [addModalVisible, setAddModalVisible] = useState(!!selectedKubernetesCluster);
+
   const [selectedCluster, setSelectedCluster] = useState<DBClusterInterface>();
   const navModel = usePerconaNavModel('dbclusters');
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
-  const { result: kubernetes = [], loading: kubernetesLoading } = useSelector(getKubernetes);
   const { result: dbClusters = [], loading: dbClustersLoading } = useSelector(getPerconaDBClusters);
   const [catchFromAsyncThunkAction] = useCatchCancellationError();
   const [loading, setLoading] = useState(kubernetesLoading);
-  const addDisabled = kubernetes.length === 0 || isKubernetesListUnavailable(kubernetes) || loading;
+  const addDisabled = kubernetes?.length === 0 || isKubernetesListUnavailable(kubernetes) || loading;
 
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
@@ -134,11 +134,12 @@ export const DBCluster: FC<DBClusterProps> = ({ setMode }) => {
       <AddClusterButton
         label={Messages.dbcluster.addAction}
         disabled={addDisabled}
-        action={() => setMode('register')}
+        action={() => history.push(DB_CLUSTER_CREATION_URL)}
         data-testid="dbcluster-add-cluster-button"
       />
     ),
-    [addDisabled, setMode]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [addDisabled]
   );
 
   const getRowKey = useCallback(({ original }) => `${original.kubernetesClusterName}${original.clusterName}`, []);

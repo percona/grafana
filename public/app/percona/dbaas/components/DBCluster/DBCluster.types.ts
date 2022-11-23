@@ -1,18 +1,13 @@
 import { SelectableValue } from '@grafana/data';
 import { Databases } from 'app/percona/shared/core';
 
-import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { DBClusterService } from './DBCluster.service';
-import { DBClusterPageMode } from './DBClusterRouting/DBClusterRouting';
+import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 export type AddDBClusterAction = (dbCluster: DBCluster) => void;
 export type GetDBClustersAction = () => void;
 export type SetDBClustersLoadingAction = (loading: boolean) => void;
 export type ManageDBClusters = [DBCluster[], GetDBClustersAction, SetDBClustersLoadingAction, boolean];
-
-export interface DBClusterProps {
-  setMode: React.Dispatch<React.SetStateAction<DBClusterPageMode>>;
-}
 
 export enum DBClusterType {
   pxc = 'DB_CLUSTER_TYPE_PXC',

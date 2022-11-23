@@ -3,37 +3,41 @@ import { css } from '@emotion/css';
 import { GrafanaTheme } from '@grafana/data/src';
 
 export const getStyles = ({ spacing, typography, colors, palette }: GrafanaTheme) => ({
-  modalWrapper: css`
-    div[data-testid='modal-body'] {
-      width: 60%;
-      max-width: none;
-    }
+  optionsWrapper: css`
+    margin-top: ${spacing.lg};
+    max-width: 650px;
   `,
-  stepProgressWrapper: css`
-    overflow: hidden;
 
-    div[class$='-current'] {
-      overflow: auto;
-    }
+  collapsableSection: css`
+    max-width: 170px;
+    margin-bottom: ${spacing.md};
+    margin-top: 64px;
   `,
-  warningIcon: css`
-    fill: ${palette.brandDanger};
-    height: 30px;
-    width: 30px;
-    margin-right: ${spacing.sm};
-  `,
-  settingsLink: css`
-    color: ${colors.linkExternal};
-    &:hover {
-      color: ${colors.linkExternal};
-    }
-  `,
-  warningWrapper: css`
-    align-items: center;
-    display: flex;
-  `,
-  warningMessage: css`
-    font-size: ${typography.size.md};
-    margin-left: ${spacing.xs};
-  `,
+  // stepProgressWrapper: css`
+  //   overflow: hidden;
+  //
+  //   div[class$='-current'] {
+  //     overflow: auto;
+  //   }
+  // `,
+  // warningIcon: css`
+  //   fill: ${palette.brandDanger};
+  //   height: 30px;
+  //   width: 30px;
+  //   margin-right: ${spacing.sm};
+  // `,
+  // settingsLink: css`
+  //   color: ${colors.linkExternal};
+  //   &:hover {
+  //     color: ${colors.linkExternal};
+  //   }
+  // `,
+  // warningWrapper: css`
+  //   align-items: center;
+  //   display: flex;
+  // `,
+  // warningMessage: css`
+  //   font-size: ${typography.size.md};
+  //   margin-left: ${spacing.xs};
+  // `,
 });

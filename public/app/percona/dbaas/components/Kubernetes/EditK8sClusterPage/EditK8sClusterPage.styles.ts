@@ -19,10 +19,7 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     align-items: flex-start;
     padding-right: ${spacing.lg};
   `,
-  pmmUrlWarning: css`
-    // TODO should be moved into PMMUrlServerWarning in https://jira.percona.com/browse/PMM-10873
-    margin: ${spacing.md} ${spacing.md} ${spacing.md} ${spacing.lg};
-  `,
+
   pageContent: css`
     padding: 0 ${spacing.lg};
   `,

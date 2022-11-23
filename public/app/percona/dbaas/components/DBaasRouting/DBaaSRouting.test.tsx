@@ -11,6 +11,7 @@ import { KubernetesClusterStatus } from '../Kubernetes/KubernetesClusterStatus/K
 import { KubernetesOperatorStatus } from '../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 
 import DBaaSRouting from './DBaaSRouting';
+import { K8S_INVENTORY_URL } from '../Kubernetes/EditK8sClusterPage/EditK8sClusterPage.constants';
 
 describe('SwitchField::', () => {
   it('should show loading when we are waiting kubernetes response', () => {
@@ -84,6 +85,6 @@ describe('SwitchField::', () => {
       </Provider>
     );
 
-    expect(locationService.getLocation().pathname).toBe('/dbaas/kubernetes');
+    expect(locationService.getLocation().pathname).toBe(K8S_INVENTORY_URL);
   });
 });

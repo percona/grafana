@@ -5,9 +5,9 @@ import { Form as FormFinal } from 'react-final-form';
 import { useStyles } from '@grafana/ui';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 
+import { newDBClusterService } from '../DBCluster.utils';
 import { MIN_NODES } from '../EditDBClusterPage/DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import { UnsafeConfigurationWarning } from '../EditDBClusterPage/UnsafeConfigurationsWarning/UnsafeConfigurationWarning';
-import { newDBClusterService } from '../DBCluster.utils';
 
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DEFAULT_SIZES } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';

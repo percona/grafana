@@ -1,9 +1,9 @@
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 import { getActiveOperators, getDatabaseOptionFromOperator } from '../../Kubernetes/Kubernetes.utils';
 
-import { AddDBClusterFields, AddDbClusterFormValues } from './EditDBClusterPage.types';
 import { INITIAL_VALUES } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
 import { getKubernetesOptions } from './DBClusterBasicOptions/DBClusterBasicOptions.utils';
+import { AddDBClusterFields, AddDbClusterFormValues } from './EditDBClusterPage.types';
 
 export const getInitialValues = (
   kubernetes: Kubernetes[],
