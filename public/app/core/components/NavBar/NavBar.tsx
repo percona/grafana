@@ -1,6 +1,5 @@
 import { css, cx } from '@emotion/css';
 import { FocusScope } from '@react-aria/focus';
-import { useTour } from '@reactour/tour';
 import { Location as HistoryLocation } from 'history';
 import { cloneDeep } from 'lodash';
 import React, { useState } from 'react';
@@ -10,6 +9,7 @@ import { GrafanaTheme2, NavModelItem, NavSection } from '@grafana/data';
 import { config, locationSearchToObject, locationService, reportInteraction } from '@grafana/runtime';
 import { Icon, useTheme2, CustomScrollbar } from '@grafana/ui';
 import { getKioskMode } from 'app/core/navigation/kiosk';
+import usePerconaTour from 'app/percona/shared/core/hooks/tour';
 import { useDispatch, useSelector } from 'app/types';
 
 import NavBarItem from './NavBarItem';
@@ -43,7 +43,7 @@ export const NavBar = React.memo(() => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuAnimationInProgress, setMenuAnimationInProgress] = useState(false);
   const [menuIdOpen, setMenuIdOpen] = useState<string | undefined>();
-  const { isOpen: isTourOpen } = useTour();
+  const { navMenuId, isOpen: isTourOpen } = usePerconaTour();
 
   // Here we need to hack in a "home" and "search" NavModelItem since this is constructed in the frontend
   const searchItem: NavModelItem = enrichWithInteractionTracking(
@@ -94,8 +94,7 @@ export const NavBar = React.memo(() => {
       <nav className={cx(styles.sidemenu, 'sidemenu')} data-testid="sidemenu" aria-label="Main menu">
         <NavBarContext.Provider
           value={{
-            // Show MySQL item during onboarding tour
-            menuIdOpen: isTourOpen ? 'mysql' : menuIdOpen,
+            menuIdOpen: isTourOpen && navMenuId ? navMenuId : menuIdOpen,
             setMenuIdOpen: setMenuIdOpen,
           }}
         >

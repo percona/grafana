@@ -221,6 +221,7 @@ export const availableIconsIndex = {
   'percona-bell-slash': true,
   'angle-double-left': true,
   'times-circle': true,
+  'percona-asterisk': true,
 };
 
 export type IconName = keyof typeof availableIconsIndex;
