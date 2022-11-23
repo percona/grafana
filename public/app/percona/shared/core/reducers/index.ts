@@ -31,6 +31,7 @@ import perconaBackupLocations from './backupLocations';
 import perconaDBClustersReducer from './dbClusters/dbClusters';
 import perconaK8SCluster from './k8sCluster/k8sCluster';
 import servicesReducer from './services';
+import tourReducer from './tour/tour';
 import perconaUserReducers from './user/user';
 
 const initialSettingsState: Settings = {
@@ -351,5 +352,6 @@ export default {
     templates: templatesReducer,
     services: servicesReducer,
     backupLocations: perconaBackupLocations,
+    tour: tourReducer,
   }),
 };
