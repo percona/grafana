@@ -333,7 +333,10 @@ describe('MSSQLDatasource', () => {
         { type: 'query', name: 'summarize', current: { value: '1m' } },
         { type: 'query', name: 'host', current: { value: 'a' } },
       ]);
-      expect(ctx.ds.targetContainsTemplate(query)).toBeTruthy();
+      const ds = new MssqlDatasource(instanceSettings);
+
+      Reflect.set(ds, 'templateSrv', templateSrv);
+      expect(ds.targetContainsTemplate(query)).toBeTruthy();
     });
 
     it('given query that only contains global template variable it should return false', () => {
@@ -355,7 +358,10 @@ describe('MSSQLDatasource', () => {
         { type: 'query', name: 'summarize', current: { value: '1m' } },
         { type: 'query', name: 'host', current: { value: 'a' } },
       ]);
-      expect(ctx.ds.targetContainsTemplate(query)).toBeFalsy();
+      const ds = new MssqlDatasource(instanceSettings);
+      Reflect.set(ds, 'templateSrv', templateSrv);
+
+      expect(ds.targetContainsTemplate(query)).toBeFalsy();
     });
   });
 });
