@@ -119,14 +119,7 @@ export class ShareLink extends PureComponent<Props, State> {
               onChange={this.onUseCurrentTimeRangeChange}
             />
           </Field>
-          <Field
-            label={t({
-              id: 'share-modal.link.theme',
-              message: `Theme`,
-            })}
-          >
-            <RadioButtonGroup options={themeOptions} value={selectedTheme} onChange={this.onThemeChange} />
-          </Field>
+          <ThemePicker selectedTheme={selectedTheme} onChange={this.onThemeChange} />
           {/* @PERCONA */}
           {differentLocalhostDomains && (
             <Alert title="PMM: URL mismatch" severity="warning">

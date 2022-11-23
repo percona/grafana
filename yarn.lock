@@ -5230,6 +5230,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@date-io/core@npm:^1.3.13":
+  version: 1.3.13
+  resolution: "@date-io/core@npm:1.3.13"
+  checksum: 5a9e9d1de20f0346a3c7d2d5946190caef4bfb0b64d82ba1f4c566657a9192667c94ebe7f438d11d4286d9c190974daad4fb2159294225cd8af4d9a140239879
+  languageName: node
+  linkType: hard
+
+"@date-io/moment@npm:^1.3.13":
+  version: 1.3.13
+  resolution: "@date-io/moment@npm:1.3.13"
+  dependencies:
+    "@date-io/core": ^1.3.13
+  peerDependencies:
+    moment: ^2.24.0
+  checksum: c4847f9d1bf09bb22c1acc5806fc50825c0bdb52408c9fec8cc5f9a65f16a8014870b5890a0eeb73b2c53a6487c35acbd2ab2a5c49068ff5a5dccbcb5c9e654b
+  languageName: node
+  linkType: hard
+
 "@daybrush/utils@npm:1.10.0":
   version: 1.10.0
   resolution: "@daybrush/utils@npm:1.10.0"
@@ -9532,6 +9550,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-aria/focus@npm:3.6.1":
+  version: 3.6.1
+  resolution: "@react-aria/focus@npm:3.6.1"
+  dependencies:
+    "@babel/runtime": ^7.6.2
+    "@react-aria/interactions": ^3.9.1
+    "@react-aria/utils": ^3.13.1
+    "@react-types/shared": ^3.13.1
+    clsx: ^1.1.1
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+  checksum: ca273afec9c21dc65d5d51ca93e979b89ee924a75d5a9e355dea1574f5db729d72e90437197c855ad45ea8bbacf227e8b4dc1bc2e74016427c5cdabe82e3017b
+  languageName: node
+  linkType: hard
+
 "@react-aria/focus@npm:3.8.0, @react-aria/focus@npm:^3.8.0":
   version: 3.8.0
   resolution: "@react-aria/focus@npm:3.8.0"
@@ -9575,6 +9608,19 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
   checksum: 668658282c937a12d6c9791025d5a672110f9cfa7452d3178fec56cb4b32682fd4d389d44498d788a8619668bb537ce9a8dcd1a6d2ad9fd25aa778dbc5e62bc9
+  languageName: node
+  linkType: hard
+
+"@react-aria/interactions@npm:^3.9.1":
+  version: 3.13.0
+  resolution: "@react-aria/interactions@npm:3.13.0"
+  dependencies:
+    "@babel/runtime": ^7.6.2
+    "@react-aria/utils": ^3.14.1
+    "@react-types/shared": ^3.16.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+  checksum: caa72fe0fc59c370268c3341b7efc64852a32904837cac5c185e8afb3138dfb90d74e17de1049eddf1b667149c7051ad56356a1aca33cb27fc3421dc6be6c37c
   languageName: node
   linkType: hard
 
@@ -9662,6 +9708,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-aria/ssr@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "@react-aria/ssr@npm:3.4.0"
+  dependencies:
+    "@babel/runtime": ^7.6.2
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+  checksum: e35d4db9fd4a62abbff8790ca4abc322df3a7127ac1c5ff6c13c74d0ff5f64e41e6461de1dceb859f1a0fe2461b5071061723ddc260de747bd9d029429f96eac
+  languageName: node
+  linkType: hard
+
 "@react-aria/utils@npm:3.13.1":
   version: 3.13.1
   resolution: "@react-aria/utils@npm:3.13.1"
@@ -9674,6 +9731,21 @@ __metadata:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
   checksum: 378b32809677114cff580fce100e151921a78ffc9ef75e45aaea3dd765c1e73055e73743fb868eb690a3729592cb1ba9d8a008adf39b0f7932d9f98377ddc07f
+  languageName: node
+  linkType: hard
+
+"@react-aria/utils@npm:^3.13.1, @react-aria/utils@npm:^3.14.1":
+  version: 3.14.1
+  resolution: "@react-aria/utils@npm:3.14.1"
+  dependencies:
+    "@babel/runtime": ^7.6.2
+    "@react-aria/ssr": ^3.4.0
+    "@react-stately/utils": ^3.5.1
+    "@react-types/shared": ^3.16.0
+    clsx: ^1.1.1
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+  checksum: a25d9a94840ee65d4bca0855df777a42993ae301ca004a9cab8ed3b97c404397d6f7ed1a0856d361bddf6d919f834fabe693172fbd38eda40759247c90b8929d
   languageName: node
   linkType: hard
 
@@ -9939,50 +10011,64 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-types/shared@npm:^3.16.0":
+  version: 3.16.0
+  resolution: "@react-types/shared@npm:3.16.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+  checksum: 3bb3aa77f4938fcd7788c5c5abf24f8f3d3c034d555962e44202d09673844cbb31d7b280edc9ac432bdd06847bc253527f8946f2604b9c88d5fcb96fdc56fbd1
+  languageName: node
+  linkType: hard
+
 "@reactour/mask@npm:*":
-  version: 1.0.4
-  resolution: "@reactour/mask@npm:1.0.4"
+  version: 1.0.0
+  resolution: "@reactour/mask@npm:1.0.0"
   dependencies:
     "@reactour/utils": "*"
+    "@types/react": 17.0.39
   peerDependencies:
     react: 16.x || 17.x || 18.x
-  checksum: 05acb18133769aa028279301815735f57869e12f4d04bc635784158914e6e5a188dcddf3e63738f00efdf0c527170df9301bfbfc2ee15ad1332e7ac3cc3bb41e
+  checksum: 7e978576733db89007a08fd297d7339e647d16ace6c6fc8fd81e528eae5580885592d6447354bca0b9433e16ec82fa51e8b7e3f6971300432a12a4b3e4119576
   languageName: node
   linkType: hard
 
 "@reactour/popover@npm:*":
-  version: 1.0.5
-  resolution: "@reactour/popover@npm:1.0.5"
+  version: 1.0.0
+  resolution: "@reactour/popover@npm:1.0.0"
   dependencies:
     "@reactour/utils": "*"
+    "@types/react": 17.0.39
   peerDependencies:
     react: 16.x || 17.x || 18.x
-  checksum: 882e1e709c7fe6e5d95a8500ae2a497d3d364f89f9e93d6d0cc6d53ecca8bda661c29ff63b1a58127d624cad927831d506b435df7e533da4949fff026e26e405
+  checksum: 593ef7d026dc0a8a7c4b9c5911b6059373feb56d3a2a6e55ba341a5a44d3fb2137cb203fb17a6821677dff17582d9bf8fd7cc4b32c42cf3e7c6dcf4aa29f678b
   languageName: node
   linkType: hard
 
 "@reactour/tour@npm:^3.0.0":
-  version: 3.1.6
-  resolution: "@reactour/tour@npm:3.1.6"
+  version: 3.0.0
+  resolution: "@reactour/tour@npm:3.0.0"
   dependencies:
+    "@react-aria/focus": 3.6.1
     "@reactour/mask": "*"
     "@reactour/popover": "*"
     "@reactour/utils": "*"
+    "@types/react": 17.0.39
   peerDependencies:
     react: 16.x || 17.x || 18.x
-  checksum: 43deb97c9aba41c915fb2214ae2a747c8799e80790598edcdc5cae8f19055782847cf70e79bc3e75ef9303395c6c49d07a1f22b3203db1cccfe82f25a1ee455f
+  checksum: 2454c27362d99f525f00d96380647bf3d39141f70677e437bc2fea218773ad99e1a8a4cb63c9dbd5ae774b040b2eb455b3c1d5cf580c0f44101dbff46b0429fd
   languageName: node
   linkType: hard
 
 "@reactour/utils@npm:*":
-  version: 0.4.7
-  resolution: "@reactour/utils@npm:0.4.7"
+  version: 0.4.0
+  resolution: "@reactour/utils@npm:0.4.0"
   dependencies:
-    "@rooks/use-mutation-observer": ^4.11.2
-    resize-observer-polyfill: ^1.5.1
+    "@rooks/use-mutation-observer": 4.11.2
+    "@types/react": 17.0.39
+    resize-observer-polyfill: 1.5.1
   peerDependencies:
     react: 16.x || 17.x || 18.x
-  checksum: fec485bdb7ef0604fdd241d583be19a2b009fbaef4fff68cf1e8e3717a09f317a4025c6ca7d0afa72b383e5732d77553122881ff569fee297a3814b0bdec5f03
+  checksum: 0cd25fd19842a3f815ce6d7f1ef0135511f779ad2d456cbd46b9cf53a6950fa150cc218782bab752a2f0f04227e577eafb4998d72355796dffcbabbc97530afc
   languageName: node
   linkType: hard
 
@@ -10100,7 +10186,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rooks/use-mutation-observer@npm:^4.11.2":
+"@rooks/use-mutation-observer@npm:4.11.2":
   version: 4.11.2
   resolution: "@rooks/use-mutation-observer@npm:4.11.2"
   peerDependencies:
@@ -13626,6 +13712,17 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: e3aaac1b8fda6e3622b75db0bd7d8dc412c2f2b77a00afdd32cae8c71fb0b1ca6926ab1fbe1c536dd51d96c0ba372738993837a8df1637637aaab7b86e421b7f
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:17.0.39":
+  version: 17.0.39
+  resolution: "@types/react@npm:17.0.39"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: bf04d3c2894559012710d595553e12b422d3b91cd8f4f7e122d8cb044ba9c2ba17f6e8a4e09581359cc5509ddc59cd8c8fabd6774f3505a40a45393f074d6e6e
   languageName: node
   linkType: hard
 
@@ -18331,6 +18428,13 @@ __metadata:
   version: 1.0.4
   resolution: "clone@npm:1.0.4"
   checksum: d06418b7335897209e77bdd430d04f882189582e67bd1f75a04565f3f07f5b3f119a9d670c943b6697d0afb100f03b866b3b8a1f91d4d02d72c4ecf2bb64b5dd
+  languageName: node
+  linkType: hard
+
+"clone@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "clone@npm:2.1.2"
+  checksum: aaf106e9bc025b21333e2f4c12da539b568db4925c0501a1bf4070836c9e848c892fa22c35548ce0d1132b08bbbfa17a00144fe58fccdab6fa900fec4250f67d
   languageName: node
   linkType: hard
 
@@ -25159,6 +25263,7 @@ __metadata:
     rc-tree: 5.6.6
     re-resizable: 6.9.9
     react: 17.0.2
+    react-awesome-query-builder: ^5.1.2
     react-beautiful-dnd: 13.1.0
     react-diff-viewer: ^3.1.1
     react-dom: 17.0.2
@@ -31476,7 +31581,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment@npm:2.29.4, moment@npm:2.x, moment@npm:>= 2.9.0, moment@npm:^2.19.4, moment@npm:^2.20.1":
+"moment@npm:2.29.4, moment@npm:2.x, moment@npm:>= 2.9.0, moment@npm:^2.19.4, moment@npm:^2.20.1, moment@npm:^2.29.4":
   version: 2.29.4
   resolution: "moment@npm:2.29.4"
   checksum: 0ec3f9c2bcba38dc2451b1daed5daded747f17610b92427bebe1d08d48d8b7bdd8d9197500b072d14e326dd0ccf3e326b9e3d07c5895d3d49e39b6803b76e80e
@@ -36682,6 +36787,46 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-awesome-query-builder@npm:^5.1.2":
+  version: 5.3.1
+  resolution: "react-awesome-query-builder@npm:5.3.1"
+  dependencies:
+    "@date-io/moment": ^1.3.13
+    classnames: ^2.3.1
+    clone: ^2.1.2
+    immutable: ^3.8.2
+    lodash: ^4.17.21
+    moment: ^2.29.4
+    prop-types: ^15.7.2
+    react-redux: ^7.2.2
+    redux: ^4.2.0
+    spel2js: ^0.2.8
+    sqlstring: ^2.3.3
+  peerDependencies:
+    "@ant-design/icons": ^4.0.0
+    "@emotion/react": ^11.7.1
+    "@emotion/styled": ^11.6.0
+    "@fortawesome/fontawesome-svg-core": ^1.2.0 || ^6.1.0
+    "@fortawesome/free-solid-svg-icons": ^5.15.4 || ^6.0.0
+    "@fortawesome/react-fontawesome": ^0.1.16 || ^0.2.0
+    "@material-ui/core": ^4.12.3
+    "@material-ui/icons": ^4.0.0
+    "@material-ui/lab": ^4.0.0-alpha.57
+    "@material-ui/pickers": ^3.2.10
+    "@mui/icons-material": ^5.2.4
+    "@mui/lab": ^5.0.0-alpha.60
+    "@mui/material": ^5.2.4
+    "@mui/x-date-pickers": ^5.0.0-beta.2
+    antd: ^4.0.0
+    bootstrap: ^5.1.3
+    material-ui-confirm: ^2.0.1 || ^3.0.0
+    react: ^16.8.4 || ^17.0.1 || ^18.0.0
+    react-dom: ^16.8.4 || ^17.0.1 || ^18.0.0
+    reactstrap: ^9.0.0
+  checksum: d9c27f5c0ce66ab9ad3f57f7c003471afd5465f732e2359ff916a6f62d0161ccf33a738bd67349d0b82384561242714c8d29f0216c8d5148fdb10c420f5fe914
+  languageName: node
+  linkType: hard
+
 "react-beautiful-dnd@npm:13.1.0":
   version: 13.1.0
   resolution: "react-beautiful-dnd@npm:13.1.0"
@@ -37296,6 +37441,27 @@ __metadata:
     react-native:
       optional: true
   checksum: 0bf142ce0d0b80aef955650fd5e9489fca32d94f19ee23893b332f1b01ceee7bd3623337c942cbda642667d1dc9de5ac869c3c1946afa6cf2046407b57d24741
+  languageName: node
+  linkType: hard
+
+"react-redux@npm:^7.2.2":
+  version: 7.2.9
+  resolution: "react-redux@npm:7.2.9"
+  dependencies:
+    "@babel/runtime": ^7.15.4
+    "@types/react-redux": ^7.1.20
+    hoist-non-react-statics: ^3.3.2
+    loose-envify: ^1.4.0
+    prop-types: ^15.7.2
+    react-is: ^17.0.2
+  peerDependencies:
+    react: ^16.8.3 || ^17 || ^18
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 369a2bdcf87915659af9e5c55abfd9f52a84e43e0d12dcc108ed17dbe6933558b7b7fc12caa9c10c1a10a8be7df89454b6c96989d8573fedec1a772c94a1f145
   languageName: node
   linkType: hard
 
@@ -38018,7 +38184,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux@npm:4.2.0":
+"redux@npm:4.2.0, redux@npm:^4.2.0":
   version: 4.2.0
   resolution: "redux@npm:4.2.0"
   dependencies:
@@ -38456,7 +38622,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resize-observer-polyfill@npm:^1.5.1":
+"resize-observer-polyfill@npm:1.5.1, resize-observer-polyfill@npm:^1.5.1":
   version: 1.5.1
   resolution: "resize-observer-polyfill@npm:1.5.1"
   checksum: 57e7f79489867b00ba43c9c051524a5c8f162a61d5547e99333549afc23e15c44fd43f2f318ea0261ea98c0eb3158cca261e6f48d66e1ed1cd1f340a43977094
@@ -40337,6 +40503,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"spel2js@npm:^0.2.8":
+  version: 0.2.8
+  resolution: "spel2js@npm:0.2.8"
+  checksum: a81f30b90438c6fef27627d8f91e2ce9040cc3743918846e535e44bdbf76be4d404d281e83b1be8287f36c1566a22e20d711532b941838f9ca7673e5caebf75f
+  languageName: node
+  linkType: hard
+
 "split-string@npm:^3.0.1, split-string@npm:^3.0.2":
   version: 3.1.0
   resolution: "split-string@npm:3.1.0"
@@ -40387,6 +40560,13 @@ __metadata:
     "@babel/polyfill": ^7.6.0
     lodash: ^4.17.15
   checksum: 5c215f85936b3465d6778af868f0a8a2d3dd4b714ab95025c3b17b9748fe420ae2e128c523d50be0a43667bf8329a974f3248828971299146786e28d9714e752
+  languageName: node
+  linkType: hard
+
+"sqlstring@npm:^2.3.3":
+  version: 2.3.3
+  resolution: "sqlstring@npm:2.3.3"
+  checksum: 1e7e2d51c38a0cf7372e875408ca100b6e0c9a941ab7773975ea41fb36e5528e404dc787689be855780cf6d0a829ff71027964ae3a05a7446e91dce26672fda7
   languageName: node
   linkType: hard
 

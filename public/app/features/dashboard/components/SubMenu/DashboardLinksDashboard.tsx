@@ -8,8 +8,8 @@ import { selectors } from '@grafana/e2e-selectors';
 import { config } from '@grafana/runtime';
 import { Icon, ToolbarButton, Tooltip, useStyles2 } from '@grafana/ui';
 import { getBackendSrv } from 'app/core/services/backend_srv';
-import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { DashboardSearchItem } from 'app/features/search/types';
+import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 
 import { getLinkSrv } from '../../../panel/panellinks/link_srv';
 import { DashboardLink } from '../../state/DashboardModel';
@@ -36,10 +36,10 @@ export const DashboardLinksDashboard = (props: Props) => {
   if (link.title === 'PMM') {
     if (isPmmAdmin(config.bootData.user)) {
       resolvedLinks = [
-        { id: 1000, url: '/graph/add-instance', title: 'PMM Add Instance' },
-        { id: 1001, url: '/graph/pmm-database-checks', title: 'PMM Advisor Checks' },
-        { id: 1002, url: '/graph/inventory', title: 'PMM Inventory' },
-        { id: 1003, url: '/graph/settings', title: 'PMM Settings' },
+        { uid: '1000', url: '/graph/add-instance', title: 'PMM Add Instance' },
+        { uid: '1001', url: '/graph/pmm-database-checks', title: 'PMM Advisor Checks' },
+        { uid: '1002', url: '/graph/inventory', title: 'PMM Inventory' },
+        { uid: '1003', url: '/graph/settings', title: 'PMM Settings' },
       ];
     } else {
       return <></>;

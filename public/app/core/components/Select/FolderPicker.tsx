@@ -169,7 +169,10 @@ export function FolderPicker(props: Props) {
   useEffect(() => {
     // if this is not the same as our initial value notify parent
     if (folder && folder.value !== initialFolderId) {
-      !isCreatingNew && folder.value && folder.label && onChange({ id: folder.value, title: folder.label });
+      !isCreatingNew &&
+        folder.value &&
+        folder.label &&
+        onChange({ id: folder.value, title: folder.label, uid: folder.uid });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [folder, initialFolderId]);
@@ -215,7 +218,7 @@ export function FolderPicker(props: Props) {
         setFolder(newFolder);
         // @PERCONA
         // uid added here
-        onChange({ id: newFolder.value!, title: newFolder.label!, uid: folder.uid });
+        onChange({ id: newFolder.value!, title: newFolder.label!, uid: newFolder.uid });
       }
     },
     [onChange, onClear, rootName, inputValue]
@@ -233,7 +236,7 @@ export function FolderPicker(props: Props) {
         appEvents.emit(AppEvents.alertSuccess, ['Folder Created', 'OK']);
         // @PERCONA
         // uid added here
-        folder = { value: newFolder.id, label: newFolder.title, uid: folder.uid };
+        folder = { value: newFolder.id, label: newFolder.title, uid: newFolder.uid };
 
         setFolder(newFolder);
         onFolderChange(folder, { action: 'create-option', option: folder });

@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { useSelector } from 'react-redux';
 
 import { Stack } from '@grafana/experimental';
 import { Field, Icon, Input, InputControl, Label, Select, Tooltip, useStyles2 } from '@grafana/ui';
@@ -14,12 +13,12 @@ import {
 } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
 import { fetchTemplatesAction } from 'app/percona/shared/core/reducers';
 import { getTemplates } from 'app/percona/shared/core/selectors';
-import { AccessControlAction, useDispatch } from 'app/types';
+import { AccessControlAction, useDispatch, useSelector } from 'app/types';
 
 import { fetchAlertManagerConfigAction } from '../../../state/actions';
 import { RuleForm, RuleFormValues } from '../../../types/rule-form';
 import { initialAsyncRequestState } from '../../../utils/redux';
-import { durationValidationPattern, parseDurationToMilliseconds } from '../../../utils/time';
+import { parsePrometheusDuration } from '../../../utils/time';
 import { RuleEditorSection } from '../RuleEditorSection';
 import { Folder, RuleFolderPicker } from '../RuleFolderPicker';
 import { checkForPathSeparator } from '../util';
@@ -216,9 +215,8 @@ export const TemplateStep: FC = () => {
           id="duration"
           {...register('duration', {
             required: { value: true, message: Messages.errors.durationRequired },
-            pattern: durationValidationPattern,
             validate: (value) => {
-              const millisFor = parseDurationToMilliseconds(value);
+              const millisFor = parsePrometheusDuration(value);
 
               // 0 is a special value meaning for equals evaluation interval
               if (millisFor === 0) {
@@ -284,6 +282,7 @@ export const TemplateStep: FC = () => {
                 enableCreateNew={contextSrv.hasPermission(AccessControlAction.FoldersCreate)}
                 enableReset={true}
                 filter={folderFilter}
+                dissalowSlashes={true}
               />
             )}
             name="folder"

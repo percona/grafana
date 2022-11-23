@@ -15,12 +15,14 @@ export interface FooterLink {
 export let getFooterLinks = (): FooterLink[] => {
   return [
     {
+      id: 'pmm-logs',
       text: 'PMM Logs',
       icon: 'download-alt',
       url: '/logs.zip',
       target: '_blank',
     },
     {
+      id: 'pmm-docs',
       text: 'Documentation',
       icon: 'document-info',
       url: 'https://www.percona.com/doc/percona-monitoring-and-management/2.x/index.html?utm_source=pmm_footer',
@@ -32,7 +34,6 @@ export let getFooterLinks = (): FooterLink[] => {
       text: 'Support',
       icon: 'question-circle',
       url: 'https://www.percona.com/services/support?utm_source=pmm_footer',
-      target: '_blank',
     },
     {
       target: '_blank',
@@ -40,7 +41,6 @@ export let getFooterLinks = (): FooterLink[] => {
       text: 'Community',
       icon: 'comments-alt',
       url: 'https://forums.percona.com/c/percona-monitoring-and-management-pmm/percona-monitoring-and-management-pmm-v2?utm_source=pmm_footer',
-      target: '_blank',
     },
   ];
 };
