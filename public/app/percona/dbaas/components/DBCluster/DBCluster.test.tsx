@@ -34,7 +34,7 @@ jest.mock('@percona/platform-core', () => {
 });
 
 describe('DBCluster::', () => {
-  xit('renders correctly without clusters', async () => {
+  it('renders correctly without clusters', async () => {
     render(
       <Provider
         store={configureStore({
@@ -59,7 +59,7 @@ describe('DBCluster::', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  xit('renders correctly with clusters', async () => {
+  it('renders correctly with clusters', async () => {
     render(
       <Provider
         store={configureStore({
@@ -99,7 +99,7 @@ describe('DBCluster::', () => {
     expect(screen.getAllByTestId('table-row')).toHaveLength(1);
   });
 
-  xit('renders correctly with failed status', async () => {
+  it('renders correctly with failed status', async () => {
     render(
       <Provider
         store={configureStore({
@@ -139,7 +139,7 @@ describe('DBCluster::', () => {
     expect(await screen.getAllByTestId('cluster-status-error-message').length).toBeGreaterThan(0);
   });
 
-  xit('renders database types correctly', async () => {
+  it('renders database types correctly', async () => {
     render(
       <Provider
         store={configureStore({
