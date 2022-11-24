@@ -1,3 +1,5 @@
+import { ValidationRule } from 'react-hook-form';
+
 import { durationToMilliseconds, parseDuration } from '@grafana/data';
 import { describeInterval } from '@grafana/data/src/datetime/rangeutil';
 
@@ -52,11 +54,11 @@ const PROMETHEUS_SUFFIX_MULTIPLIER: Record<string, number> = {
 };
 
 const DURATION_REGEXP = new RegExp(/^(?:(?<value>\d+)(?<type>ms|s|m|h|d|w|y))|0$/);
-const INVALID_FORMAT = new Error(
-  `Must be of format "(number)(unit)", for example "1m", or just "0". Available units: ${Object.values(
-    TimeOptions
-  ).join(', ')}`
-);
+// @PERCONA
+const INVALID_FORMAT_MESSAGE = `Must be of format "(number)(unit)", for example "1m", or just "0". Available units: ${Object.values(
+  TimeOptions
+).join(', ')}`;
+const INVALID_FORMAT = new Error(INVALID_FORMAT_MESSAGE);
 
 /**
  * According to https://prometheus.io/docs/alerting/latest/configuration/#configuration-file
@@ -99,3 +101,10 @@ export function parsePrometheusDuration(duration: string): number {
 
   return totalDuration;
 }
+
+// @PERCONA
+// 1h, 10m or 0 (without units)
+export const durationValidationPattern: ValidationRule<RegExp> = {
+  value: new RegExp(`^(\\d+(${Object.values(TimeOptions).join('|')})|0)$`),
+  message: INVALID_FORMAT_MESSAGE,
+};

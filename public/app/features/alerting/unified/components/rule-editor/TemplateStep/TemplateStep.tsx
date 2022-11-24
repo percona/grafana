@@ -18,7 +18,7 @@ import { AccessControlAction, useDispatch, useSelector } from 'app/types';
 import { fetchAlertManagerConfigAction } from '../../../state/actions';
 import { RuleForm, RuleFormValues } from '../../../types/rule-form';
 import { initialAsyncRequestState } from '../../../utils/redux';
-import { parsePrometheusDuration } from '../../../utils/time';
+import { durationValidationPattern, parseDurationToMilliseconds } from '../../../utils/time';
 import { RuleEditorSection } from '../RuleEditorSection';
 import { Folder, RuleFolderPicker } from '../RuleFolderPicker';
 import { checkForPathSeparator } from '../util';
@@ -215,8 +215,9 @@ export const TemplateStep: FC = () => {
           id="duration"
           {...register('duration', {
             required: { value: true, message: Messages.errors.durationRequired },
+            pattern: durationValidationPattern,
             validate: (value) => {
-              const millisFor = parsePrometheusDuration(value);
+              const millisFor = parseDurationToMilliseconds(value);
 
               // 0 is a special value meaning for equals evaluation interval
               if (millisFor === 0) {
