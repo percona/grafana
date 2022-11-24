@@ -7,10 +7,11 @@ import { locationService } from '@grafana/runtime/src';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
+import { KubernetesClusterStatus } from '../../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
+import { KubernetesOperatorStatus } from '../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { kubernetesStub } from '../../Kubernetes/__mocks__/kubernetesStubs';
 
 import { EditDBClusterPage } from './EditDBClusterPage';
-import { updateDatabaseClusterNameInitialValue } from './EditDBClusterPage.utils';
 
 jest.mock('./EditDBClusterPage.utils', () => ({
   ...jest.requireActual('./EditDBClusterPage.utils'),
@@ -20,25 +21,32 @@ jest.mock('./EditDBClusterPage.utils', () => ({
 jest.mock('app/core/app_events');
 
 describe('EditDBClusterPage::', () => {
-  const openStep = (step: string) => {
-    const stepNode = screen.getByTestId(`${step}`).querySelector('[data-testid="step-header"]');
-    if (stepNode) {
-      fireEvent.click(stepNode);
-    }
-  };
+  // TODO db-cluster-submit-button message should have different values depends on mode of page
+  // TODO the header of page should have different values depends on mode of page
 
-  const isStepActive = (step: string) => {
-    const stepNode = screen.getByTestId(`${step}`).querySelector('[data-testid="step-content"]');
-    return stepNode ? stepNode.getElementsByTagName('div')[0].className.split('-')?.includes('current') : false;
-  };
-
-  xit('renders correctly', () => {
+  it('renders correctly', () => {
     render(
       <Provider
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: {
+              loading: false,
+              result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
+            },
+            kubernetes: {
+              loading: false,
+              result: [
+                {
+                  kubernetesClusterName: 'cluster1',
+                  status: KubernetesClusterStatus.ok,
+                  operators: {
+                    psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                  },
+                },
+              ],
+            },
           },
         } as StoreState)}
       >
@@ -52,20 +60,36 @@ describe('EditDBClusterPage::', () => {
     expect(screen.getByTestId('name-text-input')).toBeTruthy();
     expect(screen.getByTestId('dbcluster-kubernetes-cluster-field')).toBeTruthy();
     expect(screen.getByTestId('dbcluster-database-type-field')).toBeTruthy();
-    expect(screen.getByTestId('step-progress-submit-button')).toBeTruthy();
     expect(screen.getByTestId('dbcluster-basic-options-step')).toBeTruthy();
-    expect(screen.getByTestId('dbcluster-advanced-options-step')).toBeTruthy();
-    expect(screen.getByTestId('dbcluster-advanced-options-step')).toBeTruthy();
+    expect(screen.getByTestId('list-dbCluster-advanced-settings')).toBeTruthy();
     expect(screen.findByTestId('add-cluster-monitoring-warning')).toBeTruthy();
+    expect(screen.getByTestId('db-cluster-cancel-button')).toBeInTheDocument();
+    expect(screen.getByTestId('db-cluster-submit-button')).toBeInTheDocument();
   });
 
-  xit('should disable submit button when there is no values', () => {
+  it('should disable submit button when there is no values', async () => {
     render(
       <Provider
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: {
+              loading: false,
+              result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
+            },
+            kubernetes: {
+              loading: false,
+              result: [
+                {
+                  kubernetesClusterName: 'cluster1',
+                  status: KubernetesClusterStatus.ok,
+                  operators: {
+                    psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                  },
+                },
+              ],
+            },
           },
         } as StoreState)}
       >
@@ -75,41 +99,36 @@ describe('EditDBClusterPage::', () => {
       </Provider>
     );
 
-    openStep('dbcluster-advanced-options-step');
+    fireEvent.click(screen.getByTestId('list-dbCluster-advanced-settings'));
 
-    const button = screen.getByTestId('step-progress-submit-button');
+    const button = screen.getByTestId('db-cluster-submit-button');
     expect(button).toBeDisabled();
   });
 
-  xit('should change step correctly', () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <EditDBClusterPage kubernetes={kubernetesStub} mode="create" />
-        </Router>
-      </Provider>
-    );
-
-    expect(isStepActive('dbcluster-basic-options-step')).toBeTruthy();
-    openStep('dbcluster-advanced-options-step');
-    expect(isStepActive('dbcluster-advanced-options-step')).toBeTruthy();
-    expect(isStepActive('dbcluster-basic-options-step')).toBeFalsy();
-  });
-
+  // TODO should be return in https://jira.percona.com/browse/PMM-11134
   xit('form should have default values', () => {
     render(
       <Provider
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: {
+              loading: false,
+              result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
+            },
+            kubernetes: {
+              loading: false,
+              result: [
+                {
+                  kubernetesClusterName: 'cluster1',
+                  status: KubernetesClusterStatus.ok,
+                  operators: {
+                    psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                  },
+                },
+              ],
+            },
           },
         } as StoreState)}
       >
@@ -118,18 +137,9 @@ describe('EditDBClusterPage::', () => {
         </Router>
       </Provider>
     );
-
-    expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalledWith(
-      expect.objectContaining({
-        databaseType: expect.objectContaining({ value: 'mongodb' }),
-        kubernetesCluster: expect.objectContaining({
-          value: 'Cluster 1',
-        }),
-        name: expect.stringContaining('mongodb-'),
-      })
-    );
   });
 
+  // TODO should be return in https://jira.percona.com/browse/PMM-11134
   xit('form should have default values from preselectedCluster', () => {
     // const preSelectedCluster = {
     //   kubernetesClusterName: 'testPreselectedCluster',
@@ -163,14 +173,14 @@ describe('EditDBClusterPage::', () => {
       </Provider>
     );
 
-    expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalledWith(
-      expect.objectContaining({
-        databaseType: expect.objectContaining({ value: 'mongodb' }),
-        kubernetesCluster: expect.objectContaining({
-          value: 'testPreselectedCluster',
-        }),
-        name: expect.stringContaining('mongodb-'),
-      })
-    );
+    // expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalledWith(
+    //   expect.objectContaining({
+    //     databaseType: expect.objectContaining({ value: 'mongodb' }),
+    //     kubernetesCluster: expect.objectContaining({
+    //       value: 'testPreselectedCluster',
+    //     }),
+    //     name: expect.stringContaining('mongodb-'),
+    //   })
+    // );
   });
 });

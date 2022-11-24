@@ -12,7 +12,7 @@ export const DBaaSPageButtons: FC<DBaaSPageButtonsProps> = ({ pageName, cancelUr
   const styles = useStyles(getStyles);
   return (
     <div className={styles.buttonsWrapper}>
-      <LinkButton href={cancelUrl} data-testid={`${pageName}_cancel-button`} variant="secondary" fill="outline">
+      <LinkButton href={cancelUrl} data-testid={`${pageName}-cancel-button`} variant="secondary" fill="outline">
         {Messages.cancelButton}
       </LinkButton>
       <LoaderButton data-testid={`${pageName}-submit-button`} size="md" type="submit" variant="primary" {...props}>

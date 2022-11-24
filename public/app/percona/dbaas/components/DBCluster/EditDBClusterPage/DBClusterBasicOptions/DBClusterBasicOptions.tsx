@@ -87,7 +87,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   useDatabaseVersions(form, databaseType, kubernetesCluster, setLoadingDatabaseVersions, setDatabaseVersions);
 
   return (
-    <div className={styles.basicOptionsWrapper}>
+    <div data-testid="dbcluster-basic-options-step" className={styles.basicOptionsWrapper}>
       <Field
         dataTestId="dbcluster-kubernetes-cluster-field"
         name={AddDBClusterFields.kubernetesCluster}

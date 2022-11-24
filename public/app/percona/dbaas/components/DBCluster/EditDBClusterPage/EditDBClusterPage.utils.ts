@@ -39,13 +39,3 @@ export const generateUID = (): string => {
   const secondPart = ('000' + ((Math.random() * 46656) | 0).toString(36)).slice(-3);
   return firstPart + secondPart;
 };
-
-export const updateDatabaseClusterNameInitialValue = (initialValues: AddDbClusterFormValues) => {
-  if (initialValues[AddDBClusterFields.databaseType]) {
-    return {
-      ...initialValues,
-      [AddDBClusterFields.name]: `${initialValues[AddDBClusterFields.databaseType]?.value}-${generateUID()}`,
-    };
-  }
-  return initialValues;
-};

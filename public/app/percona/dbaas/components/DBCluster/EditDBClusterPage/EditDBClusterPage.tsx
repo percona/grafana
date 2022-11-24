@@ -70,7 +70,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
         },
       }}
       render={({ form, handleSubmit, valid, pristine, ...props }) => (
-        <form onSubmit={handleSubmit} data-testid="step-progress">
+        <form onSubmit={handleSubmit} data-testid="create-db-cluster-page">
           <DBaaSPage
             pageToolbarProps={{
               title: Messages.dbCluster,

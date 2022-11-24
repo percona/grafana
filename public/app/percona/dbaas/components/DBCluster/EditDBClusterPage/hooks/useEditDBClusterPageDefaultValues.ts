@@ -22,9 +22,5 @@ export const useEditDBClusterPageDefaultValues = ({
     [kubernetes, preSelectedKubernetesCluster]
   );
 
-  // const updatedItialValues = useMemo(
-  //   () => (isVisible ? updateDatabaseClusterNameInitialValue(initialValues) : initialValues),
-  //   [initialValues, isVisible]
-  // );
   return [initialValues];
 };

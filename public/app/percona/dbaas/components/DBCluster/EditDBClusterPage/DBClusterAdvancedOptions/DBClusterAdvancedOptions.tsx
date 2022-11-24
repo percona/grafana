@@ -189,7 +189,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   }, [topology]);
 
   return (
-    <>
+    <div data-testid="dbcluster-advanced-options-step">
       <div className={styles.line}>
         <RadioButtonGroupField
           name={AddDBClusterFields.topology}
@@ -288,6 +288,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
           </Overlay>
         </div>
       </div>
-    </>
+    </div>
   );
 };
