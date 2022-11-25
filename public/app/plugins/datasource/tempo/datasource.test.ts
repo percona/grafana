@@ -42,13 +42,6 @@ jest.mock('@grafana/runtime', () => {
   };
 });
 
-jest.mock('@grafana/runtime', () => {
-  return {
-    ...jest.requireActual('@grafana/runtime'),
-    reportInteraction: jest.fn(),
-  };
-});
-
 describe('Tempo data source', () => {
   // Mock the console error so that running the test suite doesnt throw the error
   const origError = console.error;
