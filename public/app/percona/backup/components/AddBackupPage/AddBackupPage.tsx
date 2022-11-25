@@ -47,13 +47,13 @@ import { AddBackupPageService } from './AddBackupPage.service';
 import { getStyles } from './AddBackupPage.styles';
 import { AddBackupFormProps, SelectableService } from './AddBackupPage.types';
 import {
-  toFormBackup,
   getBackupModeOptions,
   getDataModelFromVendor,
-  isDataModelDisabled,
   getLabelForStorageOption,
+  isDataModelDisabled,
+  toFormBackup,
 } from './AddBackupPage.utils';
-import { PageSwitcher } from './PageSwitcher/PageSwitcher';
+import { PageSwitcherCard } from './PageSwitcherCard/PageSwitcherCard';
 import { RetryModeSelector } from './RetryModeSelector';
 import { ScheduleSection } from './ScheduleSection/ScheduleSection';
 
@@ -207,7 +207,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                 <div className={styles.contentInner}>
                   <div className={styles.pageWrapper}>
                     {!editing && (
-                      <PageSwitcher scheduleMode={scheduleMode} editing={editing} setModalTitle={setModalTitle} />
+                      <PageSwitcherCard scheduleMode={scheduleMode} editing={editing} setModalTitle={setModalTitle} />
                     )}
                     <h4 className={styles.headingStyle}>{Messages.backupInfo}</h4>
                     <div className={styles.formContainer}>

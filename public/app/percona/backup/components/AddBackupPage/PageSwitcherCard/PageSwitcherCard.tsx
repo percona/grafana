@@ -8,11 +8,11 @@ import { BackupType } from 'app/percona/backup/Backup.types';
 
 import { Messages } from '../AddBackupPage.messages';
 
-import { Messages as PageSwitcherMessages } from './PageSwitcher.messages';
-import { getStyles } from './PageSwitcher.styles';
-import { PageSwitcherProps } from './PageSwitcher.types';
+import { Messages as PageSwitcherMessages } from './PageSwitcherCard.messages';
+import { getStyles } from './PageSwitcherCard.styles';
+import { PageSwitcherProps } from './PageSwitcherCard.types';
 
-export const PageSwitcher = ({ scheduleMode, editing, setModalTitle }: PageSwitcherProps) => {
+export const PageSwitcherCard = ({ scheduleMode, editing, setModalTitle }: PageSwitcherProps) => {
   const styles = useStyles2(getStyles);
   const [, setQueryParams] = useQueryParams();
   const [selected, setSelected] = useState({ onDemand: !scheduleMode, scheduled: scheduleMode });
