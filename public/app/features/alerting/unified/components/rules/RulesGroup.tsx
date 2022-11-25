@@ -5,6 +5,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { logInfo } from '@grafana/runtime';
 import { Badge, ConfirmModal, HorizontalGroup, Icon, Spinner, Tooltip, useStyles2 } from '@grafana/ui';
+import kbn from 'app/core/utils/kbn';
 import { useDispatch } from 'app/types';
 import { CombinedRuleGroup, CombinedRuleNamespace } from 'app/types/unified-alerting';
 
@@ -86,7 +87,8 @@ export const RulesGroup: FC<Props> = React.memo(({ group, namespace, expandAll, 
     );
   } else if (rulesSource === GRAFANA_RULES_SOURCE_NAME) {
     if (folderUID) {
-      const baseUrl = makeFolderLink(folderUID);
+      // @ Percona - add slug to url
+      const baseUrl = makeFolderLink(folderUID, kbn.slugifyForUrl(namespace.name));
       if (folder?.canSave) {
         if (isGroupView && !isProvisioned) {
           actionIcons.push(

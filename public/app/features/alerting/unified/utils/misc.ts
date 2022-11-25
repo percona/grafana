@@ -102,8 +102,8 @@ export function makeDataSourceLink<T extends DataSourceJsonData>(dataSource: Dat
   return `${config.appSubUrl}/datasources/edit/${dataSource.uid}`;
 }
 
-export function makeFolderLink(folderUID: string): string {
-  return `${config.appSubUrl}/dashboards/f/${folderUID}`;
+export function makeFolderLink(folderUID: string, slug: string): string {
+  return `${config.appSubUrl}/dashboards/f/${folderUID}/${slug}`;
 }
 
 // keep retrying fn if it's error passes shouldRetry(error) and timeout has not elapsed yet
