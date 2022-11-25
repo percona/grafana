@@ -70,6 +70,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const initialValues = useMemo(() => toFormBackup(backup, scheduleMode), [backup]);
   const { result: locations = [], loading: locationsLoading } = useSelector(getBackupLocations);
   const { Form } = withTypes<AddBackupFormProps>();
+
   const locationsOptions = locations.map(
     ({ locationID, name, type }): SelectableValue<string> => ({
       label: name,
