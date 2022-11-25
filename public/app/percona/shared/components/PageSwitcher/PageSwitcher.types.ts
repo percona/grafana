@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export interface PageSwitcherProps {
-  values: Array<PageSwitcherValue<any>>;
+export interface PageSwitcherProps<T> {
+  values: Array<PageSwitcherValue<T>>;
   className?: string;
 }
 

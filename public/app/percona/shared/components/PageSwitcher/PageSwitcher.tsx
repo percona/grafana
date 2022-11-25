@@ -1,6 +1,6 @@
 import { cx } from '@emotion/css';
 import { RadioButton } from '@percona/platform-core/dist/components/RadioButtonGroup/RadioButton';
-import React, { FC } from 'react';
+import React from 'react';
 import { Field } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
@@ -8,7 +8,7 @@ import { useStyles2 } from '@grafana/ui';
 import { getStyles } from './PageSwitcher.styles';
 import { PageSwitcherProps } from './PageSwitcher.types';
 
-export const PageSwitcher: FC<PageSwitcherProps> = ({ values, className }) => {
+export const PageSwitcher = <T extends {}>({ values, className }: PageSwitcherProps<T>) => {
   const styles = useStyles2(getStyles);
 
   return (

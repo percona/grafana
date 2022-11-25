@@ -7,7 +7,7 @@ import { Card, useStyles2 } from '@grafana/ui';
 import { getStyles } from './PageSwitcherCard.styles';
 import { PageSwitcherProps, SelectedState } from './PageSwitcherCard.types';
 
-export const PageSwitcherCard = ({ values, className }: PageSwitcherProps) => {
+export const PageSwitcherCard = <T extends {}>({ values, className }: PageSwitcherProps<T>) => {
   const styles = useStyles2(getStyles);
   const [selectedStates, setSelectedStates] = useState<SelectedState[]>(
     values.map((v) => ({ id: v.id, selected: v.selected }))
