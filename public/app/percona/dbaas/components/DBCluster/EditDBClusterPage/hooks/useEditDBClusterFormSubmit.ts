@@ -9,12 +9,13 @@ export const useEditDBClusterFormSubmit = ({
   showPMMAddressWarning,
 }: DBClusterFormSubmitProps): [AddCluster, boolean | undefined, string, any] => {
   const dispatch = useDispatch();
-  const { result, loading } = useSelector(getAddDbCluster); //TODO check in edit mode
+  const { result, loading } = useSelector(getAddDbCluster);
 
   const addCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
-    await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning })); //unwrap();
+    await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning }));
   };
 
+  // TODO will be added in https://jira.percona.com/browse/PMM-11134
   // const editCluster = async (values: Record<string, any>, showPMMAddressWarning: boolean) => {
   //
   // };
@@ -23,5 +24,5 @@ export const useEditDBClusterFormSubmit = ({
     return [addCluster, loading, 'Create', result];
   } else {
     return [addCluster, loading, 'Edit', result];
-  } //TODO will be changes to editCluster
+  } // TODO will be changes to editCluster in https://jira.percona.com/browse/PMM-11134
 };

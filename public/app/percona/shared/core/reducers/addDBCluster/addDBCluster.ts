@@ -87,20 +87,6 @@ export const addDbClusterAction = createAsyncThunk(
   }
 );
 
-// export const addDBClustersAction = createAsyncThunk(
-//   'percona/fetchDBClusters',
-//   (args: { kubernetes: Kubernetes[]; tokens: CancelToken[] }, thunkAPI): Promise<void> =>
-//     withSerializedError(
-//       (async () => {
-//         thunkAPI.dispatch(setDBClustersLoading());
-//         const requests = args.kubernetes.map((k, idx) => DBClusterService.getDBClusters(k, args.tokens[idx]));
-//         const promiseResults = await Promise.all(requests);
-//         const dbClusters = formatDBClusters(promiseResults, args.kubernetes);
-//         thunkAPI.dispatch(setDBClusters(dbClusters));
-//       })()
-//     )
-// );
-
 export const { setAddDBClusterResult, setAddDBClusterLoading, resetAddDBClusterState } =
   perconaAddDBClusterSlice.actions;
 export default perconaAddDBClusterSlice.reducer;

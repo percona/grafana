@@ -21,7 +21,6 @@ import { useAppDispatch } from 'app/store/store';
 import { fetchDBClustersAction } from '../../../shared/core/reducers/dbClusters/dbClusters';
 import { useUpdateOfKubernetesList } from '../../hooks/useKubernetesList';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
-// import { CHECK_OPERATOR_UPDATE_CANCEL_TOKEN, GET_KUBERNETES_CANCEL_TOKEN } from '../Kubernetes/Kubernetes.constants';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 
 import {
@@ -50,8 +49,6 @@ export const DBCluster: FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
-
-  // const [addModalVisible, setAddModalVisible] = useState(!!selectedKubernetesCluster);
 
   const [selectedCluster, setSelectedCluster] = useState<DBClusterInterface>();
   const navModel = usePerconaNavModel('dbclusters');
@@ -194,13 +191,6 @@ export const DBCluster: FC = () => {
             <div className={styles.actionPanel}>
               <AddNewClusterButton />
             </div>
-            {/*<EditDBClusterPage*/}
-            {/*  kubernetes={kubernetes}*/}
-            {/*  isVisible={addModalVisible}*/}
-            {/*  setVisible={setAddModalVisible}*/}
-            {/*  onSubmit={addCluster}*/}
-            {/*  preSelectedKubernetesCluster={selectedKubernetesCluster}*/}
-            {/*/>*/}
             <DeleteDBClusterModal
               isVisible={deleteModalVisible}
               setVisible={setDeleteModalVisible}
