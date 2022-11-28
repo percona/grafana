@@ -19,7 +19,7 @@ replace github.com/gomodule/redigo => github.com/gomodule/redigo v1.8.9
 require (
 	cloud.google.com/go/storage v1.21.0
 	cuelang.org/go v0.4.3
-	github.com/Azure/azure-sdk-for-go v59.3.0+incompatible
+	github.com/Azure/azure-sdk-for-go v67.1.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.11.22
 	github.com/BurntSushi/toml v1.1.0
 	github.com/Masterminds/semver v1.5.0
