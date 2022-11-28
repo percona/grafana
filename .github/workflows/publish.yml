@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: percona-platform/checkout@v2 # only platform actions allowed!
+      - uses: percona-platform/checkout@v3 # only platform actions allowed!
       - name: publish-to-git
         uses: ./.github/actions/gha-publish-to-git
         id: publish

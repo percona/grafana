@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: percona-platform/checkout@v2
+        uses: percona-platform/checkout@v3
       - name: Run with Node 16
         uses: percona-platform/setup-node@v2
         with:

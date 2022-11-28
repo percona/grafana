@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout Grafana code
-        uses: percona-platform/checkout@v2
+        uses: percona-platform/checkout@v3
         with:
           path: ./grafana
 
@@ -46,7 +46,7 @@ jobs:
         run: make run-local-env
 
       - name: Checkout UI tests in ${{ github.head_ref }} branch
-        uses: percona-platform/checkout@v2
+        uses: percona-platform/checkout@v3
         continue-on-error: true
         id: branch_checkout
         with:
@@ -56,7 +56,7 @@ jobs:
           path: ./pmm-ui-tests
 
       - name: Checkout UI tests in main branch
-        uses: percona-platform/checkout@v2
+        uses: percona-platform/checkout@v3
         if: ${{ steps.branch_checkout.outcome != 'success' }}
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
