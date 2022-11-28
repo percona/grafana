@@ -20,7 +20,7 @@ export const PageSwitcherCard = <T extends {}>({ values, className }: PageSwitch
   return (
     <div className={cx(styles.pageSwitcherWrapper, className)}>
       {values.map((item) => (
-        <Field name={`${item.name}`} component="input" type="radio" key={`radio-field-${item.id}`} value={item.value}>
+        <Field name={`${item.name}`} component="input" type="radio" key={`field-${item.id}`} value={item.value}>
           {({ input }) => (
             <Card
               className={cardStyles}
@@ -31,6 +31,7 @@ export const PageSwitcherCard = <T extends {}>({ values, className }: PageSwitch
                 input.onChange({ target: { value: input.value } });
                 item.onClick && item.onClick();
               }}
+              data-testid={`field-${item.id}`}
             >
               <Card.Heading>{item.label}</Card.Heading>
               <Card.Description>{item.description}</Card.Description>
