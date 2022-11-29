@@ -6,5 +6,5 @@ export const Messages = {
   accessToken: 'Percona Platform Access Token',
   connect: 'Connect',
   invalidToken:
-    'Your access token has expired. Go to Percona Portal and refresh the Profile Settings page to generate a new token',
+    'Your access token has expired. Go to Percona Portal and refresh the Profile Settings page to generate a new token.',
 };
