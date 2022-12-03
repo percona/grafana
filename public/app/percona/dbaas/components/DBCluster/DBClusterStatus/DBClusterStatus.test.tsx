@@ -15,9 +15,7 @@ describe('DBClusterStatus::', () => {
       finishedSteps: 10,
       totalSteps: 10,
     };
-    const { container } = render(
-      <DBClusterStatus dbCluster={dbCluster} setSelectedCluster={jest.fn()} setLogsModalVisible={jest.fn()} />
-    );
+    const { container } = render(<DBClusterStatus dbCluster={dbCluster} setLogsModalVisible={jest.fn()} />);
 
     expect(screen.getByTestId('cluster-status-active')).toBeInTheDocument();
     expect(screen.queryByTestId('cluster-status-error-message')).not.toBeInTheDocument();
@@ -32,7 +30,7 @@ describe('DBClusterStatus::', () => {
       finishedSteps: 5,
       totalSteps: 10,
     };
-    render(<DBClusterStatus dbCluster={dbCluster} setSelectedCluster={jest.fn()} setLogsModalVisible={jest.fn()} />);
+    render(<DBClusterStatus dbCluster={dbCluster} setLogsModalVisible={jest.fn()} />);
 
     expect(screen.queryByTestId('cluster-status-active')).not.toBeInTheDocument();
     expect(screen.getByTestId('cluster-progress-bar')).toBeInTheDocument();
@@ -47,7 +45,7 @@ describe('DBClusterStatus::', () => {
       finishedSteps: 10,
       totalSteps: 10,
     };
-    render(<DBClusterStatus dbCluster={dbCluster} setSelectedCluster={jest.fn()} setLogsModalVisible={jest.fn()} />);
+    render(<DBClusterStatus dbCluster={dbCluster} setLogsModalVisible={jest.fn()} />);
 
     expect(screen.queryByTestId('cluster-status-active')).not.toBeInTheDocument();
     expect(screen.getByTestId('cluster-progress-bar')).toBeInTheDocument();

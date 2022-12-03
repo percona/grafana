@@ -7,7 +7,7 @@ import { Redirect, useHistory } from 'react-router-dom';
 import { CollapsableSection, Spinner, useStyles } from '@grafana/ui/src';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 
-import { resetAddDBClusterState } from '../../../../shared/core/reducers/addDBCluster/addDBCluster';
+import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
 import { getPerconaSettingFlag } from '../../../../shared/core/selectors';
 import { Messages as DBaaSMessages } from '../../../DBaaS.messages';
 import { useUpdateOfKubernetesList } from '../../../hooks/useKubernetesList';
@@ -36,10 +36,11 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const mode = useDefaultMode();
+  // TODO если нет редактируемого кластера то редирект на главную
   const [kubernetes, kubernetesLoading] = useUpdateOfKubernetesList();
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
-  const [initialValues] = useEditDBClusterPageDefaultValues({ kubernetes });
+  const [initialValues, selectedDBCluster] = useEditDBClusterPageDefaultValues({ kubernetes, mode });
   const [onSubmit, loading, buttonMessage] = useEditDBClusterFormSubmit({ mode, showPMMAddressWarning });
   const [result] = useEditDBClusterPageResult(mode);
 
@@ -63,7 +64,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
   ) : kubernetes && kubernetes?.length > 0 ? (
     <Form
       initialValues={initialValues}
-      onSubmit={(values) => onSubmit(values, showPMMAddressWarning)}
+      onSubmit={(values) => onSubmit(values)}
       mutators={{
         setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
           changeValue(state, `${AddDBClusterFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
@@ -90,10 +91,12 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
           >
             {showPMMAddressWarning && <PMMServerUrlWarning />}
             <div className={styles.optionsWrapper}>
-              <DBClusterBasicOptions kubernetes={kubernetes} form={form} />
+              {mode === 'create' && (
+                <DBClusterBasicOptions kubernetes={kubernetes} form={form} className={styles.basicOptions} />
+              )}
               <CollapsableSection
                 label={Messages.advancedSettings}
-                isOpen={false}
+                isOpen={mode === 'edit' ? true : false}
                 buttonDataTestId={`${mode}-dbCluster-advanced-settings`}
                 className={styles.collapsableSection}
               >
@@ -101,11 +104,19 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
                 <DBClusterAdvancedOptions
                   setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}
                   form={form}
+                  selectedCluster={selectedDBCluster}
                   handleSubmit={handleSubmit}
                   pristine={pristine}
                   valid={valid}
                   {...props}
                 />
+                {/*{mode === 'edit' && selectedDBCluster && (*/}
+                {/*  <EditDBClusterAdvancedOptions*/}
+                {/*    selectedCluster={selectedDBCluster}*/}
+                {/*    renderProps={{ form, handleSubmit, valid, pristine, ...props }}*/}
+                {/*    setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}*/}
+                {/*  />*/}
+                {/*)}*/}
               </CollapsableSection>
             </div>
           </DBaaSPage>

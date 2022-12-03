@@ -1,24 +1,28 @@
 import { logger } from '@percona/platform-core';
 import React, { FC, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
 
+import { selectDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
 import { DBCluster, DBClusterStatus } from '../DBCluster.types';
 import { isClusterChanging, newDBClusterService } from '../DBCluster.utils';
+import { DB_CLUSTER_EDIT_URL } from '../EditDBClusterPage/EditDBClusterPage.constants';
 
 import { styles } from './DBClusterActions.styles';
 import { DBClusterActionsProps } from './DBClusterActions.types';
 
 export const DBClusterActions: FC<DBClusterActionsProps> = ({
   dbCluster,
-  setSelectedCluster,
   setDeleteModalVisible,
-  setEditModalVisible,
   setLogsModalVisible,
   setUpdateModalVisible,
   getDBClusters,
 }) => {
+  const history = useHistory();
+  const dispatch = useDispatch();
   const getActions = useCallback(
     (dbCluster: DBCluster) => [
       {
@@ -29,7 +33,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
           dbCluster.status === DBClusterStatus.deleting ||
           dbCluster.status === DBClusterStatus.changing,
         action: () => {
-          setSelectedCluster(dbCluster);
+          dispatch(selectDBCluster(dbCluster));
           setUpdateModalVisible(true);
         },
       },
@@ -37,7 +41,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
         content: Messages.dbcluster.table.actions.deleteCluster,
         disabled: dbCluster.status === DBClusterStatus.deleting,
         action: () => {
-          setSelectedCluster(dbCluster);
+          dispatch(selectDBCluster(dbCluster));
           setDeleteModalVisible(true);
         },
       },
@@ -45,8 +49,9 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
         content: Messages.dbcluster.table.actions.editCluster,
         disabled: dbCluster.status !== DBClusterStatus.ready,
         action: () => {
-          setSelectedCluster(dbCluster);
-          setEditModalVisible(true);
+          dispatch(selectDBCluster(dbCluster));
+          // TODO selected cluster should be
+          history.push(DB_CLUSTER_EDIT_URL);
         },
       },
       {
@@ -88,19 +93,13 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       {
         content: Messages.dbcluster.table.actions.logs,
         action: () => {
-          setSelectedCluster(dbCluster);
+          dispatch(selectDBCluster(dbCluster));
           setLogsModalVisible(true);
         },
       },
     ],
-    [
-      setSelectedCluster,
-      setDeleteModalVisible,
-      getDBClusters,
-      setEditModalVisible,
-      setLogsModalVisible,
-      setUpdateModalVisible,
-    ]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setUpdateModalVisible, setDeleteModalVisible, getDBClusters, setLogsModalVisible]
   );
 
   return (

@@ -38,10 +38,12 @@ export const getStyles = stylesFactory((theme: GrafanaTheme) => {
     resourcesBar: css`
       margin-top: ${spacing.lg};
       margin-bottom: 67px;
+      min-height: 75px;
     `,
     resourcesBarEmpty: css`
       margin-top: ${spacing.lg};
       margin-bottom: 78px;
+      min-height: 75px;
     `,
     resourcesBarLast: css`
       margin-top: ${spacing.lg};

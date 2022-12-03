@@ -13,9 +13,7 @@ describe('DBClusterActions::', () => {
     render(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
-        setSelectedCluster={jest.fn()}
         setDeleteModalVisible={jest.fn()}
-        setEditModalVisible={jest.fn()}
         setLogsModalVisible={jest.fn()}
         setUpdateModalVisible={jest.fn()}
         getDBClusters={jest.fn()}
@@ -29,9 +27,7 @@ describe('DBClusterActions::', () => {
     render(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
-        setSelectedCluster={jest.fn()}
         setDeleteModalVisible={jest.fn()}
-        setEditModalVisible={jest.fn()}
         setLogsModalVisible={jest.fn()}
         setUpdateModalVisible={jest.fn()}
         getDBClusters={jest.fn()}
@@ -47,9 +43,7 @@ describe('DBClusterActions::', () => {
     render(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
-        setSelectedCluster={setSelectedCluster}
         setDeleteModalVisible={setDeleteModalVisible}
-        setEditModalVisible={jest.fn()}
         setLogsModalVisible={jest.fn()}
         setUpdateModalVisible={jest.fn()}
         getDBClusters={jest.fn()}
@@ -72,9 +66,7 @@ describe('DBClusterActions::', () => {
     render(
       <DBClusterActions
         dbCluster={dbClustersStub[3]}
-        setSelectedCluster={setSelectedCluster}
         setDeleteModalVisible={setDeleteModalVisible}
-        setEditModalVisible={jest.fn()}
         setLogsModalVisible={jest.fn()}
         setUpdateModalVisible={jest.fn()}
         getDBClusters={jest.fn()}
@@ -96,9 +88,7 @@ describe('DBClusterActions::', () => {
     render(
       <DBClusterActions
         dbCluster={dbClustersStub[0]}
-        setSelectedCluster={jest.fn()}
         setDeleteModalVisible={jest.fn()}
-        setEditModalVisible={jest.fn()}
         setLogsModalVisible={jest.fn()}
         setUpdateModalVisible={jest.fn()}
         getDBClusters={getDBClusters}
