@@ -6,15 +6,15 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
 
-const ForwardedPerconaTokenMiddlewareName = "forwarded-x-percona-token"
+const ForwardedProxyFilterMiddlewareName = "forwarded-x-proxy-filter"
 
-func ForwardedPerconaTokenMiddleware(token string) httpclient.Middleware {
-	return httpclient.NamedMiddlewareFunc(ForwardedPerconaTokenMiddlewareName, func(opts httpclient.Options, next http.RoundTripper) http.RoundTripper {
+func ForwardedProxyFilterMiddleware(token string) httpclient.Middleware {
+	return httpclient.NamedMiddlewareFunc(ForwardedProxyFilterMiddlewareName, func(opts httpclient.Options, next http.RoundTripper) http.RoundTripper {
 		if token == "" {
 			return next
 		}
 		return httpclient.RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
-			req.Header.Set("X-Percona-Token", token)
+			req.Header.Set("X-Proxy-Filter", token)
 
 			return next.RoundTrip(req)
 		})
