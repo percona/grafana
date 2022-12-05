@@ -1,6 +1,7 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 
+import { NavLandingPage } from 'app/core/components/AppChrome/NavLandingPage';
 import ErrorPage from 'app/core/components/ErrorPage/ErrorPage';
 import { LoginPage } from 'app/core/components/Login/LoginPage';
 import config from 'app/core/config';
@@ -27,9 +28,36 @@ import {
 } from '../percona/dbaas/components/DBCluster/EditDBClusterPage/EditDBClusterPage.constants';
 import { K8S_INVENTORY_URL } from '../percona/dbaas/components/Kubernetes/EditK8sClusterPage/EditK8sClusterPage.constants';
 
+import { pluginHasRootPage } from './utils';
+
 export const extraRoutes: RouteDescriptor[] = [];
 
 export function getAppRoutes(): RouteDescriptor[] {
+  const topnavRoutes: RouteDescriptor[] = config.featureToggles.topnav
+    ? [
+        {
+          path: '/apps',
+          component: () => <NavLandingPage navId="apps" />,
+        },
+        {
+          path: '/a/:pluginId',
+          exact: true,
+          component: (props) => {
+            const hasRoot = pluginHasRootPage(props.match.params.pluginId, config.bootData.navTree);
+            const hasQueryParams = Object.keys(props.queryParams).length > 0;
+            if (hasRoot || hasQueryParams) {
+              const AppRootPage = SafeDynamicImport(
+                () => import(/* webpackChunkName: "AppRootPage" */ 'app/features/plugins/components/AppRootPage')
+              );
+              return <AppRootPage {...props} />;
+            } else {
+              return <NavLandingPage navId={`plugin-page-${props.match.params.pluginId}`} />;
+            }
+          },
+        },
+      ]
+    : [];
+
   return [
     {
       path: '/',
@@ -125,6 +153,16 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
+      path: '/datasources/correlations',
+      component: SafeDynamicImport(() =>
+        config.featureToggles.correlations
+          ? import(/* webpackChunkName: "CorrelationsPage" */ 'app/features/correlations/CorrelationsPage')
+          : import(
+              /* webpackChunkName: "CorrelationsFeatureToggle" */ 'app/features/correlations/CorrelationsFeatureToggle'
+            )
+      ),
+    },
+    {
       path: '/dashboards',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "DashboardListPage"*/ 'app/features/search/components/DashboardListPage')
@@ -180,8 +218,9 @@ export function getAppRoutes(): RouteDescriptor[] {
           : import(/* webpackChunkName: "explore-feature-toggle-page" */ 'app/features/explore/FeatureTogglePage')
       ),
     },
+    ...topnavRoutes,
     {
-      path: '/a/:pluginId/',
+      path: '/a/:pluginId',
       exact: false,
       // Someday * and will get a ReactRouter under that path!
       component: SafeDynamicImport(
@@ -270,11 +309,14 @@ export function getAppRoutes(): RouteDescriptor[] {
       component: SafeDynamicImport(() => import(/* webpackChunkName: "TeamPages" */ 'app/features/teams/TeamPages')),
     },
     // ADMIN
-
     {
       path: '/admin',
-      // eslint-disable-next-line react/display-name
-      component: () => <Redirect to="/admin/users" />,
+      component: () => (config.featureToggles.topnav ? <NavLandingPage navId="cfg" /> : <Redirect to="/admin/users" />),
+    },
+    {
+      path: '/admin/server',
+      component: () =>
+        config.featureToggles.topnav ? <NavLandingPage navId="admin" /> : <Redirect to="/admin/users" />,
     },
     {
       path: '/admin/settings',
