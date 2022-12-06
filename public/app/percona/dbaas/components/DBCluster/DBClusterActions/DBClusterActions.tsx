@@ -1,10 +1,10 @@
 import { logger } from '@percona/platform-core';
 import React, { FC, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
+import { useDispatch } from 'app/types';
 
 import { selectDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
 import { DBCluster, DBClusterStatus } from '../DBCluster.types';
@@ -50,7 +50,6 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
         disabled: dbCluster.status !== DBClusterStatus.ready,
         action: () => {
           dispatch(selectDBCluster(dbCluster));
-          // TODO selected cluster should be
           history.push(DB_CLUSTER_EDIT_URL);
         },
       },

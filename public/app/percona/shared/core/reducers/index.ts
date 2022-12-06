@@ -24,11 +24,12 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { ServerInfo } from '../types';
 
-import perconaAddDBCluster from './dbaas/addDBCluster/addDBCluster';
 import perconaBackupLocations from './backupLocations';
+import perconaAddDBCluster from './dbaas/addDBCluster/addDBCluster';
 import perconaDBClustersReducer from './dbaas/dbClusters/dbClusters';
 import perconaDBaaSReducer from './dbaas/dbaas';
 import perconaK8SCluster from './dbaas/k8sCluster/k8sCluster';
+import perconaUpdateDBCluster from './dbaas/updateDBCluster/updateDBCluster';
 import servicesReducer from './services';
 import tourReducer from './tour/tour';
 import perconaUserReducers from './user/user';
@@ -282,6 +283,7 @@ export default {
     deleteKubernetes: deleteKubernetesReducer,
     addKubernetes: perconaK8SCluster,
     addDBCluster: perconaAddDBCluster,
+    updateDBCluster: perconaUpdateDBCluster,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbClusters: perconaDBClustersReducer,
     server: perconaServerReducers,

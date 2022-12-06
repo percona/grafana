@@ -10,7 +10,6 @@ export type DBClusterPageMode = 'create' | 'edit' | 'list';
 
 export interface EditDBClusterPageProps {
   kubernetes: Kubernetes[];
-  mode: DBClusterPageMode;
 }
 
 export enum AddDBClusterFields {

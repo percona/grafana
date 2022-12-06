@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+
+import { useSelector } from 'app/types';
 
 import { getDBaaS } from '../../../../../shared/core/selectors';
 import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
@@ -23,15 +24,6 @@ export const useEditDBClusterPageDefaultValues = ({
 ] => {
   const history = useHistory();
   const { selectedKubernetesCluster: preSelectedKubernetesCluster, selectedDBCluster } = useSelector(getDBaaS);
-
-  // TODO сделать переход по id на страницу редактирования, если такой кластер есть и его можно отредактировать то позволить редактировать
-  console.log(selectedDBCluster);
-
-  // if (mode === 'edit' && !selectedDBCluster) {
-  //   history.push(DB_CLUSTER_INVENTORY_URL);
-  // }
-
-  // TODO check of edit fields will be added in other branch
 
   const initialValues = useMemo(() => {
     if (mode === 'create') {

@@ -1,13 +1,14 @@
 /* eslint-disable react/display-name */
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
-import { useDispatch } from 'react-redux';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { CollapsableSection, Spinner, useStyles } from '@grafana/ui/src';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
+import { useDispatch } from 'app/types';
 
 import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
+import { resetDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
 import { getPerconaSettingFlag } from '../../../../shared/core/selectors';
 import { Messages as DBaaSMessages } from '../../../DBaaS.messages';
 import { useUpdateOfKubernetesList } from '../../../hooks/useKubernetesList';
@@ -36,7 +37,6 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const mode = useDefaultMode();
-  // TODO если нет редактируемого кластера то редирект на главную
   const [kubernetes, kubernetesLoading] = useUpdateOfKubernetesList();
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
@@ -52,7 +52,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
       history.push(DB_CLUSTER_INVENTORY_URL);
     }
     return () => {
-      dispatch(resetAddDBClusterState());
+      dispatch(mode === 'create' ? resetAddDBClusterState() : resetDBCluster());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
@@ -84,7 +84,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
               loading: loading, // TODO check in edit mode
               buttonMessage: buttonMessage,
             }}
-            pageHeader="Create DB Cluster"
+            pageHeader={`${mode === 'create' ? 'Create' : 'Edit'} DB Cluster`}
             pageName="db-cluster"
             cancelUrl={DBAAS_INVENTORY_URL}
             featureLoaderProps={{ featureName: DBaaSMessages.dbaas, featureSelector: featureSelector }}
@@ -96,8 +96,8 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
               )}
               <CollapsableSection
                 label={Messages.advancedSettings}
-                isOpen={mode === 'edit' ? true : false}
-                buttonDataTestId={`${mode}-dbCluster-advanced-settings`}
+                isOpen={mode === 'edit'}
+                buttonDataTestId={'dbCluster-advanced-settings'}
                 className={styles.collapsableSection}
               >
                 {showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}
@@ -110,13 +110,6 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
                   valid={valid}
                   {...props}
                 />
-                {/*{mode === 'edit' && selectedDBCluster && (*/}
-                {/*  <EditDBClusterAdvancedOptions*/}
-                {/*    selectedCluster={selectedDBCluster}*/}
-                {/*    renderProps={{ form, handleSubmit, valid, pristine, ...props }}*/}
-                {/*    setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}*/}
-                {/*  />*/}
-                {/*)}*/}
               </CollapsableSection>
             </div>
           </DBaaSPage>

@@ -53,5 +53,5 @@ export const fetchDBClustersAction = createAsyncThunk(
     )
 );
 
-export const { resetDBClustersToInitial, setDBClusters, setDBClustersLoading } = perconaDBClustersSlice.actions;
+export const { setDBClusters, setDBClustersLoading } = perconaDBClustersSlice.actions;
 export default perconaDBClustersSlice.reducer;
