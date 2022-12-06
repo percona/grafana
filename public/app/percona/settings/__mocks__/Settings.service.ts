@@ -36,6 +36,7 @@ export const stub: Settings = {
     standardInterval: '10s',
     frequentInterval: '10s',
   },
+  defaultRoleId: 1,
 };
 
 SettingsService.getSettings = () => Promise.resolve(stub);

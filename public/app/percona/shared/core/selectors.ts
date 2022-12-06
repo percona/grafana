@@ -16,3 +16,4 @@ export const getTemplates = (state: StoreState) => state.percona.templates;
 export const getServices = (state: StoreState) => state.percona.services;
 export const getBackupLocations = (state: StoreState) => state.percona.backupLocations;
 export const getTour = (state: StoreState) => state.percona.tour;
+export const getAccessRoles = (state: StoreState) => state.percona.roles;

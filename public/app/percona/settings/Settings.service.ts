@@ -58,4 +58,5 @@ const toModel = (response: SettingsPayload): Settings => ({
   },
   backupEnabled: response.backup_management_enabled,
   isConnectedToPortal: response.connected_to_platform,
+  defaultRoleId: response.default_role_id,
 });

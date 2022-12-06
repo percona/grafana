@@ -112,6 +112,7 @@ export interface SettingsPayload
   stt_check_intervals: SttCheckIntervalsPayload;
   connected_to_platform: boolean;
   telemetry_summaries: string[];
+  default_role_id: number;
 }
 
 export type SettingsAPIChangePayload =
@@ -142,6 +143,7 @@ export interface Settings {
   sttCheckIntervals: SttCheckIntervalsSettings;
   isConnectedToPortal?: boolean;
   telemetrySummaries: string[];
+  defaultRoleId: number;
 }
 
 export interface MetricsResolutions {

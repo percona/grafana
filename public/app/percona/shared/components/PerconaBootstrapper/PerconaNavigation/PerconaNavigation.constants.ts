@@ -160,6 +160,37 @@ export const PMM_ADD_INSTANCE_PAGE: NavModelItem = {
   showIconInNavbar: true,
 };
 
+export const PMM_ACCESS_ROLE_CREATE_PAGE: NavModelItem = {
+  id: 'rbac-create-role',
+  url: `${config.appSubUrl}/roles/create`,
+  icon: 'plus',
+  subTitle: 'Roles',
+  text: 'Roles',
+  hideFromTabs: false,
+  showIconInNavbar: false,
+};
+
+export const PMM_ACCESS_ROLE_EDIT_PAGE: NavModelItem = {
+  id: 'rbac-edit-role',
+  url: `${config.appSubUrl}/roles/:id/create`,
+  icon: 'plus',
+  subTitle: 'Roles',
+  text: 'Roles',
+  hideFromTabs: false,
+  showIconInNavbar: false,
+};
+
+export const PMM_ACCESS_ROLES_PAGE: NavModelItem = {
+  id: 'rbac-roles',
+  url: `${config.appSubUrl}/roles`,
+  icon: 'plus',
+  subTitle: 'Roles',
+  text: 'Roles',
+  hideFromTabs: true,
+  showIconInNavbar: true,
+  children: [PMM_ACCESS_ROLE_CREATE_PAGE, PMM_ACCESS_ROLE_EDIT_PAGE],
+};
+
 export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
   const children: NavModelItem[] = [
     {

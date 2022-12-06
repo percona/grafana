@@ -30,6 +30,7 @@ import { ServerInfo } from '../types';
 import perconaBackupLocations from './backupLocations';
 import perconaDBClustersReducer from './dbClusters/dbClusters';
 import perconaK8SCluster from './k8sCluster/k8sCluster';
+import rolesReducers from './roles/roles';
 import servicesReducer from './services';
 import tourReducer from './tour/tour';
 import perconaUserReducers from './user/user';
@@ -69,6 +70,7 @@ const initialSettingsState: Settings = {
     frequentInterval: '10s',
   },
   isConnectedToPortal: false,
+  defaultRoleId: 1,
 };
 
 export const fetchSettingsAction = createAsyncThunk(
@@ -353,5 +355,6 @@ export default {
     services: servicesReducer,
     backupLocations: perconaBackupLocations,
     tour: tourReducer,
+    roles: rolesReducers,
   }),
 };

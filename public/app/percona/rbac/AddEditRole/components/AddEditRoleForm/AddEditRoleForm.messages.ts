@@ -1,0 +1,17 @@
+export const Messages = {
+  name: {
+    label: 'Role name',
+    placeholder: 'Name',
+  },
+  description: {
+    label: 'Role description (optional)',
+    placeholder: 'Description',
+    description: 'Document the purpose of this role.',
+  },
+  metrics: {
+    label: 'Metrics access',
+    placeholder: 'Search labels',
+    description: 'Add service labels to which this role will have read access to. You can edit labels at ',
+    link: 'Inventory > Services',
+  },
+};
