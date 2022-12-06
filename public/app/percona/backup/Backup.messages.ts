@@ -48,6 +48,7 @@ export const Messages = {
       columns: {
         started: 'Started at',
         finished: 'Finished at',
+        targetService: 'Target Service',
         actions: 'Actions',
       },
     },
