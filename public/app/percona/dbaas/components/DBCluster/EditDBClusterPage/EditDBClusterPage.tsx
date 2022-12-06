@@ -9,6 +9,7 @@ import { useDispatch } from 'app/types';
 
 import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
 import { resetDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
+import { resetUpdateDBClusterState } from '../../../../shared/core/reducers/dbaas/updateDBCluster/updateDBCluster';
 import { getPerconaSettingFlag } from '../../../../shared/core/selectors';
 import { Messages as DBaaSMessages } from '../../../DBaaS.messages';
 import { useUpdateOfKubernetesList } from '../../../hooks/useKubernetesList';
@@ -52,7 +53,12 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
       history.push(DB_CLUSTER_INVENTORY_URL);
     }
     return () => {
-      dispatch(mode === 'create' ? resetAddDBClusterState() : resetDBCluster());
+      if (mode === 'create') {
+        dispatch(resetAddDBClusterState());
+      } else {
+        dispatch(resetDBCluster());
+        dispatch(resetUpdateDBClusterState());
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
@@ -80,8 +86,8 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
               parentHref: DBAAS_INVENTORY_URL,
             }}
             submitBtnProps={{
-              disabled: !valid || pristine || loading, // TODO check in edit mode
-              loading: loading, // TODO check in edit mode
+              disabled: !valid || pristine || loading,
+              loading: loading,
               buttonMessage: buttonMessage,
             }}
             pageHeader={`${mode === 'create' ? 'Create' : 'Edit'} DB Cluster`}

@@ -2,7 +2,6 @@
 
 import { CancelToken } from 'axios';
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { useStyles } from '@grafana/ui';
@@ -16,6 +15,7 @@ import { useCatchCancellationError } from 'app/percona/shared/components/hooks/c
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { getDBaaS, getPerconaDBClusters, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
+import { useSelector } from 'app/types';
 
 import { fetchDBClustersAction } from '../../../shared/core/reducers/dbaas/dbClusters/dbClusters';
 import { selectDBCluster, selectKubernetesCluster } from '../../../shared/core/reducers/dbaas/dbaas';
@@ -138,7 +138,6 @@ export const DBCluster: FC = () => {
   const getRowKey = useCallback(({ original }) => `${original.kubernetesClusterName}${original.clusterName}`, []);
 
   useEffect(() => {
-    //TODO разобраться что за условие
     if (!deleteModalVisible && !logsModalVisible && !updateModalVisible) {
       dispatch(selectDBCluster(null));
     }

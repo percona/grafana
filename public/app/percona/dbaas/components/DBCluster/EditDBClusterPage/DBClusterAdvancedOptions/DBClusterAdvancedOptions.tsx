@@ -112,12 +112,11 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
     }
   };
 
-  // done
   useEffect(() => {
     if (prevResources === DBClusterResources.custom) {
       setCustomMemory(memory);
       setCustomCPU(cpu);
-      !selectedCluster && setCustomDisk(disk); // no in edit
+      !selectedCluster && setCustomDisk(disk);
     }
 
     if (resources && resources !== DBClusterResources.custom) {
@@ -138,8 +137,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
     if (selectedCluster ? selectedCluster : kubernetesCluster) {
       getAllocatedResources();
     }
-
-    // getAllocatedResources(); in edit
 
     return () => {
       mounted.current = false;
@@ -190,7 +187,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
     return () => clearTimeout(expectedTimer);
   }, [memory, cpu, disk, kubernetesCluster, topology, nodes, single, databaseType]);
 
-  // done
   useEffect(() => {
     const dbTypeValue = selectedCluster ? selectedCluster.databaseType : databaseType?.value;
     if (dbTypeValue === Databases.mongodb) {
