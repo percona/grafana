@@ -60,7 +60,7 @@ export const updateDBClusterAction = createAsyncThunk(
         disk,
       }),
       {
-        successMessage: 'Cluster was successfully added',
+        successMessage: 'Cluster was successfully updated',
       }
     )
       .then(() => {

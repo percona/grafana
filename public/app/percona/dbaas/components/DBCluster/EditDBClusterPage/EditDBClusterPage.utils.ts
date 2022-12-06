@@ -47,7 +47,6 @@ export const generateUID = (): string => {
   return firstPart + secondPart;
 };
 
-// TODO test
 export const getEditInitialValues = (selectedDBCluster: DBCluster): EditDBClusterFormValues => {
   const isCluster = selectedDBCluster.clusterSize > 1;
   const clusterParameters: EditDBClusterFormValues = {

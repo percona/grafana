@@ -227,11 +227,13 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
             />
           )}
         </div>
-        <SwitchField
-          name={AddDBClusterFields.expose}
-          label={Messages.dbcluster.addModal.fields.expose}
-          tooltip={Messages.dbcluster.addModal.exposeTooltip}
-        />
+        {!selectedCluster && (
+          <SwitchField
+            name={AddDBClusterFields.expose}
+            label={Messages.dbcluster.addModal.fields.expose}
+            tooltip={Messages.dbcluster.addModal.exposeTooltip}
+          />
+        )}
       </div>
       <div className={styles.resourcesRadioWrapper}>
         <RadioButtonGroupField
