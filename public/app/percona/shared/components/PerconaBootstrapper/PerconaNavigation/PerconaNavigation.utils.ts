@@ -1,4 +1,4 @@
-import { NavModelItem } from '@grafana/data';
+import { NavMenuItemType, NavModelItem } from '@grafana/data';
 import { config } from 'app/core/config';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 import { FolderDTO } from 'app/types';
@@ -6,6 +6,7 @@ import { FolderDTO } from 'app/types';
 import {
   NAV_FOLDER_MAP,
   NAV_ID_TO_SERVICE,
+  PMM_ACCESS_ROLES_PAGE,
   PMM_ADD_INSTANCE_PAGE,
   PMM_ALERTING_PERCONA_ALERTS,
 } from './PerconaNavigation.constants';
@@ -50,8 +51,9 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
   const inventoryLink: NavModelItem = {
     id: 'inventory',
     icon: 'percona-inventory',
-    text: 'PMM Inventory',
+    text: 'Inventory',
     url: `${config.appSubUrl}/inventory`,
+    hideFromTabs: true,
     children: [
       {
         id: 'inventory-list',
@@ -59,6 +61,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
         icon: 'percona-inventory',
         text: 'Inventory List',
         hideFromTabs: true,
+        hideFromMenu: true,
         children: [
           {
             id: 'inventory-services',
@@ -82,32 +85,51 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
       },
     ],
   };
+  const pmmLink: NavModelItem = {
+    id: 'settings-pmm',
+    text: 'PMM',
+    menuItemType: NavMenuItemType.Section,
+  };
   const settingsLink: NavModelItem = {
     id: 'settings',
     icon: 'percona-setting',
-    text: 'PMM Settings',
+    text: 'Settings',
     url: `${config.appSubUrl}/settings`,
   };
   const configNode = mainLinks.find((link) => link.id === 'cfg');
 
   if (!configNode) {
-    mainLinks.push({
+    const cfgNode: NavModelItem = {
       id: 'cfg',
       text: 'Configuration',
       icon: 'cog',
       url: `${config.appSubUrl}/inventory`,
       subTitle: 'Configuration',
       children: [inventoryLink, settingsLink, DIVIDER, PMM_ADD_INSTANCE_PAGE],
-    });
+    };
+    addAccessRolesLink(cfgNode);
+    mainLinks.push(cfgNode);
   } else {
     if (!configNode.children) {
       configNode.children = [];
     }
     configNode.url = `${config.appSubUrl}/inventory`;
-    configNode.children.unshift(PMM_ADD_INSTANCE_PAGE, DIVIDER, inventoryLink, settingsLink);
+    configNode.children.unshift(PMM_ADD_INSTANCE_PAGE, inventoryLink, settingsLink, pmmLink, DIVIDER);
+    addAccessRolesLink(configNode);
   }
 
   return mainLinks;
+};
+
+export const addAccessRolesLink = (configNode: NavModelItem) => {
+  if (configNode.children) {
+    const usersIdx = configNode.children.findIndex((item) => item.id === 'users');
+    configNode.children = [
+      ...configNode.children.slice(0, usersIdx + 1),
+      PMM_ACCESS_ROLES_PAGE,
+      ...configNode.children.slice(usersIdx + 1),
+    ];
+  }
 };
 
 export const addFolderLinks = (navTree: NavModelItem[], folders: FolderDTO[]) => {

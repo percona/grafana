@@ -14,7 +14,6 @@ import { getPerconaSettings, getPerconaUser, getServices } from '../../../core/s
 import {
   ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS,
   getPmmSettingsPage,
-  PMM_ACCESS_ROLES_PAGE,
   PMM_ACCESS_ROLE_CREATE_PAGE,
   PMM_ACCESS_ROLE_EDIT_PAGE,
   PMM_ADD_INSTANCE_PAGE,
@@ -27,6 +26,7 @@ import {
   PMM_TICKETS_PAGE,
 } from './PerconaNavigation.constants';
 import {
+  addAccessRolesLink,
   addFolderLinks,
   buildIntegratedAlertingMenuItem,
   buildInventoryAndSettings,
@@ -52,7 +52,6 @@ const PerconaNavigation: React.FC = () => {
   dispatch(updateNavIndex(PMM_TICKETS_PAGE));
   dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
   dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
-  dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
   dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
   dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
 
@@ -81,6 +80,11 @@ const PerconaNavigation: React.FC = () => {
     }
 
     if (isAuthorized) {
+      const cfg = cloneDeep(initialState).find((i) => i.id === 'cfg');
+      if (cfg) {
+        addAccessRolesLink(cfg);
+        dispatch(updateNavIndex(cfg));
+      }
       buildInventoryAndSettings(updatedNavTree);
 
       const iaMenuItem = alertingEnabled

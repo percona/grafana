@@ -150,12 +150,17 @@ export const PMM_INVENTORY_PAGE: NavModelItem = {
   ],
 };
 
+export const PMM_HEADING_LINK: NavModelItem = {
+  id: 'settings-pmm',
+  text: 'PMM',
+};
+
 export const PMM_ADD_INSTANCE_PAGE: NavModelItem = {
   id: 'add-instance',
   url: `${config.appSubUrl}/add-instance`,
   icon: 'plus',
   subTitle: 'PMM Inventory',
-  text: 'Add Instance to PMM',
+  text: 'Add Service',
   hideFromTabs: true,
   showIconInNavbar: true,
 };
@@ -182,13 +187,10 @@ export const PMM_ACCESS_ROLE_EDIT_PAGE: NavModelItem = {
 
 export const PMM_ACCESS_ROLES_PAGE: NavModelItem = {
   id: 'rbac-roles',
+  icon: 'user-square',
   url: `${config.appSubUrl}/roles`,
-  icon: 'plus',
-  subTitle: 'Roles',
-  text: 'Roles',
-  hideFromTabs: true,
-  showIconInNavbar: true,
-  children: [PMM_ACCESS_ROLE_CREATE_PAGE, PMM_ACCESS_ROLE_EDIT_PAGE],
+  text: 'Access Roles',
+  hideFromTabs: false,
 };
 
 export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
