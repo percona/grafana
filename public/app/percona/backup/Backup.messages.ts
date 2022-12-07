@@ -9,7 +9,7 @@ export const Messages = {
     table: {
       noData: 'No backups found',
       columns: {
-        name: 'Backup name',
+        name: 'Backup Name',
         service: 'Service Name',
         created: 'Created',
         location: 'Location',
@@ -46,8 +46,8 @@ export const Messages = {
     table: {
       noData: 'No restores found',
       columns: {
-        started: 'Started at',
-        finished: 'Finished at',
+        started: 'Started At',
+        finished: 'Finished At',
         targetService: 'Target Service',
         actions: 'Actions',
       },
