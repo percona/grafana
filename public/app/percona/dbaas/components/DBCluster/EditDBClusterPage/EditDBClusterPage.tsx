@@ -70,7 +70,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
   ) : kubernetes && kubernetes?.length > 0 ? (
     <Form
       initialValues={initialValues}
-      onSubmit={(values) => onSubmit(values)}
+      onSubmit={onSubmit}
       mutators={{
         setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
           changeValue(state, `${AddDBClusterFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
