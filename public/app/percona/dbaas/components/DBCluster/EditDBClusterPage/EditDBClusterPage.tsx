@@ -87,7 +87,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
             }}
             submitBtnProps={{
               disabled: !valid || pristine || loading,
-              loading: loading,
+              loading,
               buttonMessage: buttonMessage,
             }}
             pageHeader={`${mode === 'create' ? 'Create' : 'Edit'} DB Cluster`}
