@@ -34,6 +34,7 @@ import rolesReducers from './roles/roles';
 import servicesReducer from './services';
 import tourReducer from './tour/tour';
 import perconaUserReducers from './user/user';
+import usersReducers from './users/users';
 
 const initialSettingsState: Settings = {
   updatesDisabled: true,
@@ -356,5 +357,6 @@ export default {
     backupLocations: perconaBackupLocations,
     tour: tourReducer,
     roles: rolesReducers,
+    users: usersReducers,
   }),
 };

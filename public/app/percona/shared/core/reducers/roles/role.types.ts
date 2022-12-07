@@ -4,3 +4,8 @@ export interface RolesState {
   isLoading: boolean;
   roles: AccessRole[];
 }
+
+export interface AssignRoleParams {
+  userId: number;
+  roleIds: number[];
+}

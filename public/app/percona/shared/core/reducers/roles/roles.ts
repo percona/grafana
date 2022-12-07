@@ -10,7 +10,7 @@ import {
 } from 'app/percona/shared/services/roles/Roles.types';
 import { createAsyncThunk } from 'app/types';
 
-import { RolesState } from './role.types';
+import { AssignRoleParams, RolesState } from './role.types';
 
 const initialState: RolesState = {
   isLoading: false,
@@ -89,6 +89,14 @@ export const setAsDefaultRoleAction = createAsyncThunk(
         thunkAPI.dispatch(fetchRolesAction());
       })()
     )
+);
+
+export const assignRoleAction = createAsyncThunk('percona/assignRole', async ({ roleIds, userId }: AssignRoleParams) =>
+  withSerializedError(
+    (async () => {
+      await RolesService.assign(roleIds, userId);
+    })()
+  )
 );
 
 export default rolesSlice.reducer;
