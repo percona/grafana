@@ -103,7 +103,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
               <CollapsableSection
                 label={Messages.advancedSettings}
                 isOpen={mode === 'edit'}
-                buttonDataTestId={'dbCluster-advanced-settings'}
+                buttonDataTestId="dbCluster-advanced-settings"
                 className={styles.collapsableSection}
               >
                 {showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}
