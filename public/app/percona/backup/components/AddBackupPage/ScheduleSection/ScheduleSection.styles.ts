@@ -35,4 +35,30 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   headingStyle: css`
     margin-bottom: ${spacing.lg};
   `,
+  selectRow: css`
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    & > span {
+      margin-bottom: 16px;
+    }
+    & > div {
+      width: 100%;
+    }
+  `,
+  multiselectRow: css`
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    & > div {
+      width: 100%;
+    }
+  `,
+  selectLabel: css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 37px;
+  `,
 });
