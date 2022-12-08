@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import { Field, Input, PageToolbar, ToolbarButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
@@ -20,6 +20,7 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
   submitLabel,
   onSubmit,
 }) => {
+  const history = useHistory();
   const methods = useForm({
     defaultValues: initialValues,
   });
@@ -30,10 +31,14 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialValues]);
 
+  const handleGoBack = () => {
+    history.push('/roles');
+  };
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <PageToolbar title={title}>
+        <PageToolbar title={title} onGoBack={handleGoBack}>
           <ToolbarButton type="button" onClick={onCancel}>
             {cancelLabel}
           </ToolbarButton>

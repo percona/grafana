@@ -7,7 +7,5 @@ export const toOptions = (roles: AccessRole[]): Array<SelectableValue<number>> =
     value: role.roleId,
   }));
 
-export const idsToOptions = (ids: number[]): Array<SelectableValue<number>> =>
-  ids.map((id) => ({
-    value: id,
-  }));
+export const idsToOptions = (ids: number[], roles: AccessRole[]): Array<SelectableValue<number>> =>
+  toOptions(roles.filter((r) => ids.includes(r.roleId)));

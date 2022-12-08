@@ -54,36 +54,6 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
     text: 'Inventory',
     url: `${config.appSubUrl}/inventory`,
     hideFromTabs: true,
-    children: [
-      {
-        id: 'inventory-list',
-        url: `${config.appSubUrl}/inventory`,
-        icon: 'percona-inventory',
-        text: 'Inventory List',
-        hideFromTabs: true,
-        hideFromMenu: true,
-        children: [
-          {
-            id: 'inventory-services',
-            text: 'Services',
-            url: `${config.appSubUrl}/inventory/services`,
-            hideFromMenu: true,
-          },
-          {
-            id: 'inventory-agents',
-            text: 'Agents',
-            url: `${config.appSubUrl}/inventory/agents`,
-            hideFromMenu: true,
-          },
-          {
-            id: 'inventory-nodes',
-            text: 'Nodes',
-            url: `${config.appSubUrl}/inventory/nodes`,
-            hideFromMenu: true,
-          },
-        ],
-      },
-    ],
   };
   const pmmLink: NavModelItem = {
     id: 'settings-pmm',
