@@ -17,10 +17,11 @@ const AddRolePage: FC = () => {
 
   const handleSubmit = async (values: AddEditFormValues) => {
     try {
-      await dispatch(createRoleAction(values));
+      await dispatch(createRoleAction(values)).unwrap();
       appEvents.emit(AppEvents.alertSuccess, [Messages.success.title(values.title), Messages.success.body]);
       locationService.push('/roles');
     } catch (e) {
+      console.log(e);
       logger.error(e);
     }
   };

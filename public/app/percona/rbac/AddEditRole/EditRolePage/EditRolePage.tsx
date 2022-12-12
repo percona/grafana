@@ -51,7 +51,7 @@ const EditRolePage: FC = () => {
           roleId: Number(id),
           ...values,
         })
-      );
+      ).unwrap();
       appEvents.emit(AppEvents.alertSuccess, [Messages.success.title(values.title), Messages.success.body]);
       locationService.push('/roles');
     } catch (e) {

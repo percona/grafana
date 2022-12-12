@@ -45,5 +45,4 @@ export interface SetDefaultRolePayload {
 
 export interface DeleteAccessRole {
   toDeleteId: number;
-  changeToId: number;
 }

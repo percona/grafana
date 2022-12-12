@@ -24,6 +24,7 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
   const methods = useForm({
     defaultValues: initialValues,
   });
+  const errors = methods.formState.errors;
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
@@ -37,25 +38,31 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <PageToolbar title={title} onGoBack={handleGoBack}>
-          <ToolbarButton type="button" onClick={onCancel}>
-            {cancelLabel}
-          </ToolbarButton>
-          <ToolbarButton type="submit" variant="primary">
-            {submitLabel}
-          </ToolbarButton>
-        </PageToolbar>
-        <Page.Contents isLoading={isLoading}>
+      <PageToolbar title={title} onGoBack={handleGoBack}>
+        <ToolbarButton type="button" onClick={onCancel}>
+          {cancelLabel}
+        </ToolbarButton>
+        <ToolbarButton type="submit" variant="primary">
+          {submitLabel}
+        </ToolbarButton>
+      </PageToolbar>
+      <Page.Contents isLoading={isLoading}>
+        <form onSubmit={methods.handleSubmit(onSubmit)}>
           <div className={styles.page}>
-            <Field label={Messages.name.label}>
-              <Input {...methods.register('title')} type="text" placeholder={Messages.name.placeholder} />
+            <Field label={Messages.name.label} invalid={!!errors.title} error={errors.title?.message}>
+              <Input
+                {...methods.register('title', { required: Messages.name.required })}
+                type="text"
+                placeholder={Messages.name.placeholder}
+              />
             </Field>
             <Field label={Messages.description.label} description={Messages.description.description}>
               <Input {...methods.register('description')} type="text" placeholder={Messages.description.placeholder} />
             </Field>
             <Field
               label={Messages.metrics.label}
+              invalid={!!errors.filter}
+              error={errors.filter?.message}
               description={
                 <>
                   {Messages.metrics.description}
@@ -69,8 +76,9 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
               <LabelsField register={methods.register} placeholder={Messages.metrics.placeholder} />
             </Field>
           </div>
-        </Page.Contents>
-      </form>
+          <button type="submit" className={styles.none} />
+        </form>
+      </Page.Contents>
     </FormProvider>
   );
 };
