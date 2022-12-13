@@ -42,7 +42,7 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
         <ToolbarButton type="button" onClick={onCancel}>
           {cancelLabel}
         </ToolbarButton>
-        <ToolbarButton type="submit" variant="primary">
+        <ToolbarButton type="submit" variant="primary" onClick={methods.handleSubmit(onSubmit)}>
           {submitLabel}
         </ToolbarButton>
       </PageToolbar>

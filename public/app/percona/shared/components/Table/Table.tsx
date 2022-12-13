@@ -17,7 +17,7 @@ const Table = <T extends object>({ getOptions, ...props }: TableProps<T>) => {
       getOptions
         ? {
             Header: Messages.options,
-            Cell: (item: T) => <OptionsCell menu={getOptions(item)} />,
+            accessor: (item: T) => <OptionsCell menu={getOptions(item)} />,
           }
         : undefined,
     [getOptions]
