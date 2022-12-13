@@ -2,7 +2,7 @@ import { logger } from '@percona/platform-core';
 import React, { FC, useState } from 'react';
 
 import { locationService } from '@grafana/runtime';
-import { Dropdown, IconButton, Menu } from '@grafana/ui';
+import { Menu } from '@grafana/ui';
 import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { setAsDefaultRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { useAppDispatch } from 'app/store/store';
@@ -10,9 +10,9 @@ import { useAppDispatch } from 'app/store/store';
 import { Messages } from '../../AccessRole.messages';
 import DeleteRoleModal from '../DeleteRoleModal';
 
-import { OptionsCellProps } from './OptionsCell.types';
+import { OptionsProps } from './Options.types';
 
-const OptionsCell: FC<OptionsCellProps> = ({ role }) => {
+const Options: FC<OptionsProps> = ({ role }) => {
   const dispatch = useAppDispatch();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -37,22 +37,16 @@ const OptionsCell: FC<OptionsCellProps> = ({ role }) => {
     setDeleteModalOpen(false);
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item label={Messages.options.edit} icon="pen" onClick={handleEdit} />
-      <Menu.Item label={Messages.options.default} icon="user-check" onClick={handleSetAsDefault} />
-      <Menu.Item label={Messages.options.delete} icon="trash-alt" onClick={handleDelete} />
-    </Menu>
-  );
-
   return (
     <>
       <DeleteRoleModal isOpen={deleteModalOpen} onCancel={handleDeleteCancel} role={role} />
-      <Dropdown overlay={menu}>
-        <IconButton name="ellipsis-v" />
-      </Dropdown>
+      <Menu>
+        <Menu.Item label={Messages.options.edit} icon="pen" onClick={handleEdit} />
+        <Menu.Item label={Messages.options.default} icon="user-check" onClick={handleSetAsDefault} />
+        <Menu.Item label={Messages.options.delete} icon="trash-alt" onClick={handleDelete} />
+      </Menu>
     </>
   );
 };
 
-export default OptionsCell;
+export default Options;

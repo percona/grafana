@@ -5,7 +5,6 @@ import { Messages } from '../../AccessRole.messages';
 import { AccessRoleRow } from '../../AccessRole.types';
 import MetricsColumn from '../MetricsColumn';
 import NameCell from '../NameCell';
-import OptionsCell from '../OptionsCell';
 
 export const COLUMNS: Array<Column<AccessRoleRow>> = [
   {
@@ -19,9 +18,5 @@ export const COLUMNS: Array<Column<AccessRoleRow>> = [
   {
     Header: <MetricsColumn />,
     accessor: 'filter',
-  },
-  {
-    Header: Messages.options.column,
-    accessor: (role) => <OptionsCell role={role} />,
   },
 ];
