@@ -40,7 +40,6 @@ const EditRolePage: FC = () => {
   }, [id]);
 
   const handleSubmit = async (values: AddEditFormValues) => {
-    console.log('submit', values);
     if (!id) {
       return;
     }
