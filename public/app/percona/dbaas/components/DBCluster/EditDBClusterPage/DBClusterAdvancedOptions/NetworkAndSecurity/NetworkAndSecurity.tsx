@@ -17,7 +17,12 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
   return (
     <FieldSet label={Messages.fieldSets.networkAndSecurity} dataTestId={'network-and-security'}>
       <div className={styles.errorWrapper}>
-        <CheckboxField name={NetworkAndSecurityFields.expose} label={Messages.labels.expose} />
+        <CheckboxField
+          name={NetworkAndSecurityFields.expose}
+          label={Messages.labels.expose}
+          tooltipIcon="info"
+          tooltipText={Messages.tooltips.expose}
+        />
       </div>
       <CheckboxField name={NetworkAndSecurityFields.internetFacing} label={Messages.labels.internetFacing} />
       <FieldArray name={NetworkAndSecurityFields.sourceRanges}>
