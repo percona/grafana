@@ -35,6 +35,9 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
   headingStyle: css`
     margin-bottom: ${spacing.lg};
   `,
+  firstSelectRow: css`
+    padding-left: 30px;
+  `,
   selectRow: css`
     display: flex;
     align-items: flex-end;

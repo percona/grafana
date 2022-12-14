@@ -31,8 +31,7 @@ export const ScheduleSection = ({ values }: ScheduleSectionProps) => {
       <div className={styles.scheduleSectionWrapper}>
         <Field name="period" validate={validators.required}>
           {({ input }) => (
-            <div className={styles.selectRow}>
-              <span className={styles.selectLabel}>{Messages.in}</span>
+            <div className={styles.firstSelectRow}>
               <SelectField {...input} options={PERIOD_OPTIONS} label={Messages.scheduledTime} />
             </div>
           )}
