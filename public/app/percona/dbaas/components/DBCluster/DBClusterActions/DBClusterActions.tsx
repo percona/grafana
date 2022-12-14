@@ -31,7 +31,8 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
           !dbCluster.availableImage ||
           dbCluster.status === DBClusterStatus.upgrading ||
           dbCluster.status === DBClusterStatus.deleting ||
-          dbCluster.status === DBClusterStatus.changing,
+          dbCluster.status === DBClusterStatus.changing ||
+          dbCluster.status === DBClusterStatus.suspended,
         action: () => {
           dispatch(selectDBCluster(dbCluster));
           setUpdateModalVisible(true);
@@ -55,7 +56,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       },
       {
         content: Messages.dbcluster.table.actions.restartCluster,
-        disabled: isClusterChanging(dbCluster),
+        disabled: isClusterChanging(dbCluster) || dbCluster.status === DBClusterStatus.suspended,
         action: async () => {
           try {
             const dbClusterService = newDBClusterService(dbCluster.databaseType);
@@ -91,6 +92,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       },
       {
         content: Messages.dbcluster.table.actions.logs,
+        disabled: dbCluster.status === DBClusterStatus.suspended,
         action: () => {
           dispatch(selectDBCluster(dbCluster));
           setLogsModalVisible(true);

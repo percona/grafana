@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 
 import { configureStore } from '../../../../../store/configureStore';
 import { StoreState } from '../../../../../types';
+import { Messages } from '../../../DBaaS.messages';
 import { dbClustersStub } from '../__mocks__/dbClustersStubs';
 
 import { DBClusterActions } from './DBClusterActions';
@@ -116,6 +117,28 @@ describe('DBClusterActions::', () => {
     await waitFor(() => fireEvent.click(action));
 
     expect(setDeleteModalVisible).toHaveBeenCalled();
+  });
+
+  it('correct actions are disabled if cluster is paused', async () => {
+    render(
+      <DBClusterActions
+        dbCluster={dbClustersStub[5]}
+        setDeleteModalVisible={jest.fn()}
+        setLogsModalVisible={jest.fn()}
+        setUpdateModalVisible={jest.fn()}
+        getDBClusters={jest.fn()}
+      />
+    );
+
+    const btn = screen.getByRole('button');
+    await waitFor(() => fireEvent.click(btn));
+
+    const disabledActions = screen.getAllByTestId('disabled-dropdown-button');
+    expect(disabledActions).toHaveLength(4);
+    expect(disabledActions[0]).toHaveTextContent(Messages.dbcluster.table.actions.updateCluster);
+    expect(disabledActions[1]).toHaveTextContent(Messages.dbcluster.table.actions.editCluster);
+    expect(disabledActions[2]).toHaveTextContent(Messages.dbcluster.table.actions.restartCluster);
+    expect(disabledActions[3]).toHaveTextContent(Messages.dbcluster.table.actions.logs);
   });
 
   xit('calls restart action correctly', async () => {
