@@ -4,9 +4,10 @@ import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   errorWrapper: css`
-    div > div {
+    div:only-child> div {
       display: none;
-    }
+    },
+
     margin-bottom: ${spacing.sm};
   `,
   fieldsWrapper: css`
