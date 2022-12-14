@@ -143,10 +143,12 @@ export class PSMDBService extends DBClusterService {
   }
 }
 
-const toAPI = (dbCluster: DBCluster) => ({
+const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
   kubernetes_cluster_name: dbCluster.kubernetesClusterName,
   name: dbCluster.clusterName,
   expose: dbCluster.expose,
+  internet_facing: dbCluster.internetFacing,
+  source_ranges: dbCluster.sourceRanges,
   params: {
     cluster_size: dbCluster.clusterSize,
     replicaset: {

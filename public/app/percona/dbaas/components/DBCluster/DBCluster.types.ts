@@ -32,6 +32,10 @@ export interface DBCluster {
   expose?: boolean;
   installedImage?: string;
   availableImage?: string;
+  pxcConfiguration?: string;
+  internetFacing?: boolean;
+  sourceRanges?: string[];
+  //TODO storage_class?: string;
 }
 
 export enum DBClusterStatus {
@@ -142,6 +146,10 @@ export interface DBClusterPayload {
   installed_image?: string;
   available_image?: string;
   image?: string;
+  pxcConfiguration?: string;
+  internet_facing?: boolean;
+  source_ranges?: string[];
+  //TODO storage_class?: string;
 }
 
 export interface DBClusterActionAPI {
@@ -161,6 +169,7 @@ interface DBClusterParamsAPI {
 interface DBClusterContainerAPI {
   compute_resources: DBClusterComputeResourcesAPI;
   disk_size: number;
+  configuration?: string;
   image?: string;
 }
 

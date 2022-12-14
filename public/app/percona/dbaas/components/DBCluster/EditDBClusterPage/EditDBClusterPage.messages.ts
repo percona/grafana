@@ -2,5 +2,9 @@ export const Messages = {
   cancelButton: 'Cancel',
   confirmButton: 'Register',
   dbCluster: 'DB Cluster',
-  advancedSettings: 'Advanced Settings',
+  validationMessages: {
+    clusterName: 'Should start with a letter, may only contain lower case, number, dash and end with alphanumeric',
+    notInstalledOperator: 'Operators must be installed to use database type',
+    requiredField: 'Required field',
+  },
 };

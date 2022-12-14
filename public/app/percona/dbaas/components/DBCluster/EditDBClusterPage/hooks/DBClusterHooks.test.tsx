@@ -12,7 +12,7 @@ import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
 import { KubernetesClusterStatus } from '../../../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { DBClusterStatus } from '../../DBCluster.types';
-import { AddDBClusterFormValues, EditDBClusterFormValues } from '../EditDBClusterPage.types';
+import { AddDBClusterFormValues, UpdateDBClusterFormValues } from '../EditDBClusterPage.types';
 
 import { useEditDBClusterPageDefaultValues } from './useEditDBClusterPageDefaultValues';
 
@@ -128,7 +128,7 @@ describe('DBClusterHooks::', () => {
       </Provider>
     );
     const { result } = renderHook(() => useEditDBClusterPageDefaultValues({ kubernetes, mode: 'edit' }), { wrapper });
-    const initialValues = result.current[0] as EditDBClusterFormValues;
+    const initialValues = result.current[0] as UpdateDBClusterFormValues;
     expect(initialValues).toEqual(
       expect.objectContaining({
         databaseType: expect.objectContaining({ value: Databases.mysql }),

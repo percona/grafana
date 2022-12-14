@@ -4,10 +4,10 @@ import { Form, FormRenderProps } from 'react-final-form';
 
 import { Databases } from 'app/percona/shared/core';
 
-import { AddDBClusterFields } from '../EditDBClusterPage.types';
+import { BasicOptionsFields } from '../DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions';
-import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions.types';
+import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOptions.types';
 
 jest.mock('../../DBCluster.service');
 jest.mock('../../PSMDB.service');
@@ -30,7 +30,12 @@ describe('EditDBClusterAdvancedOptions::', () => {
         <Form
           onSubmit={jest.fn()}
           render={(renderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+            <DBClusterAdvancedOptions
+              mode={'create'}
+              showUnsafeConfigurationWarning={false}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+              {...renderProps}
+            />
           )}
         />
       );
@@ -55,41 +60,24 @@ describe('EditDBClusterAdvancedOptions::', () => {
       render(
         <Form
           initialValues={{
-            [AddDBClusterFields.topology]: DBClusterTopology.cluster,
-            [AddDBClusterFields.nodes]: 3,
+            [AdvancedOptionsFields.nodes]: 3,
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+            <DBClusterAdvancedOptions
+              mode={'create'}
+              showUnsafeConfigurationWarning={false}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+              {...renderProps}
+            />
           )}
         />
       );
     });
 
     const nodes = await screen.findByTestId('nodes-number-input');
-    const topology = screen.getByTestId('topology-radio-state');
 
     expect(nodes.getAttribute('value')).toBe('3');
-    expect(topology.getAttribute('value')).toEqual(DBClusterTopology.cluster);
-  });
-
-  it('should set nodes to 1 when topology is single', async () => {
-    act(() => {
-      render(
-        <Form
-          onSubmit={jest.fn()}
-          render={(renderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
-          )}
-        />
-      );
-    });
-
-    const topology = screen.getByTestId('topology-radio-state');
-
-    fireEvent.change(topology, { target: { value: DBClusterTopology.single } });
-
-    expect(screen.getByTestId('single-number-input')).toBeInTheDocument();
   });
 
   it('should disable memory, cpu and disk when resources are not custom', async () => {
@@ -97,11 +85,16 @@ describe('EditDBClusterAdvancedOptions::', () => {
       render(
         <Form
           initialValues={{
-            [AddDBClusterFields.resources]: DBClusterResources.small,
+            [AdvancedOptionsFields.resources]: DBClusterResources.small,
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+            <DBClusterAdvancedOptions
+              mode={'create'}
+              showUnsafeConfigurationWarning={false}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+              {...renderProps}
+            />
           )}
         />
       );
@@ -120,11 +113,16 @@ describe('EditDBClusterAdvancedOptions::', () => {
       render(
         <Form
           initialValues={{
-            [AddDBClusterFields.resources]: DBClusterResources.small,
+            [AdvancedOptionsFields.resources]: DBClusterResources.small,
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+            <DBClusterAdvancedOptions
+              mode={'create'}
+              showUnsafeConfigurationWarning={false}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+              {...renderProps}
+            />
           )}
         />
       );
@@ -147,14 +145,19 @@ describe('EditDBClusterAdvancedOptions::', () => {
       render(
         <Form
           initialValues={{
-            [AddDBClusterFields.databaseType]: {
+            [BasicOptionsFields.databaseType]: {
               value: Databases.mongodb,
               key: Databases.mongodb,
             },
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+            <DBClusterAdvancedOptions
+              mode={'create'}
+              showUnsafeConfigurationWarning={false}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+              {...renderProps}
+            />
           )}
         />
       );
@@ -170,14 +173,19 @@ describe('EditDBClusterAdvancedOptions::', () => {
       render(
         <Form
           initialValues={{
-            [AddDBClusterFields.databaseType]: {
+            [BasicOptionsFields.databaseType]: {
               value: Databases.mysql,
               key: Databases.mysql,
             },
           }}
           onSubmit={jest.fn()}
           render={(renderProps: FormRenderProps) => (
-            <DBClusterAdvancedOptions setShowUnsafeConfigurationWarning={jest.fn()} {...renderProps} />
+            <DBClusterAdvancedOptions
+              mode={'create'}
+              showUnsafeConfigurationWarning={false}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+              {...renderProps}
+            />
           )}
         />
       );
