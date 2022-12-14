@@ -7,7 +7,7 @@ import { getDBaaS } from '../../../../../shared/core/selectors';
 import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
 import { DBCluster } from '../../DBCluster.types';
 import { DB_CLUSTER_INVENTORY_URL } from '../EditDBClusterPage.constants';
-import { AddDBClusterFormValues, DBClusterPageMode, EditDBClusterFormValues } from '../EditDBClusterPage.types';
+import { AddDBClusterFormValues, DBClusterPageMode, UpdateDBClusterFormValues } from '../EditDBClusterPage.types';
 import { getAddInitialValues, getEditInitialValues } from '../EditDBClusterPage.utils';
 
 interface EditDBClusterPageDefaultValuesProps {
@@ -19,7 +19,7 @@ export const useEditDBClusterPageDefaultValues = ({
   kubernetes,
   mode,
 }: EditDBClusterPageDefaultValuesProps): [
-  AddDBClusterFormValues | EditDBClusterFormValues | undefined,
+  AddDBClusterFormValues | UpdateDBClusterFormValues | undefined,
   DBCluster | null
 ] => {
   const history = useHistory();

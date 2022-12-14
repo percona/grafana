@@ -155,6 +155,8 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
   kubernetes_cluster_name: dbCluster.kubernetesClusterName,
   name: dbCluster.clusterName,
   expose: dbCluster.expose,
+  internet_facing: dbCluster.internetFacing,
+  source_ranges: dbCluster.sourceRanges,
   params: {
     cluster_size: dbCluster.clusterSize,
     pxc: {
@@ -163,6 +165,8 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
         memory_bytes: dbCluster.memory * BILLION,
       },
       disk_size: dbCluster.disk * BILLION,
+      configuration: dbCluster.pxcConfiguration,
+      // TODO 11031 storage_class: dbCluster.storageClass,
       image: dbCluster.databaseImage,
     },
     // Temporary mock data

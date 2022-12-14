@@ -8,9 +8,10 @@ import {
   INITIAL_VALUES,
   MIN_NODES,
 } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.constants';
-import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
+import { DBClusterResources } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
+import { BasicOptionsFields } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { getKubernetesOptions } from './DBClusterBasicOptions/DBClusterBasicOptions.utils';
-import { AddDBClusterFields, AddDBClusterFormValues, EditDBClusterFormValues } from './EditDBClusterPage.types';
+import { AddDBClusterFormValues, UpdateDBClusterFormValues } from './EditDBClusterPage.types';
 
 export const getAddInitialValues = (
   kubernetes: Kubernetes[],
@@ -20,7 +21,7 @@ export const getAddInitialValues = (
 
   const initialValues: AddDBClusterFormValues = {
     ...INITIAL_VALUES,
-    [AddDBClusterFields.databaseType]:
+    [BasicOptionsFields.databaseType]:
       activeOperators.length === 1
         ? getDatabaseOptionFromOperator(activeOperators[0])
         : { value: undefined, label: undefined },
@@ -30,14 +31,15 @@ export const getAddInitialValues = (
     const kubernetesOptions = getKubernetesOptions(preSelectedCluster ? [preSelectedCluster] : kubernetes);
     const initialCluster = kubernetesOptions.length > 0 && kubernetesOptions[0];
     if (initialCluster) {
-      initialValues[AddDBClusterFields.kubernetesCluster] = initialCluster;
+      initialValues[BasicOptionsFields.kubernetesCluster] = initialCluster;
       if (activeOperators.length > 0) {
         const databaseDefaultOperator = getDatabaseOptionFromOperator(activeOperators[0]);
-        initialValues[AddDBClusterFields.databaseType] = databaseDefaultOperator;
-        initialValues[AddDBClusterFields.name] = `${databaseDefaultOperator?.value}-${generateUID()}`;
+        initialValues[BasicOptionsFields.databaseType] = databaseDefaultOperator;
+        initialValues[BasicOptionsFields.name] = `${databaseDefaultOperator?.value}-${generateUID()}`;
       }
     }
   }
+
   return initialValues;
 };
 
@@ -47,12 +49,10 @@ export const generateUID = (): string => {
   return firstPart + secondPart;
 };
 
-export const getEditInitialValues = (selectedDBCluster: DBCluster): EditDBClusterFormValues => {
+export const getEditInitialValues = (selectedDBCluster: DBCluster): UpdateDBClusterFormValues => {
   const isCluster = selectedDBCluster.clusterSize > 1;
-  const clusterParameters: EditDBClusterFormValues = {
-    topology: isCluster ? DBClusterTopology.cluster : DBClusterTopology.single,
+  const clusterParameters: UpdateDBClusterFormValues = {
     nodes: isCluster ? selectedDBCluster.clusterSize : MIN_NODES,
-    single: 1,
     databaseType: {
       value: selectedDBCluster.databaseType,
       label: DATABASE_LABELS[selectedDBCluster.databaseType],

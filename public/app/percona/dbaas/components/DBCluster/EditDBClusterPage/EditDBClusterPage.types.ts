@@ -3,8 +3,13 @@ import { SelectableValue } from '@grafana/data/src';
 
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 
-import { DBClusterResources, DBClusterTopology } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { DatabaseOptionInitial, KubernetesOption } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
+import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
+import { MySQLConfigurationFields } from './DBClusterAdvancedOptions/MySQLConfigurations/MySQLConfigurations.types';
+import {
+  BasicOptionsFields,
+  DatabaseOptionInitial,
+  KubernetesOption,
+} from './DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 export type DBClusterPageMode = 'create' | 'edit' | 'list';
 
@@ -12,56 +17,29 @@ export interface EditDBClusterPageProps {
   kubernetes: Kubernetes[];
 }
 
-export enum AddDBClusterFields {
-  name = 'name',
-  kubernetesCluster = 'kubernetesCluster',
-  databaseType = 'databaseType',
-  databaseVersion = 'databaseVersion',
-  topology = 'topology',
-  nodes = 'nodes',
-  single = 'single',
-  resources = 'resources',
-  memory = 'memory',
-  cpu = 'cpu',
-  disk = 'disk',
-  expose = 'expose',
-}
-
-export enum EditDBClusterFields {
-  name = 'name',
-  kubernetesCluster = 'kubernetesCluster',
-  databaseType = 'databaseType',
-  topology = 'topology',
-  nodes = 'nodes',
-  single = 'single',
-  resources = 'resources',
-  memory = 'memory',
-  cpu = 'cpu',
-  disk = 'disk',
-}
-
 export interface AddDBClusterFormValues {
-  [AddDBClusterFields.topology]: DBClusterTopology;
-  [AddDBClusterFields.nodes]: number;
-  [AddDBClusterFields.single]: number;
-  [AddDBClusterFields.resources]: DBClusterResources;
-  [AddDBClusterFields.memory]: number;
-  [AddDBClusterFields.cpu]: number;
-  [AddDBClusterFields.disk]: number;
-  [AddDBClusterFields.databaseType]?: DatabaseOptionInitial;
-  [AddDBClusterFields.kubernetesCluster]?: KubernetesOption;
-  [AddDBClusterFields.name]?: string;
+  [AdvancedOptionsFields.nodes]: number;
+  [AdvancedOptionsFields.resources]: DBClusterResources;
+  [AdvancedOptionsFields.memory]: number;
+  [AdvancedOptionsFields.cpu]: number;
+  [AdvancedOptionsFields.disk]: number;
+  [BasicOptionsFields.databaseType]?: DatabaseOptionInitial;
+  [BasicOptionsFields.kubernetesCluster]?: KubernetesOption;
+  [BasicOptionsFields.name]?: string;
+  [MySQLConfigurationFields.pxcConfiguration]?: string;
+  // TODO [MySQLConfigurationFields.storageClass]?: string;
 }
 
-export interface EditDBClusterFormValues {
-  [EditDBClusterFields.topology]?: string;
-  [EditDBClusterFields.resources]?: DBClusterResources;
-  [EditDBClusterFields.nodes]: number;
-  [EditDBClusterFields.single]: number;
-  [EditDBClusterFields.databaseType]: SelectableValue;
-  [EditDBClusterFields.cpu]: number;
-  [EditDBClusterFields.disk]: number;
-  [EditDBClusterFields.memory]: number;
+export interface UpdateDBClusterFormValues {
+  [AdvancedOptionsFields.resources]?: DBClusterResources;
+  [AdvancedOptionsFields.nodes]: number;
+  [BasicOptionsFields.databaseType]: SelectableValue;
+  [AdvancedOptionsFields.cpu]: number;
+  [AdvancedOptionsFields.disk]: number;
+  [AdvancedOptionsFields.memory]: number;
+  [MySQLConfigurationFields.pxcConfiguration]?: string;
+
+  // TODO [MySQLConfigurationFields.storageClass]?: string;
 }
 
 export interface DBClusterFormSubmitProps {
