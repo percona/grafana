@@ -1,6 +1,6 @@
 import { Databases } from 'app/percona/shared/core';
 
-import { Operators } from '../AddDBClusterModal/DBClusterBasicOptions/DBClusterBasicOptions.types';
+import { Operators } from '../EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 import {
   CpuUnits,
   DBCluster,
@@ -77,6 +77,18 @@ export const dbClustersStub: DBCluster[] = [
     cpu: 1,
     disk: 25,
     status: DBClusterStatus.failed,
+    finishedSteps: 5,
+    totalSteps: 10,
+  },
+  {
+    kubernetesClusterName: 'Kubernetes Cluster 1',
+    clusterName: 'dbcluster5',
+    databaseType: Databases.mysql,
+    clusterSize: 3,
+    memory: 1024,
+    cpu: 1,
+    disk: 25,
+    status: DBClusterStatus.suspended,
     finishedSteps: 5,
     totalSteps: 10,
   },
