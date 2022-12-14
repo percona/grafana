@@ -113,6 +113,7 @@ export interface SettingsPayload
   connected_to_platform: boolean;
   telemetry_summaries: string[];
   default_role_id: number;
+  enable_access_control: boolean;
 }
 
 export type SettingsAPIChangePayload =
@@ -144,6 +145,7 @@ export interface Settings {
   isConnectedToPortal?: boolean;
   telemetrySummaries: string[];
   defaultRoleId: number;
+  enableAccessControl: boolean;
 }
 
 export interface MetricsResolutions {

@@ -43,8 +43,8 @@ const AccessRoleCell: FC<AccessRoleCellProps> = ({ user }) => {
 
   return (
     <td>
-      <div>{!!value.length}</div>
       <Select
+        aria-label={Messages.label}
         isMulti={isOpen || value.length !== 1}
         value={value}
         onChange={handleChange}

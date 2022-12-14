@@ -52,8 +52,11 @@ const PerconaNavigation: React.FC = () => {
   dispatch(updateNavIndex(PMM_TICKETS_PAGE));
   dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
   dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
-  dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
-  dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
+
+  if (result?.enableAccessControl) {
+    dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
+    dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
+  }
 
   useEffect(() => {
     let interval: NodeJS.Timer;
@@ -80,11 +83,16 @@ const PerconaNavigation: React.FC = () => {
     }
 
     if (isAuthorized) {
-      const cfg = cloneDeep(initialState).find((i) => i.id === 'cfg');
-      if (cfg) {
-        addAccessRolesLink(cfg);
-        dispatch(updateNavIndex(cfg));
+      if (result?.enableAccessControl) {
+        const cfg = cloneDeep(initialState).find((i) => i.id === 'cfg');
+
+        // update nav index with the access roles tab
+        if (cfg) {
+          addAccessRolesLink(cfg);
+          dispatch(updateNavIndex(cfg));
+        }
       }
+
       buildInventoryAndSettings(updatedNavTree);
 
       const iaMenuItem = alertingEnabled

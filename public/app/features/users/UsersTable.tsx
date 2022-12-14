@@ -7,6 +7,7 @@ import { fetchRoleOptions } from 'app/core/components/RolePicker/api';
 import { contextSrv } from 'app/core/core';
 import AccessRoleCell from 'app/percona/rbac/AccessRoleCell';
 import AccessRoleHeader from 'app/percona/rbac/AccessRoleHeader';
+import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
 import { AccessControlAction, OrgUser, Role } from 'app/types';
 
 import { OrgRolePicker } from '../admin/OrgRolePicker';
@@ -51,7 +52,9 @@ const UsersTable: FC<Props> = (props) => {
             <th>Seen</th>
             <th>Role</th>
             {/* PERCONA */}
-            <AccessRoleHeader />
+            <AccessRolesEnabledCheck>
+              <AccessRoleHeader />
+            </AccessRolesEnabledCheck>
             <th style={{ width: '34px' }} />
             <th></th>
           </tr>
@@ -102,7 +105,9 @@ const UsersTable: FC<Props> = (props) => {
                 </td>
 
                 {/* PERCONA */}
-                <AccessRoleCell user={user} />
+                <AccessRolesEnabledCheck>
+                  <AccessRoleCell user={user} />
+                </AccessRolesEnabledCheck>
 
                 <td className="width-1 text-center">
                   {user.isDisabled && <span className="label label-tag label-tag--gray">Disabled</span>}

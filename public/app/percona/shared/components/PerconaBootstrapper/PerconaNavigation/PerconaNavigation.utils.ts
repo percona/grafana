@@ -1,5 +1,6 @@
 import { NavMenuItemType, NavModelItem } from '@grafana/data';
 import { config } from 'app/core/config';
+import { Settings } from 'app/percona/settings/Settings.types';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 import { FolderDTO } from 'app/types';
 
@@ -47,7 +48,7 @@ export const removeAlertingMenuItem = (mainLinks: NavModelItem[]) => {
   return alertingItem;
 };
 
-export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelItem[] => {
+export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: Settings): NavModelItem[] => {
   const inventoryLink: NavModelItem = {
     id: 'inventory',
     icon: 'percona-inventory',
@@ -77,7 +78,9 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
       subTitle: 'Configuration',
       children: [inventoryLink, settingsLink, DIVIDER, PMM_ADD_INSTANCE_PAGE],
     };
-    addAccessRolesLink(cfgNode);
+    if (settings?.enableAccessControl) {
+      addAccessRolesLink(cfgNode);
+    }
     mainLinks.push(cfgNode);
   } else {
     if (!configNode.children) {
@@ -85,7 +88,9 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[]): NavModelIt
     }
     configNode.url = `${config.appSubUrl}/inventory`;
     configNode.children.unshift(PMM_ADD_INSTANCE_PAGE, inventoryLink, settingsLink, pmmLink, DIVIDER);
-    addAccessRolesLink(configNode);
+    if (settings?.enableAccessControl) {
+      addAccessRolesLink(configNode);
+    }
   }
 
   return mainLinks;

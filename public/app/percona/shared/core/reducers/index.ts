@@ -70,6 +70,7 @@ const initialSettingsState: Settings = {
   },
   isConnectedToPortal: false,
   defaultRoleId: 1,
+  enableAccessControl: false,
 };
 
 export const fetchSettingsAction = createAsyncThunk(
