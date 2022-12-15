@@ -4,7 +4,6 @@ import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { OverlayContainer, useOverlay } from '@react-aria/overlays';
 import React, { useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import CSSTransition from 'react-transition-group/CSSTransition';
 
 import { GrafanaTheme2, NavModelItem } from '@grafana/data';
@@ -19,7 +18,9 @@ import {
   useStyles2,
   useTheme2,
 } from '@grafana/ui';
+import { MenuDivider } from '@grafana/ui/src/components/Menu/MenuDivider';
 import { updateMenuTree } from 'app/core/reducers/navBarTree';
+import { useDispatch } from 'app/types';
 
 import { Branding } from '../Branding/Branding';
 
@@ -29,7 +30,7 @@ import { NavBarMenuItem } from './NavBarMenuItem';
 import { NavBarToggle } from './NavBarToggle';
 import { NavFeatureHighlight } from './NavFeatureHighlight';
 import menuItemTranslations from './navBarItem-translations';
-import { isMatchOrInnerMatch } from './utils';
+import { isMatchOrInnerMatch, sortWithSubsections } from './utils';
 
 const MENU_WIDTH = '350px';
 
@@ -270,7 +271,7 @@ export function NavItem({
           key={`${childLink.text}-${childLink.text}`}
           isActive={activeItem === childLink}
           isDivider={childLink.divider}
-          icon={childLink.showIconInNavbar ? (childLink.icon as IconName) : undefined}
+          icon={childLink.showIconInNavbar ? childLink.icon : undefined}
           onClick={() => {
             childLink.onClick?.();
             onClose();
@@ -282,6 +283,8 @@ export function NavItem({
           isMobile={true}
         />
       );
+    } else if (childLink.showDividerInExpanded) {
+      return <MenuDivider />;
     }
 
     return null;
@@ -290,7 +293,7 @@ export function NavItem({
   if (linkHasChildren(link)) {
     return (
       <CollapsibleNavItem onClose={onClose} link={link} isActive={isMatchOrInnerMatch(link, activeItem)}>
-        <ul className={styles.children}>{link.children.map(renderCollapsibleItem)}</ul>
+        <ul className={styles.children}>{sortWithSubsections(link.children).map(renderCollapsibleItem)}</ul>
       </CollapsibleNavItem>
     );
   } else if (link.emptyMessageId) {
@@ -528,7 +531,7 @@ function getLinkIcon(link: NavModelItem, size: IconSize = 'xl') {
   if (link.icon === 'grafana') {
     return <Branding.MenuLogo />;
   } else if (link.icon) {
-    return <Icon name={link.icon as IconName} size={size} />;
+    return <Icon name={link.icon} size={size} />;
   } else {
     return <img src={link.img} alt={`${link.text} logo`} height="24" width="24" style={{ borderRadius: '50%' }} />;
   }

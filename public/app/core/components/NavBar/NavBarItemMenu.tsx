@@ -107,7 +107,7 @@ function getStyles(theme: GrafanaTheme2, reverseDirection?: boolean) {
       display: flex;
       flex-direction: column;
       list-style: none;
-      max-height: 400px;
+      max-height: 600px;
       max-width: 300px;
       min-width: 140px;
       transition: ${theme.transitions.create('opacity')};

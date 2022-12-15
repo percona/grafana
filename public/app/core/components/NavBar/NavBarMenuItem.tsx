@@ -39,7 +39,7 @@ export function NavBarMenuItem({
     <div className={styles.linkContent}>
       {icon && <Icon data-testid="dropdown-child-icon" name={icon} />}
 
-      <div className={styles.linkText}>{text}</div>
+      <div className={cx(styles.linkText, !url && styles.subSection)}>{text}</div>
       {showArrow && (
         <span className={styles.menuArrow}>
           <Icon name={'angle-right'} />
@@ -68,6 +68,8 @@ export function NavBarMenuItem({
           {linkContent}
         </a>
       );
+  } else {
+    element = <span className={cx(elStyle, styles.subSection)}>{linkContent}</span>;
   }
 
   if (isMobile) {
@@ -163,5 +165,14 @@ const getStyles = (theme: GrafanaTheme2, isActive: Props['isActive']) => ({
     display: 'flex',
     justifyContent: 'flex-end',
     alignItems: 'center',
+  }),
+  // @PERCONA
+  subSection: css({
+    color: theme.colors.text.secondary,
+    fontSize: theme.typography.bodySmall.fontSize,
+
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
   }),
 });

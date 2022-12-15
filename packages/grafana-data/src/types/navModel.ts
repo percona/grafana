@@ -22,6 +22,8 @@ export interface NavLinkDTO {
   children?: NavLinkDTO[];
   highlightText?: string;
   emptyMessageId?: string;
+  // @PERCONA
+  showDividerInExpanded?: boolean;
 }
 
 export interface NavModelItem extends NavLinkDTO {
@@ -50,6 +52,8 @@ export enum NavSection {
 export enum NavMenuItemType {
   Section = 'section',
   Item = 'item',
+  // PERCONA
+  SubSection = 'subsection',
 }
 
 /**

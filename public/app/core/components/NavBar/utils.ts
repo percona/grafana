@@ -1,7 +1,7 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import { Location } from 'history';
 
-import { locationUtil, NavModelItem, NavSection } from '@grafana/data';
+import { locationUtil, NavMenuItemType, NavModelItem, NavSection } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
 import { config } from 'app/core/config';
 import { updateMenuTree } from 'app/core/reducers/navBarTree';
@@ -201,4 +201,28 @@ export const isSearchActive = (location: Location<unknown>) => {
 
 export function getNavModelItemKey(item: NavModelItem) {
   return item.id ?? item.text;
+}
+
+// @PERCONA
+// todo: refactor + add tests
+export function sortWithSubsections(items: NavModelItem[]): NavModelItem[] {
+  if (!items.some((i) => i.menuItemType === NavMenuItemType.SubSection)) {
+    return items;
+  }
+
+  const divIndex = items.findIndex((i) => i.divider);
+
+  const part1 = items.slice(0, divIndex);
+  const part2 = items.slice(divIndex + 1);
+
+  const heading1 = part1.find((i) => i.menuItemType === NavMenuItemType.SubSection);
+  const body1 = part1.filter((i) => i.menuItemType !== NavMenuItemType.SubSection);
+  const heading2 = part2.find((i) => i.menuItemType === NavMenuItemType.SubSection);
+  const body2 = part2.filter((i) => i.menuItemType !== NavMenuItemType.SubSection);
+
+  if (heading1 && heading2) {
+    return [heading1, ...body1, items[divIndex], heading2, ...body2];
+  }
+
+  return items;
 }

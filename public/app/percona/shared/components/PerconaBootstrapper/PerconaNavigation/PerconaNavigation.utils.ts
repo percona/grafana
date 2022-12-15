@@ -12,10 +12,11 @@ import {
   PMM_ALERTING_PERCONA_ALERTS,
 } from './PerconaNavigation.constants';
 
-const DIVIDER = {
+const DIVIDER: NavModelItem = {
   id: 'divider',
   text: 'Divider',
   divider: true,
+  showDividerInExpanded: true,
   hideFromTabs: true,
 };
 
@@ -56,10 +57,15 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     url: `${config.appSubUrl}/inventory`,
     hideFromTabs: true,
   };
+  const orgLink: NavModelItem = {
+    id: 'main-organization',
+    text: 'Organization',
+    menuItemType: NavMenuItemType.SubSection,
+  };
   const pmmLink: NavModelItem = {
     id: 'settings-pmm',
     text: 'PMM',
-    menuItemType: NavMenuItemType.Section,
+    menuItemType: NavMenuItemType.SubSection,
   };
   const settingsLink: NavModelItem = {
     id: 'settings',
@@ -86,8 +92,20 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     if (!configNode.children) {
       configNode.children = [];
     }
+    if (configNode.subTitle) {
+      orgLink.text = configNode.subTitle || '';
+      configNode.subTitle = '';
+    }
     configNode.url = `${config.appSubUrl}/inventory`;
-    configNode.children.unshift(PMM_ADD_INSTANCE_PAGE, inventoryLink, settingsLink, pmmLink, DIVIDER);
+    configNode.children = [
+      PMM_ADD_INSTANCE_PAGE,
+      inventoryLink,
+      settingsLink,
+      pmmLink,
+      DIVIDER,
+      ...configNode.children,
+      orgLink,
+    ];
     if (settings?.enableAccessControl) {
       addAccessRolesLink(configNode);
     }
