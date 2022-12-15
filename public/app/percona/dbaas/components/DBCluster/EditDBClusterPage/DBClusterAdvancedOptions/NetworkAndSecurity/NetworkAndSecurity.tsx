@@ -1,4 +1,4 @@
-import { CheckboxField, TextInputField, validators } from '@percona/platform-core';
+import { CheckboxField, TextInputField } from '@percona/platform-core';
 import React, { FC } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 
@@ -8,7 +8,6 @@ import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet
 import { Messages } from '../DBClusterAdvancedOptions.messages';
 
 import { getStyles } from './NetworkAndSecurity.styles';
-const { required } = validators;
 import { NetworkAndSecurityFields } from './NetworkAndSecurity.types';
 
 export interface NetworkAndSecurityProps {}
@@ -20,7 +19,7 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
         <CheckboxField
           name={NetworkAndSecurityFields.expose}
           label={Messages.labels.expose}
-          tooltipIcon="info"
+          tooltipIcon="info-circle"
           tooltipText={Messages.tooltips.expose}
         />
       </div>
@@ -41,7 +40,6 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
                 <TextInputField
                   name={`${name}.sourceRange`}
                   label={index === 0 ? Messages.labels.sourceRange : ''}
-                  validators={index === 0 ? [required] : []}
                   placeholder="181.170.213.40/32"
                 />
               </div>

@@ -75,7 +75,7 @@ export const addDbClusterAction = createAsyncThunk(
         databaseImage: databaseVersion.value,
         expose,
         internetFacing,
-        sourceRanges: sourceRanges.map((item: any) => item.sourceRange),
+        sourceRanges: sourceRanges.map((item: any) => item?.sourceRange || ''),
         //TODO 11031 storage_class
         pxcConfiguration,
       }),
