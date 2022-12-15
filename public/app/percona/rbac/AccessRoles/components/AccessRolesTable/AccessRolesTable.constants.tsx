@@ -1,8 +1,9 @@
 import React from 'react';
-import { Column } from 'react-table';
+import { Cell, Column } from 'react-table';
 
 import { Messages } from '../../AccessRole.messages';
 import { AccessRoleRow } from '../../AccessRole.types';
+import MetricsCell from '../MetricsCell';
 import MetricsColumn from '../MetricsColumn';
 import NameCell from '../NameCell';
 import OptionsCell from '../OptionsCell';
@@ -19,6 +20,7 @@ export const COLUMNS: Array<Column<AccessRoleRow>> = [
   {
     Header: <MetricsColumn />,
     accessor: 'filter',
+    Cell: (cell: Cell) => <MetricsCell filter={cell.value || ''} />,
   },
   {
     Header: Messages.options.column,

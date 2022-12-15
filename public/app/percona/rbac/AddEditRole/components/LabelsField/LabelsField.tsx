@@ -1,12 +1,17 @@
 import React, { FC } from 'react';
-
-import { Input } from '@grafana/ui';
+import { Controller } from 'react-hook-form';
 
 import { LabelsFieldProps } from './LabelsField.types';
+import LabelsBuilder from './components/LabelsBuilder';
 
-const LabelsField: FC<LabelsFieldProps> = ({ register, placeholder }) => {
-  // todo: implement correct input field
-  return <Input {...register('filter')} type="text" placeholder={placeholder} />;
+const LabelsField: FC<LabelsFieldProps> = ({ control }) => {
+  return (
+    <Controller
+      name="filter"
+      control={control}
+      render={({ field }) => <LabelsBuilder value={field.value || ''} onChange={field.onChange} />}
+    />
+  );
 };
 
 export default LabelsField;

@@ -37,6 +37,8 @@ export const LokiQueryBuilder = React.memo<Props>(({ datasource, query, onChange
   const [sampleData, setSampleData] = useState<PanelData>();
   const [highlightedOp, setHighlightedOp] = useState<QueryBuilderOperation | undefined>(undefined);
 
+  console.log('loki query builder', datasource);
+
   const onChangeLabels = (labels: QueryBuilderLabelFilter[]) => {
     onChange({ ...query, labels });
   };

@@ -73,7 +73,7 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
                 </>
               }
             >
-              <LabelsField register={methods.register} placeholder={Messages.metrics.placeholder} />
+              <LabelsField control={methods.control} />
             </Field>
           </div>
           <button type="submit" className={styles.none} />

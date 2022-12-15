@@ -11,7 +11,6 @@ export const Messages = {
   },
   metrics: {
     label: 'Metrics access',
-    placeholder: 'Search labels',
     description: 'Add service labels to which this role will have read access to. You can edit labels at ',
     link: 'Inventory > Services',
     required: 'Metrics filter is required',
