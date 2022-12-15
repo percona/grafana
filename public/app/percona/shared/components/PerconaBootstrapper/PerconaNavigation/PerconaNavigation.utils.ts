@@ -1,4 +1,4 @@
-import { NavMenuItemType, NavModelItem } from '@grafana/data';
+import { NavModelItem } from '@grafana/data';
 import { config } from 'app/core/config';
 import { Settings } from 'app/percona/settings/Settings.types';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
@@ -60,12 +60,12 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
   const orgLink: NavModelItem = {
     id: 'main-organization',
     text: 'Organization',
-    menuItemType: NavMenuItemType.SubSection,
+    isSubheader: true,
   };
   const pmmLink: NavModelItem = {
     id: 'settings-pmm',
     text: 'PMM',
-    menuItemType: NavMenuItemType.SubSection,
+    isSubheader: true,
   };
   const settingsLink: NavModelItem = {
     id: 'settings',

@@ -17,6 +17,7 @@ export interface Props {
   isMobile?: boolean;
   // @Percona
   showArrow?: boolean;
+  isSubheader?: boolean;
 }
 
 export function NavBarMenuItem({
@@ -28,6 +29,7 @@ export function NavBarMenuItem({
   target,
   text,
   url,
+  isSubheader = false,
   isMobile = false,
   showArrow = false,
 }: Props) {
@@ -39,7 +41,7 @@ export function NavBarMenuItem({
     <div className={styles.linkContent}>
       {icon && <Icon data-testid="dropdown-child-icon" name={icon} />}
 
-      <div className={cx(styles.linkText, !url && styles.subSection)}>{text}</div>
+      <div className={cx(styles.linkText, isSubheader && styles.subHeader)}>{text}</div>
       {showArrow && (
         <span className={styles.menuArrow}>
           <Icon name={'angle-right'} />
@@ -68,8 +70,8 @@ export function NavBarMenuItem({
           {linkContent}
         </a>
       );
-  } else {
-    element = <span className={cx(elStyle, styles.subSection)}>{linkContent}</span>;
+  } else if (isSubheader) {
+    element = <span className={cx(elStyle, styles.subHeader)}>{linkContent}</span>;
   }
 
   if (isMobile) {
@@ -167,7 +169,7 @@ const getStyles = (theme: GrafanaTheme2, isActive: Props['isActive']) => ({
     alignItems: 'center',
   }),
   // @PERCONA
-  subSection: css({
+  subHeader: css({
     color: theme.colors.text.secondary,
     fontSize: theme.typography.bodySmall.fontSize,
 

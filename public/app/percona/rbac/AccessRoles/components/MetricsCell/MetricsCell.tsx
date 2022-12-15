@@ -8,7 +8,7 @@ import { MetricsCellProps } from './MetricsCell.types';
 
 const MetricsCell: FC<MetricsCellProps> = ({ filter }) => (
   <div className={styles.MetricsCell}>
-    {!!filter && <RawQuery query={`{${filter}}`} lang={{ grammar: promqlGrammar, name: 'promql' }} />}
+    {!!filter && <RawQuery query={filter} lang={{ grammar: promqlGrammar, name: 'promql' }} />}
   </div>
 );
 export default MetricsCell;

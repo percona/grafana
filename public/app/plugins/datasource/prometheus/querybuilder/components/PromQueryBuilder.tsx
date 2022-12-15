@@ -210,7 +210,7 @@ export const PromQueryBuilder = React.memo<Props>((props) => {
     <>
       <EditorRow>
         {/* @PERCONA */}
-        {props.hideMetric && (
+        {!props.hideMetric && (
           <MetricSelect
             query={query}
             onChange={onChange}
@@ -237,7 +237,7 @@ export const PromQueryBuilder = React.memo<Props>((props) => {
         </OperationExplainedBox>
       )}
       {/* @PERCONA */}
-      {props.hideOperations && (
+      {!props.hideOperations && (
         <OperationsEditorRow>
           <OperationList<PromVisualQuery>
             queryModeller={promQueryModeller}

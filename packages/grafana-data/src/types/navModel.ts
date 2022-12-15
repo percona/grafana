@@ -23,6 +23,7 @@ export interface NavLinkDTO {
   highlightText?: string;
   emptyMessageId?: string;
   // @PERCONA
+  isSubHeader?: boolean;
   showDividerInExpanded?: boolean;
 }
 
@@ -40,6 +41,7 @@ export interface NavModelItem extends NavLinkDTO {
   hideFromBreadcrumbs?: boolean;
   // @Percona
   expanded?: boolean;
+  isSubheader?: boolean;
   showIconInNavbar?: boolean;
 }
 
@@ -52,8 +54,6 @@ export enum NavSection {
 export enum NavMenuItemType {
   Section = 'section',
   Item = 'item',
-  // PERCONA
-  SubSection = 'subsection',
 }
 
 /**

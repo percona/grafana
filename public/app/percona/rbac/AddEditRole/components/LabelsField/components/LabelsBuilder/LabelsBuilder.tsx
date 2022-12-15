@@ -21,7 +21,7 @@ const LabelsBuilder: FC<LabelsBuilderProps> = ({ value, onChange }) => {
   const datasource = source ? new PrometheusDatasource(source) : undefined;
   const [query, setQuery] = useState<PromQuery>({
     refId: '',
-    expr: `{${value}}`,
+    expr: value,
   });
   const visualQuery = useMemo(() => buildVisualQueryFromString(query.expr).query, [query.expr]);
 
@@ -31,7 +31,7 @@ const LabelsBuilder: FC<LabelsBuilderProps> = ({ value, onChange }) => {
 
   const handleQueryChange = (visualQuery: PromVisualQuery) => {
     const expr = promQueryModeller.renderQuery(visualQuery);
-    onChange(expr.slice(1, -1) || '');
+    onChange(expr);
     setQuery((prev) => ({ ...prev, expr }));
   };
 
@@ -43,6 +43,8 @@ const LabelsBuilder: FC<LabelsBuilderProps> = ({ value, onChange }) => {
         onRunQuery={console.log}
         query={visualQuery}
         showExplain={false}
+        hideMetric
+        hideOperations
       />
       <div />
       <QueryPreview query={query.expr} />

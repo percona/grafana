@@ -8,16 +8,7 @@ import CSSTransition from 'react-transition-group/CSSTransition';
 
 import { GrafanaTheme2, NavModelItem } from '@grafana/data';
 import { reportInteraction } from '@grafana/runtime';
-import {
-  CollapsableSection,
-  CustomScrollbar,
-  Icon,
-  IconButton,
-  IconName,
-  IconSize,
-  useStyles2,
-  useTheme2,
-} from '@grafana/ui';
+import { CollapsableSection, CustomScrollbar, Icon, IconButton, IconSize, useStyles2, useTheme2 } from '@grafana/ui';
 import { MenuDivider } from '@grafana/ui/src/components/Menu/MenuDivider';
 import { updateMenuTree } from 'app/core/reducers/navBarTree';
 import { useDispatch } from 'app/types';
@@ -281,6 +272,7 @@ export function NavItem({
           text={childLink.text}
           url={childLink.url}
           isMobile={true}
+          isSubheader={childLink.isSubheader}
         />
       );
     } else if (childLink.showDividerInExpanded) {
