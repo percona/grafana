@@ -93,7 +93,7 @@ const PerconaNavigation: React.FC = () => {
         }
       }
 
-      buildInventoryAndSettings(updatedNavTree);
+      buildInventoryAndSettings(updatedNavTree, result);
 
       const iaMenuItem = alertingEnabled
         ? buildIntegratedAlertingMenuItem(updatedNavTree)
