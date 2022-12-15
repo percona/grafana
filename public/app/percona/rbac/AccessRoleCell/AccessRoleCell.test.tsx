@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import React, { ReactElement } from 'react';
 import { Provider } from 'react-redux';
+import selectEvent from 'react-select-event';
 
+import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -78,5 +80,19 @@ describe('AccessRoleCell', () => {
 
     expect(option1).toBeInTheDocument();
     expect(option2).toBeInTheDocument();
+  });
+
+  it('calls api when role has been changed', async () => {
+    const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
+    render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
+
+    const roleSelect = screen.getByLabelText('Access Roles');
+
+    await selectEvent.select(roleSelect, ['Role #1', 'Role #2'], { container: document.body });
+
+    expect(assignRoleActionSpy).toHaveBeenCalledWith({
+      userId: 2,
+      roleIds: [1, 2],
+    });
   });
 });

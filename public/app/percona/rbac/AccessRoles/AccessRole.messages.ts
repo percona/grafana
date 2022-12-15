@@ -27,8 +27,8 @@ export const Messages = {
   },
   delete: {
     title: (role: string) => `Delete "${role}" role`,
-    description: (role: string) =>
-      `By deleting the role "${role}" all its associated users will need to be transferred to another role. Confirm below the new role for these users.`,
+    description: (roleToBeDeleted: string, defaultRole: string) =>
+      `By deleting the role “${roleToBeDeleted}” all its associated users will need to be transferred to the default role “${defaultRole}”.`,
     submit: 'Delete role',
     cancel: 'Cancel',
   },

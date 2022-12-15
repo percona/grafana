@@ -35,7 +35,7 @@ const AccessRolesPage: FC = () => {
   return (
     <Page navId="rbac-roles">
       <Page.Contents isLoading={isLoading}>
-        <h2>{Messages.title}</h2>
+        <h2 data-testid="access-roles-title">{Messages.title}</h2>
         <p className={styles.description}>
           {Messages.subtitle.text}
           <a className={styles.link}>{Messages.subtitle.link}</a>

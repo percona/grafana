@@ -1,5 +1,5 @@
 import { AccessRoleRow } from '../../AccessRole.types';
 
-export interface OptionsProps {
+export interface OptionsCellProps {
   role: AccessRoleRow;
 }

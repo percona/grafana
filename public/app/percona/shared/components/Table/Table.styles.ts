@@ -23,13 +23,4 @@ export const getStyles = (theme: GrafanaTheme2) => ({
       }
     }
   `,
-  WithOptionsCol: css`
-    table {
-      tr {
-        th:last-child {
-          width: 50px;
-        }
-      }
-    }
-  `,
 });

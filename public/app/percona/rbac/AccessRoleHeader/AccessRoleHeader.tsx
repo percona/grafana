@@ -12,13 +12,15 @@ const AccessRoleHeader: FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    // fetch in the header component
+    // to prevent grafana code
     dispatch(fetchRolesAction());
     dispatch(fetchUsersListAction());
   }, [dispatch]);
 
   return (
     <th className={styles.Header}>
-      <span>{Messages.header}</span>
+      <span data-testid="access-role-header">{Messages.header}</span>
       <span className={styles.Icon}>
         <Tooltip content={Messages.tooltip}>
           <Icon name="info-circle" />
