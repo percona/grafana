@@ -165,7 +165,7 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
         memory_bytes: dbCluster.memory * BILLION,
       },
       disk_size: dbCluster.disk * BILLION,
-      configuration: dbCluster.pxcConfiguration,
+      configuration: dbCluster.configuration,
       // TODO 11031 storage_class: dbCluster.storageClass,
       image: dbCluster.databaseImage,
     },

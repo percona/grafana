@@ -32,7 +32,7 @@ export interface DBCluster {
   expose?: boolean;
   installedImage?: string;
   availableImage?: string;
-  pxcConfiguration?: string;
+  configuration?: string;
   internetFacing?: boolean;
   sourceRanges?: string[];
   //TODO storage_class?: string;

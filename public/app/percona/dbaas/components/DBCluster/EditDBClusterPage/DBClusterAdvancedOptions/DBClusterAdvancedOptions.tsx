@@ -18,6 +18,7 @@ import { optionRequired } from '../DBClusterBasicOptions/DBClusterBasicOptions.u
 import { DBClusterPageMode } from '../EditDBClusterPage.types';
 import { UnsafeConfigurationWarning } from '../UnsafeConfigurationsWarning/UnsafeConfigurationWarning';
 
+import Configurations from './Configurations/Configurations';
 import {
   RESOURCES_OPTIONS,
   DEFAULT_SIZES,
@@ -30,8 +31,7 @@ import {
 import { Messages } from './DBClusterAdvancedOptions.messages';
 import { getStyles } from './DBClusterAdvancedOptions.styles';
 import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOptions.types';
-import { canGetExpectedResources, resourceValidator } from './DBClusterAdvancedOptions.utils';
-import MySQLConfigurations from './MySQLConfigurations/MySQLConfigurations';
+import { canGetExpectedResources, nodesValidator, resourceValidator } from './DBClusterAdvancedOptions.utils';
 import NetworkAndSecurity from './NetworkAndSecurity/NetworkAndSecurity';
 
 export interface DBClusterAdvancedOptionsProps extends FormRenderProps {
@@ -69,7 +69,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   const { required, min } = validators;
   const { change } = form;
   const diskValidators = [required, min(MIN_DISK_SIZE)];
-  const nodeValidators = [required, min(MIN_NODES)];
+  const nodeValidators = [required, min(MIN_NODES), nodesValidator];
   const parameterValidators = [required, min(MIN_RESOURCES), resourceValidator];
   const { name, kubernetesCluster, topology, resources, memory, cpu, databaseType, disk, nodes, single } = values;
   const resourcesInputProps = { step: '0.1' };
@@ -277,9 +277,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
           </Overlay>
         </div>
       </div>
-      {selectedCluster
-        ? selectedCluster.databaseType
-        : databaseType?.value === Databases.mysql && <MySQLConfigurations />}
+      <Configurations databaseType={selectedCluster ? selectedCluster.databaseType : databaseType?.value} />
       <NetworkAndSecurity />
     </FieldSet>
   );

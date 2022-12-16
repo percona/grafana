@@ -2,6 +2,7 @@ export const Messages = {
   fieldSets: {
     advancedSettings: 'Advanced Settings',
     pxcConfiguration: 'MySQL Configurations',
+    mongodbConfiguration: 'MongoDB Configurations',
     networkAndSecurity: 'Network and security',
   },
   labels: {
@@ -12,6 +13,7 @@ export const Messages = {
     disk: 'Disk (GB)',
     storageClass: 'Storage Class',
     pxcConfiguration: 'MySQL Configuration',
+    mongodbConfiguration: 'MongoDB Configuration',
     expose: 'Expose',
     // exposeTooltip: 'SomeText' TODO 11031 will be added later
     internetFacing: 'Internet Facing',

@@ -3,8 +3,8 @@ import { SelectableValue } from '@grafana/data/src';
 
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 
+import { ConfigurationFields } from './DBClusterAdvancedOptions/Configurations/Configurations.types';
 import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { MySQLConfigurationFields } from './DBClusterAdvancedOptions/MySQLConfigurations/MySQLConfigurations.types';
 import {
   BasicOptionsFields,
   DatabaseOptionInitial,
@@ -26,7 +26,7 @@ export interface AddDBClusterFormValues {
   [BasicOptionsFields.databaseType]?: DatabaseOptionInitial;
   [BasicOptionsFields.kubernetesCluster]?: KubernetesOption;
   [BasicOptionsFields.name]?: string;
-  [MySQLConfigurationFields.pxcConfiguration]?: string;
+  [ConfigurationFields.configuration]?: string;
   // TODO [MySQLConfigurationFields.storageClass]?: string;
 }
 
@@ -37,7 +37,7 @@ export interface UpdateDBClusterFormValues {
   [AdvancedOptionsFields.cpu]: number;
   [AdvancedOptionsFields.disk]: number;
   [AdvancedOptionsFields.memory]: number;
-  [MySQLConfigurationFields.pxcConfiguration]?: string;
+  [ConfigurationFields.configuration]?: string;
 
   // TODO [MySQLConfigurationFields.storageClass]?: string;
 }

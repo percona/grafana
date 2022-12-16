@@ -20,3 +20,7 @@ export const canGetExpectedResources = (
 
   return kubernetesCluster && memory > 0 && cpu > 0 && disk > 0 && nodes > 0;
 };
+
+export const nodesValidator = (value?: string): string | undefined => {
+  return value === '2' ? 'Only 1, 3 or more nodes allowed' : undefined;
+};

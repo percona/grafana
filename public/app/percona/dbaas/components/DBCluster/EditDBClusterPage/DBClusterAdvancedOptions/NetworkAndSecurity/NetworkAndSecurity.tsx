@@ -15,14 +15,13 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
   const styles = useStyles(getStyles);
   return (
     <FieldSet label={Messages.fieldSets.networkAndSecurity} dataTestId={'network-and-security'}>
-      <div className={styles.errorWrapper}>
-        <CheckboxField
-          name={NetworkAndSecurityFields.expose}
-          label={Messages.labels.expose}
-          tooltipIcon="info-circle"
-          tooltipText={Messages.tooltips.expose}
-        />
-      </div>
+      <CheckboxField
+        name={NetworkAndSecurityFields.expose}
+        label={Messages.labels.expose}
+        tooltipIcon="info-circle"
+        tooltipText={Messages.tooltips.expose}
+        noError={true}
+      />
       <CheckboxField name={NetworkAndSecurityFields.internetFacing} label={Messages.labels.internetFacing} />
       <FieldArray name={NetworkAndSecurityFields.sourceRanges}>
         {({ fields }) => (
@@ -36,12 +35,21 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
               {Messages.buttons.addNew}
             </Button>
             {fields.map((name, index) => (
-              <div key={name}>
+              <div key={name} className={styles.fieldWrapper}>
                 <TextInputField
                   name={`${name}.sourceRange`}
                   label={index === 0 ? Messages.labels.sourceRange : ''}
                   placeholder="181.170.213.40/32"
+                  fieldClassName={styles.field}
                 />
+                {index > 0 && (
+                  <Button
+                    className={styles.deleteButton}
+                    variant="secondary"
+                    onClick={() => fields.remove(index)}
+                    icon="trash-alt"
+                  />
+                )}
               </div>
             ))}
           </div>
