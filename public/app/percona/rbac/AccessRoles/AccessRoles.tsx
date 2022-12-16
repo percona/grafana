@@ -1,10 +1,11 @@
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo } from 'react';
 
 import { locationService } from '@grafana/runtime';
 import { Button, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
-import { getPerconaSettings, getAccessRoles } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings, getAccessRoles, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -21,6 +22,8 @@ const AccessRolesPage: FC = () => {
     () => roles.map((role) => toAccessRoleRow(role, settings?.defaultRoleId)).sort(orderRole),
     [roles, settings?.defaultRoleId]
   );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('enableAccessControl'), []);
 
   const styles = useStyles2(getStyles);
 
@@ -35,16 +38,18 @@ const AccessRolesPage: FC = () => {
   return (
     <Page navId="rbac-roles">
       <Page.Contents isLoading={isLoading}>
-        <h2 data-testid="access-roles-title">{Messages.title}</h2>
-        <p className={styles.description}>
-          {Messages.subtitle.text}
-          <a className={styles.link}>{Messages.subtitle.link}</a>
-          {Messages.subtitle.dot}
-        </p>
-        <div className={styles.createContainer}>
-          <Button onClick={handleCreate}>{Messages.create}</Button>
-        </div>
-        <AccessRolesTable items={rows} />
+        <FeatureLoader featureName={Messages.rbac} featureSelector={featureSelector}>
+          <h2 data-testid="access-roles-title">{Messages.title}</h2>
+          <p className={styles.description}>
+            {Messages.subtitle.text}
+            <a className={styles.link}>{Messages.subtitle.link}</a>
+            {Messages.subtitle.dot}
+          </p>
+          <div className={styles.createContainer}>
+            <Button onClick={handleCreate}>{Messages.create}</Button>
+          </div>
+          <AccessRolesTable items={rows} />
+        </FeatureLoader>
       </Page.Contents>
     </Page>
   );

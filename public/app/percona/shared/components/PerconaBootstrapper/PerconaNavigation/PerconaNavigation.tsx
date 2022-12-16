@@ -14,6 +14,7 @@ import { getPerconaSettings, getPerconaUser, getServices } from '../../../core/s
 import {
   ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS,
   getPmmSettingsPage,
+  PMM_ACCESS_ROLES_PAGE,
   PMM_ACCESS_ROLE_CREATE_PAGE,
   PMM_ACCESS_ROLE_EDIT_PAGE,
   PMM_ADD_INSTANCE_PAGE,
@@ -52,11 +53,8 @@ const PerconaNavigation: React.FC = () => {
   dispatch(updateNavIndex(PMM_TICKETS_PAGE));
   dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
   dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
-
-  if (result?.enableAccessControl) {
-    dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
-    dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
-  }
+  dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
+  dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
 
   useEffect(() => {
     let interval: NodeJS.Timer;
@@ -114,6 +112,8 @@ const PerconaNavigation: React.FC = () => {
       if (backupEnabled) {
         updatedNavTree.push(PMM_BACKUP_PAGE);
       }
+    } else {
+      dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
     }
 
     addFolderLinks(updatedNavTree, folders);

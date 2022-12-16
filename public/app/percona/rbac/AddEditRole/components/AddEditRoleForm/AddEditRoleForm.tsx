@@ -1,9 +1,11 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Link, useHistory } from 'react-router-dom';
 
 import { Field, Input, PageToolbar, ToolbarButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
+import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 
 import LabelsField from '../LabelsField';
 
@@ -26,6 +28,8 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
   });
   const errors = methods.formState.errors;
   const styles = useStyles2(getStyles);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const featureSelector = useCallback(getPerconaSettingFlag('enableAccessControl'), []);
 
   useEffect(() => {
     methods.reset(initialValues);
@@ -47,37 +51,43 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
         </ToolbarButton>
       </PageToolbar>
       <Page.Contents isLoading={isLoading}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
-          <div className={styles.page}>
-            <Field label={Messages.name.label} invalid={!!errors.title} error={errors.title?.message}>
-              <Input
-                {...methods.register('title', { required: Messages.name.required })}
-                type="text"
-                placeholder={Messages.name.placeholder}
-              />
-            </Field>
-            <Field label={Messages.description.label} description={Messages.description.description}>
-              <Input {...methods.register('description')} type="text" placeholder={Messages.description.placeholder} />
-            </Field>
-            <Field
-              label={Messages.metrics.label}
-              invalid={!!errors.filter}
-              error={errors.filter?.message}
-              description={
-                <>
-                  {Messages.metrics.description}
-                  <Link className={styles.link} to="/inventory/services">
-                    {Messages.metrics.link}
-                  </Link>
-                  .
-                </>
-              }
-            >
-              <LabelsField control={methods.control} />
-            </Field>
-          </div>
-          <button type="submit" className={styles.none} />
-        </form>
+        <FeatureLoader featureName={Messages.rbac} featureSelector={featureSelector}>
+          <form onSubmit={methods.handleSubmit(onSubmit)}>
+            <div className={styles.page}>
+              <Field label={Messages.name.label} invalid={!!errors.title} error={errors.title?.message}>
+                <Input
+                  {...methods.register('title', { required: Messages.name.required })}
+                  type="text"
+                  placeholder={Messages.name.placeholder}
+                />
+              </Field>
+              <Field label={Messages.description.label} description={Messages.description.description}>
+                <Input
+                  {...methods.register('description')}
+                  type="text"
+                  placeholder={Messages.description.placeholder}
+                />
+              </Field>
+              <Field
+                label={Messages.metrics.label}
+                invalid={!!errors.filter}
+                error={errors.filter?.message}
+                description={
+                  <>
+                    {Messages.metrics.description}
+                    <Link className={styles.link} to="/inventory/services">
+                      {Messages.metrics.link}
+                    </Link>
+                    .
+                  </>
+                }
+              >
+                <LabelsField control={methods.control} />
+              </Field>
+            </div>
+            <button type="submit" className={styles.none} />
+          </form>
+        </FeatureLoader>
       </Page.Contents>
     </FormProvider>
   );

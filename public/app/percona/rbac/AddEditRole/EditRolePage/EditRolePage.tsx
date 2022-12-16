@@ -64,17 +64,15 @@ const EditRolePage: FC = () => {
 
   return (
     <Page>
-      {!!role && (
-        <AddEditRoleForm
-          isLoading={isLoading}
-          initialValues={role}
-          title={Messages.title}
-          cancelLabel={Messages.cancel}
-          onCancel={handleCancel}
-          submitLabel={Messages.submit}
-          onSubmit={handleSubmit}
-        />
-      )}
+      <AddEditRoleForm
+        isLoading={isLoading}
+        initialValues={role}
+        title={Messages.title}
+        cancelLabel={Messages.cancel}
+        onCancel={handleCancel}
+        submitLabel={Messages.submit}
+        onSubmit={handleSubmit}
+      />
     </Page>
   );
 };

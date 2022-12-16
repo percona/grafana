@@ -1,4 +1,5 @@
 export const Messages = {
+  rbac: 'Access Control',
   name: {
     label: 'Role name',
     placeholder: 'Name',

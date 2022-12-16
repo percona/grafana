@@ -1,5 +1,6 @@
 export const Messages = {
   title: 'Access Roles',
+  rbac: 'Access Control',
   subtitle: {
     text: 'Access roles is a way to control the access to metrics and some PMM functionalities, for an increased security standard. Worth noting that every time you invite new users, the default role will be assigned to them. For futher explanation on ',
     link: 'how the Access roles work, check our documentation',

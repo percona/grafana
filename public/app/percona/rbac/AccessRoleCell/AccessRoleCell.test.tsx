@@ -48,7 +48,7 @@ const wrapWithProvider = (element: ReactElement, enableAccessControl = true) => 
 );
 
 describe('AccessRoleCell', () => {
-  it('shows cell when access roles enabled', () => {
+  it('shows cell when access roles are enabled', () => {
     render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
 
     const select = screen.queryByLabelText('Access Roles');
@@ -56,7 +56,7 @@ describe('AccessRoleCell', () => {
     expect(select).toBeInTheDocument();
   });
 
-  it("doesn't cell select when access roles disabled", () => {
+  it("isn't shown when access roles are disabled", () => {
     render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />, false));
 
     const select = screen.queryByLabelText('Access Roles');
@@ -82,7 +82,7 @@ describe('AccessRoleCell', () => {
     expect(option2).toBeInTheDocument();
   });
 
-  it('calls api when role has been changed', async () => {
+  it('calls api when role has been selected', async () => {
     const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
     render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
 
@@ -93,6 +93,20 @@ describe('AccessRoleCell', () => {
     expect(assignRoleActionSpy).toHaveBeenCalledWith({
       userId: 2,
       roleIds: [1, 2],
+    });
+  });
+
+  it('calls api when role has been removed', async () => {
+    const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
+    render(wrapWithProvider(<AccessRoleCell user={subUserMultipleRoles} />));
+
+    const removeButton = screen.getByLabelText('Remove Role #1');
+
+    removeButton.click();
+
+    expect(assignRoleActionSpy).toHaveBeenCalledWith({
+      userId: 3,
+      roleIds: [2],
     });
   });
 });
