@@ -11,6 +11,7 @@ import { reportInteraction } from '@grafana/runtime';
 import { CollapsableSection, CustomScrollbar, Icon, IconButton, IconSize, useStyles2, useTheme2 } from '@grafana/ui';
 import { MenuDivider } from '@grafana/ui/src/components/Menu/MenuDivider';
 import { updateMenuTree } from 'app/core/reducers/navBarTree';
+import { sortWithSubsections } from 'app/percona/shared/helpers/navigation';
 import { useDispatch } from 'app/types';
 
 import { Branding } from '../Branding/Branding';
@@ -21,7 +22,7 @@ import { NavBarMenuItem } from './NavBarMenuItem';
 import { NavBarToggle } from './NavBarToggle';
 import { NavFeatureHighlight } from './NavFeatureHighlight';
 import menuItemTranslations from './navBarItem-translations';
-import { isMatchOrInnerMatch, sortWithSubsections } from './utils';
+import { isMatchOrInnerMatch } from './utils';
 
 const MENU_WIDTH = '350px';
 

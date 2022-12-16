@@ -202,27 +202,3 @@ export const isSearchActive = (location: Location<unknown>) => {
 export function getNavModelItemKey(item: NavModelItem) {
   return item.id ?? item.text;
 }
-
-// @PERCONA
-// todo: refactor + add tests
-export function sortWithSubsections(items: NavModelItem[]): NavModelItem[] {
-  if (!items.some((i) => i.isSubheader)) {
-    return items;
-  }
-
-  const divIndex = items.findIndex((i) => i.divider);
-
-  const part1 = items.slice(0, divIndex);
-  const part2 = items.slice(divIndex + 1);
-
-  const heading1 = part1.find((i) => i.isSubheader);
-  const body1 = part1.filter((i) => !i.isSubheader);
-  const heading2 = part2.find((i) => i.isSubheader);
-  const body2 = part2.filter((i) => !i.isSubheader);
-
-  if (heading1 && heading2) {
-    return [heading1, ...body1, items[divIndex], heading2, ...body2];
-  }
-
-  return items;
-}

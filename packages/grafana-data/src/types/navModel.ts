@@ -23,7 +23,6 @@ export interface NavLinkDTO {
   highlightText?: string;
   emptyMessageId?: string;
   // @PERCONA
-  isSubHeader?: boolean;
   showDividerInExpanded?: boolean;
 }
 
