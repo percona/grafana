@@ -97,13 +97,11 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
         width: '250px',
-        Cell: ({ row, value }) => {
-          return (
-            <span>
-              {value} ({backupLocationMap.current[row.values.id]?.type})
-            </span>
-          );
-        },
+        Cell: ({ row, value }) => (
+          <span>
+            {value} ({backupLocationMap.current[row.values.id]?.type})
+          </span>
+        ),
       },
       {
         Header: Messages.backupInventory.table.columns.actions,
