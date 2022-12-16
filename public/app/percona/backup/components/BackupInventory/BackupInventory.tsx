@@ -119,7 +119,7 @@ export const BackupInventory: FC = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [backupLocationMap]
   );
   const styles = useStyles2(getStyles);
 

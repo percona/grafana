@@ -23,9 +23,8 @@ import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
-import { formatBackupMode } from '../../Backup.utils';
+import { formatBackupMode, formatLocationsToMap } from '../../Backup.utils';
 import { DetailedDate } from '../DetailedDate';
-import { StorageLocation } from '../StorageLocations/StorageLocations.types';
 
 import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
 import { ScheduledBackupsService } from './ScheduledBackups.service';
@@ -47,10 +46,7 @@ export const ScheduledBackups: FC = () => {
   const styles = useStyles(getStyles);
   const { result: locations = [] } = useSelector(getBackupLocations);
 
-  const locationsByLocationId = useMemo(
-    () => locations.reduce((map: Record<string, StorageLocation>, obj) => ((map[obj.locationID] = obj), map), {}),
-    [locations]
-  );
+  const locationsByLocationId = useMemo(() => formatLocationsToMap(locations), [locations]);
 
   const retentionValue = useCallback((n: number) => {
     if (n < 0) {
@@ -166,7 +162,7 @@ export const ScheduledBackups: FC = () => {
         accessor: 'locationName',
         Cell: ({ row, value }) => (
           <span>
-            {value} ({locationsByLocationId[row.original.locationId].type})
+            {value} ({locationsByLocationId[row.original.locationId]?.type})
           </span>
         ),
       },
@@ -244,8 +240,8 @@ export const ScheduledBackups: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('backupEnabled'), []);
 
   useEffect(() => {
-    getData();
     dispatch(fetchStorageLocations());
+    getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
