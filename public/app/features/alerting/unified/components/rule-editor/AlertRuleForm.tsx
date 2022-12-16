@@ -136,6 +136,8 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
               Edit yaml
             </Button>
           )}
+          {/* @PERCONA
+           *** Add type verification */}
           {type !== RuleFormType.templated && (
             <Button
               variant="primary"
