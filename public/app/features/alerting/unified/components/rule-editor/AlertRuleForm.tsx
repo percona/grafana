@@ -136,15 +136,17 @@ export const AlertRuleForm: FC<Props> = ({ existing }) => {
               Edit yaml
             </Button>
           )}
-          <Button
-            variant="primary"
-            type="button"
-            onClick={handleSubmit((values) => submit(values, false), onInvalid)}
-            disabled={submitState.loading}
-          >
-            {submitState.loading && <Spinner className={styles.buttonSpinner} inline={true} />}
-            Save
-          </Button>
+          {type !== RuleFormType.templated && (
+            <Button
+              variant="primary"
+              type="button"
+              onClick={handleSubmit((values) => submit(values, false), onInvalid)}
+              disabled={submitState.loading}
+            >
+              {submitState.loading && <Spinner className={styles.buttonSpinner} inline={true} />}
+              Save
+            </Button>
+          )}
           <Button
             variant="primary"
             type="button"
