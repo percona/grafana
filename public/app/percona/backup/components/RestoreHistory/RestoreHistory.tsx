@@ -135,6 +135,7 @@ export const RestoreHistory: FC = () => {
             pendingRequest={pending}
             autoResetExpanded={false}
             renderExpandedRow={renderSelectedSubRow}
+            getRowId={useCallback((row: Restore) => row.id, [])}
           />
         </FeatureLoader>
       </OldPage.Contents>
