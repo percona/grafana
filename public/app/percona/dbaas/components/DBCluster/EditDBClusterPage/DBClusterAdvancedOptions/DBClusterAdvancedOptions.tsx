@@ -267,7 +267,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
             name={AddDBClusterFields.disk}
             label={Messages.dbcluster.addModal.fields.disk}
             validators={diskValidators}
-            disabled={resources !== DBClusterResources.custom}
+            disabled={selectedCluster ? true : resources !== DBClusterResources.custom}
             parse={parsePositiveInt}
           />
         </div>
