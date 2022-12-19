@@ -121,13 +121,22 @@ describe('DBClusterActions::', () => {
 
   it('correct actions are disabled if cluster is paused', async () => {
     render(
-      <DBClusterActions
-        dbCluster={dbClustersStub[5]}
-        setDeleteModalVisible={jest.fn()}
-        setLogsModalVisible={jest.fn()}
-        setUpdateModalVisible={jest.fn()}
-        getDBClusters={jest.fn()}
-      />
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: { result: { dbaasEnabled: true } },
+          },
+        } as StoreState)}
+      >
+        <DBClusterActions
+          dbCluster={dbClustersStub[5]}
+          setDeleteModalVisible={jest.fn()}
+          setLogsModalVisible={jest.fn()}
+          setUpdateModalVisible={jest.fn()}
+          getDBClusters={jest.fn()}
+        />
+      </Provider>
     );
 
     const btn = screen.getByRole('button');
