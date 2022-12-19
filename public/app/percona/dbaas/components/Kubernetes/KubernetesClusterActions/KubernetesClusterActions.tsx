@@ -23,7 +23,6 @@ export const KubernetesClusterActions: FC<DBClusterActionsProps> = ({
       const actions: Action[] = [
         {
           content: Messages.kubernetes.deleteAction,
-          disabled: kubernetesCluster.status === KubernetesClusterStatus.provisioning,
           action: () => {
             setSelectedCluster(kubernetesCluster);
             setDeleteModalVisible(true);
