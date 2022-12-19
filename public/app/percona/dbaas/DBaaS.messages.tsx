@@ -44,6 +44,7 @@ export const Messages = {
       [KubernetesClusterStatus.ok]: 'Active',
       [KubernetesClusterStatus.unavailable]: 'Unavailable',
       [KubernetesClusterStatus.invalid]: 'Invalid',
+      [KubernetesClusterStatus.provisioning]: 'Provisioning',
     },
     updateOperatorModal: {
       cancel: 'Cancel',
