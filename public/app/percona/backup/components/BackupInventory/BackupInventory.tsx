@@ -2,7 +2,6 @@
 import { logger } from '@percona/platform-core';
 import { CancelToken } from 'axios';
 import React, { FC, useMemo, useState, useEffect, useCallback, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
@@ -20,6 +19,7 @@ import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backupLo
 import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
+import { useSelector } from 'app/types';
 
 import { NEW_BACKUP_URL } from '../../Backup.constants';
 import { Messages } from '../../Backup.messages';
@@ -256,6 +256,7 @@ export const BackupInventory: FC = () => {
             pendingRequest={pending}
             autoResetExpanded={false}
             renderExpandedRow={renderSelectedSubRow}
+            getRowId={useCallback((row: Backup) => row.id, [])}
           ></Table>
           {restoreModalVisible && (
             <RestoreBackupModal
