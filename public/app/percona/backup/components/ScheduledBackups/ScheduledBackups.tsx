@@ -35,7 +35,7 @@ import { ScheduledBackupDetails } from './ScheduledBackupsDetails';
 
 export const ScheduledBackups: FC = () => {
   const [data, setData] = useState<ScheduledBackup[]>([]);
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState(true);
   const [actionPending, setActionPending] = useState(false);
   const [deletePending, setDeletePending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
@@ -45,7 +45,6 @@ export const ScheduledBackups: FC = () => {
   const dispatch = useAppDispatch();
   const styles = useStyles(getStyles);
   const { result: locations = [] } = useSelector(getBackupLocations);
-
   const locationsByLocationId = useMemo(() => formatLocationsToMap(locations), [locations]);
 
   const retentionValue = useCallback((n: number) => {
@@ -62,6 +61,7 @@ export const ScheduledBackups: FC = () => {
 
   const getData = useCallback(async () => {
     setPending(true);
+    await dispatch(fetchStorageLocations());
     try {
       const backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
       setData(backups);
@@ -240,7 +240,6 @@ export const ScheduledBackups: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('backupEnabled'), []);
 
   useEffect(() => {
-    dispatch(fetchStorageLocations());
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

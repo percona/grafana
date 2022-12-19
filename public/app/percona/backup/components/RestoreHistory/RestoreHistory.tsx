@@ -105,6 +105,7 @@ export const RestoreHistory: FC = () => {
   useEffect(() => {
     const getData = async (showLoading = false) => {
       showLoading && setPending(true);
+      await dispatch(fetchStorageLocations());
 
       try {
         const restores = await RestoreHistoryService.list(generateToken(LIST_RESTORES_CANCEL_TOKEN));
@@ -117,9 +118,8 @@ export const RestoreHistory: FC = () => {
       }
       setPending(false);
     };
-    dispatch(fetchStorageLocations());
-    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
 
+    getData(true).then(() => triggerTimeout(getData, DATA_INTERVAL));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
