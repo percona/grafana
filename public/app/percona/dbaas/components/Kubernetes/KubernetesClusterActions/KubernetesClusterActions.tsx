@@ -2,14 +2,14 @@ import React, { FC, useCallback } from 'react';
 
 import { config } from '@grafana/runtime';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
-import { MultipleActions, Action } from 'app/percona/dbaas/components/MultipleActions';
+import { Action, MultipleActions } from 'app/percona/dbaas/components/MultipleActions';
 
 import { Kubernetes } from '../Kubernetes.types';
+import { KubernetesClusterStatus } from '../KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { hasActiveOperator } from '../OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.utils';
 
 import { styles } from './KubernetesClusterActions.styles';
 import { DBClusterActionsProps } from './KubernetesClusterActions.types';
-
 export const KubernetesClusterActions: FC<DBClusterActionsProps> = ({
   kubernetesCluster,
   setSelectedCluster,
@@ -23,6 +23,7 @@ export const KubernetesClusterActions: FC<DBClusterActionsProps> = ({
       const actions: Action[] = [
         {
           content: Messages.kubernetes.deleteAction,
+          disabled: kubernetesCluster.status === KubernetesClusterStatus.provisioning,
           action: () => {
             setSelectedCluster(kubernetesCluster);
             setDeleteModalVisible(true);
@@ -30,6 +31,7 @@ export const KubernetesClusterActions: FC<DBClusterActionsProps> = ({
         },
         {
           content: Messages.kubernetes.showConfiguration,
+          disabled: kubernetesCluster.status === KubernetesClusterStatus.provisioning,
           action: () => {
             setSelectedCluster(kubernetesCluster);
             setViewConfigModalVisible(true);
@@ -40,7 +42,8 @@ export const KubernetesClusterActions: FC<DBClusterActionsProps> = ({
       if (isAdmin) {
         actions.push({
           content: Messages.kubernetes.manageComponents,
-          disabled: !hasActiveOperator(kubernetesCluster),
+          disabled:
+            !hasActiveOperator(kubernetesCluster) || kubernetesCluster.status === KubernetesClusterStatus.provisioning,
           action: () => {
             setSelectedCluster(kubernetesCluster);
             setManageComponentsModalVisible(true);
