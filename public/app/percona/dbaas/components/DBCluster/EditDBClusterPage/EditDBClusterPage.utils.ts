@@ -1,7 +1,10 @@
+import { logger } from '@percona/platform-core';
+
 import { DATABASE_LABELS } from '../../../../shared/core';
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 import { getActiveOperators, getDatabaseOptionFromOperator } from '../../Kubernetes/Kubernetes.utils';
-import { DBCluster } from '../DBCluster.types';
+import { DBCluster, DBClusterPayload } from '../DBCluster.types';
+import { newDBClusterService } from '../DBCluster.utils';
 
 import {
   DEFAULT_SIZES,
@@ -49,7 +52,21 @@ export const generateUID = (): string => {
   return firstPart + secondPart;
 };
 
-export const getEditInitialValues = (selectedDBCluster: DBCluster): UpdateDBClusterFormValues => {
+export const getDBClusterConfiguration = async (selectedCluster: DBCluster): Promise<DBClusterPayload | undefined> => {
+  try {
+    const dbClusterService = newDBClusterService(selectedCluster.databaseType);
+    const result = await dbClusterService.getClusterConfiguration(selectedCluster);
+    return result;
+  } catch (e) {
+    logger.error(e);
+  }
+  return;
+};
+
+export const getEditInitialValues = (
+  selectedDBCluster: DBCluster,
+  configuration: DBClusterPayload | undefined
+): UpdateDBClusterFormValues => {
   const isCluster = selectedDBCluster.clusterSize > 1;
   const clusterParameters: UpdateDBClusterFormValues = {
     nodes: isCluster ? selectedDBCluster.clusterSize : MIN_NODES,
@@ -60,6 +77,10 @@ export const getEditInitialValues = (selectedDBCluster: DBCluster): UpdateDBClus
     cpu: selectedDBCluster.cpu,
     disk: selectedDBCluster.disk,
     memory: selectedDBCluster.memory,
+    configuration: configuration?.params?.pxc?.configuration || configuration?.params?.replicaset?.configuration,
+    expose: configuration?.expose || configuration?.exposed, //TODO 11031
+    internetFacing: configuration?.internet_facing,
+    sourceRanges: configuration?.source_ranges?.map((item) => ({ sourceRange: item })),
   };
   const isMatchSize = (type: DBClusterResources) =>
     DEFAULT_SIZES[type].cpu === selectedDBCluster.cpu &&

@@ -49,6 +49,8 @@ export abstract class DBClusterService {
 
   abstract getExpectedResources(dbCluster: DBCluster): Promise<DBClusterExpectedResources>;
 
+  abstract getClusterConfiguration(dbCluster: DBCluster): Promise<DBClusterPayload>;
+
   abstract toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster;
 
   static async getDBClusters(kubernetes: Kubernetes, token?: CancelToken): Promise<DBClusterListResponse> {
@@ -92,18 +94,6 @@ export abstract class DBClusterService {
             disk: { value: allocatedDisk / BILLION, units: ResourcesUnits.GB, original: allocatedDisk },
           },
         };
-      });
-  }
-
-  static async getExpectedResourcesNew(dbCluster: DBCluster): Promise<any> {
-    return apiManagement
-      .post<any, Partial<DBClusterPayload>>('/DBaaS/DBClusters/Get', {
-        kubernetes_cluster_name: dbCluster.kubernetesClusterName,
-        name: dbCluster.clusterName,
-      })
-      .then(({ psmdb_cluster, pxc_cluster }: any) => {
-        const cluster = psmdb_cluster ? psmdb_cluster : pxc_cluster;
-        return cluster?.params;
       });
   }
 }

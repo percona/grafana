@@ -1,14 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { useSelector } from 'app/types';
 
 import { getDBaaS } from '../../../../../shared/core/selectors';
 import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
-import { DBCluster } from '../../DBCluster.types';
+import { DBCluster, DBClusterPayload } from '../../DBCluster.types';
 import { DB_CLUSTER_INVENTORY_URL } from '../EditDBClusterPage.constants';
 import { AddDBClusterFormValues, DBClusterPageMode, UpdateDBClusterFormValues } from '../EditDBClusterPage.types';
-import { getAddInitialValues, getEditInitialValues } from '../EditDBClusterPage.utils';
+import { getAddInitialValues, getDBClusterConfiguration, getEditInitialValues } from '../EditDBClusterPage.utils';
 
 interface EditDBClusterPageDefaultValuesProps {
   kubernetes: Kubernetes[] | undefined;
@@ -24,20 +24,25 @@ export const useEditDBClusterPageDefaultValues = ({
 ] => {
   const history = useHistory();
   const { selectedKubernetesCluster: preSelectedKubernetesCluster, selectedDBCluster } = useSelector(getDBaaS);
+  const [configuration, setConfiguration] = useState<DBClusterPayload | undefined>(undefined);
+
+  useEffect(() => {
+    if (mode === 'edit' && selectedDBCluster) {
+      getDBClusterConfiguration(selectedDBCluster).then(setConfiguration);
+    }
+  }, [mode, selectedDBCluster]);
 
   const initialValues = useMemo(() => {
     if (mode === 'create') {
       return kubernetes?.length ? getAddInitialValues(kubernetes, preSelectedKubernetesCluster) : undefined;
     }
     if (mode === 'edit' && selectedDBCluster) {
-      console.log(getEditInitialValues(selectedDBCluster));
-      debugger;
-      return getEditInitialValues(selectedDBCluster);
+      return getEditInitialValues(selectedDBCluster, configuration);
     } else {
       history.push(DB_CLUSTER_INVENTORY_URL);
     }
     return undefined;
-  }, [history, kubernetes, mode, preSelectedKubernetesCluster, selectedDBCluster]);
+  }, [history, kubernetes, mode, preSelectedKubernetesCluster, selectedDBCluster, configuration]);
 
   return [initialValues, selectedDBCluster];
 };

@@ -5,6 +5,7 @@ import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 
 import { ConfigurationFields } from './DBClusterAdvancedOptions/Configurations/Configurations.types';
 import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
+import { NetworkAndSecurityFields } from './DBClusterAdvancedOptions/NetworkAndSecurity/NetworkAndSecurity.types';
 import {
   BasicOptionsFields,
   DatabaseOptionInitial,
@@ -28,6 +29,9 @@ export interface AddDBClusterFormValues {
   [BasicOptionsFields.name]?: string;
   [ConfigurationFields.configuration]?: string;
   // TODO [MySQLConfigurationFields.storageClass]?: string;
+  [NetworkAndSecurityFields.expose]?: boolean;
+  [NetworkAndSecurityFields.sourceRanges]?: Array<{}>| [];
+  [NetworkAndSecurityFields.internetFacing]?: boolean;
 }
 
 export interface UpdateDBClusterFormValues {
@@ -38,6 +42,11 @@ export interface UpdateDBClusterFormValues {
   [AdvancedOptionsFields.disk]: number;
   [AdvancedOptionsFields.memory]: number;
   [ConfigurationFields.configuration]?: string;
+  // TODO [MySQLConfigurationFields.storageClass]?: string;
+  [ConfigurationFields.configuration]?: string;
+  [NetworkAndSecurityFields.expose]?: boolean;
+  [NetworkAndSecurityFields.sourceRanges]?: Array<{}>| [];
+  [NetworkAndSecurityFields.internetFacing]?: boolean;
 
   // TODO [MySQLConfigurationFields.storageClass]?: string;
 }

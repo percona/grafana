@@ -161,16 +161,18 @@ export interface DBClusterActionAPI {
 export interface DBClusterParamsAPI {
   cluster_size: number;
   pxc?: DBClusterContainerAPI;
-  haproxy?: Omit<DBClusterContainerAPI, 'disk_size'>;
-  replicaset?: DBClusterContainerAPI;
+  haproxy?: Omit<DBClusterContainerAPI, 'disk_size' | 'configuration' | 'image' | 'storage_class'>;
+  replicaset?: Omit<DBClusterContainerAPI, 'image'>;
+  proxysql?: Omit<DBClusterContainerAPI, 'configuration' | 'storage_class'>;
   image?: string;
 }
 
 interface DBClusterContainerAPI {
   compute_resources: DBClusterComputeResourcesAPI;
-  disk_size: number;
+  disk_size: number; //string
   configuration?: string;
   image?: string;
+  storage_class?: string;
 }
 
 interface DBClusterComputeResourcesAPI {
@@ -207,21 +209,29 @@ export interface DBClusterExpectedResourcesAPI {
   expected: ResourcesAPI;
 }
 
-export interface DBClusterExpectedResourcesNewAPI {
-  pxc_cluster?: {
-    name: string;
-    state: DBClusterStatus;
-    operation: DBClusterOperationAPI;
-    params: DBClusterParamsAPI;
-    installed_image: string;
-  };
-  psmdb_cluster?: {
-    name: string;
-    state: DBClusterStatus;
-    operation: DBClusterOperationAPI;
-    params: DBClusterParamsAPI;
-    installed_image: string;
-  };
+export interface DBClusterConfigurationAPI {
+  pxc_cluster: DBClusterPayload;
+  psmdb_cluster: DBClusterPayload;
+  // pxc_cluster: {
+  //   name: string;
+  //   state: DBClusterStatus;
+  //   operation: DBClusterOperationAPI;
+  //   params: DBClusterParamsAPI;
+  //   exposed?: boolean;
+  //   installed_image: string;
+  //   available_image: 'string';
+  //   internet_facing: true;
+  // };
+  // psmdb_cluster: {
+  //   name: string;
+  //   state: DBClusterStatus;
+  //   operation: DBClusterOperationAPI;
+  //   params: DBClusterParamsAPI;
+  //   exposed?: boolean;
+  //   installed_image: string;
+  //   available_image: 'string';
+  //   internet_facing: true;
+  // };
 }
 
 interface ResourcesAPI {

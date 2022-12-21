@@ -1,6 +1,6 @@
 import { cx } from '@emotion/css';
-import { NumberInputField, logger, SelectField } from '@percona/platform-core';
-import React, { FC, useCallback, useState, useMemo, useEffect, useRef } from 'react';
+import { logger, NumberInputField, SelectField } from '@percona/platform-core';
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormRenderProps } from 'react-final-form';
 
 import { useStyles } from '@grafana/ui/src';
@@ -20,13 +20,13 @@ import { UnsafeConfigurationWarning } from '../UnsafeConfigurationsWarning/Unsaf
 
 import Configurations from './Configurations/Configurations';
 import {
-  RESOURCES_OPTIONS,
   DEFAULT_SIZES,
+  EXPECTED_DELAY,
+  MIN_DISK_SIZE,
   MIN_NODES,
   MIN_RESOURCES,
-  MIN_DISK_SIZE,
   RECHECK_INTERVAL,
-  EXPECTED_DELAY,
+  RESOURCES_OPTIONS,
 } from './DBClusterAdvancedOptions.constants';
 import { Messages } from './DBClusterAdvancedOptions.messages';
 import { getStyles } from './DBClusterAdvancedOptions.styles';
@@ -151,44 +151,27 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
       const dbTypeValue = selectedCluster ? selectedCluster.databaseType : databaseType?.value;
 
       try {
-        if (selectedCluster) {
-          setLoadingExpectedResources(true);
-          const result = await DBClusterService.getExpectedResourcesNew(selectedCluster);
-          // const expected: DBClusterExpectedResources = {
-          //   expected: {
-          //     cpu: ?
-          //     memory: ?
-          //     disk?: ?
-          //   },
-          // };
-          if (!initialExpected.current) {
-            initialExpected.current = expected;
-          }
-          setExpectedResources(
-            selectedCluster ? getExpectedResourcesDifference(expected, initialExpected.current) : expected
-          );
-        } else {
-          const dbClusterService = newDBClusterService(dbTypeValue);
-          setLoadingExpectedResources(true);
-          const expected = await dbClusterService.getExpectedResources({
-            clusterName: name,
-            kubernetesClusterName: kubernetesCluster,
-            databaseType: dbTypeValue,
-            clusterSize: nodes,
-            cpu,
-            memory,
-            disk,
-          });
-          if (!initialExpected.current) {
-            initialExpected.current = expected;
-          }
-          setExpectedResources(expected);
+        const dbClusterService = newDBClusterService(dbTypeValue);
+        setLoadingExpectedResources(true);
+
+        const expected = await dbClusterService.getExpectedResources({
+          clusterName: selectedCluster ? selectedCluster.clusterName : name,
+          kubernetesClusterName: selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster,
+          databaseType: dbTypeValue,
+          clusterSize: nodes,
+          cpu,
+          memory,
+          disk,
+        });
+        if (!initialExpected.current) {
+          initialExpected.current = expected;
         }
+        setExpectedResources(
+          selectedCluster ? getExpectedResourcesDifference(expected, initialExpected.current) : expected
+        );
       } catch (e) {
-        debugger;
         logger.error(e);
       } finally {
-        debugger;
         setLoadingExpectedResources(false);
       }
     };
