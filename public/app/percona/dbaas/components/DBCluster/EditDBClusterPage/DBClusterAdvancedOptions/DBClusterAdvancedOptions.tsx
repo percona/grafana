@@ -63,6 +63,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   const [loadingAllocatedResources, setLoadingAllocatedResources] = useState(false);
   const [expectedResources, setExpectedResources] = useState<DBClusterExpectedResources>();
   const [loadingExpectedResources, setLoadingExpectedResources] = useState(false);
+  // const { result, loading } = useSelector(getEditDBClusterResources);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const mounted = { current: true };
@@ -150,27 +151,44 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
       const dbTypeValue = selectedCluster ? selectedCluster.databaseType : databaseType?.value;
 
       try {
-        const dbClusterService = newDBClusterService(dbTypeValue);
-        setLoadingExpectedResources(true);
-
-        const expected = await dbClusterService.getExpectedResources({
-          clusterName: selectedCluster ? selectedCluster.clusterName : name,
-          kubernetesClusterName: selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster,
-          databaseType: dbTypeValue,
-          clusterSize: nodes,
-          cpu,
-          memory,
-          disk,
-        });
-        if (!initialExpected.current) {
-          initialExpected.current = expected;
+        if (selectedCluster) {
+          setLoadingExpectedResources(true);
+          const result = await DBClusterService.getExpectedResourcesNew(selectedCluster);
+          // const expected: DBClusterExpectedResources = {
+          //   expected: {
+          //     cpu: ?
+          //     memory: ?
+          //     disk?: ?
+          //   },
+          // };
+          if (!initialExpected.current) {
+            initialExpected.current = expected;
+          }
+          setExpectedResources(
+            selectedCluster ? getExpectedResourcesDifference(expected, initialExpected.current) : expected
+          );
+        } else {
+          const dbClusterService = newDBClusterService(dbTypeValue);
+          setLoadingExpectedResources(true);
+          const expected = await dbClusterService.getExpectedResources({
+            clusterName: name,
+            kubernetesClusterName: kubernetesCluster,
+            databaseType: dbTypeValue,
+            clusterSize: nodes,
+            cpu,
+            memory,
+            disk,
+          });
+          if (!initialExpected.current) {
+            initialExpected.current = expected;
+          }
+          setExpectedResources(expected);
         }
-        setExpectedResources(
-          selectedCluster ? getExpectedResourcesDifference(expected, initialExpected.current) : expected
-        );
       } catch (e) {
+        debugger;
         logger.error(e);
       } finally {
+        debugger;
         setLoadingExpectedResources(false);
       }
     };

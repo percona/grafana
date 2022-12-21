@@ -27,7 +27,7 @@ export const Configurations: FC<ConfigurationProps> = ({ databaseType }) => {
     [databaseType]
   );
   return (
-    <FieldSet label={fieldSetLabel} dataTestId={'pxc-configurations'}>
+    <FieldSet label={fieldSetLabel} data-testid={'pxc-configurations'}>
       {/*<AsyncSelectField*/}
       {/*  name={MySQLConfigurationFields.storageClass}*/}
       {/*  loadOptions={loadAsyncOptions}*/}

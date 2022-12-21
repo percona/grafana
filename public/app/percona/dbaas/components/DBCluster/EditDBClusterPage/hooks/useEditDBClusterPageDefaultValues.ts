@@ -30,6 +30,8 @@ export const useEditDBClusterPageDefaultValues = ({
       return kubernetes?.length ? getAddInitialValues(kubernetes, preSelectedKubernetesCluster) : undefined;
     }
     if (mode === 'edit' && selectedDBCluster) {
+      console.log(getEditInitialValues(selectedDBCluster));
+      debugger;
       return getEditInitialValues(selectedDBCluster);
     } else {
       history.push(DB_CLUSTER_INVENTORY_URL);

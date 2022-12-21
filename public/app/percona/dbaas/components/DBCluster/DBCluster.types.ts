@@ -158,7 +158,7 @@ export interface DBClusterActionAPI {
   cluster_type: DBClusterType;
 }
 
-interface DBClusterParamsAPI {
+export interface DBClusterParamsAPI {
   cluster_size: number;
   pxc?: DBClusterContainerAPI;
   haproxy?: Omit<DBClusterContainerAPI, 'disk_size'>;
@@ -179,7 +179,7 @@ interface DBClusterComputeResourcesAPI {
 }
 
 interface DBClusterOperationAPI {
-  message: string;
+  message?: string;
   finished_steps: number;
   total_steps: number;
 }
@@ -205,6 +205,23 @@ export interface DBClusterAllocatedResourcesAPI {
 
 export interface DBClusterExpectedResourcesAPI {
   expected: ResourcesAPI;
+}
+
+export interface DBClusterExpectedResourcesNewAPI {
+  pxc_cluster?: {
+    name: string;
+    state: DBClusterStatus;
+    operation: DBClusterOperationAPI;
+    params: DBClusterParamsAPI;
+    installed_image: string;
+  };
+  psmdb_cluster?: {
+    name: string;
+    state: DBClusterStatus;
+    operation: DBClusterOperationAPI;
+    params: DBClusterParamsAPI;
+    installed_image: string;
+  };
 }
 
 interface ResourcesAPI {

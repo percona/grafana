@@ -94,4 +94,16 @@ export abstract class DBClusterService {
         };
       });
   }
+
+  static async getExpectedResourcesNew(dbCluster: DBCluster): Promise<any> {
+    return apiManagement
+      .post<any, Partial<DBClusterPayload>>('/DBaaS/DBClusters/Get', {
+        kubernetes_cluster_name: dbCluster.kubernetesClusterName,
+        name: dbCluster.clusterName,
+      })
+      .then(({ psmdb_cluster, pxc_cluster }: any) => {
+        const cluster = psmdb_cluster ? psmdb_cluster : pxc_cluster;
+        return cluster?.params;
+      });
+  }
 }
