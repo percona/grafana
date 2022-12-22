@@ -26,7 +26,8 @@ import {
   DBClusterChangeComponentsAPI,
   DBClusterType,
   DBClusterStatus,
-  DBClusterSuspendResumeRequest, DBClusterConfigurationAPI,
+  DBClusterSuspendResumeRequest,
+  DBClusterConfigurationAPI,
 } from './DBCluster.types';
 import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
@@ -129,11 +130,7 @@ export class PSMDBService extends DBClusterService {
         kubernetes_cluster_name: dbCluster.kubernetesClusterName,
         name: dbCluster.clusterName,
       })
-      .then(
-        (result): DBClusterPayload => ({
-          ...(result?.psmdb_cluster || result?.pxc_cluster),
-        })
-      );
+      .then((result): DBClusterPayload => result?.psmdb_cluster);
   }
 
   toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster {

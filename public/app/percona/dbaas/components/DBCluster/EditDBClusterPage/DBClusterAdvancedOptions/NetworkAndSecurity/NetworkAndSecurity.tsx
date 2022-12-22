@@ -5,13 +5,16 @@ import { FieldArray } from 'react-final-form-arrays';
 import { useStyles, Button } from '@grafana/ui';
 
 import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet';
+import { DBClusterPageMode } from '../../EditDBClusterPage.types';
 import { Messages } from '../DBClusterAdvancedOptions.messages';
 
 import { getStyles } from './NetworkAndSecurity.styles';
 import { NetworkAndSecurityFields } from './NetworkAndSecurity.types';
 
-export interface NetworkAndSecurityProps {}
-export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
+export interface NetworkAndSecurityProps {
+  mode: DBClusterPageMode;
+}
+export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ mode }) => {
   const styles = useStyles(getStyles);
   return (
     <FieldSet label={Messages.fieldSets.networkAndSecurity} dataTestId={'network-and-security'}>
@@ -21,8 +24,13 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
         tooltipIcon="info-circle"
         tooltipText={Messages.tooltips.expose}
         noError={true}
+        disabled={mode === 'edit'}
       />
-      <CheckboxField name={NetworkAndSecurityFields.internetFacing} label={Messages.labels.internetFacing} />
+      <CheckboxField
+        name={NetworkAndSecurityFields.internetFacing}
+        label={Messages.labels.internetFacing}
+        disabled={mode === 'edit'}
+      />
       <FieldArray name={NetworkAndSecurityFields.sourceRanges}>
         {({ fields }) => (
           <div className={styles.fieldsWrapper}>
@@ -41,6 +49,7 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = () => {
                   label={index === 0 ? Messages.labels.sourceRange : ''}
                   placeholder="181.170.213.40/32"
                   fieldClassName={styles.field}
+                  disabled={mode === 'edit'}
                 />
                 {index > 0 && (
                   <Button

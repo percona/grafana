@@ -30,7 +30,7 @@ export interface AddDBClusterFormValues {
   [ConfigurationFields.configuration]?: string;
   // TODO [MySQLConfigurationFields.storageClass]?: string;
   [NetworkAndSecurityFields.expose]?: boolean;
-  [NetworkAndSecurityFields.sourceRanges]?: Array<{}>| [];
+  [NetworkAndSecurityFields.sourceRanges]?: Array<{}> | [];
   [NetworkAndSecurityFields.internetFacing]?: boolean;
 }
 
@@ -45,10 +45,8 @@ export interface UpdateDBClusterFormValues {
   // TODO [MySQLConfigurationFields.storageClass]?: string;
   [ConfigurationFields.configuration]?: string;
   [NetworkAndSecurityFields.expose]?: boolean;
-  [NetworkAndSecurityFields.sourceRanges]?: Array<{}>| [];
+  [NetworkAndSecurityFields.sourceRanges]?: Array<{}> | [];
   [NetworkAndSecurityFields.internetFacing]?: boolean;
-
-  // TODO [MySQLConfigurationFields.storageClass]?: string;
 }
 
 export interface DBClusterFormSubmitProps {

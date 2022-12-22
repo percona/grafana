@@ -138,11 +138,7 @@ export class XtraDBService extends DBClusterService {
         kubernetes_cluster_name: dbCluster.kubernetesClusterName,
         name: dbCluster.clusterName,
       })
-      .then(
-        (result): DBClusterPayload => ({
-          ...(result?.psmdb_cluster || result?.pxc_cluster),
-        })
-      );
+      .then((result): DBClusterPayload => result?.pxc_cluster);
   }
 
   toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster {
