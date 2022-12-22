@@ -241,7 +241,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
             name={AdvancedOptionsFields.disk}
             label={Messages.labels.disk}
             validators={diskValidators}
-            disabled={selectedCluster ? true : resources !== DBClusterResources.custom}
+            disabled={selectedCluster ? true : resources?.value !== DBClusterResources.custom}
             parse={parsePositiveInt}
           />
         </div>
@@ -279,7 +279,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
         </div>
       </div>
       <Configurations databaseType={selectedCluster ? selectedCluster.databaseType : databaseType?.value} />
-      <NetworkAndSecurity />
+      <NetworkAndSecurity mode={mode} />
     </FieldSet>
   );
 };

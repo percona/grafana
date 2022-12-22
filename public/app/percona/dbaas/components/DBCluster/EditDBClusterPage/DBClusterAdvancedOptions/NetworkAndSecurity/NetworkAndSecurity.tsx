@@ -39,6 +39,7 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ mode }) => {
               variant="secondary"
               onClick={() => fields.push({ sourceRange: '' })}
               icon="plus"
+              disabled={mode === 'edit'}
             >
               {Messages.buttons.addNew}
             </Button>
