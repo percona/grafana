@@ -3,8 +3,6 @@ import { combineReducers, createAsyncThunk, createSlice, PayloadAction } from '@
 import { CancelToken } from 'axios';
 
 import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
-import { DBClusterTopology } from 'app/percona/dbaas/components/DBCluster/AddDBClusterModal/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
-import { newDBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
 import { OPERATOR_COMPONENT_TO_UPDATE_MAP } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.constants';
 import { KubernetesService } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.service';
 import {
@@ -24,9 +22,9 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
 import { api } from 'app/percona/shared/helpers/api';
 
-import { SETTINGS_TIMEOUT } from '../constants';
 import { ServerInfo } from '../types';
 
+import perconaAddDBCluster from './addDBCluster/addDBCluster';
 import perconaBackupLocations from './backupLocations';
 import perconaDBClustersReducer from './dbClusters/dbClusters';
 import perconaK8SCluster from './k8sCluster/k8sCluster';
@@ -144,7 +142,9 @@ const toModelOperators = (
   { cluster_to_components }: CheckOperatorUpdateAPI
 ): OperatorsList => {
   const modelOperators = {} as OperatorsList;
-  const componentToUpdate = cluster_to_components[kubernetesClusterName].component_to_update_information;
+  const componentToUpdate = cluster_to_components
+    ? cluster_to_components[kubernetesClusterName]?.component_to_update_information
+    : undefined;
 
   Object.entries(operators).forEach(([operatorKey, operator]: [string, Operator]) => {
     const component = OPERATOR_COMPONENT_TO_UPDATE_MAP[operatorKey as keyof OperatorsList];
@@ -202,46 +202,6 @@ const perconaDBaaSSlice = createSlice({
 
 export const { selectKubernetesCluster } = perconaDBaaSSlice.actions;
 export const perconaDBaaSReducers = perconaDBaaSSlice.reducer;
-
-export const addDbClusterAction = createAsyncThunk(
-  'percona/addDbCluster',
-  async (args: { values: Record<string, any>; setPMMAddress?: boolean }, thunkAPI): Promise<void> => {
-    const {
-      name,
-      kubernetesCluster,
-      databaseType,
-      databaseVersion,
-      topology,
-      nodes,
-      single,
-      memory,
-      cpu,
-      disk,
-      expose,
-    } = args.values;
-    const dbClusterService = newDBClusterService(databaseType.value);
-    if (args.setPMMAddress) {
-      await thunkAPI.dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } }));
-      await new Promise((resolve) => setTimeout(resolve, SETTINGS_TIMEOUT));
-    }
-    await withAppEvents(
-      dbClusterService.addDBCluster({
-        kubernetesClusterName: kubernetesCluster.value,
-        clusterName: name,
-        databaseType: databaseType.value,
-        clusterSize: topology === DBClusterTopology.cluster ? nodes : single,
-        cpu,
-        memory,
-        disk,
-        databaseImage: databaseVersion.value,
-        expose,
-      }),
-      {
-        successMessage: 'Cluster was successfully added',
-      }
-    );
-  }
-);
 
 export const instalKuberneteslOperatorAction = createAsyncThunk(
   'percona/instalKuberneteslOperator',
@@ -306,7 +266,7 @@ export const fetchServerSaasHostAction = createAsyncThunk(
   (_, thunkAPI): Promise<void> =>
     withSerializedError(
       (async () => {
-        const { host } = await api.get('/graph/percona-api/saas-host', true);
+        const { host } = (await api.get('/graph/percona-api/saas-host', true)) as { host: string };
         thunkAPI.dispatch(setServerSaasHost(host));
       })()
     )
@@ -327,7 +287,6 @@ export const fetchTemplatesAction = createAsyncThunk(
 
 const kubernetesReducer = createAsyncSlice('kubernetes', fetchKubernetesAction).reducer;
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
-const addDbClusterReducer = createAsyncSlice('addDbCluster', addDbClusterAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice(
   'instalKuberneteslOperator',
   instalKuberneteslOperatorAction
@@ -345,7 +304,7 @@ export default {
     kubernetes: kubernetesReducer,
     deleteKubernetes: deleteKubernetesReducer,
     addKubernetes: perconaK8SCluster,
-    addDbCluster: addDbClusterReducer,
+    addDBCluster: perconaAddDBCluster,
     installKubernetesOperator: installKubernetesOperatorReducer,
     dbClusters: perconaDBClustersReducer,
     server: perconaServerReducers,
