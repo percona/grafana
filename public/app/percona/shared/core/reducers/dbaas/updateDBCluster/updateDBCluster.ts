@@ -61,7 +61,7 @@ export const updateDBClusterAction = createAsyncThunk(
         internetFacing,
         configuration,
         sourceRanges: sourceRanges ? sourceRanges.map((item: any) => item?.sourceRange || '') : [],
-        ...(storageClass?.value && { storageClass: storageClass?.value })
+        ...(storageClass?.value && { storageClass: storageClass?.value }),
       }),
       {
         successMessage: 'Cluster was successfully updated',
