@@ -25,7 +25,7 @@ jest.mock('@percona/platform-core', () => {
 });
 
 describe('DBClusterAdvancedOptions::', () => {
-  xit('renders correctly in create mode', async () => {
+  it('renders correctly in create mode', async () => {
     act(() => {
       render(
         <Form

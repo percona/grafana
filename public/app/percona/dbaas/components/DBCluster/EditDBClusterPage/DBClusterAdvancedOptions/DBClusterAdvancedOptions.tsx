@@ -63,7 +63,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   const [loadingAllocatedResources, setLoadingAllocatedResources] = useState(false);
   const [expectedResources, setExpectedResources] = useState<DBClusterExpectedResources>();
   const [loadingExpectedResources, setLoadingExpectedResources] = useState(false);
-  // TODO refactoring move "selectedCliuster ? ():()" to separate function which will return correct set of values
 
   const mounted = { current: true };
   const { required, min } = validators;
@@ -188,7 +187,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   }, [memory, cpu, disk, kubernetesCluster, topology, nodes, single, databaseType]);
 
   useEffect(() => {
-    // TODO 11031
     const dbTypeValue = selectedCluster ? selectedCluster.databaseType : databaseType?.value;
     if (dbTypeValue === Databases.mongodb) {
       nodes === 1 ? setShowUnsafeConfigurationWarning(true) : setShowUnsafeConfigurationWarning(false);

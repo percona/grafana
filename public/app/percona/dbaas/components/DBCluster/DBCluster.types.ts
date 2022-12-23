@@ -149,7 +149,6 @@ export interface DBClusterPayload {
   pxcConfiguration?: string;
   internet_facing?: boolean;
   source_ranges?: string[];
-  //TODO storage_class?: string;
 }
 
 export interface DBClusterActionAPI {
@@ -169,7 +168,7 @@ export interface DBClusterParamsAPI {
 
 interface DBClusterContainerAPI {
   compute_resources: DBClusterComputeResourcesAPI;
-  disk_size: number; //string
+  disk_size: number;
   configuration?: string;
   image?: string;
   storage_class?: string;

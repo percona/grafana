@@ -15,9 +15,7 @@ export const Messages = {
     pxcConfiguration: 'MySQL Configuration',
     mongodbConfiguration: 'MongoDB Configuration',
     expose: 'Expose',
-    // exposeTooltip: 'SomeText' TODO 11031 will be added later
     internetFacing: 'Internet Facing',
-    // internetFacingTooltip: 'SomeText' TODO 11031 will be added later
     sourceRange: 'Source Range',
   },
   resources: {
@@ -37,5 +35,5 @@ export const Messages = {
   },
   placeholders: {
     storageClass: 'choose storage class option',
-  }
+  },
 };
