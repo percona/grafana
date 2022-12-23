@@ -55,7 +55,8 @@ export const addDbClusterAction = createAsyncThunk(
       internetFacing,
       sourceRanges,
       configuration,
-    } = args.values; //TODO 11031 storage_class
+      storageClass,
+    } = args.values;
 
     const dbClusterService = newDBClusterService(databaseType.value);
     thunkAPI.dispatch(setAddDBClusterLoading());
@@ -76,8 +77,8 @@ export const addDbClusterAction = createAsyncThunk(
         expose,
         internetFacing,
         sourceRanges: sourceRanges.map((item: any) => item?.sourceRange || ''),
-        //TODO 11031 storage_class
         configuration,
+        ...(storageClass?.value && { storageClass: storageClass?.value }),
       }),
       {
         successMessage: 'Cluster was successfully added',

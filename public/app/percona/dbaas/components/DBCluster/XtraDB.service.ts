@@ -176,7 +176,7 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
       },
       disk_size: dbCluster.disk * BILLION,
       configuration: dbCluster.configuration,
-      // TODO 11031 storage_class: dbCluster.storageClass,
+      storage_class: dbCluster.storageClass,
       image: dbCluster.databaseImage,
     },
     // Temporary mock data

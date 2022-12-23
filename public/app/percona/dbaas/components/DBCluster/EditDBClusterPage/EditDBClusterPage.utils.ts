@@ -68,6 +68,8 @@ export const getEditInitialValues = (
   configuration: DBClusterPayload | undefined
 ): UpdateDBClusterFormValues => {
   const isCluster = selectedDBCluster.clusterSize > 1;
+  const sourceRangesArray = configuration?.source_ranges?.map((item) => ({ sourceRange: item })) || [{}];
+  const storageClass = configuration?.params?.replicaset?.storage_class || configuration?.params?.pxc?.storage_class;
   const clusterParameters: UpdateDBClusterFormValues = {
     nodes: isCluster ? selectedDBCluster.clusterSize : MIN_NODES,
     databaseType: {
@@ -78,9 +80,10 @@ export const getEditInitialValues = (
     disk: selectedDBCluster.disk,
     memory: selectedDBCluster.memory,
     configuration: configuration?.params?.pxc?.configuration || configuration?.params?.replicaset?.configuration,
-    expose: configuration?.expose || configuration?.exposed, //TODO 11031
+    expose: configuration?.exposed,
     internetFacing: configuration?.internet_facing,
-    sourceRanges: configuration?.source_ranges?.map((item) => ({ sourceRange: item })),
+    sourceRanges: sourceRangesArray,
+    ...(storageClass && { storageClass: { label: storageClass, value: storageClass } }),
   };
   const isMatchSize = (type: DBClusterResources) =>
     DEFAULT_SIZES[type].cpu === selectedDBCluster.cpu &&

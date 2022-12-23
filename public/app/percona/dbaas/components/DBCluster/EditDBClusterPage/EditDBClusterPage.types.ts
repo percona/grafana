@@ -28,7 +28,7 @@ export interface AddDBClusterFormValues {
   [BasicOptionsFields.kubernetesCluster]?: KubernetesOption;
   [BasicOptionsFields.name]?: string;
   [ConfigurationFields.configuration]?: string;
-  // TODO [MySQLConfigurationFields.storageClass]?: string;
+  [ConfigurationFields.storageClass]?: SelectableValue<string>;
   [NetworkAndSecurityFields.expose]?: boolean;
   [NetworkAndSecurityFields.sourceRanges]?: Array<{}> | [];
   [NetworkAndSecurityFields.internetFacing]?: boolean;
@@ -42,7 +42,7 @@ export interface UpdateDBClusterFormValues {
   [AdvancedOptionsFields.disk]: number;
   [AdvancedOptionsFields.memory]: number;
   [ConfigurationFields.configuration]?: string;
-  // TODO [MySQLConfigurationFields.storageClass]?: string;
+  [ConfigurationFields.storageClass]?: SelectableValue<string>;
   [ConfigurationFields.configuration]?: string;
   [NetworkAndSecurityFields.expose]?: boolean;
   [NetworkAndSecurityFields.sourceRanges]?: Array<{}> | [];

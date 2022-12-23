@@ -1,13 +1,14 @@
-import { TextareaInputField } from '@percona/platform-core';
+import { TextareaInputField, AsyncSelectField } from '@percona/platform-core';
 import React, { FC, useMemo } from 'react';
 
 import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet';
 import { Databases } from '../../../../../../shared/core';
 import { Messages } from '../DBClusterAdvancedOptions.messages';
 
+import { ConfigurationService } from './Configurations.service';
 import { ConfigurationFields, ConfigurationProps } from './Configurations.types';
 
-export const Configurations: FC<ConfigurationProps> = ({ databaseType }) => {
+export const Configurations: FC<ConfigurationProps> = ({ databaseType, k8sClusterName }) => {
   const label = useMemo(
     () =>
       databaseType === Databases.mysql
@@ -26,13 +27,16 @@ export const Configurations: FC<ConfigurationProps> = ({ databaseType }) => {
         : 'Database Configuration',
     [databaseType]
   );
+
   return (
     <FieldSet label={fieldSetLabel} data-testid={'pxc-configurations'}>
-      {/*<AsyncSelectField*/}
-      {/*  name={MySQLConfigurationFields.storageClass}*/}
-      {/*  loadOptions={loadAsyncOptions}*/}
-      {/*  label={Messages.labels.storageClass}*/}
-      {/*/>*/}
+      <AsyncSelectField
+        name={ConfigurationFields.storageClass}
+        loadOptions={() => ConfigurationService.loadStorageClassOptions(k8sClusterName)}
+        defaultOptions
+        placeholder={Messages.placeholders.storageClass}
+        label={Messages.labels.storageClass}
+      />
       <TextareaInputField name={ConfigurationFields.configuration} label={label} />
     </FieldSet>
   );

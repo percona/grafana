@@ -6,4 +6,5 @@ export enum ConfigurationFields {
 
 export interface ConfigurationProps {
   databaseType: Databases;
+  k8sClusterName: string;
 }

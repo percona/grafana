@@ -63,9 +63,8 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   const [loadingAllocatedResources, setLoadingAllocatedResources] = useState(false);
   const [expectedResources, setExpectedResources] = useState<DBClusterExpectedResources>();
   const [loadingExpectedResources, setLoadingExpectedResources] = useState(false);
-  // const { result, loading } = useSelector(getEditDBClusterResources);
+  // TODO refactoring move "selectedCliuster ? ():()" to separate function which will return correct set of values
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const mounted = { current: true };
   const { required, min } = validators;
   const { change } = form;
@@ -278,7 +277,10 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
           </Overlay>
         </div>
       </div>
-      <Configurations databaseType={selectedCluster ? selectedCluster.databaseType : databaseType?.value} />
+      <Configurations
+        databaseType={selectedCluster ? selectedCluster.databaseType : databaseType?.value}
+        k8sClusterName={selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster.value}
+      />
       <NetworkAndSecurity mode={mode} />
     </FieldSet>
   );

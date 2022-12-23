@@ -35,7 +35,7 @@ export interface DBCluster {
   configuration?: string;
   internetFacing?: boolean;
   sourceRanges?: string[];
-  //TODO storage_class?: string;
+  storageClass?: string;
 }
 
 export enum DBClusterStatus {
@@ -212,26 +212,6 @@ export interface DBClusterExpectedResourcesAPI {
 export interface DBClusterConfigurationAPI {
   pxc_cluster: DBClusterPayload;
   psmdb_cluster: DBClusterPayload;
-  // pxc_cluster: {
-  //   name: string;
-  //   state: DBClusterStatus;
-  //   operation: DBClusterOperationAPI;
-  //   params: DBClusterParamsAPI;
-  //   exposed?: boolean;
-  //   installed_image: string;
-  //   available_image: 'string';
-  //   internet_facing: true;
-  // };
-  // psmdb_cluster: {
-  //   name: string;
-  //   state: DBClusterStatus;
-  //   operation: DBClusterOperationAPI;
-  //   params: DBClusterParamsAPI;
-  //   exposed?: boolean;
-  //   installed_image: string;
-  //   available_image: 'string';
-  //   internet_facing: true;
-  // };
 }
 
 interface ResourcesAPI {
