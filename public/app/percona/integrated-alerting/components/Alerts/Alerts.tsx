@@ -12,6 +12,7 @@ import { useUnifiedAlertingSelector } from 'app/features/alerting/unified/hooks/
 import { fetchAmAlertsAction } from 'app/features/alerting/unified/state/actions';
 import { makeLabelBasedSilenceLink } from 'app/features/alerting/unified/utils/misc';
 import { initialAsyncRequestState } from 'app/features/alerting/unified/utils/redux';
+import { useRecurringCall } from 'app/percona/backup/hooks/recurringCall.hook';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -23,6 +24,7 @@ import { Severity } from '../Severity';
 import { Table } from '../Table/Table';
 
 import { AlertDetails } from './AlertDetails/AlertDetails';
+import { DATA_INTERVAL } from './Alerts.constants';
 import { getStyles } from './Alerts.styles';
 
 const {
@@ -41,6 +43,7 @@ export const Alerts: FC = () => {
   const style = useStyles2(getStyles);
   const navModel = useNavModel('integrated-alerting-alerts');
   const alertsRequests = useUnifiedAlertingSelector((state) => state.amAlerts);
+  const [triggerTimeout] = useRecurringCall();
   const alertsRequest = alertsRequests['grafana'] || initialAsyncRequestState;
 
   const columns = React.useMemo(
@@ -132,13 +135,15 @@ export const Alerts: FC = () => {
     []
   );
 
+  const getData = useCallback(() => dispatch(fetchAmAlertsAction('grafana')), []);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('alertingEnabled'), []);
 
   useEffect(() => {
-    dispatch(fetchAmAlertsAction('grafana'));
+    getData().then(() => triggerTimeout(getData, DATA_INTERVAL));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getData]);
 
   return (
     <OldPage navModel={navModel}>
