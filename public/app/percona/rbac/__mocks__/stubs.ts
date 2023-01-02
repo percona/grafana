@@ -1,5 +1,6 @@
 import { UserItem } from 'app/percona/shared/core/reducers/users/users.types';
 import { AccessRole } from 'app/percona/shared/services/roles/Roles.types';
+import { PrometheusDatasource } from 'app/plugins/datasource/prometheus/datasource';
 import { OrgRole, OrgUser } from 'app/types';
 
 export const stubUserSingleRole: OrgUser = {
@@ -42,3 +43,16 @@ export const stubUsersMap: Record<number, UserItem> = {
   2: stubUsers[0],
   3: stubUsers[1],
 };
+
+export const dataSourceMock = {
+  createQuery: jest.fn((q) => q),
+  getInitHints: () => [],
+  getPrometheusTime: jest.fn((date, roundup) => 123),
+  getQueryHints: jest.fn(() => []),
+  languageProvider: {
+    start: () => Promise.resolve([]),
+    syntax: () => {},
+    getLabelKeys: () => [],
+    metrics: [],
+  },
+} as unknown as PrometheusDatasource;

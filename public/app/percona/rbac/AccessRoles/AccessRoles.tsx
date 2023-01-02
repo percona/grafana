@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
 
-import { locationService } from '@grafana/runtime';
-import { Button, useStyles2 } from '@grafana/ui';
+import { LinkButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
@@ -31,14 +30,10 @@ const AccessRolesPage: FC = () => {
     dispatch(fetchRolesAction());
   }, [dispatch]);
 
-  const handleCreate = () => {
-    locationService.push('/roles/create');
-  };
-
   return (
     <Page navId="rbac-roles">
       <Page.Contents isLoading={isLoading}>
-        <FeatureLoader featureName={Messages.rbac} featureSelector={featureSelector}>
+        <FeatureLoader featureSelector={featureSelector}>
           <h2 data-testid="access-roles-title">{Messages.title}</h2>
           <p className={styles.description}>
             {Messages.subtitle.text}
@@ -46,7 +41,9 @@ const AccessRolesPage: FC = () => {
             {Messages.subtitle.dot}
           </p>
           <div className={styles.createContainer}>
-            <Button onClick={handleCreate}>{Messages.create}</Button>
+            <LinkButton href="/roles/create" size="md" variant="primary" data-testid="access-roles-create-role">
+              {Messages.create}
+            </LinkButton>
           </div>
           <AccessRolesTable items={rows} />
         </FeatureLoader>

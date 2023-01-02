@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { Field, Input, PageToolbar, ToolbarButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
@@ -43,15 +43,20 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
   return (
     <FormProvider {...methods}>
       <PageToolbar title={title} onGoBack={handleGoBack}>
-        <ToolbarButton type="button" onClick={onCancel}>
+        <ToolbarButton data-testid="add-edit-role-cancel" type="button" onClick={onCancel}>
           {cancelLabel}
         </ToolbarButton>
-        <ToolbarButton type="submit" variant="primary" onClick={methods.handleSubmit(onSubmit)}>
+        <ToolbarButton
+          data-testid="add-edit-role-submit"
+          type="submit"
+          variant="primary"
+          onClick={methods.handleSubmit(onSubmit)}
+        >
           {submitLabel}
         </ToolbarButton>
       </PageToolbar>
       <Page.Contents isLoading={isLoading}>
-        <FeatureLoader featureName={Messages.rbac} featureSelector={featureSelector}>
+        <FeatureLoader featureSelector={featureSelector}>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <div className={styles.page}>
               <Field label={Messages.name.label} invalid={!!errors.title} error={errors.title?.message}>
@@ -72,19 +77,12 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
                 label={Messages.metrics.label}
                 invalid={!!errors.filter}
                 error={errors.filter?.message}
-                description={
-                  <>
-                    {Messages.metrics.description}
-                    <Link className={styles.link} to="/inventory/services">
-                      {Messages.metrics.link}
-                    </Link>
-                    .
-                  </>
-                }
+                description={Messages.metrics.description}
               >
                 <LabelsField control={methods.control} />
               </Field>
             </div>
+            {/* Cancel button was triggering on form submit */}
             <button type="submit" className={styles.none} />
           </form>
         </FeatureLoader>
