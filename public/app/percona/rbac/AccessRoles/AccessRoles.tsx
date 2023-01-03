@@ -4,6 +4,7 @@ import { LinkButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
+import { fetchUsersListAction } from 'app/percona/shared/core/reducers/users/users';
 import { getPerconaSettings, getAccessRoles, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -28,6 +29,7 @@ const AccessRolesPage: FC = () => {
 
   useEffect(() => {
     dispatch(fetchRolesAction());
+    dispatch(fetchUsersListAction());
   }, [dispatch]);
 
   return (
