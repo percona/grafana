@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React, { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 
@@ -103,12 +103,24 @@ describe('AddEditRoleForm', () => {
     expect(onCancelFc).toHaveBeenCalled();
   });
 
-  // TODO fix
-  xit('role name is required', () => {
+  it('role name is required', async () => {
     renderWithDefaults();
     const submitButton = screen.getByTestId('add-edit-role-submit');
     submitButton.click();
 
-    expect(screen.getByText('Role name is required')).toBeInTheDocument();
+    expect(onSubmitFc).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(screen.queryByText('Role name is required')).toBeInTheDocument());
+  });
+
+  it('calls submit', async () => {
+    renderWithDefaults();
+    const titleField = screen.getByTestId('role-name-field');
+    fireEvent.change(titleField, { target: { value: 'Role Title' } });
+
+    const submitButton = screen.getByTestId('add-edit-role-submit');
+    submitButton.click();
+
+    await waitFor(() => expect(onSubmitFc).toHaveBeenCalled());
   });
 });

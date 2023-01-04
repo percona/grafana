@@ -14,7 +14,13 @@ const NameCell: FC<NameCellProps> = ({ role }) => {
     <div>
       <span>{role.title}</span>
       {role.isDefault && (
-        <Badge className={styles.button} color="blue" text={Messages.default.text} tooltip={Messages.default.tooltip} />
+        <Badge
+          data-testid="role-default-badge"
+          className={styles.button}
+          color="blue"
+          text={Messages.default.text}
+          tooltip={Messages.default.tooltip}
+        />
       )}
     </div>
   );

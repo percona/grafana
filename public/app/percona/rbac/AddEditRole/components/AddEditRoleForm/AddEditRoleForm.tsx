@@ -61,6 +61,7 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
             <div className={styles.page}>
               <Field label={Messages.name.label} invalid={!!errors.title} error={errors.title?.message}>
                 <Input
+                  data-testid="role-name-field"
                   {...methods.register('title', { required: Messages.name.required })}
                   type="text"
                   placeholder={Messages.name.placeholder}
@@ -68,6 +69,7 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
               </Field>
               <Field label={Messages.description.label} description={Messages.description.description}>
                 <Input
+                  data-testid="role-description-field"
                   {...methods.register('description')}
                   type="text"
                   placeholder={Messages.description.placeholder}
