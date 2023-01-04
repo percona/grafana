@@ -29,7 +29,7 @@ import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
 import { LocationType, StorageLocation } from '../StorageLocations/StorageLocations.types';
 
-import { LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN, DATA_INTERVAL } from './BackupInventory.constants';
+import { DATA_INTERVAL, LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN } from './BackupInventory.constants';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
 import { Backup } from './BackupInventory.types';
@@ -97,6 +97,11 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
         width: '250px',
+        Cell: ({ row, value }) => (
+          <span>
+            {value} ({backupLocationMap.current[row.values.id]?.type})
+          </span>
+        ),
       },
       {
         Header: Messages.backupInventory.table.columns.actions,
@@ -114,7 +119,7 @@ export const BackupInventory: FC = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [backupLocationMap]
   );
   const styles = useStyles2(getStyles);
 
