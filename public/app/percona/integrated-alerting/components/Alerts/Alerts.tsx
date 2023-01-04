@@ -169,6 +169,7 @@ export const Alerts: FC = () => {
             data={alertsRequest?.result || []}
             columns={columns}
             pendingRequest={alertsRequest?.loading}
+            autoResetExpanded={false}
             emptyMessage={
               <h1>
                 <Icon name="check-circle" size="xxl" /> No alerts detected
