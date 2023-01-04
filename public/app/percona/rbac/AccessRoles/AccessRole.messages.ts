@@ -33,6 +33,10 @@ export const Messages = {
       `There are users associated to this role. Please assign a different role to users with the ”${role}” role.`,
     submit: 'Confirm and delete role',
     cancel: 'Cancel',
+    success: {
+      title: (role: string) => `Role “${role}“ deleted`,
+      body: 'The role no longer exists',
+    },
   },
   create: 'Create',
   noRoles: 'No roles available',

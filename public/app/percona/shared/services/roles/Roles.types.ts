@@ -31,7 +31,6 @@ export type UpdateAccessRolePayload = Omit<UpdateAccessRole, 'roleId'> & {
 
 export interface DeleteAccessRolePayload {
   role_id: number;
-  // todo: should contain role_id to change
 }
 
 export interface AssignRolePayload {

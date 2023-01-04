@@ -13,7 +13,7 @@ const AccessRoleHeader: FC = () => {
 
   useEffect(() => {
     // fetch in the header component
-    // to prevent grafana code
+    // to prevent modifying grafana code
     dispatch(fetchRolesAction());
     dispatch(fetchUsersListAction());
   }, [dispatch]);

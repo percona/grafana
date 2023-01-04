@@ -21,7 +21,6 @@ const AddRolePage: FC = () => {
       appEvents.emit(AppEvents.alertSuccess, [Messages.success.title(values.title), Messages.success.body]);
       locationService.push('/roles');
     } catch (e) {
-      console.log(e);
       logger.error(e);
     }
   };

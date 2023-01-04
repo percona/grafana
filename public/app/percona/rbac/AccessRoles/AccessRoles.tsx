@@ -19,6 +19,7 @@ const AccessRolesPage: FC = () => {
   const { result: settings } = useSelector(getPerconaSettings);
   const { isLoading, roles } = useSelector(getAccessRoles);
   const rows = useMemo(
+    // show default role first
     () => roles.map((role) => toAccessRoleRow(role, settings?.defaultRoleId)).sort(orderRole),
     [roles, settings?.defaultRoleId]
   );

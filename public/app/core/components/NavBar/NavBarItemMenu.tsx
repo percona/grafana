@@ -107,6 +107,8 @@ function getStyles(theme: GrafanaTheme2, reverseDirection?: boolean) {
       display: flex;
       flex-direction: column;
       list-style: none;
+      // @PERCONA
+      // increase minimum height to fit all settings items
       max-height: 600px;
       max-width: 300px;
       min-width: 140px;

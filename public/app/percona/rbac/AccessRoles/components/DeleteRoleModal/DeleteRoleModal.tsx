@@ -1,7 +1,9 @@
 import { logger } from '@percona/platform-core';
 import React, { FC, useMemo } from 'react';
 
+import { AppEvents } from '@grafana/data';
 import { Button, Modal } from '@grafana/ui';
+import { appEvents } from 'app/core/core';
 import { deleteRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { getUsersInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
@@ -22,7 +24,8 @@ const DeleteRoleModal: FC<DeleteRoleModalProps> = ({ role, isOpen, onCancel }) =
         deleteRoleAction({
           toDeleteId: role.roleId,
         })
-      );
+      ).unwrap();
+      appEvents.emit(AppEvents.alertSuccess, [Messages.delete.success.title(role.title), Messages.delete.success.body]);
       onCancel();
     } catch (e) {
       logger.error(e);

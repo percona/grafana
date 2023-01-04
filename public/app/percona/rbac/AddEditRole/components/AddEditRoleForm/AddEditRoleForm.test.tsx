@@ -91,7 +91,7 @@ describe('AddEditRoleForm', () => {
     expect(screen.getByText('Insufficient access permissions.')).toBeInTheDocument();
   });
 
-  it("shows warning if access role aren't enabled", () => {
+  it("shows warning if access roles aren't enabled", () => {
     renderWithDefaults({ enableAccessControl: false });
     expect(screen.getByText('Feature is disabled.')).toBeInTheDocument();
   });

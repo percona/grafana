@@ -47,7 +47,7 @@ const LabelsBuilder: FC<LabelsBuilderProps> = ({ value, onChange }) => {
         hideOperations
       />
       <div />
-      <QueryPreview query={query.expr} />
+      {query.expr && <QueryPreview query={query.expr} />}
     </div>
   );
 };
