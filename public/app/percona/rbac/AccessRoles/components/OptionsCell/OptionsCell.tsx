@@ -1,13 +1,11 @@
 import { logger } from '@percona/platform-core';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { locationService } from '@grafana/runtime';
 import { Dropdown, IconButton, Menu } from '@grafana/ui';
 import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { setAsDefaultRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
-import { getDefaultRole } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
 
 import { Messages } from '../../AccessRole.messages';
 import DeleteRoleModal from '../DeleteRoleModal';
@@ -17,12 +15,10 @@ import { OptionsCellProps } from './OptionsCell.types';
 
 const OptionsCell: FC<OptionsCellProps> = ({ role }) => {
   const dispatch = useAppDispatch();
-  const defaultRole = useSelector(getDefaultRole);
-  const isDefault = useMemo(() => defaultRole?.roleId === role.roleId, [role, defaultRole]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const handleSetAsDefault = async () => {
-    if (isDefault) {
+    if (role.isDefault) {
       return;
     }
 
@@ -39,7 +35,7 @@ const OptionsCell: FC<OptionsCellProps> = ({ role }) => {
   };
 
   const handleDelete = () => {
-    if (isDefault) {
+    if (role.isDefault) {
       return;
     }
 
@@ -53,7 +49,7 @@ const OptionsCell: FC<OptionsCellProps> = ({ role }) => {
   const menu = () => (
     <Menu>
       <Menu.Item label={Messages.options.edit} icon="pen" onClick={handleEdit} />
-      {!isDefault && (
+      {!role.isDefault && (
         <>
           <Menu.Item label={Messages.options.default} icon="user-check" onClick={handleSetAsDefault} />
           <Menu.Item label={Messages.options.delete} icon="trash-alt" onClick={handleDelete} />
@@ -66,7 +62,7 @@ const OptionsCell: FC<OptionsCellProps> = ({ role }) => {
     <div className={styles.Cell}>
       <DeleteRoleModal isOpen={deleteModalOpen} onCancel={handleDeleteCancel} role={role} />
       <Dropdown overlay={menu}>
-        <IconButton name="ellipsis-v" />
+        <IconButton ariaLabel="Open role options" name="ellipsis-v" />
       </Dropdown>
     </div>
   );

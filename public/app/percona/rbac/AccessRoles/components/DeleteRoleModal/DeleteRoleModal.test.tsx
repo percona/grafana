@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React, { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 
+import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -54,8 +55,18 @@ describe('DeleteRoleModal', () => {
     expect(screen.queryByText('Confirm and delete role')).toBeNull();
   });
 
-  it('shows delete button if the role is assigned', () => {
+  it('shows delete button if the role is not assigned', () => {
     renderDefault(true, stubRoles[1]);
     expect(screen.queryByText('Confirm and delete role')).not.toBeNull();
+  });
+
+  it('calls delete', () => {
+    const deleteRoleActionSpy = jest.spyOn(RolesReducer, 'deleteRoleAction');
+    renderDefault(true, stubRoles[1]);
+
+    const deleteButton = screen.getByText('Confirm and delete role');
+    fireEvent.click(deleteButton);
+
+    expect(deleteRoleActionSpy).toHaveBeenCalled();
   });
 });
