@@ -55,7 +55,7 @@ const AddEditRoleForm: FC<AddEditRoleFormProps> = ({
           {submitLabel}
         </ToolbarButton>
       </PageToolbar>
-      <Page.Contents isLoading={isLoading}>
+      <Page.Contents isLoading={isLoading} className={styles.pageContainer}>
         <FeatureLoader featureSelector={featureSelector}>
           <form onSubmit={methods.handleSubmit(onSubmit)}>
             <div className={styles.page}>
