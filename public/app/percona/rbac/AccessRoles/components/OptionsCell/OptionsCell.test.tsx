@@ -3,6 +3,7 @@ import React, { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 
 import { HistoryWrapper, locationService, setLocationService } from '@grafana/runtime';
+import * as Reducers from 'app/percona/shared/core/reducers';
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
@@ -10,6 +11,9 @@ import { StoreState } from 'app/types';
 import { stubRoles, stubUsers, stubUsersMap } from '../../../__mocks__/stubs';
 
 import OptionsCell from './OptionsCell';
+
+jest.mock('app/percona/shared/services/roles/Roles.service');
+jest.mock('app/percona/settings/Settings.service');
 
 const wrapWithProvider = (children: ReactElement) => (
   <Provider
@@ -77,6 +81,7 @@ describe('OptionsCell', () => {
 
   it('sets role as default', async () => {
     const setAsDefaultRoleActionSpy = jest.spyOn(RolesReducer, 'setAsDefaultRoleAction');
+    const fetchSettingsActionSpy = jest.spyOn(Reducers, 'fetchSettingsAction');
 
     renderDefault();
 
@@ -88,7 +93,8 @@ describe('OptionsCell', () => {
     const setDefaultButton = screen.getByText('Set as default');
     fireEvent.click(setDefaultButton);
 
-    expect(setAsDefaultRoleActionSpy).toHaveBeenCalled();
+    await waitFor(() => expect(setAsDefaultRoleActionSpy).toHaveBeenCalled());
+    await waitFor(() => expect(fetchSettingsActionSpy).toHaveBeenCalled());
   });
 
   it('opens delete modal when trying to delete', async () => {
@@ -99,8 +105,8 @@ describe('OptionsCell', () => {
 
     await waitFor(() => expect(screen.queryByText('Delete')).toBeInTheDocument());
 
-    const setDefaultButton = screen.getByText('Delete');
-    fireEvent.click(setDefaultButton);
+    const deleteButton = screen.getByText('Delete');
+    fireEvent.click(deleteButton);
 
     await waitFor(() => expect(screen.getByText('Delete "Role #1" role')).toBeInTheDocument());
   });
