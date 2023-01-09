@@ -17,7 +17,7 @@ export interface NetworkAndSecurityProps {
 export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ mode }) => {
   const styles = useStyles(getStyles);
   return (
-    <FieldSet label={Messages.fieldSets.networkAndSecurity} dataTestId={'network-and-security'}>
+    <FieldSet label={Messages.fieldSets.networkAndSecurity} data-testid={'network-and-security'}>
       <CheckboxField
         name={NetworkAndSecurityFields.expose}
         label={Messages.labels.expose}

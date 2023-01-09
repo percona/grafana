@@ -12,6 +12,7 @@ import { Kubernetes } from '../../../Kubernetes/Kubernetes.types';
 import { KubernetesClusterStatus } from '../../../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 import { DBClusterStatus } from '../../DBCluster.types';
+import { DBClusterResources } from '../DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import { AddDBClusterFormValues, UpdateDBClusterFormValues } from '../EditDBClusterPage.types';
 
 import { useEditDBClusterPageDefaultValues } from './useEditDBClusterPageDefaultValues';
@@ -135,8 +136,8 @@ describe('DBClusterHooks::', () => {
         memory: 1001,
         cpu: 1002,
         disk: 1003,
-        nodes: 3,
-        topology: 'single',
+        nodes: 1,
+        resources: DBClusterResources.custom,
       })
     );
   });

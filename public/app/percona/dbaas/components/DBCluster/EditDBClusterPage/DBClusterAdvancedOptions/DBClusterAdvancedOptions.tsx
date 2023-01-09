@@ -277,7 +277,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
       </div>
       <Configurations
         databaseType={selectedCluster ? selectedCluster.databaseType : databaseType?.value}
-        k8sClusterName={selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster.value}
+        k8sClusterName={selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster?.value}
       />
       <NetworkAndSecurity mode={mode} />
     </FieldSet>

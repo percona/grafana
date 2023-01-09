@@ -41,14 +41,5 @@ describe('EditDBClusterAdvancedOptions.utils::', () => {
       expect(canGetExpectedResources(kubernetesCluster, { ...values, nodes: 2 })).toBeTruthy();
       expect(canGetExpectedResources(kubernetesCluster, { ...values, nodes: '7' })).toBeTruthy();
     });
-    it('returns true when resources are valid and topology is not cluster', () => {
-      expect(canGetExpectedResources(kubernetesCluster, { ...values })).toBeTruthy();
-      expect(
-        canGetExpectedResources(kubernetesCluster, {
-          ...values,
-          nodes: 'test_invalid_nodes',
-        })
-      ).toBeTruthy();
-    });
   });
 });
