@@ -118,10 +118,10 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
       !selectedCluster && setCustomDisk(disk);
     }
 
-    if (resources?.value && resources?.value !== DBClusterResources.custom) {
-      change(AdvancedOptionsFields.cpu, DEFAULT_SIZES[resources?.value].cpu);
-      change(AdvancedOptionsFields.memory, DEFAULT_SIZES[resources?.value].memory);
-      !selectedCluster && change(AdvancedOptionsFields.disk, DEFAULT_SIZES[resources?.value].disk);
+    if (resources.value && resources.value !== DBClusterResources.custom) {
+      change(AdvancedOptionsFields.cpu, DEFAULT_SIZES[resources.value].cpu);
+      change(AdvancedOptionsFields.memory, DEFAULT_SIZES[resources.value].memory);
+      !selectedCluster && change(AdvancedOptionsFields.disk, DEFAULT_SIZES[resources.value].disk);
     } else {
       change(AdvancedOptionsFields.cpu, customCPU);
       change(AdvancedOptionsFields.memory, customMemory);
@@ -264,7 +264,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
             />
             <ResourcesBar
               resourceLabel={Messages.labels.disk}
-              resourceEmptyValueMessage={'Information about free disk space on the Kubernetes cluster is unavailable'}
+              resourceEmptyValueMessage="Information about free disk space on the Kubernetes cluster is unavailable"
               icon={<Disk />}
               total={allocatedResources?.total.disk}
               allocated={allocatedResources?.allocated.disk}

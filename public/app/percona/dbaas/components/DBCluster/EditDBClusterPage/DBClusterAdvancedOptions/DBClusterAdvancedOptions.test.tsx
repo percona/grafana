@@ -32,7 +32,7 @@ describe('DBClusterAdvancedOptions::', () => {
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
-              mode={'create'}
+              mode="create"
               showUnsafeConfigurationWarning={true}
               setShowUnsafeConfigurationWarning={jest.fn()}
               form={form}
@@ -68,7 +68,7 @@ describe('DBClusterAdvancedOptions::', () => {
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
-              mode={'edit'}
+              mode="edit"
               showUnsafeConfigurationWarning={true}
               setShowUnsafeConfigurationWarning={jest.fn()}
               form={form}
@@ -104,7 +104,7 @@ describe('DBClusterAdvancedOptions::', () => {
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
-              mode={'create'}
+              mode="create"
               showUnsafeConfigurationWarning={true}
               setShowUnsafeConfigurationWarning={jest.fn()}
               form={form}
@@ -135,7 +135,7 @@ describe('DBClusterAdvancedOptions::', () => {
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
-              mode={'create'}
+              mode="create"
               showUnsafeConfigurationWarning={true}
               setShowUnsafeConfigurationWarning={jest.fn()}
               form={form}
@@ -172,7 +172,7 @@ describe('DBClusterAdvancedOptions::', () => {
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
-              mode={'create'}
+              mode="create"
               showUnsafeConfigurationWarning={true}
               setShowUnsafeConfigurationWarning={jest.fn()}
               form={form}

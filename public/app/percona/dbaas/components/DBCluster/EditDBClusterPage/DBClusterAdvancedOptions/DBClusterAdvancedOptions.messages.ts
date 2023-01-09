@@ -31,7 +31,7 @@ export const Messages = {
 
   tooltips: {
     expose:
-      'You will make database cluster available to connect from the internet. To limit access you need to specify source ranges',
+      'You will make this database cluster available to connect from the internet. To limit access you need to specify source ranges',
   },
   placeholders: {
     storageClass: 'choose storage class option',

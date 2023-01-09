@@ -29,7 +29,7 @@ export const Configurations: FC<ConfigurationProps> = ({ databaseType, k8sCluste
   );
 
   return (
-    <FieldSet label={fieldSetLabel} data-testid={'pxc-configurations'}>
+    <FieldSet label={fieldSetLabel} data-testid="pxc-configurations">
       <AsyncSelectField
         name={ConfigurationFields.storageClass}
         loadOptions={() => ConfigurationService.loadStorageClassOptions(k8sClusterName)}
