@@ -189,7 +189,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   useEffect(() => {
     const dbTypeValue = selectedCluster ? selectedCluster.databaseType : databaseType?.value;
     if (dbTypeValue === Databases.mongodb) {
-      nodes === 1 ? setShowUnsafeConfigurationWarning(true) : setShowUnsafeConfigurationWarning(false);
+      setShowUnsafeConfigurationWarning(nodes === 1)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [databaseType, nodes]);
