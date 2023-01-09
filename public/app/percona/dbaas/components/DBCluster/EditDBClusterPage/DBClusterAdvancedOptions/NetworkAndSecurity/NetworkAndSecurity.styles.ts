@@ -4,7 +4,7 @@ import { GrafanaTheme } from '@grafana/data';
 
 export const getStyles = ({ spacing }: GrafanaTheme) => ({
   errorWrapper: css`
-    div:only-child> div {
+    div:only-child > div {
       display: none;
     },
 
