@@ -1,15 +1,15 @@
 import { css } from '@emotion/css';
 
-import { GrafanaTheme } from '@grafana/data';
+import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ spacing }: GrafanaTheme) => ({
+export const getStyles = ({ spacing }: GrafanaTheme2) => ({
   optionsWrapper: css`
-    margin-top: ${spacing.lg};
+    margin-top: ${spacing(3)};
     max-width: 720px;
   `,
 
   collapsableSection: css`
     max-width: 170px;
-    margin: 48px 0 24px 0;
+    margin: ${spacing(6)} 0 ${spacing(3)} 0;
   `,
 });

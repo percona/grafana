@@ -4,7 +4,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Redirect, useHistory } from 'react-router-dom';
 
-import { Spinner, useStyles } from '@grafana/ui/src';
+import { Spinner, useStyles2 } from '@grafana/ui/src';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { useDispatch } from 'app/types';
 
@@ -35,7 +35,7 @@ import { useEditDBClusterPageDefaultValues } from './hooks/useEditDBClusterPageD
 import { useEditDBClusterPageResult } from './hooks/useEditDBClusterPageResult';
 
 export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const dispatch = useDispatch();
   const history = useHistory();
   const mode = useDefaultMode();
