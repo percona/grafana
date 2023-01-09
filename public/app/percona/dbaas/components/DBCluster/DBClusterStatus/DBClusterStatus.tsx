@@ -70,7 +70,7 @@ export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setLogsMo
           finishedSteps={finishedSteps || 0}
           totalSteps={totalSteps || 0}
           message={getProgressMessage(status, prevStatus.current)}
-          data-testid="cluster-progress-bar"
+          dataTestId="cluster-progress-bar"
         />
       ) : (
         <span className={cx(styles.status, statusStyles)} data-testid={`cluster-status-${STATUS_DATA_QA[status]}`}>
