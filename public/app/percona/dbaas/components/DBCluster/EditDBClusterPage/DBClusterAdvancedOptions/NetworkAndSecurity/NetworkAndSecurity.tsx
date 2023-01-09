@@ -23,7 +23,7 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ mode }) => {
         label={Messages.labels.expose}
         tooltipIcon="info-circle"
         tooltipText={Messages.tooltips.expose}
-        noError={true}
+        noError
         disabled={mode === 'edit'}
       />
       <CheckboxField
