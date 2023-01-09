@@ -24,11 +24,10 @@ jest.mock('@percona/platform-core', () => {
 
 describe('DBClusterAdvancedOptions::', () => {
   it('renders correctly in create mode', async () => {
-    // @ts-ignore
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn()}
+          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
@@ -60,11 +59,10 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('renders correctly in edit mode', async () => {
-    // @ts-ignore
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn()}
+          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
@@ -95,11 +93,10 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('renders correctly with initial values', async () => {
-    // @ts-ignore
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn()}
+          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
           initialValues={{ [AdvancedOptionsFields.nodes]: 3 }}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
@@ -126,11 +123,10 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should disable memory, cpu and disk when resources are not custom', async () => {
-    // @ts-ignore
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn()}
+          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
           initialValues={{ [AdvancedOptionsFields.resources]: DBClusterResources.small }}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
@@ -163,12 +159,13 @@ describe('DBClusterAdvancedOptions::', () => {
   });
 
   it('should enable memory and cpu when resources is custom', async () => {
-    // @ts-ignore
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn()}
-          initialValues={{ [AdvancedOptionsFields.resources]: DBClusterResources.small }}
+          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
+          initialValues={{
+            [AdvancedOptionsFields.resources]: DBClusterResources.small,
+          }}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions

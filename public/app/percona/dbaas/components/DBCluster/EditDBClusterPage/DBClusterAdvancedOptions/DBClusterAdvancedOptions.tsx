@@ -118,7 +118,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
       !selectedCluster && setCustomDisk(disk);
     }
 
-    if (resources.value && resources.value !== DBClusterResources.custom) {
+    if (resources?.value && resources.value !== DBClusterResources.custom) {
       change(AdvancedOptionsFields.cpu, DEFAULT_SIZES[resources.value].cpu);
       change(AdvancedOptionsFields.memory, DEFAULT_SIZES[resources.value].memory);
       !selectedCluster && change(AdvancedOptionsFields.disk, DEFAULT_SIZES[resources.value].disk);
