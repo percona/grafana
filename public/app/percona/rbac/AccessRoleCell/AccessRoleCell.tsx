@@ -32,7 +32,9 @@ const AccessRoleCell: FC<AccessRoleCellProps> = ({ user }) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const roleIds = selected as Array<SelectableValue<number>>;
     setValue(roleIds);
-    const ids = roleIds.map((v) => Number(v.value));
+    // value will always be defined
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const ids = roleIds.map((v) => v.value as number);
     const payload = {
       roleIds: ids,
       userId: user.userId,

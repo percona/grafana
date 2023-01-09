@@ -25,7 +25,7 @@ const EditRolePage: FC = () => {
     const fetchRole = async (id: string) => {
       setIsLoading(true);
       try {
-        const role = await RolesService.get(Number(id));
+        const role = await RolesService.get(parseInt(id, 10));
         setRole(role);
       } catch (error) {
         logger.error(error);
