@@ -3,7 +3,7 @@ export const Messages = {
     advancedSettings: 'Advanced Settings',
     pxcConfiguration: 'MySQL Configurations',
     mongodbConfiguration: 'MongoDB Configurations',
-    networkAndSecurity: 'Network and security',
+    networkAndSecurity: 'Network and Security',
   },
   labels: {
     nodes: 'Number of Nodes',
