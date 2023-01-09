@@ -38,11 +38,14 @@ export const useEditDBClusterPageDefaultValues = ({
     }
     if (mode === 'edit' && selectedDBCluster) {
       return getEditInitialValues(selectedDBCluster, configuration);
-    } else {
-      history.push(DB_CLUSTER_INVENTORY_URL);
     }
     return undefined;
-  }, [history, kubernetes, mode, preSelectedKubernetesCluster, selectedDBCluster, configuration]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history, kubernetes, mode, preSelectedKubernetesCluster, selectedDBCluster]);
+
+  if (mode !== 'create' && (mode !== 'edit' || !selectedDBCluster)) {
+    history.push(DB_CLUSTER_INVENTORY_URL);
+  }
 
   return [initialValues, selectedDBCluster];
 };

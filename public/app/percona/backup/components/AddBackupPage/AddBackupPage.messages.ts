@@ -11,10 +11,20 @@ export const Messages = {
   cancelAction: 'Cancel',
   retryTimes: 'Retry, times',
   retryInterval: 'Retry interval, seconds',
+  in: 'in',
+  on: 'on',
+  at: 'at',
   every: 'Every',
-  month: 'Month',
-  day: 'Day',
-  weekDay: 'Weekday',
+  everyMonth: 'Every month',
+  everyDay: 'Every day',
+  everyWeekDay: 'Every weekday',
+  everyHour: 'Every hour',
+  everyMinute: 'Every minute',
+  minute: 'Minutes',
+  hour: 'Hours',
+  month: 'Months',
+  day: 'Days',
+  weekDay: 'Weekdays',
   startTimeHour: 'Start time (hour)',
   startTimeMinute: 'Start time (minute)',
   advanceSettings: 'Advanced Settings:',
@@ -25,6 +35,7 @@ export const Messages = {
   backupInfo: 'Backup info',
   onDemand: 'On Demand',
   schedule: 'Schedule Backup',
+  scheduledTime: 'Scheduled time',
   scheduleName: 'Schedule',
   getModalTitle: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
@@ -40,4 +51,7 @@ export const Messages = {
 
     return 'Backup';
   },
+  backupDescription: 'Create a backup of a database immediately, to store a snapshot of its current state and data.',
+  scheduleBackupDescription:
+    'Create a task that takes regular backups of a database, according to the schedule that you specify.',
 };

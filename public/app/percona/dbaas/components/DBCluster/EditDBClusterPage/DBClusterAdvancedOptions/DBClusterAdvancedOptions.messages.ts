@@ -34,6 +34,6 @@ export const Messages = {
       'You will make this database cluster available to connect from the internet. To limit access you need to specify source ranges',
   },
   placeholders: {
-    storageClass: 'choose storage class option',
+    storageClass: 'storage class',
   },
 };
