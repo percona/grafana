@@ -143,7 +143,7 @@ export class PSMDBService extends DBClusterService {
       cpu: (dbCluster.params.replicaset?.compute_resources?.cpu_m || 0) / THOUSAND,
       disk: (dbCluster.params.replicaset?.disk_size || 0) / BILLION,
       status: dbCluster.state || DBClusterStatus.changing,
-      message: dbCluster.operation?.message, // TODO 11031 посмотреть, есть ли в новом апи
+      message: dbCluster.operation?.message,
       finishedSteps: dbCluster.operation?.finished_steps || 0,
       totalSteps: dbCluster.operation?.total_steps || 0,
       expose: dbCluster.exposed,

@@ -63,14 +63,8 @@ export const KubernetesInventory: FC<KubernetesInventoryProps> = ({ setMode }) =
   const [update, setUpdate] = useState(false);
   const [catchFromAsyncThunkAction] = useCatchCancellationError();
 
-  const loading = useMemo(
-    () => (kubernetesLoading || deleteKubernetesLoading || addKubernetesLoading) && !update,
-    [kubernetesLoading, deleteKubernetesLoading, addKubernetesLoading, update]
-  );
-  const k8sListShouldBeUpdated = useMemo(
-    () => kubernetes && kubernetes.find((item) => item.status === K8SStatus.provisioning),
-    [kubernetes]
-  );
+  const loading = (kubernetesLoading || deleteKubernetesLoading || addKubernetesLoading) && !update;
+  const k8sListShouldBeUpdated = kubernetes && kubernetes.find((item) => item.status === K8SStatus.provisioning);
 
   const deleteKubernetesCluster = useCallback(
     async (force?: boolean) => {

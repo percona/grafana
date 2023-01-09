@@ -5,15 +5,10 @@ import { FieldArray } from 'react-final-form-arrays';
 import { useStyles, Button } from '@grafana/ui';
 
 import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet';
-import { DBClusterPageMode } from '../../EditDBClusterPage.types';
 import { Messages } from '../DBClusterAdvancedOptions.messages';
 
 import { getStyles } from './NetworkAndSecurity.styles';
-import { NetworkAndSecurityFields } from './NetworkAndSecurity.types';
-
-export interface NetworkAndSecurityProps {
-  mode: DBClusterPageMode;
-}
+import { NetworkAndSecurityFields, NetworkAndSecurityProps } from './NetworkAndSecurity.types';
 export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ mode }) => {
   const styles = useStyles(getStyles);
   return (
