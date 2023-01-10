@@ -1,13 +1,16 @@
 /* eslint-disable react/display-name */
+import arrayMutators from 'final-form-arrays';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
-import { useDispatch } from 'react-redux';
 import { Redirect, useHistory } from 'react-router-dom';
 
-import { CollapsableSection, Spinner, useStyles } from '@grafana/ui/src';
+import { Spinner, useStyles2 } from '@grafana/ui/src';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
+import { useDispatch } from 'app/types';
 
-import { resetAddDBClusterState } from '../../../../shared/core/reducers/addDBCluster/addDBCluster';
+import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
+import { resetDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
+import { resetUpdateDBClusterState } from '../../../../shared/core/reducers/dbaas/updateDBCluster/updateDBCluster';
 import { getPerconaSettingFlag } from '../../../../shared/core/selectors';
 import { Messages as DBaaSMessages } from '../../../DBaaS.messages';
 import { useUpdateOfKubernetesList } from '../../../hooks/useKubernetesList';
@@ -20,26 +23,26 @@ import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarni
 
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
+import { BasicOptionsFields } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { DB_CLUSTER_INVENTORY_URL } from './EditDBClusterPage.constants';
 import { Messages } from './EditDBClusterPage.messages';
 import { getStyles } from './EditDBClusterPage.styles';
-import { AddDBClusterFields, EditDBClusterPageProps } from './EditDBClusterPage.types';
+import { EditDBClusterPageProps } from './EditDBClusterPage.types';
 import { generateUID } from './EditDBClusterPage.utils';
-import { UnsafeConfigurationWarning } from './UnsafeConfigurationsWarning/UnsafeConfigurationWarning';
 import { useDefaultMode } from './hooks/useDefaultMode';
 import { useEditDBClusterFormSubmit } from './hooks/useEditDBClusterFormSubmit';
 import { useEditDBClusterPageDefaultValues } from './hooks/useEditDBClusterPageDefaultValues';
 import { useEditDBClusterPageResult } from './hooks/useEditDBClusterPageResult';
 
 export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const dispatch = useDispatch();
   const history = useHistory();
   const mode = useDefaultMode();
   const [kubernetes, kubernetesLoading] = useUpdateOfKubernetesList();
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
-  const [initialValues] = useEditDBClusterPageDefaultValues({ kubernetes });
+  const [initialValues, selectedDBCluster] = useEditDBClusterPageDefaultValues({ kubernetes, mode });
   const [onSubmit, loading, buttonMessage] = useEditDBClusterFormSubmit({ mode, showPMMAddressWarning });
   const [result] = useEditDBClusterPageResult(mode);
 
@@ -51,7 +54,12 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
       history.push(DB_CLUSTER_INVENTORY_URL);
     }
     return () => {
-      dispatch(resetAddDBClusterState());
+      if (mode === 'create') {
+        dispatch(resetAddDBClusterState());
+      } else {
+        dispatch(resetDBCluster());
+        dispatch(resetUpdateDBClusterState());
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
@@ -63,11 +71,12 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
   ) : kubernetes && kubernetes?.length > 0 ? (
     <Form
       initialValues={initialValues}
-      onSubmit={(values) => onSubmit(values, showPMMAddressWarning)}
+      onSubmit={onSubmit}
       mutators={{
         setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
-          changeValue(state, `${AddDBClusterFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
+          changeValue(state, `${BasicOptionsFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
         },
+        ...arrayMutators,
       }}
       render={({ form, handleSubmit, valid, pristine, ...props }) => (
         <form onSubmit={handleSubmit} data-testid="create-db-cluster-page">
@@ -79,34 +88,29 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
               parentHref: DBAAS_INVENTORY_URL,
             }}
             submitBtnProps={{
-              disabled: !valid || pristine || loading, // TODO check in edit mode
-              loading: loading, // TODO check in edit mode
+              disabled: !valid || pristine || loading,
+              loading,
               buttonMessage: buttonMessage,
             }}
-            pageHeader="Create DB Cluster"
+            pageHeader={`${mode === 'create' ? 'Create' : 'Edit'} DB Cluster`}
             pageName="db-cluster"
             cancelUrl={DBAAS_INVENTORY_URL}
             featureLoaderProps={{ featureName: DBaaSMessages.dbaas, featureSelector: featureSelector }}
           >
             {showPMMAddressWarning && <PMMServerUrlWarning />}
             <div className={styles.optionsWrapper}>
-              <DBClusterBasicOptions kubernetes={kubernetes} form={form} />
-              <CollapsableSection
-                label={Messages.advancedSettings}
-                isOpen={false}
-                buttonDataTestId={`${mode}-dbCluster-advanced-settings`}
-                className={styles.collapsableSection}
-              >
-                {showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}
-                <DBClusterAdvancedOptions
-                  setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}
-                  form={form}
-                  handleSubmit={handleSubmit}
-                  pristine={pristine}
-                  valid={valid}
-                  {...props}
-                />
-              </CollapsableSection>
+              {mode === 'create' && <DBClusterBasicOptions kubernetes={kubernetes} form={form} />}
+              <DBClusterAdvancedOptions
+                mode={mode}
+                showUnsafeConfigurationWarning={showUnsafeConfigurationWarning}
+                setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}
+                form={form}
+                selectedCluster={selectedDBCluster}
+                handleSubmit={handleSubmit}
+                pristine={pristine}
+                valid={valid}
+                {...props}
+              />
             </div>
           </DBaaSPage>
         </form>
