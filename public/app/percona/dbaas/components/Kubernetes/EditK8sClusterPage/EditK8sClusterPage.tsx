@@ -1,17 +1,20 @@
 import { PasswordInputField, TextareaInputField, TextInputField, validators } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { Button, Icon, Tooltip, useStyles } from '@grafana/ui/src';
+import { useDispatch, useSelector } from 'app/types';
 
 import { FeatureLoader } from '../../../../shared/components/Elements/FeatureLoader';
 import { PageSwitcher } from '../../../../shared/components/PageSwitcher/PageSwitcher';
 import { PageSwitcherValue } from '../../../../shared/components/PageSwitcher/PageSwitcher.types';
 import { useCancelToken } from '../../../../shared/components/hooks/cancelToken.hook';
 import { useShowPMMAddressWarning } from '../../../../shared/components/hooks/showPMMAddressWarning';
-import { addKubernetesAction, resetAddK8SClusterState } from '../../../../shared/core/reducers/k8sCluster/k8sCluster';
+import {
+  addKubernetesAction,
+  resetAddK8SClusterState,
+} from '../../../../shared/core/reducers/dbaas/k8sCluster/k8sCluster';
 import { getAddKubernetes, getPerconaSettingFlag } from '../../../../shared/core/selectors';
 import { Messages as DBaaSMessages } from '../../../DBaaS.messages';
 import DBaaSPage from '../../DBaaSPage/DBaaSPage';

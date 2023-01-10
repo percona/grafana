@@ -1,7 +1,6 @@
-import { DBClusterTopology } from './DBClusterAdvancedOptions.types';
 import { canGetExpectedResources, resourceValidator } from './DBClusterAdvancedOptions.utils';
 
-describe('DBClusterAdvancedOptions.utils::', () => {
+describe('EditDBClusterAdvancedOptions.utils::', () => {
   describe('resourceValidator::', () => {
     it('returns undefined on undefined value', () => {
       expect(resourceValidator(undefined)).toBeUndefined();
@@ -22,7 +21,6 @@ describe('DBClusterAdvancedOptions.utils::', () => {
       label: 'test',
     };
     const values = {
-      topology: DBClusterTopology.cluster,
       memory: 2,
       cpu: 4,
       disk: 20,
@@ -42,18 +40,6 @@ describe('DBClusterAdvancedOptions.utils::', () => {
       expect(canGetExpectedResources(kubernetesCluster, { ...values, nodes: -3 })).toBeFalsy();
       expect(canGetExpectedResources(kubernetesCluster, { ...values, nodes: 2 })).toBeTruthy();
       expect(canGetExpectedResources(kubernetesCluster, { ...values, nodes: '7' })).toBeTruthy();
-    });
-    it('returns true when resources are valid and topology is not cluster', () => {
-      expect(
-        canGetExpectedResources(kubernetesCluster, { ...values, topology: DBClusterTopology.single })
-      ).toBeTruthy();
-      expect(
-        canGetExpectedResources(kubernetesCluster, {
-          ...values,
-          topology: DBClusterTopology.single,
-          nodes: 'test_invalid_nodes',
-        })
-      ).toBeTruthy();
     });
   });
 });

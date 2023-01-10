@@ -1,4 +1,4 @@
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
@@ -12,19 +12,14 @@ import { KubernetesOperatorStatus } from '../../Kubernetes/OperatorStatusItem/Ku
 import { kubernetesStub } from '../../Kubernetes/__mocks__/kubernetesStubs';
 
 import { EditDBClusterPage } from './EditDBClusterPage';
-
-jest.mock('./EditDBClusterPage.utils', () => ({
-  ...jest.requireActual('./EditDBClusterPage.utils'),
-  updateDatabaseClusterNameInitialValue: jest.fn(),
-}));
+import { DB_CLUSTER_CREATION_URL, DB_CLUSTER_EDIT_URL } from './EditDBClusterPage.constants';
 
 jest.mock('app/core/app_events');
 
 describe('EditDBClusterPage::', () => {
-  // TODO db-cluster-submit-button message should have different values depends on mode of page
-  // TODO the header of page should have different values depends on mode of page
+  it('renders correctly for create mode', () => {
+    locationService.push(DB_CLUSTER_CREATION_URL);
 
-  it('renders correctly', () => {
     render(
       <Provider
         store={configureStore({
@@ -51,136 +46,106 @@ describe('EditDBClusterPage::', () => {
         } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
-          <EditDBClusterPage kubernetes={kubernetesStub} mode="create" />
+          <EditDBClusterPage kubernetes={kubernetesStub} />
         </Router>
       </Provider>
     );
 
     expect(screen.findByRole('form')).toBeTruthy();
-    expect(screen.getByTestId('name-text-input')).toBeTruthy();
-    expect(screen.getByTestId('dbcluster-kubernetes-cluster-field')).toBeTruthy();
-    expect(screen.getByTestId('dbcluster-database-type-field')).toBeTruthy();
-    expect(screen.getByTestId('dbcluster-basic-options-step')).toBeTruthy();
-    expect(screen.getByTestId('list-dbCluster-advanced-settings')).toBeTruthy();
+
     expect(screen.findByTestId('add-cluster-monitoring-warning')).toBeTruthy();
+
+    expect(screen.getByTestId('dbcluster-basic-options-step')).toBeTruthy();
+    expect(screen.getByTestId('dbCluster-advanced-settings')).toBeTruthy();
+    expect(screen.queryByTestId('nodes-field-container')).not.toBeInTheDocument();
+
     expect(screen.getByTestId('db-cluster-cancel-button')).toBeInTheDocument();
     expect(screen.getByTestId('db-cluster-submit-button')).toBeInTheDocument();
+    expect(screen.getByTestId('db-cluster-submit-button')).toHaveTextContent('Create');
+    expect(screen.getByText('Create DB Cluster')).toBeInTheDocument();
+  });
+
+  it('renders correctly for edit mode', () => {
+    locationService.push(DB_CLUSTER_EDIT_URL);
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
+            },
+            kubernetes: {
+              loading: false,
+              result: [
+                {
+                  kubernetesClusterName: 'cluster1',
+                  status: KubernetesClusterStatus.ok,
+                  operators: {
+                    psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                  },
+                },
+              ],
+            },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <EditDBClusterPage kubernetes={kubernetesStub} />
+        </Router>
+      </Provider>
+    );
+
+    expect(screen.queryByTestId('dbcluster-basic-options-step')).not.toBeInTheDocument();
+    expect(screen.getByTestId('dbCluster-advanced-settings')).toBeInTheDocument();
+    expect(screen.getByTestId('nodes-field-container')).toBeInTheDocument();
+
+    expect(screen.getByTestId('db-cluster-cancel-button')).toBeInTheDocument();
+    expect(screen.getByTestId('db-cluster-submit-button')).toBeInTheDocument();
+    expect(screen.getByTestId('db-cluster-submit-button')).toHaveTextContent('Edit');
+    expect(screen.getByText('Edit DB Cluster')).toBeInTheDocument();
   });
 
   it('should disable submit button when there is no values', async () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true },
-            settings: {
-              loading: false,
-              result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
-            },
-            kubernetes: {
-              loading: false,
-              result: [
-                {
-                  kubernetesClusterName: 'cluster1',
-                  status: KubernetesClusterStatus.ok,
-                  operators: {
-                    psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
-                    pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+    await waitFor(() =>
+      render(
+        <Provider
+          store={configureStore({
+            percona: {
+              user: { isAuthorized: true },
+              settings: {
+                loading: false,
+                result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
+              },
+              kubernetes: {
+                loading: false,
+                result: [
+                  {
+                    kubernetesClusterName: 'cluster1',
+                    status: KubernetesClusterStatus.ok,
+                    operators: {
+                      psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                      pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    },
                   },
-                },
-              ],
+                ],
+              },
             },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <EditDBClusterPage kubernetes={kubernetesStub} mode="create" />
-        </Router>
-      </Provider>
+          } as StoreState)}
+        >
+          <Router history={locationService.getHistory()}>
+            <EditDBClusterPage kubernetes={kubernetesStub} />
+          </Router>
+        </Provider>
+      )
     );
 
-    fireEvent.click(screen.getByTestId('list-dbCluster-advanced-settings'));
+    fireEvent.click(screen.getByTestId('dbCluster-advanced-settings'));
 
     const button = screen.getByTestId('db-cluster-submit-button');
     expect(button).toBeDisabled();
-  });
-
-  // TODO should be return in https://jira.percona.com/browse/PMM-11134
-  xit('form should have default values', () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true },
-            settings: {
-              loading: false,
-              result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
-            },
-            kubernetes: {
-              loading: false,
-              result: [
-                {
-                  kubernetesClusterName: 'cluster1',
-                  status: KubernetesClusterStatus.ok,
-                  operators: {
-                    psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
-                    pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
-                  },
-                },
-              ],
-            },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <EditDBClusterPage kubernetes={kubernetesStub} mode="create" />
-        </Router>
-      </Provider>
-    );
-  });
-
-  // TODO should be return in https://jira.percona.com/browse/PMM-11134
-  xit('form should have default values from preselectedCluster', () => {
-    // const preSelectedCluster = {
-    //   kubernetesClusterName: 'testPreselectedCluster',
-    //   operators: {
-    //     psmdb: {
-    //       availableVersion: '1.12.0',
-    //       status: KubernetesOperatorStatus.ok,
-    //       version: '1.11.0',
-    //     },
-    //     pxc: {
-    //       availableVersion: undefined,
-    //       status: KubernetesOperatorStatus.ok,
-    //       version: '1.11.0',
-    //     },
-    //   },
-    //   status: KubernetesClusterStatus.ok,
-    // };
-
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <EditDBClusterPage kubernetes={kubernetesStub} mode="create" />
-        </Router>
-      </Provider>
-    );
-
-    // expect(updateDatabaseClusterNameInitialValue).toHaveBeenCalledWith(
-    //   expect.objectContaining({
-    //     databaseType: expect.objectContaining({ value: 'mongodb' }),
-    //     kubernetesCluster: expect.objectContaining({
-    //       value: 'testPreselectedCluster',
-    //     }),
-    //     name: expect.stringContaining('mongodb-'),
-    //   })
-    // );
   });
 });

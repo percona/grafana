@@ -1,12 +1,12 @@
 import React, { FC, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { useStyles } from '@grafana/ui/src';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
+import { useDispatch } from 'app/types';
 
 import { Databases } from '../../../../shared/core';
-import { selectKubernetesCluster } from '../../../../shared/core/reducers';
+import { selectKubernetesCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
 import { AddClusterButton } from '../../AddClusterButton/AddClusterButton';
 import { DB_CLUSTER_CREATION_URL } from '../../DBCluster/EditDBClusterPage/EditDBClusterPage.constants';
 import { Kubernetes, OperatorToUpdate } from '../Kubernetes.types';
