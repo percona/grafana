@@ -80,7 +80,7 @@ export const KubernetesInventory: FC<KubernetesInventoryProps> = ({ setMode }) =
 
   const updateK8Clusters = useCallback(
     async (triggerLoading = true) => {
-      const result = await catchFromAsyncThunkAction(
+      await catchFromAsyncThunkAction(
         appDispatch(
           fetchKubernetesAction({
             kubernetes: generateToken(GET_KUBERNETES_CANCEL_TOKEN),
@@ -88,11 +88,6 @@ export const KubernetesInventory: FC<KubernetesInventoryProps> = ({ setMode }) =
           })
         )
       );
-
-      // undefined means request was cancelled
-      if (result === undefined) {
-        return;
-      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [kubernetes]

@@ -43,7 +43,7 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ mode }) => {
                 <TextInputField
                   name={`${name}.sourceRange`}
                   label={index === 0 ? Messages.labels.sourceRange : ''}
-                  placeholder="181.170.213.40/32"
+                  placeholder={Messages.placeholders.sourceRange}
                   fieldClassName={styles.field}
                   disabled={mode === 'edit'}
                 />
