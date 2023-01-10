@@ -18,7 +18,7 @@ describe('DBClusterAdvancedOptions Configurations::', () => {
         />
       )
     );
-    expect(screen.getByTestId('configurations-fieldset').querySelector('legend')).toHaveTextContent(
+    expect(screen.getByTestId('configurations').querySelector('legend')).toHaveTextContent(
       Messages.fieldSets.commonConfiguration
     );
     expect(screen.getByTestId('storageClass-field-label')).toHaveTextContent(Messages.labels.storageClass);
@@ -36,7 +36,7 @@ describe('DBClusterAdvancedOptions Configurations::', () => {
         />
       )
     );
-    expect(screen.getByTestId('configurations-fieldset').querySelector('legend')).toHaveTextContent(
+    expect(screen.getByTestId('configurations').querySelector('legend')).toHaveTextContent(
       Messages.fieldSets.pxcConfiguration
     );
     expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(Messages.labels.pxcConfiguration);
@@ -51,7 +51,7 @@ describe('DBClusterAdvancedOptions Configurations::', () => {
         />
       )
     );
-    expect(screen.getByTestId('configurations-fieldset').querySelector('legend')).toHaveTextContent(
+    expect(screen.getByTestId('configurations').querySelector('legend')).toHaveTextContent(
       Messages.fieldSets.mongodbConfiguration
     );
     expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(Messages.labels.mongodbConfiguration);

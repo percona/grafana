@@ -54,7 +54,7 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(await screen.getByTestId('memory-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('cpu-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('disk-number-input')).toBeInTheDocument();
-    expect(await screen.getByTestId('pxc-configurations')).toBeInTheDocument();
+    expect(await screen.getByTestId('configurations')).toBeInTheDocument();
     expect(await screen.getByTestId('network-and-security')).toBeInTheDocument();
   });
 
@@ -88,7 +88,7 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(await screen.getByTestId('disk-number-input')).toBeInTheDocument();
     expect(screen.getByTestId('dbcluster-resources-bar-memory')).toBeInTheDocument();
     expect(screen.getByTestId('dbcluster-resources-bar-cpu')).toBeInTheDocument();
-    expect(await screen.getByTestId('pxc-configurations')).toBeInTheDocument();
+    expect(await screen.getByTestId('configurations')).toBeInTheDocument();
     expect(await screen.getByTestId('network-and-security')).toBeInTheDocument();
   });
 
