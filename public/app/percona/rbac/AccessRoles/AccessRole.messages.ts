@@ -20,6 +20,7 @@ export const Messages = {
     edit: 'Edit',
     default: 'Set as default',
     delete: 'Delete',
+    iconLabel: 'Open role options',
   },
   default: {
     text: 'Default',
