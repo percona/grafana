@@ -1,8 +1,8 @@
 import { LoaderButton, logger } from '@percona/platform-core';
-import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { useStyles2 } from '@grafana/ui';
+import { ControlledCollapse, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { CheckService } from 'app/percona/check/Check.service';
@@ -204,21 +204,35 @@ export const AllChecksTab: FC = () => {
               {Messages.runDbChecks}
             </LoaderButton>
           </div>
-          <Table
-            totalItems={checks.length}
-            data={checks}
-            columns={columns}
-            pendingRequest={fetchChecksPending}
-            emptyMessage={Messages.table.noData}
-            showFilter
-          />
-          {!!selectedCheck && checkIntervalModalVisible && (
-            <ChangeCheckIntervalModal
-              check={selectedCheck}
-              onClose={handleModalClose}
-              onIntervalChanged={handleIntervalChanged}
+          <ControlledCollapse
+            label={
+              <div className={styles.collapsableLabel}>
+                <span className={styles.mainLabel}>CVE security</span>
+                <span className={styles.label}>Imforming users about versions of DBs affected by CVE.</span>
+                <span className={styles.label}>Partion support (Mongo)</span>
+              </div>
+            }
+            className={styles.collapsableSection}
+            bodyCustomClass={styles.collapsableBody}
+            headerCustomClass={styles.collapsableHeader}
+            headerLabelCustomClass={styles.collapsableHeaderLabel}
+          >
+            <Table
+              totalItems={checks.length}
+              data={checks}
+              columns={columns}
+              pendingRequest={fetchChecksPending}
+              emptyMessage={Messages.table.noData}
+              showFilter
             />
-          )}
+            {!!selectedCheck && checkIntervalModalVisible && (
+              <ChangeCheckIntervalModal
+                check={selectedCheck}
+                onClose={handleModalClose}
+                onIntervalChanged={handleIntervalChanged}
+              />
+            )}
+          </ControlledCollapse>
         </FeatureLoader>
       </OldPage.Contents>
     </OldPage>

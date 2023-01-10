@@ -104,6 +104,10 @@ export interface Props {
   onToggle?: (isOpen: boolean) => void;
   /** Additional class name for the root element */
   className?: string;
+  // @Percona
+  headerCustomClass?: string;
+  bodyCustomClass?: string;
+  headerLabelCustomClass?: string;
 }
 
 export const ControlledCollapse: FunctionComponent<Props> = ({ isOpen, onToggle, ...otherProps }) => {
@@ -130,6 +134,10 @@ export const Collapse: FunctionComponent<Props> = ({
   collapsible,
   onToggle,
   className,
+  // @Percona
+  headerCustomClass,
+  headerLabelCustomClass,
+  bodyCustomClass,
   children,
 }) => {
   const style = useStyles2(getStyles);
@@ -145,13 +153,13 @@ export const Collapse: FunctionComponent<Props> = ({
 
   return (
     <div className={panelClass}>
-      <div className={headerClass} onClick={onClickToggle}>
+      <div className={cx([headerClass, headerCustomClass])} onClick={onClickToggle}>
         {collapsible && <Icon className={style.icon} name={isOpen ? 'angle-down' : 'angle-right'} />}
-        <div className={cx([style.headerLabel])}>{label}</div>
+        <div className={cx([style.headerLabel, headerLabelCustomClass])}>{label}</div>
       </div>
       {isOpen && (
-        <div className={cx([style.collapseBody])}>
-          <div className={loaderClass} />
+        <div className={cx([style.collapseBody, bodyCustomClass])}>
+          {loading && <div className={loaderClass} />}
           <div className={style.bodyContentWrapper}>{children}</div>
         </div>
       )}
