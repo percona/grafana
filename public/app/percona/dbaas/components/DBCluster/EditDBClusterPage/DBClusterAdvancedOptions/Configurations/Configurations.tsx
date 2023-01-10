@@ -15,7 +15,7 @@ export const Configurations: FC<ConfigurationProps> = ({ databaseType, k8sCluste
         ? Messages.labels.pxcConfiguration
         : databaseType === Databases.mongodb
         ? Messages.labels.mongodbConfiguration
-        : 'Database Configuration',
+        : Messages.labels.commonConfiguration,
     [databaseType]
   );
   const fieldSetLabel = useMemo(
@@ -23,13 +23,13 @@ export const Configurations: FC<ConfigurationProps> = ({ databaseType, k8sCluste
       databaseType === Databases.mysql
         ? Messages.fieldSets.pxcConfiguration
         : databaseType === Databases.mongodb
-        ? Messages.labels.mongodbConfiguration
-        : 'Database Configuration',
+        ? Messages.fieldSets.mongodbConfiguration
+        : Messages.fieldSets.commonConfiguration,
     [databaseType]
   );
 
   return (
-    <FieldSet label={fieldSetLabel} data-testid="pxc-configurations">
+    <FieldSet label={fieldSetLabel} data-testid="configurations-fieldset">
       <AsyncSelectField
         name={ConfigurationFields.storageClass}
         loadOptions={() => ConfigurationService.loadStorageClassOptions(k8sClusterName)}

@@ -3,6 +3,7 @@ export const Messages = {
     advancedSettings: 'Advanced Settings',
     pxcConfiguration: 'MySQL Configurations',
     mongodbConfiguration: 'MongoDB Configurations',
+    commonConfiguration: 'Database Configurations',
     networkAndSecurity: 'Network and Security',
   },
   labels: {
@@ -14,6 +15,7 @@ export const Messages = {
     storageClass: 'Storage Class',
     pxcConfiguration: 'MySQL Configuration',
     mongodbConfiguration: 'MongoDB Configuration',
+    commonConfiguration: 'Database Configuration',
     expose: 'Expose',
     internetFacing: 'Internet Facing',
     sourceRange: 'Source Range',
