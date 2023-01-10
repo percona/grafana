@@ -36,3 +36,10 @@ export interface KubernetesOption {
   operators: OperatorsList;
   availableOperators: Operators[];
 }
+
+export enum BasicOptionsFields {
+  name = 'name',
+  kubernetesCluster = 'kubernetesCluster',
+  databaseType = 'databaseType',
+  databaseVersion = 'databaseVersion',
+}
