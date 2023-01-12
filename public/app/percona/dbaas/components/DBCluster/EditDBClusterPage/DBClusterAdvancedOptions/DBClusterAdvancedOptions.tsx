@@ -76,7 +76,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
     mode === 'create'
       ? {
           collapsableProps: {
-            isOpen: true,
+            isOpen: false,
             buttonDataTestId: 'dbCluster-advanced-settings',
           },
         }
