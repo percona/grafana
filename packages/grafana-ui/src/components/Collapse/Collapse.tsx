@@ -142,7 +142,7 @@ export const Collapse: FunctionComponent<Props> = ({
 }) => {
   const style = useStyles2(getStyles);
   const onClickToggle = () => {
-    if (onToggle) {
+    if (onToggle && collapsible) {
       onToggle(!isOpen);
     }
   };

@@ -2,12 +2,13 @@ import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { ControlledCollapse, useStyles2 } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { CheckService } from 'app/percona/check/Check.service';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
+import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -204,18 +205,10 @@ export const AllChecksTab: FC = () => {
               {Messages.runDbChecks}
             </LoaderButton>
           </div>
-          <ControlledCollapse
-            label={
-              <div className={styles.collapsableLabel}>
-                <span className={styles.mainLabel}>CVE security</span>
-                <span className={styles.label}>Imforming users about versions of DBs affected by CVE.</span>
-                <span className={styles.label}>Partion support (Mongo)</span>
-              </div>
-            }
-            className={styles.collapsableSection}
-            bodyCustomClass={styles.collapsableBody}
-            headerCustomClass={styles.collapsableHeader}
-            headerLabelCustomClass={styles.collapsableHeaderLabel}
+          <CustomCollapsableSection
+            mainLabel="CVE security"
+            content="Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE."
+            sideLabel="Partion support (Mongo)"
           >
             <Table
               totalItems={checks.length}
@@ -232,7 +225,7 @@ export const AllChecksTab: FC = () => {
                 onIntervalChanged={handleIntervalChanged}
               />
             )}
-          </ControlledCollapse>
+          </CustomCollapsableSection>
         </FeatureLoader>
       </OldPage.Contents>
     </OldPage>
