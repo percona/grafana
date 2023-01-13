@@ -1,9 +1,9 @@
 import { logger } from '@percona/platform-core';
-import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
 import { locationService } from '@grafana/runtime';
-import { useStyles2 } from '@grafana/ui';
+import { Alert, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
@@ -28,6 +28,7 @@ export const FailedChecksTab: FC = () => {
   const navModel = usePerconaNavModel('failed-checks');
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
+  const [showAlert, setShowAlert] = useState(true);
   const [generateToken] = useCancelToken();
 
   const columns = useMemo(
@@ -89,6 +90,17 @@ export const FailedChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
+          {showAlert && (
+            <Alert
+              title="Upgrade your plan"
+              severity="info"
+              customButtonContent="Upgrade"
+              onCustomButtonClick={(e) => console.log(e)}
+              onRemove={() => setShowAlert(false)}
+            >
+              By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
+            </Alert>
+          )}
           <AlertsReloadContext.Provider value={{ fetchAlerts }}>
             <Table
               totalItems={data.length}

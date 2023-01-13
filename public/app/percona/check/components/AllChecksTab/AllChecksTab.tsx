@@ -207,7 +207,7 @@ export const AllChecksTab: FC = () => {
           </div>
           <CustomCollapsableSection
             mainLabel="CVE security"
-            content="Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE.Imforming users about versions of DBs affected by CVE."
+            content="Imforming users about versions of DBs affected by CVE."
             sideLabel="Partion support (Mongo)"
           >
             <Table
