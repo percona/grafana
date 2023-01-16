@@ -40,7 +40,13 @@ const AccessRolesPage: FC = () => {
           <h2 data-testid="access-roles-title">{Messages.title}</h2>
           <p className={styles.description}>
             {Messages.subtitle.text}
-            <a className={styles.link}>{Messages.subtitle.link}</a>
+            <a
+              className={styles.link}
+              // Internal release
+              href="https://docs.google.com/document/d/1Rao6tFlR6Gr25gHOLgFQ77gj_jlN3-KFgrxUAh3DIy8/edit?usp=sharing"
+            >
+              {Messages.subtitle.link}
+            </a>
             {Messages.subtitle.dot}
           </p>
           <div className={styles.createContainer}>
