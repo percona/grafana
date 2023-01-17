@@ -131,4 +131,38 @@ describe('Connected:', () => {
 
     await waitFor(() => expect(forceDisconnectSpy).toHaveBeenCalled());
   });
+
+  it('should show a warning for non percona platform users', () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { isConnectedToPortal: true } },
+          },
+        } as StoreState)}
+      >
+        <Connected />
+      </Provider>
+    );
+
+    expect(screen.getByText(Messages.pleaseLoginWithPercona)).toBeInTheDocument();
+  });
+
+  it('should NOT show a warning for percona platform users', () => {
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: true },
+            settings: { result: { isConnectedToPortal: true } },
+          },
+        } as StoreState)}
+      >
+        <Connected />
+      </Provider>
+    );
+
+    expect(screen.queryByText(Messages.pleaseLoginWithPercona)).not.toBeInTheDocument();
+  });
 });
