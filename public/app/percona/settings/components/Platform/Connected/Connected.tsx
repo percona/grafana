@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 
 import { AppEvents } from '@grafana/data';
 import { config } from '@grafana/runtime';
-import { Alert, ConfirmModal, useStyles2 } from '@grafana/ui';
+import { ConfirmModal, useStyles2 } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaServer, getPerconaUser } from 'app/percona/shared/core/selectors';
@@ -82,11 +82,6 @@ export const Connected: FC = () => {
             </form>
           )}
         />
-        {!isPlatformUser && (
-          <Alert title="" severity="info">
-            {Messages.pleaseLoginWithPercona}
-          </Alert>
-        )}
         <LoaderButton
           data-testid="disconnect-button"
           size="md"
