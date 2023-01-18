@@ -16,7 +16,6 @@ import { PlatformService } from '../Platform.service';
 
 import { Messages } from './Connected.messages';
 import { getStyles } from './Connected.styles';
-import { ForceDisconnectErrorBody } from './Connected.types';
 import { ModalBody } from './ModalBody/ModalBody';
 
 export const Connected: FC = () => {
@@ -53,9 +52,11 @@ export const Connected: FC = () => {
       dispatch(fetchServerInfoAction());
       dispatch(fetchSettingsAction());
     } catch (e) {
+      let message = null;
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const error = e as AxiosError<ForceDisconnectErrorBody>;
-      const message = error.response?.data?.message;
+      if (e instanceof AxiosError) {
+        message = e.response?.data?.message;
+      }
 
       logger.error(e);
       appEvents.emit(AppEvents.alertError, [message ?? 'Unknown error']);
