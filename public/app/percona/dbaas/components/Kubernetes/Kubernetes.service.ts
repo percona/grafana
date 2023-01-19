@@ -11,20 +11,29 @@ import {
   KubernetesListAPI,
   NewKubernetesCluster,
   NewKubernetesClusterAPI,
+  StorageClassesRequest,
+  StorageClassesResponse,
 } from './Kubernetes.types';
 
 export const KubernetesService = {
   getKubernetes(token?: CancelToken) {
-    return apiManagement.post<KubernetesListAPI, any>('/DBaaS/Kubernetes/List', {}, true, token);
+    return apiManagement.post<KubernetesListAPI, object>('/DBaaS/Kubernetes/List', {}, true, token);
   },
   deleteKubernetes(kubernetes: Kubernetes, force?: boolean, token?: CancelToken) {
-    return apiManagement.post<any, any>('/DBaaS/Kubernetes/Unregister', toAPI(kubernetes, force), false, token);
+    return apiManagement.post<void, object>('/DBaaS/Kubernetes/Unregister', toAPI(kubernetes, force), false, token);
   },
   getKubernetesConfig(kubernetes: Kubernetes, token?: CancelToken) {
-    return apiManagement.post<any, any>('/DBaaS/Kubernetes/Get', toAPI(kubernetes), false, token);
+    return apiManagement.post<void, object>('/DBaaS/Kubernetes/Get', toAPI(kubernetes), false, token);
+  },
+  getStorageClasses(kubernetesClasterName: string): Promise<StorageClassesResponse> {
+    return apiManagement.post<object, StorageClassesRequest>(
+      '/DBaaS/Kubernetes/StorageClasses/List',
+      { kubernetes_cluster_name: kubernetesClasterName },
+      false
+    );
   },
   addKubernetes(kubernetes: NewKubernetesCluster, token?: CancelToken) {
-    return apiManagement.post<NewKubernetesClusterAPI, any>(
+    return apiManagement.post<NewKubernetesClusterAPI, NewKubernetesClusterAPI>(
       '/DBaaS/Kubernetes/Register',
       newClusterToApi(kubernetes),
       false,
@@ -32,7 +41,7 @@ export const KubernetesService = {
     );
   },
   checkForOperatorUpdate(token?: CancelToken) {
-    return apiManagement.post<CheckOperatorUpdateAPI, any>(
+    return apiManagement.post<CheckOperatorUpdateAPI, object>(
       '/DBaaS/Components/CheckForOperatorUpdate',
       {},
       false,
@@ -57,7 +66,7 @@ export const KubernetesService = {
     );
   },
   getDBClusters(kubernetes: Kubernetes, token?: CancelToken) {
-    return apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', kubernetes, true, token);
+    return apiManagement.post<void, Kubernetes>('/DBaaS/DBClusters/List', kubernetes, true, token);
   },
 };
 

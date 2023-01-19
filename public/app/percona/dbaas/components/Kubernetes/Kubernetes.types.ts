@@ -74,12 +74,19 @@ export enum ComponentToUpdate {
   pxc = 'pxc-operator',
 }
 
-export type DatabaseComponentToUpdateMap = { [key in Databases]: ComponentToUpdate };
+export type DatabaseComponentToUpdateMap = { [key in Databases]?: ComponentToUpdate };
 
 export interface InstallOperatorRequest {
   kubernetes_cluster_name: string;
   operator_type: ComponentToUpdate;
   version: string;
+}
+
+export interface StorageClassesRequest {
+  kubernetes_cluster_name: string;
+}
+export interface StorageClassesResponse {
+  storage_classes?: string[];
 }
 
 export interface InstallOperatorResponse {
