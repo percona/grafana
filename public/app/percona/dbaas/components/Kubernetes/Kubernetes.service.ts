@@ -7,6 +7,7 @@ import {
   ComponentToUpdate,
   InstallOperatorRequest,
   InstallOperatorResponse,
+  KubeConfigResponse,
   Kubernetes,
   KubernetesListAPI,
   NewKubernetesCluster,
@@ -23,7 +24,7 @@ export const KubernetesService = {
     return apiManagement.post<void, object>('/DBaaS/Kubernetes/Unregister', toAPI(kubernetes, force), false, token);
   },
   getKubernetesConfig(kubernetes: Kubernetes, token?: CancelToken) {
-    return apiManagement.post<void, object>('/DBaaS/Kubernetes/Get', toAPI(kubernetes), false, token);
+    return apiManagement.post<KubeConfigResponse, object>('/DBaaS/Kubernetes/Get', toAPI(kubernetes), false, token);
   },
   getStorageClasses(kubernetesClasterName: string): Promise<StorageClassesResponse> {
     return apiManagement.post<object, StorageClassesRequest>(

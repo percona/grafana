@@ -138,3 +138,7 @@ interface ExtensionInfo {
   provider?: string;
   version?: string;
 }
+
+export interface KubeConfigResponse {
+  kube_auth: KubeAuth;
+}
