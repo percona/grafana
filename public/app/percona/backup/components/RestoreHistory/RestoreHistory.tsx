@@ -124,9 +124,8 @@ export const RestoreHistory: FC = () => {
   };
 
   const getLogs = useCallback(
-    async (startingChunk: number, offset: number, token?: CancelToken) => {
-      return RestoreHistoryService.getLogs(selectedRestore!.id, startingChunk, offset, token);
-    },
+    async (startingChunk: number, offset: number, token?: CancelToken) =>
+      RestoreHistoryService.getLogs(selectedRestore!.id, startingChunk, offset, token),
     [selectedRestore]
   );
 
