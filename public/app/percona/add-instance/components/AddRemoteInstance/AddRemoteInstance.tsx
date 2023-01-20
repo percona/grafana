@@ -10,6 +10,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { Databases } from 'app/percona/shared/core';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
+import { ADD_INSTANCE_FORM_NAME } from '../../panel.constants';
 import { InstanceTypesExtra, InstanceTypes, INSTANCE_TYPES_LABELS, InstanceAvailableType } from '../../panel.types';
 
 import { ADD_AZURE_CANCEL_TOKEN, ADD_RDS_CANCEL_TOKEN } from './AddRemoteInstance.constants';
@@ -145,7 +146,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
           },
         }}
         render={({ form, handleSubmit }) => (
-          <form id="add-instance-form" onSubmit={handleSubmit} data-testid="add-remote-instance-form">
+          <form id={ADD_INSTANCE_FORM_NAME} onSubmit={handleSubmit} data-testid="add-remote-instance-form">
             <h3 className={styles.addRemoteInstanceTitle}>{getHeader(type)}</h3>
             {formParts(form)}
           </form>

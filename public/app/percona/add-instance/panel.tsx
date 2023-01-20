@@ -14,6 +14,7 @@ import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance'
 import { Messages } from './components/AddRemoteInstance/AddRemoteInstance.messages';
 import AzureDiscovery from './components/AzureDiscovery/Discovery';
 import Discovery from './components/Discovery/Discovery';
+import { ADD_INSTANCE_FORM_NAME } from './panel.constants';
 import { getStyles } from './panel.styles';
 import { InstanceTypesExtra, InstanceAvailable, AvailableTypes, AddInstanceRouteParams } from './panel.types';
 
@@ -32,11 +33,10 @@ const AddInstancePanel = () => {
   const { result: settings } = useSelector(getPerconaSettings);
   const { azureDiscoverEnabled } = settings!;
   const { instanceType = '' } = useParams<AddInstanceRouteParams>();
-  console.log(instanceType);
   const [selectedInstance, selectInstance] = useState<InstanceAvailable>({
     type: availableInstanceTypes.includes(instanceType as AvailableTypes) ? instanceType : '',
   });
-  const [formName, setFormName] = useState('');
+  const [formName, setFormName] = useState(instanceType ? ADD_INSTANCE_FORM_NAME : '');
   const [showSelection, setShowSelection] = useState(!instanceType);
   const [submitting, setSubmitting] = useState(false);
   const history = useHistory();
@@ -89,7 +89,7 @@ const AddInstancePanel = () => {
 
     if (showSelection) {
       e.preventDefault();
-      setFormName('add-instance-form');
+      setFormName(ADD_INSTANCE_FORM_NAME);
     }
   };
 

@@ -3,6 +3,7 @@ import React, { FC, useCallback } from 'react';
 import { Form as FormFinal } from 'react-final-form';
 
 import { useStyles } from '@grafana/ui';
+import { ADD_INSTANCE_FORM_NAME } from 'app/percona/add-instance/panel.constants';
 
 import { Messages } from './Credentials.messages';
 import { getStyles } from './Credentials.styles';
@@ -23,7 +24,7 @@ const Credentials: FC<CredentialsProps> = ({ discover }) => {
       onSubmit={onSubmit}
       render={({ handleSubmit }) => (
         <form
-          id="add-instance-form"
+          id={ADD_INSTANCE_FORM_NAME}
           onSubmit={handleSubmit}
           className={styles.instanceForm}
           data-testid="credentials-form"
