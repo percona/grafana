@@ -45,8 +45,8 @@ describe('AddInstance page::', () => {
 
     expect(onSelectInstanceType).toBeCalledTimes(0);
 
-    const button = await screen.findByTestId('rds-instance');
-    fireEvent.click(button);
+    const button = (await screen.findByTestId('rds-instance')).querySelector('button');
+    fireEvent.click(button!);
 
     expect(onSelectInstanceType).toBeCalledTimes(1);
     expect(onSelectInstanceType.mock.calls[0][0]).toStrictEqual({ type: 'rds' });

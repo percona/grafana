@@ -1,11 +1,10 @@
 import { IconName } from '@grafana/data';
-import { Databases } from 'app/percona/shared/core';
 
-import { InstanceAvailable, InstanceTypesExtra } from '../../panel.types';
+import { InstanceAvailable, InstanceAvailableType } from '../../panel.types';
 
 export interface SelectInstanceProps extends InstanceListItem {
   isSelected: boolean;
-  selectInstanceType: (type: string) => () => void;
+  selectInstanceType: (type: InstanceAvailableType) => () => void;
 }
 
 export interface AddInstanceProps {
@@ -15,7 +14,7 @@ export interface AddInstanceProps {
 }
 
 export interface InstanceListItem {
-  type: InstanceTypesExtra | Databases;
+  type: InstanceAvailableType;
   icon?: IconName;
   title: string;
   isHidden?: boolean;

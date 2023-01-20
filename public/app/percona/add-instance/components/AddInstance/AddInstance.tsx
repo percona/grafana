@@ -44,8 +44,7 @@ export const AddInstance: FC<AddInstanceProps> = ({ selectedInstanceType, onSele
     [showAzure]
   );
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const selectInstanceType = (type: string) => () => onSelectInstanceType({ type: type as InstanceAvailableType });
+  const selectInstanceType = (type: InstanceAvailableType) => () => onSelectInstanceType({ type });
 
   return (
     <section className={styles2.Content}>
