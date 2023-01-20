@@ -25,7 +25,6 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           data-testid="service-name-label"
           name="serviceName"
           label={Messages.form.labels.mainDetails.serviceName}
-          tooltipIcon="info-circle"
           tooltipText={Messages.form.tooltips.mainDetails.serviceName}
           placeholder={Messages.form.placeholders.mainDetails.serviceName}
         />
@@ -36,7 +35,6 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           name="address"
           label={Messages.form.labels.mainDetails.address}
           tooltipText={Messages.form.tooltips.mainDetails.address}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.address}
           validators={[validators.required]}
           disabled={remoteInstanceCredentials.isRDS}
@@ -45,7 +43,6 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           name="port"
           label={Messages.form.labels.mainDetails.port}
           tooltipText={Messages.form.tooltips.mainDetails.port}
-          tooltipIcon="info-circle"
           placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
           validators={portValidators}
         />
@@ -56,7 +53,6 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           name="username"
           label={Messages.form.labels.mainDetails.username}
           tooltipText={Messages.form.tooltips.mainDetails.username}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.username}
           validators={userPassValidators}
         />
@@ -65,7 +61,6 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           name="password"
           label={Messages.form.labels.mainDetails.password}
           tooltipText={Messages.form.tooltips.mainDetails.password}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.password}
           validators={userPassValidators}
         />
@@ -76,7 +71,6 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
           name="maxQueryLength"
           label={Messages.form.labels.mysqlDetails.maxQueryLength}
           tooltipText={Messages.form.tooltips.mysqlDetails.maxQueryLength}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mysqlDetails.maxQueryLength}
           validators={maxQueryLengthValidators}
         />

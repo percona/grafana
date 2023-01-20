@@ -24,7 +24,6 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, remote
           name="serviceName"
           label={Messages.form.labels.mainDetails.serviceName}
           tooltipText={Messages.form.tooltips.mainDetails.serviceName}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.serviceName}
         />
         <div />
@@ -34,7 +33,6 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, remote
           name="address"
           label={Messages.form.labels.mainDetails.address}
           tooltipText={Messages.form.tooltips.mainDetails.address}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.address}
           validators={[validators.required]}
           disabled={remoteInstanceCredentials.isRDS}
@@ -43,7 +41,6 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, remote
           name="port"
           label={Messages.form.labels.mainDetails.port}
           tooltipText={Messages.form.tooltips.mainDetails.port}
-          tooltipIcon="info-circle"
           placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
           validators={portValidators}
         />
@@ -54,7 +51,6 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, remote
           name="username"
           label={Messages.form.labels.mainDetails.username}
           tooltipText={Messages.form.tooltips.mainDetails.username}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.username}
           validators={userPassValidators}
         />
@@ -63,7 +59,6 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, remote
           name="password"
           label={Messages.form.labels.mainDetails.password}
           tooltipText={Messages.form.tooltips.mainDetails.password}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.password}
           validators={userPassValidators}
         />

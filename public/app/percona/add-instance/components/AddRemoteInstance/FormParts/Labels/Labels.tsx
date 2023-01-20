@@ -40,7 +40,6 @@ export const LabelsFormPart: FC<LabelsProps> = ({ showNodeFields = true }) => {
             name="region"
             placeholder={Messages.form.placeholders.labels.region}
             label={Messages.form.labels.labels.region}
-            tooltipIcon="info-circle"
             tooltipText={Messages.form.tooltips.labels.region}
           />
         ) : (
@@ -54,7 +53,6 @@ export const LabelsFormPart: FC<LabelsProps> = ({ showNodeFields = true }) => {
             placeholder={Messages.form.placeholders.labels.az}
             label={Messages.form.labels.labels.az}
             tooltipText={Messages.form.tooltips.labels.az}
-            tooltipIcon="info-circle"
           />
           <div />
         </div>

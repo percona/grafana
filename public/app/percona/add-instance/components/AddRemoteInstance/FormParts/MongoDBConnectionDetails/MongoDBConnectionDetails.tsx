@@ -25,7 +25,6 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           name="serviceName"
           label={Messages.form.labels.mainDetails.serviceName}
           tooltipLinkText={Messages.form.tooltips.mainDetails.serviceName}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.serviceName}
         />
         <div />
@@ -35,7 +34,6 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           name="address"
           label={Messages.form.labels.mainDetails.address}
           tooltipText={Messages.form.tooltips.mainDetails.address}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.address}
           validators={[validators.required]}
           disabled={remoteInstanceCredentials.isRDS}
@@ -44,7 +42,6 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           name="port"
           label={Messages.form.labels.mainDetails.port}
           tooltipText={Messages.form.tooltips.mainDetails.port}
-          tooltipIcon="info-circle"
           placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
           validators={portValidators}
         />
@@ -55,7 +52,6 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           name="username"
           label={Messages.form.labels.mainDetails.username}
           tooltipText={Messages.form.tooltips.mainDetails.username}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.username}
           validators={userPassValidators}
         />
@@ -64,7 +60,6 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           name="password"
           label={Messages.form.labels.mainDetails.password}
           tooltipText={Messages.form.tooltips.mainDetails.password}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.password}
           validators={userPassValidators}
         />
@@ -75,7 +70,6 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           name="maxQueryLength"
           label={Messages.form.labels.mongodbDetails.maxQueryLength}
           tooltipText={Messages.form.tooltips.mongodbDetails.maxQueryLength}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mongodbDetails.maxQueryLength}
           validators={maxQueryLengthValidators}
         />

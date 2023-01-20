@@ -26,7 +26,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           placeholder={Messages.form.placeholders.mainDetails.serviceName}
           label={Messages.form.labels.mainDetails.serviceName}
           tooltipText={Messages.form.tooltips.mainDetails.serviceName}
-          tooltipIcon="info-circle"
         />
         <div />
       </div>
@@ -38,7 +37,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           disabled={remoteInstanceCredentials.isRDS}
           label={Messages.form.labels.mainDetails.address}
           tooltipText={Messages.form.tooltips.mainDetails.address}
-          tooltipIcon="info-circle"
         />
         <TextInputField
           name="port"
@@ -46,7 +44,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           validators={portValidators}
           label={Messages.form.labels.mainDetails.port}
           tooltipText={Messages.form.tooltips.mainDetails.port}
-          tooltipIcon="info-circle"
         />
       </div>
       <div className={styles.group}>
@@ -57,7 +54,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           validators={userPassValidators}
           label={Messages.form.labels.mainDetails.username}
           tooltipText={Messages.form.tooltips.mainDetails.username}
-          tooltipIcon="info-circle"
         />
         <PasswordInputField
           key={`password-${tlsFlag}`}
@@ -66,7 +62,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           validators={userPassValidators}
           label={Messages.form.labels.mainDetails.password}
           tooltipText={Messages.form.tooltips.mainDetails.password}
-          tooltipIcon="info-circle"
         />
       </div>
       <div className={styles.group}>
@@ -76,7 +71,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           placeholder={Messages.form.placeholders.postgresqlDetails.database}
           label={Messages.form.labels.postgresqlDetails.database}
           tooltipText={Messages.form.tooltips.postgresqlDetails.database}
-          tooltipIcon="info-circle"
         />
         <TextInputField
           key="maxQueryLength"
@@ -85,7 +79,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           validators={maxQueryLengthValidators}
           label={Messages.form.labels.postgresqlDetails.maxQueryLength}
           tooltipText={Messages.form.tooltips.postgresqlDetails.maxQueryLength}
-          tooltipIcon="info-circle"
         />
       </div>
     </div>

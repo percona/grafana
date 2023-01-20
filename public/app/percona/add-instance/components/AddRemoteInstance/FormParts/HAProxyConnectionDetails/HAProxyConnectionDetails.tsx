@@ -23,7 +23,6 @@ export const HAProxyConnectionDetails: FC<MainDetailsFormPartProps> = ({ remoteI
           initialValue=""
           label={Messages.form.labels.mainDetails.serviceName}
           tooltipText={Messages.form.tooltips.mainDetails.serviceName}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.serviceName}
         />
         <div />
@@ -34,7 +33,6 @@ export const HAProxyConnectionDetails: FC<MainDetailsFormPartProps> = ({ remoteI
           initialValue=""
           label={Messages.form.labels.mainDetails.address}
           tooltipText={Messages.form.tooltips.mainDetails.address}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.address}
           validators={[validators.required]}
         />
@@ -43,7 +41,6 @@ export const HAProxyConnectionDetails: FC<MainDetailsFormPartProps> = ({ remoteI
           initialValue=""
           label={Messages.form.labels.mainDetails.port}
           tooltipText={Messages.form.tooltips.haproxy.port}
-          tooltipIcon="info-circle"
           placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
           validators={portValidators}
         />
@@ -54,7 +51,6 @@ export const HAProxyConnectionDetails: FC<MainDetailsFormPartProps> = ({ remoteI
           initialValue=""
           label={Messages.form.labels.mainDetails.username}
           tooltipText={Messages.form.tooltips.haproxy.username}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.username}
           format={trim}
         />
@@ -63,7 +59,6 @@ export const HAProxyConnectionDetails: FC<MainDetailsFormPartProps> = ({ remoteI
           initialValue=""
           label={Messages.form.labels.mainDetails.password}
           tooltipText={Messages.form.tooltips.haproxy.password}
-          tooltipIcon="info-circle"
           placeholder={Messages.form.placeholders.mainDetails.password}
           format={trim}
         />
