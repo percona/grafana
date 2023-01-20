@@ -3,6 +3,8 @@ import React from 'react';
 
 import Discovery from './Discovery';
 
+jest.mock('app/percona/add-instance/components/Discovery/Discovery.service');
+
 describe('Discovery:: ', () => {
   it('should render credentials, instances and docs', async () => {
     await waitFor(() => render(<Discovery onSubmit={jest.fn()} selectInstance={jest.fn()} />));
