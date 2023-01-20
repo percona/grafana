@@ -1,26 +1,31 @@
-import { servicesDetailsRender, agentsDetailsRender, nodesDetailsRender } from './ColumnRenderers';
+import {
+  servicesDetailsRender,
+  agentsDetailsRender,
+  nodesDetailsRender,
+  servicesOptionsRender,
+} from './ColumnRenderers';
 
 export const MAIN_COLUMN = ['service_id', 'type', 'service_name', 'custom_labels', 'node_id', 'address', 'port'];
 
-export const SERVICES_COLUMNS = [
+export const getServicesColumns = () => [
   {
-    Header: 'ID',
-    accessor: 'service_id',
+    Header: 'Name',
+    accessor: 'service_name',
   },
   {
-    Header: 'Service Type',
+    Header: 'Type',
     accessor: 'type',
   },
   {
-    Header: 'Service name',
-    accessor: 'service_name',
+    Header: 'ID',
+    accessor: 'service_id',
   },
   {
     Header: 'Node ID',
     accessor: 'node_id',
   },
   {
-    Header: 'Addresses',
+    Header: 'Address',
     accessor: 'address',
   },
   {
@@ -28,8 +33,47 @@ export const SERVICES_COLUMNS = [
     accessor: 'port',
   },
   {
-    Header: 'Other Details',
+    Header: 'Labels',
     accessor: servicesDetailsRender,
+  },
+  {
+    Header: 'Options',
+    accessor: servicesOptionsRender,
+  },
+];
+
+export const SERVICES_COLUMNS = [
+  {
+    Header: 'Name',
+    accessor: 'service_name',
+  },
+  {
+    Header: 'Type',
+    accessor: 'type',
+  },
+  {
+    Header: 'ID',
+    accessor: 'service_id',
+  },
+  {
+    Header: 'Node ID',
+    accessor: 'node_id',
+  },
+  {
+    Header: 'Address',
+    accessor: 'address',
+  },
+  {
+    Header: 'Port',
+    accessor: 'port',
+  },
+  {
+    Header: 'Labels',
+    accessor: servicesDetailsRender,
+  },
+  {
+    Header: 'Options',
+    accessor: servicesOptionsRender,
   },
 ];
 

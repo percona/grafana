@@ -1,8 +1,7 @@
 import { PasswordInputField, TextInputField, validators } from '@percona/platform-core';
 import React, { FC, useMemo } from 'react';
 
-import { useStyles } from '@grafana/ui';
-import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
+import { useStyles2 } from '@grafana/ui';
 import Validators from 'app/percona/shared/helpers/validators';
 
 import { Messages } from '../FormParts.messages';
@@ -10,7 +9,7 @@ import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
 
 export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
   const formValues = form && form.getState().values;
   const tlsFlag = formValues && formValues['tls'];
 
@@ -21,60 +20,68 @@ export const MySQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, rem
   return (
     <div className={styles.groupWrapper}>
       <h4 className={styles.sectionHeader}>{Messages.form.titles.mainDetails}</h4>
-      <div className={styles.labelWrapper} data-testid="address-label">
-        <span>{Messages.form.labels.mainDetails.address}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mainDetails.address} icon="info-circle" />
+      <div className={styles.group}>
+        <TextInputField
+          data-testid="service-name-label"
+          name="serviceName"
+          label={Messages.form.labels.mainDetails.serviceName}
+          tooltipIcon="info-circle"
+          tooltipText={Messages.form.tooltips.mainDetails.serviceName}
+          placeholder={Messages.form.placeholders.mainDetails.serviceName}
+        />
+        <div />
       </div>
-      <TextInputField
-        name="address"
-        placeholder={Messages.form.placeholders.mainDetails.address}
-        validators={[validators.required]}
-        disabled={remoteInstanceCredentials.isRDS}
-      />
-      <div className={styles.labelWrapper} data-testid="service-name-label">
-        <span>{Messages.form.labels.mainDetails.serviceName}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mainDetails.serviceName} icon="info-circle" />
+      <div className={styles.group}>
+        <TextInputField
+          name="address"
+          label={Messages.form.labels.mainDetails.address}
+          tooltipText={Messages.form.tooltips.mainDetails.address}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mainDetails.address}
+          validators={[validators.required]}
+          disabled={remoteInstanceCredentials.isRDS}
+        />
+        <TextInputField
+          name="port"
+          label={Messages.form.labels.mainDetails.port}
+          tooltipText={Messages.form.tooltips.mainDetails.port}
+          tooltipIcon="info-circle"
+          placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
+          validators={portValidators}
+        />
       </div>
-      <TextInputField name="serviceName" placeholder={Messages.form.placeholders.mainDetails.serviceName} />
-      <div className={styles.labelWrapper} data-testid="port-label">
-        <span>{Messages.form.labels.mainDetails.port}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mainDetails.port} icon="info-circle" />
+      <div className={styles.group}>
+        <TextInputField
+          key={`username-${tlsFlag}`}
+          name="username"
+          label={Messages.form.labels.mainDetails.username}
+          tooltipText={Messages.form.tooltips.mainDetails.username}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mainDetails.username}
+          validators={userPassValidators}
+        />
+        <PasswordInputField
+          key={`password-${tlsFlag}`}
+          name="password"
+          label={Messages.form.labels.mainDetails.password}
+          tooltipText={Messages.form.tooltips.mainDetails.password}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mainDetails.password}
+          validators={userPassValidators}
+        />
       </div>
-      <TextInputField
-        name="port"
-        placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
-        validators={portValidators}
-      />
-      <div className={styles.labelWrapper} data-testid="username-label">
-        <span>{Messages.form.labels.mainDetails.username}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mainDetails.username} icon="info-circle" />
+      <div className={styles.group}>
+        <TextInputField
+          key="maxQueryLength"
+          name="maxQueryLength"
+          label={Messages.form.labels.mysqlDetails.maxQueryLength}
+          tooltipText={Messages.form.tooltips.mysqlDetails.maxQueryLength}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mysqlDetails.maxQueryLength}
+          validators={maxQueryLengthValidators}
+        />
+        <div />
       </div>
-      <TextInputField
-        key={`username-${tlsFlag}`}
-        name="username"
-        placeholder={Messages.form.placeholders.mainDetails.username}
-        validators={userPassValidators}
-      />
-      <div className={styles.labelWrapper} data-testid="password-label">
-        <span>{Messages.form.labels.mainDetails.password}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mainDetails.password} icon="info-circle" />
-      </div>
-      <PasswordInputField
-        key={`password-${tlsFlag}`}
-        name="password"
-        placeholder={Messages.form.placeholders.mainDetails.password}
-        validators={userPassValidators}
-      />
-      <div className={styles.labelWrapper} data-testid="max-query-length-label">
-        <span>{Messages.form.labels.mysqlDetails.maxQueryLength}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mysqlDetails.maxQueryLength} icon="info-circle" />
-      </div>
-      <TextInputField
-        key="maxQueryLength"
-        name="maxQueryLength"
-        placeholder={Messages.form.placeholders.mysqlDetails.maxQueryLength}
-        validators={maxQueryLengthValidators}
-      />
     </div>
   );
 };

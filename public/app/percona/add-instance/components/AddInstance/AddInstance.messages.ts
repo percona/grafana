@@ -1,4 +1,6 @@
 export const Messages = {
+  sectionTitle: 'Select service type',
+  description: 'Select the service type you want to configure and then add to your inventory.',
   titles: {
     rds: 'Amazon RDS',
     azure: 'Microsoft Azure MySQL or PostgreSQL',

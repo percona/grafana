@@ -160,6 +160,14 @@ export const PMM_ADD_INSTANCE_PAGE: NavModelItem = {
   showIconInNavbar: true,
 };
 
+export const PMM_EDIT_INSTANCE_PAGE: NavModelItem = {
+  id: 'edit-instance',
+  url: `${config.appSubUrl}/edit-instance`,
+  text: 'Edit Instance',
+  hideFromTabs: true,
+  showIconInNavbar: false,
+};
+
 export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
   const children: NavModelItem[] = [
     {

@@ -5,7 +5,7 @@ import { FormApi } from 'final-form';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Form as FormFinal } from 'react-final-form';
 
-import { Button, useStyles } from '@grafana/ui';
+import { useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases } from 'app/percona/shared/core';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -35,7 +35,10 @@ import {
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
 
-const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, credentials }, selectInstance }) => {
+const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
+  instance: { type, credentials },
+  onSubmit: submitWrapper,
+}) => {
   const styles = useStyles(getStyles);
 
   const { remoteInstanceCredentials, discoverName } = getInstanceData(type, credentials);
@@ -128,13 +131,13 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
     if (databaseType === '') {
       return Messages.form.titles.addRemoteInstance;
     }
-    return `Add remote ${INSTANCE_TYPES_LABELS[databaseType]} Instance`;
+    return `Configuring ${INSTANCE_TYPES_LABELS[databaseType]} service`;
   };
 
   return (
     <div className={styles.formWrapper}>
       <FormFinal
-        onSubmit={onSubmit}
+        onSubmit={(values) => submitWrapper(onSubmit(values))}
         initialValues={initialValues}
         mutators={{
           setValue: ([field, value], state, { changeValue }) => {
@@ -142,23 +145,9 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({ instance: { type, crede
           },
         }}
         render={({ form, handleSubmit }) => (
-          <form onSubmit={handleSubmit} data-testid="add-remote-instance-form">
-            <h4 className={styles.addRemoteInstanceTitle}>{getHeader(type)}</h4>
+          <form id="add-instance-form" onSubmit={handleSubmit} data-testid="add-remote-instance-form">
+            <h3 className={styles.addRemoteInstanceTitle}>{getHeader(type)}</h3>
             {formParts(form)}
-            <div className={styles.addRemoteInstanceButtons}>
-              <Button id="addInstance" disabled={loading} type="submit">
-                {Messages.form.buttons.addService}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => selectInstance({ type: '' })}
-                disabled={loading}
-                className={styles.returnButton}
-                icon="arrow-left"
-              >
-                {Messages.form.buttons.toMenu}
-              </Button>
-            </div>
           </form>
         )}
       />

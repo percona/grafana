@@ -2,13 +2,13 @@ import { TextInputField, PasswordInputField } from '@percona/platform-core';
 import React, { FC, useCallback } from 'react';
 import { Form as FormFinal } from 'react-final-form';
 
-import { Button, useStyles } from '@grafana/ui';
+import { useStyles } from '@grafana/ui';
 
 import { Messages } from './Credentials.messages';
 import { getStyles } from './Credentials.styles';
 import { CredentialsProps, RDSCredentialsForm } from './Credentials.types';
 
-const Credentials: FC<CredentialsProps> = ({ discover, selectInstance }) => {
+const Credentials: FC<CredentialsProps> = ({ discover }) => {
   const styles = useStyles(getStyles);
 
   const onSubmit = useCallback(
@@ -22,7 +22,12 @@ const Credentials: FC<CredentialsProps> = ({ discover, selectInstance }) => {
     <FormFinal
       onSubmit={onSubmit}
       render={({ handleSubmit }) => (
-        <form onSubmit={handleSubmit} className={styles.instanceForm} data-testid="credentials-form">
+        <form
+          id="add-instance-form"
+          onSubmit={handleSubmit}
+          className={styles.instanceForm}
+          data-testid="credentials-form"
+        >
           <div className={styles.fieldsWrapper}>
             <TextInputField
               name={Messages.form.fields.awsAccessKey.name}
@@ -37,15 +42,6 @@ const Credentials: FC<CredentialsProps> = ({ discover, selectInstance }) => {
               fieldClassName={styles.credentialsField}
             />
           </div>
-          <div className={styles.buttonsWrapper}>
-            <Button variant="secondary" onClick={() => selectInstance({ type: '' })} icon="arrow-left">
-              {Messages.form.toMenuButton}
-            </Button>
-            <Button type="submit" data-testid="credentials-search-button" className={styles.credentialsSubmit}>
-              {Messages.form.submitButton}
-            </Button>
-          </div>
-          <div></div>
         </form>
       )}
     />

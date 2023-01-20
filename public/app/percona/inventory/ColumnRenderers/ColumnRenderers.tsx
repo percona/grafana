@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 
 import { MAIN_COLUMN } from 'app/percona/inventory/Inventory.constants';
 import { CustomLabel } from 'app/percona/inventory/Inventory.types';
+
+import ServicesOptions from '../components/ServicesOptions/ServicesOptions';
 
 import * as styles from './ColumnRenderers.styles';
 
@@ -17,6 +20,8 @@ export const servicesDetailsRender = (element: any) => {
     </div>
   );
 };
+
+export const servicesOptionsRender = (element: any) => <ServicesOptions service={element} />;
 
 export const agentsDetailsRender = (element: any) => {
   const mainColumns = ['agent_id', 'type', 'isDeleted', 'service_ids', 'custom_labels'];

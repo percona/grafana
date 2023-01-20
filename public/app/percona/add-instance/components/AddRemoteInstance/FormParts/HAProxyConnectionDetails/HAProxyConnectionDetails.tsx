@@ -1,8 +1,7 @@
 import { PasswordInputField, TextInputField, validators } from '@percona/platform-core';
 import React, { FC, useCallback, useMemo } from 'react';
 
-import { useStyles } from '@grafana/ui';
-import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
+import { useStyles2 } from '@grafana/ui';
 import Validators from 'app/percona/shared/helpers/validators';
 
 import { Messages } from '../FormParts.messages';
@@ -10,7 +9,7 @@ import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
 
 export const HAProxyConnectionDetails: FC<MainDetailsFormPartProps> = ({ remoteInstanceCredentials }) => {
-  const styles = useStyles(getStyles);
+  const styles = useStyles2(getStyles);
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
   const trim = useCallback((value) => (value ? value.trim() : value), []);
@@ -18,55 +17,57 @@ export const HAProxyConnectionDetails: FC<MainDetailsFormPartProps> = ({ remoteI
   return (
     <div className={styles.groupWrapper}>
       <h4 className={styles.sectionHeader}>{Messages.form.titles.mainDetails}</h4>
-      <div className={styles.labelWrapper} data-testid="address-label">
-        <span>{Messages.form.labels.mainDetails.address}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mainDetails.address} icon="info-circle" />
+      <div className={styles.group}>
+        <TextInputField
+          name="serviceName"
+          initialValue=""
+          label={Messages.form.labels.mainDetails.serviceName}
+          tooltipText={Messages.form.tooltips.mainDetails.serviceName}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mainDetails.serviceName}
+        />
+        <div />
       </div>
-      <TextInputField
-        name="address"
-        initialValue=""
-        placeholder={Messages.form.placeholders.mainDetails.address}
-        validators={[validators.required]}
-      />
-      <div className={styles.labelWrapper} data-testid="service-name-label">
-        <span>{Messages.form.labels.mainDetails.serviceName}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.mainDetails.serviceName} icon="info-circle" />
+      <div className={styles.group}>
+        <TextInputField
+          name="address"
+          initialValue=""
+          label={Messages.form.labels.mainDetails.address}
+          tooltipText={Messages.form.tooltips.mainDetails.address}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mainDetails.address}
+          validators={[validators.required]}
+        />
+        <TextInputField
+          name="port"
+          initialValue=""
+          label={Messages.form.labels.mainDetails.port}
+          tooltipText={Messages.form.tooltips.haproxy.port}
+          tooltipIcon="info-circle"
+          placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
+          validators={portValidators}
+        />
       </div>
-      <TextInputField
-        name="serviceName"
-        initialValue=""
-        placeholder={Messages.form.placeholders.mainDetails.serviceName}
-      />
-      <div className={styles.labelWrapper} data-testid="port-label">
-        <span>{Messages.form.labels.mainDetails.port}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.haproxy.port} icon="info-circle" />
+      <div className={styles.group}>
+        <TextInputField
+          name="username"
+          initialValue=""
+          label={Messages.form.labels.mainDetails.username}
+          tooltipText={Messages.form.tooltips.haproxy.username}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mainDetails.username}
+          format={trim}
+        />
+        <PasswordInputField
+          name="password"
+          initialValue=""
+          label={Messages.form.labels.mainDetails.password}
+          tooltipText={Messages.form.tooltips.haproxy.password}
+          tooltipIcon="info-circle"
+          placeholder={Messages.form.placeholders.mainDetails.password}
+          format={trim}
+        />
       </div>
-      <TextInputField
-        name="port"
-        initialValue=""
-        placeholder={`Port (default: ${remoteInstanceCredentials.port} )`}
-        validators={portValidators}
-      />
-      <div className={styles.labelWrapper} data-testid="username-label">
-        <span>{Messages.form.labels.mainDetails.username}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.haproxy.username} icon="info-circle" />
-      </div>
-      <TextInputField
-        name="username"
-        initialValue=""
-        placeholder={Messages.form.placeholders.mainDetails.username}
-        format={trim}
-      />
-      <div className={styles.labelWrapper} data-testid="password-label">
-        <span>{Messages.form.labels.mainDetails.password}</span>
-        <LinkTooltip tooltipContent={Messages.form.tooltips.haproxy.password} icon="info-circle" />
-      </div>
-      <PasswordInputField
-        name="password"
-        initialValue=""
-        placeholder={Messages.form.placeholders.mainDetails.password}
-        format={trim}
-      />
     </div>
   );
 };

@@ -6,6 +6,9 @@ export const styles = {
     justify-content: flex-end;
     margin-bottom: 5px;
   `,
+  servicesActionPanel: css`
+    margin-bottom: 15px;
+  `,
   tableWrapper: css`
     padding: 10px;
     display: flex;

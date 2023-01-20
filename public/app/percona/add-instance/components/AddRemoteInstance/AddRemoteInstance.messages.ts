@@ -1,4 +1,15 @@
 export const Messages = {
+  pageTitleSelection: 'Inventory / Add service / Step 1 of 2',
+  pageTitleConfiguration: 'Inventory / Add service / Step 2 of 2',
+  selectionStep: {
+    cancel: 'Cancel',
+    next: 'Next step: Configuration',
+  },
+  configurationStep: {
+    cancel: 'Cancel',
+    next: 'Add service',
+    discover: 'Discover',
+  },
   form: {
     trackingOptions: {
       none: "Don't track",

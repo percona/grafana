@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { ServicesService } from 'app/percona/shared/services/services/Services.service';
 import { ServiceListPayload, ServiceType } from 'app/percona/shared/services/services/Services.types';
 import { createAsyncThunk } from 'app/types';
 
 import { filterFulfilled, processPromiseResults } from '../../../helpers/promises';
 
-import { ListServicesParams, RemoveServicesParams, ServicesState } from './services.types';
+import { ListServicesParams, RemoveServiceParams, RemoveServicesParams, ServicesState } from './services.types';
 import { toListServicesBody, toRemoveServiceBody } from './services.utils';
 
 const initialState: ServicesState = {
@@ -75,6 +76,20 @@ export const removeServicesAction = createAsyncThunk(
     const results = await processPromiseResults(requests);
     return results.filter(filterFulfilled).length;
   }
+);
+
+export const removeServiceAction = createAsyncThunk(
+  'percona/removeServices',
+  async (params: RemoveServiceParams, thunkAPI): Promise<void> =>
+    withSerializedError(
+      (async () => {
+        const body = toRemoveServiceBody(params);
+        await ServicesService.removeService(body);
+
+        thunkAPI.dispatch(fetchServicesAction({}));
+        thunkAPI.dispatch(fetchActiveServiceTypesAction());
+      })()
+    )
 );
 
 export default servicesSlice.reducer;

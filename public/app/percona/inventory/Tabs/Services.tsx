@@ -5,6 +5,7 @@ import { Form } from 'react-final-form';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -93,24 +94,37 @@ export const Services = () => {
     setSelectedRows(rows);
   }, []);
 
+  const handleAddService = useCallback(() => {
+    locationService.push('/add-instance');
+  }, []);
+
   return (
     <OldPage navModel={navModel}>
       <OldPage.Contents>
         <FeatureLoader>
           <div className={styles.tableWrapper}>
-            <div className={styles.actionPanel}>
-              <Button
-                size="md"
-                disabled={selected.length === 0}
-                onClick={() => {
-                  setModalVisible(!modalVisible);
-                }}
-                icon="trash-alt"
-                variant="destructive"
-                className={styles.destructiveButton}
-              >
-                Delete
-              </Button>
+            <div className={styles.servicesActionPanel}>
+              <HorizontalGroup justify="space-between">
+                <Button
+                  size="md"
+                  disabled={selected.length === 0}
+                  onClick={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                  icon="trash-alt"
+                  variant="destructive"
+                  className={styles.destructiveButton}
+                >
+                  {selected.length === 1
+                    ? `Delete ${selected.length} service`
+                    : selected.length > 1
+                    ? `Delete ${selected.length} services`
+                    : 'Delete'}
+                </Button>
+                <Button size="md" onClick={handleAddService} icon="plus" variant="primary">
+                  Add service
+                </Button>
+              </HorizontalGroup>
             </div>
             <Modal
               title={
