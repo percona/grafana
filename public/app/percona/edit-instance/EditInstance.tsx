@@ -80,7 +80,7 @@ const EditInstancePage: React.FC = () => {
     }
   };
 
-  const handleCancelModal = () => {
+  const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
@@ -94,7 +94,11 @@ const EditInstancePage: React.FC = () => {
       onSubmit={handleSubmit}
       render={({ handleSubmit, submitting }) => (
         <>
-          <Modal isOpen={isModalOpen} title={Messages.formTitle(service?.service_name || '')}>
+          <Modal
+            isOpen={isModalOpen}
+            title={Messages.formTitle(service?.service_name || '')}
+            onDismiss={handleCloseModal}
+          >
             <p>
               {Messages.modal.description}
               {Messages.modal.details}
@@ -105,7 +109,7 @@ const EditInstancePage: React.FC = () => {
             </p>
             <Modal.ButtonRow>
               <Button onClick={handleSubmit}>{Messages.modal.confirm}</Button>
-              <Button variant="secondary" onClick={handleCancelModal}>
+              <Button variant="secondary" onClick={handleCloseModal}>
                 {Messages.modal.cancel}
               </Button>
             </Modal.ButtonRow>

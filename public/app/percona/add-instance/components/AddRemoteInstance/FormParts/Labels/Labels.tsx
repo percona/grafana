@@ -62,7 +62,7 @@ export const LabelsFormPart: FC<LabelsProps> = ({ showNodeFields = true }) => {
           name="custom_labels"
           label={
             <div>
-              <div>{Messages.form.labels.labels.customLabels}</div>
+              <label htmlFor="input-custom_labels-id">{Messages.form.labels.labels.customLabels}</label>
               <p className={styles.description}>{Messages.form.descriptions.customLabels}</p>
             </div>
           }
