@@ -33,4 +33,8 @@ export const Messages = {
       addRemoteInstance: 'Add remote instance',
     },
   },
+  success: {
+    title: (service: string) => `Service “${service}” added to your inventory`,
+    description: 'Your MongoDB service instance is now ready to be monitored.',
+  },
 };
