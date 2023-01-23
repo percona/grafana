@@ -7,8 +7,22 @@ import { createAsyncThunk } from 'app/types';
 
 import { filterFulfilled, processPromiseResults } from '../../../helpers/promises';
 
-import { ListServicesParams, RemoveServiceParams, RemoveServicesParams, ServicesState } from './services.types';
-import { toListServicesBody, toRemoveServiceBody } from './services.utils';
+import {
+  ListServicesParams,
+  RemoveServiceParams,
+  RemoveServicesParams,
+  ServicesState,
+  UpdateServiceParams,
+} from './services.types';
+import {
+  didStandardLabelsChange,
+  hasLabelsToAddOrUpdate,
+  hasLabelsToRemove,
+  toCustomLabelsBodies,
+  toListServicesBody,
+  toRemoveServiceBody,
+  toUpdateServiceBody,
+} from './services.utils';
 
 const initialState: ServicesState = {
   activeTypes: [],
@@ -90,6 +104,32 @@ export const removeServiceAction = createAsyncThunk(
         thunkAPI.dispatch(fetchActiveServiceTypesAction());
       })()
     )
+);
+
+export const updateServiceAction = createAsyncThunk('percona/updateService', (params: UpdateServiceParams, thunkAPI) =>
+  withSerializedError(
+    (async (): Promise<void> => {
+      const updateBody = toUpdateServiceBody(params);
+      const [addLabelsBody, removeLabelsBody] = toCustomLabelsBodies(params);
+      const requests: Array<Promise<{}>> = [];
+
+      if (didStandardLabelsChange(params)) {
+        requests.push(ServicesService.updateService(updateBody));
+      }
+
+      if (hasLabelsToAddOrUpdate(addLabelsBody)) {
+        requests.push(ServicesService.addCustomLabels(addLabelsBody));
+      }
+
+      if (hasLabelsToRemove(removeLabelsBody)) {
+        requests.push(ServicesService.removeCustomLabels(removeLabelsBody));
+      }
+
+      await Promise.all(requests);
+
+      thunkAPI.dispatch(fetchServicesAction({}));
+    })()
+  )
 );
 
 export default servicesSlice.reducer;
