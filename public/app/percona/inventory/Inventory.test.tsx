@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table } from '@percona/platform-core';
 import { render, waitFor } from '@testing-library/react';
-import React from 'react';
+import React, { ReactElement } from 'react';
+import { Provider } from 'react-redux';
+
+import { configureStore } from 'app/store/configureStore';
 
 import { AGENTS_COLUMNS, NODES_COLUMNS, SERVICES_COLUMNS } from './Inventory.constants';
 import { InventoryDataService } from './Inventory.tools';
 
 jest.mock('app/percona/settings/Settings.service');
+
+const wrap = (component: ReactElement) => <Provider store={configureStore()}>{component}</Provider>;
 
 // FIXME: types
 describe('Inventory tables', () => {
@@ -44,15 +49,17 @@ describe('Inventory tables', () => {
     const data = InventoryDataService.getAgentModel(response as any);
 
     const { container } = render(
-      <Table
-        data={data}
-        totalItems={data.length}
-        rowSelection
-        columns={AGENTS_COLUMNS}
-        pendingRequest={false}
-        showPagination
-        pageSize={25}
-      />
+      wrap(
+        <Table
+          data={data}
+          totalItems={data.length}
+          rowSelection
+          columns={AGENTS_COLUMNS}
+          pendingRequest={false}
+          showPagination
+          pageSize={25}
+        />
+      )
     );
 
     // length is 5 because header is also tr
@@ -117,15 +124,17 @@ describe('Inventory tables', () => {
     };
     const data = InventoryDataService.getServiceModel(response as any);
     const { container } = render(
-      <Table
-        data={data}
-        totalItems={data.length}
-        columns={SERVICES_COLUMNS}
-        pendingRequest={false}
-        rowSelection
-        showPagination
-        pageSize={25}
-      />
+      wrap(
+        <Table
+          data={data}
+          totalItems={data.length}
+          columns={SERVICES_COLUMNS}
+          pendingRequest={false}
+          rowSelection
+          showPagination
+          pageSize={25}
+        />
+      )
     );
 
     // length is 2 because header is also tr
@@ -144,15 +153,17 @@ describe('Inventory tables', () => {
     };
     const data = InventoryDataService.getServiceModel(response as any);
     const { container } = render(
-      <Table
-        data={data}
-        totalItems={data.length}
-        columns={SERVICES_COLUMNS}
-        pendingRequest={false}
-        rowSelection
-        showPagination
-        pageSize={25}
-      />
+      wrap(
+        <Table
+          data={data}
+          totalItems={data.length}
+          columns={SERVICES_COLUMNS}
+          pendingRequest={false}
+          rowSelection
+          showPagination
+          pageSize={25}
+        />
+      )
     );
 
     // default page size is 25
@@ -168,15 +179,17 @@ describe('Inventory tables', () => {
     };
     const data = InventoryDataService.getNodeModel(response as any);
     const { container } = render(
-      <Table
-        data={data}
-        totalItems={data.length}
-        columns={NODES_COLUMNS}
-        pendingRequest={false}
-        rowSelection
-        showPagination
-        pageSize={25}
-      />
+      wrap(
+        <Table
+          data={data}
+          totalItems={data.length}
+          columns={NODES_COLUMNS}
+          pendingRequest={false}
+          rowSelection
+          showPagination
+          pageSize={25}
+        />
+      )
     );
 
     // length is 3 because header is also tr
@@ -189,15 +202,17 @@ describe('Inventory tables', () => {
     };
     const data = InventoryDataService.getNodeModel(response as any);
     const { container } = render(
-      <Table
-        data={data}
-        totalItems={data.length}
-        columns={NODES_COLUMNS}
-        pendingRequest={false}
-        rowSelection
-        showPagination
-        pageSize={25}
-      />
+      wrap(
+        <Table
+          data={data}
+          totalItems={data.length}
+          columns={NODES_COLUMNS}
+          pendingRequest={false}
+          rowSelection
+          showPagination
+          pageSize={25}
+        />
+      )
     );
 
     // default page size is 25
