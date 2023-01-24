@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ControlledCollapse, useStyles2 } from '@grafana/ui';
+import { ControlledCollapse, useTheme2 } from '@grafana/ui';
 
 import { getStyles } from './CustomCollapsableSection.styles';
 import { CustomCollapsableSectionProps } from './CustomCollapsableSection.types';
@@ -10,8 +10,10 @@ export const CustomCollapsableSection = ({
   mainLabel,
   content,
   sideLabel,
+  disabled = false,
 }: CustomCollapsableSectionProps) => {
-  const styles = useStyles2(getStyles);
+  const theme = useTheme2();
+  const styles = getStyles(theme, disabled);
   return (
     <ControlledCollapse
       label={
@@ -25,6 +27,7 @@ export const CustomCollapsableSection = ({
       bodyCustomClass={styles.collapsableBody}
       headerCustomClass={styles.collapsableHeader}
       headerLabelCustomClass={styles.collapsableHeaderLabel}
+      disabled={disabled}
     >
       {children}
     </ControlledCollapse>

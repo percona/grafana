@@ -108,6 +108,7 @@ export interface Props {
   headerCustomClass?: string;
   bodyCustomClass?: string;
   headerLabelCustomClass?: string;
+  disabled?: boolean;
 }
 
 export const ControlledCollapse: FunctionComponent<Props> = ({ isOpen, onToggle, ...otherProps }) => {
@@ -138,11 +139,12 @@ export const Collapse: FunctionComponent<Props> = ({
   headerCustomClass,
   headerLabelCustomClass,
   bodyCustomClass,
+  disabled = false,
   children,
 }) => {
   const style = useStyles2(getStyles);
   const onClickToggle = () => {
-    if (onToggle && collapsible) {
+    if (onToggle && collapsible && !disabled) {
       onToggle(!isOpen);
     }
   };
@@ -154,7 +156,7 @@ export const Collapse: FunctionComponent<Props> = ({
   return (
     <div className={panelClass}>
       <div className={cx([headerClass, headerCustomClass])} onClick={onClickToggle}>
-        {collapsible && <Icon className={style.icon} name={isOpen ? 'angle-down' : 'angle-right'} />}
+        {collapsible && !disabled && <Icon className={style.icon} name={isOpen ? 'angle-down' : 'angle-right'} />}
         <div className={cx([style.headerLabel, headerLabelCustomClass])}>{label}</div>
       </div>
       {isOpen && (

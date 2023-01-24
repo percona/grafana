@@ -2,10 +2,11 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ typography, colors, v1: { spacing } }: GrafanaTheme2) => ({
+export const getStyles = ({ typography, colors, v1: { spacing } }: GrafanaTheme2, disabled: boolean) => ({
   collapsableSection: css`
     border: none;
     background-color: ${colors.background.primary};
+    color: ${disabled && colors.text.disabled};
   `,
   collapsableHeader: css`
     padding: 20px;

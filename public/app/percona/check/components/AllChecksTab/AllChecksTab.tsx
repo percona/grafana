@@ -2,7 +2,7 @@ import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { useStyles2 } from '@grafana/ui';
+import { Alert, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { CheckService } from 'app/percona/check/Check.service';
@@ -33,6 +33,7 @@ export const AllChecksTab: FC = () => {
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
+  const [showAlert, setShowAlert] = useState(true);
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
@@ -194,38 +195,55 @@ export const AllChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          <div className={styles.actionButtons} data-testid="db-check-panel-actions">
-            <LoaderButton
-              type="button"
-              size="md"
-              loading={runChecksPending}
-              onClick={handleRunChecksClick}
-              className={styles.runChecksButton}
+          {showAlert && (
+            <Alert
+              title="Upgrade your plan"
+              severity="info"
+              customButtonContent="Upgrade"
+              onCustomButtonClick={(e) => console.log(e)}
+              onRemove={() => setShowAlert(false)}
             >
-              {Messages.runDbChecks}
-            </LoaderButton>
-          </div>
-          <CustomCollapsableSection
-            mainLabel="CVE security"
-            content="Imforming users about versions of DBs affected by CVE."
-            sideLabel="Partion support (Mongo)"
-          >
-            <Table
-              totalItems={checks.length}
-              data={checks}
-              columns={columns}
-              pendingRequest={fetchChecksPending}
-              emptyMessage={Messages.table.noData}
-              showFilter
-            />
-            {!!selectedCheck && checkIntervalModalVisible && (
-              <ChangeCheckIntervalModal
-                check={selectedCheck}
-                onClose={handleModalClose}
-                onIntervalChanged={handleIntervalChanged}
+              By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
+            </Alert>
+          )}
+          <div className={styles.wrapper}>
+            <div className={styles.header}>
+              <h1>Available to you</h1>
+              <div className={styles.actionButtons} data-testid="db-check-panel-actions">
+                <LoaderButton
+                  type="button"
+                  size="md"
+                  loading={runChecksPending}
+                  onClick={handleRunChecksClick}
+                  className={styles.runChecksButton}
+                >
+                  {Messages.runDbChecks}
+                </LoaderButton>
+              </div>
+            </div>
+            <CustomCollapsableSection
+              mainLabel="CVE security"
+              content="Imforming users about versions of DBs affected by CVE."
+              sideLabel="Partion support (Mongo)"
+              disabled={true}
+            >
+              <Table
+                totalItems={checks.length}
+                data={checks}
+                columns={columns}
+                pendingRequest={fetchChecksPending}
+                emptyMessage={Messages.table.noData}
+                showFilter
               />
-            )}
-          </CustomCollapsableSection>
+              {!!selectedCheck && checkIntervalModalVisible && (
+                <ChangeCheckIntervalModal
+                  check={selectedCheck}
+                  onClose={handleModalClose}
+                  onIntervalChanged={handleIntervalChanged}
+                />
+              )}
+            </CustomCollapsableSection>
+          </div>
         </FeatureLoader>
       </OldPage.Contents>
     </OldPage>
