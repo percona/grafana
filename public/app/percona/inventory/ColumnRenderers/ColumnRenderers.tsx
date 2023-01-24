@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 
+import { HorizontalGroup, Icon, Tooltip } from '@grafana/ui';
 import { MAIN_COLUMN } from 'app/percona/inventory/Inventory.constants';
 import { CustomLabel } from 'app/percona/inventory/Inventory.types';
 
@@ -20,6 +21,15 @@ export const servicesDetailsRender = (element: any) => {
     </div>
   );
 };
+
+export const servicesLabelsHeaderRender = (): React.ReactElement => (
+  <HorizontalGroup>
+    <span>Labels</span>
+    <Tooltip content=" Useful to define groupings and segment access to build custom user roles.">
+      <Icon name="info-circle" />
+    </Tooltip>
+  </HorizontalGroup>
+);
 
 export const servicesOptionsRender = (element: any) => <ServicesOptions service={element} />;
 

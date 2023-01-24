@@ -1,8 +1,11 @@
+import { Column } from 'react-table';
+
 import {
   servicesDetailsRender,
   agentsDetailsRender,
   nodesDetailsRender,
   servicesOptionsRender,
+  servicesLabelsHeaderRender,
 } from './ColumnRenderers';
 
 export const MAIN_COLUMN = ['service_id', 'type', 'service_name', 'custom_labels', 'node_id', 'address', 'port'];
@@ -33,7 +36,7 @@ export const getServicesColumns = () => [
     accessor: 'port',
   },
   {
-    Header: 'Labels',
+    Header: servicesLabelsHeaderRender(),
     accessor: servicesDetailsRender,
   },
   {
@@ -42,7 +45,7 @@ export const getServicesColumns = () => [
   },
 ];
 
-export const SERVICES_COLUMNS = [
+export const SERVICES_COLUMNS: Column[] = [
   {
     Header: 'Name',
     accessor: 'service_name',
@@ -68,7 +71,8 @@ export const SERVICES_COLUMNS = [
     accessor: 'port',
   },
   {
-    Header: 'Labels',
+    id: 'labels',
+    Header: servicesLabelsHeaderRender(),
     accessor: servicesDetailsRender,
   },
   {

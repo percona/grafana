@@ -35,6 +35,6 @@ export const Messages = {
   },
   success: {
     title: (service: string) => `Service “${service}” added to your inventory`,
-    description: 'Your MongoDB service instance is now ready to be monitored.',
+    description: (serviceType: string) => `Your ${serviceType} service instance is now ready to be monitored.`,
   },
 };

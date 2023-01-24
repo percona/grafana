@@ -76,7 +76,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
         }
         appEvents.emit(AppEvents.alertSuccess, [
           Messages.success.title(values.serviceName || values.address || ''),
-          Messages.success.description,
+          Messages.success.description(INSTANCE_TYPES_LABELS[type as Databases]),
         ]);
         window.location.href = '/graph/inventory/';
       } catch (e) {
