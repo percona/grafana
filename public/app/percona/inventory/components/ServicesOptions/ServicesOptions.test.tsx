@@ -10,6 +10,7 @@ import { Messages } from './ServicesOptions.messages';
 
 const serviceStub = {
   service_id: 'service_id',
+  node_id: 'node_id',
   service_name: 'service_name',
 };
 
