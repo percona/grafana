@@ -10,41 +10,6 @@ import {
 
 export const MAIN_COLUMN = ['service_id', 'type', 'service_name', 'custom_labels', 'node_id', 'address', 'port'];
 
-export const getServicesColumns = () => [
-  {
-    Header: 'Name',
-    accessor: 'service_name',
-  },
-  {
-    Header: 'Type',
-    accessor: 'type',
-  },
-  {
-    Header: 'ID',
-    accessor: 'service_id',
-  },
-  {
-    Header: 'Node ID',
-    accessor: 'node_id',
-  },
-  {
-    Header: 'Address',
-    accessor: 'address',
-  },
-  {
-    Header: 'Port',
-    accessor: 'port',
-  },
-  {
-    Header: servicesLabelsHeaderRender(),
-    accessor: servicesDetailsRender,
-  },
-  {
-    Header: 'Options',
-    accessor: servicesOptionsRender,
-  },
-];
-
 export const SERVICES_COLUMNS: Column[] = [
   {
     Header: 'Name',
