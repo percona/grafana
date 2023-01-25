@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { AppEvents } from '@grafana/data';
-import { Button, Modal, PageToolbar, ToolbarButton, ToolbarButtonRow, useStyles2 } from '@grafana/ui';
+import { Button, Modal, PageToolbar, ToolbarButton, ToolbarButtonRow } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
@@ -17,14 +17,12 @@ import { DbServicePayload } from '../shared/services/services/Services.types';
 
 import { FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
 import { Messages } from './EditInstance.messages';
-import { getStyles } from './EditInstance.styles';
 import { EditInstanceFormValues, EditInstanceRouteParams } from './EditInstance.types';
 import { getInitialValues, getService, toPayload } from './EditInstance.utils';
 
 const EditInstancePage: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const styles = useStyles2(getStyles);
   const { serviceId } = useParams<EditInstanceRouteParams>();
   const [isLoading, setIsLoading] = useState(true);
   const [service, setService] = useState<DbServicePayload>();
@@ -101,11 +99,12 @@ const EditInstancePage: React.FC = () => {
           >
             <p>
               {Messages.modal.description}
-              {Messages.modal.details}
-              <a className={styles.link} href="">
+              {/* todo: add back in when docs are available */}
+              {/* {Messages.modal.details}
+              <a className={styles.link}>
                 {Messages.modal.detailsLink}
               </a>
-              {Messages.modal.dot}
+              {Messages.modal.dot} */}
             </p>
             <Modal.ButtonRow>
               <Button onClick={handleSubmit}>{Messages.modal.confirm}</Button>

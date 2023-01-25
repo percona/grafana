@@ -69,4 +69,7 @@ export const getStyles = ({ breakpoints, spacing, colors }: GrafanaTheme2) => ({
       margin: ${spacing(2)} 0;
     }
   `,
+  link: css`
+    color: ${colors.text.link};
+  `,
 });

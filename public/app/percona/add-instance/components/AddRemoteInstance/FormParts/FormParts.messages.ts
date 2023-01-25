@@ -150,8 +150,12 @@ export const Messages = {
       connectionDetails: 'External service connection details',
     },
     descriptions: {
+      dot: '. ',
       labels:
-        'Please choose some labels for help identify your services. Labels can be useful, for example, to help define groupings and segment access to build custom user roles. Editing existing labels may affect your inventory and its data.',
+        'Please choose some labels for help identify your services. Labels can be useful, for example, to help define groupings',
+      labelsRoles: ' and segment access to build custom user roles ',
+      labelsRolesLink: 'custom user roles',
+      labelsExisting: 'Editing existing labels may affect your inventory and its data.',
       customLabels: 'Follow the format as exemplified below, one label per line.',
     },
   },

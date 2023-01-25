@@ -16,7 +16,14 @@ export const LabelsFormPart: FC<LabelsProps> = ({ showNodeFields = true }) => {
   return (
     <div className={styles.groupWrapper}>
       <h4 className={styles.sectionHeader}>{Messages.form.titles.labels}</h4>
-      <p>{Messages.form.descriptions.labels}</p>
+      <p>
+        {Messages.form.descriptions.labels}
+        {/* todo: add back in when documentation is available  */}
+        {/* {Messages.form.descriptions.labelsRoles}
+        <a className={styles.link}>{Messages.form.descriptions.labelsRolesLink}</a> */}
+        {Messages.form.descriptions.dot}
+        {Messages.form.descriptions.labelsExisting}
+      </p>
       <div className={styles.group}>
         <TextInputField
           name="environment"
