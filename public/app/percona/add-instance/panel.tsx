@@ -8,6 +8,7 @@ import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
 
 import { Databases } from '../../percona/shared/core';
+import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
 
 import { AddInstance } from './components/AddInstance/AddInstance';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';
@@ -76,8 +77,12 @@ const AddInstancePanel = () => {
     [showSelection, selectedInstance]
   );
 
-  const handleCancel: MouseEventHandler = (e) => {
-    history.push('/add-instance');
+  const handleCancel: MouseEventHandler = () => {
+    if (showSelection) {
+      history.push('/inventory/services');
+    } else {
+      history.push('/add-instance');
+    }
     selectInstance({ type: '' });
     setShowSelection(true);
     setFormName('');
@@ -112,15 +117,17 @@ const AddInstancePanel = () => {
         </ToolbarButton>
       </PageToolbar>
       <Page.Contents className={styles.page}>
-        {showSelection ? (
-          <AddInstance
-            showAzure={!!azureDiscoverEnabled}
-            selectedInstanceType={selectedInstance}
-            onSelectInstanceType={selectInstance}
-          />
-        ) : (
-          <InstanceForm />
-        )}
+        <FeatureLoader>
+          {showSelection ? (
+            <AddInstance
+              showAzure={!!azureDiscoverEnabled}
+              selectedInstanceType={selectedInstance}
+              onSelectInstanceType={selectInstance}
+            />
+          ) : (
+            <InstanceForm />
+          )}
+        </FeatureLoader>
       </Page.Contents>
     </Page>
   );
