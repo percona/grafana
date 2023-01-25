@@ -6,7 +6,7 @@ import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { Button, HorizontalGroup, Modal } from '@grafana/ui';
+import { Button, HorizontalGroup, Modal, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
@@ -28,7 +28,7 @@ import { appEvents } from '../../../core/app_events';
 import { GET_SERVICES_CANCEL_TOKEN, SERVICES_COLUMNS } from '../Inventory.constants';
 import { InventoryDataService } from '../Inventory.tools';
 
-import { styles } from './Tabs.styles';
+import { getStyles } from './Tabs.styles';
 
 interface Service {
   service_id: string;
@@ -47,6 +47,7 @@ export const Services = () => {
   const dispatch = useAppDispatch();
   const { isLoading, services } = useSelector(getServices);
   const data = useMemo(() => InventoryDataService.getServiceModel(services), [services]);
+  const styles = useStyles2(getStyles);
 
   const loadData = useCallback(async () => {
     try {
@@ -105,22 +106,26 @@ export const Services = () => {
           <div className={styles.tableWrapper}>
             <div className={styles.servicesActionPanel}>
               <HorizontalGroup justify="space-between">
-                <Button
-                  size="md"
-                  disabled={selected.length === 0}
-                  onClick={() => {
-                    setModalVisible(!modalVisible);
-                  }}
-                  icon="trash-alt"
-                  variant="destructive"
-                  className={styles.destructiveButton}
-                >
-                  {selected.length === 1
-                    ? `Delete ${selected.length} service`
-                    : selected.length > 1
-                    ? `Delete ${selected.length} services`
-                    : 'Delete'}
-                </Button>
+                {selected.length === 0 ? (
+                  <div className={styles.description}>Select services to bulk edit them</div>
+                ) : (
+                  <Button
+                    size="md"
+                    disabled={selected.length === 0}
+                    onClick={() => {
+                      setModalVisible(!modalVisible);
+                    }}
+                    icon="trash-alt"
+                    variant="destructive"
+                    className={styles.destructiveButton}
+                  >
+                    {selected.length === 1
+                      ? `Delete ${selected.length} service`
+                      : selected.length > 1
+                      ? `Delete ${selected.length} services`
+                      : 'Delete'}
+                  </Button>
+                )}
                 <Button size="md" onClick={handleAddService} icon="plus" variant="primary">
                   Add service
                 </Button>

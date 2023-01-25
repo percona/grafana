@@ -1,6 +1,8 @@
 import { css } from '@emotion/css';
 
-export const styles = {
+import { GrafanaTheme2 } from '@grafana/data';
+
+export const getStyles = (theme: GrafanaTheme2) => ({
   actionPanel: css`
     display: flex;
     justify-content: flex-end;
@@ -53,4 +55,7 @@ export const styles = {
     align-items: center;
     background-color: transparent;
   `,
-};
+  description: css`
+    color: ${theme.colors.text.secondary};
+  `,
+});

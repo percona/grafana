@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Modal } from '@grafana/ui';
+import { Button, HorizontalGroup, Modal, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { InventoryDataService, Model } from 'app/percona/inventory/Inventory.tools';
 import { AgentsList } from 'app/percona/inventory/Inventory.types';
@@ -20,7 +20,7 @@ import { appEvents } from '../../../core/app_events';
 import { AGENTS_COLUMNS, GET_AGENTS_CANCEL_TOKEN } from '../Inventory.constants';
 import { InventoryService } from '../Inventory.service';
 
-import { styles } from './Tabs.styles';
+import { getStyles } from './Tabs.styles';
 
 interface Agent {
   agent_id: string;
@@ -34,6 +34,7 @@ export const Agents = () => {
   const [selected, setSelectedRows] = useState<any[]>([]);
   const navModel = usePerconaNavModel('inventory-agents');
   const [generateToken] = useCancelToken();
+  const styles = useStyles2(getStyles);
 
   const loadData = useCallback(async () => {
     setLoading(true);
