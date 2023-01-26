@@ -71,6 +71,7 @@ export interface AdvancedChangePayload extends AdvancedPayload {
   disable_dbaas?: boolean;
   enable_updates?: boolean;
   disable_updates?: boolean;
+  enable_access_control?: boolean;
 }
 
 export interface MetricsResolutionsPayload {
