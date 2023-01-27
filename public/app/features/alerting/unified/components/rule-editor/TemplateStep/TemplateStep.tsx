@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState, useCallback } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Stack } from '@grafana/experimental';
@@ -79,8 +79,10 @@ export const TemplateStep: FC = () => {
 
   const setRuleNameAfterTemplate = useCallback(
     (template?: Template) => {
-      if (!getValues('name')) {
-        setValue('name', `${template?.name} Alerting Rule`);
+      const value = getValues('ruleName');
+      const valueExists = templates.current.find((opt) => value === `${opt.name} Alerting Rule`);
+      if (valueExists || !value) {
+        setValue('ruleName', `${template?.name} Alerting Rule`);
       }
     },
     [getValues, setValue]
@@ -169,7 +171,7 @@ export const TemplateStep: FC = () => {
         error={errors.name?.message}
         invalid={!!errors.name?.message}
       >
-        <Input id="name" {...register('name', { required: { value: true, message: Messages.errors.name } })} />
+        <Input id="ruleName" {...register('ruleName', { required: { value: true, message: Messages.errors.name } })} />
       </Field>
 
       {/* TODO add remaining params as API starts supporting them
