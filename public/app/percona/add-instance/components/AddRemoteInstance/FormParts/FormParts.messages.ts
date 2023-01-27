@@ -152,7 +152,7 @@ export const Messages = {
     descriptions: {
       dot: '. ',
       labels:
-        'Please choose some labels for help identify your services. Labels can be useful, for example, to help define groupings',
+        'Please choose some labels to help identify your services. Labels can be useful, for example, to help define groupings',
       labelsRoles: ' and segment access to build custom user roles ',
       labelsRolesLink: 'custom user roles',
       labelsExisting: 'Editing existing labels may affect your inventory and its data.',

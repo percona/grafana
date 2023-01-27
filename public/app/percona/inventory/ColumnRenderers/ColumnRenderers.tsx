@@ -25,7 +25,7 @@ export const servicesDetailsRender = (element: any) => {
 export const servicesLabelsHeaderRender = (): React.ReactElement => (
   <HorizontalGroup>
     <span>Labels</span>
-    <Tooltip content=" Useful to define groupings and segment access to build custom user roles.">
+    <Tooltip content="Useful to define groupings and segment access to build custom user roles.">
       <Icon name="info-circle" />
     </Tooltip>
   </HorizontalGroup>

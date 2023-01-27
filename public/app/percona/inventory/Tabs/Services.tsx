@@ -111,19 +111,14 @@ export const Services = () => {
                 ) : (
                   <Button
                     size="md"
-                    disabled={selected.length === 0}
                     onClick={() => {
-                      setModalVisible(!modalVisible);
+                      setModalVisible((visible) => !visible);
                     }}
                     icon="trash-alt"
                     variant="destructive"
                     className={styles.destructiveButton}
                   >
-                    {selected.length === 1
-                      ? `Delete ${selected.length} service`
-                      : selected.length > 1
-                      ? `Delete ${selected.length} services`
-                      : 'Delete'}
+                    {selected.length === 1 ? `Delete ${selected.length} service` : `Delete ${selected.length} services`}
                   </Button>
                 )}
                 <Button size="md" onClick={handleAddService} icon="plus" variant="primary">

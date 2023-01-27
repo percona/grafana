@@ -74,7 +74,7 @@ const EditInstancePage: React.FC = () => {
       ]);
       history.push('/inventory/services');
     } catch (error) {
-      logger.log(error);
+      logger.error(error);
     }
   };
 

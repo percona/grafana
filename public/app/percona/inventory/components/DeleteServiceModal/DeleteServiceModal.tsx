@@ -51,7 +51,7 @@ const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({ serviceId, serv
           label={Messages.forceMode.label}
           description={Messages.forceMode.description}
           value={forceModeActive}
-          onChange={() => setForceActive(!forceModeActive)}
+          onChange={() => setForceActive((active) => !active)}
         />
       </div>
       <Modal.ButtonRow>
