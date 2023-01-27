@@ -4,7 +4,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 
 export const getStyles = ({ typography, colors, v1: { spacing } }: GrafanaTheme2, disabled: boolean) => ({
   collapsableSection: css`
-    border: none;
+    border: ${disabled ? '1px solid ' + colors.border.medium : 'none'};
     background-color: ${colors.background.primary};
     color: ${disabled && colors.text.disabled};
   `,

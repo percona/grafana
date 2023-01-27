@@ -3,12 +3,13 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
 import { locationService } from '@grafana/runtime';
-import { Alert, useStyles2 } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
 import { FailedCheckSummary } from 'app/percona/check/types';
 import { ExtendedTableCellProps, ExtendedTableRowProps, Table } from 'app/percona/integrated-alerting/components/Table';
+import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertLocalStorage/AlertLocalStorage';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -28,7 +29,6 @@ export const FailedChecksTab: FC = () => {
   const navModel = usePerconaNavModel('failed-checks');
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
-  const [showAlert, setShowAlert] = useState(true);
   const [generateToken] = useCancelToken();
 
   const columns = useMemo(
@@ -90,17 +90,14 @@ export const FailedChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          {showAlert && (
-            <Alert
-              title="Upgrade your plan"
-              severity="info"
-              customButtonContent="Upgrade"
-              onCustomButtonClick={(e) => console.log(e)}
-              onRemove={() => setShowAlert(false)}
-            >
-              By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-            </Alert>
-          )}
+          <AlertLocalStorage
+            title="Upgrade your plan"
+            customButtonContent="Upgrade"
+            onCustomButtonClick={() => console.log('clicked')}
+            name={'upgrade'}
+          >
+            By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
+          </AlertLocalStorage>
           <AlertsReloadContext.Provider value={{ fetchAlerts }}>
             <Table
               totalItems={data.length}

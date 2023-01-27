@@ -2,14 +2,16 @@ import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { Alert, useStyles2 } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { CheckService } from 'app/percona/check/Check.service';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
+import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertLocalStorage/AlertLocalStorage';
 import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { UpgradePlanWrapper } from 'app/percona/shared/components/Elements/UpgradePlanWrapper/UpgradePlanWrapper';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -33,7 +35,6 @@ export const AllChecksTab: FC = () => {
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
-  const [showAlert, setShowAlert] = useState(true);
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
@@ -195,23 +196,21 @@ export const AllChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          {showAlert && (
-            <Alert
-              title="Upgrade your plan"
-              severity="info"
-              customButtonContent="Upgrade"
-              onCustomButtonClick={(e) => console.log(e)}
-              onRemove={() => setShowAlert(false)}
-            >
-              By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-            </Alert>
-          )}
+          <AlertLocalStorage
+            title="Upgrade your plan"
+            customButtonContent="Upgrade"
+            onCustomButtonClick={() => console.log('clicked')}
+            name={'upgradeAlert'}
+          >
+            By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
+          </AlertLocalStorage>
           <div className={styles.wrapper}>
             <div className={styles.header}>
               <h1>Available to you</h1>
               <div className={styles.actionButtons} data-testid="db-check-panel-actions">
                 <LoaderButton
                   type="button"
+                  variant="secondary"
                   size="md"
                   loading={runChecksPending}
                   onClick={handleRunChecksClick}
@@ -225,7 +224,7 @@ export const AllChecksTab: FC = () => {
               mainLabel="CVE security"
               content="Imforming users about versions of DBs affected by CVE."
               sideLabel="Partion support (Mongo)"
-              disabled={true}
+              disabled={false}
             >
               <Table
                 totalItems={checks.length}
@@ -243,6 +242,21 @@ export const AllChecksTab: FC = () => {
                 />
               )}
             </CustomCollapsableSection>
+
+            <UpgradePlanWrapper label="Standart plan" buttonLabel="See plan details" buttonOnClick={() => {}}>
+              <CustomCollapsableSection
+                mainLabel="CVE security"
+                content="Imforming users about versions of DBs affected by CVE."
+                sideLabel="Partion support (Mongo)"
+                disabled
+              />
+              <CustomCollapsableSection
+                mainLabel="CVE security"
+                content="Imforming users about versions of DBs affected by CVE."
+                sideLabel="Partion support (Mongo)"
+                disabled
+              />
+            </UpgradePlanWrapper>
           </div>
         </FeatureLoader>
       </OldPage.Contents>
