@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import { Alert } from '@grafana/ui';
 
 interface AlertLocalStorageProps {
-  name: string;
+  uniqueName: string;
   title: string;
   customButtonContent: ReactNode;
   onCustomButtonClick: () => void;
@@ -11,7 +11,7 @@ interface AlertLocalStorageProps {
 }
 
 export const AlertLocalStorage = ({
-  name,
+  uniqueName,
   title,
   children,
   customButtonContent,
@@ -45,16 +45,16 @@ export const AlertLocalStorage = ({
   };
 
   useEffect(() => {
-    const isClosed = getFromLocalStorage(name ?? 'alertClosed');
+    const isClosed = getFromLocalStorage(uniqueName);
     if (isClosed) {
       setShowAlert(false);
     } else {
       setShowAlert(true);
     }
-  }, [name]);
+  }, [uniqueName]);
 
   const handleCloseAlert = () => {
-    setToLocalStorage(name ?? 'alertClosed', true, 7);
+    setToLocalStorage(uniqueName, true, 7);
     setShowAlert(false);
   };
 

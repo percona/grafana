@@ -94,7 +94,7 @@ export const FailedChecksTab: FC = () => {
             title="Upgrade your plan"
             customButtonContent="Upgrade"
             onCustomButtonClick={() => console.log('clicked')}
-            name={'upgrade'}
+            uniqueName={'upgrade'}
           >
             By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
           </AlertLocalStorage>
