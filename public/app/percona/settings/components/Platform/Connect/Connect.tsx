@@ -43,7 +43,7 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
       <h2 className={styles.connectionTitle}>{Messages.connectTitle}</h2>
       <form data-testid="connect-form" className={styles.form} onSubmit={handleSubmit} autoComplete="off">
         <div className={styles.serverDetails}>
-          <TextInputField name="pmmServerId" disabled label={Messages.pmmServerId} fieldClassName="my-class" />
+          <TextInputField name="pmmServerId" disabled label={Messages.pmmServerId} />
           <TextInputField
             name="pmmServerName"
             label={Messages.pmmServerName}
