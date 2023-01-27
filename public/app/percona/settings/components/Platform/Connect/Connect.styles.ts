@@ -3,6 +3,9 @@ import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 
 export const getStyles = ({ v1: { breakpoints, colors }, spacing }: GrafanaTheme2) => ({
+  titles: css`
+    margin-bottom: ${spacing(4)};
+  `,
   serverDetails: css`
     display: flex;
 

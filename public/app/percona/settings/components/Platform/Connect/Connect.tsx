@@ -1,3 +1,4 @@
+import { cx } from '@emotion/css';
 import { LoaderButton, TextInputField } from '@percona/platform-core';
 import React, { FC } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
@@ -22,15 +23,11 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
 
   const ConnectForm: FC<FormRenderProps<ConnectRenderProps>> = ({ valid, handleSubmit }) => (
     <>
-      <h2>{Messages.perconaPlatform}</h2>
-      <p>
-        <h4>{Messages.whatIsPerconaPlatform}</h4>
-        {Messages.perconaPlatformExplanation}
-      </p>
-      <p>
-        <h4>{Messages.whyToConnect}</h4>
-        {Messages.connectionReason}
-      </p>
+      <h2 className={styles.titles}>{Messages.perconaPlatform}</h2>
+      <h4>{Messages.whatIsPerconaPlatform}</h4>
+      <p>{Messages.perconaPlatformExplanation}</p>
+      <h4>{Messages.whyToConnect}</h4>
+      <p>{Messages.connectionReason}</p>
       <p>
         <h4>{Messages.noPerconaAccount}</h4>
         {Messages.createAnAccount}
@@ -40,7 +37,7 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
           {Messages.createPerconaAccountAnchor}
         </Button>
       </a>
-      <h2 className={styles.connectionTitle}>{Messages.connectTitle}</h2>
+      <h2 className={cx(styles.titles, styles.connectionTitle)}>{Messages.connectTitle}</h2>
       <form data-testid="connect-form" className={styles.form} onSubmit={handleSubmit} autoComplete="off">
         <div className={styles.serverDetails}>
           <TextInputField name="pmmServerId" disabled label={Messages.pmmServerId} />
