@@ -28,10 +28,8 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
       <p>{Messages.perconaPlatformExplanation}</p>
       <h4>{Messages.whyToConnect}</h4>
       <p>{Messages.connectionReason}</p>
-      <p>
-        <h4>{Messages.noPerconaAccount}</h4>
-        {Messages.createAnAccount}
-      </p>
+      <h4>{Messages.noPerconaAccount}</h4>
+      <p>{Messages.createAnAccount}</p>
       <a href={`${saasHost}/login`} rel="noreferrer noopener" target="_blank">
         <Button variant="secondary" icon="external-link-alt">
           {Messages.createPerconaAccountAnchor}
