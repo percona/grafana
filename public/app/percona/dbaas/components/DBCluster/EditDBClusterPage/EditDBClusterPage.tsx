@@ -2,6 +2,7 @@
 import arrayMutators from 'final-form-arrays';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
+import { useSelector } from 'react-redux';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { Spinner, useStyles2 } from '@grafana/ui/src';
@@ -11,7 +12,7 @@ import { useDispatch } from 'app/types';
 import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
 import { resetDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
 import { resetUpdateDBClusterState } from '../../../../shared/core/reducers/dbaas/updateDBCluster/updateDBCluster';
-import { getPerconaSettingFlag } from '../../../../shared/core/selectors';
+import { getPerconaSettingFlag, getPerconaSettings } from '../../../../shared/core/selectors';
 import { Messages as DBaaSMessages } from '../../../DBaaS.messages';
 import { useUpdateOfKubernetesList } from '../../../hooks/useKubernetesList';
 import DBaaSPage from '../../DBaaSPage/DBaaSPage';
@@ -21,6 +22,7 @@ import {
 } from '../../Kubernetes/EditK8sClusterPage/EditK8sClusterPage.constants';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 
+import Backups from './Backups/Backups';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
 import { BasicOptionsFields } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
@@ -39,6 +41,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const mode = useDefaultMode();
+  const { result: settings } = useSelector(getPerconaSettings);
   const [kubernetes, kubernetesLoading] = useUpdateOfKubernetesList();
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
@@ -100,6 +103,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
             {showPMMAddressWarning && <PMMServerUrlWarning />}
             <div className={styles.optionsWrapper}>
               {mode === 'create' && <DBClusterBasicOptions kubernetes={kubernetes} form={form} />}
+              {settings?.backupEnabled && mode === 'create' && <Backups />}
               <DBClusterAdvancedOptions
                 mode={mode}
                 showUnsafeConfigurationWarning={showUnsafeConfigurationWarning}

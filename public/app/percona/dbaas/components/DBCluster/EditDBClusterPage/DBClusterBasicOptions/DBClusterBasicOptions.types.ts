@@ -42,4 +42,7 @@ export enum BasicOptionsFields {
   kubernetesCluster = 'kubernetesCluster',
   databaseType = 'databaseType',
   databaseVersion = 'databaseVersion',
+  restoreFrom = 'restoreFrom',
+
+  backupArtifact = 'backupArtifact',
 }

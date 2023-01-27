@@ -4,4 +4,6 @@ export const Messages = {
   databaseType: 'Database Type',
   databaseVersion: 'Database Version',
   noOperatorsMessage: 'No clusters found with installed operators',
+  restoreFrom: 'Restore from',
+  backupArtifact: 'Backup artifact',
 };
