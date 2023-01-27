@@ -64,7 +64,7 @@ const getTablestatValues = (type: TablestatOptionsInterface) => {
 };
 
 const MySQLOptions = ({ form }: { form: FormApi }) => {
-  const selectedOption = form.getState().values && form.getState().values['tablestat-options'];
+  const selectedOption = form.getState().values && form.getState().values.tablestatOptions;
   const [selectedValue, setSelectedValue] = useState<string>(selectedOption || TablestatOptionsInterface.disabled);
   const styles = useStyles2(getStyles);
 
@@ -78,7 +78,7 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
       <h4>{Messages.form.labels.additionalOptions.tablestatOptions}</h4>
       <div className={styles.group}>
         <RadioButtonGroupField
-          name="tablestat-options"
+          name="tablestatOptions"
           data-testid="tablestat-options-radio-button-group"
           defaultValue={selectedValue}
           options={tablestatOptions}
