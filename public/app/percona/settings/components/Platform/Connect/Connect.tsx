@@ -58,14 +58,14 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
             name="accessToken"
             label={Messages.accessToken}
             validators={[validators.required]}
-            placeholder="Token here..."
+            placeholder={Messages.tokenHerePlaceholder}
             showErrorOnBlur
             required
             disabled={connecting}
           />
           <a href={`${saasHost}/profile`} rel="noreferrer noopener" target="_blank" className={styles.getTokenAnchor}>
             <Button variant="secondary" fill="text" icon="external-link-alt">
-              Get token
+              {Messages.getToken}
             </Button>
           </a>
         </div>

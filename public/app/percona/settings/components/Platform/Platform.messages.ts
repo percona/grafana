@@ -12,6 +12,8 @@ export const Messages = {
   noPerconaAccount: "Don't have a Percona account?",
   createAnAccount: 'Create an account now to check all the Percona Platform advantages.',
   createPerconaAccountAnchor: 'Create a Percona account',
+  tokenHerePlaceholder: 'Token here...',
+  getToken: 'Get token',
   connectTitle: 'Connect to Percona Platform',
   connectSucceeded: 'Successfully connected PMM to Percona Platform',
   pmmServerName: 'PMM Server Name',
