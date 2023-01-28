@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 import { Button, Icon, useStyles2 } from '@grafana/ui';
 
-import { IsDisabledContext } from '../CustomCollapsableSection/CustomCollapsableSection.context';
+import { IsDisabledContext } from '../CustomCollapsableSection.context';
 
 import { getStyles } from './UpgradePlanWrapper.style';
 
