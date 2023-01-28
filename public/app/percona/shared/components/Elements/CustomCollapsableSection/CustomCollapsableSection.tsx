@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { ControlledCollapse, useTheme2 } from '@grafana/ui';
 
+import { IsDisabledContext } from './CustomCollapsableSection.context';
 import { getStyles } from './CustomCollapsableSection.styles';
 import { CustomCollapsableSectionProps } from './CustomCollapsableSection.types';
 
@@ -10,8 +11,9 @@ export const CustomCollapsableSection = ({
   mainLabel,
   content,
   sideLabel,
-  disabled = false,
 }: CustomCollapsableSectionProps) => {
+  //used to automatically disable collapse when wrapping in UpgradePlanWrapper
+  const disabled = useContext(IsDisabledContext);
   const theme = useTheme2();
   const styles = getStyles(theme, disabled);
   return (

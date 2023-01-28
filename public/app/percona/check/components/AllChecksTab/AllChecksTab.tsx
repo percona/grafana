@@ -224,7 +224,6 @@ export const AllChecksTab: FC = () => {
               mainLabel="CVE security"
               content="Imforming users about versions of DBs affected by CVE."
               sideLabel="Partion support (Mongo)"
-              disabled={false}
             >
               <Table
                 totalItems={checks.length}
@@ -248,13 +247,11 @@ export const AllChecksTab: FC = () => {
                 mainLabel="CVE security"
                 content="Imforming users about versions of DBs affected by CVE."
                 sideLabel="Partion support (Mongo)"
-                disabled
               />
               <CustomCollapsableSection
                 mainLabel="CVE security"
                 content="Imforming users about versions of DBs affected by CVE."
                 sideLabel="Partion support (Mongo)"
-                disabled
               />
             </UpgradePlanWrapper>
           </div>

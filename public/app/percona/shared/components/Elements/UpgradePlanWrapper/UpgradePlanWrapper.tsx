@@ -2,6 +2,8 @@ import React, { ReactNode } from 'react';
 
 import { Button, Icon, useStyles2 } from '@grafana/ui';
 
+import { IsDisabledContext } from '../CustomCollapsableSection/CustomCollapsableSection.context';
+
 import { getStyles } from './UpgradePlanWrapper.style';
 
 type UpgradePlanWrapperProps = {
@@ -23,7 +25,9 @@ export const UpgradePlanWrapper = ({ label, buttonLabel, buttonOnClick, children
           {buttonLabel}
         </Button>
       </div>
-      <div className={styles.children}>{children}</div>
+      <div className={styles.children}>
+        <IsDisabledContext.Provider value={true}>{children}</IsDisabledContext.Provider>
+      </div>
     </div>
   );
 };
