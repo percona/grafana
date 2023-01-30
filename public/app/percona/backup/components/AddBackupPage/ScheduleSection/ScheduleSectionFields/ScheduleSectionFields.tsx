@@ -23,7 +23,6 @@ import {
 } from './ScheduleSectionFields.types';
 
 export const ScheduleSectionFields = ({ values }: ScheduleSectionFieldsProps) => {
-  console.log(values);
   const styles = useStyles2(getStyles);
   return (
     <div className={styles.scheduleSectionWrapper}>

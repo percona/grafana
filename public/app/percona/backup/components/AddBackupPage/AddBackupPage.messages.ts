@@ -21,8 +21,8 @@ export const Messages = {
   scheduleSection: 'UTC time',
   backupInfo: 'Backup info',
   onDemand: 'On Demand',
-  schedule: 'ScheduleSectionFields Backup',
-  scheduleName: 'ScheduleSectionFields',
+  schedule: 'Schedule Backup',
+  scheduleName: 'Schedule',
   getModalTitle: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
       return edit ? 'Edit Scheduled backup' : 'Create Scheduled backup';
@@ -32,7 +32,7 @@ export const Messages = {
   },
   getSubmitButtonText: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
-      return edit ? 'Edit' : 'ScheduleSectionFields';
+      return edit ? 'Edit' : 'Schedule';
     }
 
     return 'Backup';
