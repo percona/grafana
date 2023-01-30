@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React, { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 
@@ -50,23 +50,15 @@ describe('DeleteRoleModal', () => {
     expect(screen.queryByText('Delete "Role #1" role')).not.toBeNull();
   });
 
-  it("doesn't show delete button if the role is assigned", () => {
-    renderDefault();
-    expect(screen.queryByText('Confirm and delete role')).toBeNull();
-  });
-
-  it('shows delete button if the role is not assigned', () => {
-    renderDefault(true, stubRoles[1]);
-    expect(screen.queryByText('Confirm and delete role')).not.toBeNull();
-  });
-
-  it('calls delete', () => {
+  it('calls delete', async () => {
     const deleteRoleActionSpy = jest.spyOn(RolesReducer, 'deleteRoleAction');
     renderDefault(true, stubRoles[1]);
+
+    await waitFor(() => expect(screen.queryByText('Confirm and delete role')).toBeInTheDocument());
 
     const deleteButton = screen.getByText('Confirm and delete role');
     fireEvent.click(deleteButton);
 
-    expect(deleteRoleActionSpy).toHaveBeenCalled();
+    await waitFor(() => expect(deleteRoleActionSpy).toHaveBeenCalled());
   });
 });

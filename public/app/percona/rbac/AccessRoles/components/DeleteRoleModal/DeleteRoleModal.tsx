@@ -45,7 +45,15 @@ const DeleteRoleModal: FC<DeleteRoleModalProps> = ({ role, isOpen, onCancel }) =
             <InputControl
               control={control}
               name="replacementRoleId"
-              render={({ field }) => <Select getOptionValue={(item) => item.value} options={options} {...field} />}
+              render={({ field }) => (
+                <Select
+                  getOptionValue={(item) => item.value}
+                  options={options}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
             <Modal.ButtonRow>
               <Button type="submit" disabled={formState.isSubmitting}>
