@@ -1,56 +1,47 @@
+import { AsyncSelectField, validators } from '@percona/platform-core';
 import React, { FC } from 'react';
-import { Field } from 'react-final-form';
 
-import { SelectableValue } from '@grafana/data';
 import { useStyles } from '@grafana/ui';
 
-import { AsyncSelectFieldAdapter } from '../../../../../../shared/components/Form/FieldAdapters/FieldAdapters';
+import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../../../../../../backup/components/ScheduledBackups/ScheduledBackups.constants';
+import { useCancelToken } from '../../../../../../shared/components/hooks/cancelToken.hook';
+import { AddDBClusterFormValues } from '../../EditDBClusterPage.types';
 import { Messages } from '../DBClusterBasicOptions.messages';
 import { BasicOptionsFields } from '../DBClusterBasicOptions.types';
-import { optionRequired } from '../DBClusterBasicOptions.utils';
 
+import { RestoreFromService } from './RestoreFrom.service';
 import { getStyles } from './RestoreFrom.styles';
 import { RestoreFromProps } from './RestoreFrom.types';
+
 export const RestoreFrom: FC<RestoreFromProps> = ({ form }) => {
   const styles = useStyles(getStyles);
 
-  const { restoreFrom } = form.getState().values;
-  const showBackupArtifacts = restoreFrom ? true : false; //TODO  11301 check cases when we show backup artifact
+  const [generateToken] = useCancelToken();
 
-  const restoreFromOptions: SelectableValue[] = [{ label: 'none', value: 'none' }];
-  const backupArtifactOptions: SelectableValue[] = [
-    { label: 'test', value: 'test' },
-    { label: 'test1', value: 'test1' },
-  ];
-
+  const { restoreFrom } = form.getState().values as AddDBClusterFormValues;
+  const restoreFromValue = restoreFrom?.value;
   return (
     <div className={styles.line}>
-      <Field
+      <AsyncSelectField
         name={BasicOptionsFields.restoreFrom}
+        loadOptions={() => RestoreFromService.loadStorageLocations(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN))}
+        defaultOptions
+        placeholder={Messages.placeholders.restoreFrom}
         label={Messages.restoreFrom}
-        dataTestId={`dbcluster-${BasicOptionsFields.restoreFrom}-field`}
-        component={AsyncSelectFieldAdapter}
-        loading={false}
-        options={restoreFromOptions}
-        validate={optionRequired}
-        // disabled={}
-        // onChange={onChangeDatabase}
-        // defaultValue={}
+        validate={validators.required}
       />
-      <div className={!showBackupArtifacts ? styles.hiddenField : ''}>
-        <Field
+      {restoreFromValue !== undefined && restoreFromValue ? (
+        <AsyncSelectField
           name={BasicOptionsFields.backupArtifact}
+          loadOptions={() => RestoreFromService.loadBackupArtifacts(restoreFromValue)}
+          defaultOptions
+          placeholder={Messages.placeholders.backupArtifact}
           label={Messages.backupArtifact}
-          dataTestId={`dbcluster-${BasicOptionsFields.backupArtifact}-field`}
-          component={AsyncSelectFieldAdapter}
-          loading={false}
-          options={backupArtifactOptions}
-          validate={optionRequired}
-          // defaultValue={}
-          // disabled={}
-          // onChange={onChangeDatabase}
+          validate={validators.required}
         />
-      </div>
+      ) : (
+        <div />
+      )}
     </div>
   );
 };

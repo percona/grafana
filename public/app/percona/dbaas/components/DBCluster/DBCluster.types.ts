@@ -36,6 +36,21 @@ export interface DBCluster {
   internetFacing?: boolean;
   sourceRanges?: string[];
   storageClass?: string;
+  backup?: DBaaSBackup;
+  restore?: DBaaSRestore;
+}
+
+interface DBaaSBackup {
+  location_id: string;
+  keep_copies: number;
+  cron_expression: string;
+  service_account: 'string';
+}
+
+interface DBaaSRestore {
+  location_id: 'string';
+  destination: 'string';
+  secrets_name: 'string';
 }
 
 export enum DBClusterStatus {
@@ -164,6 +179,8 @@ export interface DBClusterParamsAPI {
   replicaset?: Omit<DBClusterContainerAPI, 'image'>;
   proxysql?: Omit<DBClusterContainerAPI, 'configuration' | 'storage_class'>;
   image?: string;
+  backup?: DBaaSBackup;
+  restore?: DBaaSRestore;
 }
 
 interface DBClusterContainerAPI {

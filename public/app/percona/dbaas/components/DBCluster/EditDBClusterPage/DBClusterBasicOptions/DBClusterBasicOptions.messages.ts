@@ -6,4 +6,8 @@ export const Messages = {
   noOperatorsMessage: 'No clusters found with installed operators',
   restoreFrom: 'Restore from',
   backupArtifact: 'Backup artifact',
+  placeholders: {
+    restoreFrom: 'Choose',
+    backupArtifact: 'Choose',
+  },
 };

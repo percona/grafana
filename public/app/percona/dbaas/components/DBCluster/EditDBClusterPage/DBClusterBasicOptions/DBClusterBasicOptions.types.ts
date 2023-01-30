@@ -43,6 +43,5 @@ export enum BasicOptionsFields {
   databaseType = 'databaseType',
   databaseVersion = 'databaseVersion',
   restoreFrom = 'restoreFrom',
-
   backupArtifact = 'backupArtifact',
 }

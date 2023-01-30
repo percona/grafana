@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SelectableValue } from '@grafana/data/src';
 
+import { ScheduledSectionFieldsValuesProps } from '../../../../backup/components/AddBackupPage/ScheduleSection/ScheduleSectionFields/ScheduleSectionFields.types';
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';
 
 import { ConfigurationFields } from './DBClusterAdvancedOptions/Configurations/Configurations.types';
@@ -11,42 +12,41 @@ import {
   DatabaseOptionInitial,
   KubernetesOption,
 } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
-
+import { DBaaSBackupProps } from './DBaaSBackups/DBaaSBackups.types';
 export type DBClusterPageMode = 'create' | 'edit' | 'list';
 
 export interface EditDBClusterPageProps {
   kubernetes: Kubernetes[];
 }
 
-export interface AddDBClusterFormValues {
+export interface DBClusterFormValues {
   [AdvancedOptionsFields.nodes]: number;
-  [AdvancedOptionsFields.resources]: DBClusterResources;
   [AdvancedOptionsFields.memory]: number;
   [AdvancedOptionsFields.cpu]: number;
   [AdvancedOptionsFields.disk]: number;
-  [BasicOptionsFields.databaseType]?: DatabaseOptionInitial;
-  [BasicOptionsFields.kubernetesCluster]?: KubernetesOption;
-  [BasicOptionsFields.name]?: string;
   [ConfigurationFields.configuration]?: string;
   [ConfigurationFields.storageClass]?: SelectableValue<string>;
   [NetworkAndSecurityFields.expose]?: boolean;
   [NetworkAndSecurityFields.sourceRanges]?: Array<{}> | [];
   [NetworkAndSecurityFields.internetFacing]?: boolean;
 }
+export interface AddDBClusterFormValues
+  extends ScheduledSectionFieldsValuesProps,
+    DBClusterFormValues,
+    DBaaSBackupProps {
+  [BasicOptionsFields.kubernetesCluster]?: KubernetesOption;
+  [BasicOptionsFields.name]?: string;
+  [BasicOptionsFields.databaseType]?: DatabaseOptionInitial;
+  [BasicOptionsFields.databaseVersion]?: string;
+  [BasicOptionsFields.restoreFrom]?: SelectableValue<string>;
 
-export interface UpdateDBClusterFormValues {
-  [AdvancedOptionsFields.resources]?: DBClusterResources;
-  [AdvancedOptionsFields.nodes]: number;
+  [BasicOptionsFields.backupArtifact]?: SelectableValue<string>;
+  [AdvancedOptionsFields.resources]: DBClusterResources;
+}
+
+export interface UpdateDBClusterFormValues extends DBClusterFormValues {
   [BasicOptionsFields.databaseType]: SelectableValue;
-  [AdvancedOptionsFields.cpu]: number;
-  [AdvancedOptionsFields.disk]: number;
-  [AdvancedOptionsFields.memory]: number;
-  [ConfigurationFields.configuration]?: string;
-  [ConfigurationFields.storageClass]?: SelectableValue<string>;
-  [ConfigurationFields.configuration]?: string;
-  [NetworkAndSecurityFields.expose]?: boolean;
-  [NetworkAndSecurityFields.sourceRanges]?: Array<{}> | [];
-  [NetworkAndSecurityFields.internetFacing]?: boolean;
+  [AdvancedOptionsFields.resources]?: DBClusterResources;
 }
 
 export interface DBClusterFormSubmitProps {

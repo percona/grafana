@@ -2,12 +2,11 @@
 import arrayMutators from 'final-form-arrays';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
-import { useSelector } from 'react-redux';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { Spinner, useStyles2 } from '@grafana/ui/src';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
-import { useDispatch } from 'app/types';
+import { useSelector, useDispatch } from 'app/types';
 
 import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
 import { resetDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
@@ -22,10 +21,10 @@ import {
 } from '../../Kubernetes/EditK8sClusterPage/EditK8sClusterPage.constants';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 
-import Backups from './Backups/Backups';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
 import { BasicOptionsFields } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
+import DBaaSBackups from './DBaaSBackups/DBaaSBackups';
 import { DB_CLUSTER_INVENTORY_URL } from './EditDBClusterPage.constants';
 import { Messages } from './EditDBClusterPage.messages';
 import { getStyles } from './EditDBClusterPage.styles';
@@ -103,7 +102,9 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
             {showPMMAddressWarning && <PMMServerUrlWarning />}
             <div className={styles.optionsWrapper}>
               {mode === 'create' && <DBClusterBasicOptions kubernetes={kubernetes} form={form} />}
-              {settings?.backupEnabled && mode === 'create' && <Backups />}
+              {settings?.backupEnabled && mode === 'create' && (
+                <DBaaSBackups handleSubmit={handleSubmit} pristine={pristine} valid={valid} form={form} {...props} />
+              )}
               <DBClusterAdvancedOptions
                 mode={mode}
                 showUnsafeConfigurationWarning={showUnsafeConfigurationWarning}

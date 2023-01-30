@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents } from '../../../../../../features/alerting/unified/utils/redux';
 import { newDBClusterService } from '../../../../../dbaas/components/DBCluster/DBCluster.utils';
+import { getCronStringFromValues } from '../../../../helpers/cron/cron';
 import { SETTINGS_TIMEOUT } from '../../../constants';
 import { updateSettingsAction } from '../../index';
 
@@ -56,6 +57,16 @@ export const addDbClusterAction = createAsyncThunk(
       sourceRanges,
       configuration,
       storageClass,
+      restoreFrom,
+      backupArtifact,
+      backupLocation,
+      retention,
+      period,
+      month,
+      day,
+      weekDay,
+      startHour,
+      startMinute,
     } = args.values;
 
     const dbClusterService = newDBClusterService(databaseType.value);
@@ -64,21 +75,46 @@ export const addDbClusterAction = createAsyncThunk(
       await thunkAPI.dispatch(updateSettingsAction({ body: { pmm_public_address: window.location.host } }));
       await new Promise((resolve) => setTimeout(resolve, SETTINGS_TIMEOUT));
     }
+
+    const cronExpression = getCronStringFromValues(
+      period!.value!,
+      month!.map((m: { value: any }) => m.value!),
+      day!.map((m: { value: any }) => m.value!),
+      weekDay!.map((m: { value: any }) => m.value!),
+      startHour!.map((m: { value: any }) => m.value!),
+      startMinute!.map((m: { value: any }) => m.value!)
+    );
+
     await withAppEvents(
       dbClusterService.addDBCluster({
-        kubernetesClusterName: kubernetesCluster.value,
+        kubernetesClusterName: kubernetesCluster?.value,
         clusterName: name,
-        databaseType: databaseType.value,
+        databaseType: databaseType?.value,
         clusterSize: nodes,
         cpu,
         memory,
         disk,
-        databaseImage: databaseVersion.value,
+        databaseImage: databaseVersion?.value,
         expose,
         internetFacing,
-        sourceRanges: sourceRanges.map((item: any) => item?.sourceRange || ''),
+        sourceRanges: sourceRanges?.map((item: any) => item?.sourceRange || ''),
         configuration,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
+        ...(backupLocation?.value && {
+          backup: {
+            cron_expression: cronExpression,
+            location_id: backupLocation?.value,
+            keep_copies: retention,
+            // serviceAccount TODO 11301
+          },
+        }),
+        ...(restoreFrom?.value && {
+          restore: {
+            locationId: restoreFrom?.value,
+            destination: backupArtifact?.value,
+            // secretsName: 'string'; TODO 11301
+          },
+        }),
       }),
       {
         successMessage: 'Cluster was successfully added',

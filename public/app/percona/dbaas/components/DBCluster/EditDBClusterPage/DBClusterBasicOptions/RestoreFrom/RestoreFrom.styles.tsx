@@ -7,11 +7,16 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     display: flex;
     gap: ${spacing.lg};
     > div {
-      flex: 1 0 auto;
+      flex: 1 0;
     }
   `,
 
   hiddenField: css`
     visibility: hidden;
+  `,
+
+  field: css`
+    width: 50%;
+    flex-shrink: 1;
   `,
 });

@@ -11,20 +11,7 @@ export const Messages = {
   cancelAction: 'Cancel',
   retryTimes: 'Retry, times',
   retryInterval: 'Retry interval, seconds',
-  in: 'in',
-  on: 'on',
-  at: 'at',
   every: 'Every',
-  everyMonth: 'Every month',
-  everyDay: 'Every day',
-  everyWeekDay: 'Every weekday',
-  everyHour: 'Every hour',
-  everyMinute: 'Every minute',
-  minute: 'Minutes',
-  hour: 'Hours',
-  month: 'Months',
-  day: 'Days',
-  weekDay: 'Weekdays',
   startTimeHour: 'Start time (hour)',
   startTimeMinute: 'Start time (minute)',
   advanceSettings: 'Advanced Settings:',
@@ -34,9 +21,8 @@ export const Messages = {
   scheduleSection: 'UTC time',
   backupInfo: 'Backup info',
   onDemand: 'On Demand',
-  schedule: 'Schedule Backup',
-  scheduledTime: 'Scheduled time',
-  scheduleName: 'Schedule',
+  schedule: 'ScheduleSectionFields Backup',
+  scheduleName: 'ScheduleSectionFields',
   getModalTitle: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
       return edit ? 'Edit Scheduled backup' : 'Create Scheduled backup';
@@ -46,7 +32,7 @@ export const Messages = {
   },
   getSubmitButtonText: (scheduleMode: boolean, edit: boolean) => {
     if (scheduleMode) {
-      return edit ? 'Edit' : 'Schedule';
+      return edit ? 'Edit' : 'ScheduleSectionFields';
     }
 
     return 'Backup';

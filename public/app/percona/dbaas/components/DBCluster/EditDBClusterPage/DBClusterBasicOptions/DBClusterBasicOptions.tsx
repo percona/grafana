@@ -9,6 +9,8 @@ import {
   SelectFieldAdapter,
 } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 
+import { useSelector } from '../../../../../../types';
+import { getPerconaSettings } from '../../../../../shared/core/selectors';
 import { Kubernetes, Operator } from '../../../Kubernetes/Kubernetes.types';
 import { getDatabaseOptionFromOperator } from '../../../Kubernetes/Kubernetes.utils';
 import { KubernetesOperatorStatus } from '../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
@@ -44,6 +46,7 @@ const getAvailableDatabaseOptions = (kubernetesCluster: Kubernetes): DatabaseOpt
 
 export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernetes, form }) => {
   const styles = useStyles(getStyles);
+  const { result: settings } = useSelector(getPerconaSettings);
   const { required, maxLength } = validators;
   const { change } = form;
   const { kubernetesCluster, databaseType } = form.getState().values;
@@ -86,7 +89,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   useDatabaseVersions(form, databaseType, kubernetesCluster, setLoadingDatabaseVersions, setDatabaseVersions);
 
   return (
-    <div data-testid="dbcluster-basic-options-step">
+    <div data-testid="dbcluster-basic-options-step" className={styles.basicOptions}>
       <Field
         dataTestId="dbcluster-kubernetes-cluster-field"
         name={BasicOptionsFields.kubernetesCluster}
@@ -124,7 +127,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
         label={Messages.clusterName}
         validators={[required, kubernetesClusterNameValidator, maxLength(CLUSTER_NAME_MAX_LENGTH)]}
       />
-      <RestoreFrom form={form} />
+      {settings?.backupEnabled && <RestoreFrom form={form} />}
     </div>
   );
 };
