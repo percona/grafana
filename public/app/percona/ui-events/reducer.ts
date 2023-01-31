@@ -1,21 +1,17 @@
-import { processDashboardEvents } from "app/percona/ui-events/events/dashboard";
-import { processFetchingEvents } from "app/percona/ui-events/events/fetching";
-import { processNotificationEvents } from "app/percona/ui-events/events/notification";
+/* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/consistent-type-assertions, */
 
-const skipPrefixes = [
-  "@@",
-  "navIndex/",
-  "navBarTree/",
-  "panels/removePanels",
-  "appNotifications/hideAppNotification",
-];
+import { processDashboardEvents } from 'app/percona/ui-events/events/dashboard';
+import { processFetchingEvents } from 'app/percona/ui-events/events/fetching';
+import { processNotificationEvents } from 'app/percona/ui-events/events/notification';
+
+const skipPrefixes = ['@@', 'navIndex/', 'navBarTree/', 'panels/removePanels', 'appNotifications/hideAppNotification'];
 
 const shouldProcess = (type: string): boolean => {
   if (!type) {
     return false;
   }
 
-  return !skipPrefixes.find(each => type.startsWith(each));
+  return !skipPrefixes.find((each) => type.startsWith(each));
 };
 
 export interface Action {
@@ -32,7 +28,6 @@ export const uiEventsReducer = (state: any = {}, action: Action) => {
     processNotificationEvents(state, action);
     processFetchingEvents(state, action);
     processDashboardEvents(state, action);
-
   } finally {
     // we should not block execution nor override state
     // noinspection ReturnInsideFinallyBlockJS

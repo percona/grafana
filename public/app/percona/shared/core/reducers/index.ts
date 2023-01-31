@@ -21,7 +21,7 @@ import { SettingsService } from 'app/percona/settings/Settings.service';
 import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Settings.types';
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
 import { api } from 'app/percona/shared/helpers/api';
-import { uiEventsReducer } from "app/percona/ui-events/reducer";
+import { uiEventsReducer } from 'app/percona/ui-events/reducer';
 
 import { ServerInfo } from '../types';
 
@@ -138,11 +138,11 @@ const toKubernetesListModel = (
 
 const toKubernetesModel =
   (checkUpdateResponse: CheckOperatorUpdateAPI) =>
-    ({ kubernetes_cluster_name: kubernetesClusterName, operators, status }: KubernetesAPI): Kubernetes => ({
-      kubernetesClusterName,
-      operators: toModelOperators(kubernetesClusterName, operators, checkUpdateResponse),
-      status: status as KubernetesClusterStatus,
-    });
+  ({ kubernetes_cluster_name: kubernetesClusterName, operators, status }: KubernetesAPI): Kubernetes => ({
+    kubernetesClusterName,
+    operators: toModelOperators(kubernetesClusterName, operators, checkUpdateResponse),
+    status: status as KubernetesClusterStatus,
+  });
 
 const toModelOperators = (
   kubernetesClusterName: string,
