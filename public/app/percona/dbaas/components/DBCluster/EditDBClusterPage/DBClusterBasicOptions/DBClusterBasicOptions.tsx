@@ -28,7 +28,7 @@ import {
   Operators,
 } from './DBClusterBasicOptions.types';
 import { getKubernetesOptions, kubernetesClusterNameValidator, optionRequired } from './DBClusterBasicOptions.utils';
-import RestoreFrom from './RestoreFrom/RestoreFrom';
+import Restore from './Restore/Restore';
 
 const getAvailableDatabaseOptions = (kubernetesCluster: Kubernetes): DatabaseOption[] => {
   const { operators } = kubernetesCluster;
@@ -127,7 +127,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
         label={Messages.clusterName}
         validators={[required, kubernetesClusterNameValidator, maxLength(CLUSTER_NAME_MAX_LENGTH)]}
       />
-      {settings?.backupEnabled && <RestoreFrom form={form} />}
+      {settings?.backupEnabled && <Restore form={form} />}
     </div>
   );
 };

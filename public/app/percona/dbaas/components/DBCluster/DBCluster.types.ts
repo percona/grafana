@@ -44,7 +44,7 @@ interface DBaaSBackup {
   location_id: string;
   keep_copies: number;
   cron_expression: string;
-  service_account: 'string';
+  service_account: string;
 }
 
 interface DBaaSRestore {
@@ -208,6 +208,14 @@ export interface DBClusterConnectionAPI {
 
 export interface DBClusterLogsAPI {
   logs: DBClusterLogAPI[];
+}
+
+export interface DBClusterSecretsAPI {
+  secrets: DBClusterSecret[];
+}
+
+export interface DBClusterSecret {
+  name: string;
 }
 
 export interface DBClusterLogAPI {

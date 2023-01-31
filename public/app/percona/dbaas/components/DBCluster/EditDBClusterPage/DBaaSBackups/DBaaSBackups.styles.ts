@@ -27,4 +27,7 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
       flex: 1 0;
     }
   `,
+  asyncSelectField: css`
+    background-color: red;
+  `,
 });

@@ -9,7 +9,7 @@ import { MAX_RETENTION, MIN_RETENTION } from '../../../../../backup/components/A
 import { ScheduleSectionFields } from '../../../../../backup/components/AddBackupPage/ScheduleSection/ScheduleSectionFields/ScheduleSectionFields';
 import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../../../../../backup/components/ScheduledBackups/ScheduledBackups.constants';
 import { useCancelToken } from '../../../../../shared/components/hooks/cancelToken.hook';
-import { RestoreFromService } from '../DBClusterBasicOptions/RestoreFrom/RestoreFrom.service';
+import { RestoreService } from '../DBClusterBasicOptions/Restore/Restore.service';
 import { AddDBClusterFormValues } from '../EditDBClusterPage.types';
 
 import { Messages } from '././DBaaSBackups.messages';
@@ -44,7 +44,7 @@ export const DBaaSBackups: FC<FormRenderProps> = ({ values }) => {
               <AsyncSelectField
                 name={DBaaSBackupFields.location}
                 loadOptions={() =>
-                  RestoreFromService.loadStorageLocations(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN))
+                  RestoreService.loadStorageLocations(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN))
                 }
                 defaultOptions
                 placeholder={Messages.placeholders.location}

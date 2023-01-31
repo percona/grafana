@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents } from '../../../../../../features/alerting/unified/utils/redux';
 import { newDBClusterService } from '../../../../../dbaas/components/DBCluster/DBCluster.utils';
+import { Settings } from '../../../../../settings/Settings.types';
 import { getCronStringFromValues } from '../../../../helpers/cron/cron';
 import { SETTINGS_TIMEOUT } from '../../../constants';
 import { updateSettingsAction } from '../../index';
@@ -42,7 +43,10 @@ const perconaAddDBClusterSlice = createSlice({
 
 export const addDbClusterAction = createAsyncThunk(
   'percona/addDBCluster',
-  async (args: { values: Record<string, any>; setPMMAddress?: boolean }, thunkAPI): Promise<void> => {
+  async (
+    args: { values: Record<string, any>; setPMMAddress?: boolean; settings?: Settings },
+    thunkAPI
+  ): Promise<void> => {
     const {
       name,
       kubernetesCluster,
@@ -67,6 +71,7 @@ export const addDbClusterAction = createAsyncThunk(
       weekDay,
       startHour,
       startMinute,
+      secretsName,
     } = args.values;
 
     const dbClusterService = newDBClusterService(databaseType.value);
@@ -100,19 +105,18 @@ export const addDbClusterAction = createAsyncThunk(
         sourceRanges: sourceRanges?.map((item: any) => item?.sourceRange || ''),
         configuration,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
-        ...(backupLocation?.value && {
+        ...(args.settings?.backupEnabled && {
           backup: {
-            cron_expression: cronExpression,
-            location_id: backupLocation?.value,
-            keep_copies: retention,
-            // serviceAccount TODO 11301
+            cron_expression: cronExpression || '',
+            location_id: backupLocation?.value || '',
+            keep_copies: retention || '',
           },
         }),
-        ...(restoreFrom?.value && {
+        ...(args.settings?.backupEnabled && {
           restore: {
-            locationId: restoreFrom?.value,
-            destination: backupArtifact?.value,
-            // secretsName: 'string'; TODO 11301
+            location_id: restoreFrom?.value || '',
+            destination: backupArtifact?.value || '',
+            secrets_name: secretsName?.value || '',
           },
         }),
       }),

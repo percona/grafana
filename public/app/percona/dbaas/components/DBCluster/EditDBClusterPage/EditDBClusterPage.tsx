@@ -45,7 +45,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
   const [showPMMAddressWarning] = useShowPMMAddressWarning();
   const [showUnsafeConfigurationWarning, setShowUnsafeConfigurationWarning] = useState(false);
   const [initialValues, selectedDBCluster] = useEditDBClusterPageDefaultValues({ kubernetes, mode });
-  const [onSubmit, loading, buttonMessage] = useEditDBClusterFormSubmit({ mode, showPMMAddressWarning });
+  const [onSubmit, loading, buttonMessage] = useEditDBClusterFormSubmit({ mode, showPMMAddressWarning, settings });
   const [result] = useEditDBClusterPageResult(mode);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

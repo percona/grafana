@@ -8,13 +8,14 @@ import { ClusterSubmit, DBClusterFormSubmitProps } from '../EditDBClusterPage.ty
 export const useEditDBClusterFormSubmit = ({
   mode,
   showPMMAddressWarning,
+  settings,
 }: DBClusterFormSubmitProps): [ClusterSubmit, boolean | undefined, string, any] => {
   const dispatch = useDispatch();
   const { result, loading } = useSelector(mode === 'create' ? getAddDbCluster : getUpdateDbCluster);
   const { selectedDBCluster } = useSelector(getDBaaS);
 
   const addCluster = async (values: Record<string, any>) => {
-    await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning }));
+    await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning, settings }));
   };
 
   const editCluster = async (values: Record<string, any>) => {
