@@ -1,6 +1,8 @@
-import { DashboardModel } from "app/features/dashboard/state";
-import { EventStore, EventType } from "app/percona/ui-events/EventStore.service";
-import { Action } from "app/percona/ui-events/reducer";
+/* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/consistent-type-assertions, */
+
+import { DashboardModel } from 'app/features/dashboard/state';
+import { EventStore, EventType } from 'app/percona/ui-events/EventStore';
+import { Action } from 'app/percona/ui-events/reducer';
 
 export interface DashboardUsageEvent {
   uid: string;
@@ -11,15 +13,15 @@ export interface DashboardUsageEvent {
   location_params: string;
 }
 
-const startLoadingEvent = "dashboard/dashboardInitFetching";
-const endLoadingEvent = "dashboard/dashboardInitCompleted";
+const startLoadingEvent = 'dashboard/dashboardInitFetching';
+const endLoadingEvent = 'dashboard/dashboardInitCompleted';
 
 const supportedEvents = [startLoadingEvent, endLoadingEvent];
 
 let loadingStarted: null | number = null;
 
 export const processDashboardEvents = (state: any = {}, action: Action) => {
-  if (!supportedEvents.find(each => action.type.startsWith(each))) {
+  if (!supportedEvents.find((each) => action.type.startsWith(each))) {
     return;
   }
 
@@ -36,7 +38,7 @@ export const processDashboardEvents = (state: any = {}, action: Action) => {
           tags: payload.tags as string[],
           loadTime: now - loadingStarted,
           location: window.location.pathname,
-          location_params: window.location.search
+          location_params: window.location.search,
         };
         EventStore.add(EventType.DashboardUsage, event);
       }

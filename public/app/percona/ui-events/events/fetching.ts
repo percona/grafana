@@ -1,14 +1,16 @@
-import { EventStore, EventType } from "app/percona/ui-events/EventStore.service";
-import { Action } from "app/percona/ui-events/reducer";
+/* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/consistent-type-assertions, */
+
+import { EventStore, EventType } from 'app/percona/ui-events/EventStore';
+import { Action } from 'app/percona/ui-events/reducer';
 
 interface FetchingPayload {
   action: {
     payload: {
-      id: string,
-      type: string,
-      data: any,
+      id: string;
+      type: string;
+      data: any;
     };
-    type: string,
+    type: string;
   };
   key: string;
 }
@@ -20,16 +22,15 @@ export interface FetchingEvent {
   location_params: string;
 }
 
-const startFetchingEvent = "templating/keyed/shared/variableStateFetching";
-const endFetchingEvent = "templating/keyed/shared/variableStateCompleted";
+const startFetchingEvent = 'templating/keyed/shared/variableStateFetching';
+const endFetchingEvent = 'templating/keyed/shared/variableStateCompleted';
 
 const supportedEvents = [startFetchingEvent, endFetchingEvent];
 
 const fetchingEvents = new Map();
 
 export const processFetchingEvents = (state: any = {}, action: Action) => {
-
-  if (!supportedEvents.find(each => action.type.startsWith(each))) {
+  if (!supportedEvents.find((each) => action.type.startsWith(each))) {
     return;
   }
 
@@ -48,7 +49,7 @@ export const processFetchingEvents = (state: any = {}, action: Action) => {
         component,
         loadTime: now - start,
         location: window.location.pathname,
-        location_params: window.location.search
+        location_params: window.location.search,
       };
       EventStore.add(EventType.Fetching, event);
     }

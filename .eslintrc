@@ -117,6 +117,28 @@
         "no-redeclare": "error",
         "@typescript-eslint/no-redeclare": "off"
       }
+    },
+    {
+      "files": [
+        "public/app/percona/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "off",
+          {
+            "paths": [
+              {
+                "name": "react-redux",
+                "importNames": [
+                  "useDispatch",
+                  "useSelector"
+                ],
+                "message": "Please import from app/types instead."
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

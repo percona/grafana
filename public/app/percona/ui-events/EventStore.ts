@@ -1,9 +1,11 @@
-const cache = new Map();
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+const cache = new Map<string, any>();
 
 export enum EventType {
-  NotificationError = "NOTIFICATION_ERROR",
-  Fetching = "FETCHING",
-  DashboardUsage = "DASHBOARD_USAGE",
+  NotificationError = 'NOTIFICATION_ERROR',
+  Fetching = 'FETCHING',
+  DashboardUsage = 'DASHBOARD_USAGE',
 }
 
 export const EventStore = {
@@ -20,5 +22,6 @@ export const EventStore = {
     let copy = new Map(cache);
     cache.clear();
     return copy;
-  }
+  },
+  clear: (): void => cache.clear(),
 };
