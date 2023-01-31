@@ -2,7 +2,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { DBaaSBackup, DBaaSBackupListResponse } from './DBaaSBackups.types';
 
-const BASE_URL = '/v1/management/DBaaS/DBaaSBackups';
+const BASE_URL = '/v1/management/DBaaS/Backups';
 
 export const DBaaSBackupService = {
   async list(locationId: string): Promise<DBaaSBackup[]> {
