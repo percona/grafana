@@ -72,6 +72,8 @@ export const addDbClusterAction = createAsyncThunk(
       startHour,
       startMinute,
       secretsName,
+      enableRestore,
+      enableBackups,
     } = args.values;
 
     const dbClusterService = newDBClusterService(databaseType.value);
@@ -105,20 +107,22 @@ export const addDbClusterAction = createAsyncThunk(
         sourceRanges: sourceRanges?.map((item: any) => item?.sourceRange || ''),
         configuration,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
-        ...(args.settings?.backupEnabled && {
-          backup: {
-            cron_expression: cronExpression || '',
-            location_id: backupLocation?.value || '',
-            keep_copies: retention || '',
-          },
-        }),
-        ...(args.settings?.backupEnabled && {
-          restore: {
-            location_id: restoreFrom?.value || '',
-            destination: backupArtifact?.value || '',
-            secrets_name: secretsName?.value || '',
-          },
-        }),
+        ...(args.settings?.backupEnabled &&
+          enableBackups && {
+            backup: {
+              cron_expression: cronExpression || '',
+              location_id: backupLocation?.value || '',
+              keep_copies: retention || '',
+            },
+          }),
+        ...(args.settings?.backupEnabled &&
+          enableRestore && {
+            restore: {
+              location_id: restoreFrom?.value || '',
+              destination: backupArtifact?.value || '',
+              secrets_name: secretsName?.value || '',
+            },
+          }),
       }),
       {
         successMessage: 'Cluster was successfully added',

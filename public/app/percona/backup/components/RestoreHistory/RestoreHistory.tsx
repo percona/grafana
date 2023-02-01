@@ -1,7 +1,6 @@
 /* eslint-disable react/display-name */
 import { logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { Column, Row } from 'react-table';
 
 import { OldPage } from 'app/core/components/Page/Page';
@@ -10,10 +9,11 @@ import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoa
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
-import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backupLocations';
+import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
+import { useSelector } from 'app/types';
 
 import { Messages } from '../../Backup.messages';
 import { formatLocationsToMap } from '../../Backup.utils';

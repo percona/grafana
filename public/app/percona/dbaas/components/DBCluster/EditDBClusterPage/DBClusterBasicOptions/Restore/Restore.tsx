@@ -1,10 +1,12 @@
 import { AsyncSelectField, validators } from '@percona/platform-core';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
+import { Field } from 'react-final-form';
 
-import { useStyles } from '@grafana/ui';
+import { FieldSet, useStyles, Switch } from '@grafana/ui';
 
-import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../../../../../../backup/components/ScheduledBackups/ScheduledBackups.constants';
-import { useCancelToken } from '../../../../../../shared/components/hooks/cancelToken.hook';
+import { useSelector } from '../../../../../../../types';
+import { SelectField } from '../../../../../../shared/components/Form/SelectField';
+import { getBackupLocations } from '../../../../../../shared/core/selectors';
 import { AddDBClusterFormValues } from '../../EditDBClusterPage.types';
 
 import { Messages } from './Restore.messages';
@@ -15,48 +17,83 @@ import { RestoreFields, RestoreFromProps } from './Restore.types';
 export const Restore: FC<RestoreFromProps> = ({ form }) => {
   const styles = useStyles(getStyles);
 
-  const [generateToken] = useCancelToken();
+  const [enableRestore, setEnableRestore] = useState(false);
+  const { result: locations = [], loading: locationsLoading } = useSelector(getBackupLocations);
+  const locationsOptions = locations.map((location) => ({
+    label: location.name,
+    value: location.locationID,
+  }));
 
   const { restoreFrom, kubernetesCluster } = form.getState().values as AddDBClusterFormValues;
   const restoreFromValue = restoreFrom?.value;
   return (
-    <>
-      <div className={styles.line}>
-        <AsyncSelectField
-          name={RestoreFields.restoreFrom}
-          loadOptions={() => RestoreService.loadStorageLocations(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN))}
-          defaultOptions
-          placeholder={Messages.placeholders.restoreFrom}
-          label={Messages.labels.restoreFrom}
-          validate={validators.required}
-        />
-        {restoreFromValue !== undefined && restoreFromValue ? (
-          <AsyncSelectField
-            name={RestoreFields.backupArtifact}
-            loadOptions={() => RestoreService.loadBackupArtifacts(restoreFromValue)}
-            defaultOptions
-            placeholder={Messages.placeholders.backupArtifact}
-            label={Messages.labels.backupArtifact}
-            validate={validators.required}
-          />
-        ) : (
-          <div />
-        )}
-      </div>
-      {kubernetesCluster?.value && (
-        <div className={styles.line}>
-          <AsyncSelectField
-            name={RestoreFields.secretsName}
-            loadOptions={() => RestoreService.loadSecretsNames(kubernetesCluster?.value)}
-            defaultOptions
-            placeholder={Messages.placeholders.secretsName}
-            label={Messages.labels.secretsName}
-            validate={validators.required}
-          />
-          <div />
+    <FieldSet
+      label={
+        <div className={styles.fieldSetLabel}>
+          <div>{Messages.labels.enableRestore}</div>
+          <div className={styles.fieldSetSwitch}>
+            <Field name="enableRestore">
+              {({ input }) => (
+                <Switch
+                  onClick={() => setEnableRestore((prevState) => !prevState)}
+                  data-testid="toggle-scheduled-restore"
+                  {...input}
+                />
+              )}
+            </Field>
+          </div>
         </div>
+      }
+      data-testid="configurations"
+    >
+      {enableRestore ? (
+        <div>
+          <div className={styles.line}>
+            <Field name={RestoreFields.restoreFrom} validate={validators.required}>
+              {({ input }) => (
+                <div>
+                  <SelectField
+                    label={Messages.labels.restoreFrom}
+                    isSearchable={false}
+                    options={locationsOptions}
+                    isLoading={locationsLoading}
+                    {...input}
+                    data-testid="location-select-input"
+                  />
+                </div>
+              )}
+            </Field>
+            {restoreFromValue !== undefined && restoreFromValue ? (
+              <AsyncSelectField
+                name={RestoreFields.backupArtifact}
+                loadOptions={() => RestoreService.loadBackupArtifacts(restoreFromValue)}
+                defaultOptions
+                placeholder={Messages.placeholders.backupArtifact}
+                label={Messages.labels.backupArtifact}
+                validate={validators.required}
+              />
+            ) : (
+              <div />
+            )}
+          </div>
+          {kubernetesCluster?.value && (
+            <div className={styles.line}>
+              <AsyncSelectField
+                name={RestoreFields.secretsName}
+                loadOptions={() => RestoreService.loadSecretsNames(kubernetesCluster?.value)}
+                defaultOptions
+                placeholder={Messages.placeholders.secretsName}
+                label={Messages.labels.secretsName}
+                validate={validators.required}
+              />
+              <div />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div />
       )}
-    </>
+    </FieldSet>
   );
 };
 

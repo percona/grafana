@@ -3,9 +3,10 @@ export const Messages = {
     restoreFrom: 'Restore from',
     backupArtifact: 'Backup artifact',
     secretsName: 'Secrets Name',
+    enableRestore: 'Enable restore',
   },
   placeholders: {
-    restoreFrom: 'Choose',
+    restoreFrom: 'None',
     backupArtifact: 'Choose',
     secretsName: 'Choose',
   },

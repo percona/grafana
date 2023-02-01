@@ -19,4 +19,15 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     width: 50%;
     flex-shrink: 1;
   `,
+
+  fieldSetSwitch: css`
+    label {
+      position: absolute;
+    }
+  `,
+  fieldSetLabel: css`
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+  `,
 });

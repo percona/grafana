@@ -8,6 +8,7 @@ import { Spinner, useStyles2 } from '@grafana/ui/src';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { useSelector, useDispatch } from 'app/types';
 
+import { fetchStorageLocations } from '../../../../shared/core/reducers/backups/backupLocations';
 import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
 import { resetDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
 import { resetUpdateDBClusterState } from '../../../../shared/core/reducers/dbaas/updateDBCluster/updateDBCluster';
@@ -65,6 +66,11 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result]);
+
+  useEffect(() => {
+    dispatch(fetchStorageLocations());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return kubernetes === undefined || kubernetesLoading ? (
     <div data-testid="db-cluster-form-loading">
