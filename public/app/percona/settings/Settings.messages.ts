@@ -33,7 +33,8 @@ export const Messages = {
       'Option to enable/disable DBaaS features. Disabling DBaaS does not suspend or remove running clusters.',
     dbaasLink: `${HOW_TO_DOC_URL}#dbaas`,
     accessControl: 'Access control',
-    accessControlTooltip: '',
+    accessControlTooltip: 'Option to enable/disable Access control.',
+    // todo: will be added later
     accessControlLink: '',
     publicAddressLabel: 'Public Address',
     publicAddressTooltip: 'Public Address to this PMM server.',
