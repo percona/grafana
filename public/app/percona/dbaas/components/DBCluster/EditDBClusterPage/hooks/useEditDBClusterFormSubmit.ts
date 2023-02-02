@@ -9,7 +9,7 @@ export const useEditDBClusterFormSubmit = ({
   mode,
   showPMMAddressWarning,
   settings,
-}: DBClusterFormSubmitProps): [ClusterSubmit, boolean | undefined, string, any] => {
+}: DBClusterFormSubmitProps): [ClusterSubmit, boolean | undefined, string, 'error' | 'ok' | undefined] => {
   const dispatch = useDispatch();
   const { result, loading } = useSelector(mode === 'create' ? getAddDbCluster : getUpdateDbCluster);
   const { selectedDBCluster } = useSelector(getDBaaS);
@@ -18,7 +18,7 @@ export const useEditDBClusterFormSubmit = ({
     await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning, settings }));
   };
 
-  const editCluster = async (values: Record<string, any>) => {
+  const editCluster = async (values: Record<string, void>) => {
     if (selectedDBCluster) {
       await dispatch(updateDBClusterAction({ values, selectedDBCluster }));
     }

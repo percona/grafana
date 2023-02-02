@@ -48,9 +48,9 @@ interface DBaaSBackup {
 }
 
 interface DBaaSRestore {
-  location_id: 'string';
-  destination: 'string';
-  secrets_name: 'string';
+  location_id: string;
+  destination: string;
+  secrets_name: string;
 }
 
 export enum DBClusterStatus {
