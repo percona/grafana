@@ -44,7 +44,7 @@ export const Restore: FC<RestoreFromProps> = ({ form }) => {
           </div>
         </div>
       }
-      data-testid="configurations"
+      data-testid="restore"
     >
       {enableRestore ? (
         <div>

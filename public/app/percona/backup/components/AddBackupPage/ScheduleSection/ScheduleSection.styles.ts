@@ -9,6 +9,10 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
     padding-top: ${spacing.xs};
     margin-bottom: 17px;
   `,
+  selectField: css`
+    padding-top: 7px;
+    padding-bottom: 7px;
+  `,
   section: css`
     margin-top: 48px;
   `,
@@ -30,9 +34,5 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
     & > div {
       width: 100%;
     }
-  `,
-  selectField: css`
-    padding-top: 7px;
-    padding-bottom: 7px;
   `,
 });
