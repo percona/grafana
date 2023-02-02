@@ -165,6 +165,7 @@ export const Advanced: FC = () => {
       enable_updates: updates,
       disable_updates: !updates,
       enable_access_control: accessControl,
+      disable_access_control: !accessControl,
     };
 
     setLoading(true);
