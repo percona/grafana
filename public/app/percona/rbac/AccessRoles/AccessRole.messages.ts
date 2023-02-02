@@ -1,7 +1,8 @@
 export const Messages = {
   title: 'Access Roles',
   subtitle: {
-    text: 'Access roles is a way to control the access to metrics and some PMM functionalities, for an increased security standard. Worth noting that every time you invite new users, the default role will be assigned to them. For futher explanation on ',
+    text: 'Access roles is a way to control the access to metrics and some PMM functionalities, for an increased security standard. Worth noting that every time you invite new users, the default role will be assigned to them.',
+    further: ' For futher explanation on ',
     link: 'how the Access roles work, check our documentation',
     dot: '.',
   },
@@ -13,7 +14,9 @@ export const Messages = {
   },
   metrics: {
     column: 'Metrics access ',
-    tooltip: 'Roles are built using service labels. Go to Inventory > Services to edit labels.',
+    tooltip: 'Roles are built using service labels.',
+    // todo: add back in when option to edit service labels is available
+    // tooltip: 'Roles are built using service labels. Go to Inventory > Services to edit labels.',
   },
   options: {
     column: 'Options',

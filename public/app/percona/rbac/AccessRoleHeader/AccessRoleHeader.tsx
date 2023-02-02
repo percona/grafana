@@ -1,12 +1,11 @@
 import React, { FC, useEffect } from 'react';
 
-import { Icon, Tooltip } from '@grafana/ui';
+import { HorizontalGroup, Icon, Tooltip } from '@grafana/ui';
 import { fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { fetchUsersListAction } from 'app/percona/shared/core/reducers/users/users';
 import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from './AccessRoleHeader.messages';
-import { styles } from './AccessRoleHeader.styles';
 
 const AccessRoleHeader: FC = () => {
   const dispatch = useAppDispatch();
@@ -19,13 +18,13 @@ const AccessRoleHeader: FC = () => {
   }, [dispatch]);
 
   return (
-    <th className={styles.Header}>
-      <span data-testid="access-role-header">{Messages.header}</span>
-      <span className={styles.Icon}>
+    <th>
+      <HorizontalGroup>
+        <span data-testid="access-role-header">{Messages.header}</span>
         <Tooltip content={Messages.tooltip}>
           <Icon name="info-circle" />
         </Tooltip>
-      </span>
+      </HorizontalGroup>
     </th>
   );
 };
