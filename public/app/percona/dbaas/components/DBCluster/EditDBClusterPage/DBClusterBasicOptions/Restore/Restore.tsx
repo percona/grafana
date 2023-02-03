@@ -32,7 +32,7 @@ export const Restore: FC<RestoreFromProps> = ({ form }) => {
         <div className={styles.fieldSetLabel}>
           <div>{Messages.labels.enableRestore}</div>
           <div className={styles.fieldSetSwitch}>
-            <Field name="enableRestore">
+            <Field name="enableRestore" type="checkbox">
               {({ input }) => (
                 <Switch
                   onClick={() => setEnableRestore((prevState) => !prevState)}
@@ -51,14 +51,13 @@ export const Restore: FC<RestoreFromProps> = ({ form }) => {
           <div className={styles.line}>
             <Field name={RestoreFields.restoreFrom} validate={validators.required}>
               {({ input }) => (
-                <div>
+                <div data-testid="locations-select-wrapper">
                   <SelectField
                     label={Messages.labels.restoreFrom}
                     isSearchable={false}
                     options={locationsOptions}
                     isLoading={locationsLoading}
                     {...input}
-                    data-testid="location-select-input"
                   />
                 </div>
               )}

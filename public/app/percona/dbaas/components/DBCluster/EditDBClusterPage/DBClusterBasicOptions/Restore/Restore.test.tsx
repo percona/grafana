@@ -1,50 +1,94 @@
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render, waitFor, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 
 import { configureStore } from '../../../../../../../store/configureStore';
 import { StoreState } from '../../../../../../../types';
-import { KubernetesClusterStatus } from '../../../../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
-import { KubernetesOperatorStatus } from '../../../../Kubernetes/OperatorStatusItem/KubernetesOperatorStatus/KubernetesOperatorStatus.types';
 
 import { Restore } from './Restore';
 
 jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
+jest.mock('app/percona/backup/components/StorageLocations/StorageLocations.service');
 
+const store = configureStore({
+  percona: {
+    user: { isAuthorized: true },
+    kubernetes: {
+      loading: false,
+    },
+  },
+} as StoreState);
 describe('DBaaS DBCluster creation Restore section ::', () => {
-  it('renders items correctly', async () => {
+  it('renders items correctly, shows fields on switch on', async () => {
     await waitFor(() =>
       render(
-        <Provider
-          store={configureStore({
-            percona: {
-              user: { isAuthorized: true },
-              settings: {
-                loading: false,
-                result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
-              },
-              kubernetes: {
-                loading: false,
-                result: [
-                  {
-                    kubernetesClusterName: 'cluster1',
-                    status: KubernetesClusterStatus.ok,
-                    operators: {
-                      psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
-                      pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
-                    },
-                  },
-                ],
-              },
-            },
-          } as StoreState)}
-        >
+        <Provider store={store}>
           <Form onSubmit={jest.fn()} render={({ form }) => <Restore form={form} />} />
         </Provider>
       )
     );
     expect(screen.getByTestId('toggle-scheduled-restore')).toBeInTheDocument();
-    expect(screen.getByText('Enable restore')).toBeInTheDocument();
+
+    const checkbox = screen.getByTestId('toggle-scheduled-restore');
+
+    const consoleWarnMock = jest.spyOn(console, 'warn').mockImplementation();
+    fireEvent.click(checkbox);
+    expect(consoleWarnMock.mock.calls).toEqual([
+      ['[Deprecation warning] Switch: checked prop is deprecated. Use value instead'],
+    ]);
+    consoleWarnMock.mockRestore();
+
+    expect(screen.getByTestId('locations-select-wrapper')).toBeInTheDocument();
+  });
+  it('shows backup artifacts field when location field is not empty', async () => {
+    await waitFor(() =>
+      render(
+        <Provider store={store}>
+          <Form
+            onSubmit={jest.fn()}
+            initialValues={{
+              restoreFrom: {
+                label: 'location1',
+                value: 'location1',
+              },
+            }}
+            render={({ form }) => {
+              return <Restore form={form} />;
+            }}
+          />
+        </Provider>
+      )
+    );
+
+    expect(screen.getByTestId('toggle-scheduled-restore')).toBeInTheDocument();
+    const checkbox = screen.getByTestId('toggle-scheduled-restore');
+    fireEvent.click(checkbox);
+    expect(screen.getByTestId('backupArtifact-field-container')).toBeInTheDocument();
+  });
+  it('shows secrets field if kubernetesCluster name exists in form', async () => {
+    await waitFor(() =>
+      render(
+        <Provider store={store}>
+          <Form
+            onSubmit={jest.fn()}
+            initialValues={{
+              kubernetesCluster: {
+                label: 'cluster 1',
+                value: 'cluster 1',
+              },
+            }}
+            render={({ form }) => {
+              return <Restore form={form} />;
+            }}
+          />
+        </Provider>
+      )
+    );
+
+    expect(screen.getByTestId('toggle-scheduled-restore')).toBeInTheDocument();
+    const checkbox = screen.getByTestId('toggle-scheduled-restore');
+    fireEvent.click(checkbox);
+    expect(screen.getByTestId('backupArtifact-field-container')).toBeInTheDocument();
   });
 });
