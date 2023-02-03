@@ -10,4 +10,7 @@ export const Messages = {
     backupArtifact: 'Choose',
     secretsName: 'Choose',
   },
+  tooltips: {
+    secretsName: 'Select a secret of the cluster with the same user passwords of the original cluster',
+  },
 };

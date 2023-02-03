@@ -30,4 +30,9 @@ export const getStyles = ({ spacing }: GrafanaTheme) => ({
     align-items: center;
     column-gap: 10px;
   `,
+  asyncSelect: css`
+    svg {
+      margin-bottom: ${spacing.xxs};
+    }
+  `,
 });

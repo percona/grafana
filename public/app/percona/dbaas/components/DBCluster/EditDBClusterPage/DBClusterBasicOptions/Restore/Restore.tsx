@@ -84,6 +84,9 @@ export const Restore: FC<RestoreFromProps> = ({ form }) => {
                 placeholder={Messages.placeholders.secretsName}
                 label={Messages.labels.secretsName}
                 validate={validators.required}
+                tooltipIcon="info-circle"
+                tooltipText={Messages.tooltips.secretsName}
+                fieldClassName={styles.asyncSelect}
               />
               <div />
             </div>
