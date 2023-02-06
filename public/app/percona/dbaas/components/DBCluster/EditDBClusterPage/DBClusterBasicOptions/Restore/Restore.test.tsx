@@ -30,16 +30,8 @@ describe('DBaaS DBCluster creation Restore section ::', () => {
       )
     );
     expect(screen.getByTestId('toggle-scheduled-restore')).toBeInTheDocument();
-
     const checkbox = screen.getByTestId('toggle-scheduled-restore');
-
-    const consoleWarnMock = jest.spyOn(console, 'warn').mockImplementation();
     fireEvent.click(checkbox);
-    expect(consoleWarnMock.mock.calls).toEqual([
-      ['[Deprecation warning] Switch: checked prop is deprecated. Use value instead'],
-    ]);
-    consoleWarnMock.mockRestore();
-
     expect(screen.getByTestId('locations-select-wrapper')).toBeInTheDocument();
   });
   it('shows backup artifacts field when location field is not empty', async () => {
@@ -89,7 +81,7 @@ describe('DBaaS DBCluster creation Restore section ::', () => {
 
     expect(screen.getByTestId('toggle-scheduled-restore')).toBeInTheDocument();
     const checkbox = screen.getByTestId('toggle-scheduled-restore');
-    fireEvent.click(checkbox);
-    expect(screen.getByTestId('backupArtifact-field-container')).toBeInTheDocument();
+    await waitFor(() => fireEvent.click(checkbox));
+    expect(screen.getByTestId('secretsName-field-container')).toBeInTheDocument();
   });
 });

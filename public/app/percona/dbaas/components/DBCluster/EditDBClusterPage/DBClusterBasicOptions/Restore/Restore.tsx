@@ -37,6 +37,7 @@ export const Restore: FC<RestoreFromProps> = ({ form }) => {
                   onClick={() => setEnableRestore((prevState) => !prevState)}
                   data-testid="toggle-scheduled-restore"
                   {...input}
+                  checked={undefined}
                 />
               )}
             </Field>
