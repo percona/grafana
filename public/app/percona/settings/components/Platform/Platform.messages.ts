@@ -4,7 +4,7 @@ export const Messages = {
   whatIsPerconaPlatform: 'What is Percona Platform?',
   perconaPlatformExplanation:
     'Percona Platform is a command center for monitoring, securing, and optimizing database enviroments on any infrastructure.',
-  whyToConnect: 'Why to connect?',
+  whyConnect: 'Why connect?',
   connectionReason: `
       Connecting to Percona Platform will boost PMM's monitoring capabilities and give you access to advanced
       Advisor checks and templates, private DBaaS, K8s operators, knowledge base articles and more.

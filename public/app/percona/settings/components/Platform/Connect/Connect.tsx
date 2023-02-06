@@ -26,7 +26,7 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
       <h2 className={styles.titles}>{Messages.perconaPlatform}</h2>
       <h4>{Messages.whatIsPerconaPlatform}</h4>
       <p>{Messages.perconaPlatformExplanation}</p>
-      <h4>{Messages.whyToConnect}</h4>
+      <h4>{Messages.whyConnect}</h4>
       <p>{Messages.connectionReason}</p>
       <h4>{Messages.noPerconaAccount}</h4>
       <p>{Messages.createAnAccount}</p>
@@ -64,18 +64,18 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
             </Button>
           </a>
         </div>
+        {showPMMAddressWarning && <PMMServerUrlWarning />}
         <LoaderButton
           data-testid="connect-button"
           type="submit"
           size="md"
           variant="primary"
-          disabled={!valid || connecting}
+          disabled={connecting}
           loading={connecting}
           className={styles.submitButton}
         >
           {Messages.connect}
         </LoaderButton>
-        {showPMMAddressWarning && <PMMServerUrlWarning />}
       </form>
     </>
   );
