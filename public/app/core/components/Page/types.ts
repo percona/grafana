@@ -1,4 +1,4 @@
-import React, { FC, HTMLAttributes, RefCallback } from 'react';
+import React, { FC, HTMLAttributes, ReactNode, RefCallback } from 'react';
 
 import { NavModel, NavModelItem, PageLayoutType } from '@grafana/data';
 
@@ -13,6 +13,7 @@ export interface PageProps extends HTMLAttributes<HTMLDivElement> {
   navModel?: NavModel;
   // @PERCONA
   tabsDataTestId?: string;
+  navActions?: ReactNode;
   // @PERCONA
   // For page settings, with vertical tabs
   vertical?: boolean;

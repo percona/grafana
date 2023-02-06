@@ -1,8 +1,8 @@
 import { css, cx } from '@emotion/css';
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
-import { NavModelItem, NavModelBreadcrumb, GrafanaTheme2 } from '@grafana/data';
-import { Tab, TabsBar, Icon, useStyles2, toIconName } from '@grafana/ui';
+import { GrafanaTheme2, NavModelBreadcrumb, NavModelItem } from '@grafana/data';
+import { Icon, Tab, TabsBar, toIconName, useStyles2 } from '@grafana/ui';
 import { PanelHeaderMenuItem } from 'app/features/dashboard/dashgrid/PanelHeader/PanelHeaderMenuItem';
 
 import { PageInfoItem } from '../Page/types';
@@ -18,6 +18,7 @@ export interface Props {
   // @PERCONA
   vertical?: boolean;
   tabsDataTestId?: string;
+  navActions?: ReactNode;
 }
 
 const SelectNav = ({ children, customCss }: { children: NavModelItem[]; customCss: string }) => {
@@ -100,6 +101,7 @@ export const PageHeader: FC<Props> = ({
   navItem: model,
   renderTitle,
   actions,
+  navActions,
   info,
   subTitle,
   vertical = false,
@@ -140,11 +142,14 @@ export const PageHeader: FC<Props> = ({
       <div className="page-container">
         <div className="page-header">
           {renderHeader(model)}
-          {model.children && model.children.length > 0 && (
-            <Navigation vertical={vertical} dataTestId={tabsDataTestId}>
-              {model.children}
-            </Navigation>
-          )}
+          <div className={styles.navRow}>
+            {model.children && model.children.length > 0 && (
+              <Navigation vertical={vertical} dataTestId={tabsDataTestId}>
+                {model.children}
+              </Navigation>
+            )}
+            {navActions}
+          </div>
         </div>
       </div>
     </div>
@@ -227,6 +232,17 @@ const getStyles = (theme: GrafanaTheme2) => {
       width: 20%;
       @media (min-width: ${maxWidthBreakpoint}px) {
         width: 12%;
+      }
+    `,
+
+    // @PERCONA
+    navRow: css`
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      @media (min-width: ${theme.breakpoints.values.lg}px) {
+        flex-direction: row;
       }
     `,
   };

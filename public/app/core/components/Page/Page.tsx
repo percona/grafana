@@ -31,6 +31,7 @@ export const OldPage: PageType = ({
   renderTitle,
   subTitle,
   actions,
+  navActions,
   info,
   ...otherProps
 }) => {
@@ -53,6 +54,7 @@ export const OldPage: PageType = ({
                 tabsDataTestId={tabsDataTestId}
                 vertical={vertical}
                 actions={actions}
+                navActions={navActions}
                 info={info}
                 navItem={pageHeaderNav}
                 renderTitle={renderTitle}

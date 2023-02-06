@@ -1,8 +1,8 @@
 import { LoaderButton, logger } from '@percona/platform-core';
-import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { useStyles2 } from '@grafana/ui';
+import { Button, IconButton, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { CheckService } from 'app/percona/check/Check.service';
@@ -186,7 +186,16 @@ export const AllChecksTab: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
   return (
-    <OldPage navModel={navModel} tabsDataTestId="db-check-tabs-bar" data-testid="db-check-panel">
+    <OldPage
+      navModel={navModel}
+      navActions={
+        <div className={styles.navActions}>
+          <IconButton name="info-circle" size="lg" /> <Button>Get more advisors</Button>
+        </div>
+      }
+      tabsDataTestId="db-check-tabs-bar"
+      data-testid="db-check-panel"
+    >
       <OldPage.Contents dataTestId="db-check-tab-content">
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"

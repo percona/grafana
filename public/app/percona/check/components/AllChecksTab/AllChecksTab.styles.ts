@@ -17,4 +17,11 @@ export const getStyles = ({ v1: { spacing } }: GrafanaTheme2) => ({
     width: 140px;
     justify-content: center;
   `,
+  navActions: css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 5px;
+  `,
 });
