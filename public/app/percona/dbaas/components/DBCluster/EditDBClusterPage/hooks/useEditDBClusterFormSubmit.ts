@@ -18,7 +18,7 @@ export const useEditDBClusterFormSubmit = ({
     await dispatch(addDbClusterAction({ values, setPMMAddress: showPMMAddressWarning, settings }));
   };
 
-  const editCluster = async (values: Record<string, void>) => {
+  const editCluster = async (values: Record<string, any>) => {
     if (selectedDBCluster) {
       await dispatch(updateDBClusterAction({ values, selectedDBCluster }));
     }

@@ -7,7 +7,6 @@ import { FieldSet, useStyles, Switch } from '@grafana/ui';
 import { useSelector } from '../../../../../../../types';
 import { SelectField } from '../../../../../../shared/components/Form/SelectField';
 import { getBackupLocations } from '../../../../../../shared/core/selectors';
-import { AddDBClusterFormValues } from '../../EditDBClusterPage.types';
 
 import { Messages } from './Restore.messages';
 import { RestoreService } from './Restore.service';
@@ -24,7 +23,7 @@ export const Restore: FC<RestoreFromProps> = ({ form }) => {
     value: location.locationID,
   }));
 
-  const { restoreFrom, kubernetesCluster } = form.getState().values as AddDBClusterFormValues;
+  const { restoreFrom, kubernetesCluster } = form.getState().values;
   const restoreFromValue = restoreFrom?.value;
   return (
     <FieldSet
