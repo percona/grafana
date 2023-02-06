@@ -25,7 +25,7 @@ import {
 export const ScheduleSectionFields = ({ values }: ScheduleSectionFieldsProps) => {
   const styles = useStyles2(getStyles);
   return (
-    <div className={styles.scheduleSectionWrapper}>
+    <div className={styles.scheduleSectionWrapper} data-testid="shedule-section-fields-wrapper">
       <Field name="period" validate={validators.required}>
         {({ input }) => (
           <div className={styles.firstSelectRow}>

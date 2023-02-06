@@ -32,7 +32,7 @@ export const DBaaSBackups: FC<FormRenderProps> = ({ values }) => {
         <div className={styles.fieldSetLabel}>
           <div>{Messages.labels.enableBackups}</div>
           <div className={styles.fieldSetSwitch}>
-            <Field name="enableBackups">
+            <Field name="enableBackups" type="checkbox">
               {({ input }) => (
                 <Switch
                   onClick={() => setEnableBackups((prevState) => !prevState)}
@@ -52,7 +52,7 @@ export const DBaaSBackups: FC<FormRenderProps> = ({ values }) => {
             <div className={styles.line}>
               <Field name={DBaaSBackupFields.location} validate={validators.required}>
                 {({ input }) => (
-                  <div>
+                  <div data-testid="location-select-wrapper">
                     <SelectField
                       label={Messages.labels.location}
                       placeholder={Messages.placeholders.location}
@@ -60,12 +60,10 @@ export const DBaaSBackups: FC<FormRenderProps> = ({ values }) => {
                       options={locationsOptions}
                       isLoading={locationsLoading}
                       {...input}
-                      data-testid="location-select-input"
                     />
                   </div>
                 )}
               </Field>
-
               <NumberInputField
                 name={DBaaSBackupFields.retention}
                 label={Messages.labels.retention}

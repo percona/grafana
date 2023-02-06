@@ -171,17 +171,17 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
     image: dbCluster.databaseImage,
     ...(dbCluster.backup && {
       backup: {
-        location_id: dbCluster.backup?.location_id,
-        keep_copies: dbCluster.backup?.keep_copies,
-        cron_expression: dbCluster.backup?.cron_expression,
-        service_account: dbCluster.backup?.service_account,
+        location_id: dbCluster.backup?.locationId,
+        keep_copies: dbCluster.backup?.keepCopies,
+        cron_expression: dbCluster.backup?.cronExpression,
+        service_account: dbCluster.backup?.serviceAccount,
       },
     }),
     ...(dbCluster.restore && {
       restore: {
-        location_id: dbCluster.restore?.location_id,
+        location_id: dbCluster.restore?.locationId,
         destination: dbCluster.restore?.destination,
-        secrets_name: dbCluster.restore?.secrets_name,
+        secrets_name: dbCluster.restore?.secretsName,
       },
     }),
   },
