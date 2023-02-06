@@ -26,6 +26,7 @@ import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_SERVICES_CANCEL_TOKEN, SERVICES_COLUMNS } from '../Inventory.constants';
+import { Messages } from '../Inventory.messages';
 import { InventoryDataService } from '../Inventory.tools';
 
 import { getStyles } from './Tabs.styles';
@@ -77,7 +78,7 @@ export const Services = () => {
         const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
 
         appEvents.emit(AppEvents.alertSuccess, [
-          `${successfullyDeleted} of ${services.length} services successfully deleted`,
+          Messages.services.tab.deleteSuccess(successfullyDeleted, services.length),
         ]);
       } catch (e) {
         if (isApiCancelError(e)) {
@@ -107,7 +108,7 @@ export const Services = () => {
             <div className={styles.servicesActionPanel}>
               <HorizontalGroup justify="space-between">
                 {selected.length === 0 ? (
-                  <div className={styles.description}>Select services to bulk edit them</div>
+                  <div className={styles.description}>{Messages.services.tab.selectBulk}</div>
                 ) : (
                   <Button
                     size="md"
@@ -118,18 +119,18 @@ export const Services = () => {
                     variant="destructive"
                     className={styles.destructiveButton}
                   >
-                    {selected.length === 1 ? `Delete ${selected.length} service` : `Delete ${selected.length} services`}
+                    {Messages.services.tab.delete(selected.length)}
                   </Button>
                 )}
                 <Button size="md" onClick={handleAddService} icon="plus" variant="primary">
-                  Add service
+                  {Messages.services.tab.add}
                 </Button>
               </HorizontalGroup>
             </div>
             <Modal
               title={
                 <div className="modal-header-title">
-                  <span className="p-l-1">Confirm action</span>
+                  <span className="p-l-1">{Messages.services.multiDelete.title}</span>
                 </div>
               }
               isOpen={modalVisible}
@@ -141,19 +142,18 @@ export const Services = () => {
                   <form onSubmit={handleSubmit}>
                     <>
                       <h4 className={styles.confirmationText}>
-                        Are you sure that you want to permanently delete {selected.length}{' '}
-                        {selected.length === 1 ? 'service' : 'services'}?
+                        {Messages.services.multiDelete.description(selected.length)}
                       </h4>
                       <FormElement
                         dataTestId="form-field-force"
-                        label="Force mode"
+                        label={Messages.services.multiDelete.forceMode.label}
                         element={
-                          <CheckboxField label="Force mode is going to delete all associated agents" name="force" />
+                          <CheckboxField label={Messages.services.multiDelete.forceMode.description} name="force" />
                         }
                       />
                       <HorizontalGroup justify="space-between" spacing="md">
                         <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                          Cancel
+                          {Messages.services.multiDelete.cancel}
                         </Button>
                         <Button
                           variant="destructive"
@@ -164,7 +164,7 @@ export const Services = () => {
                           }}
                           className={styles.destructiveButton}
                         >
-                          Proceed
+                          {Messages.services.multiDelete.confirm}
                         </Button>
                       </HorizontalGroup>
                     </>
@@ -182,7 +182,7 @@ export const Services = () => {
                 showPagination
                 pageSize={25}
                 allRowsSelectionMode="page"
-                emptyMessage="No services Available"
+                emptyMessage={Messages.services.table.empty}
                 emptyMessageClassName={styles.emptyMessage}
                 pendingRequest={isLoading}
                 overlayClassName={styles.overlay}

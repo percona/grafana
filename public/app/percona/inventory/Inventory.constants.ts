@@ -7,32 +7,33 @@ import {
   servicesOptionsRender,
   servicesLabelsHeaderRender,
 } from './ColumnRenderers';
+import { Messages } from './Inventory.messages';
 
 export const MAIN_COLUMN = ['service_id', 'type', 'service_name', 'custom_labels', 'node_id', 'address', 'port'];
 
 export const SERVICES_COLUMNS: Column[] = [
   {
-    Header: 'Name',
+    Header: Messages.services.table.name,
     accessor: 'service_name',
   },
   {
-    Header: 'Type',
+    Header: Messages.services.table.type,
     accessor: 'type',
   },
   {
-    Header: 'ID',
+    Header: Messages.services.table.id,
     accessor: 'service_id',
   },
   {
-    Header: 'Node ID',
+    Header: Messages.services.table.nodeId,
     accessor: 'node_id',
   },
   {
-    Header: 'Address',
+    Header: Messages.services.table.address,
     accessor: 'address',
   },
   {
-    Header: 'Port',
+    Header: Messages.services.table.port,
     accessor: 'port',
   },
   {
@@ -41,7 +42,7 @@ export const SERVICES_COLUMNS: Column[] = [
     accessor: servicesDetailsRender,
   },
   {
-    Header: 'Options',
+    Header: Messages.services.table.options,
     accessor: servicesOptionsRender,
   },
 ];

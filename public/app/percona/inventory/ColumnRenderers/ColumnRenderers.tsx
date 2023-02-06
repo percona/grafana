@@ -5,6 +5,7 @@ import { HorizontalGroup, Icon, Tooltip } from '@grafana/ui';
 import { MAIN_COLUMN } from 'app/percona/inventory/Inventory.constants';
 import { CustomLabel } from 'app/percona/inventory/Inventory.types';
 
+import { Messages } from '../Inventory.messages';
 import ServicesOptions from '../components/ServicesOptions/ServicesOptions';
 
 import * as styles from './ColumnRenderers.styles';
@@ -24,8 +25,8 @@ export const servicesDetailsRender = (element: any) => {
 
 export const servicesLabelsHeaderRender = (): React.ReactElement => (
   <HorizontalGroup>
-    <span>Labels</span>
-    <Tooltip content="Useful to define groupings and segment access to build custom user roles.">
+    <span>{Messages.services.table.labels}</span>
+    <Tooltip content={Messages.services.table.labelsTooltip}>
       <Icon name="info-circle" />
     </Tooltip>
   </HorizontalGroup>
