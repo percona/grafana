@@ -10,6 +10,7 @@ import { Restore } from './Restore';
 
 jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
 jest.mock('app/percona/backup/components/StorageLocations/StorageLocations.service');
+jest.mock('app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBaaSBackups/DBaaSBackups.service');
 
 const store = configureStore({
   percona: {
@@ -56,7 +57,7 @@ describe('DBaaS DBCluster creation Restore section ::', () => {
 
     expect(screen.getByTestId('toggle-scheduled-restore')).toBeInTheDocument();
     const checkbox = screen.getByTestId('toggle-scheduled-restore');
-    fireEvent.click(checkbox);
+    await waitFor(() => fireEvent.click(checkbox));
     expect(screen.getByTestId('backupArtifact-field-container')).toBeInTheDocument();
   });
   it('shows secrets field if kubernetesCluster name exists in form', async () => {
