@@ -44,12 +44,7 @@ describe('DBaaSBackups Scheduled Section ::', () => {
     expect(screen.getByTestId('toggle-scheduled-backup')).toBeInTheDocument();
     const checkbox = screen.getByTestId('toggle-scheduled-backup');
 
-    const consoleWarnMock = jest.spyOn(console, 'warn').mockImplementation();
     fireEvent.click(checkbox);
-    expect(consoleWarnMock.mock.calls).toEqual([
-      ['[Deprecation warning] Switch: checked prop is deprecated. Use value instead'],
-    ]);
-    consoleWarnMock.mockRestore();
     expect(screen.getByTestId('location-select-wrapper')).toBeInTheDocument();
     expect(screen.getByTestId('retention-field-container')).toBeInTheDocument();
     expect(screen.getByTestId('shedule-section-fields-wrapper')).toBeInTheDocument();

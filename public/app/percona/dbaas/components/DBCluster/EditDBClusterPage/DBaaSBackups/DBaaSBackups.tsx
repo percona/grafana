@@ -38,6 +38,7 @@ export const DBaaSBackups: FC<FormRenderProps> = ({ values }) => {
                   onClick={() => setEnableBackups((prevState) => !prevState)}
                   data-testid="toggle-scheduled-backup"
                   {...input}
+                  checked={undefined}
                 />
               )}
             </Field>
