@@ -3,12 +3,11 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents } from '../../../../../../features/alerting/unified/utils/redux';
 import { newDBClusterService } from '../../../../../dbaas/components/DBCluster/DBCluster.utils';
-import { Settings } from '../../../../../settings/Settings.types';
 import { getCronStringFromValues } from '../../../../helpers/cron/cron';
 import { SETTINGS_TIMEOUT } from '../../../constants';
 import { updateSettingsAction } from '../../index';
 
-import { PerconaAddDBClusterState } from './addDBCluster.types';
+import { AddDBClusterArgs, PerconaAddDBClusterState } from './addDBCluster.types';
 
 export const initialAddDBClusterState: PerconaAddDBClusterState = {
   result: undefined,
@@ -44,10 +43,7 @@ const perconaAddDBClusterSlice = createSlice({
 
 export const addDbClusterAction = createAsyncThunk(
   'percona/addDBCluster',
-  async (
-    args: { values: Record<string, any>; setPMMAddress?: boolean; settings?: Settings },
-    thunkAPI
-  ): Promise<void> => {
+  async (args: AddDBClusterArgs, thunkAPI): Promise<void> => {
     const {
       name,
       kubernetesCluster,
@@ -111,17 +107,17 @@ export const addDbClusterAction = createAsyncThunk(
         ...(args.settings?.backupEnabled &&
           enableBackups && {
             backup: {
-              cron_expression: cronExpression || '',
-              location_id: backupLocation?.value || '',
-              keep_copies: retention || '',
+              cronExpression: cronExpression || '',
+              locationId: backupLocation?.value || '',
+              keepCopies: retention || '',
             },
           }),
         ...(args.settings?.backupEnabled &&
           enableRestore && {
             restore: {
-              location_id: restoreFrom?.value || '',
+              locationId: restoreFrom?.value || '',
               destination: backupArtifact?.value || '',
-              secrets_name: secretsName?.value || '',
+              secretsName: secretsName?.value || '',
             },
           }),
       }),
