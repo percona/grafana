@@ -241,8 +241,10 @@ const getStyles = (theme: GrafanaTheme2) => {
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
+      padding-bottom: ${theme.spacing(1)};
       @media (min-width: ${theme.breakpoints.values.lg}px) {
         flex-direction: row;
+        padding-bottom: 0px;
       }
     `,
   };

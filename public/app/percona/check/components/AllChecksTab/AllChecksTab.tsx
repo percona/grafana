@@ -2,7 +2,7 @@ import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { Button, IconButton, useStyles2 } from '@grafana/ui';
+import { useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { CheckService } from 'app/percona/check/Check.service';
@@ -15,6 +15,8 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
+import { InfoModal } from '../InfoModal/InfoModal';
+import { NavActions } from '../NavActions/NavActions';
 
 import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { Messages } from './AllChecksTab.messages';
@@ -24,6 +26,7 @@ import { CheckActions } from './CheckActions/CheckActions';
 import { FetchChecks } from './types';
 
 export const AllChecksTab: FC = () => {
+  const [openModal, setOpenModal] = useState(false);
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const navModel = usePerconaNavModel('all-checks');
   const [generateToken] = useCancelToken();
@@ -188,11 +191,7 @@ export const AllChecksTab: FC = () => {
   return (
     <OldPage
       navModel={navModel}
-      navActions={
-        <div className={styles.navActions}>
-          <IconButton name="info-circle" size="lg" /> <Button>Get more advisors</Button>
-        </div>
-      }
+      navActions={<NavActions buttonOnClick={() => {}} iconOnClick={() => setOpenModal(true)} />}
       tabsDataTestId="db-check-tabs-bar"
       data-testid="db-check-panel"
     >
@@ -229,6 +228,7 @@ export const AllChecksTab: FC = () => {
             />
           )}
         </FeatureLoader>
+        <InfoModal isOpen={openModal} closeModal={() => setOpenModal(false)} />
       </OldPage.Contents>
     </OldPage>
   );

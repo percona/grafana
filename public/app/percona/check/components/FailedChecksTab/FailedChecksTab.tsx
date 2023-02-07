@@ -1,5 +1,5 @@
 import { logger } from '@percona/platform-core';
-import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
 import { locationService } from '@grafana/runtime';
@@ -16,6 +16,8 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
+import { InfoModal } from '../InfoModal/InfoModal';
+import { NavActions } from '../NavActions/NavActions';
 
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 import { Messages } from './FailedChecksTab.messages';
@@ -29,6 +31,7 @@ export const FailedChecksTab: FC = () => {
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
+  const [openModal, setOpenModal] = useState(false);
 
   const columns = useMemo(
     (): Array<Column<FailedCheckSummary>> => [
@@ -82,7 +85,12 @@ export const FailedChecksTab: FC = () => {
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
   return (
-    <OldPage navModel={navModel} tabsDataTestId="db-check-tabs-bar" data-testid="db-check-panel">
+    <OldPage
+      navModel={navModel}
+      navActions={<NavActions buttonOnClick={() => {}} iconOnClick={() => setOpenModal(true)} />}
+      tabsDataTestId="db-check-tabs-bar"
+      data-testid="db-check-panel"
+    >
       <OldPage.Contents dataTestId="db-check-tab-content">
         <FeatureLoader
           messagedataTestId="db-check-panel-settings-link"
@@ -101,6 +109,7 @@ export const FailedChecksTab: FC = () => {
             />
           </AlertsReloadContext.Provider>
         </FeatureLoader>
+        <InfoModal isOpen={openModal} closeModal={() => setOpenModal(false)} />
       </OldPage.Contents>
     </OldPage>
   );
