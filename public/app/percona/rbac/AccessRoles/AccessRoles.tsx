@@ -48,8 +48,8 @@ const AccessRolesPage: FC = () => {
               href="https://docs.google.com/document/d/1Rao6tFlR6Gr25gHOLgFQ77gj_jlN3-KFgrxUAh3DIy8/edit?usp=sharing"
             >
               {Messages.subtitle.link}
-            </a> */}
-            {Messages.subtitle.dot}
+            </a>
+            {Messages.subtitle.dot} */}
           </p>
           <div className={styles.createContainer}>
             <LinkButton href="/roles/create" size="md" variant="primary" data-testid="access-roles-create-role">
