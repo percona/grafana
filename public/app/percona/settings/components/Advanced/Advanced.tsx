@@ -90,6 +90,7 @@ export const Advanced: FC = () => {
       publicAddressButton,
       accessControl,
       accessControlTooltip,
+      accessControlLink,
       alertingLabel,
       alertingTooltip,
       alertingLink,
@@ -367,6 +368,8 @@ export const Advanced: FC = () => {
                       type="checkbox"
                       label={accessControl}
                       tooltip={accessControlTooltip}
+                      tooltipLinkText={tooltipLinkText}
+                      link={accessControlLink}
                       dataTestId="access-control"
                       component={SwitchRow}
                     />
