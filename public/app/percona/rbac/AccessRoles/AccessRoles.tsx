@@ -40,16 +40,14 @@ const AccessRolesPage: FC = () => {
           <h2 data-testid="access-roles-title">{Messages.title}</h2>
           <p className={styles.description}>
             {Messages.subtitle.text}
-            {/* TODO: add when documentation is available
             {Messages.subtitle.further}
             <a
               className={styles.link}
-              // Internal release
-              href="https://docs.google.com/document/d/1Rao6tFlR6Gr25gHOLgFQ77gj_jlN3-KFgrxUAh3DIy8/edit?usp=sharing"
+              href="https://docs.percona.com/percona-monitoring-and-management/get-started/access-control.html"
             >
               {Messages.subtitle.link}
             </a>
-            {Messages.subtitle.dot} */}
+            {Messages.subtitle.dot}
           </p>
           <div className={styles.createContainer}>
             <LinkButton href="/roles/create" size="md" variant="primary" data-testid="access-roles-create-role">
