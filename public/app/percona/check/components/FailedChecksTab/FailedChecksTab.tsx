@@ -16,7 +16,6 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
-import { InfoModal } from '../InfoModal/InfoModal';
 import { NavActions } from '../NavActions/NavActions';
 
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
@@ -31,7 +30,6 @@ export const FailedChecksTab: FC = () => {
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
-  const [openModal, setOpenModal] = useState(false);
 
   const columns = useMemo(
     (): Array<Column<FailedCheckSummary>> => [
@@ -87,7 +85,7 @@ export const FailedChecksTab: FC = () => {
   return (
     <OldPage
       navModel={navModel}
-      navActions={<NavActions buttonOnClick={() => {}} iconOnClick={() => setOpenModal(true)} />}
+      navActions={<NavActions />}
       tabsDataTestId="db-check-tabs-bar"
       data-testid="db-check-panel"
     >
@@ -109,7 +107,6 @@ export const FailedChecksTab: FC = () => {
             />
           </AlertsReloadContext.Provider>
         </FeatureLoader>
-        <InfoModal isOpen={openModal} closeModal={() => setOpenModal(false)} />
       </OldPage.Contents>
     </OldPage>
   );

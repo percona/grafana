@@ -15,7 +15,6 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
-import { InfoModal } from '../InfoModal/InfoModal';
 import { NavActions } from '../NavActions/NavActions';
 
 import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
@@ -26,7 +25,6 @@ import { CheckActions } from './CheckActions/CheckActions';
 import { FetchChecks } from './types';
 
 export const AllChecksTab: FC = () => {
-  const [openModal, setOpenModal] = useState(false);
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const navModel = usePerconaNavModel('all-checks');
   const [generateToken] = useCancelToken();
@@ -191,7 +189,7 @@ export const AllChecksTab: FC = () => {
   return (
     <OldPage
       navModel={navModel}
-      navActions={<NavActions buttonOnClick={() => {}} iconOnClick={() => setOpenModal(true)} />}
+      navActions={<NavActions />}
       tabsDataTestId="db-check-tabs-bar"
       data-testid="db-check-panel"
     >
@@ -228,7 +226,6 @@ export const AllChecksTab: FC = () => {
             />
           )}
         </FeatureLoader>
-        <InfoModal isOpen={openModal} closeModal={() => setOpenModal(false)} />
       </OldPage.Contents>
     </OldPage>
   );
