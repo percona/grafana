@@ -206,6 +206,7 @@ export const availableIconsIndex = {
   'percona-surface': true,
   'percona-temperature': true,
   'pmm-logo': true,
+  'pmm-logo-light': true,
   'qan-logo': true,
   'percona-system': true,
   'percona-nav-overview': true,
@@ -222,6 +223,8 @@ export const availableIconsIndex = {
   'angle-double-left': true,
   'times-circle': true,
   'percona-asterisk': true,
+  'user-check': true,
+  'user-square': true,
 };
 
 export type IconName = keyof typeof availableIconsIndex;

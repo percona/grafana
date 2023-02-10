@@ -20,6 +20,8 @@ import {
   ResourcesUnits,
   CpuUnits,
   DBClusterListResponse,
+  DBClusterSecretsResponse,
+  DBClusterSecretsRequest,
 } from './DBCluster.types';
 import { formatResources } from './DBCluster.utils';
 
@@ -54,11 +56,11 @@ export abstract class DBClusterService {
   abstract toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster;
 
   static async getDBClusters(kubernetes: Kubernetes, token?: CancelToken): Promise<DBClusterListResponse> {
-    return apiManagement.post<any, Kubernetes>('/DBaaS/DBClusters/List', kubernetes, true, token);
+    return apiManagement.post<DBClusterListResponse, Kubernetes>('/DBaaS/DBClusters/List', kubernetes, true, token);
   }
 
   static async getLogs({ kubernetesClusterName, clusterName }: DBCluster): Promise<DBClusterLogsAPI> {
-    return apiManagement.post<DBClusterLogsAPI, any>(
+    return apiManagement.post<DBClusterLogsAPI, object>(
       '/DBaaS/GetLogs',
       {
         kubernetes_cluster_name: kubernetesClusterName,
@@ -68,9 +70,19 @@ export abstract class DBClusterService {
     );
   }
 
+  static async getDBClusterSecrets(kubernetesClusterName: string): Promise<DBClusterSecretsResponse> {
+    return apiManagement.post<DBClusterSecretsResponse, DBClusterSecretsRequest>(
+      '/DBaaS/Secrets/List',
+      {
+        kubernetes_cluster_name: kubernetesClusterName,
+      },
+      true
+    );
+  }
+
   static async getAllocatedResources(kubernetesClusterName: string): Promise<DBClusterAllocatedResources> {
     return apiManagement
-      .post<DBClusterAllocatedResourcesAPI, any>('/DBaaS/Kubernetes/Resources/Get', {
+      .post<DBClusterAllocatedResourcesAPI, object>('/DBaaS/Kubernetes/Resources/Get', {
         kubernetes_cluster_name: kubernetesClusterName,
       })
       .then(({ all, available }) => {
