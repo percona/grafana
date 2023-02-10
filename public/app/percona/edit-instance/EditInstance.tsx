@@ -1,10 +1,10 @@
 import { logger } from '@percona/platform-core';
-import React, { useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useHistory, useParams } from 'react-router-dom';
 
 import { AppEvents } from '@grafana/data';
-import { Button, Modal, PageToolbar, ToolbarButton, ToolbarButtonRow } from '@grafana/ui';
+import { Alert, Button, Modal, PageToolbar, ToolbarButton, ToolbarButtonRow, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
@@ -17,6 +17,7 @@ import { DbServicePayload } from '../shared/services/services/Services.types';
 
 import { FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
 import { Messages } from './EditInstance.messages';
+import { getStyles } from './EditInstance.styles';
 import { EditInstanceFormValues, EditInstanceRouteParams } from './EditInstance.types';
 import { getInitialValues, getService, toPayload } from './EditInstance.utils';
 
@@ -28,6 +29,7 @@ const EditInstancePage: React.FC = () => {
   const [service, setService] = useState<DbServicePayload>();
   const [generateToken] = useCancelToken();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const styles = useStyles2(getStyles);
 
   useEffect(() => {
     fetchService(serviceId);
@@ -82,15 +84,16 @@ const EditInstancePage: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (e?: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
     setIsModalOpen(true);
+    e?.preventDefault();
   };
 
   return (
     <Form
       initialValues={getInitialValues(service)}
       onSubmit={handleSubmit}
-      render={({ handleSubmit, submitting }) => (
+      render={({ handleSubmit, submitting, values }) => (
         <>
           <Modal
             isOpen={isModalOpen}
@@ -106,6 +109,15 @@ const EditInstancePage: React.FC = () => {
               </a>
               {Messages.modal.dot} */}
             </p>
+            {service?.cluster !== values?.cluster && (
+              <Alert title={Messages.modal.cluster.title} severity="warning">
+                {Messages.modal.cluster.description}
+                <a target="_blank" rel="noopener noreferrer" href="todo" className={styles.link}>
+                  {Messages.modal.cluster.descriptionLink}
+                </a>
+                {Messages.modal.cluster.dot}
+              </Alert>
+            )}
             <Modal.ButtonRow>
               <Button onClick={handleSubmit}>{Messages.modal.confirm}</Button>
               <Button variant="secondary" onClick={handleCloseModal}>
@@ -124,8 +136,10 @@ const EditInstancePage: React.FC = () => {
             </PageToolbar>
             <Page.Contents isLoading={isLoading}>
               <h3>{Messages.formTitle(service?.service_name || '')}</h3>
-              <form>
+              <form onSubmit={handleOpenModal}>
                 <Labels showNodeFields={false} />
+                {/* enable submit by keyboard */}
+                <input type="submit" className={styles.hidden} />
               </form>
             </Page.Contents>
           </Page>

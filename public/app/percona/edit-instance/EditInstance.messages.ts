@@ -15,5 +15,12 @@ export const Messages = {
     dot: '.',
     confirm: 'Confirm and save changes',
     cancel: 'Cancel',
+    cluster: {
+      title: 'Cluster label changed',
+      description:
+        'Changing the cluster label will remove all scheduled backups for the impacted service/cluster. Make sure to recreate your backups after finishing the cluster configuration. For  more information, see ',
+      descriptionLink: 'TODO',
+      dot: '.',
+    },
   },
 };
