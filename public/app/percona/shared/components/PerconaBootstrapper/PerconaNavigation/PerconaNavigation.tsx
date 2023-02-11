@@ -9,7 +9,7 @@ import { fetchActiveServiceTypesAction } from 'app/percona/shared/core/reducers/
 import { useAppDispatch } from 'app/store/store';
 import { FolderDTO, useSelector } from 'app/types';
 
-import { getPerconaSettings, getPerconaUser, getServices } from '../../../core/selectors';
+import { getCategorizedAdvisors, getPerconaSettings, getPerconaUser, getServices } from '../../../core/selectors';
 
 import {
   ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS,
@@ -40,6 +40,7 @@ const PerconaNavigation: React.FC = () => {
   const { result } = useSelector(getPerconaSettings);
   const { alertingEnabled, sttEnabled, dbaasEnabled, backupEnabled } = result!;
   const { isPlatformUser, isAuthorized } = useSelector(getPerconaUser);
+  const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
   const dispatch = useAppDispatch();
   const { activeTypes } = useSelector(getServices);

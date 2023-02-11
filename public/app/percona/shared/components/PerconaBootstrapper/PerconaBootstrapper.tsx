@@ -7,6 +7,7 @@ import {
   fetchServerInfoAction,
   fetchServerSaasHostAction,
 } from 'app/percona/shared/core/reducers';
+import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
 import {
   setAuthorized,
@@ -75,6 +76,7 @@ export const PerconaBootstrapper = () => {
       await dispatch(fetchUserStatusAction());
       await dispatch(fetchServerInfoAction());
       await dispatch(fetchServerSaasHostAction());
+      await dispatch(fetchAdvisors());
     };
 
     if (isLoggedIn) {
