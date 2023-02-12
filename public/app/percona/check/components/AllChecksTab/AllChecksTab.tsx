@@ -70,7 +70,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   };
 
   const updateUI = (check: CheckDetails) => {
-    // TODO
+    // TODO this should be done with reducers
     // const { name, disabled, interval } = check;
     // setChecks((oldChecks) =>
     //   oldChecks.map((oldCheck) => {
