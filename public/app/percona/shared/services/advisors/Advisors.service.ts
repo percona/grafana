@@ -12,7 +12,7 @@ export const AdvisorsService = {
         summary: 'CVE Security',
         description: 'Informing users about versions of DBs affected by CVE',
         comment: 'Partial Support (MongoDB)',
-        category: 'Security',
+        category: 'security',
         checks: [
           {
             name: 'cve_check_1',
@@ -35,7 +35,7 @@ export const AdvisorsService = {
         summary: 'Configuration Security',
         description: 'Make sure your DB is configured bla bla',
         comment: 'Partial Support (MySQL, MongoDB)',
-        category: 'Security',
+        category: 'security',
         checks: [
           {
             name: 'config_check_1',
@@ -51,7 +51,7 @@ export const AdvisorsService = {
         summary: 'Query Performance',
         description: 'Query description',
         comment: 'Full Support',
-        category: 'Query',
+        category: 'query',
         checks: [
           {
             name: 'query_perf_1',

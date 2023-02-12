@@ -2,9 +2,11 @@ import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
 import { useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
+import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { CheckService } from 'app/percona/check/Check.service';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
@@ -14,8 +16,9 @@ import { UpgradePlanWrapper } from 'app/percona/shared/components/Elements/Custo
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { getCategorizedAdvisors, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { useSelector } from 'app/types';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 
@@ -26,15 +29,28 @@ import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { CheckActions } from './CheckActions/CheckActions';
 import { FetchChecks } from './types';
 
-export const AllChecksTab: FC = () => {
+export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> = ({ match }) => {
+  const category = match.params.category;
   const [fetchChecksPending, setFetchChecksPending] = useState(false);
-  const navModel = usePerconaNavModel('all-checks');
+  const navModel = usePerconaNavModel(`advisors-${category}`);
   const [generateToken] = useCancelToken();
   const [runChecksPending, setRunChecksPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
   const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
+  const categorizedAdvisors = useSelector(getCategorizedAdvisors);
+
+  // In case a user ends up in a wrong category by any reason, redirect him
+  if (navModel.main.id === 'not-found') {
+    const categories = Object.keys(categorizedAdvisors);
+    if (categories.length) {
+      //TODO we should redirect to check notifications
+      locationService.push(`/advisors/${categories[0]}`);
+    } else {
+      locationService.push('/');
+    }
+  }
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
