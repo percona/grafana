@@ -1,5 +1,5 @@
 import { LoaderButton, logger } from '@percona/platform-core';
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
@@ -14,32 +14,27 @@ import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertL
 import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
 import { UpgradePlanWrapper } from 'app/percona/shared/components/Elements/CustomCollapsableSection/UpgradePlanWrapper/UpgradePlanWrapper';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { getCategorizedAdvisors, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
-import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getAdvisors, getCategorizedAdvisors, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 
-import { GET_ALL_CHECKS_CANCEL_TOKEN } from './AllChecksTab.constants';
 import { Messages } from './AllChecksTab.messages';
 import { getStyles } from './AllChecksTab.styles';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { CheckActions } from './CheckActions/CheckActions';
-import { FetchChecks } from './types';
 
 export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> = ({ match }) => {
   const category = match.params.category;
-  const [fetchChecksPending, setFetchChecksPending] = useState(false);
   const navModel = usePerconaNavModel(`advisors-${category}`);
-  const [generateToken] = useCancelToken();
   const [runChecksPending, setRunChecksPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
-  const [checks, setChecks] = useState<CheckDetails[]>([]);
   const styles = useStyles2(getStyles);
+  const { loading: advisorsPending } = useSelector(getAdvisors);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
+  const advisors = categorizedAdvisors[category];
 
   // In case a user ends up in a wrong category by any reason, redirect him
   if (navModel.main.id === 'not-found') {
@@ -75,17 +70,16 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   };
 
   const updateUI = (check: CheckDetails) => {
-    const { name, disabled, interval } = check;
-
-    setChecks((oldChecks) =>
-      oldChecks.map((oldCheck) => {
-        if (oldCheck.name !== name) {
-          return oldCheck;
-        }
-
-        return { ...oldCheck, disabled, interval };
-      })
-    );
+    // TODO
+    // const { name, disabled, interval } = check;
+    // setChecks((oldChecks) =>
+    //   oldChecks.map((oldCheck) => {
+    //     if (oldCheck.name !== name) {
+    //       return oldCheck;
+    //     }
+    //     return { ...oldCheck, disabled, interval };
+    //   })
+    // );
   };
 
   const changeCheck = useCallback(async (check: CheckDetails) => {
@@ -182,25 +176,6 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
     [changeCheck, handleIntervalChangeClick]
   );
 
-  useEffect(() => {
-    const fetchChecks: FetchChecks = async () => {
-      setFetchChecksPending(true);
-      try {
-        const checks = await CheckService.getAllChecks(generateToken(GET_ALL_CHECKS_CANCEL_TOKEN));
-
-        setChecks(checks.map((check) => (!!check.disabled ? check : { ...check, disabled: false })));
-      } catch (e) {
-        if (isApiCancelError(e)) {
-          return;
-        }
-        logger.error(e);
-      }
-      setFetchChecksPending(false);
-    };
-    fetchChecks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
@@ -236,27 +211,30 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
                 </LoaderButton>
               </div>
             </div>
-            <CustomCollapsableSection
-              mainLabel="CVE security"
-              content="Imforming users about versions of DBs affected by CVE."
-              sideLabel="Partion support (Mongo)"
-            >
-              <Table
-                totalItems={checks.length}
-                data={checks}
-                columns={columns}
-                pendingRequest={fetchChecksPending}
-                emptyMessage={Messages.table.noData}
-                showFilter
-              />
-              {!!selectedCheck && checkIntervalModalVisible && (
-                <ChangeCheckIntervalModal
-                  check={selectedCheck}
-                  onClose={handleModalClose}
-                  onIntervalChanged={handleIntervalChanged}
+            {Object.keys(advisors).map((summary) => (
+              <CustomCollapsableSection
+                key={summary}
+                mainLabel={summary}
+                content={advisors[summary].description}
+                sideLabel={advisors[summary].comment}
+              >
+                <Table
+                  totalItems={advisors[summary].checks.length}
+                  data={advisors[summary].checks}
+                  columns={columns}
+                  pendingRequest={advisorsPending}
+                  emptyMessage={Messages.table.noData}
+                  showFilter
                 />
-              )}
-            </CustomCollapsableSection>
+                {!!selectedCheck && checkIntervalModalVisible && (
+                  <ChangeCheckIntervalModal
+                    check={selectedCheck}
+                    onClose={handleModalClose}
+                    onIntervalChanged={handleIntervalChanged}
+                  />
+                )}
+              </CustomCollapsableSection>
+            ))}
 
             <UpgradePlanWrapper label="Standart plan" buttonLabel="See plan details" buttonOnClick={() => {}}>
               <CustomCollapsableSection

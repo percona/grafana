@@ -4,17 +4,14 @@ export const groupAdvisorsIntoCategories = (advisors: Advisor[]): CategorizedAdv
   const result: CategorizedAdvisor = {};
 
   advisors.forEach((advisor) => {
-    const { category, summary, checks } = advisor;
+    const { category, summary } = advisor;
 
     if (!result[category]) {
       result[category] = {};
     }
 
     if (!result[category][summary]) {
-      result[category][summary] = {
-        advisor,
-        checks,
-      };
+      result[category][summary] = advisor;
     }
   });
 

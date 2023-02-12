@@ -29,9 +29,6 @@ export interface AdvisorCheck {
 
 export interface CategorizedAdvisor {
   [category: string]: {
-    [summary: string]: {
-      advisor: Advisor;
-      checks: AdvisorCheck[];
-    };
+    [summary: string]: Advisor;
   };
 }
