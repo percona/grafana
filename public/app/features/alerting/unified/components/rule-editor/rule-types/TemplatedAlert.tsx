@@ -20,7 +20,7 @@ const TemplatedAlertRuleType: FC<SharedProps> = ({ selected = false, disabled, o
           Simpler initial alert setup with more robust alerting options.
         </span>
       }
-      image={theme.isLight ? 'public/img/icons/mono/pmm-logo-light.svg' : 'public/img/icons/mono/percona-logo.svg'}
+      image={theme.isLight ? 'public/img/icons/mono/pmm-logo-light.svg' : 'public/img/icons/mono/pmm-logo.svg'}
       selected={selected}
       disabled={disabled}
       value={RuleFormType.templated}
