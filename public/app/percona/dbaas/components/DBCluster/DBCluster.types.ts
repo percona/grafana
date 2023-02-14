@@ -5,7 +5,7 @@ import { DBClusterService } from './DBCluster.service';
 import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 export type AddDBClusterAction = (dbCluster: DBCluster) => void;
-export type GetDBClustersAction = () => void;
+export type GetDBClustersAction = (triggerLoading?: any) => Promise<void>;
 export type SetDBClustersLoadingAction = (loading: boolean) => void;
 export type ManageDBClusters = [DBCluster[], GetDBClustersAction, SetDBClustersLoadingAction, boolean];
 
