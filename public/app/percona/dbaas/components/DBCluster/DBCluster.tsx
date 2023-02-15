@@ -57,20 +57,29 @@ export const DBCluster: FC = () => {
   const [catchFromAsyncThunkAction] = useCatchCancellationError();
   const [loading, setLoading] = useState(kubernetesLoading);
   const addDisabled = kubernetes?.length === 0 || isKubernetesListUnavailable(kubernetes) || loading;
-  const [showDBClustersLoading, setShowDBClustersLoading] = useState(dbClustersLoading === undefined);
-
-  useEffect(() => {
-    if (dbClustersLoading === false && dbClusters.length > 0) {
-      setShowDBClustersLoading(false);
-    }
-  }, [dbClustersLoading, dbClusters.length]);
 
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
+      if (!kubernetes.length) {
+        return;
+      }
+
+      if (triggerLoading) {
+        setLoading(true);
+      }
+
       const tokens: CancelToken[] = kubernetes.map((k) =>
         generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}`)
       );
-      await catchFromAsyncThunkAction(dispatch(fetchDBClustersAction({ kubernetes, tokens })));
+
+      const result = await catchFromAsyncThunkAction(dispatch(fetchDBClustersAction({ kubernetes, tokens })));
+
+      // undefined means request was cancelled
+      if (result === undefined) {
+        return;
+      }
+
+      setLoading(false);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [kubernetes]
@@ -146,10 +155,7 @@ export const DBCluster: FC = () => {
   }, []);
 
   useEffect(() => {
-    const tokens: CancelToken[] = kubernetes.map((k) =>
-      generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}`)
-    );
-    dispatch(fetchDBClustersAction({ kubernetes, tokens }));
+    getDBClusters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kubernetes]);
 
@@ -208,7 +214,7 @@ export const DBCluster: FC = () => {
             <Table
               columns={columns}
               data={dbClusters}
-              loading={loading || showDBClustersLoading}
+              loading={loading}
               noData={<AddNewClusterButton />}
               rowKey={getRowKey}
             />
