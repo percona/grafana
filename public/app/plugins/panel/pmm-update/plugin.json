@@ -9,20 +9,6 @@
       "url": "https://percona.com"
     },
     "keywords": ["percona", "plugin", "updates"],
-    "links": [
-      {
-        "name": "Website",
-        "url": "https://github.com/percona/grafana-dashboards/pmm-app/src/pmm-update"
-      },
-      {
-        "name": "License",
-        "url": "https://github.com/percona/grafana-dashboards/LICENSE"
-      }
-    ],
     "screenshots": []
-  },
-  "dependencies": {
-    "grafanaDependency": ">=7.x.x",
-    "plugins": []
   }
 }
