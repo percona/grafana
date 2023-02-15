@@ -1,0 +1,29 @@
+{
+  "type": "panel",
+  "name": "PMM Update",
+  "id": "pmm-update-panel",
+  "info": {
+    "description": "A panel to visualize and install updates. I guess",
+    "author": {
+      "name": "Percona",
+      "url": "https://percona.com"
+    },
+    "keywords": ["percona", "plugin", "updates"],
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/percona/grafana-dashboards/pmm-app/src/pmm-update"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/percona/grafana-dashboards/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "2.33.0"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=7.x.x",
+    "plugins": []
+  }
+}
