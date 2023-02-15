@@ -3,7 +3,7 @@
   "name": "PMM Update",
   "id": "pmm-update-panel",
   "info": {
-    "description": "A panel to visualize and install updates. I guess",
+    "description": "A panel to visualize and install updates",
     "author": {
       "name": "Percona",
       "url": "https://percona.com"
@@ -19,8 +19,7 @@
         "url": "https://github.com/percona/grafana-dashboards/LICENSE"
       }
     ],
-    "screenshots": [],
-    "version": "2.33.0"
+    "screenshots": []
   },
   "dependencies": {
     "grafanaDependency": ">=7.x.x",
