@@ -27,7 +27,7 @@ describe('DBClusterAdvancedOptions::', () => {
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
+          onSubmit={jest.fn() as (values: Record<string, object>) => Promise<void>}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
@@ -62,7 +62,7 @@ describe('DBClusterAdvancedOptions::', () => {
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
+          onSubmit={jest.fn() as (values: Record<string, object>) => Promise<void>}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
             <DBClusterAdvancedOptions
@@ -96,7 +96,7 @@ describe('DBClusterAdvancedOptions::', () => {
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
+          onSubmit={jest.fn() as (values: Record<string, object>) => Promise<void>}
           initialValues={{ [AdvancedOptionsFields.nodes]: 3 }}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
@@ -126,7 +126,7 @@ describe('DBClusterAdvancedOptions::', () => {
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
+          onSubmit={jest.fn() as (values: Record<string, object>) => Promise<void>}
           initialValues={{ [AdvancedOptionsFields.resources]: DBClusterResources.small }}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
@@ -162,7 +162,7 @@ describe('DBClusterAdvancedOptions::', () => {
     await waitFor(() =>
       render(
         <Form
-          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
+          onSubmit={jest.fn() as (values: Record<string, object>) => Promise<void>}
           initialValues={{
             [AdvancedOptionsFields.resources]: DBClusterResources.small,
           }}
@@ -199,5 +199,31 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(memory).toBeDisabled();
     expect(cpu).toBeDisabled();
     expect(disk).toBeDisabled();
+  });
+
+  it('should not show the arror button in edit mode ', async () => {
+    await waitFor(() =>
+      render(
+        <Form
+          onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
+          mutators={{ ...arrayMutators }}
+          render={({ form, handleSubmit, valid, pristine, ...props }) => (
+            <DBClusterAdvancedOptions
+              mode="edit"
+              showUnsafeConfigurationWarning={true}
+              setShowUnsafeConfigurationWarning={jest.fn()}
+              form={form}
+              selectedCluster={dbClustersStub[0]}
+              handleSubmit={handleSubmit}
+              pristine={pristine}
+              valid={valid}
+              {...props}
+            />
+          )}
+        />
+      )
+    );
+
+    expect(screen.queryByTestId('dbCluster-advanced-settings')).not.toBeInTheDocument();
   });
 });

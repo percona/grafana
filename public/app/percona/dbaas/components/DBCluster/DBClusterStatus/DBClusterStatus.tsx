@@ -20,7 +20,7 @@ import { getProgressMessage, getShowProgressBarValue } from './DBClusterStatus.u
 export const DBClusterStatus: FC<DBClusterStatusProps> = ({ dbCluster, setLogsModalVisible }) => {
   const dispatch = useDispatch();
   const { message, finishedSteps, totalSteps } = dbCluster;
-  const status = dbCluster.status as Status;
+  const status = dbCluster.status || Status.unknown;
   const styles = useStyles2(getStyles);
   const statusStyles = useStyles2(getStatusStyles);
   const prevStatus = useRef<Status>();
