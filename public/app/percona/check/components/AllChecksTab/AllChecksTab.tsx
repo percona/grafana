@@ -12,7 +12,6 @@ import { CheckDetails, Interval } from 'app/percona/check/types';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
 import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertLocalStorage/AlertLocalStorage';
 import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
-import { UpgradePlanWrapper } from 'app/percona/shared/components/Elements/CustomCollapsableSection/UpgradePlanWrapper/UpgradePlanWrapper';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
@@ -220,7 +219,8 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
                 </CustomCollapsableSection>
               ))}
 
-            <UpgradePlanWrapper label="Standart plan" buttonLabel="See plan details" buttonOnClick={() => {}}>
+            {/* Uncomment and set when api for upgradable plans is ready */}
+            {/* <UpgradePlanWrapper label="Standart plan" buttonLabel="See plan details" buttonOnClick={() => {}}>
               <CustomCollapsableSection
                 mainLabel="CVE security"
                 content="Imforming users about versions of DBs affected by CVE."
@@ -231,7 +231,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
                 content="Imforming users about versions of DBs affected by CVE."
                 sideLabel="Partion support (Mongo)"
               />
-            </UpgradePlanWrapper>
+            </UpgradePlanWrapper> */}
           </div>
         </FeatureLoader>
       </OldPage.Contents>
