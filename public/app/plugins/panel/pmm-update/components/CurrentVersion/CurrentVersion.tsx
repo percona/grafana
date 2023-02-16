@@ -16,11 +16,12 @@ export const CurrentVersion: FC<CurrentVersionProps> = ({ installedVersionDetail
   return (
     <section className={styles.currentVersion}>
       <span onClick={handleToggleShowFullVersion}>
-        {Messages.currentVersion}:{' '}
+        {Messages.currentVersion}:&nbsp;
         <span>
           <span data-testid="update-installed-version">
             {showFullVersion ? installedFullVersion : installedVersion}
-          </span>{' '}
+          </span>
+          &nbsp;
           <span data-testid="update-installed-release-date" className={styles.releaseDate}>
             {!!installedVersionDate && (
               <>
