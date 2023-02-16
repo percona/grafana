@@ -1,3 +1,4 @@
+import { logger } from '@percona/platform-core';
 import { useState } from 'react';
 
 import { startUpdate } from '../UpdatePanel.service';
@@ -22,7 +23,7 @@ export const useInitializeUpdate = (): UpdateInitialization => {
       setInitialLogOffset(log_offset);
     } catch (e) {
       setUpdateFailed(true);
-      console.error(e);
+      logger.error(e);
     }
   };
 
