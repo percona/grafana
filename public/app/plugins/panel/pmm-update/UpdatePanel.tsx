@@ -4,6 +4,7 @@ import React, { useEffect, useState, FC, MouseEvent } from 'react';
 import { Button, IconName, Spinner } from '@grafana/ui';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
+import { Messages } from './UpdatePanel.messages';
 import * as styles from './UpdatePanel.styles';
 import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck, ProgressModal } from './components';
 import { useVersionDetails, usePerformUpdate } from './hooks';
@@ -91,7 +92,7 @@ export const UpdatePanel: FC<{}> = () => {
               <div className={styles.middleSectionWrapper}>
                 {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
                 <Button onClick={handleUpdate} icon={'fa fa-download' as IconName} variant="secondary">
-                  Upgrade to {nextVersionDetails?.nextVersion}
+                  {Messages.upgradeTo(nextVersionDetails?.nextVersion)}
                 </Button>
               </div>
             ) : (
