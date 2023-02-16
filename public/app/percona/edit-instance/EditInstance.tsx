@@ -15,7 +15,7 @@ import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { updateServiceAction } from '../shared/core/reducers/services';
 import { DbServicePayload } from '../shared/services/services/Services.types';
 
-import { FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
+import { EDIT_INSTANCE_DOCS_LINK, FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
 import { Messages } from './EditInstance.messages';
 import { getStyles } from './EditInstance.styles';
 import { EditInstanceFormValues, EditInstanceRouteParams } from './EditInstance.types';
@@ -102,17 +102,16 @@ const EditInstancePage: React.FC = () => {
           >
             <p>
               {Messages.modal.description}
-              {/* todo: add back in when docs are available */}
-              {/* {Messages.modal.details}
-              <a className={styles.link}>
+              {Messages.modal.details}
+              <a target="_blank" rel="noopener noreferrer" className={styles.link} href={EDIT_INSTANCE_DOCS_LINK}>
                 {Messages.modal.detailsLink}
               </a>
-              {Messages.modal.dot} */}
+              {Messages.modal.dot}
             </p>
             {service?.cluster !== values?.cluster && (
               <Alert title={Messages.modal.cluster.title} severity="warning">
                 {Messages.modal.cluster.description}
-                <a target="_blank" rel="noopener noreferrer" href="todo" className={styles.link}>
+                <a target="_blank" rel="noopener noreferrer" href={EDIT_INSTANCE_DOCS_LINK} className={styles.link}>
                   {Messages.modal.cluster.descriptionLink}
                 </a>
                 {Messages.modal.cluster.dot}
