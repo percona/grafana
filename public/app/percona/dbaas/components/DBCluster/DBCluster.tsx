@@ -4,6 +4,7 @@ import { CancelToken } from 'axios';
 import React, { FC, useCallback, useMemo, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { AppEvents } from '@grafana/data';
 import { useStyles } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
@@ -17,11 +18,13 @@ import { getDBaaS, getPerconaDBClusters, getPerconaSettingFlag } from 'app/perco
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
+import { appEvents } from '../../../../core/core';
 import { fetchDBClustersAction } from '../../../shared/core/reducers/dbaas/dbClusters/dbClusters';
 import { selectDBCluster, selectKubernetesCluster } from '../../../shared/core/reducers/dbaas/dbaas';
 import { useUpdateOfKubernetesList } from '../../hooks/useKubernetesList';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
+import { KubernetesClusterStatus } from '../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
 
 import {
   clusterStatusRender,
@@ -58,6 +61,34 @@ export const DBCluster: FC = () => {
   const [loading, setLoading] = useState(kubernetesLoading);
   const addDisabled = kubernetes?.length === 0 || isKubernetesListUnavailable(kubernetes) || loading;
 
+  const unAvailableK8s = useMemo(
+    () =>
+      kubernetes.filter(
+        (k) => k.status === KubernetesClusterStatus.invalid || k.status === KubernetesClusterStatus.unavailable
+      ),
+    [kubernetes]
+  );
+
+  const availableK8s = useMemo(
+    () =>
+      kubernetes.filter(
+        (k) => k.status !== KubernetesClusterStatus.invalid && k.status !== KubernetesClusterStatus.unavailable
+      ),
+    [kubernetes]
+  );
+
+  useEffect(() => {
+    if (unAvailableK8s.length) {
+      unAvailableK8s.forEach((k) => {
+        appEvents.emit(AppEvents.alertError, [
+          `Unable to load DB clusters for ${k.kubernetesClusterName}. K8s cluster is ${
+            Messages.kubernetes.kubernetesStatus[k.status]
+          }`,
+        ]);
+      });
+    }
+  }, [unAvailableK8s]);
+
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
       if (!kubernetes.length) {
@@ -68,12 +99,13 @@ export const DBCluster: FC = () => {
         setLoading(true);
       }
 
-      const tokens: CancelToken[] = kubernetes.map((k) =>
+      const tokens: CancelToken[] = availableK8s.map((k) =>
         generateToken(`${GET_CLUSTERS_CANCEL_TOKEN}-${k.kubernetesClusterName}`)
       );
 
-      const result = await catchFromAsyncThunkAction(dispatch(fetchDBClustersAction({ kubernetes, tokens })));
-
+      const result = await catchFromAsyncThunkAction(
+        dispatch(fetchDBClustersAction({ kubernetes: availableK8s, tokens }))
+      );
       // undefined means request was cancelled
       if (result === undefined) {
         return;

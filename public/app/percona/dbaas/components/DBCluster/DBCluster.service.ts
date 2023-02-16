@@ -22,6 +22,7 @@ import {
   DBClusterListResponse,
   DBClusterSecretsResponse,
   DBClusterSecretsRequest,
+  DBClusterResponse,
 } from './DBCluster.types';
 import { formatResources } from './DBCluster.utils';
 
@@ -53,7 +54,7 @@ export abstract class DBClusterService {
 
   abstract getClusterConfiguration(dbCluster: DBCluster): Promise<DBClusterPayload>;
 
-  abstract toModel(dbCluster: DBClusterPayload, kubernetesClusterName: string, databaseType: Databases): DBCluster;
+  abstract toModel(dbCluster: DBClusterResponse, kubernetesClusterName: string, databaseType: Databases): DBCluster;
 
   static async getDBClusters(kubernetes: Kubernetes, token?: CancelToken): Promise<DBClusterListResponse> {
     return apiManagement.post<DBClusterListResponse, Kubernetes>('/DBaaS/DBClusters/List', kubernetes, true, token);
