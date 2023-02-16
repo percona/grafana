@@ -1,13 +1,13 @@
 import React, { useCallback, useLayoutEffect, useRef, useState, FC } from 'react';
 
-import { ClipboardButton, Icon, Button, Modal, IconName } from '@grafana/ui';
+import { ClipboardButton, Icon, Button, Modal, IconName, useStyles2 } from '@grafana/ui';
 
 import { ProgressModalHeader } from '../../components';
 import { useClickOutside } from '../../hooks';
 import { ProgressModalProps } from '../../types';
 
 import { Messages } from './ProgressModal.messages';
-import * as styles from './ProgressModal.styles';
+import { getStyles } from './ProgressModal.styles';
 
 export const ProgressModal: FC<ProgressModalProps> = ({
   version,
@@ -17,6 +17,7 @@ export const ProgressModal: FC<ProgressModalProps> = ({
   output = '',
   updateFailed = false,
 }) => {
+  const styles = useStyles2(getStyles);
   const outputRef = useRef<HTMLPreElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [isOutputShown, setIsOutputShown] = useState(true);
@@ -102,7 +103,6 @@ export const ProgressModal: FC<ProgressModalProps> = ({
           </>
         )}
       </div>
-      <div className={styles.backdrop} />
     </Modal>
   );
 };
