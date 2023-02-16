@@ -2,6 +2,7 @@ import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
 import { useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
@@ -37,16 +38,9 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const advisors = categorizedAdvisors[category];
 
-  // In case a user ends up in a wrong category by any reason, redirect him
-  // if (navModel.main.id === 'not-found') {
-  //   const categories = Object.keys(categorizedAdvisors);
-  //   if (categories.length > 0) {
-  //     //TODO we should redirect to check notifications
-  //     locationService.push(`/advisors/${categories[0]}`);
-  //   } else {
-  //     locationService.push('/advisors');
-  //   }
-  // }
+  if (navModel.main.id === 'not-found') {
+    locationService.push('/advisors');
+  }
 
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
@@ -168,84 +162,80 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
   return (
-    <>
-      {navModel.main.id === 'advisors' && (
-        <OldPage navModel={navModel} tabsDataTestId="db-check-tabs-bar" data-testid="db-check-panel">
-          <OldPage.Contents dataTestId="db-check-tab-content">
-            <FeatureLoader
-              messagedataTestId="db-check-panel-settings-link"
-              featureName={mainChecksMessages.advisors}
-              featureSelector={featureSelector}
-            >
-              <AlertLocalStorage
-                title="Upgrade your plan"
-                customButtonContent="Upgrade"
-                onCustomButtonClick={() => console.log('clicked')}
-                uniqueName={'upgradeAlert'}
-              >
-                {/* TODO: Add text */}
-                By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-              </AlertLocalStorage>
-              <div className={styles.wrapper}>
-                <div className={styles.header}>
-                  <h1>Available to you</h1>
-                  <div className={styles.actionButtons} data-testid="db-check-panel-actions">
-                    <LoaderButton
-                      type="button"
-                      variant="secondary"
-                      size="md"
-                      loading={runChecksPending}
-                      onClick={handleRunChecksClick}
-                      className={styles.runChecksButton}
-                    >
-                      {Messages.runDbChecks}
-                    </LoaderButton>
-                  </div>
-                </div>
-                {advisors &&
-                  Object.keys(advisors).map((summary) => (
-                    <CustomCollapsableSection
-                      key={summary}
-                      mainLabel={summary}
-                      content={advisors[summary].description}
-                      sideLabel={advisors[summary].comment}
-                    >
-                      <Table
-                        totalItems={advisors[summary].checks.length}
-                        data={advisors[summary].checks}
-                        columns={columns}
-                        pendingRequest={advisorsPending}
-                        emptyMessage={Messages.table.noData}
-                        showFilter
-                      />
-                      {!!selectedCheck && checkIntervalModalVisible && (
-                        <ChangeCheckIntervalModal
-                          check={selectedCheck}
-                          onClose={handleModalClose}
-                          onIntervalChanged={handleIntervalChanged}
-                        />
-                      )}
-                    </CustomCollapsableSection>
-                  ))}
-
-                <UpgradePlanWrapper label="Standart plan" buttonLabel="See plan details" buttonOnClick={() => {}}>
-                  <CustomCollapsableSection
-                    mainLabel="CVE security"
-                    content="Imforming users about versions of DBs affected by CVE."
-                    sideLabel="Partion support (Mongo)"
-                  />
-                  <CustomCollapsableSection
-                    mainLabel="CVE security"
-                    content="Imforming users about versions of DBs affected by CVE."
-                    sideLabel="Partion support (Mongo)"
-                  />
-                </UpgradePlanWrapper>
+    <OldPage navModel={navModel} tabsDataTestId="db-check-tabs-bar" data-testid="db-check-panel">
+      <OldPage.Contents dataTestId="db-check-tab-content">
+        <FeatureLoader
+          messagedataTestId="db-check-panel-settings-link"
+          featureName={mainChecksMessages.advisors}
+          featureSelector={featureSelector}
+        >
+          <AlertLocalStorage
+            title="Upgrade your plan"
+            customButtonContent="Upgrade"
+            onCustomButtonClick={() => console.log('clicked')}
+            uniqueName={'upgradeAlert'}
+          >
+            {/* TODO: Add text */}
+            By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
+          </AlertLocalStorage>
+          <div className={styles.wrapper}>
+            <div className={styles.header}>
+              <h1>Available to you</h1>
+              <div className={styles.actionButtons} data-testid="db-check-panel-actions">
+                <LoaderButton
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  loading={runChecksPending}
+                  onClick={handleRunChecksClick}
+                  className={styles.runChecksButton}
+                >
+                  {Messages.runDbChecks}
+                </LoaderButton>
               </div>
-            </FeatureLoader>
-          </OldPage.Contents>
-        </OldPage>
-      )}
-    </>
+            </div>
+            {advisors &&
+              Object.keys(advisors).map((summary) => (
+                <CustomCollapsableSection
+                  key={summary}
+                  mainLabel={summary}
+                  content={advisors[summary].description}
+                  sideLabel={advisors[summary].comment}
+                >
+                  <Table
+                    totalItems={advisors[summary].checks.length}
+                    data={advisors[summary].checks}
+                    columns={columns}
+                    pendingRequest={advisorsPending}
+                    emptyMessage={Messages.table.noData}
+                    showFilter
+                  />
+                  {!!selectedCheck && checkIntervalModalVisible && (
+                    <ChangeCheckIntervalModal
+                      check={selectedCheck}
+                      onClose={handleModalClose}
+                      onIntervalChanged={handleIntervalChanged}
+                    />
+                  )}
+                </CustomCollapsableSection>
+              ))}
+
+            <UpgradePlanWrapper label="Standart plan" buttonLabel="See plan details" buttonOnClick={() => {}}>
+              <CustomCollapsableSection
+                mainLabel="CVE security"
+                content="Imforming users about versions of DBs affected by CVE."
+                sideLabel="Partion support (Mongo)"
+              />
+              <CustomCollapsableSection
+                mainLabel="CVE security"
+                content="Imforming users about versions of DBs affected by CVE."
+                sideLabel="Partion support (Mongo)"
+              />
+            </UpgradePlanWrapper>
+          </div>
+        </FeatureLoader>
+      </OldPage.Contents>
+    </OldPage>
   );
 };
 
