@@ -26,7 +26,7 @@ import { Failures } from './Failures/Failures';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
-  const navModel = usePerconaNavModel('failed-checks');
+  const navModel = usePerconaNavModel('advisors-notifications');
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
@@ -94,8 +94,9 @@ export const FailedChecksTab: FC = () => {
             title="Upgrade your plan"
             customButtonContent="Upgrade"
             onCustomButtonClick={() => console.log('clicked')}
-            uniqueName={'upgrade'}
+            uniqueName={'upgradeAlert'}
           >
+            {/* TODO: Add text */}
             By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
           </AlertLocalStorage>
           <AlertsReloadContext.Provider value={{ fetchAlerts }}>

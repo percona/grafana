@@ -628,7 +628,12 @@ export function getAppRoutes(): RouteDescriptor[] {
       path: '/advisors',
       // eslint-disable-next-line react/display-name
       //TODO we should redirect to check notifications
-      component: () => <Redirect to="/advisors/security" />,
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/FailedChecksTab/FailedChecksTab'
+          )
+      ),
     },
     {
       path: '/advisors/:category',
