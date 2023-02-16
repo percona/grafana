@@ -32,8 +32,6 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
     { force: initialForceUpdate, onlyInstalledVersion: true }
   );
 
-  // console.log(data, isLoading);
-
   useEffect(() => {
     if (!data) {
       return;
