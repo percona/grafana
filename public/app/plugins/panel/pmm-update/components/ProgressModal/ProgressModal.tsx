@@ -66,7 +66,7 @@ export const ProgressModal: FC<ProgressModalProps> = ({
                 name={chevronIcon}
                 onClick={handleToggleShowOutput}
               />
-              <span>Log</span>
+              <span>{Messages.log}</span>
               <ClipboardButton
                 getText={copyToClipboard}
                 className={styles.clipboardButton}
@@ -97,7 +97,7 @@ export const ProgressModal: FC<ProgressModalProps> = ({
               variant="primary"
               onClick={reloadAfterUpdate}
             >
-              Close
+              {Messages.close}
             </Button>
           </>
         )}
