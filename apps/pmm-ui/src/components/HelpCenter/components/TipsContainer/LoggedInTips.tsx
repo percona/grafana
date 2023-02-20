@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
-import { Tip } from '../Tip/Tip';
+import { Tip } from '../Tip';
 import tipsData from './data/tips.json';
 
 export const LoggedInTips: FC = () => {

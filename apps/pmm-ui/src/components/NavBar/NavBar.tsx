@@ -3,8 +3,8 @@ import { Button, Dropdown, Icon, Menu, ToolbarButtonRow, useStyles2, ToolbarButt
 import { NavBarButton } from './components/NavBarButton';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
-import perconaIcon from '../assets/pmm-percona-icon.svg';
-import appIcon from '../assets/pmm-app-icon.svg';
+import perconaIcon from './assets/pmm-percona-icon.svg';
+import appIcon from './assets/pmm-app-icon.svg';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
 export interface NavBarProps {
   title: string;

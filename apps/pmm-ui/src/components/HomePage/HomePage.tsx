@@ -2,17 +2,17 @@ import React, { FC } from 'react';
 import { HorizontalGroup, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
-import { ActionCard, ActionCardVariant } from '../ActionCard/ActionCard';
+import { ActionCard, ActionCardVariant } from './comonents/ActionCard';
+import img3dHome from './assets/3d-home.png';
+import img3dSetting from './assets/3d-setting.png';
+import img3dStar from './assets/3d-star.png';
 
-interface IntroContainerProps {
+interface HomePageProps {
   onHelpCenterLinkClick?: () => void;
   onGettingStartedGuideLinkClicked?: () => void;
 }
 
-export const IntroContainer: FC<IntroContainerProps> = ({
-  onHelpCenterLinkClick,
-  onGettingStartedGuideLinkClicked,
-}) => {
+export const HomePage: FC<HomePageProps> = ({ onHelpCenterLinkClick, onGettingStartedGuideLinkClicked }) => {
   const styles = useStyles2(getStyles);
 
   return (
@@ -54,20 +54,20 @@ export const IntroContainer: FC<IntroContainerProps> = ({
             heading="Get a Percona Expert"
             description="Boost your project with top tier expertise"
             hasExternalLink
-            imgSrc="/graph/public/plugins/pmm-app/img/3d-star.png"
+            imgSrc={img3dStar}
             imgAlt="Get a Percona Expert"
             externalLinkTooltip="Open link in the new tab"
           />
           <ActionCard
             variant={ActionCardVariant.Secondary}
             heading="PMM configurations"
-            imgSrc="/graph/public/plugins/pmm-app/img/3d-setting.png"
+            imgSrc={img3dSetting}
             imgAlt="PMM configurations"
           />
           <ActionCard
             variant={ActionCardVariant.Secondary}
             heading="Homepage settings"
-            imgSrc="/graph/public/plugins/pmm-app/img/3d-home.png"
+            imgSrc={img3dHome}
             imgAlt="Homepage settings"
           />
         </HorizontalGroup>
