@@ -49,7 +49,7 @@ services:
     volumes:
       - ../:/workspace
       - ./Makefile.devcontainer:/workspace/Makefile
-      - ../Makefile:/workspace/dev-next/Makefile.root
+      - ../Makefile:/workspace/apps/Makefile.root
       - "../public:/usr/share/grafana/public"
       # caching
       - go-modules:/root/go/pkg/mod
