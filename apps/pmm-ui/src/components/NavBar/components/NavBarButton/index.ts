@@ -1,1 +1,1 @@
-export { NavBarButton, NavBarButtonProps } from './NavBarButton';
+export * from './NavBarButton';

@@ -30,12 +30,8 @@ export const Step2: FC<Step2Props> = ({ onSubmit }) => {
           }}
         />
       </div>
-      <div className={styles.ratingDestription}>
-        We will use your feedback to improve our products and services.
-      </div>
-      <div>
-        <Button icon="navigator" onClick={submitFeedback}>Send feedback</Button>
-      </div>
+      <div className={styles.ratingDestription}>We will use your feedback to improve our products and services.</div>
+      <div>{/*<Button icon="navigator" onClick={submitFeedback}>Send feedback</Button>*/}</div>
     </>
   );
 };
@@ -57,9 +53,9 @@ const getStyles = (theme: GrafanaTheme2) => ({
       flex-grow: 0;
   `,
   rating: css`
-      flex: none;
-      align-self: stretch;
-      justify-content: space-between;
+    flex: none;
+    align-self: stretch;
+    justify-content: space-between;
   `,
   ratingDestription: css`
       color: ${theme.colors.text.secondary}

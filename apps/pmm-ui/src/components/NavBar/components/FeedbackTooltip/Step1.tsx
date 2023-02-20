@@ -12,37 +12,33 @@ export const Step1: FC<Step1Props> = ({ onSubmit }) => {
 
   return (
     <>
-      <div className={styles.contentTitle}>
-        How&apos;s your experience with PMM so far?
-      </div>
+      <div className={styles.contentTitle}>How&apos;s your experience with PMM so far?</div>
       <div className={styles.rating}>
-        <Button variant="secondary" icon="sad" onClick={onSubmit}>Bad</Button>
-        <Button variant="secondary" icon="meh" onClick={onSubmit}>Fair</Button>
-        <Button variant="secondary" icon="smile" onClick={onSubmit}>Good</Button>
+        {/*<Button variant="secondary" icon="sad" onClick={onSubmit}>Bad</Button>*/}
+        {/*<Button variant="secondary" icon="meh" onClick={onSubmit}>Fair</Button>*/}
+        {/*<Button variant="secondary" icon="smile" onClick={onSubmit}>Good</Button>*/}
       </div>
-      <div className={styles.ratingDestription}>
-        With only one click you&apos;ll help us improve PMM.
-      </div>
+      <div className={styles.ratingDestription}>With only one click you&apos;ll help us improve PMM.</div>
     </>
   );
 };
 
 const getStyles = (theme: GrafanaTheme2) => ({
   modalHeaderClose: css`
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   `,
   feedbackContentForm: css`
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 0px 24px 24px 24px;
-      gap: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px 24px 24px 24px;
+    gap: 12px;
 
-      flex: none;
-      order: 0;
-      flex-grow: 0;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
   `,
   contentTitle: css`
       font-family: 'Roboto';
@@ -62,16 +58,16 @@ const getStyles = (theme: GrafanaTheme2) => ({
       flex-grow: 0;
   `,
   rating: css`
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 0px;
-      gap: 12px;
-      flex: none;
-      order: 1;
-      align-self: stretch;
-      flex-grow: 0;
-      justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 12px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+    justify-content: space-between;
   `,
   ratingDestription: css`
       color: ${theme.colors.text.secondary}
