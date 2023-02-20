@@ -13,9 +13,7 @@ interface TipProps {
 }
 
 export const Tip: FC<TipProps> = (props) => {
-  const {
-    title, number, tipText, buttonText, active, onClick,
-  } = props;
+  const { title, number, tipText, buttonText, active, onClick } = props;
   const styles = useStyles2(getStyles);
 
   return (
@@ -71,7 +69,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     width: 28px;
     height: 28px;
 
-    background-color: #F8D06B;
+    background-color: #f8d06b;
     font-weight: 700;
     font-size: 18px;
     color: #111217;

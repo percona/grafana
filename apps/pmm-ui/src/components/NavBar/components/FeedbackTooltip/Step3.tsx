@@ -3,8 +3,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { HorizontalGroup, useStyles2 } from '@grafana/ui';
 
-interface Step3Props {
-}
+interface Step3Props {}
 
 export const Step3: FC<Step3Props> = () => {
   const styles = useStyles2(getStyles);
@@ -27,8 +26,7 @@ export const Step3: FC<Step3Props> = () => {
             Feedback sent!
           </div>
           <div className={styles.description}>
-            Your input is playing a crucial role in shaping the future of PMM and making it even better.
-            Thank you!
+            Your input is playing a crucial role in shaping the future of PMM and making it even better. Thank you!
           </div>
         </div>
       </HorizontalGroup>
@@ -38,7 +36,7 @@ export const Step3: FC<Step3Props> = () => {
 
 const getStyles = (theme: GrafanaTheme2) => ({
   imageChecked: css`
-      padding: ${theme.spacing(0.5)};
+    padding: ${theme.spacing(0.5)};
   `,
   contentTitle: css`
       font-family: 'Roboto';
@@ -58,16 +56,16 @@ const getStyles = (theme: GrafanaTheme2) => ({
       flex-grow: 0;
   `,
   rating: css`
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 0px;
-      gap: 12px;
-      flex: none;
-      order: 1;
-      align-self: stretch;
-      flex-grow: 0;
-      justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 12px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+    justify-content: space-between;
   `,
   description: css`
     padding-top: ${theme.spacing(1)};
@@ -85,6 +83,5 @@ const getStyles = (theme: GrafanaTheme2) => ({
     align-self: stretch;
     flex-grow: 0;
     text-align: justify;
-
   `,
 });

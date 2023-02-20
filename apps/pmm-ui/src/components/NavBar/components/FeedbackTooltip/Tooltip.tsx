@@ -16,9 +16,7 @@ interface TooltipProps {
  * File is just a simple copy of grafana's Tooltip.
  */
 export const ToolTip: FC<TooltipProps> = ({ content, visible, children }) => {
-  const {
-    getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef,
-  } = usePopperTooltip({
+  const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } = usePopperTooltip({
     placement: 'bottom-end',
     interactive: true,
     delayHide: 100,
@@ -34,7 +32,7 @@ export const ToolTip: FC<TooltipProps> = ({ content, visible, children }) => {
       {React.cloneElement(children, {
         ref: setTriggerRef,
       })}
-      { visible && (
+      {visible && (
         <Portal>
           <div ref={setTooltipRef} {...getTooltipProps({ className: containerStyle })}>
             <div {...getArrowProps({ className: 'tooltip-arrow' })} />
@@ -187,14 +185,10 @@ function getGrafanaTooltipStyle(theme: GrafanaTheme2) {
   const info = buildTooltipTheme(
     theme.components.tooltip.background,
     theme.components.tooltip.background,
-    theme.components.tooltip.text,
+    theme.components.tooltip.text
   );
 
-  const error = buildTooltipTheme(
-    theme.colors.error.main,
-    theme.colors.error.main,
-    theme.colors.error.contrastText,
-  );
+  const error = buildTooltipTheme(theme.colors.error.main, theme.colors.error.main, theme.colors.error.contrastText);
 
   return {
     info,

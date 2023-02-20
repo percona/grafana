@@ -1,7 +1,5 @@
 import React, { FC } from 'react';
-import {
-  Card, HorizontalGroup, IconButton, useStyles2,
-} from '@grafana/ui';
+import { Card, HorizontalGroup, IconButton, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 
@@ -9,12 +7,12 @@ interface ActionCardProps {
   onClick?: () => void;
   hasExternalLink?: boolean;
   onExternalLinkClick?: () => void;
-  externalLinkTooltip?: string,
-  variant: ActionCardVariant,
-  imgSrc?: string,
-  imgAlt?: string,
-  heading: string,
-  description?: string,
+  externalLinkTooltip?: string;
+  variant: ActionCardVariant;
+  imgSrc?: string;
+  imgAlt?: string;
+  heading: string;
+  description?: string;
 }
 
 export enum ActionCardVariant {
@@ -35,9 +33,10 @@ export const ActionCard: FC<ActionCardProps> = ({
 }) => {
   const styles = useStyles2(getStyles);
 
-  const containerClass = variant === ActionCardVariant.Primary
-    ? styles.actionCardLogoContainerPrimary
-    : styles.actionCardLogoContainerSecondary;
+  const containerClass =
+    variant === ActionCardVariant.Primary
+      ? styles.actionCardLogoContainerPrimary
+      : styles.actionCardLogoContainerSecondary;
 
   return (
     <div className={styles.actionCard} onClick={onClick}>
@@ -80,7 +79,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     color: ${theme.colors.text.primary};
   `,
   cardDescription: css`
-    min-height: ${theme.typography.body.lineHeight}em
+    min-height: ${theme.typography.body.lineHeight}em;
   `,
   externalLinkIcon: css`
     height: 16.67px;
@@ -106,7 +105,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
   actionCardLogoContainerPrimary: css`
     width: 332px;
     height: 142.29px;
-    background: #F5B73D;
+    background: #f5b73d;
   `,
   actionCardLogoContainerSecondary: css`
     width: 332px;
