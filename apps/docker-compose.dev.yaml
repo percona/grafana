@@ -1,0 +1,60 @@
+version: '3.0'
+
+services:
+  ch:
+    image: ${CH_IMAGE:-clickhouse/clickhouse-server:22.6.9.11-alpine}
+    hostname: ${CH_HOSTNAME:-ch}
+    ports:
+      - ${CH_PORT:-9000}:9000
+  pmm:
+    container_name: 'pmm-grafana-dev'
+    restart: always
+    links:
+      - ch
+    networks:
+      - ${NETWORK:-default}
+    build:
+      context: ./.config
+      args:
+        PMM_CONTAINER: ${PMM_CONTAINER:-perconalab/pmm-server:dev-container}
+    environment:
+      - ENABLE_DBAAS=${ENABLE_DBAAS:-0}
+      - ENABLE_BACKUP_MANAGEMENT=1
+      #      - PERCONA_TEST_PLATFORM_ADDRESS=https://check.localhost
+      #      - PERCONA_TEST_PLATFORM_INSECURE=1
+      #      - PERCONA_TEST_PLATFORM_PUBLIC_KEY=<public key>
+      #      - PERCONA_TEST_TELEMETRY_INTERVAL=10s
+      #      - PERCONA_TEST_TELEMETRY_RETRY_BACKOFF=10s
+      #      - PERCONA_TEST_TELEMETRY_DISABLE_START_DELAY=1
+      - PERCONA_TEST_PMM_CLICKHOUSE_ADDR=${CH_HOSTNAME:-ch}:9000
+      - PERCONA_TEST_PMM_CLICKHOUSE_DATABASE=pmm
+      - PERCONA_TEST_PMM_CLICKHOUSE_BLOCK_SIZE=10000
+      - PERCONA_TEST_PMM_CLICKHOUSE_POOL_SIZE=2
+      #      - PMM_DEBUG=1
+      - ENABLE_DBAAS=1
+      - ENABLE_ALERTING=1
+      - GF_INSTALL_PLUGINS=marcusolsson-static-datasource
+      - GF_DEFAULT_APP_MODE="development"
+#      - GF_PATHS_PROVISIONING="/etc/grafana/provisioning"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+      - portal.localhost:${PORTAL_HOST:-host-gateway}
+      - check.localhost:${PORTAL_CHECK_HOST:-host-gateway}
+      - pmm.localhost:${PORTAL_PMM_HOST:-host-gateway}
+      - check-dev.percona.com:${PORTAL_PMM_HOST:-host-gateway}
+
+    ports:
+      - ${PMM_PORT_HTTP:-80}:80
+      - ${PMM_PORT_HTTPS:-443}:443
+    volumes:
+      - ../:/workspace
+      - ./Makefile.devcontainer:/workspace/Makefile
+      - ../Makefile:/workspace/dev-next/Makefile.root
+      - "../public:/usr/share/grafana/public"
+      # caching
+      - go-modules:/root/go/pkg/mod
+      - root-cache:/root/.cache
+
+volumes:
+  go-modules:
+  root-cache:

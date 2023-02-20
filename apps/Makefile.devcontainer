@@ -1,0 +1,9 @@
+include ./dev-next/Makefile.include
+include ./dev-next/Makefile.root
+
+.PHONY: run-server
+run-server: build-server
+	supervisorctl stop grafana
+	cp $(shell find ./bin -name "grafana-server") /usr/sbin/grafana-server
+	supervisorctl start grafana &
+	supervisorctl tail -f grafana
