@@ -3,7 +3,7 @@
   "name": "PMM Update",
   "id": "pmm-update-panel",
   "info": {
-    "description": "A panel to visualize and install updates",
+    "description": "A panel to visualize and install updates.",
     "author": {
       "name": "Percona",
       "url": "https://percona.com"
