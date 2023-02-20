@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { IconName } from '@grafana/ui';
-import { Resource } from '../Resource/Resource';
-import { PerconaUpgradeLevel } from '../PerconaUpgradeLevel/PerconaUpgradeLevel';
-import resourcesData from './data/resources.json';
+import { Resource } from '../Resource';
+import { PerconaUpgradeLevel } from '../PerconaUpgradeLevel';
+import resourcesData from './stub/resources.json'; //todo
 
 export const ResourcesContainer: FC = () => (
   <div>

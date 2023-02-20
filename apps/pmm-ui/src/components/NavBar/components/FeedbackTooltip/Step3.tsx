@@ -2,6 +2,8 @@ import React, { FC } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { HorizontalGroup, useStyles2 } from '@grafana/ui';
+import checkImg from '../../assets/pmm-circle-check-green.svg';
+import feedbackSentImg from '../../assets/pmm-feedback-sent.svg';
 
 interface Step3Props {}
 
@@ -11,18 +13,10 @@ export const Step3: FC<Step3Props> = () => {
   return (
     <>
       <HorizontalGroup>
-        <img
-          className={styles.imageChecked}
-          alt="feedback-sent"
-          src="/graph/public/plugins/pmm-app/img/pmm-feedback-sent.svg"
-        />
+        <img className={styles.imageChecked} alt="feedback-sent" src={feedbackSentImg} />
         <div>
           <div className={styles.contentTitle}>
-            <img
-              className={styles.imageChecked}
-              alt="feedback-sent"
-              src="/graph/public/plugins/pmm-app/img/pmm-circle-check-green.svg"
-            />
+            <img className={styles.imageChecked} alt="feedback-sent" src={checkImg} />
             Feedback sent!
           </div>
           <div className={styles.description}>
@@ -39,21 +33,21 @@ const getStyles = (theme: GrafanaTheme2) => ({
     padding: ${theme.spacing(0.5)};
   `,
   contentTitle: css`
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 18px;
-      line-height: 22px;
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
 
-      display: flex;
-      align-items: center;
+    display: flex;
+    align-items: center;
 
-      color: ${theme.colors.text.primary}
+    color: ${theme.colors.text.primary}
 
-      flex: none;
-      order: 0;
-      align-self: stretch;
-      flex-grow: 0;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
   `,
   rating: css`
     display: flex;

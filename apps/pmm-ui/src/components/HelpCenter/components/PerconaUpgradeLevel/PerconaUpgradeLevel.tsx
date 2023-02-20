@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Button, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
+import headerImg from '../../assets/percona-header.png';
 
 interface PerconaUpgradeLevelProps {}
 
@@ -11,11 +12,7 @@ export const PerconaUpgradeLevel: FC<PerconaUpgradeLevelProps> = () => {
   return (
     <div className={styles.resourceContainer}>
       <div>
-        <img
-          alt="percona-logo"
-          className={styles.headerImage}
-          src="/graph/public/plugins/pmm-app/img/percona-header.png"
-        />
+        <img alt="percona-logo" className={styles.headerImage} src={headerImg} />
       </div>
       <div className={styles.body}>
         <div className={styles.text}>Scale your projects with Percona’s open source database solutions.</div>
@@ -72,7 +69,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     line-height: 21px;
     letter-spacing: 0.01071em;
     linear-gradient(0deg, #0E1A53, #0E1A53),
-    width: 100%;
+  width: 100 %;
     max-height: 15em;
   `,
   text: css`
