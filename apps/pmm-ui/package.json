@@ -6,6 +6,7 @@
     "dev": "craco start --config ./config/craco.config.dev.js",
     "dev:federation": "craco start --config ./config/craco.config.federation.js",
     "build": "craco build --config ./config/craco.config.federation.js",
+    "build:grafana": "npm run build && cp -r ./build/ ../../public/pmm-ui/",
     "test": "craco test",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",

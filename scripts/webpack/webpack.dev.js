@@ -12,6 +12,12 @@ const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const {federationFactory} = require('./webpack.federation.js');
+const federation = federationFactory( (module) => {
+  // return `${module}@http://localhost:3000/remoteEntry.js`
+  return `${module}@/graph/public/pmm-ui/remoteEntry.js`
+})
+
 module.exports = (env = {}) =>
   merge(common, {
     devtool: 'inline-source-map',
@@ -114,6 +120,7 @@ module.exports = (env = {}) =>
           NODE_ENV: JSON.stringify('development'),
         },
       }),
+      federation,
       // new BundleAnalyzerPlugin({
       //   analyzerPort: 8889
       // })
