@@ -1,16 +1,15 @@
-
 module.exports = {
-    webpack: {
-        configure: (config) => {
-            config.output.publicPath = "auto";
+  webpack: {
+    configure: (config) => {
+      config.output.publicPath = 'auto';
 
-            if (!config.plugins) {
-                config.plugins = [];
-            }
+      if (!config.plugins) {
+        config.plugins = [];
+      }
 
-            config.plugins.unshift();
+      config.plugins.unshift();
 
-            return config;
-        },
+      return config;
     },
+  },
 };
