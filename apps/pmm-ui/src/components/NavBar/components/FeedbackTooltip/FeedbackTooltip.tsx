@@ -31,26 +31,25 @@ export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, o
     <>
       {/* close button */}
       <div className={styles.modalHeaderClose}>
-        <IconButton
-          data-testid="modal-close-button"
-          name="times"
-          size="lg"
-          onClick={feedbackClose}
-        />
+        <IconButton data-testid="modal-close-button" name="times" size="lg" onClick={feedbackClose} />
       </div>
 
       <div className={styles.feedbackContentForm}>
-        { currentStep === 'Step1' && (
+        {currentStep === 'Step1' && (
           <Step1
-            onSubmit={() => { setCurrentStep('Step2'); }}
+            onSubmit={() => {
+              setCurrentStep('Step2');
+            }}
           />
         )}
-        { currentStep === 'Step2' && (
-          <Step2 onSubmit={() => { setCurrentStep('Step3'); }} />
+        {currentStep === 'Step2' && (
+          <Step2
+            onSubmit={() => {
+              setCurrentStep('Step3');
+            }}
+          />
         )}
-        { currentStep === 'Step3' && (
-          <Step3 />
-        )}
+        {currentStep === 'Step3' && <Step3 />}
       </div>
     </>
   );
@@ -64,20 +63,20 @@ export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, o
 
 const getStyles = (theme: GrafanaTheme2) => ({
   modalHeaderClose: css`
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   `,
   feedbackContentForm: css`
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 0px 24px 24px 24px;
-      gap: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px 24px 24px 24px;
+    gap: 12px;
 
-      flex: none;
-      order: 0;
-      flex-grow: 0;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
   `,
   contentTitle: css`
       font-family: 'Roboto';
@@ -97,16 +96,16 @@ const getStyles = (theme: GrafanaTheme2) => ({
       flex-grow: 0;
   `,
   rating: css`
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      padding: 0px;
-      gap: 12px;
-      flex: none;
-      order: 1;
-      align-self: stretch;
-      flex-grow: 0;
-      justify-content: space-between;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 12px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+    justify-content: space-between;
   `,
   ratingDestription: css`
       color: ${theme.colors.text.secondary}

@@ -1,12 +1,9 @@
 import React, { FC } from 'react';
-import {
-  Button, useStyles2,
-} from '@grafana/ui';
+import { Button, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 
-interface PerconaUpgradeLevelProps {
-}
+interface PerconaUpgradeLevelProps {}
 
 export const PerconaUpgradeLevel: FC<PerconaUpgradeLevelProps> = () => {
   const styles = useStyles2(getStyles);
@@ -41,7 +38,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     margin-top: 24px;
     padding-bottom: 16px;
 
-    background: linear-gradient(0deg, #0E1A53, #0E1A53), #181B1F;
+    background: linear-gradient(0deg, #0e1a53, #0e1a53), #181b1f;
     background-blend-mode: color, normal, normal;
     border-radius: 8px;
   `,

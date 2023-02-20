@@ -14,7 +14,6 @@ export default {
 const Template: ComponentStory<typeof NavBar> = (args) => {
   const [message, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
-  console.log(args);
   return (
     <>
       <NavBar

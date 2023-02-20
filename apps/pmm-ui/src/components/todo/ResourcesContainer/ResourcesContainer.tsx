@@ -8,13 +8,7 @@ export const ResourcesContainer: FC = () => (
   <div>
     <PerconaUpgradeLevel />
     {resourcesData.map((r) => (
-      <Resource
-        icon={r.icon as IconName}
-        title={r.title}
-        text={r.text}
-        buttonText={r.buttonText}
-        url={r.url}
-      />
+      <Resource icon={r.icon as IconName} title={r.title} text={r.text} buttonText={r.buttonText} url={r.url} />
     ))}
   </div>
 );
