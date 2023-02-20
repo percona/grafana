@@ -1,5 +1,5 @@
-include ./dev-next/Makefile.include
-include ./dev-next/Makefile.root
+include ./apps/Makefile.include
+include ./apps/Makefile.root
 
 .PHONY: run-server
 run-server: build-server

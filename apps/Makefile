@@ -5,7 +5,8 @@ init:								## Prepares local development.
 
 dev:								## Starts local development.
 	make env-down; \
-	make env-up;
+	make env-up; \
+	yarn start
 
 env-up:								## Starts devcontainer.
 	docker-compose -f docker-compose.dev.yaml up -d
