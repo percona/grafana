@@ -1,4 +1,6 @@
+// @ts-ignore
 declare let __webpack_public_path__: string;
+// @ts-ignore
 declare let __webpack_nonce__: string;
 
 // Check if we are hosting files on cdn and set webpack public path
@@ -17,5 +19,8 @@ if (window.nonce) {
 // This is an indication to the window.onLoad failure check that the app bundle has loaded.
 window.__grafana_app_bundle_loaded = true;
 
-import app from './app';
-app.init();
+// load app dynamically, so that webpack has a chance to load external modules (e.g. federated modules)
+(async () => {
+  const {GrafanaApp} = await import('./app');
+  new GrafanaApp().init();
+})()

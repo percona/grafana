@@ -7,8 +7,9 @@ import { useLocation } from 'react-router-dom';
 
 import { GrafanaTheme2, NavModelItem, NavSection } from '@grafana/data';
 import { config, locationSearchToObject, locationService, reportInteraction } from '@grafana/runtime';
-import { Icon, useTheme2, CustomScrollbar } from '@grafana/ui';
+import { CustomScrollbar, Icon, useTheme2 } from '@grafana/ui';
 import { getKioskMode } from 'app/core/navigation/kiosk';
+import { settings } from 'app/percona/nar-bar';
 import usePerconaTour from 'app/percona/shared/core/hooks/tour';
 import { useDispatch, useSelector } from 'app/types';
 
@@ -114,36 +115,40 @@ export const NavBar = React.memo(() => {
 
             <NavBarMenuPortalContainer />
 
-            <NavBarItemWithoutMenu
-              elClassName={styles.grafanaLogoInner}
-              label={homeItem.text}
-              className={styles.grafanaLogo}
-              url={homeItem.url}
-              onClick={homeItem.onClick}
-            >
-              <NavBarItemIcon link={homeItem} />
-            </NavBarItemWithoutMenu>
+            {/*@Percona*/}
+            {settings.showLogo && (
+              <NavBarItemWithoutMenu
+                elClassName={styles.grafanaLogoInner}
+                label={homeItem.text}
+                className={styles.grafanaLogo}
+                url={homeItem.url}
+                onClick={homeItem.onClick}
+              >
+                <NavBarItemIcon link={homeItem} />
+              </NavBarItemWithoutMenu>
+            )}
 
             <CustomScrollbar hideHorizontalTrack hideVerticalTrack showScrollIndicators>
               <ul className={styles.itemList}>
-                <NavBarItem className={styles.search} isActive={activeItem === searchItem} link={searchItem} />
-
-                {coreItems.map((link, index) => (
-                  <NavBarItem
-                    key={`${link.id}-${index}`}
-                    isActive={isMatchOrInnerMatch(link, activeItem)}
-                    link={{ ...link, subTitle: undefined }}
-                  />
-                ))}
-
-                {pluginItems.length > 0 &&
+                {settings.orderNavBarItems(
+                  <NavBarItem className={styles.search} isActive={activeItem === searchItem} link={searchItem} />,
+                  coreItems.map((link, index) => (
+                    <NavBarItem
+                      key={`${link.id}-${index}`}
+                      isActive={isMatchOrInnerMatch(link, activeItem)}
+                      link={{ ...link, subTitle: undefined }}
+                    />
+                  )),
                   pluginItems.map((link, index) => (
+                    // TODO: hideMenu=true needs to be set only for PerconaHome menu item
                     <NavBarItem
                       key={`${link.id}-${index}`}
                       isActive={isMatchOrInnerMatch(link, activeItem)}
                       link={link}
+                      hideMenu={true}
                     />
-                  ))}
+                  ))
+                )}
 
                 {configItems.map((link, index) => (
                   <NavBarItem

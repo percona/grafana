@@ -17,12 +17,13 @@ import { getNavModelItemKey } from './utils';
 
 export interface Props {
   isActive?: boolean;
+  hideMenu?: boolean;
   className?: string;
   reverseMenuDirection?: boolean;
   link: NavModelItem;
 }
 
-const NavBarItem = ({ isActive = false, className, reverseMenuDirection = false, link }: Props) => {
+const NavBarItem = ({ isActive = false, hideMenu = false, className, reverseMenuDirection = false, link }: Props) => {
   const { i18n } = useLingui();
   const theme = useTheme2();
   const menuItems = link.children ?? [];
@@ -66,39 +67,44 @@ const NavBarItem = ({ isActive = false, className, reverseMenuDirection = false,
         label={linkText}
         reverseMenuDirection={reverseMenuDirection}
       >
-        <NavBarItemMenu
-          items={items}
-          reverseMenuDirection={reverseMenuDirection}
-          adjustHeightForBorder={adjustHeightForBorder}
-          disabledKeys={['divider', 'subtitle']}
-          aria-label={section.text}
-          onNavigate={onNavigate}
-        >
-          {(item: NavModelItem) => {
-            const translationKey = item.id && menuItemTranslations[item.id];
-            const itemText = translationKey ? i18n._(translationKey) : item.text;
-            const isSection = item.menuItemType === NavMenuItemType.Section;
-            const iconName = item.icon ? toIconName(item.icon) : undefined;
-            const icon = item.showIconInNavbar && !isSection ? iconName : undefined;
+        {/*@Percona*/}
+        {hideMenu ? (
+          <></>
+        ) : (
+          <NavBarItemMenu
+            items={items}
+            reverseMenuDirection={reverseMenuDirection}
+            adjustHeightForBorder={adjustHeightForBorder}
+            disabledKeys={['divider', 'subtitle']}
+            aria-label={section.text}
+            onNavigate={onNavigate}
+          >
+            {(item: NavModelItem) => {
+              const translationKey = item.id && menuItemTranslations[item.id];
+              const itemText = translationKey ? i18n._(translationKey) : item.text;
+              const isSection = item.menuItemType === NavMenuItemType.Section;
+              const iconName = item.icon ? toIconName(item.icon) : undefined;
+              const icon = item.showIconInNavbar && !isSection ? iconName : undefined;
 
-            return (
-              <Item key={getNavModelItemKey(item)} textValue={item.text}>
-                <NavBarMenuItem
-                  isDivider={!isSection && item.divider}
-                  icon={icon}
-                  target={item.target}
-                  text={itemText}
-                  url={item.url}
-                  onClick={item.onClick}
-                  // @Percona
-                  showArrow={!!item.children && !isSection}
-                  isSubheader={item.isSubheader}
-                  styleOverrides={cx(styles.primaryText, { [styles.header]: isSection })}
-                />
-              </Item>
-            );
-          }}
-        </NavBarItemMenu>
+              return (
+                <Item key={getNavModelItemKey(item)} textValue={item.text}>
+                  <NavBarMenuItem
+                    isDivider={!isSection && item.divider}
+                    icon={icon}
+                    target={item.target}
+                    text={itemText}
+                    url={item.url}
+                    onClick={item.onClick}
+                    // @Percona
+                    showArrow={!!item.children && !isSection}
+                    isSubheader={item.isSubheader}
+                    styleOverrides={cx(styles.primaryText, { [styles.header]: isSection })}
+                  />
+                </Item>
+              );
+            }}
+          </NavBarItemMenu>
+        )}
       </NavBarItemMenuTrigger>
     </li>
   );
