@@ -196,5 +196,17 @@ func AddPerconaRoutes() []*navtree.NavLink {
 		HideFromTabs: true,
 	})
 
+	// Home
+	//TODO:WIP: make it available via feature flag
+	navTree = append(navTree, &navtree.NavLink{
+		Text:         "Home Screen",
+		Id:           "pmm-home-screen",
+		Icon:         "pmm-logo",
+		Url:          "/a/pmm-homescreen-app",
+		SortWeight:   navtree.WeightDashboard,
+		Section:      navtree.NavSectionPlugin,
+		HideFromTabs: true,
+	})
+
 	return navTree
 }

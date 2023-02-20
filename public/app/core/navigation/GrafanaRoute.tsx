@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 // @ts-ignore
 import Drop from 'tether-drop';
 
@@ -10,6 +10,8 @@ import { useGrafana } from '../context/GrafanaContext';
 import { GrafanaRouteError } from './GrafanaRouteError';
 import { GrafanaRouteLoading } from './GrafanaRouteLoading';
 import { GrafanaRouteComponentProps, RouteDescriptor } from './types';
+
+import { PmmUi } from '../../percona/federation';
 
 export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> {}
 
@@ -41,6 +43,24 @@ export function GrafanaRoute(props: Props) {
 
   navigationLogger('GrafanaRoute', false, 'Rendered', props.route);
 
+  //TODO:WIP:
+  const [_, setMessage] = useState('');
+  const [userContext, setUserContext] = useState('');
+  const nav = (<PmmUi.NavBar
+    title="Percona monitoring and management"
+    userContext={userContext}
+    showSignIn
+    // showFeedbackButton
+    showHelpCenterButton
+    showHelpCenterNotificationMarker
+    onSignInClick={() => {
+      setMessage('sign in');
+      setUserContext('something_here');
+    }}
+    onHelpCenterClick={() => setMessage('help center')}
+    onNotificationClick={() => setMessage('notification')}
+    onFeedbackClick={() => setMessage('feedback form')}
+  />)
   return (
     <ErrorBoundary>
       {({ error, errorInfo }) => {
@@ -50,7 +70,19 @@ export function GrafanaRoute(props: Props) {
 
         return (
           <Suspense fallback={<GrafanaRouteLoading />}>
-            <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} />
+            <>
+              {nav}
+              {/*TODO:WIP: refactor*/}
+              {props.location.pathname === '/a/pmm-homescreen-app' ? (
+                <Suspense fallback={<div></div>}>
+                  <>
+                    <PmmUi.HomePage />
+                  </>
+                </Suspense>
+              ) : (
+                <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} />
+              )}
+            </>
           </Suspense>
         );
       }}

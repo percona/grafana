@@ -1,6 +1,5 @@
 import React, { FC, memo } from 'react';
 
-import { config } from '@grafana/runtime';
 import { useUrlParams } from 'app/core/navigation/hooks';
 
 import { DashboardSearch } from './DashboardSearch';
@@ -9,7 +8,7 @@ import { DashboardSearchModal } from './DashboardSearchModal';
 export const SearchWrapper: FC = memo(() => {
   const [params] = useUrlParams();
   const isOpen = params.get('search') === 'open';
-  const isTopnav = config.featureToggles.topnav;
+  const isTopnav = true; // @Percona
 
   return isOpen ? (
     isTopnav ? (

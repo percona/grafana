@@ -26,9 +26,6 @@ module.exports = {
             // <export-name>: "<name>@http://<host>:<port>/remoteEntry.js"
           },
           exposes: exposeDirectory('./src/federated'),
-          // exposes: {
-          //     './App': './src/App',
-          // },
           shared: {
             ...deps,
             react: {
