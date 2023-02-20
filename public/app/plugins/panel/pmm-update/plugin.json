@@ -9,6 +9,9 @@
       "url": "https://percona.com"
     },
     "keywords": ["percona", "plugin", "updates"],
-    "screenshots": []
+    "logos": {
+      "small": "img/pmm-logo.svg",
+      "large": "img/pmm-logo.svg"
+    }
   }
 }
