@@ -1,31 +1,44 @@
 import React, { FC } from 'react';
-import { Button, Icon, IconName, useStyles2 } from '@grafana/ui';
+import {
+  Button, Icon, IconName, useStyles2,
+} from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 
 interface ResourceProps {
-  icon: IconName;
+  icon?: IconName;
   title: string;
-  text?: string;
+  text?: string | JSX.Element;
+  button?: JSX.Element;
   buttonText?: string;
   url: string;
 }
 
 export const Resource: FC<ResourceProps> = (props) => {
-  const { title, text, buttonText, url, icon } = props;
+  const {
+    title, text, buttonText, url, icon, button
+  } = props;
   const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.resourceContainer}>
       <div className={styles.header}>
-        <Icon name={icon} size="xl" />
+        { icon && (
+          <Icon name={icon} size="xl" />
+        )}
         <div className={styles.title}>{title}</div>
       </div>
       <div className={styles.body}>
         <div className={styles.text}>{text}</div>
-        <Button icon="external-link-alt" variant="secondary" size="md" type="button" onClick={onClickUrl(url)}>
-          {buttonText}
-        </Button>
+        { button ? (
+          <>
+            {button}
+          </>
+        ) : (
+          <Button icon="external-link-alt" variant="secondary" size="md" type="button" onClick={onClickUrl(url)}>
+            {buttonText}
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -39,10 +52,7 @@ const openInNewTab = (url: string): void => {
   }
 };
 
-const onClickUrl =
-  (url: string): (() => void) =>
-  () =>
-    openInNewTab(url);
+const onClickUrl = (url: string): (() => void) => () => openInNewTab(url);
 
 const getStyles = (theme: GrafanaTheme2) => ({
   resourceContainer: css`
