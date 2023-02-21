@@ -40,25 +40,6 @@ export const CheckService = {
       token
     );
 
-    if (true) {
-      return [
-        {
-          serviceName: 'ServiceOne',
-          serviceId: 's1',
-          counts: {
-            emergency: 2,
-            alert: 0,
-            critical: 1,
-            error: 1,
-            warning: 5,
-            notice: 0,
-            info: 2,
-            debug: 0,
-          },
-        },
-      ];
-    }
-
     return result
       .map(
         ({
