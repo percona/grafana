@@ -21,6 +21,6 @@ window.__grafana_app_bundle_loaded = true;
 
 // load app dynamically, so that webpack has a chance to load external modules (e.g. federated modules)
 (async () => {
-  const {GrafanaApp} = await import('./app');
+  const { GrafanaApp } = await import('./app');
   new GrafanaApp().init();
-})()
+})();

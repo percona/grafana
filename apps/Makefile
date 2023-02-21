@@ -1,7 +1,8 @@
 include Makefile.include
 
-init:								## Prepares local development.
-	cd pmm-ui && npm install
+init:								## Prepares local development environment.
+	cd ../ && yarn install --immutable; \
+	cd ./apps/pmm-ui && npm install
 
 dev:								## Starts local development.
 	make env-down; \
@@ -9,6 +10,7 @@ dev:								## Starts local development.
 	yarn start
 
 env-up:								## Starts devcontainer.
+	docker-compose -f docker-compose.dev.yaml build --no-cache; \
 	docker-compose -f docker-compose.dev.yaml up -d
 
 ui-up:

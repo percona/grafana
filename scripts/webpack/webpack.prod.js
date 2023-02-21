@@ -11,10 +11,10 @@ const { merge } = require('webpack-merge');
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 
-const {federationFactory} = require('./webpack.federation.js');
-const federation = federationFactory( (module) => {
-  return `${module}@/graph/public/pmm-ui/remoteEntry.js`
-})
+const { federationFactory } = require('./webpack.federation.js');
+const federation = federationFactory((module) => {
+  return `${module}@/graph/public/pmm-ui/remoteEntry.js`;
+});
 
 module.exports = (env = {}) =>
   merge(common, {
