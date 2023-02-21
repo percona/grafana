@@ -8,4 +8,4 @@ const HomePage = React.lazy(() => import('pmm_ui/HomePage'));
 export const PmmUi = {
   NavBar,
   HomePage,
-}
+};

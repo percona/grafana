@@ -5,13 +5,12 @@ import Drop from 'tether-drop';
 import { locationSearchToObject, navigationLogger, reportPageview } from '@grafana/runtime';
 import { ErrorBoundary } from '@grafana/ui';
 
+import { PmmUi } from '../../percona/federation';
 import { useGrafana } from '../context/GrafanaContext';
 
 import { GrafanaRouteError } from './GrafanaRouteError';
 import { GrafanaRouteLoading } from './GrafanaRouteLoading';
 import { GrafanaRouteComponentProps, RouteDescriptor } from './types';
-
-import { PmmUi } from '../../percona/federation';
 
 export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> {}
 
@@ -46,21 +45,23 @@ export function GrafanaRoute(props: Props) {
   //TODO:WIP:
   const [_, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
-  const nav = (<PmmUi.NavBar
-    title="Percona monitoring and management"
-    userContext={userContext}
-    showSignIn
-    // showFeedbackButton
-    showHelpCenterButton
-    showHelpCenterNotificationMarker
-    onSignInClick={() => {
-      setMessage('sign in');
-      setUserContext('something_here');
-    }}
-    onHelpCenterClick={() => setMessage('help center')}
-    onNotificationClick={() => setMessage('notification')}
-    onFeedbackClick={() => setMessage('feedback form')}
-  />)
+  const nav = (
+    <PmmUi.NavBar
+      title="Percona monitoring and management"
+      userContext={userContext}
+      showSignIn
+      // showFeedbackButton
+      showHelpCenterButton
+      showHelpCenterNotificationMarker
+      onSignInClick={() => {
+        setMessage('sign in');
+        setUserContext('something_here');
+      }}
+      onHelpCenterClick={() => setMessage('help center')}
+      onNotificationClick={() => setMessage('notification')}
+      onFeedbackClick={() => setMessage('feedback form')}
+    />
+  );
   return (
     <ErrorBoundary>
       {({ error, errorInfo }) => {

@@ -2,6 +2,7 @@
 
 const ESLintPlugin = require('eslint-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
@@ -12,10 +13,10 @@ const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const {federationFactory} = require('./webpack.federation.js');
-const federation = federationFactory( (module) => {
-  return `${module}@http://localhost:3000/remoteEntry.js`
-})
+const { federationFactory } = require('./webpack.federation.js');
+const federation = federationFactory((module) => {
+  return `${module}@http://localhost:3000/remoteEntry.js`;
+});
 
 module.exports = (env = {}) =>
   merge(common, {
@@ -119,6 +120,7 @@ module.exports = (env = {}) =>
           NODE_ENV: JSON.stringify('development'),
         },
       }),
+      new LiveReloadPlugin(),
       federation,
       // new BundleAnalyzerPlugin({
       //   analyzerPort: 8889
