@@ -23,7 +23,7 @@ PMM_CONTAINER=ritbl/pmm-x:v2.33.0-3
 You can run new devcontainer and grafana build (with watch) by running:
 
 ```shell
-cd ./apps/pmm-ui
+cd ./apps
 make dev
 ```
 
