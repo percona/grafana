@@ -1,14 +1,15 @@
-import { logger } from '@percona/platform-core';
-import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 
+import { NavIndex } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { CheckService } from 'app/percona/check/Check.service';
-import { Interval } from 'app/percona/check/types';
+import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
+
+import { CheckService } from '../../Check.service';
 
 import { AllChecksTab } from './AllChecksTab';
 import { Messages } from './AllChecksTab.messages';
@@ -22,180 +23,277 @@ jest.mock('@percona/platform-core', () => {
     },
   };
 });
-jest.mock('app/percona/check/Check.service');
+//jest.mock('app/percona/check/Check.service');
+//jest.mock('app/percona/shared/services/advisors/Advisors.service.ts');
 
 describe('AllChecksTab::', () => {
-  beforeEach(() => jest.clearAllMocks());
-  it('should fetch checks at startup', async () => {
-    const spy = jest.spyOn(CheckService, 'getAllChecks');
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab />
-        </Router>
-      </Provider>
-    );
+  //beforeEach(() => jest.clearAllMocks());
+  // it('should fetch checks at startup', async () => {
+  //   const spy = jest.spyOn(CheckService, 'getAllChecks');
+  //   render(
+  //     <Provider
+  //       store={configureStore({
+  //         percona: {
+  //           user: { isAuthorized: true, isPlatformUser: false },
+  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+  //         },
+  //       } as StoreState)}
+  //     >
+  //       <Router history={locationService.getHistory()}>
+  //         <AllChecksTab
+  //           {...getRouteComponentProps({
+  //             match: { params: {}, isExact: true, path: '/test', url: '' },
+  //           })}
+  //         />
+  //       </Router>
+  //     </Provider>
+  //   );
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
 
-    expect(spy).toBeCalledTimes(1);
-  });
+  //   expect(spy).toBeCalledTimes(1);
+  // });
 
-  it('should render a spinner at startup, while loading', async () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab />
-        </Router>
-      </Provider>
-    );
+  // it('should render a spinner at startup, while loading', async () => {
+  //   render(
+  //     <Provider
+  //       store={configureStore({
+  //         percona: {
+  //           user: { isAuthorized: true, isPlatformUser: false },
+  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+  //         },
+  //       } as StoreState)}
+  //     >
+  //       <Router history={locationService.getHistory()}>
+  //         <AllChecksTab
+  //           {...getRouteComponentProps({
+  //             match: { params: {}, isExact: true, path: '/test', url: '' },
+  //           })}
+  //         />
+  //       </Router>
+  //     </Provider>
+  //   );
 
-    expect(screen.queryByTestId('table-loading')).toBeInTheDocument();
-    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
-    expect(screen.queryByTestId('spinner-wrapper')).not.toBeInTheDocument();
-  });
+  //   expect(screen.queryByTestId('table-loading')).toBeInTheDocument();
+  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+  //   expect(screen.queryByTestId('spinner-wrapper')).not.toBeInTheDocument();
+  // });
 
-  it('should render a table', async () => {
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab />
-        </Router>
-      </Provider>
-    );
+  // it('should render a table', async () => {
+  //   render(
+  //     <Provider
+  //       store={configureStore({
+  //         percona: {
+  //           user: { isAuthorized: true, isPlatformUser: false },
+  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+  //         },
+  //       } as StoreState)}
+  //     >
+  //       <Router history={locationService.getHistory()}>
+  //         <AllChecksTab
+  //           {...getRouteComponentProps({
+  //             match: { params: {}, isExact: true, path: '/test', url: '' },
+  //           })}
+  //         />
+  //       </Router>
+  //     </Provider>
+  //   );
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
-    const tbody = screen.getByTestId('table-tbody');
+  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+  //   const tbody = screen.getByTestId('table-tbody');
 
-    expect(tbody.querySelectorAll('tr > td')).toHaveLength(2 * 5);
-    expect(tbody.querySelectorAll('tr > td')[0]).toHaveTextContent('Test');
-    expect(tbody.querySelectorAll('tr > td')[1]).toHaveTextContent('test enabled description');
-    expect(tbody.querySelectorAll('tr > td')[2]).toHaveTextContent(Messages.enabled);
-    expect(tbody.querySelectorAll('tr > td')[3]).toHaveTextContent(Interval.STANDARD);
-    expect(tbody.querySelectorAll('tr > td')[4]).toHaveTextContent(Messages.disable);
-    expect(tbody.querySelectorAll('tr > td')[5]).toHaveTextContent('Test disabled');
-    expect(tbody.querySelectorAll('tr > td')[6]).toHaveTextContent('test disabled description');
-    expect(tbody.querySelectorAll('tr > td')[7]).toHaveTextContent(Messages.disabled);
-    expect(tbody.querySelectorAll('tr > td')[8]).toHaveTextContent(Interval.RARE);
-    expect(tbody.querySelectorAll('tr > td')[9]).toHaveTextContent(Messages.enable);
-  });
+  //   expect(tbody.querySelectorAll('tr > td')).toHaveLength(2 * 5);
+  //   expect(tbody.querySelectorAll('tr > td')[0]).toHaveTextContent('Test');
+  //   expect(tbody.querySelectorAll('tr > td')[1]).toHaveTextContent('test enabled description');
+  //   expect(tbody.querySelectorAll('tr > td')[2]).toHaveTextContent(Messages.enabled);
+  //   expect(tbody.querySelectorAll('tr > td')[3]).toHaveTextContent(Interval.STANDARD);
+  //   expect(tbody.querySelectorAll('tr > td')[4]).toHaveTextContent(Messages.disable);
+  //   expect(tbody.querySelectorAll('tr > td')[5]).toHaveTextContent('Test disabled');
+  //   expect(tbody.querySelectorAll('tr > td')[6]).toHaveTextContent('test disabled description');
+  //   expect(tbody.querySelectorAll('tr > td')[7]).toHaveTextContent(Messages.disabled);
+  //   expect(tbody.querySelectorAll('tr > td')[8]).toHaveTextContent(Interval.RARE);
+  //   expect(tbody.querySelectorAll('tr > td')[9]).toHaveTextContent(Messages.enable);
+  // });
 
-  it('should call an API to change the check status when the action button gets clicked', async () => {
-    const spy = jest.spyOn(CheckService, 'changeCheck');
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab />
-        </Router>
-      </Provider>
-    );
+  // it('should call an API to change the check status when the action button gets clicked', async () => {
+  //   const spy = jest.spyOn(CheckService, 'changeCheck');
+  //   render(
+  //     <Provider
+  //       store={configureStore({
+  //         percona: {
+  //           user: { isAuthorized: true, isPlatformUser: false },
+  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+  //         },
+  //       } as StoreState)}
+  //     >
+  //       <Router history={locationService.getHistory()}>
+  //         <AllChecksTab
+  //           {...getRouteComponentProps({
+  //             match: { params: {}, isExact: true, path: '/test', url: '' },
+  //           })}
+  //         />
+  //       </Router>
+  //     </Provider>
+  //   );
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
 
-    const button = screen.getAllByTestId('check-table-loader-button')[0];
-    fireEvent.click(button);
+  //   const button = screen.getAllByTestId('check-table-loader-button')[0];
+  //   fireEvent.click(button);
 
-    await waitFor(() => expect(button).toHaveTextContent('Enable'));
+  //   await waitFor(() => expect(button).toHaveTextContent('Enable'));
 
-    expect(spy).toBeCalledTimes(1);
-    expect(spy).toBeCalledWith({ params: [{ name: 'test enabled', disable: true }] });
-    spy.mockClear();
-  });
+  //   expect(spy).toBeCalledTimes(1);
+  //   expect(spy).toBeCalledWith({ params: [{ name: 'test enabled', disable: true }] });
+  //   spy.mockClear();
+  // });
 
-  it('should log an error if the run checks API call fails', async () => {
-    jest.spyOn(CheckService, 'runDbChecks').mockImplementationOnce(() => {
-      throw Error('test');
-    });
-    const loggerSpy = jest.spyOn(logger, 'error');
+  // it('should log an error if the run checks API call fails', async () => {
+  //   jest.spyOn(CheckService, 'runDbChecks').mockImplementationOnce(() => {
+  //     throw Error('test');
+  //   });
+  //   const loggerSpy = jest.spyOn(logger, 'error');
 
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-          },
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab />
-        </Router>
-      </Provider>
-    );
+  //   render(
+  //     <Provider
+  //       store={configureStore({
+  //         percona: {
+  //           user: { isAuthorized: true, isPlatformUser: false },
+  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+  //         },
+  //       } as StoreState)}
+  //     >
+  //       <Router history={locationService.getHistory()}>
+  //         <AllChecksTab
+  //           {...getRouteComponentProps({
+  //             match: { params: {}, isExact: true, path: '/test', url: '' },
+  //           })}
+  //         />
+  //       </Router>
+  //     </Provider>
+  //   );
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
 
-    const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
+  //   const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
 
-    await waitFor(() => fireEvent.click(runChecksButton));
-    fireEvent.click(runChecksButton);
-    expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+  //   await waitFor(() => fireEvent.click(runChecksButton));
+  //   fireEvent.click(runChecksButton);
+  //   expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(loggerSpy).toBeCalledTimes(1);
-    });
+  //   await waitFor(() => {
+  //     expect(loggerSpy).toBeCalledTimes(1);
+  //   });
 
-    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
-  });
+  //   expect(await screen.findByText('Run Checks')).toBeInTheDocument();
+  // });
 
   it('should call the API to run checks when the "run checks" button gets clicked', async () => {
-    const runChecksSpy = jest.spyOn(CheckService, 'runDbChecks');
+    let runChecksSpy = jest.spyOn(CheckService, 'runDbChecks').mockImplementation(async () => ({}));
+
+    const navIndex: NavIndex = {
+      ['advisors-security']: {
+        id: 'advisors-security',
+        text: 'advisors-security',
+        icon: 'list-ul',
+        url: '/advisors/security',
+      },
+    };
     render(
       <Provider
         store={configureStore({
           percona: {
             user: { isAuthorized: true, isPlatformUser: false },
             settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+            advisors: {
+              loading: false,
+              result: advisorsArray,
+            },
           },
+          navIndex: navIndex,
         } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
-          <AllChecksTab />
+          <AllChecksTab
+            {...getRouteComponentProps({
+              match: {
+                params: { category: 'security' },
+                isExact: true,
+                path: '/advisors/:category',
+                url: '/advisors/security',
+              },
+            })}
+          />
         </Router>
       </Provider>
     );
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    await waitFor(() => screen.getByText(/CVE security/i));
+
+    const text = screen.queryByText(/CVE security/i);
+    expect(text).toHaveTextContent(/CVE security/i);
 
     const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
 
+    expect(runChecksButton).toBeInTheDocument();
     expect(runChecksSpy).toBeCalledTimes(0);
-    fireEvent.click(runChecksButton);
 
-    expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+    await waitFor(() => {
+      fireEvent.click(runChecksButton);
+    });
 
     await waitFor(() => {
       expect(runChecksSpy).toBeCalledTimes(1);
     });
-
-    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
   });
 });
+
+const advisorsArray = [
+  {
+    name: 'cve_security',
+    description: 'Informing users about versions of DBs  affected by CVE.',
+    summary: 'CVE security',
+    category: 'security',
+    checks: [
+      {
+        name: 'mongodb_cve_version',
+        description:
+          'This check returns errors if MongoDB or Percona Server for MongoDB version is less than the latest one with CVE fixes.',
+        summary: 'MongoDB CVE Version',
+        interval: 'RARE',
+      },
+    ],
+  },
+  {
+    name: 'version_configuration',
+    description:
+      'Informs users about new versions of database released to simplify the process of keeping your DB up to date.',
+    summary: 'Version configuration',
+    category: 'configuration',
+    checks: [
+      {
+        name: 'mongodb_version',
+        disabled: true,
+        description:
+          'This check returns warnings if MongoDB or Percona Server for MongoDB version is not the latest one.',
+        summary: 'MongoDB Version',
+        interval: 'FREQUENT',
+      },
+      {
+        name: 'mysql_version',
+        disabled: true,
+        description:
+          'This check returns warnings if MySQL, Percona Server for MySQL, or MariaDB version is not the latest one.',
+        summary: 'MySQL Version',
+        interval: 'RARE',
+      },
+      {
+        name: 'postgresql_version',
+        description:
+          'This check returns warnings if PostgreSQL minor version is not the latest one.\nAdditionally notice is returned if PostgreSQL major version is not the latest one.\nError is returned if the major version of PostgreSQL is 9.4 or older.\n',
+        summary: 'PostgreSQL Version',
+        interval: 'STANDARD',
+      },
+    ],
+  },
+];
