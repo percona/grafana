@@ -2,10 +2,10 @@
 import { CheckboxField, logger, Table } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { Row } from 'react-table';
+import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Modal } from '@grafana/ui';
+import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
@@ -24,10 +24,10 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { GET_SERVICES_CANCEL_TOKEN, SERVICES_COLUMNS } from '../Inventory.constants';
-import { InventoryDataService } from '../Inventory.tools';
+import { GET_SERVICES_CANCEL_TOKEN, MAIN_COLUMN } from '../Inventory.constants';
+import { InventoryDataService, Model } from '../Inventory.tools';
 
-import { styles } from './Tabs.styles';
+import { getStyles } from './Tabs.styles';
 
 interface Service {
   service_id: string;
@@ -46,6 +46,50 @@ export const Services = () => {
   const dispatch = useAppDispatch();
   const { isLoading, services } = useSelector(getServices);
   const data = useMemo(() => InventoryDataService.getServiceModel(services), [services]);
+  const styles = useStyles2(getStyles);
+
+  const columns = useMemo(
+    (): Array<Column<Model>> => [
+      {
+        Header: 'Service Name',
+        accessor: 'service_name',
+      },
+      {
+        Header: 'Service Type',
+        accessor: 'type',
+      },
+      {
+        Header: 'Node ID',
+        accessor: 'node_id',
+      },
+      {
+        Header: 'Address',
+        accessor: 'address',
+      },
+      {
+        Header: 'Port',
+        accessor: 'port',
+      },
+      {
+        Header: 'Labels',
+        Cell: ({ row }) => (
+          <>
+            <TagList
+              className={styles.tagList}
+              tags={Object.keys(row.original)
+                .filter((label) => !MAIN_COLUMN.includes(label))
+                .map((label) => `${label}: ${row.original[label]}`)}
+            />
+            <TagList
+              className={styles.tagList}
+              tags={row.original.custom_labels.map(({ key, value }) => `${key}=${value}`)}
+            />
+          </>
+        ),
+      },
+    ],
+    [styles.tagList]
+  );
 
   const loadData = useCallback(async () => {
     try {
@@ -160,7 +204,8 @@ export const Services = () => {
             </Modal>
             <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
               <Table
-                columns={SERVICES_COLUMNS}
+                // @ts-ignore
+                columns={columns}
                 data={data}
                 totalItems={data.length}
                 rowSelection

@@ -1,6 +1,18 @@
 import { css } from '@emotion/css';
 
-export const styles = {
+export const getStyles = () => ({
+  detailsWrapper: css`
+    display: flex;
+    flex-direction: column;
+  `,
+  tagList: css`
+    justify-content: flex-start;
+
+    & > li {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  `,
   actionPanel: css`
     display: flex;
     justify-content: flex-end;
@@ -50,4 +62,4 @@ export const styles = {
     align-items: center;
     background-color: transparent;
   `,
-};
+});

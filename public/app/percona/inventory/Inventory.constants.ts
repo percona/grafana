@@ -1,33 +1,6 @@
-import { servicesDetailsRender, agentsDetailsRender, nodesDetailsRender } from './ColumnRenderers';
+import { agentsDetailsRender, nodesDetailsRender } from './ColumnRenderers';
 
 export const MAIN_COLUMN = ['service_id', 'type', 'service_name', 'custom_labels', 'node_id', 'address', 'port'];
-
-export const SERVICES_COLUMNS = [
-  {
-    Header: 'Service Name',
-    accessor: 'service_name',
-  },
-  {
-    Header: 'Service Type',
-    accessor: 'type',
-  },
-  {
-    Header: 'Node ID',
-    accessor: 'node_id',
-  },
-  {
-    Header: 'Address',
-    accessor: 'address',
-  },
-  {
-    Header: 'Port',
-    accessor: 'port',
-  },
-  {
-    Header: 'Labels',
-    accessor: servicesDetailsRender,
-  },
-];
 
 export const AGENTS_COLUMNS = [
   {
