@@ -25,7 +25,7 @@ export const ServicesService = {
     return api.post<{}, RemoveServiceBody>(`${BASE_URL}/Remove`, body, false, token);
   },
   updateService(body: UpdateServiceBody, token?: CancelToken) {
-    return api.post<{}, UpdateServiceBody>(`${BASE_URL}/Update`, body, false, token);
+    return api.post<{}, UpdateServiceBody>(`${BASE_URL}/Change`, body, false, token);
   },
   addCustomLabels(body: AddCustomLabelsBody, token?: CancelToken) {
     return api.post<{}, UpdateServiceBody>(`${BASE_URL}/CustomLabels/Add`, body, false, token);
