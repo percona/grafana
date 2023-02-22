@@ -4,23 +4,19 @@ export const MAIN_COLUMN = ['service_id', 'type', 'service_name', 'custom_labels
 
 export const SERVICES_COLUMNS = [
   {
-    Header: 'ID',
-    accessor: 'service_id',
+    Header: 'Service Name',
+    accessor: 'service_name',
   },
   {
     Header: 'Service Type',
     accessor: 'type',
   },
   {
-    Header: 'Service name',
-    accessor: 'service_name',
-  },
-  {
     Header: 'Node ID',
     accessor: 'node_id',
   },
   {
-    Header: 'Addresses',
+    Header: 'Address',
     accessor: 'address',
   },
   {
@@ -28,7 +24,7 @@ export const SERVICES_COLUMNS = [
     accessor: 'port',
   },
   {
-    Header: 'Other Details',
+    Header: 'Labels',
     accessor: servicesDetailsRender,
   },
 ];
