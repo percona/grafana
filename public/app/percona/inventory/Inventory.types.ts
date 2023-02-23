@@ -46,8 +46,6 @@ export type InventoryList = {
   [key in InventoryType]: InventoryNode[];
 };
 
-export type ServicesList = InventoryList;
-
 export type NodesList = InventoryList;
 
 export type AgentsList = InventoryList;

@@ -2,12 +2,11 @@
 import { orderBy } from 'lodash';
 
 import { inventoryTypes } from './Inventory.constants';
-import { CustomLabel, InventoryList, InventoryType, ServicesList } from './Inventory.types';
+import { CustomLabel, InventoryList, InventoryType } from './Inventory.types';
 
 export interface Model {
   custom_labels: CustomLabel[];
   type: string;
-  isDeleted: boolean;
   [key: string]: any;
 }
 
@@ -21,12 +20,11 @@ const getParams = (params: any, type: string): Model => {
   return {
     custom_labels: labels,
     type,
-    isDeleted: false,
     ...rest,
   };
 };
 
-const getModel = (item: Partial<ServicesList>) => {
+const getModel = (item: Partial<InventoryList>) => {
   const addType = Object.keys(item).map((type) => ({ type, params: item[type as InventoryType] || [] }));
 
   return addType.map((agent) =>
@@ -37,16 +35,6 @@ const getModel = (item: Partial<ServicesList>) => {
 
       return getParams(arrItem, type);
     })
-  );
-};
-
-const getServiceModel = (item: Partial<ServicesList>) => {
-  const createParams = getModel(item);
-
-  return orderBy(
-    ([] as Model[]).concat(...createParams),
-    [(service: Model) => (service.service_name || '').toLowerCase()],
-    ['asc']
   );
 };
 
@@ -71,7 +59,6 @@ const getAgentModel = (item: InventoryList) => {
 };
 
 export const InventoryDataService = {
-  getServiceModel,
   getAgentModel,
   getNodeModel,
 };

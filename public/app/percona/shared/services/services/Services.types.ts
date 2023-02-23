@@ -40,14 +40,44 @@ export interface ExternalServicePayload extends DbServicePayload {
   group: string;
 }
 
-export type ServiceListPayload = {
+export interface ServiceListPayload {
   [Databases.haproxy]?: DbServicePayload[];
   [Databases.mariadb]?: DbServiceWithAddressPayload[];
   [Databases.mongodb]?: DbServiceWithAddressPayload[];
   [Databases.mysql]?: DbServiceWithAddressPayload[];
   [Databases.postgresql]?: PostgreSQLServicePayload[];
   [Databases.proxysql]?: DbServiceWithAddressPayload[];
+  external?: ExternalServicePayload[];
+}
+
+export type Service = {
+  type: keyof typeof Databases | 'external';
+  params: DbService & DbServiceWithAddress & PostgreSQLService & ExternalService;
 };
+
+export interface DbService {
+  serviceId: string;
+  serviceName: string;
+  nodeId: string;
+  environment?: string;
+  cluster?: string;
+  replicationSet?: string;
+  customLabels?: Record<string, string>;
+}
+
+export interface DbServiceWithAddress extends DbService {
+  address: string;
+  port: string;
+  socket: string;
+}
+
+export interface PostgreSQLService extends DbServiceWithAddress {
+  databaseName: string;
+}
+
+export interface ExternalService extends DbService {
+  group: string;
+}
 
 export interface RemoveServiceBody {
   service_id: string;

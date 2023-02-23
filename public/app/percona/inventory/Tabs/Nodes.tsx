@@ -162,6 +162,7 @@ export const NodesTab = () => {
             </Modal>
             <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
               <Table
+                // @ts-ignore
                 columns={NODES_COLUMNS}
                 data={data}
                 totalItems={data.length}

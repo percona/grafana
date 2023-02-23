@@ -8,7 +8,7 @@ import { Model } from '../Inventory.tools';
 import * as styles from './ColumnRenderers.styles';
 
 export const agentsDetailsRender = (element: Model) => {
-  const mainColumns = ['agent_id', 'type', 'isDeleted', 'service_ids', 'custom_labels'];
+  const mainColumns = ['agent_id', 'type', 'service_ids', 'custom_labels'];
   const labels = Object.keys(element).filter((label) => !mainColumns.includes(label));
 
   return (
@@ -31,7 +31,7 @@ export const agentsDetailsRender = (element: Model) => {
 };
 
 export const nodesDetailsRender = (element: Model) => {
-  const mainColumns = ['node_id', 'node_name', 'address', 'custom_labels', 'type', 'isDeleted'];
+  const mainColumns = ['node_id', 'node_name', 'address', 'custom_labels', 'type'];
   const labels = Object.keys(element).filter((label) => !mainColumns.includes(label));
 
   return (

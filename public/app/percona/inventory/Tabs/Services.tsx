@@ -20,23 +20,14 @@ import {
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { Service } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { GET_SERVICES_CANCEL_TOKEN, MAIN_COLUMN } from '../Inventory.constants';
-import { InventoryDataService, Model } from '../Inventory.tools';
+import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 
 import { getStyles } from './Tabs.styles';
-
-interface Service {
-  service_id: string;
-  service_name: string;
-  node_id: string;
-  address: string;
-  port: string;
-  [key: string]: string;
-}
 
 export const Services = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,14 +36,13 @@ export const Services = () => {
   const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
   const { isLoading, services } = useSelector(getServices);
-  const data = useMemo(() => InventoryDataService.getServiceModel(services), [services]);
   const styles = useStyles2(getStyles);
 
   const columns = useMemo(
-    (): Array<Column<Model>> => [
+    (): Array<Column<Service>> => [
       {
         Header: 'Service Name',
-        accessor: 'service_name',
+        accessor: (row) => row.params.serviceName,
       },
       {
         Header: 'Service Type',
@@ -60,29 +50,24 @@ export const Services = () => {
       },
       {
         Header: 'Node ID',
-        accessor: 'node_id',
+        accessor: (row) => row.params.nodeId,
       },
       {
         Header: 'Address',
-        accessor: 'address',
+        accessor: (row) => row.params.address,
       },
       {
         Header: 'Port',
-        accessor: 'port',
+        accessor: (row) => row.params.port,
       },
       {
         Header: 'Labels',
-        Cell: ({ row }) => (
+        accessor: 'params',
+        Cell: ({ value }) => (
           <>
             <TagList
               className={styles.tagList}
-              tags={Object.keys(row.original)
-                .filter((label) => !MAIN_COLUMN.includes(label))
-                .map((label) => `${label}: ${row.original[label]}`)}
-            />
-            <TagList
-              className={styles.tagList}
-              tags={row.original.custom_labels.map(({ key, value }) => `${key}=${value}`)}
+              tags={Object.keys(value.customLabels || {}).map((label) => `${label}: ${value.customLabels![label]}`)}
             />
           </>
         ),
@@ -113,7 +98,7 @@ export const Services = () => {
     async (services: Array<SelectedTableRows<Service>>, forceMode) => {
       try {
         const params = services.map<RemoveServiceParams>((s) => ({
-          serviceId: s.original.service_id,
+          serviceId: s.original.params.serviceId,
           force: forceMode,
         }));
         const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
@@ -206,8 +191,8 @@ export const Services = () => {
               <Table
                 // @ts-ignore
                 columns={columns}
-                data={data}
-                totalItems={data.length}
+                data={services}
+                totalItems={services.length}
                 rowSelection
                 onRowSelection={handleSelectionChange}
                 showPagination
