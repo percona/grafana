@@ -64,12 +64,10 @@ export const Services = () => {
         Header: 'Labels',
         accessor: 'params',
         Cell: ({ value }) => (
-          <>
-            <TagList
-              className={styles.tagList}
-              tags={Object.keys(value.customLabels || {}).map((label) => `${label}: ${value.customLabels![label]}`)}
-            />
-          </>
+          <TagList
+            className={styles.tagList}
+            tags={Object.keys(value.customLabels || {}).map((label) => `${label}: ${value.customLabels![label]}`)}
+          />
         ),
       },
     ],

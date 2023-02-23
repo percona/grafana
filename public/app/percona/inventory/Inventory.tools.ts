@@ -38,16 +38,6 @@ const getModel = (item: Partial<InventoryList>) => {
   );
 };
 
-const getNodeModel = (item: InventoryList) => {
-  const createParams = getModel(item);
-
-  return orderBy(
-    ([] as Model[]).concat(...createParams),
-    [(node: Model) => (node.node_name || '').toLowerCase()],
-    ['asc']
-  );
-};
-
 const getAgentModel = (item: InventoryList) => {
   const createParams = getModel(item);
 
@@ -60,5 +50,4 @@ const getAgentModel = (item: InventoryList) => {
 
 export const InventoryDataService = {
   getAgentModel,
-  getNodeModel,
 };

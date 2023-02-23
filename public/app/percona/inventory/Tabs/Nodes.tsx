@@ -1,56 +1,82 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 import { CheckboxField, Table, logger } from '@percona/platform-core';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
+import { Column } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Modal, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
-import { InventoryDataService, Model } from 'app/percona/inventory/Inventory.tools';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
+import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
+import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
+import { Node } from 'app/percona/shared/services/nodes/Nodes.types';
+import { useAppDispatch } from 'app/store/store';
+import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { GET_NODES_CANCEL_TOKEN, NODES_COLUMNS } from '../Inventory.constants';
-import { InventoryService } from '../Inventory.service';
-import { NodesList } from '../Inventory.types';
+import { GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
 
 import { getStyles } from './Tabs.styles';
 
-interface Node {
-  node_id: string;
-  node_name: string;
-  address: string;
-  [key: string]: string;
-}
-
 export const NodesTab = () => {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<Model[]>([]);
+  const { isLoading, nodes } = useSelector(getNodes);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const navModel = usePerconaNavModel('inventory-nodes');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
+  const dispatch = useAppDispatch();
+
+  const columns = useMemo(
+    (): Array<Column<Node>> => [
+      {
+        Header: 'ID',
+        accessor: (row) => row.params.nodeId,
+      },
+      {
+        Header: 'Node Type',
+        accessor: 'type',
+      },
+      {
+        Header: 'Node Name',
+        accessor: (row) => row.params.nodeName,
+      },
+      {
+        Header: 'Addresses',
+        accessor: (row) => row.params.address,
+      },
+      {
+        Header: 'Other Details',
+        accessor: 'params',
+        Cell: ({ value }) => (
+          <TagList
+            className={styles.tagList}
+            tags={Object.keys(value.customLabels || {}).map((label) => `${label}: ${value.customLabels![label]}`)}
+          />
+        ),
+      },
+    ],
+    [styles.tagList]
+  );
 
   const loadData = useCallback(async () => {
-    setLoading(true);
     try {
-      const result: NodesList = await InventoryService.getNodes(generateToken(GET_NODES_CANCEL_TOKEN));
-
-      setData(InventoryDataService.getNodeModel(result));
+      await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap();
+      // const result: NodesList = await InventoryService.getNodes(generateToken(GET_NODES_CANCEL_TOKEN));
+      // setData(InventoryDataService.getNodeModel(result));
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
       }
       logger.error(e);
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -62,14 +88,13 @@ export const NodesTab = () => {
   const removeNodes = useCallback(
     async (nodes: Array<SelectedTableRows<Node>>, forceMode: boolean) => {
       try {
-        setLoading(true);
         // eslint-disable-next-line max-len
-        const requests = nodes.map((node) =>
-          InventoryService.removeNode({ node_id: node.original.node_id, force: forceMode })
-        );
+        const requests = nodes.map<RemoveNodeParams>((node) => ({
+          nodeId: node.original.params.nodeId,
+          force: forceMode,
+        }));
 
-        const results = await processPromiseResults(requests);
-        const successfullyDeleted = results.filter(filterFulfilled).length;
+        const successfullyDeleted = await dispatch(removeNodesAction({ nodes: requests })).unwrap();
 
         appEvents.emit(AppEvents.alertSuccess, [
           `${successfullyDeleted} of ${nodes.length} nodes successfully deleted`,
@@ -83,7 +108,7 @@ export const NodesTab = () => {
       setSelectedRows([]);
       loadData();
     },
-    [loadData]
+    [dispatch, loadData]
   );
 
   const proceed = useCallback(
@@ -163,9 +188,9 @@ export const NodesTab = () => {
             <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
               <Table
                 // @ts-ignore
-                columns={NODES_COLUMNS}
-                data={data}
-                totalItems={data.length}
+                columns={columns}
+                data={nodes}
+                totalItems={nodes.length}
                 rowSelection
                 onRowSelection={handleSelectionChange}
                 showPagination
@@ -173,7 +198,7 @@ export const NodesTab = () => {
                 allRowsSelectionMode="page"
                 emptyMessage="No nodes Available"
                 emptyMessageClassName={styles.emptyMessage}
-                pendingRequest={loading}
+                pendingRequest={isLoading}
                 overlayClassName={styles.overlay}
               />
             </div>

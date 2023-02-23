@@ -1,4 +1,3 @@
-import { MAIN_COLUMN } from 'app/percona/inventory/Inventory.constants';
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 import {
   DbService,
@@ -12,6 +11,8 @@ import {
 } from 'app/percona/shared/services/services/Services.types';
 
 import { ListServicesParams, RemoveServiceParams } from './services.types';
+
+export const MAIN_COLUMNS = ['service_id', 'type', 'service_name', 'custom_labels', 'node_id', 'address', 'port'];
 
 export const toRemoveServiceBody = (params: RemoveServiceParams): RemoveServiceBody => ({
   service_id: params.serviceId,
@@ -38,7 +39,7 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
       const extraLabels: Record<string, string> = {};
 
       Object.entries(params)
-        .filter(([field]) => !MAIN_COLUMN.includes(field))
+        .filter(([field]) => !MAIN_COLUMNS.includes(field))
         .forEach(([key, value]: [string, string]) => {
           extraLabels[key] = value;
         });

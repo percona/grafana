@@ -30,6 +30,7 @@ import perconaDBClustersReducer from './dbaas/dbClusters/dbClusters';
 import perconaDBaaSReducer from './dbaas/dbaas';
 import perconaK8SCluster from './dbaas/k8sCluster/k8sCluster';
 import perconaUpdateDBCluster from './dbaas/updateDBCluster/updateDBCluster';
+import nodesReducer from './nodes';
 import rolesReducers from './roles/roles';
 import servicesReducer from './services';
 import tourReducer from './tour/tour';
@@ -295,6 +296,7 @@ export default {
     server: perconaServerReducers,
     templates: templatesReducer,
     services: servicesReducer,
+    nodes: nodesReducer,
     backupLocations: perconaBackupLocations,
     tour: tourReducer,
     roles: rolesReducers,
