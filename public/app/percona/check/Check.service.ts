@@ -129,8 +129,15 @@ export const CheckService = {
       token
     );
   },
-  runDbChecks(token?: CancelToken): Promise<void | {}> {
-    return api.post<{}, {}>('/v1/management/SecurityChecks/Start', {}, false, token);
+  runDbChecks(checkNames: string[], token?: CancelToken): Promise<void | {}> {
+    return api.post<{}, {}>(
+      '/v1/management/SecurityChecks/Start',
+      {
+        names: checkNames,
+      },
+      false,
+      token
+    );
   },
   async getAllChecks(token?: CancelToken): Promise<CheckDetails[]> {
     const response = await api.post<AllChecks, object>('/v1/management/SecurityChecks/List', {}, false, token);

@@ -39,10 +39,20 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
     locationService.push('/advisors');
   }
 
+  const getCheckNamesListInCategory = () => {
+    let checkNames: string[] = [];
+    Object.keys(advisors).forEach((summary) => {
+      advisors[summary].checks.forEach((check) => {
+        checkNames.push(check.name);
+      });
+    });
+    return checkNames;
+  };
+
   const handleRunChecksClick = async () => {
     setRunChecksPending(true);
     try {
-      await CheckService.runDbChecks();
+      await CheckService.runDbChecks(getCheckNamesListInCategory());
       appEvents.emit(AppEvents.alertSuccess, [Messages.checksExecutionStarted]);
     } catch (e) {
       logger.error(e);
