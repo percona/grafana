@@ -1,3 +1,4 @@
+import { logger } from '@percona/platform-core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
@@ -23,11 +24,11 @@ jest.mock('@percona/platform-core', () => {
     },
   };
 });
-//jest.mock('app/percona/check/Check.service');
+jest.mock('app/percona/check/Check.service');
 //jest.mock('app/percona/shared/services/advisors/Advisors.service.ts');
 
 describe('AllChecksTab::', () => {
-  //beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => jest.clearAllMocks());
   // it('should fetch checks at startup', async () => {
   //   const spy = jest.spyOn(CheckService, 'getAllChecks');
   //   render(
@@ -115,122 +116,66 @@ describe('AllChecksTab::', () => {
   //   expect(tbody.querySelectorAll('tr > td')[9]).toHaveTextContent(Messages.enable);
   // });
 
-  // it('should call an API to change the check status when the action button gets clicked', async () => {
-  //   const spy = jest.spyOn(CheckService, 'changeCheck');
-  //   render(
-  //     <Provider
-  //       store={configureStore({
-  //         percona: {
-  //           user: { isAuthorized: true, isPlatformUser: false },
-  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-  //         },
-  //       } as StoreState)}
-  //     >
-  //       <Router history={locationService.getHistory()}>
-  //         <AllChecksTab
-  //           {...getRouteComponentProps({
-  //             match: { params: {}, isExact: true, path: '/test', url: '' },
-  //           })}
-  //         />
-  //       </Router>
-  //     </Provider>
-  //   );
+  it('should call an API to change the check status when the action button gets clicked', async () => {
+    let runChecksSpy = jest.spyOn(CheckService, 'runDbChecks').mockImplementation(async () => ({}));
+    render(<AllChecksTabTesting />);
 
-  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    const text = screen.queryByText(/CVE security/i);
 
-  //   const button = screen.getAllByTestId('check-table-loader-button')[0];
-  //   fireEvent.click(button);
+    await waitFor(() => text);
 
-  //   await waitFor(() => expect(button).toHaveTextContent('Enable'));
+    expect(text).toHaveTextContent(/CVE security/i);
 
-  //   expect(spy).toBeCalledTimes(1);
-  //   expect(spy).toBeCalledWith({ params: [{ name: 'test enabled', disable: true }] });
-  //   spy.mockClear();
-  // });
+    const collabseDiv = screen.getByTestId('collapse-clickable');
 
-  // it('should log an error if the run checks API call fails', async () => {
-  //   jest.spyOn(CheckService, 'runDbChecks').mockImplementationOnce(() => {
-  //     throw Error('test');
-  //   });
-  //   const loggerSpy = jest.spyOn(logger, 'error');
+    expect(collabseDiv).toBeInTheDocument();
 
-  //   render(
-  //     <Provider
-  //       store={configureStore({
-  //         percona: {
-  //           user: { isAuthorized: true, isPlatformUser: false },
-  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-  //         },
-  //       } as StoreState)}
-  //     >
-  //       <Router history={locationService.getHistory()}>
-  //         <AllChecksTab
-  //           {...getRouteComponentProps({
-  //             match: { params: {}, isExact: true, path: '/test', url: '' },
-  //           })}
-  //         />
-  //       </Router>
-  //     </Provider>
-  //   );
+    await waitFor(() => fireEvent.click(collabseDiv));
 
-  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+    const button = screen.getAllByTestId('check-table-loader-button')[0];
+    fireEvent.click(button);
 
-  //   const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
+    screen.debug();
+    //await waitFor(() => expect(button).toHaveTextContent('Enable'));
 
-  //   await waitFor(() => fireEvent.click(runChecksButton));
-  //   fireEvent.click(runChecksButton);
-  //   expect(screen.queryByText('Run Checks')).not.toBeInTheDocument();
+    // expect(runChecksSpy).toBeCalledTimes(1);
+    //expect(runChecksSpy).toBeCalledWith({ params: [{ name: 'test enabled', disable: true }] });
+  });
 
-  //   await waitFor(() => {
-  //     expect(loggerSpy).toBeCalledTimes(1);
-  //   });
+  it('should log an error if the run checks API call fails', async () => {
+    jest.spyOn(CheckService, 'runDbChecks').mockImplementationOnce(() => {
+      throw Error('test');
+    });
+    const loggerSpy = jest.spyOn(logger, 'error');
 
-  //   expect(await screen.findByText('Run Checks')).toBeInTheDocument();
-  // });
+    render(<AllChecksTabTesting />);
+
+    const text = screen.queryByText(/CVE security/i);
+
+    await waitFor(() => text);
+
+    expect(text).toHaveTextContent(/CVE security/i);
+
+    const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
+
+    await waitFor(() => fireEvent.click(runChecksButton));
+
+    await waitFor(() => {
+      expect(loggerSpy).toBeCalledTimes(1);
+    });
+
+    expect(await screen.findByText('Run Checks')).toBeInTheDocument();
+  });
 
   it('should call the API to run checks when the "run checks" button gets clicked', async () => {
     let runChecksSpy = jest.spyOn(CheckService, 'runDbChecks').mockImplementation(async () => ({}));
 
-    const navIndex: NavIndex = {
-      ['advisors-security']: {
-        id: 'advisors-security',
-        text: 'advisors-security',
-        icon: 'list-ul',
-        url: '/advisors/security',
-      },
-    };
-    render(
-      <Provider
-        store={configureStore({
-          percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-            advisors: {
-              loading: false,
-              result: advisorsArray,
-            },
-          },
-          navIndex: navIndex,
-        } as StoreState)}
-      >
-        <Router history={locationService.getHistory()}>
-          <AllChecksTab
-            {...getRouteComponentProps({
-              match: {
-                params: { category: 'security' },
-                isExact: true,
-                path: '/advisors/:category',
-                url: '/advisors/security',
-              },
-            })}
-          />
-        </Router>
-      </Provider>
-    );
-
-    await waitFor(() => screen.getByText(/CVE security/i));
+    render(<AllChecksTabTesting />);
 
     const text = screen.queryByText(/CVE security/i);
+
+    await waitFor(() => text);
+
     expect(text).toHaveTextContent(/CVE security/i);
 
     const runChecksButton = screen.getByRole('button', { name: Messages.runDbChecks });
@@ -247,6 +192,46 @@ describe('AllChecksTab::', () => {
     });
   });
 });
+
+const AllChecksTabTesting = () => {
+  return (
+    <Provider
+      store={configureStore({
+        percona: {
+          user: { isAuthorized: true, isPlatformUser: false },
+          settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+          advisors: {
+            loading: false,
+            result: advisorsArray,
+          },
+        },
+        navIndex: navIndex,
+      } as StoreState)}
+    >
+      <Router history={locationService.getHistory()}>
+        <AllChecksTab
+          {...getRouteComponentProps({
+            match: {
+              params: { category: 'security' },
+              isExact: true,
+              path: '/advisors/:category',
+              url: '/advisors/security',
+            },
+          })}
+        />
+      </Router>
+    </Provider>
+  );
+};
+
+const navIndex: NavIndex = {
+  ['advisors-security']: {
+    id: 'advisors-security',
+    text: 'advisors-security',
+    icon: 'list-ul',
+    url: '/advisors/security',
+  },
+};
 
 const advisorsArray = [
   {

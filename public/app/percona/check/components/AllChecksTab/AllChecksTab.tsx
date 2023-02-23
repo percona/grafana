@@ -10,7 +10,6 @@ import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { CheckService } from 'app/percona/check/Check.service';
 import { CheckDetails, Interval } from 'app/percona/check/types';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
-import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertLocalStorage/AlertLocalStorage';
 import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -36,7 +35,6 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   const { loading: advisorsPending } = useSelector(getAdvisors);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const advisors = categorizedAdvisors[category];
-
   if (navModel.main.id === 'not-found') {
     locationService.push('/advisors');
   }
@@ -168,15 +166,15 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          <AlertLocalStorage
+          {/* <AlertLocalStorage
             title="Upgrade your plan"
             customButtonContent="Upgrade"
             onCustomButtonClick={() => console.log('clicked')}
             uniqueName={'upgradeAlert'}
           >
-            {/* TODO: Add text */}
+           TODO: Add text 
             By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-          </AlertLocalStorage>
+          </AlertLocalStorage> */}
           <div className={styles.wrapper}>
             <div className={styles.header}>
               <h1>Available to you</h1>

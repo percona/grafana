@@ -155,7 +155,7 @@ export const Collapse: FunctionComponent<Props> = ({
 
   return (
     <div className={panelClass}>
-      <div className={cx([headerClass, headerCustomClass])} onClick={onClickToggle}>
+      <div data-testid="collapse-clickable" className={cx([headerClass, headerCustomClass])} onClick={onClickToggle}>
         {collapsible && !disabled && <Icon className={style.icon} name={isOpen ? 'angle-down' : 'angle-right'} />}
         <div className={cx([style.headerLabel, headerLabelCustomClass])}>{label}</div>
       </div>
