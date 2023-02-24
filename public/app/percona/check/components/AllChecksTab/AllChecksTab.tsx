@@ -187,7 +187,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
           </AlertLocalStorage> */}
           <div className={styles.wrapper}>
             <div className={styles.header}>
-              <h1>Available to you</h1>
+              <h1>{Messages.availableHeader}</h1>
               <div className={styles.actionButtons} data-testid="db-check-panel-actions">
                 <LoaderButton
                   type="button"
