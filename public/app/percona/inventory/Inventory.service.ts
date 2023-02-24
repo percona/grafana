@@ -4,7 +4,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { NodeListPayload } from '../shared/services/nodes/Nodes.types';
 
-import { AgentsList, DBServiceList, ServiceListPayload } from './Inventory.types';
+import { DBServiceList, ServiceAgentPayload, ServiceListPayload } from './Inventory.types';
 
 const BASE_URL = `/v1/inventory`;
 
@@ -19,7 +19,7 @@ export interface RemoveNodeBody {
 
 export const InventoryService = {
   getAgents(body = {}, token?: CancelToken) {
-    return api.post<AgentsList, object>(`${BASE_URL}/Agents/List`, body, false, token);
+    return api.post<ServiceAgentPayload, object>(`${BASE_URL}/Agents/List`, body, false, token);
   },
   removeAgent(body: RemoveAgentBody, token?: CancelToken) {
     return api.post<void, object>(`${BASE_URL}/Agents/Remove`, body, false, token);

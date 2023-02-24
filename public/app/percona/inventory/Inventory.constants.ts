@@ -1,20 +1,3 @@
-import { agentsDetailsRender } from './ColumnRenderers';
-
-export const AGENTS_COLUMNS = [
-  {
-    Header: 'ID',
-    accessor: 'agent_id',
-  },
-  {
-    Header: 'Agent Type',
-    accessor: 'type',
-  },
-  {
-    Header: 'Other Details',
-    accessor: agentsDetailsRender,
-  },
-];
-
 export const inventoryTypes = {
   amazon_rds_mysql: 'Amazon RDS MySQL',
   container: 'Container',

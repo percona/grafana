@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 import { CheckboxField, Table, logger } from '@percona/platform-core';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
+import { Column } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Modal, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
-import { InventoryDataService, Model } from 'app/percona/inventory/Inventory.tools';
-import { AgentsList } from 'app/percona/inventory/Inventory.types';
+import { Agent, ServiceAgentPayload } from 'app/percona/inventory/Inventory.types';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { FormElement } from 'app/percona/shared/components/Form';
@@ -17,31 +17,52 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 
 import { appEvents } from '../../../core/app_events';
-import { AGENTS_COLUMNS, GET_AGENTS_CANCEL_TOKEN } from '../Inventory.constants';
+import { GET_AGENTS_CANCEL_TOKEN } from '../Inventory.constants';
 import { InventoryService } from '../Inventory.service';
 
+import { beautifyAgentType, toAgentModel } from './Agents.utils';
 import { getStyles } from './Tabs.styles';
-
-interface Agent {
-  agent_id: string;
-  [key: string]: string;
-}
 
 export const Agents = () => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [data, setData] = useState<Model[]>([]);
+  const [data, setData] = useState<Agent[]>([]);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const navModel = usePerconaNavModel('inventory-agents');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
+  const columns = useMemo(
+    (): Array<Column<Agent>> => [
+      {
+        Header: 'ID',
+        accessor: (row) => row.params.agentId,
+      },
+      {
+        Header: 'Agent Type',
+        accessor: 'type',
+        Cell: ({ value }) => beautifyAgentType(value),
+      },
+      {
+        Header: 'Other Details',
+        accessor: 'params',
+        Cell: ({ value }) => (
+          <TagList
+            className={styles.tagList}
+            tags={Object.keys(value.customLabels || {}).map((label) => `${label}: ${value.customLabels![label]}`)}
+          />
+        ),
+      },
+    ],
+    [styles.tagList]
+  );
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const result: AgentsList = await InventoryService.getAgents(generateToken(GET_AGENTS_CANCEL_TOKEN));
+      const result: ServiceAgentPayload = await InventoryService.getAgents(generateToken(GET_AGENTS_CANCEL_TOKEN));
 
-      setData(InventoryDataService.getAgentModel(result));
+      setData(toAgentModel(result));
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -63,7 +84,7 @@ export const Agents = () => {
         setLoading(true);
         // eslint-disable-next-line max-len
         const requests = agents.map((agent) =>
-          InventoryService.removeAgent({ agent_id: agent.original.agent_id, force: forceMode })
+          InventoryService.removeAgent({ agent_id: agent.original.params.agentId, force: forceMode })
         );
         const results = await processPromiseResults(requests);
 
@@ -157,7 +178,7 @@ export const Agents = () => {
             <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
               <Table
                 // @ts-ignore
-                columns={AGENTS_COLUMNS}
+                columns={columns}
                 data={data}
                 totalItems={data.length}
                 rowSelection

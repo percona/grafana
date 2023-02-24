@@ -69,8 +69,6 @@ export const NodesTab = () => {
   const loadData = useCallback(async () => {
     try {
       await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap();
-      // const result: NodesList = await InventoryService.getNodes(generateToken(GET_NODES_CANCEL_TOKEN));
-      // setData(InventoryDataService.getNodeModel(result));
     } catch (e) {
       if (isApiCancelError(e)) {
         return;

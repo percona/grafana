@@ -38,8 +38,6 @@ export const fetchNodesAction = createAsyncThunk<Node[], { token?: CancelToken }
   'percona/fetchNodes',
   async (params = {}) => {
     const nodes = await InventoryService.getNodes(params.token);
-    console.log(nodes);
-    console.log(toDbNodesModel(nodes));
     return toDbNodesModel(nodes);
   }
 );

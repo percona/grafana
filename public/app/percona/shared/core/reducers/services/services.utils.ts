@@ -41,7 +41,9 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
       Object.entries(params)
         .filter(([field]) => !MAIN_COLUMNS.includes(field))
         .forEach(([key, value]: [string, string]) => {
-          extraLabels[key] = value;
+          if (typeof value !== 'object' || Array.isArray(value)) {
+            extraLabels[key] = value;
+          }
         });
 
       if (!camelCaseParams.customLabels) {

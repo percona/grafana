@@ -1,24 +1,19 @@
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
-import {
-  ContainerDbNode,
-  DbNode,
-  GenericDbNode,
-  Node,
-  NodeListPayload,
-} from 'app/percona/shared/services/nodes/Nodes.types';
+
+import { Agent, AgentType, ServiceAgent, ServiceAgentPayload } from '../Inventory.types';
 
 const MAIN_COLUMNS = ['node_id', 'node_name', 'address', 'custom_labels', 'type'];
 
-export const toDbNodesModel = (nodeList: NodeListPayload): Node[] => {
-  const result: Node[] = [];
+export const toAgentModel = (agentList: ServiceAgentPayload): Agent[] => {
+  const result: Agent[] = [];
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  (Object.keys(nodeList) as Array<keyof NodeListPayload>).forEach((nodeType) => {
-    const nodeParams = nodeList[nodeType];
+  (Object.keys(agentList) as Array<keyof ServiceAgentPayload>).forEach((agentType) => {
+    const agentParams = agentList[agentType];
 
-    nodeParams?.forEach((params) => {
+    agentParams?.forEach((params) => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <DbNode & GenericDbNode & ContainerDbNode>payloadToCamelCase(params);
+      const camelCaseParams = <ServiceAgent>payloadToCamelCase(params);
       const extraLabels: Record<string, string> = {};
 
       Object.entries(params)
@@ -33,10 +28,14 @@ export const toDbNodesModel = (nodeList: NodeListPayload): Node[] => {
         camelCaseParams.customLabels = {};
       }
 
+      if (params.username) {
+        camelCaseParams.customLabels.password = '******';
+      }
+
       camelCaseParams.customLabels = { ...camelCaseParams.customLabels, ...extraLabels };
 
       result.push({
-        type: nodeType,
+        type: agentType,
         params: camelCaseParams,
       });
     });
@@ -44,3 +43,6 @@ export const toDbNodesModel = (nodeList: NodeListPayload): Node[] => {
 
   return result;
 };
+
+export const beautifyAgentType = (type: AgentType): string =>
+  type.replace(/^\w/, (c) => c.toUpperCase()).replace(/[_-]/g, ' ');

@@ -14,7 +14,7 @@ export interface Service {
 
 export type DBServiceList = { [key in Databases]?: Service[] };
 
-export enum InventoryType {
+export enum AgentType {
   amazonRdsMysql = 'amazon_rds_mysql',
   container = 'container',
   externalExporter = 'externalExporter',
@@ -40,17 +40,24 @@ export enum InventoryType {
   vmAgent = 'vm_agent',
 }
 
-export type InventoryNode = {};
-
-export type InventoryList = {
-  [key in InventoryType]: InventoryNode[];
+export type ServiceAgentPayload = {
+  [key in AgentType]: Array<{
+    agent_id: string;
+    custom_labels?: Record<string, string>;
+    // We don't need to care about all the other fields for now
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  }>;
 };
 
-export type NodesList = InventoryList;
+export interface ServiceAgent {
+  agentId: string;
+  customLabels?: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
 
-export type AgentsList = InventoryList;
-
-export interface CustomLabel {
-  key: string;
-  value: string;
+export interface Agent {
+  type: AgentType;
+  params: ServiceAgent;
 }
