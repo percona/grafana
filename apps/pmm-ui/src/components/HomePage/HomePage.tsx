@@ -79,9 +79,11 @@ export const HomePage: FC<HomePageProps> = ({ onHelpCenterLinkClick, onGettingSt
 const getStyles = (theme: GrafanaTheme2) => ({
   welcomePage: css`
     background: ${theme.colors.background.canvas};
+    padding: 16px 16px 24px;
   `,
   introContainer: css`
     background: ${theme.colors.background.canvas};
+    padding: 16px 16px 24px;
   `,
   introHeader: css`
     width: 680px;
@@ -119,6 +121,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
   actionsContainer: css`
     background: ${theme.colors.background.canvas};
-    margin-top: 25px;
+    padding: 16px 16px 24px;
   `,
 });
