@@ -5,6 +5,7 @@ import { Form } from 'react-final-form';
 import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
+import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -87,6 +88,10 @@ export const Services = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onAddService = useCallback(() => {
+    locationService.push('/add-instance');
+  }, []);
+
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,85 +129,82 @@ export const Services = () => {
     <OldPage navModel={navModel}>
       <OldPage.Contents>
         <FeatureLoader>
-          <div className={styles.tableWrapper}>
-            <div className={styles.actionPanel}>
-              <Button
-                size="md"
-                disabled={selected.length === 0}
-                onClick={() => {
-                  setModalVisible(!modalVisible);
-                }}
-                icon="trash-alt"
-                variant="destructive"
-                className={styles.destructiveButton}
-              >
-                Delete
-              </Button>
-            </div>
-            <Modal
-              title={
-                <div className="modal-header-title">
-                  <span className="p-l-1">Confirm action</span>
-                </div>
-              }
-              isOpen={modalVisible}
-              onDismiss={() => setModalVisible(false)}
+          <HorizontalGroup height={40} justify="flex-end" align="flex-start">
+            <Button
+              size="md"
+              disabled={selected.length === 0}
+              onClick={() => {
+                setModalVisible(!modalVisible);
+              }}
+              icon="trash-alt"
+              variant="destructive"
             >
-              <Form
-                onSubmit={() => {}}
-                render={({ form, handleSubmit }) => (
-                  <form onSubmit={handleSubmit}>
-                    <>
-                      <h4 className={styles.confirmationText}>
-                        Are you sure that you want to permanently delete {selected.length}{' '}
-                        {selected.length === 1 ? 'service' : 'services'}?
-                      </h4>
-                      <FormElement
-                        dataTestId="form-field-force"
-                        label="Force mode"
-                        element={
-                          <CheckboxField label="Force mode is going to delete all associated agents" name="force" />
-                        }
-                      />
-                      <HorizontalGroup justify="space-between" spacing="md">
-                        <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                          Cancel
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="md"
-                          onClick={() => {
-                            removeServices(selected, form.getState().values.force);
-                            setModalVisible(false);
-                          }}
-                          className={styles.destructiveButton}
-                        >
-                          Proceed
-                        </Button>
-                      </HorizontalGroup>
-                    </>
-                  </form>
-                )}
-              />
-            </Modal>
-            <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
-              <Table
-                // @ts-ignore
-                columns={columns}
-                data={services}
-                totalItems={services.length}
-                rowSelection
-                onRowSelection={handleSelectionChange}
-                showPagination
-                pageSize={25}
-                allRowsSelectionMode="page"
-                emptyMessage="No services Available"
-                emptyMessageClassName={styles.emptyMessage}
-                pendingRequest={isLoading}
-                overlayClassName={styles.overlay}
-              />
-            </div>
-          </div>
+              Delete
+            </Button>
+            <Button icon="plus" onClick={onAddService}>
+              Add Service
+            </Button>
+          </HorizontalGroup>
+          <Modal
+            title={
+              <div className="modal-header-title">
+                <span className="p-l-1">Confirm action</span>
+              </div>
+            }
+            isOpen={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+          >
+            <Form
+              onSubmit={() => {}}
+              render={({ form, handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
+                  <>
+                    <h4 className={styles.confirmationText}>
+                      Are you sure that you want to permanently delete {selected.length}{' '}
+                      {selected.length === 1 ? 'service' : 'services'}?
+                    </h4>
+                    <FormElement
+                      dataTestId="form-field-force"
+                      label="Force mode"
+                      element={
+                        <CheckboxField label="Force mode is going to delete all associated agents" name="force" />
+                      }
+                    />
+                    <HorizontalGroup justify="space-between" spacing="md">
+                      <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="md"
+                        onClick={() => {
+                          removeServices(selected, form.getState().values.force);
+                          setModalVisible(false);
+                        }}
+                      >
+                        Proceed
+                      </Button>
+                    </HorizontalGroup>
+                  </>
+                </form>
+              )}
+            />
+          </Modal>
+          <Table
+            // @ts-ignore
+            columns={columns}
+            data={services}
+            totalItems={services.length}
+            rowSelection
+            onRowSelection={handleSelectionChange}
+            showPagination
+            pageSize={25}
+            allRowsSelectionMode="page"
+            emptyMessage="No services Available"
+            emptyMessageClassName={styles.emptyMessage}
+            pendingRequest={isLoading}
+            overlayClassName={styles.overlay}
+          />
         </FeatureLoader>
       </OldPage.Contents>
     </OldPage>

@@ -125,82 +125,75 @@ export const NodesTab = () => {
     <OldPage navModel={navModel}>
       <OldPage.Contents>
         <FeatureLoader>
-          <div className={styles.tableWrapper}>
-            <div className={styles.actionPanel}>
-              <Button
-                size="md"
-                disabled={selected.length === 0}
-                onClick={() => {
-                  setModalVisible(!modalVisible);
-                }}
-                icon="trash-alt"
-                variant="destructive"
-                className={styles.destructiveButton}
-              >
-                Delete
-              </Button>
-            </div>
-            <Modal
-              title={
-                <div className="modal-header-title">
-                  <span className="p-l-1">Confirm action</span>
-                </div>
-              }
-              isOpen={modalVisible}
-              onDismiss={() => setModalVisible(false)}
+          <div className={styles.actionPanel}>
+            <Button
+              size="md"
+              disabled={selected.length === 0}
+              onClick={() => {
+                setModalVisible(!modalVisible);
+              }}
+              icon="trash-alt"
+              variant="destructive"
             >
-              <Form
-                onSubmit={proceed}
-                render={({ handleSubmit }) => (
-                  <form onSubmit={handleSubmit}>
-                    <>
-                      <h4 className={styles.confirmationText}>
-                        Are you sure that you want to permanently delete {selected.length}{' '}
-                        {selected.length === 1 ? 'node' : 'nodes'}?
-                      </h4>
-                      <FormElement
-                        dataTestId="form-field-force"
-                        label="Force mode"
-                        element={
-                          <CheckboxField
-                            name="force"
-                            label={
-                              'Force mode is going to delete all ' + 'agents and services associated with the nodes'
-                            }
-                          />
-                        }
-                      />
-                      <HorizontalGroup justify="space-between" spacing="md">
-                        <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                          Cancel
-                        </Button>
-                        <Button type="submit" size="md" variant="destructive" className={styles.destructiveButton}>
-                          Proceed
-                        </Button>
-                      </HorizontalGroup>
-                    </>
-                  </form>
-                )}
-              />
-            </Modal>
-            <div className={styles.tableInnerWrapper} data-testid="table-inner-wrapper">
-              <Table
-                // @ts-ignore
-                columns={columns}
-                data={nodes}
-                totalItems={nodes.length}
-                rowSelection
-                onRowSelection={handleSelectionChange}
-                showPagination
-                pageSize={25}
-                allRowsSelectionMode="page"
-                emptyMessage="No nodes Available"
-                emptyMessageClassName={styles.emptyMessage}
-                pendingRequest={isLoading}
-                overlayClassName={styles.overlay}
-              />
-            </div>
+              Delete
+            </Button>
           </div>
+          <Modal
+            title={
+              <div className="modal-header-title">
+                <span className="p-l-1">Confirm action</span>
+              </div>
+            }
+            isOpen={modalVisible}
+            onDismiss={() => setModalVisible(false)}
+          >
+            <Form
+              onSubmit={proceed}
+              render={({ handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
+                  <>
+                    <h4 className={styles.confirmationText}>
+                      Are you sure that you want to permanently delete {selected.length}{' '}
+                      {selected.length === 1 ? 'node' : 'nodes'}?
+                    </h4>
+                    <FormElement
+                      dataTestId="form-field-force"
+                      label="Force mode"
+                      element={
+                        <CheckboxField
+                          name="force"
+                          label={'Force mode is going to delete all ' + 'agents and services associated with the nodes'}
+                        />
+                      }
+                    />
+                    <HorizontalGroup justify="space-between" spacing="md">
+                      <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" size="md" variant="destructive">
+                        Proceed
+                      </Button>
+                    </HorizontalGroup>
+                  </>
+                </form>
+              )}
+            />
+          </Modal>
+          <Table
+            // @ts-ignore
+            columns={columns}
+            data={nodes}
+            totalItems={nodes.length}
+            rowSelection
+            onRowSelection={handleSelectionChange}
+            showPagination
+            pageSize={25}
+            allRowsSelectionMode="page"
+            emptyMessage="No nodes Available"
+            emptyMessageClassName={styles.emptyMessage}
+            pendingRequest={isLoading}
+            overlayClassName={styles.overlay}
+          />
         </FeatureLoader>
       </OldPage.Contents>
     </OldPage>
