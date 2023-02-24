@@ -1,5 +1,5 @@
 import { logger } from '@percona/platform-core';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
@@ -25,99 +25,94 @@ jest.mock('@percona/platform-core', () => {
   };
 });
 jest.mock('app/percona/check/Check.service');
-//jest.mock('app/percona/shared/services/advisors/Advisors.service.ts');
+jest.mock('app/percona/shared/services/advisors/Advisors.service.ts');
 
 describe('AllChecksTab::', () => {
   beforeEach(() => jest.clearAllMocks());
-  // it('should fetch checks at startup', async () => {
-  //   const spy = jest.spyOn(CheckService, 'getAllChecks');
-  //   render(
-  //     <Provider
-  //       store={configureStore({
-  //         percona: {
-  //           user: { isAuthorized: true, isPlatformUser: false },
-  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-  //         },
-  //       } as StoreState)}
-  //     >
-  //       <Router history={locationService.getHistory()}>
-  //         <AllChecksTab
-  //           {...getRouteComponentProps({
-  //             match: { params: {}, isExact: true, path: '/test', url: '' },
-  //           })}
-  //         />
-  //       </Router>
-  //     </Provider>
-  //   );
+  afterEach(() => {
+    cleanup();
+  });
 
-  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
+  it('should render a table in category', async () => {
+    render(<AllChecksTabTesting />);
 
-  //   expect(spy).toBeCalledTimes(1);
-  // });
+    const text = screen.queryByText(/CVE security/i);
 
-  // it('should render a spinner at startup, while loading', async () => {
-  //   render(
-  //     <Provider
-  //       store={configureStore({
-  //         percona: {
-  //           user: { isAuthorized: true, isPlatformUser: false },
-  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-  //         },
-  //       } as StoreState)}
-  //     >
-  //       <Router history={locationService.getHistory()}>
-  //         <AllChecksTab
-  //           {...getRouteComponentProps({
-  //             match: { params: {}, isExact: true, path: '/test', url: '' },
-  //           })}
-  //         />
-  //       </Router>
-  //     </Provider>
-  //   );
+    await waitFor(() => text);
 
-  //   expect(screen.queryByTestId('table-loading')).toBeInTheDocument();
-  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
-  //   expect(screen.queryByTestId('spinner-wrapper')).not.toBeInTheDocument();
-  // });
+    expect(text).toHaveTextContent(/CVE security/i);
 
-  // it('should render a table', async () => {
-  //   render(
-  //     <Provider
-  //       store={configureStore({
-  //         percona: {
-  //           user: { isAuthorized: true, isPlatformUser: false },
-  //           settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
-  //         },
-  //       } as StoreState)}
-  //     >
-  //       <Router history={locationService.getHistory()}>
-  //         <AllChecksTab
-  //           {...getRouteComponentProps({
-  //             match: { params: {}, isExact: true, path: '/test', url: '' },
-  //           })}
-  //         />
-  //       </Router>
-  //     </Provider>
-  //   );
+    const collabseDiv = screen.getByTestId('collapse-clickable');
 
-  //   await waitForElementToBeRemoved(() => screen.getByTestId('table-loading'));
-  //   const tbody = screen.getByTestId('table-tbody');
+    expect(collabseDiv).toBeInTheDocument();
 
-  //   expect(tbody.querySelectorAll('tr > td')).toHaveLength(2 * 5);
-  //   expect(tbody.querySelectorAll('tr > td')[0]).toHaveTextContent('Test');
-  //   expect(tbody.querySelectorAll('tr > td')[1]).toHaveTextContent('test enabled description');
-  //   expect(tbody.querySelectorAll('tr > td')[2]).toHaveTextContent(Messages.enabled);
-  //   expect(tbody.querySelectorAll('tr > td')[3]).toHaveTextContent(Interval.STANDARD);
-  //   expect(tbody.querySelectorAll('tr > td')[4]).toHaveTextContent(Messages.disable);
-  //   expect(tbody.querySelectorAll('tr > td')[5]).toHaveTextContent('Test disabled');
-  //   expect(tbody.querySelectorAll('tr > td')[6]).toHaveTextContent('test disabled description');
-  //   expect(tbody.querySelectorAll('tr > td')[7]).toHaveTextContent(Messages.disabled);
-  //   expect(tbody.querySelectorAll('tr > td')[8]).toHaveTextContent(Interval.RARE);
-  //   expect(tbody.querySelectorAll('tr > td')[9]).toHaveTextContent(Messages.enable);
-  // });
+    await waitFor(() => fireEvent.click(collabseDiv));
+
+    expect(screen.getByText('MongoDB CVE Version')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'This check returns errors if MongoDB or Percona Server for MongoDB version is less than the latest one with CVE fixes.'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('should render a table in different category', async () => {
+    const navIndex: NavIndex = {
+      ['advisors-configuration']: {
+        id: 'advisors-configuration',
+        text: 'advisors-configuration',
+        icon: 'list-ul',
+        url: '/advisors/configuration',
+      },
+    };
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true, isPlatformUser: false },
+            settings: { result: { sttEnabled: true, isConnectedToPortal: false } },
+            advisors: {
+              loading: false,
+              result: advisorsArray,
+            },
+          },
+          navIndex: navIndex,
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <AllChecksTab
+            {...getRouteComponentProps({
+              match: {
+                params: { category: 'configuration' },
+                isExact: true,
+                path: '/advisors/:category',
+                url: '/advisors/configuration',
+              },
+            })}
+          />
+        </Router>
+      </Provider>
+    );
+
+    const text = screen.queryByText(/Version configuration/i);
+
+    await waitFor(() => text);
+
+    expect(text).toHaveTextContent(/Version configuration/i);
+
+    const collabseDiv = screen.getByTestId('collapse-clickable');
+
+    expect(collabseDiv).toBeInTheDocument();
+
+    await waitFor(() => fireEvent.click(collabseDiv));
+
+    expect(screen.getByText('PostgreSQL Version')).toBeInTheDocument();
+    expect(screen.getByText('MySQL Version')).toBeInTheDocument();
+  });
 
   it('should call an API to change the check status when the action button gets clicked', async () => {
-    let runChecksSpy = jest.spyOn(CheckService, 'runDbChecks').mockImplementation(async () => ({}));
+    let runChecksSpy = jest.spyOn(CheckService, 'changeCheck');
     render(<AllChecksTabTesting />);
 
     const text = screen.queryByText(/CVE security/i);
@@ -133,13 +128,12 @@ describe('AllChecksTab::', () => {
     await waitFor(() => fireEvent.click(collabseDiv));
 
     const button = screen.getAllByTestId('check-table-loader-button')[0];
-    fireEvent.click(button);
+    expect(button).toBeInTheDocument();
 
-    screen.debug();
-    //await waitFor(() => expect(button).toHaveTextContent('Enable'));
+    await waitFor(() => fireEvent.click(button));
 
-    // expect(runChecksSpy).toBeCalledTimes(1);
-    //expect(runChecksSpy).toBeCalledWith({ params: [{ name: 'test enabled', disable: true }] });
+    expect(runChecksSpy).toBeCalledTimes(1);
+    expect(runChecksSpy).toBeCalledWith({ params: [{ name: 'mongodb_cve_version', disable: true }] });
   });
 
   it('should log an error if the run checks API call fails', async () => {
