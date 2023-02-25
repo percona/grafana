@@ -69,7 +69,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     line-height: 21px;
     letter-spacing: 0.01071em;
     linear-gradient(0deg, #0E1A53, #0E1A53),
-  width: 100 %;
+    width: 100%;
     max-height: 15em;
   `,
   text: css`
