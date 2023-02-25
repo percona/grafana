@@ -45,23 +45,8 @@ export function GrafanaRoute(props: Props) {
   //TODO:WIP:
   const [_, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
-  const nav = (
-    <PmmUi.NavBar
-      title="Percona monitoring and management"
-      userContext={userContext}
-      showSignIn
-      // showFeedbackButton
-      showHelpCenterButton
-      showHelpCenterNotificationMarker
-      onSignInClick={() => {
-        setMessage('sign in');
-        setUserContext('something_here');
-      }}
-      onHelpCenterClick={() => setMessage('help center')}
-      onNotificationClick={() => setMessage('notification')}
-      onFeedbackClick={() => setMessage('feedback form')}
-    />
-  );
+  const [isHelpCenterOpen, setIsHelpCenterOpen] = useState(false);
+
   return (
     <ErrorBoundary>
       {({ error, errorInfo }) => {
@@ -72,17 +57,34 @@ export function GrafanaRoute(props: Props) {
         return (
           <Suspense fallback={<GrafanaRouteLoading />}>
             <>
-              {nav}
+              <PmmUi.NavBar
+                title="Percona monitoring and management"
+                userContext={userContext}
+                showSignIn
+                // showFeedbackButton
+                showHelpCenterButton
+                showHelpCenterNotificationMarker
+                onSignInClick={() => {
+                  setMessage('sign in');
+                  setUserContext('something_here');
+                }}
+                onHelpCenterClick={() => setIsHelpCenterOpen(!isHelpCenterOpen)}
+                onNotificationClick={() => setMessage('notification')}
+                onFeedbackClick={() => setMessage('feedback form')}
+              />
+              <PmmUi.HelpCenter open={isHelpCenterOpen} onClose={() => setIsHelpCenterOpen(false)} width="416px" />
               {/*TODO:WIP: refactor*/}
-              {props.location.pathname === '/a/pmm-homescreen-app' ? (
-                <Suspense fallback={<div></div>}>
-                  <>
-                    <PmmUi.HomePage />
-                  </>
-                </Suspense>
-              ) : (
-                <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} />
-              )}
+              <div style={{"width": isHelpCenterOpen ? 'calc(100% - 430px)' : '100%'}}>
+                {props.location.pathname === '/a/pmm-homescreen-app' ? (
+                  <Suspense fallback={<div></div>}>
+                    <>
+                      <PmmUi.HomePage />
+                    </>
+                  </Suspense>
+                ) : (
+                  <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} />
+                )}
+              </div>
             </>
           </Suspense>
         );
