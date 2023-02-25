@@ -58,14 +58,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
     flex: 1 0 auto;
     height: calc(100% - 80px);
     top: 56px;
-    display: flex;
-    outline: 0;
-    z-index: 1200;
     position: fixed;
     box-sizing: border-box;
     overflow-y: auto;
     border-left: none;
-    flex-direction: column;
     background-color: ${theme.colors.background.canvas};
   `,
   container: css`
