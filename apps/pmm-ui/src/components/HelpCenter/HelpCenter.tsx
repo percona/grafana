@@ -7,7 +7,10 @@ import { LoggedInTips } from './components/TipsContainer/LoggedInTips';
 import { ResourcesContainer } from './components/ResourcesContainer';
 
 interface HelpCenterProps {
+  open: boolean;
   onClose: () => void;
+
+  width: string;
 }
 
 type TabName = 'tips' | 'resources' | 'wnatsnew';
@@ -15,7 +18,7 @@ type TabName = 'tips' | 'resources' | 'wnatsnew';
 export const HelpCenter: FC<HelpCenterProps> = (props) => {
   const [activeTab, setActiveTab] = useState<TabName>('tips');
 
-  const { onClose } = props;
+  const { open, onClose, width } = props;
   const styles = useStyles2(getStyles);
 
   const changeTab = (tab: TabName) => {
@@ -26,9 +29,9 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
   };
 
   return (
-    <div className={styles.drawer}>
+    <div className={styles.drawer} style={{ visibility: open ? 'visible' : 'hidden', width: width }}>
       <div className={styles.indentContainer} />
-      <div className={styles.container} style={{ height: '100%' }}>
+      <div className={styles.container}>
         <div className={styles.headerRow}>
           <h3 className={styles.helpCenterHeader}>Help center</h3>
           <div className="flex-grow-1" />
@@ -38,7 +41,6 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
           <TabsBar>
             <Tab label="Tips" active={activeTab === 'tips'} onChangeTab={changeTab('tips')} />
             <Tab label="Resources" active={activeTab === 'resources'} onChangeTab={changeTab('resources')} />
-            <Tab label={"What's new"} active={activeTab === 'wnatsnew'} onChangeTab={changeTab('wnatsnew')} />
           </TabsBar>
         </TabsBar>
         {activeTab === 'tips' && <LoggedInTips />}
@@ -54,9 +56,8 @@ const getStyles = (theme: GrafanaTheme2) => ({
     left: auto;
     right: 0;
     flex: 1 0 auto;
-    width: 416px;
     height: calc(100% - 80px);
-    top: 80px;
+    top: 56px;
     display: flex;
     outline: 0;
     z-index: 1200;
@@ -65,7 +66,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     overflow-y: auto;
     border-left: none;
     flex-direction: column;
-    background-color: ${theme.colors.background.primary};
+    background-color: ${theme.colors.background.canvas};
   `,
   container: css`
     padding-left: 16px;
