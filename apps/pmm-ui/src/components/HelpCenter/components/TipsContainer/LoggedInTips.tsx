@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css, keyframes } from '@emotion/css';
-import { useStyles2 } from '@grafana/ui';
+import {IconName, useStyles2} from '@grafana/ui';
 import { Tip } from '../Tip';
 import tipsData from './data/tips.json';
 
@@ -31,9 +31,12 @@ export const LoggedInTips: FC = () => {
             title={t.title}
             number={t.id}
             buttonText={t.buttonText}
+            buttonIcon={t.buttonIcon as IconName}
+            buttonTooltipText={t.buttonTooltipText}
             tipText={t.text}
-            onClick={() => setTip(t.id)}
-            active={tip === t.id}
+            onClick={ !t.completed ? () => setTip(t.id) : () => {} }
+            completed={t.completed}
+            opened={tip === t.id}
           />
         ))}
       </div>

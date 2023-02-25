@@ -1,32 +1,64 @@
 import React, { FC } from 'react';
-import { Button, useStyles2 } from '@grafana/ui';
+import {Button, IconName, Tooltip, useStyles2} from '@grafana/ui';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
+import checkMarkImg from '../../assets/check-mark.svg';
 
 interface TipProps {
   title: string;
   number?: number;
   tipText?: string;
   buttonText?: string;
-  active: boolean;
+  buttonIcon?: IconName;
+  buttonTooltipText?: string;
+  opened: boolean;
+  completed?: boolean;
   onClick?: () => void;
 }
 
 export const Tip: FC<TipProps> = (props) => {
-  const { title, number, tipText, buttonText, active, onClick } = props;
+  const {
+    title,
+    number,
+    tipText,
+    opened,
+    onClick,
+    completed,
+    buttonText,
+    buttonIcon,
+    buttonTooltipText,
+  } = props;
   const styles = useStyles2(getStyles);
 
+  let active: boolean = opened && !completed;
   return (
     <div className={`${styles.tipContainer} ${!active ? styles.tipContainerNoPadding : ''}`}>
       <div className={`${styles.tipHeader} ${!active ? styles.tipPointer : ''}`} onClick={onClick}>
-        <div className={active ? styles.tipNumberActive : styles.tipNumberNotActive}>{number}</div>
-        <div className={styles.tipTitle}>{title}</div>
+        <div className={`${styles.tipNumber} ${completed ? styles.tipNumberCompleted : (active ? styles.tipNumberActive : styles.tipNumberNotActive)}`}>
+          {completed &&
+            <img
+              alt="tip-check-mark"
+              src={checkMarkImg}
+            />
+          }
+          {!completed && number}
+        </div>
+        <div className={`${styles.tipTitle} ${completed ? styles.tipTitleCompleted : ''}`}>{title}</div>
       </div>
       <div className={`${styles.tipBody} ${!active ? styles.tipBodyHidden : ''}`}>
         <div className={styles.tipText}>{tipText}</div>
-        <Button variant="secondary" size="md" type="button">
-          {buttonText}
-        </Button>
+        {buttonTooltipText ?
+          <Tooltip content={buttonTooltipText} placement="top" interactive={true}>
+            <Button variant="secondary" size="md" type="button" icon={buttonIcon}>
+              {buttonText}
+            </Button>
+          </Tooltip>
+
+          : <Button variant="secondary" size="md" type="button" icon={buttonIcon}>
+            {buttonText}
+          </Button>
+
+        }
       </div>
     </div>
   );
@@ -58,7 +90,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     gap: 8px;
   `,
-  tipNumberActive: css`
+  tipNumber: css`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -69,28 +101,20 @@ const getStyles = (theme: GrafanaTheme2) => ({
     width: 28px;
     height: 28px;
 
-    background-color: #f8d06b;
     font-weight: 700;
     font-size: 18px;
+  `,
+  tipNumberActive: css`
+    background-color: #f8d06b;
     color: #111217;
-
     transition: background-color 225ms linear;
   `,
   tipNumberNotActive: css`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-
-    width: 28px;
-    height: 28px;
-
     border: 2px solid ${theme.colors.border.weak};
-    border-radius: 2px;
-    font-weight: 700;
-    font-size: 18px;
     color: ${theme.colors.text.primary};
+  `,
+  tipNumberCompleted: css`
+    background-color: rgba(108, 207, 142, 0.15);
   `,
   tipTitle: css`
     font-weight: 400;
@@ -102,6 +126,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  `,
+  tipTitleCompleted: css`
+    text-decoration: line-through;
+    opacity: 0.67;
   `,
   tipBody: css`
     padding: 16px 16px 0;
