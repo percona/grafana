@@ -8,6 +8,7 @@ import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { ExpandAndActionsCol } from 'app/percona/shared/components/Elements/ExpandAndActionsCol/ExpandAndActionsCol';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { FormElement } from 'app/percona/shared/components/Form';
@@ -62,17 +63,11 @@ export const Services = () => {
         accessor: (row) => row.params.port,
       },
       {
-        Header: 'Labels',
-        accessor: 'params',
-        Cell: ({ value }) => (
-          <TagList
-            className={styles.tagList}
-            tags={Object.keys(value.customLabels || {}).map((label) => `${label}: ${value.customLabels![label]}`)}
-          />
-        ),
+        Header: 'Actions',
+        Cell: ({ row }: { row: Row<Service> }) => <ExpandAndActionsCol row={row} />,
       },
     ],
-    [styles.tagList]
+    []
   );
 
   const loadData = useCallback(async () => {
@@ -124,6 +119,21 @@ export const Services = () => {
   const handleSelectionChange = useCallback((rows: Array<Row<{}>>) => {
     setSelectedRows(rows);
   }, []);
+
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<Service>) => (
+      <>
+        <span>Labels</span>
+        <TagList
+          className={styles.tagList}
+          tags={Object.keys(row.original.params.customLabels || {}).map(
+            (label) => `${label}=${row.original.params.customLabels![label]}`
+          )}
+        />
+      </>
+    ),
+    [styles.tagList]
+  );
 
   return (
     <OldPage navModel={navModel}>
@@ -204,6 +214,7 @@ export const Services = () => {
             emptyMessageClassName={styles.emptyMessage}
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
+            renderExpandedRow={renderSelectedSubRow}
           />
         </FeatureLoader>
       </OldPage.Contents>
