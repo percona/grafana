@@ -21,7 +21,6 @@ If you are using IntelliJ IDEA. You need to open `apps` directory as project, so
 You can add parent `grafana`, if you want to work with it in one project. But only apps dependency modules will be resolved
 correctly. If you want to work in both of them you need to open them separatly.
 
-
 ## 2.1: FrontEnd Components
 
 ### 2.1.1: Grafana
@@ -63,7 +62,7 @@ make grafana-update #recompile, replace and start as grafana service
 
 To debug Grafana Server, it has to be first compiled with debug symbols (e.g. by running `make grafana-update`).
 
-For ARM architecture (Apple M1/M2 CPUs), you should run native image, when running AMD64 in emulation debugging will not work. 
+For ARM architecture (Apple ARM CPUs), you should run native image, when running AMD64 in emulation debugging will not work.
 
 ```shell
 make grafana-debug
