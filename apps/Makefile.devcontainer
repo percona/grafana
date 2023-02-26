@@ -1,9 +1,19 @@
 include ./apps/Makefile.include
 include ./apps/Makefile.root
 
+LDFLAGS=-dev
+##@ Percona
+
+.PHONY: grafana-clear
+grafana-clear: ## Cleanup compiled binaries
+	rm -rf ./bin
+
 .PHONY: run-server
-run-server: build-server
+grafana-update: grafana-clear build-server ## Recompile Grafana Server, replace and start
 	supervisorctl stop grafana
 	cp $(shell find ./bin -name "grafana-server") /usr/sbin/grafana-server
 	supervisorctl start grafana &
 	supervisorctl tail -f grafana
+
+grafana-debug:						## Attache Delve debugger to Grafana Server
+	dlv --listen=:2350 --log --headless --api-version=2 --accept-multiclient attach $(shell pgrep grafana)
