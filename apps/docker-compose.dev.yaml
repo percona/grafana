@@ -43,10 +43,22 @@ services:
       - pmm.localhost:${PORTAL_PMM_HOST:-host-gateway}
       - check-dev.percona.com:${PORTAL_PMM_HOST:-host-gateway}
 
+    # for delve
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    # see https://github.com/golang/go/wiki/LinuxKernelSignalVectorBug#what-to-do
+    ulimits:
+      memlock: 67108864
+
     ports:
       - ${PMM_PORT_HTTP:-80}:80
       - ${PMM_PORT_HTTPS:-443}:443
+      # grafana debug
+      - "2350:2350"
     volumes:
+      - ./.config/grafana.ini:/etc/grafana/grafana.ini
       - ../:/workspace
       - ./Makefile.devcontainer:/workspace/Makefile
       - ../Makefile:/workspace/apps/Makefile.root
