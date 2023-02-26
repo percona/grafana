@@ -1,9 +1,8 @@
 ## 1: Preparation
 
-Clone repository and prepare environment:
+Clone repository and prepare environment, execute in `apps` directory:
 
 ```shell
-cd ./apps/
 make init
 cp .env.example .env
 ```
