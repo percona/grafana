@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="grafana-server" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="grafana" />
+    <parameters value="-packaging=dev --config=./apps/.config/grafana/grafana.ini --homepath=./apps/.config/grafana/workdir cfg:app_mode=development cfg:default.paths.data=./data cfg:default.paths.plugins=./apps/.config/grafana/plugins cfg:default.paths.logs=./apps/logs cfg:default.log.mode=console cfg:default.log.console.format=console cfg:default.server.root_url=&quot;http://localhost/graph&quot;" />
+    <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="GO_BUILD_DEV" value="1" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="github.com/grafana/grafana/pkg/cmd/grafana-server" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/pkg/cmd/grafana-server/main.go" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -7,6 +7,10 @@ init:								## Prepares local development environment.
 dev:								## Starts local development.
 	make env-down; \
 	make env-up; \
+	find ./.config/grafana/plugins ! -name '.gitkeep' -type f -exec rm -f {} +; \
+	docker cp pmm-grafana-dev:/srv/grafana/plugins/. ./.config/grafana/plugins/; \
+	find ./.config/grafana/percona-dashboards ! -name '.gitkeep' -type f -exec rm -f {} +; \
+	docker cp pmm-grafana-dev:/usr/share/percona-dashboards/. ./.config/grafana/percona-dashboards/; \
 	yarn start
 
 env-up:								## Starts devcontainer.

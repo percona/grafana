@@ -1,3 +1,12 @@
+# Intro
+
+This guide will help you run core grafana components:
+
+- Grafana Server
+- Grafana FrontendEnd
+- PMM-UI micro-frontend
+- PMM devcontainer for the rest of components
+
 ## 1: Preparation
 
 Clone repository and prepare environment, execute in `apps` directory:
@@ -15,7 +24,7 @@ Example:
 PMM_CONTAINER=ritbl/pmm-x:v2.33.0-3
 ```
 
-# 2: Development
+# 2: Run core components
 
 If you are using IntelliJ IDEA. You need to open `apps` directory as project, so that modules resolved correctly.
 You can add parent `grafana`, if you want to work with it in one project. But only apps dependency modules will be resolved
@@ -47,26 +56,6 @@ Navigate to grafana `http:localhost/`
 
 ### 2.2.1: Grafana Server
 
-Following needs to be executed only once, container recreated (e.g. if you executed `make dev` or after clean container start):
+Following needs to be executed after frontend components (`make dev` configures configs used by server components):
 
-```shell
-make env # run it if not in container
-make build-go
-```
-
-To recompile Grafana Server and run:
-
-```shell
-make env # run it if not in container
-make grafana-update #recompile, replace and start as grafana service
-```
-
-To debug Grafana Server, it has to be first compiled with debug symbols (e.g. by running `make grafana-update`).
-
-For ARM architecture (Apple ARM CPUs), you should run native image, when running AMD64 in emulation debugging will not work.
-
-```shell
-make grafana-debug
-```
-
-Next, connect to debugger with `go remote` debug session in IDE, connect to port `2350`.
+Run `grafana-server` run configuration from IntelliJ Idea.
