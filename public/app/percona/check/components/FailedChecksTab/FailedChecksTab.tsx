@@ -89,15 +89,6 @@ export const FailedChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          {/* <AlertLocalStorage
-            title="Upgrade your plan"
-            customButtonContent="Upgrade"
-            onCustomButtonClick={() => console.log('clicked')}
-            uniqueName={'upgradeAlert'}
-          >
-            TODO: Add text
-            By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-          </AlertLocalStorage> */}
           <AlertsReloadContext.Provider value={{ fetchAlerts }}>
             <Table
               totalItems={data.length}

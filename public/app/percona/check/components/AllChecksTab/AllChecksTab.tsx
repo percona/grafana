@@ -173,15 +173,6 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          {/* <AlertLocalStorage
-            title="Upgrade your plan"
-            customButtonContent="Upgrade"
-            onCustomButtonClick={() => console.log('clicked')}
-            uniqueName={'upgradeAlert'}
-          >
-           TODO: Add text 
-            By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-          </AlertLocalStorage> */}
           <div className={styles.wrapper}>
             <div className={styles.header}>
               <h1>{Messages.availableHeader}</h1>
