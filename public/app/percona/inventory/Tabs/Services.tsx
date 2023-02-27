@@ -6,18 +6,17 @@ import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { ExpandAndActionsCol } from 'app/percona/shared/components/Elements/ExpandAndActionsCol/ExpandAndActionsCol';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
   fetchServicesAction,
   removeServicesAction,
-  RemoveServiceParams,
   fetchActiveServiceTypesAction,
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
@@ -33,12 +32,31 @@ import { getStyles } from './Tabs.styles';
 
 export const Services = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selected, setSelectedRows] = useState<any[]>([]);
+  const [selected, setSelectedRows] = useState<Array<Row<Service>>>([]);
+  const [actionItem, setActionItem] = useState<Service | null>(null);
   const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
   const { isLoading, services } = useSelector(getServices);
   const styles = useStyles2(getStyles);
+
+  const getActions = useCallback(
+    (row: Row<Service>): Action[] => [
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="trash-alt" />
+            <span className={styles.deleteItemTxtSpan}>Delete</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          setActionItem(row.original);
+          setModalVisible(true);
+        },
+      },
+    ],
+    [styles.deleteItemTxtSpan]
+  );
 
   const columns = useMemo(
     (): Array<Column<Service>> => [
@@ -64,11 +82,19 @@ export const Services = () => {
       },
       {
         Header: 'Actions',
-        Cell: ({ row }: { row: Row<Service> }) => <ExpandAndActionsCol row={row} />,
+        Cell: ({ row }: { row: Row<Service> }) => <ExpandAndActionsCol actions={getActions(row)} row={row} />,
       },
     ],
-    []
+    [getActions]
   );
+
+  const deletionMsg = useMemo(() => {
+    const servicesToDelete = actionItem ? [actionItem] : selected;
+
+    return `Are you sure that you want to permanently delete ${servicesToDelete.length} service${
+      servicesToDelete.length ? 's' : ''
+    }`;
+  }, [actionItem, selected]);
 
   const loadData = useCallback(async () => {
     try {
@@ -93,30 +119,37 @@ export const Services = () => {
   }, []);
 
   const removeServices = useCallback(
-    async (services: Array<SelectedTableRows<Service>>, forceMode) => {
+    async (forceMode) => {
+      const servicesToDelete = actionItem ? [actionItem] : selected.map((s) => s.original);
+
       try {
-        const params = services.map<RemoveServiceParams>((s) => ({
-          serviceId: s.original.params.serviceId,
+        const params = servicesToDelete.map((s) => ({
+          serviceId: s.params.serviceId,
           force: forceMode,
         }));
         const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
 
         appEvents.emit(AppEvents.alertSuccess, [
-          `${successfullyDeleted} of ${services.length} services successfully deleted`,
+          `${successfullyDeleted} of ${servicesToDelete.length} services successfully deleted`,
         ]);
+
+        if (actionItem) {
+          setActionItem(null);
+        } else {
+          setSelectedRows([]);
+        }
+        loadData();
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
         }
         logger.error(e);
       }
-      setSelectedRows([]);
-      loadData();
     },
-    [dispatch, loadData]
+    [actionItem, dispatch, loadData, selected]
   );
 
-  const handleSelectionChange = useCallback((rows: Array<Row<{}>>) => {
+  const handleSelectionChange = useCallback((rows: Array<Row<Service>>) => {
     setSelectedRows(rows);
   }, []);
 
@@ -135,6 +168,11 @@ export const Services = () => {
     [styles.tagList]
   );
 
+  const onModalClose = useCallback(() => {
+    setModalVisible(false);
+    setActionItem(null);
+  }, []);
+
   return (
     <OldPage navModel={navModel}>
       <OldPage.Contents>
@@ -144,7 +182,7 @@ export const Services = () => {
               size="md"
               disabled={selected.length === 0}
               onClick={() => {
-                setModalVisible(!modalVisible);
+                setModalVisible(true);
               }}
               icon="trash-alt"
               variant="destructive"
@@ -162,17 +200,14 @@ export const Services = () => {
               </div>
             }
             isOpen={modalVisible}
-            onDismiss={() => setModalVisible(false)}
+            onDismiss={onModalClose}
           >
             <Form
               onSubmit={() => {}}
-              render={({ form, handleSubmit }) => (
+              render={({ values, handleSubmit }) => (
                 <form onSubmit={handleSubmit}>
                   <>
-                    <h4 className={styles.confirmationText}>
-                      Are you sure that you want to permanently delete {selected.length}{' '}
-                      {selected.length === 1 ? 'service' : 'services'}?
-                    </h4>
+                    <h4 className={styles.confirmationText}>{deletionMsg}</h4>
                     <FormElement
                       dataTestId="form-field-force"
                       label="Force mode"
@@ -181,14 +216,14 @@ export const Services = () => {
                       }
                     />
                     <HorizontalGroup justify="space-between" spacing="md">
-                      <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
+                      <Button variant="secondary" size="md" onClick={onModalClose}>
                         Cancel
                       </Button>
                       <Button
                         variant="destructive"
                         size="md"
                         onClick={() => {
-                          removeServices(selected, form.getState().values.force);
+                          removeServices(values.force);
                           setModalVisible(false);
                         }}
                       >
@@ -206,6 +241,7 @@ export const Services = () => {
             data={services}
             totalItems={services.length}
             rowSelection
+            // @ts-ignore
             onRowSelection={handleSelectionChange}
             showPagination
             pageSize={25}

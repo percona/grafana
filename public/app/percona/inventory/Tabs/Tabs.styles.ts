@@ -34,4 +34,7 @@ export const getStyles = () => ({
     align-items: center;
     background-color: transparent;
   `,
+  deleteItemTxtSpan: css`
+    line-height: 15px;
+  `,
 });
