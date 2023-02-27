@@ -2,6 +2,8 @@ import React, { ReactNode, useEffect, useState } from 'react';
 
 import { Alert } from '@grafana/ui';
 
+import { DAY } from './AlertLocalStorage.constants';
+
 interface AlertLocalStorageProps {
   uniqueName: string;
   title: string;
@@ -22,7 +24,7 @@ export const AlertLocalStorage = ({
   const setToLocalStorage = (keyName: string, keyValue: boolean, ttlInDays: number) => {
     const data = {
       value: keyValue,
-      ttl: Date.now() + ttlInDays * 1000 * 60 * 60 * 24,
+      ttl: Date.now() + ttlInDays * DAY,
     };
 
     localStorage.setItem(keyName, JSON.stringify(data));

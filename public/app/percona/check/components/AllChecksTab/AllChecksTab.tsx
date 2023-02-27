@@ -40,13 +40,10 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   }
 
   const getCheckNamesListInCategory = () => {
-    let checkNames: string[] = [];
-    Object.keys(advisors).forEach((summary) => {
-      advisors[summary].checks.forEach((check) => {
-        checkNames.push(check.name);
-      });
-    });
-    return checkNames;
+    return Object.values(advisors)
+      .map((advisor) => advisor.checks)
+      .flat()
+      .map((check) => check.name);
   };
 
   const handleRunChecksClick = async () => {

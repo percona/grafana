@@ -9,7 +9,6 @@ import { AlertsReloadContext } from 'app/percona/check/Check.context';
 import { CheckService } from 'app/percona/check/Check.service';
 import { FailedCheckSummary } from 'app/percona/check/types';
 import { ExtendedTableCellProps, ExtendedTableRowProps, Table } from 'app/percona/integrated-alerting/components/Table';
-import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertLocalStorage/AlertLocalStorage';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -90,15 +89,15 @@ export const FailedChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          <AlertLocalStorage
+          {/* <AlertLocalStorage
             title="Upgrade your plan"
             customButtonContent="Upgrade"
             onCustomButtonClick={() => console.log('clicked')}
             uniqueName={'upgradeAlert'}
           >
-            {/* TODO: Add text */}
+            TODO: Add text
             By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-          </AlertLocalStorage>
+          </AlertLocalStorage> */}
           <AlertsReloadContext.Provider value={{ fetchAlerts }}>
             <Table
               totalItems={data.length}

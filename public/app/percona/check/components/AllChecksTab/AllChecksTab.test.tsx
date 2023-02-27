@@ -1,5 +1,5 @@
 import { logger } from '@percona/platform-core';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
@@ -29,9 +29,6 @@ jest.mock('app/percona/shared/services/advisors/Advisors.service.ts');
 
 describe('AllChecksTab::', () => {
   beforeEach(() => jest.clearAllMocks());
-  afterEach(() => {
-    cleanup();
-  });
 
   it('should render a table in category', async () => {
     render(<AllChecksTabTesting />);
