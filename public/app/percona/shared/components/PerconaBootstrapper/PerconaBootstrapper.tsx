@@ -83,6 +83,8 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
     if (isLoggedIn) {
       bootstrap();
+    } else {
+      onReady();
     }
   }, [dispatch, isLoggedIn, setSteps, onReady]);
 
