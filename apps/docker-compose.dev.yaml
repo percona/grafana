@@ -55,6 +55,7 @@ services:
     ports:
       - ${PMM_PORT_HTTP:-80}:80
       - ${PMM_PORT_HTTPS:-443}:443
+      - ${GRAFANA_SERVER:-3333}:3000
       # grafana debug
       - "2350:2350"
     volumes:

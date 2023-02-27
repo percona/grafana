@@ -50,13 +50,14 @@ Navigate to grafana `http:localhost/`
 Following needs to be executed only once, container recreated (e.g. if you executed `make dev` or after clean container start):
 
 ```shell
+make env # run it if not in container
 make build-go
 ```
 
 To recompile Grafana Server and run:
 
 ```shell
-make env # enter container
+make env # run it if not in container
 make grafana-update #recompile, replace and start as grafana service
 ```
 
