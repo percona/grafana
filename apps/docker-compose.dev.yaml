@@ -7,7 +7,7 @@ services:
     ports:
       - ${CH_PORT:-9000}:9000
   pmm:
-    container_name: 'pmm-grafana-dev'
+    container_name: pmm-grafana-dev
     restart: always
     links:
       - ch
@@ -35,7 +35,7 @@ services:
       - ENABLE_ALERTING=1
       - GF_INSTALL_PLUGINS=marcusolsson-static-datasource
       - GF_DEFAULT_APP_MODE="development"
-#      - GF_PATHS_PROVISIONING="/etc/grafana/provisioning"
+    #      - GF_PATHS_PROVISIONING="/etc/grafana/provisioning"
     extra_hosts:
       - host.docker.internal:host-gateway
       - portal.localhost:${PORTAL_HOST:-host-gateway}
@@ -56,17 +56,22 @@ services:
       - ${PMM_PORT_HTTP:-80}:80
       - ${PMM_PORT_HTTPS:-443}:443
       - ${GRAFANA_SERVER:-3333}:3000
-      # grafana debug
-      - "2350:2350"
     volumes:
-      - ./.config/grafana.ini:/etc/grafana/grafana.ini
+      # configs
+      #- ./.config/etc/grafana.ini:/etc/grafana/grafana.ini
+      - ./.config/etc/supervisord.d/grafana.ini:/etc/supervisord.d/grafana.ini:ro
+      - ./.config/etc/nginx/conf.d/pmm.conf:/etc/nginx/conf.d/pmm.conf:ro
+      - ./.config/etc/nginx/conf.d/pmm-ssl.conf:/etc/nginx/conf.d/pmm-ssl.conf:ro
+      # workspace
       - ../:/workspace
       - ./Makefile.devcontainer:/workspace/Makefile
       - ../Makefile:/workspace/apps/Makefile.root
-      - "../public:/usr/share/grafana/public"
+      #- "../public:/usr/share/grafana/public"
       # caching
       - go-modules:/root/go/pkg/mod
       - root-cache:/root/.cache
+      # development
+      - ./share:/share
 
 volumes:
   go-modules:
