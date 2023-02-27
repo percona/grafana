@@ -51,7 +51,7 @@ export interface ServiceListPayload {
 }
 
 export type Service = {
-  type: keyof typeof Databases | 'external';
+  type: Databases | 'external';
   params: DbService & DbServiceWithAddress & PostgreSQLService & ExternalService;
 };
 

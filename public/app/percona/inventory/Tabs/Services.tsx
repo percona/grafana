@@ -11,6 +11,7 @@ import { OldPage } from 'app/core/components/Page/Page';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { ExpandAndActionsCol } from 'app/percona/shared/components/Elements/ExpandAndActionsCol/ExpandAndActionsCol';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { ServiceIconWithText } from 'app/percona/shared/components/Elements/ServiceIconWithText/ServiceIconWithText';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -63,6 +64,9 @@ export const Services = () => {
       {
         Header: 'Service Name',
         accessor: (row) => row.params.serviceName,
+        Cell: ({ value, row }: { row: Row<Service>; value: string }) => (
+          <ServiceIconWithText text={value} dbType={row.original.type} />
+        ),
       },
       {
         Header: 'Service Type',
