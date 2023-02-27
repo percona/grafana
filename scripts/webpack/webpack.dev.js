@@ -15,7 +15,7 @@ const common = require('./webpack.common.js');
 
 const { federationFactory } = require('./webpack.federation.js');
 const federation = federationFactory((module) => {
-  return `${module}@http://localhost:3000/remoteEntry.js`;
+  return `${module}@http://localhost:3001/remoteEntry.js`;
 });
 
 module.exports = (env = {}) =>

@@ -10,6 +10,9 @@ const exposeDirectory = (dirName) =>
   }, {});
 
 module.exports = {
+  devServer: {
+    port: 3001,
+  },
   webpack: {
     configure: (config) => {
       config.output.publicPath = 'auto';
