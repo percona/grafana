@@ -1,16 +1,20 @@
 import React, { FC } from 'react';
 
-import { Badge, BadgeColor } from '@grafana/ui';
+import { Badge, BadgeColor, useStyles2 } from '@grafana/ui';
 
 import { ServiceAgentStatus } from '../../Inventory.types';
 
+import { getStyles } from './StatusBadge.styles';
 import { StatusBadgeProps } from './StatusBadge.types';
 
-export const StatusBadge: FC<StatusBadgeProps> = ({ agents, full }) => {
+export const StatusBadge: FC<StatusBadgeProps> = ({ agents, full, strippedServiceId }) => {
+  const styles = useStyles2(getStyles);
+
   if (!agents.length) {
     return null;
   }
 
+  const link = `/inventory/services/${strippedServiceId}/agents`;
   const totalAgents = agents.length;
   const [good, bad] = agents.reduce(
     (acc, agent) => {
@@ -25,10 +29,18 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, full }) => {
   );
   const percentageNotRunning = bad / totalAgents;
   const badgeColor: BadgeColor = percentageNotRunning === 1 ? 'red' : percentageNotRunning === 0 ? 'green' : 'orange';
+  const textToShow = `${percentageNotRunning === 1 ? bad : good}/${totalAgents}`;
+  const textToAppend = full ? `${percentageNotRunning === 1 ? ' not running' : ' running'}` : '';
 
-  if (percentageNotRunning === 1) {
-    return <Badge color={badgeColor} text={`${bad}/${totalAgents}${full ? ' not running' : ''}`} />;
-  } else {
-    return <Badge color={badgeColor} text={`${good}/${totalAgents}${full ? ' running' : ''}`} />;
-  }
+  return (
+    <Badge
+      color={badgeColor}
+      text={
+        <a className={styles.anchor} href={link}>
+          {textToShow}
+          {textToAppend}
+        </a>
+      }
+    />
+  );
 };

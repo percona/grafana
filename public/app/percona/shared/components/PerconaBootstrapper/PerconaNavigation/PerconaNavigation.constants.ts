@@ -136,12 +136,6 @@ export const PMM_INVENTORY_PAGE: NavModelItem = {
       hideFromMenu: true,
     },
     {
-      id: 'inventory-agents',
-      text: 'Agents',
-      url: `${config.appSubUrl}/inventory/agents`,
-      hideFromMenu: true,
-    },
-    {
       id: 'inventory-nodes',
       text: 'Nodes',
       url: `${config.appSubUrl}/inventory/nodes`,

@@ -18,8 +18,8 @@ export interface RemoveNodeBody {
 }
 
 export const InventoryService = {
-  getAgents(body = {}, token?: CancelToken) {
-    return api.post<ServiceAgentPayload, object>(`${BASE_URL}/Agents/List`, body, false, token);
+  getAgents(serviceId: string, token?: CancelToken) {
+    return api.post<ServiceAgentPayload, object>(`${BASE_URL}/Agents/List`, { service_id: serviceId }, false, token);
   },
   removeAgent(body: RemoveAgentBody, token?: CancelToken) {
     return api.post<void, object>(`${BASE_URL}/Agents/Remove`, body, false, token);

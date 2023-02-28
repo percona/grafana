@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 import { CheckboxField, Table, logger } from '@percona/platform-core';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Column } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
-import { OldPage } from 'app/core/components/Page/Page';
+import { Page } from 'app/core/components/Page/Page';
+import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
+import { formatServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Agent, ServiceAgentPayload } from 'app/percona/inventory/Inventory.types';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
@@ -23,14 +25,15 @@ import { InventoryService } from '../Inventory.service';
 import { beautifyAgentType, toAgentModel } from './Agents.utils';
 import { getStyles } from './Tabs.styles';
 
-export const Agents = () => {
+export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }) => {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<Agent[]>([]);
   const [selected, setSelectedRows] = useState<any[]>([]);
-  const navModel = usePerconaNavModel('inventory-agents');
+  const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
+  const serviceId = match.params.id;
 
   const columns = useMemo(
     (): Array<Column<Agent>> => [
@@ -60,7 +63,10 @@ export const Agents = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const result: ServiceAgentPayload = await InventoryService.getAgents(generateToken(GET_AGENTS_CANCEL_TOKEN));
+      const result: ServiceAgentPayload = await InventoryService.getAgents(
+        formatServiceId(serviceId),
+        generateToken(GET_AGENTS_CANCEL_TOKEN)
+      );
 
       setData(toAgentModel(result));
     } catch (e) {
@@ -110,8 +116,8 @@ export const Agents = () => {
   }, []);
 
   return (
-    <OldPage navModel={navModel}>
-      <OldPage.Contents>
+    <Page navModel={navModel}>
+      <Page.Contents>
         <FeatureLoader>
           <div className={styles.actionPanel}>
             <Button
@@ -188,8 +194,8 @@ export const Agents = () => {
             overlayClassName={styles.overlay}
           />
         </FeatureLoader>
-      </OldPage.Contents>
-    </OldPage>
+      </Page.Contents>
+    </Page>
   );
 };
 

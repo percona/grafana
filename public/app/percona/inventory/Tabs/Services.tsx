@@ -8,6 +8,7 @@ import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { ExpandAndActionsCol } from 'app/percona/shared/components/Elements/ExpandAndActionsCol/ExpandAndActionsCol';
@@ -74,7 +75,9 @@ export const Services = () => {
         Header: 'Agents',
         accessor: 'params',
         width: '70px',
-        Cell: ({ value }) => <StatusBadge agents={value.agents || []} />,
+        Cell: ({ value, row }) => (
+          <StatusBadge strippedServiceId={stripServiceId(row.original.params.serviceId)} agents={value.agents || []} />
+        ),
       },
       {
         Header: 'Node Name',
@@ -176,7 +179,11 @@ export const Services = () => {
           )}
           {!!agents.length && (
             <DetailsRow.Contents title="Agents">
-              <StatusBadge agents={row.original.params.agents || []} full />
+              <StatusBadge
+                strippedServiceId={stripServiceId(row.original.params.serviceId)}
+                agents={row.original.params.agents || []}
+                full
+              />
             </DetailsRow.Contents>
           )}
           <DetailsRow.Contents title="Service ID">
