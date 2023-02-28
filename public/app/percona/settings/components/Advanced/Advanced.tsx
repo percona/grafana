@@ -5,6 +5,7 @@ import { Field, withTypes } from 'react-final-form';
 
 import { Button, Spinner, Icon, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import FilesPage from 'app/percona/files/FilesPage';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -386,6 +387,7 @@ export const Advanced: FC = () => {
                 </form>
               )}
             />
+            <FilesPage />
           </div>
         </FeatureLoader>
       </OldPage.Contents>
