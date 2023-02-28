@@ -1,3 +1,5 @@
+import { ServiceAgent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
+
 import { Databases } from '../../core';
 
 export enum ServiceType {
@@ -24,6 +26,7 @@ export interface DbServicePayload {
   cluster?: string;
   replication_set?: string;
   custom_labels?: Record<string, string>;
+  agents?: Array<{ agent_id: string; status: ServiceAgentStatus }>;
 }
 
 export interface DbServiceWithAddressPayload extends DbServicePayload {
@@ -63,6 +66,7 @@ export interface DbService {
   cluster?: string;
   replicationSet?: string;
   customLabels?: Record<string, string>;
+  agents?: Array<Pick<ServiceAgent, 'agentId' | 'status'>>;
 }
 
 export interface DbServiceWithAddress extends DbService {

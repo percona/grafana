@@ -12,7 +12,16 @@ import {
 
 import { ListServicesParams, RemoveServiceParams } from './services.types';
 
-export const MAIN_COLUMNS = ['service_id', 'type', 'service_name', 'custom_labels', 'node_id', 'address', 'port'];
+export const MAIN_COLUMNS = [
+  'service_id',
+  'type',
+  'service_name',
+  'custom_labels',
+  'node_id',
+  'address',
+  'port',
+  'agents',
+];
 
 export const toRemoveServiceBody = (params: RemoveServiceParams): RemoveServiceBody => ({
   service_id: params.serviceId,

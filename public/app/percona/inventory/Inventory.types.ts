@@ -40,9 +40,19 @@ export enum AgentType {
   vmAgent = 'vm_agent',
 }
 
+export enum ServiceAgentStatus {
+  STARTING = 'STARTING',
+  RUNNING = 'RUNNING',
+  WAITING = 'WAITING',
+  STOPPING = 'STOPPING',
+  DOPE = 'DONE',
+  UNKNOWN = 'UNKNOWN',
+}
+
 export type ServiceAgentPayload = {
   [key in AgentType]: Array<{
     agent_id: string;
+    status?: ServiceAgentStatus;
     custom_labels?: Record<string, string>;
     // We don't need to care about all the other fields for now
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,6 +62,7 @@ export type ServiceAgentPayload = {
 
 export interface ServiceAgent {
   agentId: string;
+  status?: ServiceAgentStatus;
   customLabels?: Record<string, string>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
