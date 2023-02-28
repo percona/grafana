@@ -2,7 +2,7 @@ include Makefile.include
 
 init:								## Prepares local development environment.
 	cd ../ && make build-go; \
-	cd ../ && yarn install --immutable; \
+	yarn install --immutable; \
 	cd ./apps/pmm-ui && npm install
 
 dev:								## Starts local development.
