@@ -9,6 +9,7 @@ import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
+import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { ExpandAndActionsCol } from 'app/percona/shared/components/Elements/ExpandAndActionsCol/ExpandAndActionsCol';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ServiceIconWithText } from 'app/percona/shared/components/Elements/ServiceIconWithText/ServiceIconWithText';
@@ -28,6 +29,7 @@ import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
+import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 
 import { getStyles } from './Tabs.styles';
 
@@ -69,8 +71,10 @@ export const Services = () => {
         ),
       },
       {
-        Header: 'Service Type',
-        accessor: 'type',
+        Header: 'Agents',
+        accessor: 'params',
+        width: '70px',
+        Cell: ({ value }) => <StatusBadge agents={value.agents || []} />,
       },
       {
         Header: 'Node ID',
@@ -158,17 +162,29 @@ export const Services = () => {
   }, []);
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row<Service>) => (
-      <>
-        <span>Labels</span>
-        <TagList
-          className={styles.tagList}
-          tags={Object.keys(row.original.params.customLabels || {}).map(
-            (label) => `${label}=${row.original.params.customLabels![label]}`
+    (row: Row<Service>) => {
+      const labels = row.original.params.customLabels || {};
+      const labelKeys = Object.keys(labels);
+      const agents = row.original.params.agents || [];
+
+      return (
+        <DetailsRow>
+          {!!labelKeys.length && (
+            <DetailsRow.Contents title="Labels">
+              <TagList className={styles.tagList} tags={labelKeys.map((label) => `${label}=${labels![label]}`)} />
+            </DetailsRow.Contents>
           )}
-        />
-      </>
-    ),
+          {!!agents.length && (
+            <DetailsRow.Contents title="Agents">
+              <StatusBadge agents={row.original.params.agents || []} full />
+            </DetailsRow.Contents>
+          )}
+          <DetailsRow.Contents title="Service ID">
+            <span>{row.original.params.serviceId}</span>
+          </DetailsRow.Contents>
+        </DetailsRow>
+      );
+    },
     [styles.tagList]
   );
 
