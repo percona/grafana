@@ -3,8 +3,6 @@ import { logger, NumberInputField, SelectField } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormRenderProps } from 'react-final-form';
 
-//empty comment
-
 import { useStyles } from '@grafana/ui/src';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { Databases } from 'app/percona/shared/core';
