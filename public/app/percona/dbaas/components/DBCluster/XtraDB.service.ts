@@ -157,6 +157,7 @@ export class XtraDBService extends DBClusterService {
       expose: dbCluster.exposed,
       installedImage: dbCluster.installed_image,
       availableImage: dbCluster.available_image,
+      template: dbCluster.template,
     };
   }
 }
