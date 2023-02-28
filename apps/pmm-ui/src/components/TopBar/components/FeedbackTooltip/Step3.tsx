@@ -33,49 +33,14 @@ const getStyles = (theme: GrafanaTheme2) => ({
     padding: ${theme.spacing(0.5)};
   `,
   contentTitle: css`
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
+    font-size: ${theme.typography.h4.fontSize};
     line-height: 22px;
-
-    display: flex;
-    align-items: center;
-
     color: ${theme.colors.text.primary}
-
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  `,
-  rating: css`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0px;
-    gap: 12px;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
-    justify-content: space-between;
   `,
   description: css`
     padding-top: ${theme.spacing(1)};
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 21px;
-    display: flex;
-    align-items: center;
-    letter-spacing: 0.01071em;
+    font-size: ${theme.typography.h6.fontSize};
     color: rgba(204, 204, 220, 0.65);
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
     text-align: justify;
   `,
 });

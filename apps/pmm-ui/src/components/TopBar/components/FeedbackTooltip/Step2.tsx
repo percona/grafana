@@ -22,7 +22,7 @@ export const Step2: FC<Step2Props> = ({ onSubmit }) => {
       <div className={styles.contentTitle}>
         We&apos;re sorry to hear it... Can you tell us more about your experience and what went wrong?
       </div>
-      <div className={styles.rating}>
+      <div className={styles.feedbackHolder}>
         <TextArea
           placeholder="Write your feedback here"
           onChange={(e) => {
@@ -31,46 +31,24 @@ export const Step2: FC<Step2Props> = ({ onSubmit }) => {
         />
       </div>
       <div className={styles.ratingDestription}>We will use your feedback to improve our products and services.</div>
-      <div>{/*<Button icon="navigator" onClick={submitFeedback}>Send feedback</Button>*/}</div>
+      <div>
+        <Button icon="message" onClick={submitFeedback}>Send feedback</Button>
+      </div>
     </>
   );
 };
 
 const getStyles = (theme: GrafanaTheme2) => ({
   contentTitle: css`
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 18px;
+      font-size: ${theme.typography.h4.fontSize};
       line-height: 22px;
-      display: flex;
-
       color: ${theme.colors.text.primary}
-
-      flex: none;
-      order: 0;
-      align-self: stretch;
-      flex-grow: 0;
   `,
-  rating: css`
-    flex: none;
+  feedbackHolder: css`
     align-self: stretch;
-    justify-content: space-between;
   `,
   ratingDestription: css`
-      color: ${theme.colors.text.secondary}
-      font-family: 'Roboto';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
       line-height: 15px;
-      display: flex;
-      align-items: center;
-      letter-spacing: 0.01071em;
       color: rgba(204, 204, 220, 0.65);
-      flex: none;
-      order: 2;
-      align-self: stretch;
-      flex-grow: 0;
   `,
 });
