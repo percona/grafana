@@ -77,8 +77,8 @@ export const Services = () => {
         Cell: ({ value }) => <StatusBadge agents={value.agents || []} />,
       },
       {
-        Header: 'Node ID',
-        accessor: (row) => row.params.nodeId,
+        Header: 'Node Name',
+        accessor: (row) => row.params.nodeName,
       },
       {
         Header: 'Address',

@@ -22,6 +22,7 @@ export interface DbServicePayload {
   service_id: string;
   service_name: string;
   node_id: string;
+  node_name: string;
   enviroment?: string;
   cluster?: string;
   replication_set?: string;
@@ -62,6 +63,7 @@ export interface DbService {
   serviceId: string;
   serviceName: string;
   nodeId: string;
+  nodeName: string;
   environment?: string;
   cluster?: string;
   replicationSet?: string;
