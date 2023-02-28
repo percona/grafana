@@ -202,6 +202,12 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
       },
     }),
   },
+  ...(dbCluster.template && {
+    template: {
+      name: dbCluster.template.name,
+      kind: dbCluster.template.kind,
+    },
+  }),
 });
 
 const toSuspendAPI = (dbCluster: DBCluster) => ({
