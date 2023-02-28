@@ -170,7 +170,7 @@ export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) =>
   modelItem.children!.push({
     id: 'advisors-notifications',
     text: 'Notifications',
-    url: `${config.appSubUrl}/advisors`,
+    url: `${config.appSubUrl}/advisors/notifications`,
   });
 
   categories.forEach((category) => {

@@ -65,7 +65,7 @@ export const FailedChecksTab: FC = () => {
   const getRowProps = (row: Row<FailedCheckSummary>): ExtendedTableRowProps => ({
     key: row.original.serviceId,
     className: styles.row,
-    onClick: () => locationService.push(`/pmm-database-checks/failed-checks/${stripServiceId(row.original.serviceId)}`),
+    onClick: () => locationService.push(`/advisors/notifications/${stripServiceId(row.original.serviceId)}`),
   });
 
   const getCellProps = (cellInfo: Cell<FailedCheckSummary>): ExtendedTableCellProps => ({
