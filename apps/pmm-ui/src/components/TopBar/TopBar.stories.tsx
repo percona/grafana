@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
-import { NavBar } from './NavBar';
+import { TopBar } from './TopBar';
 
 export default {
-  title: 'Percona/NavBar',
-  component: NavBar,
+  title: 'Percona/TopBar',
+  component: TopBar,
   argTypes: {
     text: { type: 'string' },
   },
-} as ComponentMeta<typeof NavBar>;
+} as ComponentMeta<typeof TopBar>;
 
-const Template: ComponentStory<typeof NavBar> = (args) => {
+const Template: ComponentStory<typeof TopBar> = (args) => {
   const [message, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
   return (
     <>
-      <NavBar
+      <TopBar
         title="Percona monitoring and management"
         userContext={userContext}
         showSignIn

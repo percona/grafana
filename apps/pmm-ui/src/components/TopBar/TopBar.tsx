@@ -6,7 +6,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import perconaIcon from './assets/pmm-percona-icon.svg';
 import appIcon from './assets/pmm-app-icon.svg';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
-export interface NavBarProps {
+export interface TopBarProps {
   title: string;
   showSignIn?: boolean;
   showFeedbackButton?: boolean;
@@ -21,7 +21,7 @@ export interface NavBarProps {
   children?: ReactNode;
 }
 
-export const NavBar: FC<NavBarProps> = ({
+export const TopBar: FC<TopBarProps> = ({
   title,
   userContext,
   showSignIn,
@@ -31,7 +31,7 @@ export const NavBar: FC<NavBarProps> = ({
   onHelpCenterClick,
   showHelpCenterNotificationMarker,
 }) => {
-  const [visibleFeedback, setVisibleFeedback] = useState(true);
+  const [visibleFeedback, setVisibleFeedback] = useState(false);
 
   const styles = useStyles2(getStyles);
   const userMenu = (
@@ -56,7 +56,7 @@ export const NavBar: FC<NavBarProps> = ({
           </div>
         </div>
         <nav className={styles.navElement}>
-          <div className={styles.titleWrapper}>
+          <div>
             <h1 className={styles.h1Styles}>
               <div className={styles.titleText}>{title}</div>
             </h1>
@@ -87,13 +87,12 @@ export const NavBar: FC<NavBarProps> = ({
             <FeedbackTooltip
               visible={visibleFeedback}
               onClose={() => {
-                console.log('da');
                 setVisibleFeedback(true);
                 setVisibleFeedback(false);
               }}
             >
               <ToolbarButton
-                icon="bell"
+                icon="message"
                 onClick={() => {
                   setVisibleFeedback(true);
                 }}
@@ -113,7 +112,6 @@ export const getStyles = (theme: GrafanaTheme2) => ({
   `,
   toolbar: css`
     align-items: center;
-    height: 64px;
     background: ${theme.colors.background.canvas};
     display: flex;
     gap: ${theme.spacing(2)};
@@ -130,18 +128,10 @@ export const getStyles = (theme: GrafanaTheme2) => ({
   `,
   leftWrapper: css`
     display: flex;
-    flex-wrap: nowrap;
-    max-width: 70%;
   `,
   navElement: css`
     display: flex;
     align-items: center;
-    min-width: 0;
-  `,
-  titleWrapper: css`
-    display: flex;
-    margin: 0;
-    min-width: 0;
   `,
   pageIcon: css`
     display: flex;
@@ -150,19 +140,10 @@ export const getStyles = (theme: GrafanaTheme2) => ({
   `,
   h1Styles: css`
     margin: 0;
-    line-height: inherit;
-    flex-grow: 1;
-    min-width: 0;
   `,
   titleText: css`
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 600;
+    font-weight: ${theme.typography.fontWeightBold};
     font-size: ${theme.typography.body.fontSize};
-    line-height: 100%;
-    flex: none;
-    order: 0;
-    flex-grow: 1;
     color: ${theme.colors.text.primary};
   `,
   notificationMarker: css`
@@ -174,21 +155,11 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     background: #ff5286;
     border: 2px solid ${theme.colors.background.canvas};
     border-radius: 16px;
-    flex: none;
-    order: 6;
-    flex-grow: 0;
-    z-index: 6;
+    z-index: 2;
   `,
   tooltip: css`
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
     font-size: ${theme.typography.bodySmall.fontSize};
-    line-height: 15px;
     color: ${theme.colors.text.secondary};
-    flex: none;
-    order: 0;
-    flex-grow: 0;
     margin-right: 24px;
   `,
 });

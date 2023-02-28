@@ -1,5 +1,5 @@
 import React, { useState, FC } from 'react';
-import { NavBar } from '../components';
+import { TopBar } from '../components';
 
 export const OnboardPanel: FC<{}> = () => {
   const [message, setMessage] = useState('');
@@ -7,7 +7,7 @@ export const OnboardPanel: FC<{}> = () => {
 
   return (
     <>
-      <NavBar
+      <TopBar
         title="Percona monitoring and management"
         userContext={userContext}
         showSignIn
