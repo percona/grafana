@@ -15,7 +15,7 @@ import { DBCluster, DBClusterAllocatedResources, DBClusterExpectedResources } fr
 import { getExpectedResourcesDifference, newDBClusterService } from '../../DBCluster.utils';
 import { ResourcesBar } from '../../ResourcesBar/ResourcesBar';
 import { optionRequired } from '../DBClusterBasicOptions/DBClusterBasicOptions.utils';
-import { DBClusterPageMode } from '../EditDBClusterPage.types';
+import { DBClusterPageMode, EditDBClusterForm } from '../EditDBClusterPage.types';
 import { UnsafeConfigurationWarning } from '../UnsafeConfigurationsWarning/UnsafeConfigurationWarning';
 
 import Configurations from './Configurations/Configurations';
@@ -35,7 +35,7 @@ import { canGetExpectedResources, nodesValidator, resourceValidator } from './DB
 import NetworkAndSecurity from './NetworkAndSecurity/NetworkAndSecurity';
 import Templates from './Templates/Templates';
 
-export interface DBClusterAdvancedOptionsProps extends FormRenderProps {
+export interface DBClusterAdvancedOptionsProps extends FormRenderProps<EditDBClusterForm> {
   mode: DBClusterPageMode;
   showUnsafeConfigurationWarning: boolean;
   setShowUnsafeConfigurationWarning: React.Dispatch<React.SetStateAction<boolean>>;

@@ -1,10 +1,11 @@
 import { screen, render, waitFor, fireEvent } from '@testing-library/react';
 import React from 'react';
-import { Form } from 'react-final-form';
+import { Form, FormRenderProps } from 'react-final-form';
 import { Provider } from 'react-redux';
 
 import { configureStore } from '../../../../../../../store/configureStore';
 import { StoreState } from '../../../../../../../types';
+import { EditDBClusterForm } from '../../EditDBClusterPage.types';
 
 import { Restore } from './Restore';
 
@@ -26,7 +27,10 @@ describe('DBaaS DBCluster creation Restore section ::', () => {
     await waitFor(() =>
       render(
         <Provider store={store}>
-          <Form onSubmit={jest.fn()} render={({ form }) => <Restore form={form} />} />
+          <Form
+            onSubmit={jest.fn()}
+            render={({ form }: FormRenderProps<EditDBClusterForm>) => <Restore form={form} />}
+          />
         </Provider>
       )
     );
@@ -47,7 +51,7 @@ describe('DBaaS DBCluster creation Restore section ::', () => {
                 value: 'location1',
               },
             }}
-            render={({ form }) => {
+            render={({ form }: FormRenderProps<EditDBClusterForm>) => {
               return <Restore form={form} />;
             }}
           />
@@ -72,7 +76,7 @@ describe('DBaaS DBCluster creation Restore section ::', () => {
                 value: 'cluster 1',
               },
             }}
-            render={({ form }) => {
+            render={({ form }: FormRenderProps<EditDBClusterForm>) => {
               return <Restore form={form} />;
             }}
           />

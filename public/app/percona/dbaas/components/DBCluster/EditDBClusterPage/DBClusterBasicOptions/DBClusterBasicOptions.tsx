@@ -50,6 +50,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   const { required, maxLength } = validators;
   const { change } = form;
   const { kubernetesCluster, databaseType } = form.getState().values;
+  debugger;
   const [databaseVersions, setDatabaseVersions] = useState<SelectableValue[]>([]);
   const [loadingDatabaseVersions, setLoadingDatabaseVersions] = useState(false);
 
