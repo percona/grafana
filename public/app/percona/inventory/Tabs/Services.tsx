@@ -185,15 +185,6 @@ export const Services = () => {
 
       return (
         <DetailsRow>
-          {!!labelKeys.length && (
-            <DetailsRow.Contents title="Labels">
-              <TagList
-                colorIndex={9}
-                className={styles.tagList}
-                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
-              />
-            </DetailsRow.Contents>
-          )}
           {!!agents.length && (
             <DetailsRow.Contents title="Agents">
               <StatusBadge
@@ -206,6 +197,15 @@ export const Services = () => {
           <DetailsRow.Contents title="Service ID">
             <span>{row.original.params.serviceId}</span>
           </DetailsRow.Contents>
+          {!!labelKeys.length && (
+            <DetailsRow.Contents title="Labels" fullRow>
+              <TagList
+                colorIndex={9}
+                className={styles.tagList}
+                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
+              />
+            </DetailsRow.Contents>
+          )}
         </DetailsRow>
       );
     },

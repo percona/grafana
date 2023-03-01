@@ -7,6 +7,9 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
     display: flex;
     flex-direction: column;
   `,
+  fullRowContent: css`
+    flex-basis: 100%;
+  `,
   row: css`
     display: flex;
     flex-wrap: wrap;
