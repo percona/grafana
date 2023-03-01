@@ -4,6 +4,7 @@ import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import perconaIcon from './assets/pmm-percona-icon.svg';
 import appIcon from './assets/pmm-app-icon.svg';
+import platformIcon from './assets/pmm-platform-purple.svg';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
 export interface TopBarProps {
   showSignIn?: boolean;
@@ -36,7 +37,7 @@ export const TopBar: FC<TopBarProps> = ({
   const styles = useStyles2(getStyles);
   const userMenu = (
     <Menu>
-      <Menu.Item label="Open Percona Platform" />
+      <Menu.Item label="Open Percona Platform" className={styles.miOpenPerconaPlatform} icon="info" />
       <Menu.Item label="Percona Account profile" />
       <Menu.Item label="Platform connection settings" />
       <Menu.Divider />
@@ -89,8 +90,8 @@ export const TopBar: FC<TopBarProps> = ({
                 icon="info"
                 variant="secondary"
                 onClick={onSignInClick}
-                >
-                  Connect to platform
+              >
+                Connect to platform
               </Button>
             </>
           ))}
@@ -187,5 +188,23 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     & > div > svg > path {
       display: none;
     }
-  `
+  `,
+  miOpenPerconaPlatform: css`
+    background: none;
+    & > div > svg {
+      height: 32px;
+      width: 32px;
+      background: url(${platformIcon});
+    }
+
+    & > div > svg > path {
+      display: none;
+    }
+
+    &:hover, &:focus {
+      background: rgba(71, 47, 100, 0.67);
+      color: ${theme.colors.error.contrastText};
+    }
+
+  `,
 });
