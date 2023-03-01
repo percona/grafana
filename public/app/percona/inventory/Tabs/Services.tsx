@@ -24,6 +24,7 @@ import {
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getDashboardLinkForService } from 'app/percona/shared/helpers/getDashboardLinkForService';
 import { Service } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -56,6 +57,18 @@ export const Services = () => {
         action: () => {
           setActionItem(row.original);
           setModalVisible(true);
+        },
+      },
+      {
+        content: 'Dashboard',
+        action: () => {
+          locationService.push(getDashboardLinkForService(row.original.type, row.original.params.serviceName));
+        },
+      },
+      {
+        content: 'QAN',
+        action: () => {
+          locationService.push(`/d/pmm-qan/pmm-query-analytics?var-service_name=${row.original.params.serviceName}`);
         },
       },
     ],
