@@ -1,25 +1,25 @@
-import React, {Suspense, useEffect, useState} from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 // @ts-ignore
 import Drop from 'tether-drop';
 
-import {locationSearchToObject, navigationLogger, reportPageview} from '@grafana/runtime';
-import {ErrorBoundary} from '@grafana/ui';
+import { locationSearchToObject, navigationLogger, reportPageview } from '@grafana/runtime';
+import { ErrorBoundary } from '@grafana/ui';
 
-import {PmmUi} from '../../percona/federation';
-import {LocalStorageValueProvider} from "../components/LocalStorageValueProvider";
-import {useGrafana} from '../context/GrafanaContext';
+import { PmmUi } from '../../percona/federation';
+import { LocalStorageValueProvider } from "../components/LocalStorageValueProvider";
+import { useGrafana } from '../context/GrafanaContext';
 
-import {GrafanaRouteError} from './GrafanaRouteError';
-import {GrafanaRouteLoading} from './GrafanaRouteLoading';
-import {GrafanaRouteComponentProps, RouteDescriptor} from './types';
+import { GrafanaRouteError } from './GrafanaRouteError';
+import { GrafanaRouteLoading } from './GrafanaRouteLoading';
+import { GrafanaRouteComponentProps, RouteDescriptor } from './types';
 
 export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> {
 }
 
-const LOCAL_STORAGE_KEY = 'grafana.dashboard.navigation.onboarding';
+const LOCAL_STORAGE_KEY='grafana.dashboard.navigation.onboarding';
 
 export function GrafanaRoute(props: Props) {
-  const {chrome, keybindings} = useGrafana();
+  const {chrome, keybindings}=useGrafana();
 
   chrome.setMatchedRoute(props.route);
 
@@ -47,8 +47,8 @@ export function GrafanaRoute(props: Props) {
   navigationLogger('GrafanaRoute', false, 'Rendered', props.route);
 
   //TODO:WIP:
-  const [_, setMessage] = useState('');
-  const [userContext, setUserContext] = useState('');
+  const [_, setMessage]=useState('');
+  const [userContext, setUserContext]=useState('');
 
   return (
     <ErrorBoundary>
@@ -65,7 +65,6 @@ export function GrafanaRoute(props: Props) {
                   return (
                     <>
                       <PmmUi.TopBar
-                        title="Percona monitoring and management"
                         userContext={userContext}
                         showSignIn
                         showFeedbackButton
@@ -104,8 +103,7 @@ export function GrafanaRoute(props: Props) {
               </LocalStorageValueProvider>
             </>
           </Suspense>
-        )
-          ;
+        );
       }}
     </ErrorBoundary>
   );
@@ -115,7 +113,7 @@ function getPageClasses(route: RouteDescriptor) {
   return route.pageClass ? route.pageClass.split(' ') : [];
 }
 
-function updateBodyClassNames(route: RouteDescriptor, clear = false) {
+function updateBodyClassNames(route: RouteDescriptor, clear=false) {
   for (const cls of getPageClasses(route)) {
     if (clear) {
       document.body.classList.remove(cls);
@@ -129,12 +127,12 @@ function cleanupDOM() {
   document.body.classList.remove('sidemenu-open--xs');
 
   // cleanup tooltips
-  const tooltipById = document.getElementById('tooltip');
+  const tooltipById=document.getElementById('tooltip');
   tooltipById?.parentElement?.removeChild(tooltipById);
 
-  const tooltipsByClass = document.querySelectorAll('.tooltip');
-  for (let i = 0; i < tooltipsByClass.length; i++) {
-    const tooltip = tooltipsByClass[i];
+  const tooltipsByClass=document.querySelectorAll('.tooltip');
+  for (let i=0; i < tooltipsByClass.length; i++) {
+    const tooltip=tooltipsByClass[i];
     tooltip.parentElement?.removeChild(tooltip);
   }
 
