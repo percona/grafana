@@ -5,7 +5,7 @@ import {IconName, useStyles2} from '@grafana/ui';
 import { Tip } from '../Tip';
 import tipsData from './data/tips.json';
 
-export const LoggedInTips: FC = () => {
+export const TipsConnected: FC = () => {
   const styles = useStyles2(getStyles);
   const [tip, setTip] = useState(1);
   const [isHoveredMarker, setHoveredMarker] = useState(false);
@@ -55,13 +55,13 @@ const getStyles = (theme: GrafanaTheme2) => {
   `;
   const pulseDot = keyframes`
     0% {
-      transform: scale(.8);
+      transform: scale(1);
     }
     50% {
       transform: scale(1.5);
     }
     100% {
-      transform: scale(.8);
+      transform: scale(1);
     }
   `;
   const dotDisappearing = keyframes`
@@ -92,25 +92,28 @@ const getStyles = (theme: GrafanaTheme2) => {
       height: 8px;
       border-radius: 50%;
       margin-left: 10px;
+
       background: #FF5286;
-      animation: ${pulseDot} 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) -.4s infinite;
+      animation: ${pulseDot} 1125ms cubic-bezier(0.04, 0.78, 0.52, 0.92) infinite;
 
       &:before {
         content: '';
         position: relative;
         display: block;
-        width: 500%;
-        height: 500%;
+        width: 400%;
+        height: 400%;
         box-sizing: border-box;
-        margin-left: -200%;
-        margin-top: -200%;
+        margin-left: -150%;
+        margin-top: -150%;
         border-radius: 50%;
-        background: #ee8aa6;
-        animation: ${pulseRing} 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        background: #FF5286;
+        opacity: 0.5;
+
+        animation: ${pulseRing} 1125ms ease-out -.5s infinite;
       }
     `,
     notificationMarkerHidden: css`
-      animation: ${dotDisappearing} 1.25s cubic-bezier(0.455, 0.03, 0.515, 0.955) 1;
+      animation: ${dotDisappearing} 1s cubic-bezier(0.455, 0.03, 0.515, 0.955) 1;
       animation-fill-mode: forwards;
       &:before {
         display: none;
