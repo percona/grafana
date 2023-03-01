@@ -1,21 +1,25 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, {Suspense, useEffect, useState} from 'react';
 // @ts-ignore
 import Drop from 'tether-drop';
 
-import { locationSearchToObject, navigationLogger, reportPageview } from '@grafana/runtime';
-import { ErrorBoundary } from '@grafana/ui';
+import {locationSearchToObject, navigationLogger, reportPageview} from '@grafana/runtime';
+import {ErrorBoundary} from '@grafana/ui';
 
-import { PmmUi } from '../../percona/federation';
-import { useGrafana } from '../context/GrafanaContext';
+import {PmmUi} from '../../percona/federation';
+import {LocalStorageValueProvider} from "../components/LocalStorageValueProvider";
+import {useGrafana} from '../context/GrafanaContext';
 
-import { GrafanaRouteError } from './GrafanaRouteError';
-import { GrafanaRouteLoading } from './GrafanaRouteLoading';
-import { GrafanaRouteComponentProps, RouteDescriptor } from './types';
+import {GrafanaRouteError} from './GrafanaRouteError';
+import {GrafanaRouteLoading} from './GrafanaRouteLoading';
+import {GrafanaRouteComponentProps, RouteDescriptor} from './types';
 
-export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> {}
+export interface Props extends Omit<GrafanaRouteComponentProps, 'queryParams'> {
+}
+
+const LOCAL_STORAGE_KEY = 'grafana.dashboard.navigation.onboarding';
 
 export function GrafanaRoute(props: Props) {
-  const { chrome, keybindings } = useGrafana();
+  const {chrome, keybindings} = useGrafana();
 
   chrome.setMatchedRoute(props.route);
 
@@ -45,49 +49,63 @@ export function GrafanaRoute(props: Props) {
   //TODO:WIP:
   const [_, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
-  const [isHelpCenterOpen, setIsHelpCenterOpen] = useState(false);
 
   return (
     <ErrorBoundary>
-      {({ error, errorInfo }) => {
+      {({error, errorInfo}) => {
         if (error) {
-          return <GrafanaRouteError error={error} errorInfo={errorInfo} />;
+          return <GrafanaRouteError error={error} errorInfo={errorInfo}/>;
         }
 
         return (
-          <Suspense fallback={<GrafanaRouteLoading />}>
+          <Suspense fallback={<GrafanaRouteLoading/>}>
             <>
-              <PmmUi.TopBar
-                title="Percona monitoring and management"
-                userContext={userContext}
-                showSignIn
-                showFeedbackButton
-                showHelpCenterButton
-                showHelpCenterNotificationMarker
-                onSignInClick={() => {
-                  setMessage('sign in');
-                  setUserContext('something_here');
-                }}
-                onHelpCenterClick={() => setIsHelpCenterOpen(!isHelpCenterOpen)}
-                onNotificationClick={() => setMessage('notification')}
-                onFeedbackClick={() => setMessage('feedback form')}
-              />
-              <PmmUi.HelpCenter open={isHelpCenterOpen} onClose={() => setIsHelpCenterOpen(false)} width="416px" />
-              {/*TODO:WIP: refactor*/}
-              <div style={{"width": isHelpCenterOpen ? 'calc(100% - 430px)' : '100%'}}>
-                {props.location.pathname === '/a/pmm-homescreen-app' ? (
-                  <Suspense fallback={<div></div>}>
+              <LocalStorageValueProvider<boolean> storageKey={LOCAL_STORAGE_KEY} defaultValue={false}>
+                {(isHelpCenterOpen, saveHelpCenterOpen) => {
+                  return (
                     <>
-                      <PmmUi.HomePage />
+                      <PmmUi.TopBar
+                        title="Percona monitoring and management"
+                        userContext={userContext}
+                        showSignIn
+                        showFeedbackButton
+                        showHelpCenterButton
+                        showHelpCenterNotificationMarker
+                        onSignInClick={() => {
+                          setMessage('sign in');
+                          setUserContext('something_here');
+                        }}
+                        onHelpCenterClick={() => saveHelpCenterOpen(!isHelpCenterOpen)}
+                        onNotificationClick={() => setMessage('notification')}
+                        onFeedbackClick={() => setMessage('feedback form')}
+                      />
+                      <PmmUi.HelpCenter
+                        open={isHelpCenterOpen}
+                        onClose={() => saveHelpCenterOpen(false)}
+                        width="416px"
+                        isConnectedUser={true}
+                      />
+                      {/*TODO:WIP: refactor*/}
+                      <div style={{"width": isHelpCenterOpen ? 'calc(100% - 430px)' : '100%'}}>
+                        {props.location.pathname === '/a/pmm-homescreen-app' ? (
+                          <Suspense fallback={<div></div>}>
+                            <>
+                              <PmmUi.HomePage/>
+                            </>
+                          </Suspense>
+                        ) : (
+                          <props.route.component {...props}
+                                                 queryParams={locationSearchToObject(props.location.search)}/>
+                        )}
+                      </div>
                     </>
-                  </Suspense>
-                ) : (
-                  <props.route.component {...props} queryParams={locationSearchToObject(props.location.search)} />
-                )}
-              </div>
+                  )
+                }}
+              </LocalStorageValueProvider>
             </>
           </Suspense>
-        );
+        )
+          ;
       }}
     </ErrorBoundary>
   );

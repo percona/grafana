@@ -3,15 +3,17 @@ import React__default, { FC, useState } from 'react';
 import { IconButton, Tab, TabsBar, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
-import { LoggedInTips } from './components/TipsContainer/LoggedInTips';
+import { TipsConnected } from './components/TipsContainer/TipsConnected';
 import { ResourcesContainer } from './components/ResourcesContainer';
 import {EmptyTip} from "./components/TipsContainer/EmptyTip";
+import {TipNotConnected} from "./components/TipsContainer/TipNotConnected";
 
 interface HelpCenterProps {
   open: boolean;
   onClose: () => void;
 
   width: string;
+  isConnectedUser?: boolean;
 }
 
 type TabName = 'tips' | 'resources' | 'wnatsnew';
@@ -19,7 +21,7 @@ type TabName = 'tips' | 'resources' | 'wnatsnew';
 export const HelpCenter: FC<HelpCenterProps> = (props) => {
   const [activeTab, setActiveTab] = useState<TabName>('tips');
 
-  const { open, onClose, width } = props;
+  const { open, onClose, width, isConnectedUser } = props;
   const styles = useStyles2(getStyles);
 
   const changeTab = (tab: TabName) => {
@@ -44,8 +46,9 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
             <Tab label="Resources" active={activeTab === 'resources'} onChangeTab={changeTab('resources')} />
           </TabsBar>
         </TabsBar>
-        {/*{activeTab === 'tips' && <LoggedInTips />}*/}
-        {activeTab === 'tips' && <EmptyTip />}
+        {activeTab === 'tips' && isConnectedUser && <TipsConnected />}
+        {activeTab === 'tips' && !isConnectedUser && <TipNotConnected />}
+
         {activeTab === 'resources' && <ResourcesContainer />}
       </div>
       <div className={styles.indentContainer} />
