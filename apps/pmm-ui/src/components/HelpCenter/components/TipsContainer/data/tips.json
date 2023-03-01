@@ -1,6 +1,15 @@
 [
   {
     "id": 1,
+    "title": "Install PMM server",
+    "text": "",
+    "buttonText": "",
+    "buttonTooltipText": "",
+    "url": "",
+    "completed": true
+  },
+  {
+    "id": 2,
     "title": "Check new advisors",
     "text": "You now have access to more Advisors to automatically check your system health.",
     "buttonText": "Check new advisors",
@@ -9,7 +18,7 @@
     "completed": false
   },
   {
-    "id": 2,
+    "id": 3,
     "title": "Activate your new alerts",
     "text": "Check new Alerts Templates.",
     "buttonText": "Check new Alerts templates",

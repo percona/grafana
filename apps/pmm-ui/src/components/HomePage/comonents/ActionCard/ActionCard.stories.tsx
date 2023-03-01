@@ -1,28 +1,17 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { ActionCard, ActionCardVariant } from './ActionCard';
-import img3dStar from '../../assets/3d-star.png';
+import { ActionCard } from './ActionCard';
+import imgDbHealth from '../../assets/db-health.svg';
 
 export default {
   title: 'Percona/ActionCard',
   component: ActionCard,
   argTypes: {
-    variant: {
-      defaultValue: 'Primary',
-      options: Object.values(ActionCardVariant).filter((x) => typeof x === 'string'),
-      mapping: ActionCardVariant,
-      control: {
-        type: 'select',
-      },
-    },
-    heading: {
-      defaultValue: 'Heading',
-    },
-    description: {
-      defaultValue: 'Action card description',
+    text: {
+      defaultValue: 'Action card #1',
     },
     imgSrc: {
-      defaultValue: img3dStar,
+      defaultValue: imgDbHealth,
     },
   },
 } as ComponentMeta<typeof ActionCard>;

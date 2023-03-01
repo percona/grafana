@@ -1,11 +1,14 @@
 import React, { FC } from 'react';
-import { HorizontalGroup, useStyles2 } from '@grafana/ui';
+import { Button, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
-import { ActionCard, ActionCardVariant } from './comonents/ActionCard';
-import img3dHome from './assets/3d-home.png';
-import img3dSetting from './assets/3d-setting.png';
-import img3dStar from './assets/3d-star.png';
+import { ActionCard } from './comonents/ActionCard';
+import imgDbHealth from './assets/db-health.svg';
+import imgDiscoverPatterns from './assets/discover-patterns.svg';
+import imgOptmizeAndImprove from './assets/optimize-and-improve.svg';
+import imgMaintainPerformance from './assets/maintain-performance.svg';
+import { ActionContainer } from './comonents/ActionContainer';
+import { HelpCenterContainer } from './comonents/HelpCenterContainer';
 
 interface HomePageProps {
   onHelpCenterLinkClick?: () => void;
@@ -15,62 +18,33 @@ interface HomePageProps {
 export const HomePage: FC<HomePageProps> = ({ onHelpCenterLinkClick, onGettingStartedGuideLinkClicked }) => {
   const styles = useStyles2(getStyles);
 
+  const wavingHandEmoji = String.fromCodePoint(128075);
+  const ringBuoyEmoji = String.fromCodePoint(128735);
+  const welcomeHeader = `${wavingHandEmoji} Welcome to PMM`;
+  const welcomeText =
+    "We're glad to have you onboard in Percona Monitoring and Management (PMM). Get ready to monitor and optimize your database like a pro with our powerful and more user-friendly tool. Let's get started!";
+  const helpBlockHeader = `${ringBuoyEmoji} We’re here to help`;
+  const helpBlockText =
+    "We've got you covered. Check out our Help Center, official documentation, and community forums to find the answers you need and connect with other PMM users.";
   return (
     <div className={styles.welcomePage}>
-      <div className={styles.introContainer}>
-        <div className={styles.introHeader}>
-          <h1>Welcome</h1>
-        </div>
-        <div className={styles.introText}>
-          <p>
-            Your PMM instance is ready to roll. All you need now is to have your inventory setup. As next steps we
-            recommend:
-            <li className={styles.introTextList}>
-              Follow the&nbsp;
-              <a className={styles.introLink} onClick={onGettingStartedGuideLinkClicked}>
-                Getting Started guide
-              </a>
-              ;
-            </li>
-            <li className={styles.introTextList}>Or get a Percona Expert for a bulletproof scaling of your project.</li>
-          </p>
-          <p>
-            If you already know PMM like the back of your hand, and prefer to fine-tune it to your liking, we recommend
-            to go to Configurations.
-          </p>
-          <p>
-            If you ever feel lost, return to the&nbsp;
-            <a className={styles.introLink} onClick={onHelpCenterLinkClick}>
-              Help Center
-            </a>
-            &nbsp;on the top right corner of your screen.
-          </p>
-        </div>
-      </div>
-      <div className={styles.actionsContainer}>
-        <HorizontalGroup spacing="lg" wrap>
-          <ActionCard
-            variant={ActionCardVariant.Primary}
-            heading="Get a Percona Expert"
-            description="Boost your project with top tier expertise"
-            hasExternalLink
-            imgSrc={img3dStar}
-            imgAlt="Get a Percona Expert"
-            externalLinkTooltip="Open link in the new tab"
-          />
-          <ActionCard
-            variant={ActionCardVariant.Secondary}
-            heading="PMM configurations"
-            imgSrc={img3dSetting}
-            imgAlt="PMM configurations"
-          />
-          <ActionCard
-            variant={ActionCardVariant.Secondary}
-            heading="Homepage settings"
-            imgSrc={img3dHome}
-            imgAlt="Homepage settings"
-          />
-        </HorizontalGroup>
+      <div className={styles.welcomePageContent}>
+        <ActionContainer headerType="h1" header={welcomeHeader} text={welcomeText} actionsSpacing="none">
+          <ActionCard text="Monitor database health" imgSrc={imgDbHealth} imgAlt="Monitor database health" />
+          <ActionCard text="Discover patterns" imgSrc={imgDiscoverPatterns} imgAlt="Discover patterns" />
+          <ActionCard text="Optimize and improve" imgSrc={imgOptmizeAndImprove} imgAlt="Optimize and improve" />
+          <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
+        </ActionContainer>
+        <HelpCenterContainer />
+        <ActionContainer headerType="h2" header={helpBlockHeader} text={helpBlockText} actionsSpacing="md">
+          <Button variant="secondary">Open Help Center</Button>
+          <Button variant="secondary" icon="external-link-alt">
+            PMM Documentation
+          </Button>
+          <Button variant="secondary" icon="external-link-alt">
+            Community Forum
+          </Button>
+        </ActionContainer>
       </div>
     </div>
   );
@@ -79,48 +53,21 @@ export const HomePage: FC<HomePageProps> = ({ onHelpCenterLinkClick, onGettingSt
 const getStyles = (theme: GrafanaTheme2) => ({
   welcomePage: css`
     background: ${theme.colors.background.canvas};
-    padding: 16px 16px 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 16px;
+    gap: 10px;
   `,
-  introContainer: css`
-    background: ${theme.colors.background.canvas};
-    padding: 16px 16px 24px;
-  `,
-  introHeader: css`
-    width: 680px;
-    height: 33px;
+  welcomePageContent: css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    gap: 32px;
 
-    font-weight: 400;
-    font-size: 28px;
-    line-height: 33px;
-    color: ${theme.colors.text.primary};
-    letter-spacing: -0.00893em;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  `,
-  introText: css`
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 21px;
-
-    letter-spacing: 0.01071em;
-
-    color: ${theme.colors.text.primary};
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
-    margin-top: 10px;
-  `,
-  introLink: css`
-    color: ${theme.colors.text.link};
-  `,
-  introTextList: css`
-    margin-left: 10px;
-  `,
-  actionsContainer: css`
-    background: ${theme.colors.background.canvas};
-    padding: 16px 16px 24px;
+    width: 640px;
+    height: 795px;
   `,
 });
