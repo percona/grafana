@@ -85,16 +85,16 @@ export const Services = () => {
         ),
       },
       {
+        Header: 'Node Name',
+        accessor: (row) => row.params.nodeName,
+      },
+      {
         Header: 'Agents',
         accessor: 'params',
         width: '70px',
         Cell: ({ value, row }) => (
           <StatusBadge strippedServiceId={stripServiceId(row.original.params.serviceId)} agents={value.agents || []} />
         ),
-      },
-      {
-        Header: 'Node Name',
-        accessor: (row) => row.params.nodeName,
       },
       {
         Header: 'Address',
