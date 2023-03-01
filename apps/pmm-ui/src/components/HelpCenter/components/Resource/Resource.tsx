@@ -35,7 +35,7 @@ export const Resource: FC<ResourceProps> = (props) => {
             {button}
           </>
         ) : (
-          <Button icon="external-link-alt" variant="secondary" size="md" type="button" onClick={onClickUrl(url)}>
+          <Button icon="external-link-alt" variant="secondary" size="md" type="button" onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}>
             {buttonText}
           </Button>
         )}
@@ -43,16 +43,6 @@ export const Resource: FC<ResourceProps> = (props) => {
     </div>
   );
 };
-
-const openInNewTab = (url: string): void => {
-  const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
-
-  if (newWindow) {
-    newWindow.opener = null;
-  }
-};
-
-const onClickUrl = (url: string): (() => void) => () => openInNewTab(url);
 
 const getStyles = (theme: GrafanaTheme2) => ({
   resourceContainer: css`
