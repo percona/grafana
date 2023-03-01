@@ -1,16 +1,16 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
-import { TipsContainer } from './TipsContainer';
+import { TipNotConnected } from './TipNotConnected';
 
 export default {
   title: 'Percona/HelpCenter/TipsContainer',
-  component: TipsContainer,
+  component: TipNotConnected,
   argTypes: {},
-} as ComponentMeta<typeof TipsContainer>;
+} as ComponentMeta<typeof TipNotConnected>;
 
-const Template: ComponentStory<typeof TipsContainer> = (args) => {
-  return <TipsContainer {...args} />;
+const Template: ComponentStory<typeof TipNotConnected> = (args) => {
+  return <TipNotConnected {...args} />;
 };
 
 export const Primary = Template.bind({});
