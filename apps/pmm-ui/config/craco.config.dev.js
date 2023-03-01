@@ -2,6 +2,7 @@ module.exports = {
   webpack: {
     devServer: {
       port: 3001,
+      open: false,
     },
     configure: (config) => {
       config.output.publicPath = 'auto';
