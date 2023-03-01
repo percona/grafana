@@ -17,7 +17,6 @@ const Template: ComponentStory<typeof TopBar> = (args) => {
   return (
     <>
       <TopBar
-        title="Percona monitoring and management"
         userContext={userContext}
         showSignIn
         showFeedbackButton

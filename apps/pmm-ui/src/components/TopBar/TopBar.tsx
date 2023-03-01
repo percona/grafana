@@ -1,13 +1,11 @@
 import React, { FC, ReactNode, useState } from 'react';
-import { Button, Dropdown, Icon, Menu, ToolbarButtonRow, useStyles2, ToolbarButton } from '@grafana/ui';
-import { NavBarButton } from './components/NavBarButton';
+import { Button, Dropdown, Icon, Menu, ToolbarButtonRow, useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import perconaIcon from './assets/pmm-percona-icon.svg';
 import appIcon from './assets/pmm-app-icon.svg';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
 export interface TopBarProps {
-  title: string;
   showSignIn?: boolean;
   showFeedbackButton?: boolean;
   showHelpCenterButton?: boolean;
@@ -22,7 +20,6 @@ export interface TopBarProps {
 }
 
 export const TopBar: FC<TopBarProps> = ({
-  title,
   userContext,
   showSignIn,
   showFeedbackButton,
@@ -33,19 +30,25 @@ export const TopBar: FC<TopBarProps> = ({
 }) => {
   const [visibleFeedback, setVisibleFeedback] = useState(false);
 
+  // TODO: consider passing proper appSubUrl
+  const appSubUrl = '/graph';
+
   const styles = useStyles2(getStyles);
   const userMenu = (
     <Menu>
-      <Menu.Item label="Preferences" />
-      <Menu.Item label="Notification history" />
-      <Menu.Item label="Change password" />
-      <Menu.Divider />
       <Menu.Item label="Open Percona Platform" />
-      <Menu.Item label="Edit my Percona profile" />
+      <Menu.Item label="Percona Account profile" />
+      <Menu.Item label="Platform connection settings" />
       <Menu.Divider />
-      <Menu.Item label="Sign out" icon="signout" />
+      <Menu.Item url={appSubUrl + '/profile'} label="Preferences" />
+      <Menu.Item url={appSubUrl + '/profile/notifications'} label="Notification history" />
+      <Menu.Item url={appSubUrl + '/profile/password'} label="Change password" />
+      <Menu.Divider />
+      <Menu.Item url={appSubUrl + '/logout'} label="Sign out" icon="signout" />
     </Menu>
   );
+
+  const connectedToPortal = userContext;
 
   return (
     <nav className={styles.toolbar}>
@@ -58,7 +61,9 @@ export const TopBar: FC<TopBarProps> = ({
         <nav className={styles.navElement}>
           <div>
             <h1 className={styles.h1Styles}>
-              <div className={styles.titleText}>{title}</div>
+              <div className={styles.titleText}>
+                {connectedToPortal ? 'PMM' : 'Percona monitoring and management'}
+              </div>
             </h1>
           </div>
         </nav>
@@ -66,7 +71,7 @@ export const TopBar: FC<TopBarProps> = ({
       <ToolbarButtonRow alignment="right">
         {showHelpCenterNotificationMarker && <div className={styles.notificationMarker} />}
         {showSignIn &&
-          (userContext ? (
+          (connectedToPortal ? (
             <>
               <Dropdown overlay={userMenu} placement="bottom">
                 <Button variant="secondary">John Doe</Button>
@@ -76,10 +81,17 @@ export const TopBar: FC<TopBarProps> = ({
             <>
               <div className={styles.notificationMarker} />
               <div className={styles.tooltip}>
-                Get free features with a quick sign in
+                Get more out of PMM
                 <Icon name="arrow-right" />
               </div>
-              <NavBarButton title="Percona sign in" imgSrc={perconaIcon} imgAlt="PMM" onClick={onSignInClick} />
+              <Button
+                className={styles.connectButton}
+                icon="info"
+                variant="secondary"
+                onClick={onSignInClick}
+                >
+                  Connect to platform
+              </Button>
             </>
           ))}
         {showFeedbackButton && (
@@ -91,7 +103,8 @@ export const TopBar: FC<TopBarProps> = ({
                 setVisibleFeedback(false);
               }}
             >
-              <ToolbarButton
+              <Button
+                variant="secondary"
                 icon="message"
                 onClick={() => {
                   setVisibleFeedback(true);
@@ -100,7 +113,7 @@ export const TopBar: FC<TopBarProps> = ({
             </FeedbackTooltip>
           </>
         )}
-        {showHelpCenterButton && <NavBarButton icon="question-circle" onClick={onHelpCenterClick} />}
+        {showHelpCenterButton && <Button variant="secondary" icon="question-circle" onClick={onHelpCenterClick} />}
       </ToolbarButtonRow>
     </nav>
   );
@@ -162,4 +175,17 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     color: ${theme.colors.text.secondary};
     margin-right: 24px;
   `,
+  connectButton: css`
+    & > div > svg {
+      height: 18px;
+      width: 20px;
+
+      background-color: currentColor;
+      -webkit-mask-image: url(${perconaIcon});
+    }
+
+    & > div > svg > path {
+      display: none;
+    }
+  `
 });

@@ -8,7 +8,6 @@ export const OnboardPanel: FC<{}> = () => {
   return (
     <>
       <TopBar
-        title="Percona monitoring and management"
         userContext={userContext}
         showSignIn
         showFeedbackButton
