@@ -2,22 +2,27 @@ import React, { FC } from 'react';
 import { usePopperTooltip } from 'react-popper-tooltip';
 import { useStyles2, Portal, PopoverContent } from '@grafana/ui';
 import { colorManipulator, GrafanaTheme2 } from '@grafana/data';
+import * as PopperJS from '@popperjs/core';
 import { css } from '@emotion/css';
 
 interface TooltipProps {
   content: PopoverContent;
   visible: boolean;
   children?: any;
+  placement?: PopperJS.Placement,
 }
 
 /**
  * Tooltip from @grafana/ui library have hardcoded trigger actions: 'hover', 'focus' which shouldn't be
  * a proper behaviour of FeedbackTooltip.
- * File is just a simple copy of grafana's Tooltip.
+ * If we use Tooltip from @grafana/ui and move mouse pointer outside it's borders, the tooltip will disappear.
+ * We want to avoid such behaviour.
+ *
+ * File is just a simple copy of @grafana/ui/Tooltip.
  */
-export const ToolTip: FC<TooltipProps> = ({ content, visible, children }) => {
+export const ToolTip: FC<TooltipProps> = ({ content, visible, children, placement }) => {
   const { getArrowProps, getTooltipProps, setTooltipRef, setTriggerRef } = usePopperTooltip({
-    placement: 'bottom-end',
+    placement: placement ? placement : 'bottom-end',
     interactive: true,
     delayHide: 100,
     delayShow: 150,

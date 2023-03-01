@@ -5,7 +5,7 @@ import { Button, useStyles2 } from '@grafana/ui';
 import { Resource } from '../Resource/Resource';
 import tipIcon from '../../assets/pmm-percona-icon-purple.svg'
 
-export const TipsContainer: FC = () => {
+export const TipNotConnected: FC = () => {
   const styles = useStyles2(getStyles);
 
   const resourceText = (
