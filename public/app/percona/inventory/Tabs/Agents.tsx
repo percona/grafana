@@ -51,8 +51,9 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
         accessor: 'params',
         Cell: ({ value }) => (
           <TagList
+            colorIndex={9}
             className={styles.tagList}
-            tags={Object.keys(value.customLabels || {}).map((label) => `${label}: ${value.customLabels![label]}`)}
+            tags={Object.keys(value.customLabels || {}).map((label) => `${label}=${value.customLabels![label]}`)}
           />
         ),
       },

@@ -187,7 +187,11 @@ export const Services = () => {
         <DetailsRow>
           {!!labelKeys.length && (
             <DetailsRow.Contents title="Labels">
-              <TagList className={styles.tagList} tags={labelKeys.map((label) => `${label}=${labels![label]}`)} />
+              <TagList
+                colorIndex={9}
+                className={styles.tagList}
+                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
+              />
             </DetailsRow.Contents>
           )}
           {!!agents.length && (
