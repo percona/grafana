@@ -22,4 +22,5 @@ export const Messages = {
   connect: 'Validate Platform connection',
   invalidToken:
     'Your access token has expired. Go to Percona Portal and refresh the Profile Settings page to generate a new token.',
+  unknownError: 'Unknown error',
 };
