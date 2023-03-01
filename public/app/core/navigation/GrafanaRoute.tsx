@@ -58,7 +58,6 @@ export function GrafanaRoute(props: Props) {
           <Suspense fallback={<GrafanaRouteLoading />}>
             <>
               <PmmUi.TopBar
-                title="Percona monitoring and management"
                 userContext={userContext}
                 showSignIn
                 showFeedbackButton
