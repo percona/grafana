@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import {Button, IconName, Tooltip, useStyles2} from '@grafana/ui';
+import { Button, IconName, Tooltip, useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import checkMarkImg from '../../assets/check-mark.svg';
@@ -17,48 +17,36 @@ interface TipProps {
 }
 
 export const Tip: FC<TipProps> = (props) => {
-  const {
-    title,
-    number,
-    tipText,
-    opened,
-    onClick,
-    completed,
-    buttonText,
-    buttonIcon,
-    buttonTooltipText,
-  } = props;
+  const { title, number, tipText, opened, onClick, completed, buttonText, buttonIcon, buttonTooltipText } = props;
   const styles = useStyles2(getStyles);
 
   let active: boolean = opened && !completed;
   return (
     <div className={`${styles.tipContainer} ${!active ? styles.tipContainerNoPadding : ''}`}>
       <div className={`${styles.tipHeader} ${!active ? styles.tipPointer : ''}`} onClick={onClick}>
-        <div className={`${styles.tipNumber} ${completed ? styles.tipNumberCompleted : (active ? styles.tipNumberActive : styles.tipNumberNotActive)}`}>
-          {completed &&
-            <img
-              alt="tip-check-mark"
-              src={checkMarkImg}
-            />
-          }
+        <div
+          className={`${styles.tipNumber} ${
+            completed ? styles.tipNumberCompleted : active ? styles.tipNumberActive : styles.tipNumberNotActive
+          }`}
+        >
+          {completed && <img alt="tip-check-mark" src={checkMarkImg} />}
           {!completed && number}
         </div>
         <div className={`${styles.tipTitle} ${completed ? styles.tipTitleCompleted : ''}`}>{title}</div>
       </div>
       <div className={`${styles.tipBody} ${!active ? styles.tipBodyHidden : ''}`}>
         <div className={styles.tipText}>{tipText}</div>
-        {buttonTooltipText ?
+        {buttonTooltipText ? (
           <Tooltip content={buttonTooltipText} placement="top" interactive={true}>
             <Button variant="secondary" size="md" type="button" icon={buttonIcon}>
               {buttonText}
             </Button>
           </Tooltip>
-
-          : <Button variant="secondary" size="md" type="button" icon={buttonIcon}>
+        ) : (
+          <Button variant="secondary" size="md" type="button" icon={buttonIcon}>
             {buttonText}
           </Button>
-
-        }
+        )}
       </div>
     </div>
   );
@@ -71,7 +59,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     align-items: flex-start;
     margin-bottom: 16px;
 
-    width: 384px;
+    width: 100%;
     padding-bottom: 16px;
 
     background: ${theme.colors.background.secondary};

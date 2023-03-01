@@ -1,9 +1,8 @@
 import React, { FC, useState } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css, keyframes } from '@emotion/css';
-import {IconName, useStyles2} from '@grafana/ui';
-import { Tip } from '../Tip';
-import tipsData from './data/tips.json';
+import { useStyles2 } from '@grafana/ui';
+import { TipContainer } from './TipContainer';
 
 export const TipsConnected: FC = () => {
   const styles = useStyles2(getStyles);
@@ -25,21 +24,7 @@ export const TipsConnected: FC = () => {
           }}
         />
       </div>
-      <div>
-        {tipsData.map((t) => (
-          <Tip
-            title={t.title}
-            number={t.id}
-            buttonText={t.buttonText}
-            buttonIcon={t.buttonIcon as IconName}
-            buttonTooltipText={t.buttonTooltipText}
-            tipText={t.text}
-            onClick={ !t.completed ? () => setTip(t.id) : () => {} }
-            completed={t.completed}
-            opened={tip === t.id}
-          />
-        ))}
-      </div>
+      <TipContainer />
     </>
   );
 };
