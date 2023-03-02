@@ -5,9 +5,10 @@ import Drop from 'tether-drop';
 import {locationSearchToObject, navigationLogger, reportPageview} from '@grafana/runtime';
 import {ErrorBoundary} from '@grafana/ui';
 
-import {PmmUi} from '../../percona/federation';
-import {LocalStorageValueProvider} from "../components/LocalStorageValueProvider";
-import {useGrafana} from '../context/GrafanaContext';
+import { PmmUi } from '../../percona/federation';
+import { LocalStorageValueProvider } from "../components/LocalStorageValueProvider";
+import { useGrafana } from '../context/GrafanaContext';
+import { contextSrv } from 'app/core/core';
 
 import {GrafanaRouteError} from './GrafanaRouteError';
 import {GrafanaRouteLoading} from './GrafanaRouteLoading';
@@ -49,6 +50,8 @@ export function GrafanaRoute(props: Props) {
   //TODO:WIP:
   const [_, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
+  const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
+  const isAdmin = contextSrv.isGrafanaAdmin;
 
   return (
     <ErrorBoundary>
@@ -64,6 +67,19 @@ export function GrafanaRoute(props: Props) {
                 {(isHelpCenterOpen, saveHelpCenterOpen) => {
                   return (
                     <>
+                      {/*MODALS*/}
+                      <>
+                        <PmmUi.ConnectPortalModal
+                          onClose={() => setConnectPortalModalVisible(false)}
+                          onConfirm={() => {
+                            setConnectPortalModalVisible(false);
+                            setUserContext('something_here');
+                          }}
+                          isAdmin={isAdmin}
+                          isOpen={connectPortalModalVisible}
+                        />
+                      </>
+
                       <PmmUi.TopBar
                         title="Percona monitoring and management"
                         userContext={userContext}
@@ -72,8 +88,7 @@ export function GrafanaRoute(props: Props) {
                         showHelpCenterButton
                         showHelpCenterNotificationMarker
                         onSignInClick={() => {
-                          setMessage('sign in');
-                          setUserContext('something_here');
+                          setConnectPortalModalVisible(true);
                         }}
                         onHelpCenterClick={() => saveHelpCenterOpen(!isHelpCenterOpen)}
                         onNotificationClick={() => setMessage('notification')}

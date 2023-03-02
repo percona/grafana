@@ -3,8 +3,8 @@ import { Button, Dropdown, Icon, Menu, ToolbarButtonRow, useStyles2 } from '@gra
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import perconaIcon from './assets/pmm-percona-icon.svg';
-import appIcon from './assets/pmm-app-icon.svg';
-import platformIcon from './assets/pmm-platform-purple.svg';
+import appIcon from '../../assets/pmm-app-icon.svg';
+import platformIcon from '../../assets/pmm-platform-purple.svg';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
 export interface TopBarProps {
   showSignIn?: boolean;
@@ -56,15 +56,15 @@ export const TopBar: FC<TopBarProps> = ({
       <div className={styles.leftWrapper}>
         <div className={styles.pageIcon}>
           <div className={styles.pmmIconHolder}>
-            <img alt="percona-logo" className={styles.pmmIcon} src={appIcon} />
+            <a href={appSubUrl + '/a/pmm-homescreen-app'}>
+              <img alt="percona-logo" className={styles.pmmIcon} src={appIcon} />
+            </a>
           </div>
         </div>
         <nav className={styles.navElement}>
           <div>
             <h1 className={styles.h1Styles}>
-              <div className={styles.titleText}>
-                {connectedToPortal ? 'PMM' : 'Percona monitoring and management'}
-              </div>
+              <div className={styles.titleText}>{connectedToPortal ? 'PMM' : 'Percona monitoring and management'}</div>
             </h1>
           </div>
         </nav>
@@ -85,12 +85,7 @@ export const TopBar: FC<TopBarProps> = ({
                 Get more out of PMM
                 <Icon name="arrow-right" />
               </div>
-              <Button
-                className={styles.connectButton}
-                icon="info"
-                variant="secondary"
-                onClick={onSignInClick}
-              >
+              <Button className={styles.connectButton} icon="info" variant="secondary" onClick={onSignInClick}>
                 Connect to platform
               </Button>
             </>
@@ -201,10 +196,10 @@ export const getStyles = (theme: GrafanaTheme2) => ({
       display: none;
     }
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background: rgba(71, 47, 100, 0.67);
       color: ${theme.colors.error.contrastText};
     }
-
   `,
 });

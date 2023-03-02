@@ -35,7 +35,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
   contentTitle: css`
     font-size: ${theme.typography.h4.fontSize};
     line-height: 22px;
-    color: ${theme.colors.text.primary}
+    color: ${theme.colors.text.primary};
   `,
   description: css`
     padding-top: ${theme.spacing(1)};

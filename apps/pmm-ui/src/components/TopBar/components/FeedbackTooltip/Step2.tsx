@@ -32,7 +32,9 @@ export const Step2: FC<Step2Props> = ({ onSubmit }) => {
       </div>
       <div className={styles.ratingDestription}>We will use your feedback to improve our products and services.</div>
       <div>
-        <Button icon="message" onClick={submitFeedback}>Send feedback</Button>
+        <Button icon="message" onClick={submitFeedback}>
+          Send feedback
+        </Button>
       </div>
     </>
   );
@@ -40,15 +42,15 @@ export const Step2: FC<Step2Props> = ({ onSubmit }) => {
 
 const getStyles = (theme: GrafanaTheme2) => ({
   contentTitle: css`
-      font-size: ${theme.typography.h4.fontSize};
-      line-height: 22px;
-      color: ${theme.colors.text.primary}
+    font-size: ${theme.typography.h4.fontSize};
+    line-height: 22px;
+    color: ${theme.colors.text.primary};
   `,
   feedbackHolder: css`
     align-self: stretch;
   `,
   ratingDestription: css`
-      line-height: 15px;
-      color: rgba(204, 204, 220, 0.65);
+    line-height: 15px;
+    color: rgba(204, 204, 220, 0.65);
   `,
 });
