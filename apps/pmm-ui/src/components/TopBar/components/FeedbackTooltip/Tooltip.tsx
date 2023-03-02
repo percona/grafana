@@ -9,7 +9,7 @@ interface TooltipProps {
   content: PopoverContent;
   visible: boolean;
   children?: any;
-  placement?: PopperJS.Placement,
+  placement?: PopperJS.Placement;
 }
 
 /**
