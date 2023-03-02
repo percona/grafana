@@ -33,7 +33,9 @@ export interface GetUpdatesResponse {
     version: string;
   };
   latest_news_url: string;
-  update_available: boolean;
+  update_available?: boolean;
+  pmm_update_available?: boolean;
+  server_upgrade_service_available?: boolean;
 }
 
 export interface GetUpdateStatusResponse {

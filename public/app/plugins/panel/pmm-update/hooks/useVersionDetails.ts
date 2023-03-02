@@ -47,6 +47,8 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
       latest_news_url,
       installed,
       update_available,
+      pmm_update_available,
+      server_upgrade_service_available,
     } = data;
     const { full_version: latestFullVersion, timestamp: latestTimestamp, version: latestVersion } = latest;
     const {
@@ -54,6 +56,7 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
       timestamp: installedVersionTimestamp,
       version: installedVersion,
     } = installed;
+    const updateOptionAvailable = pmm_update_available || server_upgrade_service_available;
 
     setNextVersionDetails({
       nextVersion: latestVersion ?? '',
@@ -67,7 +70,7 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
       installedVersionDate: installedVersionTimestamp ? formatDateWithYear(installedVersionTimestamp) : '',
     });
     setLastCheckDate(last_check ? formatDateWithTime(last_check) : '');
-    setIsUpdateAvailable(update_available ?? false);
+    setIsUpdateAvailable(!!(updateOptionAvailable && update_available));
     setIsDefaultView(false);
   }, [data]);
 
