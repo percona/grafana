@@ -16,7 +16,7 @@ export const ExpandAndActionsCol = <T extends object>({
   className,
   children,
 }: PropsWithChildren<ExpandAndActionsColProps<T>>): ReactElement => {
-  const styles = useStyles2(getStyles);
+  const styles = useStyles2((theme) => getStyles(theme, !children && !actions.length));
 
   return (
     <div className={cx(styles.actionsWrapper, className)}>

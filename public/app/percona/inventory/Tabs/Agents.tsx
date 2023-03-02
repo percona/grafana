@@ -2,7 +2,7 @@
 import { CheckboxField, Table, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { Column } from 'react-table';
+import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
@@ -10,12 +10,14 @@ import { Page } from 'app/core/components/Page/Page';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { formatServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Agent, ServiceAgentPayload } from 'app/percona/inventory/Inventory.types';
+import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 
 import { appEvents } from '../../../core/app_events';
@@ -38,27 +40,17 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   const columns = useMemo(
     (): Array<Column<Agent>> => [
       {
-        Header: 'ID',
-        accessor: (row) => row.params.agentId,
-      },
-      {
         Header: 'Agent Type',
         accessor: 'type',
         Cell: ({ value }) => beautifyAgentType(value),
       },
       {
-        Header: 'Other Details',
-        accessor: 'params',
-        Cell: ({ value }) => (
-          <TagList
-            colorIndex={9}
-            className={styles.tagList}
-            tags={Object.keys(value.customLabels || {}).map((label) => `${label}=${value.customLabels![label]}`)}
-          />
-        ),
+        Header: 'Agent ID',
+        accessor: (row) => row.params.agentId,
       },
+      getExpandAndActionsCol(),
     ],
-    [styles.tagList]
+    []
   );
 
   const loadData = useCallback(async () => {
@@ -79,6 +71,28 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
     setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<Agent>) => {
+      const labels = row.original.params.customLabels || {};
+      const labelKeys = Object.keys(labels);
+
+      return (
+        <DetailsRow>
+          {!!labelKeys.length && (
+            <DetailsRow.Contents title="Labels" fullRow>
+              <TagList
+                colorIndex={9}
+                className={styles.tagList}
+                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
+              />
+            </DetailsRow.Contents>
+          )}
+        </DetailsRow>
+      );
+    },
+    [styles.tagList]
+  );
 
   useEffect(() => {
     loadData();
@@ -193,6 +207,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             emptyMessageClassName={styles.emptyMessage}
             pendingRequest={loading}
             overlayClassName={styles.overlay}
+            renderExpandedRow={renderSelectedSubRow}
           />
         </FeatureLoader>
       </Page.Contents>
