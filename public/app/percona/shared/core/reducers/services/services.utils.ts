@@ -21,6 +21,7 @@ export const MAIN_COLUMNS = [
   'address',
   'port',
   'agents',
+  'node_name',
 ];
 
 export const toRemoveServiceBody = (params: RemoveServiceParams): RemoveServiceBody => ({
