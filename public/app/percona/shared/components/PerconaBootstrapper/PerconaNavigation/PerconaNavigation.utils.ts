@@ -169,7 +169,7 @@ export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) =>
 
   modelItem.children!.push({
     id: 'advisors-insights',
-    text: 'Insights',
+    text: 'Advisor Insights',
     url: `${config.appSubUrl}/advisors/insights`,
   });
 
