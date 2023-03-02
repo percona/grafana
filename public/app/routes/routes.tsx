@@ -635,6 +635,16 @@ export function getAppRoutes(): RouteDescriptor[] {
       component: () => <Redirect to="/advisors/insights" />,
     },
     {
+      path: '/pmm-database-checks/failed-checks',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/advisors/insights" />,
+    },
+    {
+      path: '/pmm-database-checks/all-checks',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/advisors/insights" />,
+    },
+    {
       path: '/advisors/insights',
       // eslint-disable-next-line react/display-name
       component: SafeDynamicImport(
