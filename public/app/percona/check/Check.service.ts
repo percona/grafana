@@ -2,9 +2,7 @@
 import { CancelToken } from 'axios';
 
 import {
-  AllChecks,
   ChangeCheckBody,
-  CheckDetails,
   CheckResultForServicePayload,
   CheckResultSummaryPayload,
   FailedCheckSummary,
@@ -138,11 +136,6 @@ export const CheckService = {
       false,
       token
     );
-  },
-  async getAllChecks(token?: CancelToken): Promise<CheckDetails[]> {
-    const response = await api.post<AllChecks, object>('/v1/management/SecurityChecks/List', {}, false, token);
-
-    return response && response.checks ? response.checks.sort((a, b) => a.summary.localeCompare(b.summary)) : [];
   },
   runIndividualDbCheck(checkName: string, token?: CancelToken): Promise<void | {}> {
     return api.post<{}, {}>(

@@ -627,10 +627,15 @@ export function getAppRoutes(): RouteDescriptor[] {
     {
       path: '/advisors',
       // eslint-disable-next-line react/display-name
-      component: () => <Redirect to="/advisors/notifications" />,
+      component: () => <Redirect to="/advisors/insights" />,
     },
     {
-      path: '/advisors/notifications',
+      path: '/pmm-database-checks',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/advisors/insights" />,
+    },
+    {
+      path: '/advisors/insights',
       // eslint-disable-next-line react/display-name
       component: SafeDynamicImport(
         () =>

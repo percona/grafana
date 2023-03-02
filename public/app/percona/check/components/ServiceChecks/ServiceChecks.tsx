@@ -34,7 +34,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   const [serviceName, setServiceName] = useState('');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
-  const navModel = usePerconaNavModel('advisors-notifications');
+  const navModel = usePerconaNavModel('advisors-insights');
 
   const fetchChecks = useCallback(async () => {
     try {

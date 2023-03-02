@@ -25,7 +25,7 @@ import { Failures } from './Failures/Failures';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
-  const navModel = usePerconaNavModel('advisors-notifications');
+  const navModel = usePerconaNavModel('advisors-insights');
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();

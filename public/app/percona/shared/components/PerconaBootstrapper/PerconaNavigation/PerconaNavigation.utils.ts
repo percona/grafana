@@ -168,9 +168,9 @@ export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) =>
   const categories = Object.keys(categorizedAdvisors);
 
   modelItem.children!.push({
-    id: 'advisors-notifications',
-    text: 'Notifications',
-    url: `${config.appSubUrl}/advisors/notifications`,
+    id: 'advisors-insights',
+    text: 'Insights',
+    url: `${config.appSubUrl}/advisors/insights`,
   });
 
   categories.forEach((category) => {
