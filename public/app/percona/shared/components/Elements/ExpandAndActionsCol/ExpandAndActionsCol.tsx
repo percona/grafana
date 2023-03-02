@@ -1,3 +1,4 @@
+import { cx } from '@emotion/css';
 import React, { PropsWithChildren, ReactElement } from 'react';
 
 import { Spinner, Tooltip, useStyles2 } from '@grafana/ui';
@@ -12,12 +13,13 @@ export const ExpandAndActionsCol = <T extends object>({
   row,
   loading = false,
   actions = [],
+  className,
   children,
 }: PropsWithChildren<ExpandAndActionsColProps<T>>): ReactElement => {
   const styles = useStyles2(getStyles);
 
   return (
-    <div className={styles.actionsWrapper}>
+    <div className={cx(styles.actionsWrapper, className)}>
       {loading ? (
         <Spinner />
       ) : (

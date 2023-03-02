@@ -11,7 +11,6 @@ import { OldPage } from 'app/core/components/Page/Page';
 import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
-import { ExpandAndActionsCol } from 'app/percona/shared/components/Elements/ExpandAndActionsCol/ExpandAndActionsCol';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ServiceIconWithText } from 'app/percona/shared/components/Elements/ServiceIconWithText/ServiceIconWithText';
 import { FormElement } from 'app/percona/shared/components/Form';
@@ -25,6 +24,7 @@ import {
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getDashboardLinkForService } from 'app/percona/shared/helpers/getDashboardLinkForService';
+import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { Service } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -103,11 +103,9 @@ export const Services = () => {
       {
         Header: 'Port',
         accessor: (row) => row.params.port,
+        width: '100px',
       },
-      {
-        Header: 'Actions',
-        Cell: ({ row }: { row: Row<Service> }) => <ExpandAndActionsCol actions={getActions(row)} row={row} />,
-      },
+      getExpandAndActionsCol(getActions),
     ],
     [getActions]
   );
