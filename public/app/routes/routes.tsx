@@ -645,7 +645,7 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/advisors/notifications/:service',
+      path: '/advisors/insights/:service',
       component: SafeDynamicImport(
         () =>
           import(/* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/ServiceChecks/ServiceChecks')
