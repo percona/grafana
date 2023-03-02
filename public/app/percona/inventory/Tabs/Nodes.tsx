@@ -2,11 +2,12 @@
 import { CheckboxField, Table, logger } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { Column } from 'react-table';
+import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table';
 import { FormElement } from 'app/percona/shared/components/Form';
@@ -16,6 +17,7 @@ import { RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { Node } from 'app/percona/shared/services/nodes/Nodes.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -37,7 +39,11 @@ export const NodesTab = () => {
   const columns = useMemo(
     (): Array<Column<Node>> => [
       {
-        Header: 'ID',
+        Header: 'Node Name',
+        accessor: (row) => row.params.nodeName,
+      },
+      {
+        Header: 'Node ID',
         accessor: (row) => row.params.nodeId,
       },
       {
@@ -45,26 +51,12 @@ export const NodesTab = () => {
         accessor: 'type',
       },
       {
-        Header: 'Node Name',
-        accessor: (row) => row.params.nodeName,
-      },
-      {
         Header: 'Addresses',
         accessor: (row) => row.params.address,
       },
-      {
-        Header: 'Other Details',
-        accessor: 'params',
-        Cell: ({ value }) => (
-          <TagList
-            colorIndex={9}
-            className={styles.tagList}
-            tags={Object.keys(value.customLabels || {}).map((label) => `${label}=${value.customLabels![label]}`)}
-          />
-        ),
-      },
+      getExpandAndActionsCol(),
     ],
-    [styles.tagList]
+    []
   );
 
   const loadData = useCallback(async () => {
@@ -78,6 +70,28 @@ export const NodesTab = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<Node>) => {
+      const labels = row.original.params.customLabels || {};
+      const labelKeys = Object.keys(labels);
+
+      return (
+        <DetailsRow>
+          {!!labelKeys.length && (
+            <DetailsRow.Contents title="Labels" fullRow>
+              <TagList
+                colorIndex={9}
+                className={styles.tagList}
+                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
+              />
+            </DetailsRow.Contents>
+          )}
+        </DetailsRow>
+      );
+    },
+    [styles.tagList]
+  );
 
   useEffect(() => {
     loadData();
@@ -194,6 +208,7 @@ export const NodesTab = () => {
             emptyMessageClassName={styles.emptyMessage}
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
+            renderExpandedRow={renderSelectedSubRow}
           />
         </FeatureLoader>
       </OldPage.Contents>
