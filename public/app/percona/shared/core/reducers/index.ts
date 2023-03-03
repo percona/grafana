@@ -24,6 +24,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { ServerInfo } from '../types';
 
+import advisorsReducers from './advisors/advisors';
 import perconaBackupLocations from './backups/backupLocations';
 import perconaAddDBCluster from './dbaas/addDBCluster/addDBCluster';
 import perconaDBClustersReducer from './dbaas/dbClusters/dbClusters';
@@ -301,5 +302,6 @@ export default {
     tour: tourReducer,
     roles: rolesReducers,
     users: usersReducers,
+    advisors: advisorsReducers,
   }),
 };
