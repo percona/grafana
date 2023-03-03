@@ -5,17 +5,16 @@ import { css } from '@emotion/css';
 import { ActionCard } from './comonents/ActionCard';
 import imgDbHealth from './assets/db-health.svg';
 import imgDiscoverPatterns from './assets/discover-patterns.svg';
-import imgOptmizeAndImprove from './assets/optimize-and-improve.svg';
+import imgOptimizeAndImprove from './assets/optimize-and-improve.svg';
 import imgMaintainPerformance from './assets/maintain-performance.svg';
 import { ActionContainer } from './comonents/ActionContainer';
 import { HelpCenterContainer } from './comonents/HelpCenterContainer';
 
 interface HomePageProps {
-  onHelpCenterLinkClick?: () => void;
-  onGettingStartedGuideLinkClicked?: () => void;
+  onHelpCenterButtonClick?: () => void;
 }
 
-export const HomePage: FC<HomePageProps> = ({ onHelpCenterLinkClick, onGettingStartedGuideLinkClicked }) => {
+export const HomePage: FC<HomePageProps> = ({ onHelpCenterButtonClick }) => {
   const styles = useStyles2(getStyles);
 
   const wavingHandEmoji = String.fromCodePoint(128075);
@@ -32,16 +31,26 @@ export const HomePage: FC<HomePageProps> = ({ onHelpCenterLinkClick, onGettingSt
         <ActionContainer headerType="h1" header={welcomeHeader} text={welcomeText} actionsSpacing="none">
           <ActionCard text="Monitor database health" imgSrc={imgDbHealth} imgAlt="Monitor database health" />
           <ActionCard text="Discover patterns" imgSrc={imgDiscoverPatterns} imgAlt="Discover patterns" />
-          <ActionCard text="Optimize and improve" imgSrc={imgOptmizeAndImprove} imgAlt="Optimize and improve" />
+          <ActionCard text="Optimize and improve" imgSrc={imgOptimizeAndImprove} imgAlt="Optimize and improve" />
           <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
         </ActionContainer>
         <HelpCenterContainer />
         <ActionContainer headerType="h2" header={helpBlockHeader} text={helpBlockText} actionsSpacing="md">
-          <Button variant="secondary">Open Help Center</Button>
-          <Button variant="secondary" icon="external-link-alt">
+          <Button variant="secondary" onClick={onHelpCenterButtonClick}>
+            Open Help Centers
+          </Button>
+          <Button
+            variant="secondary"
+            icon="external-link-alt"
+            onClick={() => window.open('https://docs.percona.com/percona-monitoring-and-management/')}
+          >
             PMM Documentation
           </Button>
-          <Button variant="secondary" icon="external-link-alt">
+          <Button
+            variant="secondary"
+            icon="external-link-alt"
+            onClick={() => window.open('https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none ')}
+          >
             Community Forum
           </Button>
         </ActionContainer>

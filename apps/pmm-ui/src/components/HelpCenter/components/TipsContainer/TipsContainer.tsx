@@ -3,11 +3,11 @@ import tipsData from './data/tips.json';
 import { Tip } from '../Tip';
 import { IconName } from '@grafana/ui';
 
-export interface TipContainerProps {
+export interface TipsContainerProps {
   className?: string;
 }
 
-export const TipContainer: FC<TipContainerProps> = ({ className }) => {
+export const TipsContainer: FC<TipsContainerProps> = ({ className }) => {
   const notCompletedTip = tipsData.find((tipData) => tipData.completed === false);
   const initial = notCompletedTip !== undefined ? notCompletedTip.id : 0;
   const [tip, setTip] = useState(initial);

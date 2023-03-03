@@ -6,6 +6,7 @@ import perconaIcon from './assets/pmm-percona-icon.svg';
 import appIcon from '../../assets/pmm-app-icon.svg';
 import platformIcon from '../../assets/pmm-platform-purple.svg';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
+import { HelpCenterTooltip } from './components/HelpCenterTooltip';
 export interface TopBarProps {
   showSignIn?: boolean;
   showFeedbackButton?: boolean;
@@ -18,6 +19,8 @@ export interface TopBarProps {
   onHelpCenterClick: () => void;
   showHelpCenterNotificationMarker?: boolean;
   children?: ReactNode;
+  showHelpCenterToolTip?: boolean;
+  onCloseHelpCenterTooltip: () => void;
 }
 
 export const TopBar: FC<TopBarProps> = ({
@@ -28,6 +31,8 @@ export const TopBar: FC<TopBarProps> = ({
   onSignInClick,
   onHelpCenterClick,
   showHelpCenterNotificationMarker,
+  showHelpCenterToolTip,
+  onCloseHelpCenterTooltip,
 }) => {
   const [visibleFeedback, setVisibleFeedback] = useState(false);
 
@@ -109,7 +114,13 @@ export const TopBar: FC<TopBarProps> = ({
             </FeedbackTooltip>
           </>
         )}
-        {showHelpCenterButton && <Button variant="secondary" icon="question-circle" onClick={onHelpCenterClick} />}
+        {showHelpCenterButton && (
+          <>
+            <HelpCenterTooltip visible={!!showHelpCenterToolTip} onClose={onCloseHelpCenterTooltip}>
+              <Button variant="secondary" icon="question-circle" onClick={onHelpCenterClick} />
+            </HelpCenterTooltip>
+          </>
+        )}
       </ToolbarButtonRow>
     </nav>
   );

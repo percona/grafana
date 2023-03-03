@@ -29,6 +29,7 @@ const Template: ComponentStory<typeof TopBar> = (args) => {
         onHelpCenterClick={() => setMessage('help center')}
         onNotificationClick={() => setMessage('notification')}
         onFeedbackClick={() => setMessage('feedback form')}
+        onCloseHelpCenterTooltip={() => setMessage('close tooltip')}
       />
       <p>{message}</p>
     </>

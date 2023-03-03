@@ -154,7 +154,7 @@ function getGrafanaTooltipStyle(theme: GrafanaTheme2) {
 
       &[data-popper-placement*='left'] .tooltip-arrow::before {
         border-color: transparent transparent transparent ${tooltipBorder};
-        border-width: 7px 0px 6px 7px;
+        border-width: 7px 0 6px 7px;
       }
 
       &[data-popper-placement*='left'] .tooltip-arrow::after {

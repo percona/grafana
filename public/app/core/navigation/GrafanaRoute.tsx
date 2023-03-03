@@ -51,6 +51,7 @@ export function GrafanaRoute(props: Props) {
   const [_, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
+  const [helpCenterToolTipVisiable, setHelpCenterToolTipVisiable] = useState(false);
   const isAdmin = contextSrv.isGrafanaAdmin;
 
   return (
@@ -93,6 +94,8 @@ export function GrafanaRoute(props: Props) {
                         onHelpCenterClick={() => saveHelpCenterOpen(!isHelpCenterOpen)}
                         onNotificationClick={() => setMessage('notification')}
                         onFeedbackClick={() => setMessage('feedback form')}
+                        showHelpCenterToolTip={helpCenterToolTipVisiable}
+                        onCloseHelpCenterTooltip={() => setHelpCenterToolTipVisiable(false)}
                       />
                       <PmmUi.HelpCenter
                         open={isHelpCenterOpen}
@@ -105,7 +108,7 @@ export function GrafanaRoute(props: Props) {
                         {props.location.pathname === '/a/pmm-homescreen-app' ? (
                           <Suspense fallback={<div></div>}>
                             <>
-                              <PmmUi.HomePage/>
+                              <PmmUi.HomePage onHelpCenterButtonClick={() => setHelpCenterToolTipVisiable(true)}/>
                             </>
                           </Suspense>
                         ) : (

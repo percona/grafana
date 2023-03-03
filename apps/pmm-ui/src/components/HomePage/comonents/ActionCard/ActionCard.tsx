@@ -8,13 +8,14 @@ interface ActionCardProps {
   imgSrc?: string;
   imgAlt?: string;
   text: string;
+  isClickable?: boolean;
 }
 
-export const ActionCard: FC<ActionCardProps> = ({ imgSrc, onClick, imgAlt, text }) => {
+export const ActionCard: FC<ActionCardProps> = ({ imgSrc, onClick, imgAlt, text, isClickable }) => {
   const styles = useStyles2(getStyles);
 
   return (
-    <div className={styles.actionCard} onClick={onClick}>
+    <div className={`${styles.actionCard} ${isClickable ? styles.actionCardClickable : ''}`} onClick={onClick}>
       <div className={styles.actionCardImageContainer}>
         <img className={styles.actionCardImage} src={imgSrc} alt={imgAlt} />
       </div>
@@ -36,6 +37,8 @@ const getStyles = (theme: GrafanaTheme2) => ({
     height: 101px;
 
     background: ${theme.colors.background.canvas};
+  `,
+  actionCardClickable: css`
     cursor: pointer;
   `,
   actionCardImageContainer: css`
