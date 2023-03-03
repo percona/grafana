@@ -24,6 +24,7 @@ import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
+import { Messages } from '../Inventory.messages';
 
 import { getStyles } from './Tabs.styles';
 
@@ -150,13 +151,13 @@ export const NodesTab = () => {
               icon="trash-alt"
               variant="destructive"
             >
-              Delete
+              {Messages.delete}
             </Button>
           </div>
           <Modal
             title={
               <div className="modal-header-title">
-                <span className="p-l-1">Confirm action</span>
+                <span className="p-l-1">{Messages.confirmAction}</span>
               </div>
             }
             isOpen={modalVisible}
@@ -174,19 +175,14 @@ export const NodesTab = () => {
                     <FormElement
                       dataTestId="form-field-force"
                       label="Force mode"
-                      element={
-                        <CheckboxField
-                          name="force"
-                          label={'Force mode is going to delete all ' + 'agents and services associated with the nodes'}
-                        />
-                      }
+                      element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
                     />
                     <HorizontalGroup justify="space-between" spacing="md">
                       <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                        Cancel
+                        {Messages.cancel}
                       </Button>
                       <Button type="submit" size="md" variant="destructive">
-                        Proceed
+                        {Messages.proceed}
                       </Button>
                     </HorizontalGroup>
                   </>

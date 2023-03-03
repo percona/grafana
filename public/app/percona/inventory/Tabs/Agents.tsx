@@ -26,6 +26,7 @@ import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_AGENTS_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
+import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
 import { beautifyAgentType, toAgentModel } from './Agents.utils';
@@ -147,22 +148,22 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             <a href="/inventory/services">
               <Icon name="arrow-left" size="lg" />
             </a>
-            <span>Go back to services</span>
+            <span>{Messages.agents.goBack}</span>
           </HorizontalGroup>
           {service && !servicesLoading && (
-            <h5 className={styles.agentBreadcrumb}>Service {service.params.serviceName} / Agents</h5>
+            <h5 className={styles.agentBreadcrumb}>{Messages.agents.breadcrumb(service.params.serviceName)}</h5>
           )}
           <HorizontalGroup height={40} justify="flex-end" align="flex-start">
             <Button
               size="md"
               disabled={selected.length === 0}
               onClick={() => {
-                setModalVisible(!modalVisible);
+                setModalVisible((visible) => !visible);
               }}
               icon="trash-alt"
               variant="destructive"
             >
-              Delete
+              {Messages.delete}
             </Button>
           </HorizontalGroup>
           <Modal
@@ -193,7 +194,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
 
                     <HorizontalGroup justify="space-between" spacing="md">
                       <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
-                        Cancel
+                        {Messages.cancel}
                       </Button>
                       <Button
                         size="md"
@@ -203,7 +204,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
                         }}
                         variant="destructive"
                       >
-                        Proceed
+                        {Messages.proceed}
                       </Button>
                     </HorizontalGroup>
                   </>
@@ -221,7 +222,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             showPagination
             pageSize={25}
             allRowsSelectionMode="page"
-            emptyMessage="No agents Available"
+            emptyMessage={Messages.agents.noAgents}
             emptyMessageClassName={styles.emptyMessage}
             pendingRequest={agentsLoading || servicesLoading}
             overlayClassName={styles.overlay}

@@ -31,6 +31,7 @@ import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
+import { Messages } from '../Inventory.messages';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 
 import { getStyles } from './Tabs.styles';
@@ -229,16 +230,16 @@ export const Services = () => {
               icon="trash-alt"
               variant="destructive"
             >
-              Delete
+              {Messages.delete}
             </Button>
             <Button icon="plus" onClick={onAddService}>
-              Add Service
+              {Messages.services.add}
             </Button>
           </HorizontalGroup>
           <Modal
             title={
               <div className="modal-header-title">
-                <span className="p-l-1">Confirm action</span>
+                <span className="p-l-1">{Messages.confirmAction}</span>
               </div>
             }
             isOpen={modalVisible}
@@ -252,14 +253,12 @@ export const Services = () => {
                     <h4 className={styles.confirmationText}>{deletionMsg}</h4>
                     <FormElement
                       dataTestId="form-field-force"
-                      label="Force mode"
-                      element={
-                        <CheckboxField label="Force mode is going to delete all associated agents" name="force" />
-                      }
+                      label={Messages.forceMode}
+                      element={<CheckboxField label={Messages.services.forceConfirmation} name="force" />}
                     />
                     <HorizontalGroup justify="space-between" spacing="md">
                       <Button variant="secondary" size="md" onClick={onModalClose}>
-                        Cancel
+                        {Messages.cancel}
                       </Button>
                       <Button
                         variant="destructive"
@@ -269,7 +268,7 @@ export const Services = () => {
                           setModalVisible(false);
                         }}
                       >
-                        Proceed
+                        {Messages.proceed}
                       </Button>
                     </HorizontalGroup>
                   </>
