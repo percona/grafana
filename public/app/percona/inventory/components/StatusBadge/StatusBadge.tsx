@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { Badge, BadgeColor, useStyles2 } from '@grafana/ui';
+import { Badge, BadgeColor, Link, useStyles2 } from '@grafana/ui';
 
 import { ServiceAgentStatus } from '../../Inventory.types';
 
@@ -36,10 +36,10 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, full, strippedServic
     <Badge
       color={badgeColor}
       text={
-        <a className={styles.anchor} href={link}>
+        <Link href={link} className={styles.anchor}>
           {textToShow}
           {textToAppend}
-        </a>
+        </Link>
       }
     />
   );

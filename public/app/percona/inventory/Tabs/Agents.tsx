@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { formatServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
@@ -145,9 +145,9 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
       <Page.Contents>
         <FeatureLoader>
           <HorizontalGroup height="auto">
-            <a href="/inventory/services">
+            <Link href="/inventory/services">
               <Icon name="arrow-left" size="lg" />
-            </a>
+            </Link>
             <span>{Messages.agents.goBack}</span>
           </HorizontalGroup>
           {service && !servicesLoading && (
