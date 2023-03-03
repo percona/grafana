@@ -6,27 +6,24 @@ import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertL
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
 
+import { Messages } from './CheckInfoAlert.messages';
 import { getStyles } from './CheckInfoAlert.styles';
 
 export const ChecksInfoAlert = () => {
   const { result } = useSelector(getPerconaSettings);
   const { isConnectedToPortal } = result!;
   const styles = useStyles2(getStyles);
-  console.log(isConnectedToPortal);
+
   return (
     <>
       {!isConnectedToPortal && (
         <AlertLocalStorage
-          title="Want more free Advisors?"
-          customButtonContent="Connect to Percona Platform"
+          title={Messages.title}
+          customButtonContent={Messages.buttonText}
           onCustomButtonClick={() => locationService.push(`/settings/percona-platform`)}
           uniqueName={'connectInfoAlert'}
         >
           <div className={styles.content}>
-            Connect your PMM instance to Percona Platform and get instant access to our advanced Advisors. You can also
-            connect your PMM instance to Percona Platform to get extra basic Advisors for free:{' '}
-            <i>Generic Configuration, Resources Configuration, Configuration Security, Generic Performance</i> If youre
-            looking for more advanced Advisors,{' '}
             <a
               data-testid="read-more-link"
               target="_blank"
@@ -34,9 +31,10 @@ export const ChecksInfoAlert = () => {
               href={'https://www.percona.com/software/percona-platform/subscription'}
               className={styles.link}
             >
-              check out our Premium plans
+              {Messages.link}
             </a>{' '}
-            instead.
+            {Messages.content} <br /> {Messages.contentSecondPart} <i>{Messages.advisorsList}</i>{' '}
+            {Messages.contentThirdPart}
           </div>
         </AlertLocalStorage>
       )}

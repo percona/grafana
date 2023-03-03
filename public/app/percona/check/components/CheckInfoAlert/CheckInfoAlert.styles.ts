@@ -10,6 +10,6 @@ export const getStyles = ({ v1: { colors: v1Colors } }: GrafanaTheme2) => ({
     }
   `,
   content: css`
-    max-width: 70%;
+    max-width: 80%;
   `,
 });
