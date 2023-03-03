@@ -56,7 +56,7 @@ export interface ServiceListPayload {
 
 export type Service = {
   type: Databases | 'external';
-  params: DbService & DbServiceWithAddress & PostgreSQLService & ExternalService;
+  params: DbService & Partial<DbServiceWithAddress>;
 };
 
 export interface DbService {
@@ -74,15 +74,6 @@ export interface DbService {
 export interface DbServiceWithAddress extends DbService {
   address: string;
   port: string;
-  socket: string;
-}
-
-export interface PostgreSQLService extends DbServiceWithAddress {
-  databaseName: string;
-}
-
-export interface ExternalService extends DbService {
-  group: string;
 }
 
 export interface RemoveServiceBody {

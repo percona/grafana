@@ -4,7 +4,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { NodeListPayload } from '../shared/services/nodes/Nodes.types';
 
-import { DBServiceList, ServiceAgentPayload, ServiceListPayload } from './Inventory.types';
+import { DBServiceList, ServiceAgentPayload, CompatibleServiceListPayload } from './Inventory.types';
 
 const BASE_URL = `/v1/inventory`;
 
@@ -26,11 +26,16 @@ export const InventoryService = {
   },
   // TODO unify typings and this function with getServices()
   async getDbServices(token?: CancelToken): Promise<DBServiceList> {
-    const response = await api.post<ServiceListPayload, object>(`${BASE_URL}/Services/List`, {}, false, token);
+    const response = await api.post<CompatibleServiceListPayload, object>(
+      `${BASE_URL}/Services/List`,
+      {},
+      false,
+      token
+    );
     const result: DBServiceList = {};
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    (Object.keys(response) as Array<keyof ServiceListPayload>).forEach((db) => {
+    (Object.keys(response) as Array<keyof CompatibleServiceListPayload>).forEach((db) => {
       const dbServices = response[db];
 
       if (dbServices?.length) {

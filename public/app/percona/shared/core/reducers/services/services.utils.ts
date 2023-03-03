@@ -2,9 +2,7 @@ import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCas
 import {
   DbService,
   DbServiceWithAddress,
-  ExternalService,
   ListServicesBody,
-  PostgreSQLService,
   RemoveServiceBody,
   Service,
   ServiceListPayload,
@@ -42,10 +40,6 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
   (Object.keys(serviceList) as Array<keyof ServiceListPayload>).forEach((serviceType) => {
     const serviceParams = serviceList[serviceType];
     serviceParams?.forEach((params) => {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <DbService & DbServiceWithAddress & PostgreSQLService & ExternalService>(
-        payloadToCamelCase(params)
-      );
       const extraLabels: Record<string, string> = {};
 
       Object.entries(params)
@@ -53,8 +47,13 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
         .forEach(([key, value]: [string, string]) => {
           if (typeof value !== 'object' || Array.isArray(value)) {
             extraLabels[key] = value;
+            // @ts-ignore
+            delete params[key];
           }
         });
+
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const camelCaseParams = <DbService & DbServiceWithAddress>payloadToCamelCase(params);
 
       if (!camelCaseParams.customLabels) {
         camelCaseParams.customLabels = {};

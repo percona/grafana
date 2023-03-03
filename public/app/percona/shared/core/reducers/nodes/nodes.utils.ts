@@ -17,8 +17,6 @@ export const toDbNodesModel = (nodeList: NodeListPayload): Node[] => {
     const nodeParams = nodeList[nodeType];
 
     nodeParams?.forEach((params) => {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <DbNode & GenericDbNode & ContainerDbNode>payloadToCamelCase(params);
       const extraLabels: Record<string, string> = {};
 
       Object.entries(params)
@@ -26,8 +24,13 @@ export const toDbNodesModel = (nodeList: NodeListPayload): Node[] => {
         .forEach(([key, value]: [string, string]) => {
           if (typeof value !== 'object' || Array.isArray(value)) {
             extraLabels[key] = value;
+            // @ts-ignore
+            delete params[key];
           }
         });
+
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const camelCaseParams = <DbNode & GenericDbNode & ContainerDbNode>payloadToCamelCase(params);
 
       if (!camelCaseParams.customLabels) {
         camelCaseParams.customLabels = {};

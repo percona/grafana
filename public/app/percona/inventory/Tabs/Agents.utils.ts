@@ -12,8 +12,6 @@ export const toAgentModel = (agentList: ServiceAgentPayload): Agent[] => {
     const agentParams = agentList[agentType];
 
     agentParams?.forEach((params) => {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <ServiceAgent>payloadToCamelCase(params);
       const extraLabels: Record<string, string> = {};
 
       Object.entries(params)
@@ -21,8 +19,13 @@ export const toAgentModel = (agentList: ServiceAgentPayload): Agent[] => {
         .forEach(([key, value]: [string, string]) => {
           if (typeof value !== 'object' || Array.isArray(value)) {
             extraLabels[key] = value;
+            // @ts-ignore
+            delete params[key];
           }
         });
+
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const camelCaseParams = <ServiceAgent>payloadToCamelCase(params);
 
       if (!camelCaseParams.customLabels) {
         camelCaseParams.customLabels = {};

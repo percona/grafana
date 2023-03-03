@@ -1,11 +1,11 @@
 import { Databases } from '../shared/core';
 
-export interface ServicePayload {
+export interface CompatibleServicePayload {
   service_id: string;
   service_name: string;
 }
 
-export type ServiceListPayload = { [key in Databases]?: ServicePayload[] };
+export type CompatibleServiceListPayload = { [key in Databases]?: CompatibleServicePayload[] };
 
 export interface Service {
   id: string;
