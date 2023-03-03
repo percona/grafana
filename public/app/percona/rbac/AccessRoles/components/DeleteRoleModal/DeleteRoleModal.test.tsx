@@ -10,6 +10,8 @@ import { stubRoles, stubUsers, stubUsersMap } from '../../../__mocks__/stubs';
 
 import DeleteRoleModal from './DeleteRoleModal';
 
+jest.mock('app/percona/shared/services/roles/Roles.service');
+
 const cancelFn = jest.fn();
 
 const wrapWithProvider = (children: ReactElement) => (
