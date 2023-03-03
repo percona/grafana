@@ -1,4 +1,5 @@
 import { SelectableValue } from '@grafana/data';
+import { UserItem } from 'app/percona/shared/core/reducers/users/users.types';
 import { AccessRole } from 'app/percona/shared/services/roles/Roles.types';
 
 import { DeleteRoleFormValues } from './DeleteRoleModal.types';
@@ -17,3 +18,6 @@ export const getDefaultFormValues = (defaultRole?: AccessRole): DeleteRoleFormVa
         replacementRoleId: roleToOption(defaultRole),
       }
     : undefined;
+
+export const isRoleAssigned = (role: AccessRole, users: UserItem[]) =>
+  users.some((u) => u.roleIds.includes(role.roleId));

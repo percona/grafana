@@ -5,21 +5,23 @@ import { AppEvents } from '@grafana/data';
 import { Button, Form, InputControl, Modal, Select } from '@grafana/ui';
 import { appEvents } from 'app/core/core';
 import { deleteRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
-import { getAccessRoles, getDefaultRole } from 'app/percona/shared/core/selectors';
+import { getAccessRoles, getDefaultRole, getUsersInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Messages } from '../../AccessRole.messages';
 
 import { DeleteRoleFormValues, DeleteRoleModalProps } from './DeleteRoleModal.types';
-import { getDefaultFormValues, getOptions } from './DeleteRoleModal.utils';
+import { getDefaultFormValues, getOptions, isRoleAssigned } from './DeleteRoleModal.utils';
 
 const DeleteRoleModal: FC<DeleteRoleModalProps> = ({ role, isOpen, onCancel }) => {
   const dispatch = useAppDispatch();
   const { roles } = useSelector(getAccessRoles);
   const defaultRole = useSelector(getDefaultRole);
+  const { users } = useSelector(getUsersInfo);
   const options = useMemo(() => getOptions(roles, role), [roles, role]);
   const defaultValues = useMemo(() => getDefaultFormValues(defaultRole), [defaultRole]);
+  const isAssigned = useMemo(() => isRoleAssigned(role, users), [users, role]);
 
   const handleDelete = async (values: DeleteRoleFormValues) => {
     try {
@@ -41,20 +43,26 @@ const DeleteRoleModal: FC<DeleteRoleModalProps> = ({ role, isOpen, onCancel }) =
       <Form defaultValues={defaultValues} onSubmit={handleDelete} maxWidth="none">
         {({ formState, control }) => (
           <>
-            <p>{Messages.delete.description(role.title)}</p>
-            <InputControl
-              control={control}
-              name="replacementRoleId"
-              render={({ field }) => (
-                <Select
-                  getOptionValue={(item) => item.value}
-                  options={options}
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
+            {isAssigned ? (
+              <>
+                <p>{Messages.delete.description(role.title)}</p>
+                <InputControl
+                  control={control}
+                  name="replacementRoleId"
+                  render={({ field }) => (
+                    <Select
+                      getOptionValue={(item) => item.value}
+                      options={options}
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                    />
+                  )}
                 />
-              )}
-            />
+              </>
+            ) : (
+              <p>{Messages.delete.descriptionNonAssigned}</p>
+            )}
             <Modal.ButtonRow>
               <Button type="submit" disabled={formState.isSubmitting}>
                 {Messages.delete.submit}

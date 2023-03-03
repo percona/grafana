@@ -31,6 +31,8 @@ export const Messages = {
   },
   delete: {
     title: (role: string) => `Delete "${role}" role`,
+    descriptionNonAssigned:
+      'Are you sure you want to delete this role? You won’t be able to recover it. Please confirm your action below.',
     description: (role: string) =>
       `There are users associated to this role. By deleting the role “${role}“ all its users will be transferred to a new role. Please select the new role below.`,
     submit: 'Confirm and delete role',
