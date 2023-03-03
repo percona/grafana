@@ -2,11 +2,10 @@ import React, { FC, useState } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css, keyframes } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
-import { TipContainer } from './TipContainer';
+import { TipsContainer } from './TipsContainer';
 
 export const TipsConnected: FC = () => {
   const styles = useStyles2(getStyles);
-  const [tip, setTip] = useState(1);
   const [isHoveredMarker, setHoveredMarker] = useState(false);
 
   return (
@@ -24,7 +23,7 @@ export const TipsConnected: FC = () => {
           }}
         />
       </div>
-      <TipContainer />
+      <TipsContainer />
     </>
   );
 };
@@ -78,7 +77,7 @@ const getStyles = (theme: GrafanaTheme2) => {
       border-radius: 50%;
       margin-left: 10px;
 
-      background: #FF5286;
+      background: #ff5286;
       animation: ${pulseDot} 1125ms cubic-bezier(0.04, 0.78, 0.52, 0.92) infinite;
 
       &:before {
@@ -91,10 +90,10 @@ const getStyles = (theme: GrafanaTheme2) => {
         margin-left: -150%;
         margin-top: -150%;
         border-radius: 50%;
-        background: #FF5286;
+        background: #ff5286;
         opacity: 0.5;
 
-        animation: ${pulseRing} 1125ms ease-out -.5s infinite;
+        animation: ${pulseRing} 1125ms ease-out -0.5s infinite;
       }
     `,
     notificationMarkerHidden: css`

@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
-import { TipContainer } from '../../../HelpCenter/components/TipsContainer/TipContainer';
+import { TipsContainer } from '../../../HelpCenter/components/TipsContainer/TipsContainer';
 
 export const HelpCenterContainer: FC = () => {
   const styles = useStyles2(getStyles);
@@ -17,7 +17,7 @@ export const HelpCenterContainer: FC = () => {
         <h2>{helpCenterHeading}</h2>
         <span>{helpCenterText}</span>
       </div>
-      <TipContainer className={styles.helpCenterActionsContainer} />
+      <TipsContainer className={styles.helpCenterActionsContainer} />
     </div>
   );
 };

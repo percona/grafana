@@ -20,6 +20,7 @@ export const OnboardPanel: FC<{}> = () => {
         onHelpCenterClick={() => setMessage('help center')}
         onNotificationClick={() => setMessage('notification')}
         onFeedbackClick={() => setMessage('feedback form')}
+        onCloseHelpCenterTooltip={() => setMessage('close tooltip')}
       />
       <br />
       <div>{message}</div>

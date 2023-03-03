@@ -5,7 +5,7 @@ import { css } from '@emotion/css';
 import { Step1 } from './Step1';
 import { Step2 } from './Step2';
 import { Step3 } from './Step3';
-import { ToolTip } from './Tooltip';
+import { ToolTip } from '../../../ToolTip';
 
 interface FeedbackTooltipProps {
   visible: boolean;
@@ -71,7 +71,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 0px 24px 24px 24px;
+    padding: 0 24px 24px 24px;
     gap: 12px;
 
     flex: none;
@@ -99,7 +99,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0px;
+    padding: 0;
     gap: 12px;
     flex: none;
     order: 1;
