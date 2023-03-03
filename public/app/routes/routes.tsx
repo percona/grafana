@@ -627,12 +627,38 @@ export function getAppRoutes(): RouteDescriptor[] {
     {
       path: '/advisors',
       // eslint-disable-next-line react/display-name
-      //TODO we should redirect to check notifications
+      component: () => <Redirect to="/advisors/insights" />,
+    },
+    {
+      path: '/pmm-database-checks',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/advisors/insights" />,
+    },
+    {
+      path: '/pmm-database-checks/failed-checks',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/advisors/insights" />,
+    },
+    {
+      path: '/pmm-database-checks/all-checks',
+      // eslint-disable-next-line react/display-name
+      component: () => <Redirect to="/advisors/insights" />,
+    },
+    {
+      path: '/advisors/insights',
+      // eslint-disable-next-line react/display-name
       component: SafeDynamicImport(
         () =>
           import(
             /* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/FailedChecksTab/FailedChecksTab'
           )
+      ),
+    },
+    {
+      path: '/advisors/insights/:service',
+      component: SafeDynamicImport(
+        () =>
+          import(/* webpackChunkName: "FailedChecksPage" */ 'app/percona/check/components/ServiceChecks/ServiceChecks')
       ),
     },
     {

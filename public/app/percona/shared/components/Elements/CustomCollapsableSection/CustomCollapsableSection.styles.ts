@@ -22,7 +22,7 @@ export const getStyles = ({ typography, colors, v1: { spacing } }: GrafanaTheme2
   collapsableLabel: css`
     display: grid;
     gap: 20px;
-    grid-template-columns: 1.5fr 4fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 1fr;
     width: 100%;
   `,
   mainLabel: css`

@@ -26,7 +26,7 @@ import { Failures } from './Failures/Failures';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
-  const navModel = usePerconaNavModel('advisors-notifications');
+  const navModel = usePerconaNavModel('advisors-insights');
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
@@ -66,7 +66,7 @@ export const FailedChecksTab: FC = () => {
   const getRowProps = (row: Row<FailedCheckSummary>): ExtendedTableRowProps => ({
     key: row.original.serviceId,
     className: styles.row,
-    onClick: () => locationService.push(`/pmm-database-checks/failed-checks/${stripServiceId(row.original.serviceId)}`),
+    onClick: () => locationService.push(`/advisors/insights/${stripServiceId(row.original.serviceId)}`),
   });
 
   const getCellProps = (cellInfo: Cell<FailedCheckSummary>): ExtendedTableCellProps => ({
