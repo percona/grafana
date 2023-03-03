@@ -16,26 +16,32 @@ import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
+import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
+import { dispatch } from 'app/store/store';
+import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { GET_AGENTS_CANCEL_TOKEN } from '../Inventory.constants';
+import { GET_AGENTS_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { InventoryService } from '../Inventory.service';
 
 import { beautifyAgentType, toAgentModel } from './Agents.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }) => {
-  const [loading, setLoading] = useState(false);
+  const [agentsLoading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<Agent[]>([]);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
+  const { isLoading: servicesLoading, services } = useSelector(getServices);
   const styles = useStyles2(getStyles);
-  const serviceId = match.params.id;
+  const serviceId = formatServiceId(match.params.id);
+  const service = services.find((s) => s.params.serviceId === serviceId);
 
   const columns = useMemo(
     (): Array<Column<Agent>> => [
@@ -57,7 +63,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
     setLoading(true);
     try {
       const result: ServiceAgentPayload = await InventoryService.getAgents(
-        formatServiceId(serviceId),
+        serviceId,
         generateToken(GET_AGENTS_CANCEL_TOKEN)
       );
 
@@ -95,9 +101,12 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   );
 
   useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!service) {
+      dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
+    } else {
+      loadData();
+    }
+  }, [generateToken, loadData, service]);
 
   const removeAgents = useCallback(
     async (agents: Array<SelectedTableRows<Agent>>, forceMode) => {
@@ -140,7 +149,10 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             </a>
             <span>Go back to services</span>
           </HorizontalGroup>
-          <div className={styles.actionPanel}>
+          {service && !servicesLoading && (
+            <h5 className={styles.agentBreadcrumb}>Service {service.params.serviceName} / Agents</h5>
+          )}
+          <HorizontalGroup height={40} justify="flex-end" align="flex-start">
             <Button
               size="md"
               disabled={selected.length === 0}
@@ -152,7 +164,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             >
               Delete
             </Button>
-          </div>
+          </HorizontalGroup>
           <Modal
             title={
               <div className="modal-header-title">
@@ -211,7 +223,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             allRowsSelectionMode="page"
             emptyMessage="No agents Available"
             emptyMessageClassName={styles.emptyMessage}
-            pendingRequest={loading}
+            pendingRequest={agentsLoading || servicesLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
           />

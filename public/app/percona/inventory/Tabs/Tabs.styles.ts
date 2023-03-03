@@ -1,6 +1,8 @@
 import { css } from '@emotion/css';
 
-export const getStyles = () => ({
+import { GrafanaTheme2 } from '@grafana/data';
+
+export const getStyles = ({ spacing }: GrafanaTheme2) => ({
   detailsWrapper: css`
     display: flex;
     flex-direction: column;
@@ -36,5 +38,8 @@ export const getStyles = () => ({
   `,
   deleteItemTxtSpan: css`
     line-height: 15px;
+  `,
+  agentBreadcrumb: css`
+    margin-top: ${spacing(4)};
   `,
 });
