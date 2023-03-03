@@ -19,6 +19,7 @@ import { dispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
+import { ChecksInfoAlert } from '../CheckInfoAlert/CheckInfoAlert';
 
 import { Messages } from './AllChecksTab.messages';
 import { getStyles } from './AllChecksTab.styles';
@@ -173,15 +174,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
-          {/* <AlertLocalStorage
-            title="Upgrade your plan"
-            customButtonContent="Upgrade"
-            onCustomButtonClick={() => console.log('clicked')}
-            uniqueName={'upgradeAlert'}
-          >
-           TODO: Add text 
-            By upgrading your plan etc. By upgrading your plan etc. By upgrading your plan etc
-          </AlertLocalStorage> */}
+          <ChecksInfoAlert />
           <div className={styles.wrapper}>
             <div className={styles.header}>
               <h1>{Messages.availableHeader}</h1>

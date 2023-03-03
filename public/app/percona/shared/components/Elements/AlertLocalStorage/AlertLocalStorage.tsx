@@ -61,7 +61,7 @@ export const AlertLocalStorage = ({
   };
 
   return (
-    <div>
+    <>
       {showAlert && (
         <Alert
           title={title}
@@ -73,6 +73,6 @@ export const AlertLocalStorage = ({
           {children}
         </Alert>
       )}
-    </div>
+    </>
   );
 };
