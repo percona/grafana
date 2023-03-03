@@ -36,6 +36,7 @@ export const Messages = {
     description: (role: string) =>
       `There are users associated to this role. By deleting the role “${role}“ all its users will be transferred to a new role. Please select the new role below.`,
     submit: 'Confirm and delete role',
+    replacementAriaLabel: 'Replacement role',
     cancel: 'Cancel',
     success: {
       title: (role: string) => `Role “${role}“ deleted`,

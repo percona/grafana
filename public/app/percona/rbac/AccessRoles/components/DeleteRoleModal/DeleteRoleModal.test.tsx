@@ -61,4 +61,20 @@ describe('DeleteRoleModal', () => {
 
     await waitFor(() => expect(deleteRoleActionSpy).toHaveBeenCalled());
   });
+
+  it('shows role replacement selection when users are assigned', async () => {
+    renderDefault(true, stubRoles[0]);
+
+    await waitFor(() => expect(screen.queryByText('Confirm and delete role')).toBeInTheDocument());
+
+    await waitFor(() => expect(screen.queryByLabelText('Replacement role')).toBeInTheDocument());
+  });
+
+  it('doesnt show  role replacement selection when no users are assigned', async () => {
+    renderDefault(true, stubRoles[1]);
+
+    await waitFor(() => expect(screen.queryByText('Confirm and delete role')).toBeInTheDocument());
+
+    await waitFor(() => expect(screen.queryByLabelText('Replacement role')).toBeNull());
+  });
 });

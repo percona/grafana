@@ -51,6 +51,7 @@ const DeleteRoleModal: FC<DeleteRoleModalProps> = ({ role, isOpen, onCancel }) =
                   name="replacementRoleId"
                   render={({ field }) => (
                     <Select
+                      aria-label={Messages.delete.replacementAriaLabel}
                       getOptionValue={(item) => item.value}
                       options={options}
                       value={field.value}
