@@ -31,17 +31,18 @@ export const TipsConnected: FC = () => {
 const getStyles = (theme: GrafanaTheme2) => {
   const pulseRing = keyframes`
     0% {
-      transform: scale(.33);
+      transform: scale(1);
     }
-    80%, 100% {
+    100% {
       opacity: 0;
+      transform: scale(4);
     }
   `;
   const pulseDot = keyframes`
     0% {
       transform: scale(1);
     }
-    50% {
+    80% {
       transform: scale(1.5);
     }
     100% {
@@ -78,26 +79,24 @@ const getStyles = (theme: GrafanaTheme2) => {
       margin-left: 10px;
 
       background: #ff5286;
-      animation: ${pulseDot} 1125ms cubic-bezier(0.04, 0.78, 0.52, 0.92) infinite;
+      animation: ${pulseDot} 1125ms cubic-bezier(0.05, 0.91, 0.53, 0.97) infinite;
 
       &:before {
         content: '';
         position: relative;
         display: block;
-        width: 400%;
-        height: 400%;
+        width: 100%;
+        height: 100%;
         box-sizing: border-box;
-        margin-left: -150%;
-        margin-top: -150%;
         border-radius: 50%;
         background: #ff5286;
         opacity: 0.5;
 
-        animation: ${pulseRing} 1125ms ease-out -0.5s infinite;
+        animation: ${pulseRing} 1125ms cubic-bezier(0.27, 0.8, 0.46, 0.93) -.5s infinite;
       }
     `,
     notificationMarkerHidden: css`
-      animation: ${dotDisappearing} 1s cubic-bezier(0.455, 0.03, 0.515, 0.955) 1;
+      animation: ${dotDisappearing} 1s ease-in-out 1;
       animation-fill-mode: forwards;
       &:before {
         display: none;
