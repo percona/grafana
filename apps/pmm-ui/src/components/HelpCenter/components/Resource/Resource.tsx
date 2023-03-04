@@ -8,15 +8,14 @@ import { css } from '@emotion/css';
 interface ResourceProps {
   icon?: IconName;
   title: string;
-  text?: string | JSX.Element;
-  button?: JSX.Element;
+  text?: string;
   buttonText?: string;
   url: string;
 }
 
 export const Resource: FC<ResourceProps> = (props) => {
   const {
-    title, text, buttonText, url, icon, button
+    title, text, buttonText, url, icon
   } = props;
   const styles = useStyles2(getStyles);
 
@@ -30,15 +29,9 @@ export const Resource: FC<ResourceProps> = (props) => {
       </div>
       <div className={styles.body}>
         <div className={styles.text}>{text}</div>
-        { button ? (
-          <>
-            {button}
-          </>
-        ) : (
-          <Button icon="external-link-alt" variant="secondary" size="md" type="button" onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}>
-            {buttonText}
-          </Button>
-        )}
+        <Button icon="external-link-alt" variant="secondary" size="md" type="button" onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}>
+          {buttonText}
+        </Button>
       </div>
     </div>
   );
