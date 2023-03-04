@@ -2,13 +2,13 @@ import React, {Suspense, useEffect, useState} from 'react';
 // @ts-ignore
 import Drop from 'tether-drop';
 
-import {locationSearchToObject, navigationLogger, reportPageview} from '@grafana/runtime';
-import {ErrorBoundary} from '@grafana/ui';
+import { locationSearchToObject, navigationLogger, reportPageview } from '@grafana/runtime';
+import { ErrorBoundary } from '@grafana/ui';
+import { contextSrv } from 'app/core/core';
 
 import { PmmUi } from '../../percona/federation';
 import { LocalStorageValueProvider } from "../components/LocalStorageValueProvider";
 import { useGrafana } from '../context/GrafanaContext';
-import { contextSrv } from 'app/core/core';
 
 import {GrafanaRouteError} from './GrafanaRouteError';
 import {GrafanaRouteLoading} from './GrafanaRouteLoading';
@@ -101,7 +101,7 @@ export function GrafanaRoute(props: Props) {
                         open={isHelpCenterOpen}
                         onClose={() => saveHelpCenterOpen(false)}
                         width="416px"
-                        isConnectedUser={true}
+                        isConnectedUser={false}
                       />
                       {/*TODO:WIP: refactor*/}
                       <div style={{"width": isHelpCenterOpen ? 'calc(100% - 430px)' : '100%'}}>

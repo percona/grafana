@@ -9,11 +9,9 @@ export default {
   argTypes: {},
 } as ComponentMeta<typeof Resource>;
 
-const Template = args => {
-  return (
-    <Resource {...args}/>
-  )
-}
+const Template: ComponentStory<typeof Resource> = (args) => {
+  return <Resource {...args} />;
+};
 
 export const Primary = Template.bind({});
 Primary.args = {

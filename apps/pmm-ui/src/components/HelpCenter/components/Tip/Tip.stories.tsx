@@ -9,8 +9,9 @@ export default {
   argTypes: {},
 } as ComponentMeta<typeof Tip>;
 
-const Template = args => <Tip {...args}/>
-
+const Template: ComponentStory<typeof Tip> = (args) => {
+  return <Tip {...args} />;
+};
 
 export const Primary = Template.bind({});
 Primary.args = {
