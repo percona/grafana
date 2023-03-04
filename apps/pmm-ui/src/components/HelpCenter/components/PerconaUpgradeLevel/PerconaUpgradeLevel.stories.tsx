@@ -10,6 +10,9 @@ export default {
 } as ComponentMeta<typeof PerconaUpgradeLevel>;
 
 
-const Template = args => <PerconaUpgradeLevel {...args} />;
+const Template: ComponentStory<typeof PerconaUpgradeLevel> = (args) => {
+  return <PerconaUpgradeLevel {...args} />;
+};
+
 export const Primary = Template.bind({});
 Primary.args = {};
