@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { Button, useStyles2 } from '@grafana/ui';
-import tipIcon from '../../assets/pmm-percona-icon-purple.svg'
+import tipIcon from '../../assets/pmm-percona-icon-purple.svg';
 
 export const TipNotConnected: FC = () => {
   const styles = useStyles2(getStyles);
@@ -15,22 +15,30 @@ export const TipNotConnected: FC = () => {
       <div className={styles.body}>
         <div className={styles.text}>
           <p className={styles.paragraph}>
-            Get more <a className={styles.link} href="#">Advisors</a> to automatically check your system status.
+            Get more{' '}
+            <a className={styles.link} href="#">
+              Advisors
+            </a>{' '}
+            to automatically check your system status.
           </p>
           <p className={styles.paragraph}>
-            Get more <a className={styles.link} href="#">Alerts Templates</a> to notify you when something happens.
+            Get more{' '}
+            <a className={styles.link} href="#">
+              Alerts Templates
+            </a>{' '}
+            to notify you when something happens.
           </p>
           <p className={styles.paragraph}>
-            Visit our <a className={styles.link} href="#">Premium Plans</a> to discover all benefits and growth potential for your projects.
+            Visit our{' '}
+            <a className={styles.link} href="#">
+              Premium Plans
+            </a>{' '}
+            to discover all benefits and growth potential for your projects.
           </p>
         </div>
         <div>
           <Button className={styles.tipsButton} fullWidth variant="secondary">
-            <img
-              className={styles.buttonImage}
-              alt="pmm-logo"
-              src={tipIcon}
-            />
+            <img className={styles.buttonImage} alt="pmm-logo" src={tipIcon} />
             <div className={styles.perconaButtonLabel}>Connect to platform</div>
           </Button>
         </div>
@@ -41,10 +49,10 @@ export const TipNotConnected: FC = () => {
 
 const getStyles = (theme: GrafanaTheme2) => ({
   link: css`
-    color: ${theme.colors.text.link}
+    color: ${theme.colors.text.link};
   `,
   paragraph: css`
-    margin-bottom: ${theme.spacing(1)}
+    margin-bottom: ${theme.spacing(1)};
   `,
   tipsButton: css`
     width: 170px;

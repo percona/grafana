@@ -26,8 +26,20 @@ export const ConnectPortalModal: FC<ConnectPortalModalProps> = ({ isOpen, onClos
       <div>
         <h3>Get more out of PMM by connecting to Percona Platform</h3>
         <ul className={styles.unorderedList}>
-          <li>Get more <a href="#" className={styles.link}>Advisors</a> to automatically check your system health status.</li>
-          <li>Get more <a href="#" className={styles.link}>Alerts Templates</a> to notify you when something happens.</li>
+          <li>
+            Get more{' '}
+            <a href="#" className={styles.link}>
+              Advisors
+            </a>{' '}
+            to automatically check your system health status.
+          </li>
+          <li>
+            Get more{' '}
+            <a href="#" className={styles.link}>
+              Alerts Templates
+            </a>{' '}
+            to notify you when something happens.
+          </li>
         </ul>
         {isAdmin ? (
           <p>
