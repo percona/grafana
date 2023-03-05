@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
-import { ConnectedModal } from './ConnectedModal';
+import { ConfirmEmailModal } from './ConfirmEmailModal';
 import { Button } from '@grafana/ui';
 
 export default {
-  title: 'Percona/Portal/Modals/ConnectedModal',
-  component: ConnectedModal,
-} as ComponentMeta<typeof ConnectedModal>;
+  title: 'Percona/Portal/Modals/ConfirmEmailModal',
+  component: ConfirmEmailModal,
+} as ComponentMeta<typeof ConfirmEmailModal>;
 
-const Template: ComponentStory<typeof ConnectedModal> = (args) => {
+const Template: ComponentStory<typeof ConfirmEmailModal> = (args) => {
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
-      <ConnectedModal onClose={() => setShowModal(false)} isOpen={showModal} />
+      <ConfirmEmailModal onClose={() => setShowModal(false)} isOpen={showModal} />
       <Button onClick={() => setShowModal(true)}>Show modal</Button>
     </>
   );

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 
 import { ConnectPortalModal } from './ConnectPortalModal';
-import { Button } from "@grafana/ui";
+import { Button } from '@grafana/ui';
 
 export default {
   title: 'Percona/Portal/Modals/ConnectPortalModal',
@@ -17,10 +17,8 @@ const Template: ComponentStory<typeof ConnectPortalModal> = (args) => {
 
   return (
     <>
-      <ConnectPortalModal onClose={() => setShowModal(false)} isOpen={showModal} isAdmin={args.isAdmin}/>
-      <Button onClick={() => setShowModal(true)}>
-        Show modal
-      </Button>
+      <ConnectPortalModal onClose={() => setShowModal(false)} isOpen={showModal} isAdmin={args.isAdmin} />
+      <Button onClick={() => setShowModal(true)}>Show modal</Button>
     </>
   );
 };
