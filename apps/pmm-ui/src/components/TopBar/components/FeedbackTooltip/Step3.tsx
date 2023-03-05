@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { HorizontalGroup, useStyles2 } from '@grafana/ui';
-import checkImg from '../../assets/pmm-circle-check-green.svg';
+import checkImg from '../../../../assets/pmm-circle-check-green.svg';
 import feedbackSentImg from '../../assets/pmm-feedback-sent.svg';
 
 interface Step3Props {}
