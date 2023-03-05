@@ -22,7 +22,7 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
   const [activeTab, setActiveTab] = useState<TabName>('tips');
 
   const { open, onClose, width, isConnectedUser } = props;
-  const styles = useStyles2(getStyles);
+  const styles = useStyles2(getStyles(open));
 
   const changeTab = (tab: TabName) => {
     return (e?: React__default.MouseEvent<HTMLAnchorElement>) => {
@@ -32,7 +32,11 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
   };
 
   return (
-    <div className={styles.drawer} style={{ visibility: open ? 'visible' : 'hidden', width: width }}>
+    <div className={styles.drawer} style={{
+      width: width,
+      transform: open ? `translateX(0)`: `translateX(${width})`,
+      transition: 'transform 225ms',
+    }}>
       <div className={styles.indentContainer} />
       <div className={styles.container}>
         <div className={styles.headerRow}>
@@ -56,7 +60,7 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
   );
 };
 
-const getStyles = (theme: GrafanaTheme2) => ({
+const getStyles = (open: boolean) => (theme: GrafanaTheme2) => ({
   drawer: css`
     left: auto;
     right: 0;
@@ -68,6 +72,15 @@ const getStyles = (theme: GrafanaTheme2) => ({
     overflow-y: auto;
     border-left: none;
     background-color: ${theme.colors.background.canvas};
+    z-index: 1200;
+    visibility: ${open ? 'visible' : 'hidden' };
+
+    @media (max-width: 1279px) {
+      height: 100%;
+      top: 0;
+      visibility: visible;
+      box-shadow: 0 8px 24px #010409;
+    }
   `,
   container: css`
     padding-left: 16px;
@@ -75,6 +88,9 @@ const getStyles = (theme: GrafanaTheme2) => ({
     border-left: solid;
     height: 100%;
     border-left-color: ${theme.colors.background.secondary};
+    @media (max-width: 1279px) {
+      border-left: none;
+    }
   `,
   indentContainer: css`
     height: 16px;

@@ -1,4 +1,5 @@
-import React, {Suspense, useEffect, useState} from 'react';
+import { css } from '@emotion/css';
+import React, { Suspense, useEffect, useState } from 'react';
 // @ts-ignore
 import Drop from 'tether-drop';
 
@@ -53,6 +54,7 @@ export function GrafanaRoute(props: Props) {
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
   const [helpCenterToolTipVisiable, setHelpCenterToolTipVisiable] = useState(false);
   const isAdmin = contextSrv.isGrafanaAdmin;
+  const styles = getStyles();
 
   return (
     <ErrorBoundary>
@@ -97,6 +99,7 @@ export function GrafanaRoute(props: Props) {
                         showHelpCenterToolTip={helpCenterToolTipVisiable}
                         onCloseHelpCenterTooltip={() => setHelpCenterToolTipVisiable(false)}
                       />
+
                       <PmmUi.HelpCenter
                         open={isHelpCenterOpen}
                         onClose={() => saveHelpCenterOpen(false)}
@@ -104,7 +107,7 @@ export function GrafanaRoute(props: Props) {
                         isConnectedUser={false}
                       />
                       {/*TODO:WIP: refactor*/}
-                      <div style={{"width": isHelpCenterOpen ? 'calc(100% - 430px)' : '100%'}}>
+                      <div className={isHelpCenterOpen ? styles.openedHelpCenter : ''}>
                         {props.location.pathname === '/a/pmm-homescreen-app' ? (
                           <Suspense fallback={<div></div>}>
                             <>
@@ -128,6 +131,15 @@ export function GrafanaRoute(props: Props) {
     </ErrorBoundary>
   );
 }
+
+const getStyles = () => ({
+  openedHelpCenter: css`
+    width: calc(100% - 430px);
+    @media (max-width: 1279px) {
+      width: 100%;
+    }
+  `
+})
 
 function getPageClasses(route: RouteDescriptor) {
   return route.pageClass ? route.pageClass.split(' ') : [];
