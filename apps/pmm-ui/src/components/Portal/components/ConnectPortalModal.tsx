@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Button, Modal, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
+import { Messages } from './ConnectPortalModal.messages';
 import pmmAppIcon from '../../../assets/pmm-app-icon.svg';
 import swapIcon from '../../../assets/swap.svg';
 import pmmPlatformIcon from '../../../assets/pmm-platform-purple.svg';
@@ -24,40 +25,38 @@ export const ConnectPortalModal: FC<ConnectPortalModalProps> = ({ isOpen, onClos
         <img alt="pmm-platform-icon" src={pmmPlatformIcon} className={styles.icon} />
       </div>
       <div>
-        <h3>Get more out of PMM by connecting to Percona Platform</h3>
+        <h3>{Messages.title}</h3>
         <ul className={styles.unorderedList}>
           <li>
-            Get more{' '}
+            {Messages.advisors1}
             <a href="#" className={styles.link}>
-              Advisors
-            </a>{' '}
-            to automatically check your system health status.
+              {Messages.advisorsLinkDescription}
+            </a>
+            {Messages.advisors2}
           </li>
           <li>
-            Get more{' '}
+            {Messages.alerts1}
             <a href="#" className={styles.link}>
-              Alerts Templates
-            </a>{' '}
-            to notify you when something happens.
+              {Messages.alertsLinkDescription}
+            </a>
+            {Messages.alerts2}
           </li>
         </ul>
         {isAdmin ? (
-          <p>
-            By clicking on Continue to Platform you’ll be taken to the Percona Platform to sign in and give permissions
-            to Percona to access this PMM instance details.
-          </p>
+          <p>{Messages.adminDescription}</p>
         ) : (
           <>
-            <h4>Contact your PMM administrator</h4>
-            <p>
-              In order to get advantage of the above you need to contact your PMM administrator to connect it with
-              Percona Platform.
-            </p>
+            <h4>{Messages.nonAdminWarningTitle}</h4>
+            <p>{Messages.nonAdminDescription}</p>
           </>
         )}
       </div>
       <Modal.ButtonRow>
-        {isAdmin ? <Button onClick={onConfirm}>Continue to platform</Button> : <Button onClick={onClose}>Close</Button>}
+        {isAdmin ? (
+          <Button onClick={onConfirm}>{Messages.button.continue}</Button>
+        ) : (
+          <Button onClick={onClose}>{Messages.button.close}</Button>
+        )}
       </Modal.ButtonRow>
     </Modal>
   );

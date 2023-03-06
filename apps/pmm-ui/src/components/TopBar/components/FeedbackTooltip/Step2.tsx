@@ -4,7 +4,6 @@ import { css } from '@emotion/css';
 import { Button, TextArea, useStyles2 } from '@grafana/ui';
 import { Messages } from './FeedbackTooltip.messages';
 
-
 interface Step2Props {
   onSubmit?: (feedbackDescription: string) => void;
 }
@@ -21,9 +20,7 @@ export const Step2: FC<Step2Props> = ({ onSubmit }) => {
 
   return (
     <>
-      <div className={styles.contentTitle}>
-        {Messages.step2Title}
-      </div>
+      <div className={styles.contentTitle}>{Messages.step2Title}</div>
       <div className={styles.feedbackHolder}>
         <TextArea
           placeholder={Messages.placeholderText}
@@ -34,8 +31,12 @@ export const Step2: FC<Step2Props> = ({ onSubmit }) => {
       </div>
       <div className={styles.note}>{Messages.note}</div>
       <div>
-        <Button icon="message" onClick={submitFeedback}>{Messages.button.sendFeedback}</Button>
-        <Button className={styles.dismissButton} variant="secondary" fill="text">{Messages.button.dismiss}</Button>
+        <Button icon="message" onClick={submitFeedback}>
+          {Messages.button.sendFeedback}
+        </Button>
+        <Button className={styles.dismissButton} variant="secondary" fill="text">
+          {Messages.button.dismiss}
+        </Button>
       </div>
     </>
   );
