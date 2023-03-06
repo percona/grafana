@@ -40,14 +40,12 @@ export const NetworkAndSecurity: FC = () => {
                   placeholder={Messages.placeholders.sourceRange}
                   fieldClassName={styles.field}
                 />
-                {index > 0 && (
-                  <Button
-                    className={styles.deleteButton}
-                    variant="secondary"
-                    onClick={() => fields.remove(index)}
-                    icon="trash-alt"
-                  />
-                )}
+                <Button
+                  className={styles.deleteButton}
+                  variant="secondary"
+                  onClick={() => fields.remove(index)}
+                  icon="trash-alt"
+                />
               </div>
             ))}
           </div>

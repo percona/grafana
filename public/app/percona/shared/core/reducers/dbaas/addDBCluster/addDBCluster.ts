@@ -89,6 +89,12 @@ export const addDbClusterAction = createAsyncThunk(
       startMinute!.map((m: { value: any }) => m.value!)
     );
 
+    const preparedSourceRanges = sourceRanges.reduce(
+      (acc: string[], item: { sourceRange: string }): string[] =>
+        !!item?.sourceRange ? [...acc, item?.sourceRange] : acc,
+      []
+    );
+
     await withAppEvents(
       dbClusterService.addDBCluster({
         kubernetesClusterName: kubernetesCluster?.value,
@@ -101,7 +107,7 @@ export const addDbClusterAction = createAsyncThunk(
         databaseImage: databaseVersion?.value,
         expose,
         internetFacing,
-        sourceRanges: sourceRanges?.map((item: any) => item?.sourceRange || ''),
+        ...(preparedSourceRanges.length > 0 && { sourceRanges: preparedSourceRanges }),
         configuration,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
         ...(args.settings?.backupEnabled &&

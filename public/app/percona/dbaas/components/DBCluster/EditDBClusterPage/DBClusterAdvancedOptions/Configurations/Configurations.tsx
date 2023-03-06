@@ -8,7 +8,7 @@ import { Messages } from '../DBClusterAdvancedOptions.messages';
 import { ConfigurationService } from './Configurations.service';
 import { ConfigurationFields, ConfigurationProps } from './Configurations.types';
 
-export const Configurations: FC<ConfigurationProps> = ({ mode, databaseType, k8sClusterName }) => {
+export const Configurations: FC<ConfigurationProps> = ({ form, mode, databaseType, k8sClusterName }) => {
   const label = useMemo(
     () =>
       databaseType === Databases.mysql
@@ -38,7 +38,15 @@ export const Configurations: FC<ConfigurationProps> = ({ mode, databaseType, k8s
         label={Messages.labels.storageClass}
         disabled={mode === 'edit'}
       />
-      <TextareaInputField name={ConfigurationFields.configuration} label={label} />
+      <TextareaInputField
+        name={ConfigurationFields.configuration}
+        label={label}
+        inputProps={{
+          onBlur: (event) => {
+            form.mutators.trimConfiguration(event?.target?.value);
+          },
+        }}
+      />
     </FieldSet>
   );
 };

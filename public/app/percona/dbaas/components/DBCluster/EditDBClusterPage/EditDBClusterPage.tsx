@@ -22,6 +22,7 @@ import {
 } from '../../Kubernetes/EditK8sClusterPage/EditK8sClusterPage.constants';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 
+import { ConfigurationFields } from './DBClusterAdvancedOptions/Configurations/Configurations.types';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
 import { BasicOptionsFields } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
@@ -83,6 +84,9 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
       mutators={{
         setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
           changeValue(state, `${BasicOptionsFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
+        },
+        trimConfiguration: ([configuration]: string[], state, { changeValue }) => {
+          changeValue(state, ConfigurationFields.configuration, () => configuration.trim());
         },
         ...arrayMutators,
       }}

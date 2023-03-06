@@ -48,6 +48,12 @@ export const updateDBClusterAction = createAsyncThunk(
     const dbClusterService = newDBClusterService(selectedDBCluster.databaseType);
     thunkAPI.dispatch(setUpdateDBClusterLoading());
 
+    const preparedSourceRanges = sourceRanges.reduce(
+      (acc: string[], item: { sourceRange: string }): string[] =>
+        !!item?.sourceRange ? [...acc, item?.sourceRange] : acc,
+      []
+    );
+
     await withAppEvents(
       dbClusterService.updateDBCluster({
         databaseImage: selectedDBCluster.installedImage,
@@ -61,7 +67,7 @@ export const updateDBClusterAction = createAsyncThunk(
         expose,
         internetFacing,
         configuration,
-        sourceRanges: sourceRanges ? sourceRanges.map((item: any) => item?.sourceRange || '') : [],
+        ...(preparedSourceRanges.length > 0 && { sourceRanges: preparedSourceRanges }),
         ...(storageClass?.value && { storageClass: storageClass?.value }),
       }),
       {
