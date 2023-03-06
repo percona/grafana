@@ -3,6 +3,7 @@ import React, { ReactElement } from 'react';
 import { Provider } from 'react-redux';
 
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
+import { UserService } from 'app/percona/shared/services/user/__mocks__/User.service';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -11,6 +12,18 @@ import { stubRoles, stubUsers, stubUsersMap } from '../../../__mocks__/stubs';
 import DeleteRoleModal from './DeleteRoleModal';
 
 jest.mock('app/percona/shared/services/roles/Roles.service');
+jest.mock('app/percona/shared/services/user/User.service', () => ({
+  ...UserService,
+  getUsersList: () =>
+    Promise.resolve({
+      users: [
+        {
+          role_ids: stubUsers[0].roleIds,
+          user_id: stubUsers[0].userId,
+        },
+      ],
+    }),
+}));
 
 const cancelFn = jest.fn();
 
