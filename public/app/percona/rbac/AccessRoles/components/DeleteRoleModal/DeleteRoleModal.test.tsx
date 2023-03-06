@@ -30,6 +30,13 @@ const cancelFn = jest.fn();
 const wrapWithProvider = (children: ReactElement) => (
   <Provider
     store={configureStore({
+      users: {
+        users: [
+          {
+            userId: stubUsers[0].userId,
+          },
+        ],
+      },
       percona: {
         users: {
           isLoading: false,
