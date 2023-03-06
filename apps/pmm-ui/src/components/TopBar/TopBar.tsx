@@ -5,6 +5,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import perconaIcon from './assets/pmm-percona-icon.svg';
 import appIcon from '../../assets/pmm-app-icon.svg';
 import platformIcon from '../../assets/pmm-platform-purple.svg';
+import { Messages } from './TopBar.messages';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
 import { HelpCenterTooltip } from './components/HelpCenterTooltip';
 export interface TopBarProps {
@@ -42,15 +43,15 @@ export const TopBar: FC<TopBarProps> = ({
   const styles = useStyles2(getStyles);
   const userMenu = (
     <Menu>
-      <Menu.Item label="Open Percona Platform" className={styles.miOpenPerconaPlatform} icon="info" />
-      <Menu.Item label="Percona Account profile" />
-      <Menu.Item label="Platform connection settings" />
+      <Menu.Item label={Messages.userMenu.openPerconaPlatform} className={styles.miOpenPerconaPlatform} icon="info" />
+      <Menu.Item label={Messages.userMenu.accountProfile} />
+      <Menu.Item label={Messages.userMenu.connectionSettings} />
       <Menu.Divider />
-      <Menu.Item url={appSubUrl + '/profile'} label="Preferences" />
-      <Menu.Item url={appSubUrl + '/profile/notifications'} label="Notification history" />
-      <Menu.Item url={appSubUrl + '/profile/password'} label="Change password" />
+      <Menu.Item url={appSubUrl + '/profile'} label={Messages.userMenu.preferences} />
+      <Menu.Item url={appSubUrl + '/profile/notifications'} label={Messages.userMenu.notificationHistory} />
+      <Menu.Item url={appSubUrl + '/profile/password'} label={Messages.userMenu.changePassword} />
       <Menu.Divider />
-      <Menu.Item url={appSubUrl + '/logout'} label="Sign out" icon="signout" />
+      <Menu.Item url={appSubUrl + '/logout'} label={Messages.userMenu.logout} icon="signout" />
     </Menu>
   );
 
@@ -69,7 +70,7 @@ export const TopBar: FC<TopBarProps> = ({
         <nav className={styles.navElement}>
           <div>
             <h1 className={styles.h1Styles}>
-              <div className={styles.titleText}>{connectedToPortal ? 'PMM' : 'Percona monitoring and management'}</div>
+              <div className={styles.titleText}>{connectedToPortal ? Messages.connectedToPlatformTitle : Messages.title}</div>
             </h1>
           </div>
         </nav>
@@ -87,11 +88,11 @@ export const TopBar: FC<TopBarProps> = ({
             <>
               <div className={styles.notificationMarker} />
               <div className={styles.tooltip}>
-                Get more out of PMM
+                {Messages.legend}
                 <Icon name="arrow-right" />
               </div>
               <Button className={styles.connectButton} icon="info" variant="secondary" onClick={onSignInClick}>
-                Connect to platform
+                {Messages.button.connectToPortal}
               </Button>
             </>
           ))}
