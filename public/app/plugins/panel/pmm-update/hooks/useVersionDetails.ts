@@ -26,6 +26,7 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
   });
   const [lastCheckDate, setLastCheckDate] = useState('');
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  const [isUpgradeServiceAvailable, setIsUpgradeServiceAvailable] = useState(false);
   const [data, errorMessage, isLoading, getVersionDetails] = useApiCall<GetUpdatesResponse | void, GetUpdatesBody>(
     getCurrentVersion,
     { force: initialForceUpdate },
@@ -71,6 +72,7 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
     });
     setLastCheckDate(last_check ? formatDateWithTime(last_check) : '');
     setIsUpdateAvailable(!!(updateOptionAvailable && update_available));
+    setIsUpgradeServiceAvailable(!!server_upgrade_service_available);
     setIsDefaultView(false);
   }, [data]);
 
@@ -80,6 +82,7 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
       lastCheckDate,
       nextVersionDetails,
       isUpdateAvailable,
+      isUpgradeServiceAvailable,
     },
     errorMessage,
     isLoading,

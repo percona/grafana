@@ -68,6 +68,7 @@ export type CurrentOrNextVersionDetails = [
     lastCheckDate: string;
     nextVersionDetails: NextVersionDetails;
     isUpdateAvailable: boolean;
+    isUpgradeServiceAvailable: boolean;
   },
   string,
   boolean,
@@ -116,3 +117,9 @@ export type UpdateStatus = [string, string, boolean, boolean, () => void];
 export type ApiCall<R, A> = [R | undefined, string, boolean, (args?: A) => void];
 
 export type UpdateInitialization = [string, number, boolean, () => void];
+
+export enum UpdateMethod {
+  server = 'PMM_SERVER_UPGRADE',
+  legacy = 'PMM_UPDATE',
+  invalid = 'UPDATE_METHOD_INVALID',
+}

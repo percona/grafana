@@ -1,11 +1,11 @@
 import { logger } from '@percona/platform-core';
 import React, { useEffect, useState, FC, MouseEvent } from 'react';
 
-import { Button, IconName, Spinner } from '@grafana/ui';
+import { Button, IconName, Spinner, useStyles2 } from '@grafana/ui';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
 import { Messages } from './UpdatePanel.messages';
-import * as styles from './UpdatePanel.styles';
+import { getStyles } from './UpdatePanel.styles';
 import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck, ProgressModal } from './components';
 import { useVersionDetails, usePerformUpdate } from './hooks';
 
@@ -18,7 +18,7 @@ export const UpdatePanel: FC<{}> = () => {
   const [isLoadingSettings, setLoadingSettings] = useState(true);
   const [hasNoAccess, setHasNoAccess] = useState(false);
   const [
-    { installedVersionDetails, lastCheckDate, nextVersionDetails, isUpdateAvailable },
+    { installedVersionDetails, lastCheckDate, nextVersionDetails, isUpdateAvailable, isUpgradeServiceAvailable },
     fetchVersionErrorMessage,
     isLoadingVersionDetails,
     isDefaultView,
@@ -26,6 +26,7 @@ export const UpdatePanel: FC<{}> = () => {
   ] = useVersionDetails();
   const [output, updateErrorMessage, isUpdated, updateFailed, launchUpdate] = usePerformUpdate();
   const isLoading = isLoadingVersionDetails || isLoadingSettings;
+  const styles = useStyles2(getStyles);
 
   const getSettings = async () => {
     setLoadingSettings(true);
@@ -90,10 +91,22 @@ export const UpdatePanel: FC<{}> = () => {
           <>
             {(isUpdateAvailable || forceUpdate) && !updatesDisabled && !hasNoAccess && isOnline ? (
               <div className={styles.middleSectionWrapper}>
-                {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
-                <Button onClick={handleUpdate} icon={'fa fa-download' as IconName} variant="secondary">
-                  {Messages.upgradeTo(nextVersionDetails?.nextVersion)}
-                </Button>
+                <>
+                  {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
+                  <Button onClick={handleUpdate} icon={'fa fa-download' as IconName} variant="secondary">
+                    {Messages.upgradeTo(nextVersionDetails?.nextVersion)}
+                  </Button>
+                  {!isUpgradeServiceAvailable && (
+                    // TODO: update wording and docs link
+                    <p className={styles.notAvailable}>
+                      {Messages.upgradeServiceUnavailable.first}
+                      <a className={styles.link} href="/">
+                        {Messages.upgradeServiceUnavailable.docs}
+                      </a>
+                      {Messages.upgradeServiceUnavailable.last}
+                    </p>
+                  )}
+                </>
               </div>
             ) : (
               <InfoBox
