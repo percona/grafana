@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { Button, useStyles2 } from '@grafana/ui';
+import { Messages } from './FeedbackTooltip.messages';
 import sadImage from '../../assets/sad.svg';
 import mehImage from '../../assets/meh.svg';
 import smileImage from '../../assets/smile.svg';
@@ -15,19 +16,19 @@ export const Step1: FC<Step1Props> = ({ onSubmit }) => {
 
   return (
     <>
-      <div className={styles.contentTitle}>How&apos;s your experience with PMM so far?</div>
+      <div className={styles.contentTitle}>{Messages.step1Title}</div>
       <div className={styles.rating}>
         <Button variant="secondary" icon="info" onClick={onSubmit} className={fixedIconStyle(sadImage)}>
-          Bad
+          {Messages.button.badFeedback}
         </Button>
         <Button variant="secondary" icon="info" onClick={onSubmit} className={fixedIconStyle(mehImage)}>
-          Fair
+          {Messages.button.fairFeedback}
         </Button>
         <Button variant="secondary" icon="info" onClick={onSubmit} className={fixedIconStyle(smileImage)}>
-          Good
+          {Messages.button.goodFeedback}
         </Button>
       </div>
-      <div className={styles.ratingDescription}>With only one click you&apos;ll help us improve PMM.</div>
+      <div className={styles.ratingDescription}>{Messages.ratingDescription}</div>
     </>
   );
 };

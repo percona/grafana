@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { HorizontalGroup, useStyles2 } from '@grafana/ui';
+import { Messages } from './FeedbackTooltip.messages';
 import checkImg from '../../../../assets/pmm-circle-check-green.svg';
 import feedbackSentImg from '../../assets/pmm-feedback-sent.svg';
 
@@ -17,10 +18,10 @@ export const Step3: FC<Step3Props> = () => {
         <div>
           <div className={styles.contentTitle}>
             <img className={styles.imageChecked} alt="feedback-sent" src={checkImg} />
-            Feedback sent!
+            {Messages.step3Title}
           </div>
           <div className={styles.description}>
-            Your input is playing a crucial role in shaping the future of PMM and making it even better. Thank you!
+            {Messages.thankYou}
           </div>
         </div>
       </HorizontalGroup>
