@@ -22,13 +22,19 @@ all: deps build
 deps-go: ## Install backend dependencies.
 	$(GO) run build.go setup
 
-deps-js: node_modules ## Install frontend dependencies.
+deps-js: node_modules pmm-ui-deps ## Install frontend dependencies.
 
 deps: deps-js ## Install all dependencies.
 
 node_modules: package.json yarn.lock ## Install node modules.
 	@echo "install frontend dependencies"
 	YARN_CHECKSUM_BEHAVIOR=update YARN_ENABLE_PROGRESS_BARS=false yarn install --immutable
+
+pmm-ui-deps:
+	cd apps/pmm-ui && npm run install
+
+pmm-ui-build:
+	cd apps/pmm-ui && npm run build:grafana
 
 ##@ Swagger
 SPEC_TARGET = public/api-spec.json
@@ -84,7 +90,7 @@ build-cli: ## Build Grafana CLI application.
 	@echo "build grafana-cli"
 	$(GO) run build.go $(GO_BUILD_FLAGS) build-cli
 
-build-js: ## Build frontend assets.
+build-js: pmm-ui-build ## Build frontend assets.
 	@echo "build frontend"
 	yarn run build-max-memory
 	yarn run plugins:build-bundled
