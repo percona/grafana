@@ -1,10 +1,11 @@
 import { logger } from '@percona/platform-core';
-import React, { FC, useMemo } from 'react';
+import React, { useEffect, FC, useMemo } from 'react';
 
 import { AppEvents } from '@grafana/data';
-import { Button, Form, InputControl, Modal, Select } from '@grafana/ui';
+import { Button, Form, HorizontalGroup, InputControl, Modal, Select, Spinner } from '@grafana/ui';
 import { appEvents } from 'app/core/core';
 import { deleteRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
+import { fetchUsersListAction } from 'app/percona/shared/core/reducers/users/users';
 import { getAccessRoles, getDefaultRole, getUsersInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -18,7 +19,7 @@ const DeleteRoleModal: FC<DeleteRoleModalProps> = ({ role, isOpen, onCancel }) =
   const dispatch = useAppDispatch();
   const { roles } = useSelector(getAccessRoles);
   const defaultRole = useSelector(getDefaultRole);
-  const { users } = useSelector(getUsersInfo);
+  const { users, isLoading } = useSelector(getUsersInfo);
   const options = useMemo(() => getOptions(roles, role), [roles, role]);
   const defaultValues = useMemo(() => getDefaultFormValues(defaultRole), [defaultRole]);
   const isAssigned = useMemo(() => isRoleAssigned(role, users), [users, role]);
@@ -38,43 +39,56 @@ const DeleteRoleModal: FC<DeleteRoleModalProps> = ({ role, isOpen, onCancel }) =
     }
   };
 
+  useEffect(() => {
+    // refetch user <-> role associations
+    if (isOpen) {
+      dispatch(fetchUsersListAction());
+    }
+  }, [dispatch, isOpen]);
+
   return (
     <Modal isOpen={isOpen} title={Messages.delete.title(role.title)} onDismiss={onCancel}>
-      <Form defaultValues={defaultValues} onSubmit={handleDelete} maxWidth="none">
-        {({ formState, control }) => (
-          <>
-            {isAssigned ? (
-              <>
-                <p>{Messages.delete.description(role.title)}</p>
-                <InputControl
-                  control={control}
-                  name="replacementRoleId"
-                  render={({ field }) => (
-                    <Select
-                      aria-label={Messages.delete.replacementAriaLabel}
-                      getOptionValue={(item) => item.value}
-                      options={options}
-                      value={field.value}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                    />
-                  )}
-                />
-              </>
-            ) : (
-              <p>{Messages.delete.descriptionNonAssigned}</p>
-            )}
-            <Modal.ButtonRow>
-              <Button type="submit" disabled={formState.isSubmitting}>
-                {Messages.delete.submit}
-              </Button>
-              <Button variant="secondary" onClick={onCancel}>
-                {Messages.delete.cancel}
-              </Button>
-            </Modal.ButtonRow>
-          </>
-        )}
-      </Form>
+      {isLoading ? (
+        <HorizontalGroup align="center" justify="center">
+          <Spinner />
+        </HorizontalGroup>
+      ) : (
+        <Form defaultValues={defaultValues} onSubmit={handleDelete} maxWidth="none">
+          {({ formState, control }) => (
+            <>
+              {isAssigned ? (
+                <>
+                  <p>{Messages.delete.description(role.title)}</p>
+                  <InputControl
+                    control={control}
+                    name="replacementRoleId"
+                    render={({ field }) => (
+                      <Select
+                        aria-label={Messages.delete.replacementAriaLabel}
+                        getOptionValue={(item) => item.value}
+                        options={options}
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                      />
+                    )}
+                  />
+                </>
+              ) : (
+                <p>{Messages.delete.descriptionNonAssigned}</p>
+              )}
+              <Modal.ButtonRow>
+                <Button type="submit" disabled={formState.isSubmitting}>
+                  {Messages.delete.submit}
+                </Button>
+                <Button variant="secondary" onClick={onCancel}>
+                  {Messages.delete.cancel}
+                </Button>
+              </Modal.ButtonRow>
+            </>
+          )}
+        </Form>
+      )}
     </Modal>
   );
 };
