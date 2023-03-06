@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useState } from 'react';
 
 import { Alert } from '@grafana/ui';
 
-import { DAY } from './AlertLocalStorage.constants';
+import { DAY_IN_MS } from './AlertLocalStorage.constants';
 
 interface AlertLocalStorageProps {
   uniqueName: string;
@@ -24,7 +24,7 @@ export const AlertLocalStorage = ({
   const setToLocalStorage = (keyName: string, keyValue: boolean, ttlInDays: number) => {
     const data = {
       value: keyValue,
-      ttl: Date.now() + ttlInDays * DAY,
+      ttl: Date.now() + ttlInDays * DAY_IN_MS,
     };
 
     localStorage.setItem(keyName, JSON.stringify(data));
@@ -60,19 +60,19 @@ export const AlertLocalStorage = ({
     setShowAlert(false);
   };
 
+  if (!showAlert) {
+    return null;
+  }
+
   return (
-    <>
-      {showAlert && (
-        <Alert
-          title={title}
-          severity="info"
-          customButtonContent={customButtonContent}
-          onCustomButtonClick={onCustomButtonClick}
-          onRemove={handleCloseAlert}
-        >
-          {children}
-        </Alert>
-      )}
-    </>
+    <Alert
+      title={title}
+      severity="info"
+      customButtonContent={customButtonContent}
+      onCustomButtonClick={onCustomButtonClick}
+      onRemove={handleCloseAlert}
+    >
+      {children}
+    </Alert>
   );
 };

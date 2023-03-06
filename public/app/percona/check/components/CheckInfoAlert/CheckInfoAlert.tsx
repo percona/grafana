@@ -14,30 +14,30 @@ export const ChecksInfoAlert = () => {
   const { isConnectedToPortal } = result!;
   const styles = useStyles2(getStyles);
 
+  if (isConnectedToPortal) {
+    return null;
+  }
+
   return (
-    <>
-      {!isConnectedToPortal && (
-        <AlertLocalStorage
-          title={Messages.title}
-          customButtonContent={Messages.buttonText}
-          onCustomButtonClick={() => locationService.push(`/settings/percona-platform`)}
-          uniqueName={'connectInfoAlert'}
+    <AlertLocalStorage
+      title={Messages.title}
+      customButtonContent={Messages.buttonText}
+      onCustomButtonClick={() => locationService.push(`/settings/percona-platform`)}
+      uniqueName={'connectInfoAlert'}
+    >
+      <div className={styles.content}>
+        <a
+          data-testid="read-more-link"
+          target="_blank"
+          rel="noreferrer"
+          href={'https://www.percona.com/software/percona-platform/subscription'}
+          className={styles.link}
         >
-          <div className={styles.content}>
-            <a
-              data-testid="read-more-link"
-              target="_blank"
-              rel="noreferrer"
-              href={'https://www.percona.com/software/percona-platform/subscription'}
-              className={styles.link}
-            >
-              {Messages.link}
-            </a>{' '}
-            {Messages.content} <br /> {Messages.contentSecondPart} <i>{Messages.advisorsList}</i>{' '}
-            {Messages.contentThirdPart}
-          </div>
-        </AlertLocalStorage>
-      )}
-    </>
+          {Messages.link}
+        </a>{' '}
+        {Messages.content} <br /> {Messages.contentSecondPart} <i>{Messages.advisorsList}</i>{' '}
+        {Messages.contentThirdPart}
+      </div>
+    </AlertLocalStorage>
   );
 };

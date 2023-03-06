@@ -2,11 +2,11 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ v1: { colors: v1Colors } }: GrafanaTheme2) => ({
+export const getStyles = ({ colors }: GrafanaTheme2) => ({
   link: css`
-    color: ${v1Colors.linkExternal};
+    color: ${colors.text.link};
     &:hover {
-      color: ${v1Colors.textBlue};
+      color: ${colors.text.primary};
     }
   `,
   content: css`
