@@ -70,7 +70,9 @@ export const TopBar: FC<TopBarProps> = ({
         <nav className={styles.navElement}>
           <div>
             <h1 className={styles.h1Styles}>
-              <div className={styles.titleText}>{connectedToPortal ? Messages.connectedToPlatformTitle : Messages.title}</div>
+              <div className={styles.titleText}>
+                {connectedToPortal ? Messages.connectedToPlatformTitle : Messages.title}
+              </div>
             </h1>
           </div>
         </nav>

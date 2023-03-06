@@ -20,9 +20,7 @@ export const Step3: FC<Step3Props> = () => {
             <img className={styles.imageChecked} alt="feedback-sent" src={checkImg} />
             {Messages.step3Title}
           </div>
-          <div className={styles.description}>
-            {Messages.thankYou}
-          </div>
+          <div className={styles.description}>{Messages.thankYou}</div>
         </div>
       </HorizontalGroup>
     </>

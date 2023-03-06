@@ -6,12 +6,12 @@ export const Messages = {
     preferences: 'Preferences',
     notificationHistory: 'Notification history',
     changePassword: 'Change password',
-    logout: 'Sign out'
+    logout: 'Sign out',
   },
   connectedToPlatformTitle: 'PMM',
   title: 'Percona monitoring and management',
   legend: 'Get more out of PMM',
   button: {
     connectToPortal: 'Connect to platform',
-  }
+  },
 };

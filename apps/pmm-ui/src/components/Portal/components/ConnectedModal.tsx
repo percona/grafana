@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { Button, Modal, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
+import { Messages } from './ConnectedModal.messages';
 import checkedIcon from '../../../assets/pmm-circle-check-green.svg';
 
 export interface ConnectedModalProps {
@@ -16,28 +17,28 @@ export const ConnectedModal: FC<ConnectedModalProps> = ({ isOpen, onClose }) => 
     <>
       <Modal title="" isOpen={isOpen} className={styles.modal} onDismiss={onClose}>
         <div className={styles.verticalGroup}>
-          <h3>This PMM instance is now connected to Percona Platform</h3>
+          <h3>{Messages.title}</h3>
         </div>
         <ul className={styles.unorderedList}>
           <li className={styles.liStyle}>
-            You now have access to more Advisiors to automatically check your health.
+            {Messages.advisorsDescription}
             <br />
             <a href="#" className={styles.link}>
-              How to use Advisors
+              {Messages.advisorsLinkDescription}
             </a>
           </li>
           <li className={styles.liStyle}>
-            You now have access to more Alerts Templates to notify you when something happens.
+            {Messages.alertTemplatesDescription}
             <br />
             <a href="#" className={styles.link}>
-              How to use Alerts Templates
+              {Messages.alertTemplatesLinkDescription}
             </a>
           </li>
         </ul>
-        <p>Every time you need to upgrade and scale your projects, visit our Percona Plans and contact us.</p>
-        <p className={styles.endingParagraph}>Bon voyage 👋</p>
+        <p>{Messages.contactUs}</p>
+        <p className={styles.endingParagraph}>{Messages.bonVoyage}</p>
         <Modal.ButtonRow>
-          <Button onClick={onClose}>Continue exploring</Button>
+          <Button onClick={onClose}>{Messages.button.continue}</Button>
         </Modal.ButtonRow>
       </Modal>
     </>
