@@ -3,6 +3,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { css, keyframes } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
 import { TipsContainer } from './TipsContainer';
+import { FeedbackContainer } from '../FeedbackContainer/FeedbackContainer';
 
 export const TipsConnected: FC = () => {
   const styles = useStyles2(getStyles);
@@ -24,6 +25,7 @@ export const TipsConnected: FC = () => {
         />
       </div>
       <TipsContainer />
+      <FeedbackContainer />
     </>
   );
 };
@@ -92,7 +94,7 @@ const getStyles = (theme: GrafanaTheme2) => {
         background: #ff5286;
         opacity: 0.5;
 
-        animation: ${pulseRing} 1125ms cubic-bezier(0.27, 0.8, 0.46, 0.93) -.5s infinite;
+        animation: ${pulseRing} 1125ms cubic-bezier(0.27, 0.8, 0.46, 0.93) -0.5s infinite;
       }
     `,
     notificationMarkerHidden: css`

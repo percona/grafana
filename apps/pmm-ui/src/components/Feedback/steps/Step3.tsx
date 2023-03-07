@@ -1,35 +1,48 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
-import { HorizontalGroup, useStyles2 } from '@grafana/ui';
-import { Messages } from './FeedbackTooltip.messages';
-import checkImg from '../../../../assets/pmm-circle-check-green.svg';
-import feedbackSentImg from '../../assets/pmm-feedback-sent.svg';
+import { useStyles2 } from '@grafana/ui';
+import { Messages } from './Step.messages';
+import checkImg from '../../../assets/pmm-circle-check-green.svg';
+import feedbackSentImg from '../../TopBar/assets/pmm-feedback-sent.svg';
 
-interface Step3Props {}
+interface Step3Props {
+  onFinish: () => void;
+  displayTimeMs: number;
+}
 
-export const Step3: FC<Step3Props> = () => {
+export const Step3: FC<Step3Props> = ({ displayTimeMs, onFinish }) => {
   const styles = useStyles2(getStyles);
+
+  useEffect(() => {
+    setTimeout(() => onFinish(), displayTimeMs);
+  }, []);
 
   return (
     <>
-      <HorizontalGroup>
+      <div className={styles.main}>
         <img className={styles.imageChecked} alt="feedback-sent" src={feedbackSentImg} />
-        <div>
+        <div className={styles.text}>
           <div className={styles.contentTitle}>
             <img className={styles.imageChecked} alt="feedback-sent" src={checkImg} />
             {Messages.step3Title}
           </div>
           <div className={styles.description}>{Messages.thankYou}</div>
         </div>
-      </HorizontalGroup>
+      </div>
     </>
   );
 };
 
 const getStyles = (theme: GrafanaTheme2) => ({
+  main: css`
+    display: flex;
+  `,
   imageChecked: css`
     padding: ${theme.spacing(0.5)};
+  `,
+  text: css`
+    margin-left: ${theme.spacing(2)};
   `,
   contentTitle: css`
     font-size: ${theme.typography.h4.fontSize};

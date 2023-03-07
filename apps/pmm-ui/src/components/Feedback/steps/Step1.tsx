@@ -2,34 +2,35 @@ import React, { FC } from 'react';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { Button, useStyles2 } from '@grafana/ui';
-import { Messages } from './FeedbackTooltip.messages';
-import sadImage from '../../assets/sad.svg';
-import mehImage from '../../assets/meh.svg';
-import smileImage from '../../assets/smile.svg';
+import { Messages } from './Step.messages';
+import { FeedbackNote } from '../Feedback';
+import sadImage from '../../TopBar/assets/sad.svg';
+import mehImage from '../../TopBar/assets/meh.svg';
+import smileImage from '../../TopBar/assets/smile.svg';
 
 interface Step1Props {
-  onSubmit: () => void;
+  onSubmit: (val: FeedbackNote) => void;
 }
 
 export const Step1: FC<Step1Props> = ({ onSubmit }) => {
   const styles = useStyles2(getStyles);
 
   return (
-    <>
+    <div className={styles.main}>
       <div className={styles.contentTitle}>{Messages.step1Title}</div>
       <div className={styles.rating}>
-        <Button variant="secondary" icon="info" onClick={onSubmit} className={fixedIconStyle(sadImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit('bad')} className={fixedIconStyle(sadImage)}>
           {Messages.button.badFeedback}
         </Button>
-        <Button variant="secondary" icon="info" onClick={onSubmit} className={fixedIconStyle(mehImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit('fair')} className={fixedIconStyle(mehImage)}>
           {Messages.button.fairFeedback}
         </Button>
-        <Button variant="secondary" icon="info" onClick={onSubmit} className={fixedIconStyle(smileImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit('good')} className={fixedIconStyle(smileImage)}>
           {Messages.button.goodFeedback}
         </Button>
       </div>
       <div className={styles.ratingDescription}>{Messages.ratingDescription}</div>
-    </>
+    </div>
   );
 };
 
@@ -47,6 +48,11 @@ const fixedIconStyle = (image: any) =>
   `;
 
 const getStyles = (theme: GrafanaTheme2) => ({
+  main: css`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  `,
   contentTitle: css`
     font-size: ${theme.typography.h4.fontSize};
     color: ${theme.colors.text.primary};
