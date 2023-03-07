@@ -45,7 +45,7 @@ export const TopBar: FC<TopBarProps> = ({
     <Menu>
       <Menu.Item label={Messages.userMenu.openPerconaPlatform} className={styles.miOpenPerconaPlatform} icon="info" />
       <Menu.Item label={Messages.userMenu.accountProfile} />
-      <Menu.Item label={Messages.userMenu.connectionSettings} />
+      <Menu.Item url={appSubUrl + '/settings/percona-platform'} label={Messages.userMenu.connectionSettings} />
       <Menu.Divider />
       <Menu.Item url={appSubUrl + '/profile'} label={Messages.userMenu.preferences} />
       <Menu.Item url={appSubUrl + '/profile/notifications'} label={Messages.userMenu.notificationHistory} />
@@ -103,7 +103,6 @@ export const TopBar: FC<TopBarProps> = ({
             <FeedbackTooltip
               visible={visibleFeedback}
               onClose={() => {
-                setVisibleFeedback(true);
                 setVisibleFeedback(false);
               }}
             >
