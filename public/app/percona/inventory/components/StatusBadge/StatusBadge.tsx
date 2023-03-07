@@ -7,7 +7,7 @@ import { ServiceAgentStatus } from '../../Inventory.types';
 import { getStyles } from './StatusBadge.styles';
 import { StatusBadgeProps } from './StatusBadge.types';
 
-export const StatusBadge: FC<StatusBadgeProps> = ({ agents, full, strippedServiceId }) => {
+export const StatusBadge: FC<StatusBadgeProps> = ({ agents, strippedServiceId }) => {
   const styles = useStyles2(getStyles);
 
   if (!agents.length) {
@@ -30,11 +30,12 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, full, strippedServic
   const percentageNotRunning = bad / totalAgents;
   const badgeColor: BadgeColor = percentageNotRunning === 1 ? 'red' : percentageNotRunning === 0 ? 'green' : 'orange';
   const textToShow = `${percentageNotRunning === 1 ? bad : good}/${totalAgents}`;
-  const textToAppend = full ? `${percentageNotRunning === 1 ? ' not running' : ' running'}` : '';
+  const textToAppend = `${percentageNotRunning === 1 ? ' not running' : ' running'}`;
 
   return (
     <Badge
       color={badgeColor}
+      data-testid={`status-badge-${badgeColor}`}
       text={
         <Link href={link} className={styles.anchor}>
           {textToShow}

@@ -45,7 +45,7 @@ export enum ServiceAgentStatus {
   RUNNING = 'RUNNING',
   WAITING = 'WAITING',
   STOPPING = 'STOPPING',
-  DOPE = 'DONE',
+  DONE = 'DONE',
   UNKNOWN = 'UNKNOWN',
 }
 

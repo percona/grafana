@@ -190,7 +190,6 @@ export const Services = () => {
               <StatusBadge
                 strippedServiceId={stripServiceId(row.original.params.serviceId)}
                 agents={row.original.params.agents || []}
-                full
               />
             </DetailsRow.Contents>
           )}

@@ -1,7 +1,6 @@
 import { ServiceAgent } from '../../Inventory.types';
 
 export interface StatusBadgeProps {
-  agents: Array<Pick<ServiceAgent, 'agentId' | 'status'>>;
+  agents: Array<Pick<ServiceAgent, 'status'>>;
   strippedServiceId: string;
-  full?: boolean;
 }
