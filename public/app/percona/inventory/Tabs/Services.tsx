@@ -33,6 +33,7 @@ import { appEvents } from '../../../core/app_events';
 import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
+import { StatusLink } from '../components/StatusLink/StatusLink';
 
 import { getStyles } from './Tabs.styles';
 
@@ -90,11 +91,11 @@ export const Services = () => {
         accessor: (row) => row.params.nodeName,
       },
       {
-        Header: 'Agents',
+        Header: 'Monitoring',
         accessor: 'params',
         width: '70px',
         Cell: ({ value, row }) => (
-          <StatusBadge strippedServiceId={stripServiceId(row.original.params.serviceId)} agents={value.agents || []} />
+          <StatusLink strippedServiceId={stripServiceId(row.original.params.serviceId)} agents={value.agents || []} />
         ),
       },
       {
