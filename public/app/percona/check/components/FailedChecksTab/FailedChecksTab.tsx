@@ -1,5 +1,5 @@
 import { logger } from '@percona/platform-core';
-import React, { FC, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
 import { locationService } from '@grafana/runtime';
@@ -16,6 +16,7 @@ import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
+import { ChecksInfoAlert } from '../CheckInfoAlert/CheckInfoAlert';
 
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 import { Messages } from './FailedChecksTab.messages';
@@ -25,7 +26,7 @@ import { Failures } from './Failures/Failures';
 
 export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
-  const navModel = usePerconaNavModel('failed-checks');
+  const navModel = usePerconaNavModel('advisors-insights');
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
@@ -65,7 +66,7 @@ export const FailedChecksTab: FC = () => {
   const getRowProps = (row: Row<FailedCheckSummary>): ExtendedTableRowProps => ({
     key: row.original.serviceId,
     className: styles.row,
-    onClick: () => locationService.push(`/pmm-database-checks/failed-checks/${stripServiceId(row.original.serviceId)}`),
+    onClick: () => locationService.push(`/advisors/insights/${stripServiceId(row.original.serviceId)}`),
   });
 
   const getCellProps = (cellInfo: Cell<FailedCheckSummary>): ExtendedTableCellProps => ({
@@ -89,6 +90,7 @@ export const FailedChecksTab: FC = () => {
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
         >
+          <ChecksInfoAlert />
           <AlertsReloadContext.Provider value={{ fetchAlerts }}>
             <Table
               totalItems={data.length}
