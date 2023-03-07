@@ -28,14 +28,30 @@ export const HomePage: FC<HomePageProps> = ({ onHelpCenterButtonClick }) => {
   return (
     <div className={styles.welcomePage}>
       <div className={styles.welcomePageContent}>
-        <ActionContainer headerType="h1" header={welcomeHeader} text={welcomeText} actionsSpacing="none">
-          <ActionCard text="Monitor database health" imgSrc={imgDbHealth} imgAlt="Monitor database health" />
-          <ActionCard text="Discover patterns" imgSrc={imgDiscoverPatterns} imgAlt="Discover patterns" />
-          <ActionCard text="Optimize and improve" imgSrc={imgOptimizeAndImprove} imgAlt="Optimize and improve" />
-          <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
+        <ActionContainer
+          headerType="h1"
+          header={welcomeHeader}
+          text={welcomeText}
+          actionsSpacing="none"
+          actionsJustify="center"
+        >
+          <div className={styles.actionCardPair}>
+            <ActionCard text="Monitor database health" imgSrc={imgDbHealth} imgAlt="Monitor database health" />
+            <ActionCard text="Discover patterns" imgSrc={imgDiscoverPatterns} imgAlt="Discover patterns" />
+          </div>
+          <div className={styles.actionCardPair}>
+            <ActionCard text="Optimize and improve" imgSrc={imgOptimizeAndImprove} imgAlt="Optimize and improve" />
+            <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
+          </div>
         </ActionContainer>
         <HelpCenterContainer />
-        <ActionContainer headerType="h2" header={helpBlockHeader} text={helpBlockText} actionsSpacing="md">
+        <ActionContainer
+          headerType="h2"
+          header={helpBlockHeader}
+          text={helpBlockText}
+          actionsSpacing="md"
+          actionsJustify="flex-start"
+        >
           <Button variant="secondary" onClick={onHelpCenterButtonClick}>
             Open Help Centers
           </Button>
@@ -78,5 +94,12 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
     width: 640px;
     height: 795px;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  `,
+  actionCardPair: css`
+    display: flex;
+    flex-direction: row;
   `,
 });

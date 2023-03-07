@@ -35,6 +35,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
     width: 640px;
     border-radius: 4px;
+    @media (max-width: 768px) {
+      flex-wrap: wrap;
+      width: 100%;
+    }
   `,
   helpCenterTextContainer: css`
     display: flex;
@@ -43,6 +47,11 @@ const getStyles = (theme: GrafanaTheme2) => ({
     padding: 0;
     gap: 8px;
     width: 38%;
+    @media (max-width: 768px) {
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   `,
   helpCenterActionsContainer: css`
     display: flex;
@@ -50,5 +59,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
     align-items: center;
     padding: 0;
     width: 62%;
+    @media (max-width: 768px) {
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   `,
 });

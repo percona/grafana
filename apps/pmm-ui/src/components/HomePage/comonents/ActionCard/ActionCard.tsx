@@ -19,7 +19,7 @@ export const ActionCard: FC<ActionCardProps> = ({ imgSrc, onClick, imgAlt, text,
       <div className={styles.actionCardImageContainer}>
         <img className={styles.actionCardImage} src={imgSrc} alt={imgAlt} />
       </div>
-      <div>
+      <div className={styles.actionCardText}>
         <span>{text}</span>
       </div>
     </div>
@@ -45,10 +45,14 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    padding: 0 40px;
+    padding: 0 25%;
     gap: 10px;
-    width: 160px;
-    height: 80px;
+    width: 100%;
+    height: 81%;
   `,
   actionCardImage: css``,
+  actionCardText: css`
+    text-align: center;
+    word-wrap: normal;
+  `,
 });
