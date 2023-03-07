@@ -6,6 +6,7 @@ import { newDBClusterService } from '../../../../../dbaas/components/DBCluster/D
 import { getCronStringFromValues } from '../../../../helpers/cron/cron';
 import { SETTINGS_TIMEOUT } from '../../../constants';
 import { updateSettingsAction } from '../../index';
+import { prepareSourceRanges } from '../dbaas.utils';
 
 import { AddDBClusterArgs, PerconaAddDBClusterState } from './addDBCluster.types';
 
@@ -89,11 +90,7 @@ export const addDbClusterAction = createAsyncThunk(
       startMinute!.map((m: { value: any }) => m.value!)
     );
 
-    const preparedSourceRanges = sourceRanges.reduce(
-      (acc: string[], item: { sourceRange: string }): string[] =>
-        !!item?.sourceRange ? [...acc, item?.sourceRange] : acc,
-      []
-    );
+    const preparedSourceRanges = prepareSourceRanges(sourceRanges);
 
     await withAppEvents(
       dbClusterService.addDBCluster({
