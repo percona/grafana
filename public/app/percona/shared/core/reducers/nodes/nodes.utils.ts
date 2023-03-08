@@ -1,11 +1,5 @@
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
-import {
-  ContainerDbNode,
-  DbNode,
-  GenericDbNode,
-  Node,
-  NodeListPayload,
-} from 'app/percona/shared/services/nodes/Nodes.types';
+import { DbNode, Node, NodeListPayload } from 'app/percona/shared/services/nodes/Nodes.types';
 
 const MAIN_COLUMNS = ['node_id', 'node_name', 'address', 'custom_labels', 'type'];
 
@@ -30,7 +24,7 @@ export const toDbNodesModel = (nodeList: NodeListPayload): Node[] => {
         });
 
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <DbNode & GenericDbNode & ContainerDbNode>payloadToCamelCase(params);
+      const camelCaseParams = <DbNode>payloadToCamelCase(params);
 
       if (!camelCaseParams.customLabels) {
         camelCaseParams.customLabels = {};

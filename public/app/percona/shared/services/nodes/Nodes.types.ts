@@ -40,27 +40,15 @@ export interface NodeListPayload {
 
 export type Node = {
   type: NodeType;
-  params: DbNode & GenericDbNode & ContainerDbNode;
+  params: DbNode;
 };
 
 export interface DbNode {
   nodeId: string;
   nodeName: string;
   address: string;
-  nodeModel?: string;
-  region?: string;
   az?: string;
   customLabels?: Record<string, string>;
-}
-
-export interface GenericDbNode extends DbNode {
-  distro?: string;
-}
-
-export interface ContainerDbNode extends Node {
-  machineId?: string;
-  containerId?: string;
-  containerName?: string;
 }
 
 export type RemoteDbNode = Node;
