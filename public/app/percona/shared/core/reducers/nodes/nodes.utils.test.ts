@@ -23,6 +23,9 @@ describe('toDbNodesModel', () => {
           machine_id: 'machine1',
           container_id: 'container1',
           container_name: 'container one',
+          custom_labels: {
+            env_name: 'dev',
+          },
         },
       ],
       remote_azure_database: [
@@ -59,6 +62,7 @@ describe('toDbNodesModel', () => {
             machine_id: 'machine1',
             container_id: 'container1',
             container_name: 'container one',
+            env_name: 'dev',
           },
         },
       },

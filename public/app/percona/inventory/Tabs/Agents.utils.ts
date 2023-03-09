@@ -1,8 +1,8 @@
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 
-import { Agent, AgentType, ServiceAgent, ServiceAgentPayload } from '../Inventory.types';
+import { Agent, AgentType, ServiceAgentPayload } from '../Inventory.types';
 
-const MAIN_COLUMNS = ['node_id', 'node_name', 'address', 'custom_labels', 'type'];
+const MAIN_COLUMNS = ['node_id', 'agent_id', 'node_name', 'address', 'custom_labels', 'type'];
 
 export const toAgentModel = (agentList: ServiceAgentPayload): Agent[] => {
   const result: Agent[] = [];
@@ -19,27 +19,26 @@ export const toAgentModel = (agentList: ServiceAgentPayload): Agent[] => {
         .forEach(([key, value]: [string, string]) => {
           if (typeof value !== 'object' || Array.isArray(value)) {
             extraLabels[key] = value;
+
+            if (key === 'username') {
+              extraLabels.password = '******';
+            }
             // @ts-ignore
             delete params[key];
           }
         });
 
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <ServiceAgent>payloadToCamelCase(params);
-
-      if (!camelCaseParams.customLabels) {
-        camelCaseParams.customLabels = {};
-      }
-
-      if (params.username) {
-        camelCaseParams.customLabels.password = '******';
-      }
-
-      camelCaseParams.customLabels = { ...camelCaseParams.customLabels, ...extraLabels };
+      const camelCaseParams = payloadToCamelCase(params, ['custom_labels']);
+      // @ts-ignore
+      delete camelCaseParams['custom_labels'];
 
       result.push({
         type: agentType,
-        params: camelCaseParams,
+        // @ts-ignore
+        params: {
+          ...camelCaseParams,
+          customLabels: { ...params['custom_labels'], ...extraLabels },
+        },
       });
     });
   });

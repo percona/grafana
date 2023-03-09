@@ -50,7 +50,7 @@ export enum ServiceAgentStatus {
 }
 
 export type ServiceAgentPayload = {
-  [key in AgentType]: Array<{
+  [key in AgentType]?: Array<{
     agent_id: string;
     status?: ServiceAgentStatus;
     custom_labels?: Record<string, string>;
@@ -62,7 +62,6 @@ export type ServiceAgentPayload = {
 
 export interface ServiceAgent {
   agentId: string;
-  status?: ServiceAgentStatus;
   customLabels?: Record<string, string>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;

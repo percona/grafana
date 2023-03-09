@@ -76,4 +76,36 @@ describe('payloadToCamelCase', () => {
       ],
     });
   });
+
+  it('should ignore specified keys', () => {
+    const obj = {
+      name: 'John',
+      addresses: [
+        {
+          address_state: 'California',
+          'zip-code': '1234-567',
+        },
+        {
+          address_state: 'New York',
+          'zip-code': '9999-999',
+        },
+      ],
+      marital_status: 'single',
+    };
+
+    expect(payloadToCamelCase(obj, ['address_state', 'marital_status'])).toEqual({
+      name: 'John',
+      addresses: [
+        {
+          address_state: 'California',
+          zipCode: '1234-567',
+        },
+        {
+          address_state: 'New York',
+          zipCode: '9999-999',
+        },
+      ],
+      marital_status: 'single',
+    });
+  });
 });

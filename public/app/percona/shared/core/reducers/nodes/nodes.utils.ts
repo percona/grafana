@@ -1,5 +1,5 @@
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
-import { DbNode, Node, NodeListPayload } from 'app/percona/shared/services/nodes/Nodes.types';
+import { Node, NodeListPayload } from 'app/percona/shared/services/nodes/Nodes.types';
 
 const MAIN_COLUMNS = ['node_id', 'node_name', 'address', 'custom_labels', 'type'];
 
@@ -23,18 +23,17 @@ export const toDbNodesModel = (nodeList: NodeListPayload): Node[] => {
           }
         });
 
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <DbNode>payloadToCamelCase(params);
-
-      if (!camelCaseParams.customLabels) {
-        camelCaseParams.customLabels = {};
-      }
-
-      camelCaseParams.customLabels = { ...camelCaseParams.customLabels, ...extraLabels };
+      const camelCaseParams = payloadToCamelCase(params, ['custom_labels']);
+      // @ts-ignore
+      delete camelCaseParams['custom_labels'];
 
       result.push({
         type: nodeType,
-        params: camelCaseParams,
+        // @ts-ignore
+        params: {
+          ...camelCaseParams,
+          customLabels: { ...params['custom_labels'], ...extraLabels },
+        },
       });
     });
   });
