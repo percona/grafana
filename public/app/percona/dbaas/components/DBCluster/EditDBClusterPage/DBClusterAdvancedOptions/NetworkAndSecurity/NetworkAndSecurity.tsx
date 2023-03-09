@@ -41,9 +41,10 @@ export const NetworkAndSecurity: FC = () => {
                   fieldClassName={styles.field}
                 />
                 <Button
+                  data-testid={`deleteButton-${index}`}
                   className={styles.deleteButton}
                   variant="secondary"
-                  onClick={() => fields.remove(index)}
+                  onClick={() => (index > 0 ? fields.remove(index) : fields.update(0, ''))}
                   icon="trash-alt"
                 />
               </div>
