@@ -72,6 +72,7 @@ export const addDbClusterAction = createAsyncThunk(
       secretsName,
       enableRestore,
       enableBackups,
+      template,
     } = args.values;
 
     const dbClusterService = newDBClusterService(databaseType.value);
@@ -123,6 +124,12 @@ export const addDbClusterAction = createAsyncThunk(
               secretsName: secretsName?.value || '',
             },
           }),
+        ...(template && {
+          template: {
+            name: template.label,
+            kind: template.value,
+          },
+        }),
       }),
       {
         successMessage: 'Cluster was successfully added',
