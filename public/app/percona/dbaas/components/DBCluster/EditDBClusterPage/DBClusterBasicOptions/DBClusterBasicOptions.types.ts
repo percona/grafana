@@ -1,14 +1,16 @@
 import { FormApi } from 'final-form';
 
+import { SelectableValue } from '@grafana/data';
 import { Databases } from 'app/percona/shared/core';
 
 import { Kubernetes, OperatorsList } from '../../../Kubernetes/Kubernetes.types';
+import { EditDBClusterForm } from '../EditDBClusterPage.types';
 
 import { RestoreFieldsProps } from './Restore/Restore.types';
 
 export interface DBClusterBasicOptionsProps {
   kubernetes: Kubernetes[];
-  form: FormApi;
+  form: FormApi<EditDBClusterForm, Partial<EditDBClusterForm>>;
 }
 
 export enum Operators {
@@ -48,7 +50,7 @@ export enum BasicOptionsFields {
 
 export interface BasicOptionsFieldsProps extends RestoreFieldsProps {
   [BasicOptionsFields.name]?: string;
-  [BasicOptionsFields.kubernetesCluster]?: KubernetesOption;
+  [BasicOptionsFields.kubernetesCluster]?: SelectableValue;
   [BasicOptionsFields.databaseType]?: DatabaseOptionInitial;
   [BasicOptionsFields.databaseVersion]?: string;
 }

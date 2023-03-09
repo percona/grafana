@@ -10,13 +10,13 @@ import { MAX_RETENTION, MIN_RETENTION } from '../../../../../backup/components/A
 import { ScheduleSectionFields } from '../../../../../backup/components/AddBackupPage/ScheduleSection/ScheduleSectionFields/ScheduleSectionFields';
 import { SelectField } from '../../../../../shared/components/Form/SelectField';
 import { getBackupLocations } from '../../../../../shared/core/selectors';
-import { AddDBClusterFormValues } from '../EditDBClusterPage.types';
+import { AddDBClusterFormValues, EditDBClusterForm } from '../EditDBClusterPage.types';
 
 import { Messages } from '././DBaaSBackups.messages';
 import { getStyles } from './DBaaSBackups.styles';
 import { DBaaSBackupFields } from './DBaaSBackups.types';
 
-export const DBaaSBackups: FC<FormRenderProps> = ({ values }) => {
+export const DBaaSBackups: FC<FormRenderProps<EditDBClusterForm>> = ({ values }) => {
   const styles = useStyles(getStyles);
   const [enableBackups, setEnableBackups] = useState(false);
 

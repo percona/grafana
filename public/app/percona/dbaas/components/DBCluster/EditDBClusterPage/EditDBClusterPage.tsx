@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 import arrayMutators from 'final-form-arrays';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Form } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { Spinner, useStyles2 } from '@grafana/ui/src';
@@ -30,7 +30,7 @@ import DBaaSBackups from './DBaaSBackups/DBaaSBackups';
 import { DB_CLUSTER_INVENTORY_URL } from './EditDBClusterPage.constants';
 import { Messages } from './EditDBClusterPage.messages';
 import { getStyles } from './EditDBClusterPage.styles';
-import { EditDBClusterPageProps } from './EditDBClusterPage.types';
+import { EditDBClusterForm, EditDBClusterPageProps } from './EditDBClusterPage.types';
 import { generateUID } from './EditDBClusterPage.utils';
 import { useDefaultMode } from './hooks/useDefaultMode';
 import { useEditDBClusterFormSubmit } from './hooks/useEditDBClusterFormSubmit';
@@ -80,9 +80,9 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
           <Spinner />
         </div>
       ) : kubernetes && kubernetes?.length > 0 ? (
-        <Form
+        <FinalForm
           initialValues={initialValues}
-          onSubmit={onSubmit}
+          onSubmit={(values: EditDBClusterForm) => onSubmit(values)}
           mutators={{
             setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
               changeValue(state, `${BasicOptionsFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);

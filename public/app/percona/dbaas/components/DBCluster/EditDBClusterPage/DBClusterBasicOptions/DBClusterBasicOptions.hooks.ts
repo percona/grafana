@@ -5,12 +5,13 @@ import { useEffect } from 'react';
 import { SelectableValue } from '@grafana/data/src';
 
 import { isOptionEmpty, newDBClusterService } from '../../DBCluster.utils';
+import { EditDBClusterForm } from '../EditDBClusterPage.types';
 
 import { BasicOptionsFields } from './DBClusterBasicOptions.types';
 import { findDefaultDatabaseVersion } from './DBClusterBasicOptions.utils';
 
 export const useDatabaseVersions = (
-  form: FormApi,
+  form: FormApi<EditDBClusterForm, Partial<EditDBClusterForm>>,
   databaseType: SelectableValue,
   kubernetesCluster: SelectableValue,
   setLoadingDatabaseVersions: (loading: boolean) => void,
