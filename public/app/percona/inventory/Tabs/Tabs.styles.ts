@@ -42,4 +42,7 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
   agentBreadcrumb: css`
     margin-top: ${spacing(4)};
   `,
+  goBack: css`
+    vertical-align: middle;
+  `,
 });

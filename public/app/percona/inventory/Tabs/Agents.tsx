@@ -147,8 +147,8 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
           <HorizontalGroup height="auto">
             <Link href="/inventory/services">
               <Icon name="arrow-left" size="lg" />
+              <span className={styles.goBack}>{Messages.agents.goBack}</span>
             </Link>
-            <span>{Messages.agents.goBack}</span>
           </HorizontalGroup>
           {service && !servicesLoading && (
             <h5 className={styles.agentBreadcrumb}>{Messages.agents.breadcrumb(service.params.serviceName)}</h5>
