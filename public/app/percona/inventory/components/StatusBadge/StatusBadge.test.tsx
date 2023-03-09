@@ -19,9 +19,9 @@ describe('StatusBadge', () => {
       <Router history={locationService.getHistory()}>
         <StatusBadge
           agents={[
-            { status: ServiceAgentStatus.RUNNING },
-            { status: ServiceAgentStatus.STARTING },
-            { status: ServiceAgentStatus.STARTING },
+            { agentId: 'agent_1', status: ServiceAgentStatus.RUNNING },
+            { agentId: 'agent_2', status: ServiceAgentStatus.STARTING },
+            { agentId: 'agent_3', status: ServiceAgentStatus.STARTING },
           ]}
           strippedServiceId=""
         />
@@ -36,9 +36,9 @@ describe('StatusBadge', () => {
       <Router history={locationService.getHistory()}>
         <StatusBadge
           agents={[
-            { status: ServiceAgentStatus.RUNNING },
-            { status: ServiceAgentStatus.STARTING },
-            { status: ServiceAgentStatus.DONE },
+            { agentId: 'agent_1', status: ServiceAgentStatus.RUNNING },
+            { agentId: 'agent_2', status: ServiceAgentStatus.STARTING },
+            { agentId: 'agent_3', status: ServiceAgentStatus.DONE },
           ]}
           strippedServiceId=""
         />
@@ -53,9 +53,9 @@ describe('StatusBadge', () => {
       <Router history={locationService.getHistory()}>
         <StatusBadge
           agents={[
-            { status: ServiceAgentStatus.STOPPING },
-            { status: ServiceAgentStatus.WAITING },
-            { status: ServiceAgentStatus.DONE },
+            { agentId: 'agent_1', status: ServiceAgentStatus.STOPPING },
+            { agentId: 'agent_2', status: ServiceAgentStatus.WAITING },
+            { agentId: 'agent_3', status: ServiceAgentStatus.DONE },
           ]}
           strippedServiceId=""
         />

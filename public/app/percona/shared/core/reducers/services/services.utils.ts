@@ -1,7 +1,5 @@
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 import {
-  DbService,
-  DbServiceWithAddress,
   ListServicesBody,
   RemoveServiceBody,
   Service,
@@ -35,36 +33,33 @@ export const toListServicesBody = (params: Partial<ListServicesParams>): Partial
 
 export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] => {
   const result: Service[] = [];
+  const { services = [] } = serviceList;
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  (Object.keys(serviceList) as Array<keyof ServiceListPayload>).forEach((serviceType) => {
-    const serviceParams = serviceList[serviceType];
-    serviceParams?.forEach((params) => {
-      const extraLabels: Record<string, string> = {};
+  services.forEach(({ service_type: serviceType, ...serviceParams }) => {
+    const extraLabels: Record<string, string> = {};
 
-      Object.entries(params)
-        .filter(([field]) => !MAIN_COLUMNS.includes(field))
-        .forEach(([key, value]: [string, string]) => {
-          if (typeof value !== 'object' || Array.isArray(value)) {
-            extraLabels[key] = value;
-            // @ts-ignore
-            delete params[key];
-          }
-        });
-
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const camelCaseParams = <DbService & DbServiceWithAddress>payloadToCamelCase(params);
-
-      if (!camelCaseParams.customLabels) {
-        camelCaseParams.customLabels = {};
-      }
-
-      camelCaseParams.customLabels = { ...camelCaseParams.customLabels, ...extraLabels };
-
-      result.push({
-        type: serviceType,
-        params: camelCaseParams,
+    Object.entries(serviceParams)
+      .filter(([field]) => !MAIN_COLUMNS.includes(field))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .forEach(([key, value]: [string, string | number | any[] | Record<string, string>]) => {
+        if (typeof value !== 'object' || Array.isArray(value)) {
+          extraLabels[key] = value.toString();
+          // @ts-ignore
+          delete serviceParams[key];
+        }
       });
+
+    const camelCaseParams = payloadToCamelCase(serviceParams, ['custom_labels']);
+    // @ts-ignore
+    delete camelCaseParams['custom_labels'];
+
+    result.push({
+      type: serviceType,
+      // @ts-ignore
+      params: {
+        ...camelCaseParams,
+        customLabels: { ...serviceParams['custom_labels'], ...extraLabels },
+      },
     });
   });
 

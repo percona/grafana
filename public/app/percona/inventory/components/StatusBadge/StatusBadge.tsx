@@ -18,7 +18,11 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, strippedServiceId })
   const totalAgents = agents.length;
   const [good, bad] = agents.reduce(
     (acc, agent) => {
-      if (agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING) {
+      if (
+        agent.status === ServiceAgentStatus.RUNNING ||
+        agent.status === ServiceAgentStatus.STARTING ||
+        !!agent.isConnected
+      ) {
         acc[0]++;
       } else {
         acc[1]++;

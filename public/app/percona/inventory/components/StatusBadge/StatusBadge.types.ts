@@ -1,6 +1,6 @@
-import { ServiceAgent } from '../../Inventory.types';
+import { DbServiceAgent } from 'app/percona/shared/services/services/Services.types';
 
 export interface StatusBadgeProps {
-  agents: Array<Pick<ServiceAgent, 'status'>>;
+  agents: DbServiceAgent[];
   strippedServiceId: string;
 }

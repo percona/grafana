@@ -1,4 +1,4 @@
-import { ServiceAgent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
+import { ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
 
 import { Databases } from '../../core';
 
@@ -19,6 +19,7 @@ export interface ListServicesBody {
 }
 
 export interface DbServicePayload {
+  service_type: Databases | 'external';
   service_id: string;
   service_name: string;
   node_id: string;
@@ -27,12 +28,12 @@ export interface DbServicePayload {
   cluster?: string;
   replication_set?: string;
   custom_labels?: Record<string, string>;
-  agents?: Array<{ agent_id: string; status: ServiceAgentStatus }>;
+  agents?: Array<{ agent_id: string; status?: ServiceAgentStatus; is_connected?: boolean }>;
 }
 
 export interface DbServiceWithAddressPayload extends DbServicePayload {
   address: string;
-  port: string;
+  port: number;
   socket: string;
 }
 
@@ -45,19 +46,19 @@ export interface ExternalServicePayload extends DbServicePayload {
 }
 
 export interface ServiceListPayload {
-  [Databases.haproxy]?: DbServicePayload[];
-  [Databases.mariadb]?: DbServiceWithAddressPayload[];
-  [Databases.mongodb]?: DbServiceWithAddressPayload[];
-  [Databases.mysql]?: DbServiceWithAddressPayload[];
-  [Databases.postgresql]?: PostgreSQLServicePayload[];
-  [Databases.proxysql]?: DbServiceWithAddressPayload[];
-  external?: ExternalServicePayload[];
+  services?: Array<DbServicePayload | DbServiceWithAddressPayload | PostgreSQLServicePayload | ExternalServicePayload>;
 }
 
 export type Service = {
   type: Databases | 'external';
   params: DbService & Partial<DbServiceWithAddress>;
 };
+
+export interface DbServiceAgent {
+  agentId: string;
+  status?: ServiceAgentStatus;
+  isConnected?: boolean;
+}
 
 export interface DbService {
   serviceId: string;
@@ -68,12 +69,12 @@ export interface DbService {
   cluster?: string;
   replicationSet?: string;
   customLabels?: Record<string, string>;
-  agents?: Array<Pick<ServiceAgent, 'agentId' | 'status'>>;
+  agents?: DbServiceAgent[];
 }
 
 export interface DbServiceWithAddress extends DbService {
   address: string;
-  port: string;
+  port: number;
 }
 
 export interface RemoveServiceBody {
