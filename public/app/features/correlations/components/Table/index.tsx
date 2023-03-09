@@ -144,11 +144,14 @@ export function Table<TableData extends object>({
                   );
                 })}
               </tr>
-              {row.isExpanded && renderExpandedRow && (
-                <tr className={className} {...otherRowProps}>
-                  <td colSpan={row.cells.length}>{renderExpandedRow(row.original)}</td>
-                </tr>
-              )}
+              {
+                // @ts-expect-error react-table doesn't ship with useExpanded types and we can't use declaration merging without affecting the table viz
+                row.isExpanded && renderExpandedRow && (
+                  <tr className={className} {...otherRowProps}>
+                    <td colSpan={row.cells.length}>{renderExpandedRow(row.original)}</td>
+                  </tr>
+                )
+              }
             </Fragment>
           );
         })}
