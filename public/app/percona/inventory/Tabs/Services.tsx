@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { CheckboxField, logger, Table } from '@percona/platform-core';
+import { CheckboxField, logger } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Column, Row } from 'react-table';
@@ -10,6 +10,7 @@ import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@graf
 import { OldPage } from 'app/core/components/Page/Page';
 import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
+import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ServiceIconWithText } from 'app/percona/shared/components/Elements/ServiceIconWithText/ServiceIconWithText';
@@ -277,18 +278,15 @@ export const Services = () => {
             />
           </Modal>
           <Table
-            // @ts-ignore
             columns={columns}
             data={services}
             totalItems={services.length}
             rowSelection
-            // @ts-ignore
             onRowSelection={handleSelectionChange}
             showPagination
             pageSize={25}
             allRowsSelectionMode="page"
             emptyMessage="No services Available"
-            emptyMessageClassName={styles.emptyMessage}
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
