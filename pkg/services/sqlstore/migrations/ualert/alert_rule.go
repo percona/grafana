@@ -19,13 +19,6 @@ const (
 	ContactLabel = "__contacts__"
 )
 
-const (
-	// ContactLabel is a private label created during migration and used in notification policies.
-	// It stores a string array of all contact point names an alert rule should send to.
-	// It was created as a means to simplify post-migration notification policies.
-	ContactLabel = "__contacts__"
-)
-
 type alertRule struct {
 	ID              int64 `xorm:"pk autoincr 'id'"`
 	OrgID           int64 `xorm:"org_id"`
