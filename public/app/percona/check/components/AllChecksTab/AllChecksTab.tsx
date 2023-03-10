@@ -39,7 +39,6 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   if (navModel.main.id === 'not-found') {
     locationService.push('/advisors');
   }
-
   const getCheckNamesListInCategory = () => {
     return Object.values(advisors)
       .map((advisor) => advisor.checks)
@@ -205,6 +204,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
                     columns={columns}
                     pendingRequest={advisorsPending}
                     emptyMessage={Messages.table.noData}
+                    tableKey={advisors[summary].name}
                     showFilter
                   />
                   {!!selectedCheck && checkIntervalModalVisible && (

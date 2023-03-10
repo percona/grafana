@@ -44,6 +44,7 @@ export const buildObjForQueryParams = (columns: Array<ExtendedColumn<any>>, valu
       }
     }
   });
+
   return obj;
 };
 
