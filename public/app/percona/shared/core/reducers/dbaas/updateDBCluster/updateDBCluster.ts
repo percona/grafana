@@ -65,7 +65,7 @@ export const updateDBClusterAction = createAsyncThunk(
         expose,
         internetFacing,
         configuration,
-        ...(preparedSourceRanges.length > 0 && { sourceRanges: preparedSourceRanges }),
+        sourceRanges: preparedSourceRanges,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
         ...(template && {
           template: {
