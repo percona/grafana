@@ -48,6 +48,22 @@ export const buildObjForQueryParams = (columns: Array<ExtendedColumn<any>>, valu
   return obj;
 };
 
+export const buildParamsFromKey = (
+  tableKey: string | undefined,
+  columns: Array<ExtendedColumn<any>>,
+  values: Record<string, any>
+) => {
+  const params = buildObjForQueryParams(columns, values);
+  if (tableKey) {
+    const paramsResult = Object.values(params).some((value) => value !== undefined);
+    if (paramsResult) {
+      return { [tableKey]: JSON.stringify(params) };
+    }
+    return { [tableKey]: undefined };
+  }
+  return params;
+};
+
 export const buildSearchOptions = (columns: Array<ExtendedColumn<any>>) => {
   const searchOptions = columns
     .filter((value) => value.type === FilterFieldTypes.TEXT)

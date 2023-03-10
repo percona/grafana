@@ -7,7 +7,7 @@ import { Form, FormSpy } from 'react-final-form';
 import { IconButton, useStyles2 } from '@grafana/ui';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 
-import { ExtendedColumn, FilterFieldTypes } from '..';
+import { FilterFieldTypes } from '..';
 
 import { DEBOUNCE_DELAY, SEARCH_INPUT_FIELD_NAME, SEARCH_SELECT_FIELD_NAME } from './Filter.constants';
 import { Messages } from './Filter.messages';
@@ -15,7 +15,7 @@ import { getStyles } from './Filter.styles';
 import { FilterProps } from './Filter.types';
 import {
   buildEmptyValues,
-  buildObjForQueryParams,
+  buildParamsFromKey,
   buildSearchOptions,
   getQueryParams,
   isInOptions,
@@ -47,25 +47,8 @@ export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering 
     }
     return queryParams;
   }, [queryParams, tableKey]);
-  //const queryParamsByKey = queryParams;
+
   const searchColumnsOptions = useMemo(() => buildSearchOptions(columns), [columns]);
-
-  const buildParamsFromKey = (
-    tableKey: string | undefined,
-    columns: Array<ExtendedColumn<any>>,
-    values: Record<string, any>
-  ) => {
-    const params = buildObjForQueryParams(columns, values);
-
-    if (tableKey) {
-      if (Object.keys(values).length > 0) {
-        return { [tableKey]: JSON.stringify(params) };
-      } else {
-        return { [tableKey]: undefined };
-      }
-    }
-    return params;
-  };
 
   const onFormChange = debounce(
     (values: Record<string, any>) => setQueryParams(buildParamsFromKey(tableKey, columns, values)),
