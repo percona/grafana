@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import { Field, PanelProps, getLinksSupplier } from '@grafana/data';
+import { Field, PanelProps } from '@grafana/data';
 import { PanelDataErrorView } from '@grafana/runtime';
 import { TooltipDisplayMode } from '@grafana/schema';
 import { usePanelContext, TimeSeries, TooltipPlugin, ZoomPlugin, KeyboardPlugin } from '@grafana/ui';

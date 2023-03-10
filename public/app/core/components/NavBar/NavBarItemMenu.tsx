@@ -7,7 +7,7 @@ import { SpectrumMenuProps } from '@react-types/menu';
 import React, { ReactElement, useEffect, useRef } from 'react';
 
 import { GrafanaTheme2, NavMenuItemType, NavModelItem } from '@grafana/data';
-import { CustomScrollbar, useTheme2 } from '@grafana/ui';
+import { useTheme2 } from '@grafana/ui';
 
 import { NavBarItemMenuItem } from './NavBarItemMenuItem';
 import { useNavBarItemMenuContext } from './context';

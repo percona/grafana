@@ -13,7 +13,6 @@ const expanderContainerStyles = css`
 export const ExpanderCell = ({ row }: CellProps<object, void>) => (
   <div className={expanderContainerStyles}>
     <IconButton
-      // @ts-expect-error react-table doesn't ship with useExpanded types and we can't use declaration merging without affecting the table viz
       name={row.isExpanded ? 'angle-down' : 'angle-right'}
       // @ts-expect-error same as the line above
       {...row.getToggleRowExpandedProps({})}
