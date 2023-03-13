@@ -1,5 +1,6 @@
 import { css } from '@emotion/css';
 import React, { Suspense, useEffect, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 // @ts-ignore
 import Drop from 'tether-drop';
 
@@ -52,7 +53,8 @@ export function GrafanaRoute(props: Props) {
   const [_, setMessage]=useState('');
   const [userContext, setUserContext]=useState('');
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
-  const [helpCenterToolTipVisiable, setHelpCenterToolTipVisiable] = useState(false);
+  const [helpCenterToolTipVisible, setHelpCenterToolTipVisible] = useState(false);
+  const [isConnectedUser, setIsConnectedUser] = useState(true);
   const isAdmin = contextSrv.isGrafanaAdmin;
   const styles = getStyles();
 
@@ -77,6 +79,7 @@ export function GrafanaRoute(props: Props) {
                           onConfirm={() => {
                             setConnectPortalModalVisible(false);
                             setUserContext('something_here');
+                            setIsConnectedUser(true);
                           }}
                           isAdmin={isAdmin}
                           isOpen={connectPortalModalVisible}
@@ -95,22 +98,22 @@ export function GrafanaRoute(props: Props) {
                         onHelpCenterClick={() => saveHelpCenterOpen(!isHelpCenterOpen)}
                         onNotificationClick={() => setMessage('notification')}
                         onFeedbackClick={() => setMessage('feedback form')}
-                        showHelpCenterToolTip={helpCenterToolTipVisiable}
-                        onCloseHelpCenterTooltip={() => setHelpCenterToolTipVisiable(false)}
+                        showHelpCenterToolTip={helpCenterToolTipVisible}
+                        onCloseHelpCenterTooltip={() => setHelpCenterToolTipVisible(false)}
                       />
 
                       <PmmUi.HelpCenter
                         open={isHelpCenterOpen}
                         onClose={() => saveHelpCenterOpen(false)}
                         width="416px"
-                        isConnectedUser={false}
+                        isConnectedUser={isConnectedUser}
                       />
                       {/*TODO:WIP: refactor*/}
                       <div className={isHelpCenterOpen ? styles.openedHelpCenter : ''}>
                         {props.location.pathname === '/a/pmm-homescreen-app' ? (
                           <Suspense fallback={<div></div>}>
                             <>
-                              <PmmUi.HomePage onHelpCenterButtonClick={() => setHelpCenterToolTipVisiable(true)}/>
+                            {(isConnectedUser) ? <PmmUi.HomePage onHelpCenterButtonClick={() => setHelpCenterToolTipVisible(true)}/> : <Redirect to="/" /> }
                             </>
                           </Suspense>
                         ) : (

@@ -53,7 +53,7 @@ export const HomePage: FC<HomePageProps> = ({ onHelpCenterButtonClick }) => {
           actionsJustify="flex-start"
         >
           <Button variant="secondary" onClick={onHelpCenterButtonClick}>
-            Open Help Centers
+            Open Help Center
           </Button>
           <Button
             variant="secondary"
@@ -93,7 +93,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     gap: 32px;
 
     width: 640px;
-    height: 795px;
     @media (max-width: 768px) {
       width: 100%;
     }
