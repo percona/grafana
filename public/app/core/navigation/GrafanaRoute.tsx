@@ -50,7 +50,6 @@ export function GrafanaRoute(props: Props) {
   navigationLogger('GrafanaRoute', false, 'Rendered', props.route);
 
   //TODO:WIP:
-  const [_, setMessage]=useState('');
   const [userContext, setUserContext]=useState('');
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
   const [helpCenterToolTipVisible, setHelpCenterToolTipVisible] = useState(false);
@@ -96,8 +95,6 @@ export function GrafanaRoute(props: Props) {
                           setConnectPortalModalVisible(true);
                         }}
                         onHelpCenterClick={() => saveHelpCenterOpen(!isHelpCenterOpen)}
-                        onNotificationClick={() => setMessage('notification')}
-                        onFeedbackClick={() => setMessage('feedback form')}
                         showHelpCenterToolTip={helpCenterToolTipVisible}
                         onCloseHelpCenterTooltip={() => setHelpCenterToolTipVisible(false)}
                       />
