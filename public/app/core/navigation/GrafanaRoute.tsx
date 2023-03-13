@@ -97,8 +97,6 @@ export function GrafanaRoute(props: Props) {
                           setConnectPortalModalVisible(true);
                         }}
                         onHelpCenterClick={() => saveHelpCenterOpen(!isHelpCenterOpen)}
-                        onNotificationClick={() => setMessage('notification')}
-                        onFeedbackClick={() => setMessage('feedback form')}
                         showHelpCenterToolTip={helpCenterToolTipVisible}
                         onCloseHelpCenterTooltip={() => setHelpCenterToolTipVisible(false)}
                       />
