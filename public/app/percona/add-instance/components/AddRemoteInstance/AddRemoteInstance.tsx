@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
-import { logger } from '@percona/platform-core';
+/* eslint-disable @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any */
 import { FormApi } from 'final-form';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Form as FormFinal } from 'react-final-form';
@@ -8,9 +7,10 @@ import { Form as FormFinal } from 'react-final-form';
 import { Button, useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases } from 'app/percona/shared/core';
+import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
-import { InstanceTypesExtra, InstanceTypes, INSTANCE_TYPES_LABELS, InstanceAvailableType } from '../../panel.types';
+import { InstanceAvailableType, InstanceTypes, InstanceTypesExtra, INSTANCE_TYPES_LABELS } from '../../panel.types';
 
 import { ADD_AZURE_CANCEL_TOKEN, ADD_RDS_CANCEL_TOKEN } from './AddRemoteInstance.constants';
 import { Messages } from './AddRemoteInstance.messages';
@@ -20,8 +20,8 @@ import { getInstanceData, remoteToken } from './AddRemoteInstance.tools';
 import {
   AddRemoteInstanceProps,
   FormValues,
-  RDSPayload,
   MSAzurePayload,
+  RDSPayload,
   TrackingOptions,
 } from './AddRemoteInstance.types';
 import {

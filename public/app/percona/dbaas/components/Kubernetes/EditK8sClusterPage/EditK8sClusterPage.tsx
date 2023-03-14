@@ -1,14 +1,14 @@
-import { PasswordInputField, TextareaInputField, TextInputField, validators } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 import { useHistory } from 'react-router-dom';
 
 import { Button, Icon, Tooltip, useStyles } from '@grafana/ui/src';
+import { PasswordInputField, TextareaInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
 import { useDispatch, useSelector } from 'app/types';
 
 import { FeatureLoader } from '../../../../shared/components/Elements/FeatureLoader';
-import { PageSwitcher } from '../../../../shared/components/PageSwitcher/PageSwitcher';
-import { PageSwitcherValue } from '../../../../shared/components/PageSwitcher/PageSwitcher.types';
+import { PageSwitcher } from '../../../../shared/components/Elements/PageSwitcher/PageSwitcher';
+import { PageSwitcherValue } from '../../../../shared/components/Elements/PageSwitcher/PageSwitcher.types';
 import { useCancelToken } from '../../../../shared/components/hooks/cancelToken.hook';
 import { useShowPMMAddressWarning } from '../../../../shared/components/hooks/showPMMAddressWarning';
 import {

@@ -1,8 +1,8 @@
-import { logger } from '@percona/platform-core';
-import React, { FC, useEffect, useState, useCallback } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import { useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { DISCOVERY_RDS_CANCEL_TOKEN, INITIAL_CREDENTIALS } from './Discovery.constants';

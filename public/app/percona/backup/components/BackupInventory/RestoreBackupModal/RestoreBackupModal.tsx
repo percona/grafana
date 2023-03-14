@@ -1,5 +1,4 @@
 import { cx } from '@emotion/css';
-import { LoaderButton, Modal, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
@@ -9,6 +8,7 @@ import { BackupMode } from 'app/percona/backup/Backup.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { Label } from 'app/percona/shared/components/Form/Label';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
+import { LoaderButton, Modal, RadioButtonGroupField, TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
 import { LocationType } from '../../StorageLocations/StorageLocations.types';

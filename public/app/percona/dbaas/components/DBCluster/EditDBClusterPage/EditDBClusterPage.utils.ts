@@ -1,4 +1,4 @@
-import { logger } from '@percona/platform-core';
+import { logger } from 'app/percona/shared/core-ui';
 
 import { DATABASE_LABELS } from '../../../../shared/core';
 import { Kubernetes } from '../../Kubernetes/Kubernetes.types';

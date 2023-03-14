@@ -1,5 +1,4 @@
 /* eslint-disable react/display-name */
-import { CheckboxField, Modal } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Column } from 'react-table';
@@ -13,6 +12,7 @@ import { TechnicalPreview } from 'app/percona/shared/components/Elements/Technic
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { CheckboxField, Modal } from 'app/percona/shared/core-ui';
 import { deleteKubernetesAction, fetchKubernetesAction } from 'app/percona/shared/core/reducers';
 import {
   getAddKubernetes,

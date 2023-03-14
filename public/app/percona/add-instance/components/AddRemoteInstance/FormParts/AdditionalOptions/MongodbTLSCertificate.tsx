@@ -1,5 +1,6 @@
-import { PasswordInputField, TextareaInputField } from '@percona/platform-core';
 import React, { FC } from 'react';
+
+import { PasswordInputField, TextareaInputField } from 'app/percona/shared/core-ui';
 
 import { Messages } from '../FormParts.messages';
 import { FormPartProps } from '../FormParts.types';

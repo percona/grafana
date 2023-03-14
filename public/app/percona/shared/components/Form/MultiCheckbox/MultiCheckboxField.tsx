@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import { cx } from '@emotion/css';
-import { CheckboxField, validators } from '@percona/platform-core';
-import React, { FC, ChangeEvent, FocusEvent, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { ChangeEvent, FC, FocusEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, FieldInputProps } from 'react-final-form';
 
 import { useStyles } from '@grafana/ui';
+import { CheckboxField, validators } from 'app/percona/shared/core-ui';
 
 import { Label } from '../Label';
 

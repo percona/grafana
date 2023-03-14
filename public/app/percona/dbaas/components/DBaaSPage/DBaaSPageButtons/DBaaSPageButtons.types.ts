@@ -1,4 +1,4 @@
-import { LoaderButtonProps } from '@percona/platform-core';
+import { LoaderButtonProps } from 'app/percona/shared/core-ui';
 
 export interface DBaaSPageButtonsProps {
   pageName: string;

@@ -1,4 +1,3 @@
-import { Modal, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
@@ -6,6 +5,7 @@ import { Button, ClipboardButton, HorizontalGroup, useTheme } from '@grafana/ui'
 import { appEvents } from 'app/core/app_events';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { logger, Modal } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { Messages } from '../../../DBaaS.messages';

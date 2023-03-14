@@ -1,11 +1,3 @@
-import {
-  TextInputField,
-  PasswordInputField,
-  validators,
-  RadioButtonGroupField,
-  CheckboxField,
-  logger,
-} from '@percona/platform-core';
 import { FormApi } from 'final-form';
 import React, { FC, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -16,6 +8,14 @@ import { Button, Spinner, useStyles2 } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { EmailAuthType } from 'app/percona/settings/Settings.types';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
+import {
+  CheckboxField,
+  logger,
+  PasswordInputField,
+  RadioButtonGroupField,
+  TextInputField,
+  validators,
+} from 'app/percona/shared/core-ui';
 
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';

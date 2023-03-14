@@ -1,8 +1,8 @@
-import { AsyncSelectField, validators } from '@percona/platform-core';
 import React, { FC, useState } from 'react';
 import { Field } from 'react-final-form';
 
-import { FieldSet, useStyles, Switch } from '@grafana/ui';
+import { FieldSet, Switch, useStyles } from '@grafana/ui';
+import { AsyncSelectField, validators } from 'app/percona/shared/core-ui';
 
 import { useSelector } from '../../../../../../../types';
 import { SelectField } from '../../../../../../shared/components/Form/SelectField';

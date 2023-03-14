@@ -1,6 +1,5 @@
-import { LoaderButtonProps } from '@percona/platform-core';
-
 import { Props } from '@grafana/ui/src/components/PageLayout/PageToolbar';
+import { LoaderButtonProps } from 'app/percona/shared/core-ui';
 
 import { FeatureLoaderProps } from '../../../shared/components/Elements/FeatureLoader/FeatureLoader.types';
 

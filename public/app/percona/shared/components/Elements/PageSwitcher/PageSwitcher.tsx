@@ -1,9 +1,9 @@
 import { cx } from '@emotion/css';
-import { RadioButton } from '@percona/platform-core/dist/components/RadioButtonGroup/RadioButton';
 import React, { FC } from 'react';
 import { Field } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
+import { RadioButton } from 'app/percona/shared/core-ui/components/RadioButtonGroup/RadioButton';
 
 import { getStyles } from './PageSwitcher.styles';
 import { PageSwitcherProps } from './PageSwitcher.types';

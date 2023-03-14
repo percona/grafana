@@ -1,4 +1,3 @@
-import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
@@ -13,6 +12,7 @@ import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-
 import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { LoaderButton, logger } from 'app/percona/shared/core-ui';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { getAdvisors, getCategorizedAdvisors, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { dispatch } from 'app/store/store';

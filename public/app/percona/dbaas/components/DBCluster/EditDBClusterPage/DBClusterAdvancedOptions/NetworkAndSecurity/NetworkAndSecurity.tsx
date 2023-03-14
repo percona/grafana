@@ -1,8 +1,8 @@
-import { CheckboxField, TextInputField } from '@percona/platform-core';
 import React, { FC } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 
-import { useStyles, Button } from '@grafana/ui';
+import { Button, useStyles } from '@grafana/ui';
+import { CheckboxField, TextInputField } from 'app/percona/shared/core-ui';
 
 import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet';
 import { Messages } from '../DBClusterAdvancedOptions.messages';

@@ -1,5 +1,6 @@
-import { TextareaInputField, AsyncSelectField } from '@percona/platform-core';
 import React, { FC, useMemo } from 'react';
+
+import { AsyncSelectField, TextareaInputField } from 'app/percona/shared/core-ui';
 
 import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet';
 import { Databases } from '../../../../../../shared/core';

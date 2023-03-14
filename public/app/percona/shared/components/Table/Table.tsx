@@ -1,9 +1,9 @@
 import { cx } from '@emotion/css';
-import { Table as PerconaTable } from '@percona/platform-core';
 import React from 'react';
 import { Column } from 'react-table';
 
 import { useStyles2 } from '@grafana/ui';
+import { Table as PerconaTable } from 'app/percona/shared/core-ui';
 
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';

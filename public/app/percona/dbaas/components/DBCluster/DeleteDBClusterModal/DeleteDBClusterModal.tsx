@@ -1,9 +1,9 @@
-import { Modal, logger } from '@percona/platform-core';
 import React, { FC, useCallback } from 'react';
 
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
+import { logger, Modal } from 'app/percona/shared/core-ui';
 
 import { newDBClusterService } from '../DBCluster.utils';
 

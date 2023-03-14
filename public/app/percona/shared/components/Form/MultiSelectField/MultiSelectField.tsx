@@ -1,9 +1,10 @@
-import { Label } from '@percona/platform-core';
-import { LabeledFieldProps } from '@percona/platform-core/dist/shared/types';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import React, { FC } from 'react';
 
 import { MultiSelect } from '@grafana/ui';
 import { MultiSelectCommonProps } from '@grafana/ui/src/components/Select/types';
+import { Label } from 'app/percona/shared/core-ui';
+import { LabeledFieldProps } from 'app/percona/shared/core-ui/dist/shared/types';
 
 import { withSelectStyles } from '../withSelectStyles/withSelectStyles';
 

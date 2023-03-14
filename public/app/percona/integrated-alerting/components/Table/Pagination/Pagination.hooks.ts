@@ -1,5 +1,7 @@
-import { logger } from '@percona/platform-core';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import { useEffect, useState } from 'react';
+
+import { logger } from 'app/percona/shared/core-ui';
 
 import { PAGE_SIZES } from './Pagination.constants';
 

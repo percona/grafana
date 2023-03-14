@@ -1,7 +1,7 @@
-import { CheckboxField, NumberInputField, validators } from '@percona/platform-core';
 import React from 'react';
 
 import { useStyles2 } from '@grafana/ui';
+import { CheckboxField, NumberInputField, validators } from 'app/percona/shared/core-ui';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 
 import { MAX_RETENTION, MIN_RETENTION } from '../AddBackupPage.constants';

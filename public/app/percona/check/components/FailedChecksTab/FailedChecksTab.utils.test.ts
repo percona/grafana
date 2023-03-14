@@ -1,7 +1,7 @@
-import { stripServiceId, formatServiceId } from './FailedChecksTab.utils';
+import { formatServiceId, stripServiceId } from './FailedChecksTab.utils';
 
-jest.mock('@percona/platform-core', () => {
-  const originalModule = jest.requireActual('@percona/platform-core');
+jest.mock('app/percona/shared/core-ui', () => {
+  const originalModule = jest.requireActual('app/percona/shared/core-ui');
   return {
     ...originalModule,
     logger: {

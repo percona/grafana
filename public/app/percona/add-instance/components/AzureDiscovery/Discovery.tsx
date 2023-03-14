@@ -1,8 +1,8 @@
-import { logger } from '@percona/platform-core';
 import React, { FC, useEffect, useState } from 'react';
 
 import { useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 
 import { DISCOVERY_AZURE_CANCEL_TOKEN } from './Discovery.constants';

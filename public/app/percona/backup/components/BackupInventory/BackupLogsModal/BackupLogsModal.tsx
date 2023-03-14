@@ -1,5 +1,6 @@
-import { Modal } from '@percona/platform-core';
 import React, { FC } from 'react';
+
+import { Modal } from 'app/percona/shared/core-ui';
 
 import { ChunkedLogsViewer } from '../../ChunkedLogsViewer/ChunkedLogsViewer';
 

@@ -1,4 +1,3 @@
-import { TextInputField, validators } from '@percona/platform-core';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { Field } from 'react-final-form';
 
@@ -8,6 +7,7 @@ import {
   AsyncSelectFieldAdapter,
   SelectFieldAdapter,
 } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
+import { TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { useSelector } from '../../../../../../types';
 import { getPerconaSettings } from '../../../../../shared/core/selectors';

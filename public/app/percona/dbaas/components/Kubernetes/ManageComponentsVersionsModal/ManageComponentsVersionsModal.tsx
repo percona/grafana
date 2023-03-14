@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
-import { LoaderButton, Modal, logger } from '@percona/platform-core';
 import { FormApi } from 'final-form';
 import React, { FC } from 'react';
-import { Form, Field, FormRenderProps } from 'react-final-form';
+import { Field, Form, FormRenderProps } from 'react-final-form';
 
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
@@ -11,6 +10,7 @@ import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay'
 import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { MultiCheckboxField } from 'app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField';
 import { Databases } from 'app/percona/shared/core';
+import { LoaderButton, logger, Modal } from 'app/percona/shared/core-ui';
 
 import { DATABASE_OPERATORS } from '../../DBCluster/DBCluster.constants';
 import { newDBClusterService } from '../../DBCluster/DBCluster.utils';
@@ -19,13 +19,13 @@ import { KubernetesOperatorStatus } from '../OperatorStatusItem/KubernetesOperat
 
 import { useOperatorsComponentsVersions } from './ManageComponentsVersions.hooks';
 import {
-  requiredVersions,
+  buildDefaultFieldName,
   buildVersionsFieldName,
+  defaultRequired,
   findRecommendedVersions,
   getDefaultOptions,
-  defaultRequired,
-  buildDefaultFieldName,
   parseDefaultVersionsOptions,
+  requiredVersions,
 } from './ManageComponentsVersions.utils';
 import { Messages } from './ManageComponentsVersionsModal.messages';
 import { getStyles } from './ManageComponentsVersionsModal.styles';

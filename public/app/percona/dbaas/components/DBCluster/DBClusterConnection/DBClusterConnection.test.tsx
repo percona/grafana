@@ -9,8 +9,8 @@ jest.mock('app/core/app_events');
 jest.mock('../XtraDB.service');
 jest.mock('../PSMDB.service');
 
-jest.mock('@percona/platform-core', () => {
-  const originalModule = jest.requireActual('@percona/platform-core');
+jest.mock('app/percona/shared/core-ui', () => {
+  const originalModule = jest.requireActual('app/percona/shared/core-ui');
   return {
     ...originalModule,
     logger: {

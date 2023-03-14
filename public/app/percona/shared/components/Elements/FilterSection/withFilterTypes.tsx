@@ -1,10 +1,10 @@
 /* eslint-disable react/display-name */
 import { cx } from '@emotion/css';
-import { LoaderButton } from '@percona/platform-core';
-import React, { FC, useState, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { withTypes } from 'react-final-form';
 
 import { Collapse, HorizontalGroup, useStyles2 } from '@grafana/ui';
+import { LoaderButton } from 'app/percona/shared/core-ui';
 
 import { getStyles } from './FilterSection.styles';
 import { FilterSectionProps } from './FilterSection.types';
@@ -30,7 +30,7 @@ export const withFilterTypes =
             className={styles.collapse}
             label="Filters"
           >
-            <form onSubmit={handleSubmit} className={cx(styles.form, className)} role="form">
+            <form onSubmit={handleSubmit} className={cx(styles.form, className)}>
               {children}
               <HorizontalGroup justify="flex-end" spacing="md">
                 <LoaderButton

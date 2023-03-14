@@ -1,15 +1,15 @@
-import {
-  CheckboxField,
-  NumberInputField,
-  RadioButtonGroupField,
-  validators as platformCoreValidators,
-} from '@percona/platform-core';
 import { FormApi } from 'final-form';
 import React, { FC, useEffect, useState } from 'react';
 
 import { useStyles } from '@grafana/ui';
 import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
 import { Databases } from 'app/percona/shared/core';
+import {
+  CheckboxField,
+  NumberInputField,
+  RadioButtonGroupField,
+  validators as platformCoreValidators,
+} from 'app/percona/shared/core-ui';
 
 import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
 import { Messages } from '../FormParts.messages';

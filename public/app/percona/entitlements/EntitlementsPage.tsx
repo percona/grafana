@@ -1,12 +1,11 @@
-import { logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { useStyles2 } from '@grafana/ui';
 import { CollapsableSection } from '@grafana/ui/src/components';
 import { OldPage } from 'app/core/components/Page/Page';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { StoreState } from 'app/types';
+import { logger } from 'app/percona/shared/core-ui';
+import { StoreState, useSelector } from 'app/types';
 
 import { Overlay } from '../shared/components/Elements/Overlay/Overlay';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';

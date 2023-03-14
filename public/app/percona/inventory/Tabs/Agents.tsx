@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { CheckboxField, Table, logger } from '@percona/platform-core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 
@@ -13,6 +12,7 @@ import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { CheckboxField, logger, Table } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 

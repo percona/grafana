@@ -1,4 +1,3 @@
-import { LoaderButton, logger, TextInputField } from '@percona/platform-core';
 import { AxiosError } from 'axios';
 import React, { FC, useCallback, useState } from 'react';
 import { Form } from 'react-final-form';
@@ -7,6 +6,7 @@ import { AppEvents } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { ConfirmModal, useStyles2 } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
+import { LoaderButton, logger, TextInputField } from 'app/percona/shared/core-ui';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaServer, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { useDispatch, useSelector } from 'app/types';

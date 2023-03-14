@@ -1,7 +1,6 @@
 /* eslint-disable react/display-name */
-import { logger } from '@percona/platform-core';
 import { format } from 'date-fns';
-import React, { FC, useState, useEffect, useCallback } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Column } from 'react-table';
 
 import { Button, useStyles2 } from '@grafana/ui';
@@ -10,6 +9,7 @@ import { OldPage } from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { logger } from 'app/percona/shared/core-ui';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 

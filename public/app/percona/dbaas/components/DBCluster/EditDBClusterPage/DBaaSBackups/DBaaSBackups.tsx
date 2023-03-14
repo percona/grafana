@@ -1,8 +1,9 @@
-import { NumberInputField, validators } from '@percona/platform-core';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import React, { FC, useState } from 'react';
-import { FormRenderProps, Field } from 'react-final-form';
+import { Field, FormRenderProps } from 'react-final-form';
 
 import { FieldSet, Switch, useStyles } from '@grafana/ui';
+import { NumberInputField, validators } from 'app/percona/shared/core-ui';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 
 import { useSelector } from '../../../../../../types';

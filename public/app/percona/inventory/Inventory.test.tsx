@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Table } from '@percona/platform-core';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
+
+import { Table } from 'app/percona/shared/core-ui';
 
 import { AGENTS_COLUMNS, NODES_COLUMNS, SERVICES_COLUMNS } from './Inventory.constants';
 import { InventoryDataService } from './Inventory.tools';

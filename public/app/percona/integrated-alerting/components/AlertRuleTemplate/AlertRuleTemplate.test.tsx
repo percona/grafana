@@ -11,8 +11,8 @@ import { AlertRuleTemplate } from './AlertRuleTemplate';
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';
 
 jest.mock('./AlertRuleTemplate.service');
-jest.mock('@percona/platform-core', () => {
-  const originalModule = jest.requireActual('@percona/platform-core');
+jest.mock('app/percona/shared/core-ui', () => {
+  const originalModule = jest.requireActual('app/percona/shared/core-ui');
   return {
     ...originalModule,
     logger: {
