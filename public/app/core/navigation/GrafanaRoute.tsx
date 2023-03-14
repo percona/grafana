@@ -1,5 +1,6 @@
 import { css } from '@emotion/css';
 import React, { Suspense, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 // @ts-ignore
 import Drop from 'tether-drop';
@@ -7,6 +8,7 @@ import Drop from 'tether-drop';
 import { locationSearchToObject, navigationLogger, reportPageview } from '@grafana/runtime';
 import { ErrorBoundary } from '@grafana/ui';
 import { contextSrv } from 'app/core/core';
+import {getPerconaServer, getPerconaSettings} from 'app/percona/shared/core/selectors';
 
 import { PmmUi } from '../../percona/federation';
 import { LocalStorageValueProvider } from "../components/LocalStorageValueProvider";
@@ -54,7 +56,9 @@ export function GrafanaRoute(props: Props) {
   const [userContext, setUserContext] = useState('');
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
   const [helpCenterToolTipVisible, setHelpCenterToolTipVisible] = useState(false);
-  const [isConnectedUser, setIsConnectedUser] = useState(true);
+  const { result } = useSelector(getPerconaSettings);
+  const { serverId = '' } = useSelector(getPerconaServer);
+  const [isConnectedUser, setIsConnectedUser] = useState(result?.isConnectedToPortal || false);
   const isAdmin = contextSrv.isGrafanaAdmin;
   const styles = getStyles();
 
@@ -93,6 +97,7 @@ export function GrafanaRoute(props: Props) {
                         showFeedbackButton
                         showHelpCenterButton
                         showHelpCenterNotificationMarker
+                        pmmServerId={serverId}
                         onSignInClick={() => {
                           setConnectPortalModalVisible(true);
                         }}

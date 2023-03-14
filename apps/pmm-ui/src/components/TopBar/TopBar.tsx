@@ -13,6 +13,7 @@ export interface TopBarProps {
   showFeedbackButton?: boolean;
   showHelpCenterButton?: boolean;
   userContext?: any;
+  pmmServerId?: any;
 
   onSignInClick: () => void;
   onHelpCenterClick: () => void;
