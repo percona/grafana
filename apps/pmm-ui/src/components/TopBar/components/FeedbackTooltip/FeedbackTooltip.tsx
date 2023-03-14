@@ -7,11 +7,12 @@ import { Feedback } from '../../../Feedback';
 
 interface FeedbackTooltipProps {
   visible: boolean;
+  pmmServerId?: string;
   children?: any;
   onClose?: () => void;
 }
 
-export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, onClose }) => {
+export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, onClose, pmmServerId}) => {
   const styles = useStyles2(getStyles);
 
   const feedbackClose = () => {
@@ -28,7 +29,7 @@ export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, o
       </div>
 
       <div className={styles.feedbackContentForm}>
-        <Feedback />
+        <Feedback pmmServerId={pmmServerId} />
       </div>
     </>
   );
