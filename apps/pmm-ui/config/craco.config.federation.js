@@ -34,11 +34,33 @@ module.exports = {
             ...deps,
             react: {
               singleton: true,
+              version: '0.0.0', //workaround, to force loading dependency from grafana
               requiredVersion: deps.react,
             },
             'react-dom': {
               singleton: true,
+              version: '0.0.0', //workaround, to force loading dependency from grafana
               requiredVersion: deps['react-dom'],
+            },
+            'calculate-size': {
+              singleton: true,
+              requiredVersion: deps['calculate-size'],
+            },
+            '@grafana/ui': {
+              singleton: true,
+              requiredVersion: deps['@grafana/ui'],
+            },
+            '@emotion/css': {
+              singleton: true,
+              requiredVersion: deps['@emotion/css'],
+            },
+            '@emotion/react': {
+              singleton: true,
+              requiredVersion: deps['@emotion/react'],
+            },
+            '@grafana/data': {
+              singleton: true,
+              requiredVersion: deps['@grafana/data'],
             },
           },
         })

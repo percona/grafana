@@ -24,6 +24,12 @@ Example:
 PMM_CONTAINER=ritbl/pmm-x:v2.33.0-3
 ```
 
+In root, configure pmm-ui location, create file `.env` in root, add location of pmm-ui (that will be running locally):
+```dotenv
+fd_pmm=http://localhost:3001
+```
+
+
 # 2: Run core components
 
 If you are using IntelliJ IDEA. You need to open `apps` directory as project, so that modules resolved correctly.
@@ -32,7 +38,7 @@ correctly. If you want to work in both of them you need to open them separatly.
 
 ## 2.1: FrontEnd Components
 
-### 2.1.1: Grafana
+### 2.1.1: Grafana UI
 
 You can run new devcontainer and grafana build (with watch) by running in `apps` directory:
 
@@ -48,10 +54,6 @@ In separate window, navigate to `apps/pmm-ui` and execute:
 npm run dev:federation
 ```
 
-### 2.1.3: open grafana
-
-Navigate to grafana `http:localhost/`
-
 ## 2.2: BackEnd Components
 
 ### 2.2.1: Grafana Server
@@ -59,3 +61,7 @@ Navigate to grafana `http:localhost/`
 Following needs to be executed after frontend components (`make dev` configures configs used by server components):
 
 Run `grafana-server` run configuration from IntelliJ Idea.
+
+### 2.3: navigate to Grafana UI in browser
+
+After running 2.1.1, 2.1.2, 2.2.1 navigate to grafana `http:localhost/`

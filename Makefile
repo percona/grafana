@@ -31,10 +31,12 @@ node_modules: package.json yarn.lock ## Install node modules.
 	YARN_CHECKSUM_BEHAVIOR=update YARN_ENABLE_PROGRESS_BARS=false yarn install --immutable
 
 pmm-ui-deps:
-	cd apps/pmm-ui && npm run install
+	cd apps/pmm-ui && npm install
 
 pmm-ui-build:
 	cd apps/pmm-ui && npm run build:grafana
+
+pmm-ui: pmm-ui-deps pmm-ui-build
 
 ##@ Swagger
 SPEC_TARGET = public/api-spec.json
