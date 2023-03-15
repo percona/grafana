@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Button, Dropdown, Icon, Menu, ToolbarButtonRow, useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
@@ -13,13 +13,11 @@ export interface TopBarProps {
   showFeedbackButton?: boolean;
   showHelpCenterButton?: boolean;
   userContext?: any;
+  pmmServerId?: any;
 
   onSignInClick: () => void;
-  onFeedbackClick: () => void;
-  onNotificationClick: () => void;
   onHelpCenterClick: () => void;
   showHelpCenterNotificationMarker?: boolean;
-  children?: ReactNode;
   showHelpCenterToolTip?: boolean;
   onCloseHelpCenterTooltip: () => void;
 }
