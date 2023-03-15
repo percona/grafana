@@ -1,4 +1,5 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
+import { useEffectOnce } from 'react-use';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
@@ -14,9 +15,9 @@ interface Step3Props {
 export const Step3: FC<Step3Props> = ({ displayTimeMs, onFinish }) => {
   const styles = useStyles2(getStyles);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     setTimeout(() => onFinish(), displayTimeMs);
-  }, []);
+  });
 
   return (
     <>

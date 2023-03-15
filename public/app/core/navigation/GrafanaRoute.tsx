@@ -1,6 +1,5 @@
 import { css } from '@emotion/css';
 import React, { Suspense, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 // @ts-ignore
 import Drop from 'tether-drop';
@@ -9,6 +8,7 @@ import { locationSearchToObject, navigationLogger, reportPageview } from '@grafa
 import { ErrorBoundary } from '@grafana/ui';
 import { contextSrv } from 'app/core/core';
 import {getPerconaServer, getPerconaSettings} from 'app/percona/shared/core/selectors';
+import { useSelector } from 'app/types';
 
 import { PmmUi } from '../../percona/federation';
 import { LocalStorageValueProvider } from "../components/LocalStorageValueProvider";

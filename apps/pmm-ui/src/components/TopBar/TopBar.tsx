@@ -8,6 +8,7 @@ import platformIcon from '../../assets/pmm-platform-purple.svg';
 import { Messages } from './TopBar.messages';
 import { FeedbackTooltip } from './components/FeedbackTooltip';
 import { HelpCenterTooltip } from './components/HelpCenterTooltip';
+
 export interface TopBarProps {
   showSignIn?: boolean;
   showFeedbackButton?: boolean;
@@ -24,6 +25,7 @@ export interface TopBarProps {
 
 export const TopBar: FC<TopBarProps> = ({
   userContext,
+  pmmServerId,
   showSignIn,
   showFeedbackButton,
   showHelpCenterButton,
@@ -99,6 +101,7 @@ export const TopBar: FC<TopBarProps> = ({
         {showFeedbackButton && (
           <>
             <FeedbackTooltip
+              pmmServerId={pmmServerId}
               visible={visibleFeedback}
               onClose={() => {
                 setVisibleFeedback(false);
