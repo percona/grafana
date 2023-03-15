@@ -3,7 +3,7 @@ import React, { FC, useMemo } from 'react';
 import { Field } from 'react-final-form';
 
 import { Icon, Switch, Tooltip, useStyles } from '@grafana/ui';
-import { compose } from 'app/percona/shared/core-ui/dist/shared/validators';
+import { compose } from 'app/percona/shared/core-ui/shared/validators';
 
 import { getStyles } from './Switch.styles';
 import { SwitchFieldProps, SwitchFieldRenderProps } from './Switch.types';

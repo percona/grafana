@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { LoaderButton } from 'components/LoaderButton';
-import { TextInputField } from 'components/TextInput';
-import { TextareaInputField } from 'components/TextareaInput';
 import React from 'react';
+
+import { LoaderButton } from '../LoaderButton';
+import { TextInputField } from '../TextInput';
+import { TextareaInputField } from '../TextareaInput';
 
 import { StepProgress } from './StepProgress';
 
@@ -32,9 +33,9 @@ describe('StepProgress::', () => {
 
   const isCurrentStep = (wrapper: HTMLElement, dataQa: string) => {
     const className = wrapper
-      .querySelector(`[data-testid="${dataQa}"]`)
+      .querySelector(`[data-testid="${dataQa}"]`)!
       .querySelectorAll('[data-testid="step-content"] > div')[0]
-      .getAttribute('class');
+      .getAttribute('class') as string;
 
     return /current$/i.test(className);
   };
@@ -71,7 +72,7 @@ describe('StepProgress::', () => {
 
     expect(isCurrentStep(container, 'step-1')).toBeTruthy();
 
-    const stepHeader = await screen.getByTestId('step-2').querySelector('[data-testid="step-header"]');
+    const stepHeader = (await screen.getByTestId('step-2').querySelector('[data-testid="step-header"]')) as Element;
 
     fireEvent.click(stepHeader);
 

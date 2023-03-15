@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import { MultiSelect } from '@grafana/ui';
 import { MultiSelectCommonProps } from '@grafana/ui/src/components/Select/types';
 import { Label } from 'app/percona/shared/core-ui';
-import { LabeledFieldProps } from 'app/percona/shared/core-ui/dist/shared/types';
+import { LabeledFieldProps } from 'app/percona/shared/core-ui/shared/types';
 
 import { withSelectStyles } from '../withSelectStyles/withSelectStyles';
 

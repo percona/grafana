@@ -22,7 +22,7 @@ describe('Modal window::', () => {
     render(<Modal onClose={onClose} isVisible title="test" />);
 
     expect(onClose).toBeCalledTimes(0);
-    userEvent.click(await screen.findByTestId('modal-close-button'));
+    fireEvent.click(await screen.findByTestId('modal-close-button'));
     expect(onClose).toBeCalledTimes(1);
   });
 
@@ -35,7 +35,10 @@ describe('Modal window::', () => {
     const modal = screen.queryByTestId('modal-wrapper');
 
     expect(modal).toBeInTheDocument();
-    fireEvent.keyDown(modal, { key: 'Escape', code: 'Escape' });
+    if (modal) {
+      fireEvent.keyDown(modal, { key: 'Escape', code: 'Escape' });
+    }
+
     expect(onClose).toBeCalledTimes(0);
   });
 
@@ -45,7 +48,7 @@ describe('Modal window::', () => {
     render(<Modal onClose={onClose} isVisible title="test" />);
 
     expect(onClose).toBeCalledTimes(0);
-    userEvent.click(await screen.findByTestId('modal-background'));
+    fireEvent.click(await screen.findByTestId('modal-background'));
     expect(onClose).toBeCalledTimes(1);
   });
 

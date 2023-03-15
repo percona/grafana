@@ -43,7 +43,7 @@ export const Modal: FC<ModalWindow> = (props) => {
         <div className={styles.modalHeader} data-testid="modal-header">
           {title}
           <div className={styles.modalHeaderClose}>
-            <IconButton surface="header" data-testid="modal-close-button" name="times" size="lg" onClick={onClose} />
+            <IconButton data-testid="modal-close-button" name="times" size="lg" onClick={onClose} />
           </div>
         </div>
         <div className={styles.content} data-testid="modal-content">
