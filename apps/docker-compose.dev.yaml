@@ -62,7 +62,7 @@ services:
       # configs
       #- ./.config/etc/grafana.ini:/etc/grafana/grafana.ini
       - ./.config/etc/supervisord.d/grafana.ini:/etc/supervisord.d/grafana.ini:ro
-#      - ./.config/etc/supervisord.d/pmm.ini:/etc/supervisord.d/pmm.ini:ro
+      - ${PMM_SVC_CONFIG:-./.config/etc/supervisord.d/pmm.ini}:/etc/supervisord.d/pmm.ini:ro
       - ./.config/etc/supervisord.d/victoriametrics.ini:/etc/supervisord.d/victoriametrics.ini:ro
       - ./.config/etc/nginx/conf.d/pmm.conf:/etc/nginx/conf.d/pmm.conf:ro
       - ./.config/etc/nginx/conf.d/pmm-ssl.conf:/etc/nginx/conf.d/pmm-ssl.conf:ro
