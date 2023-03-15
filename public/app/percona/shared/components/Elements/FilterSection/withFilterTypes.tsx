@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-redundant-roles */
 /* eslint-disable react/display-name */
 import { cx } from '@emotion/css';
 import React, { FC, useCallback, useState } from 'react';
@@ -30,7 +31,7 @@ export const withFilterTypes =
             className={styles.collapse}
             label="Filters"
           >
-            <form onSubmit={handleSubmit} className={cx(styles.form, className)}>
+            <form role="form" onSubmit={handleSubmit} className={cx(styles.form, className)}>
               {children}
               <HorizontalGroup justify="flex-end" spacing="md">
                 <LoaderButton

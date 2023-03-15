@@ -2,15 +2,15 @@
 import { css } from '@emotion/css';
 import React, { FC, useEffect } from 'react';
 import {
-  useTable,
-  usePagination,
-  useExpanded,
-  useRowSelect,
-  PluginHook,
   ColumnInstance,
-  UseRowSelectRowProps,
-  UseRowSelectInstanceProps,
+  PluginHook,
   Row,
+  useExpanded,
+  usePagination,
+  useRowSelect,
+  UseRowSelectInstanceProps,
+  UseRowSelectRowProps,
+  useTable,
 } from 'react-table';
 
 import { useStyles2 } from '@grafana/ui';
@@ -21,7 +21,7 @@ import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableCheckbox } from './Selection';
 import { getStyles } from './Table.styles';
-import { TableProps, PaginatedTableInstance, PaginatedTableOptions, PaginatedTableState } from './Table.types';
+import { PaginatedTableOptions, PaginatedTableState, TableProps } from './Table.types';
 import { TableContent } from './TableContent';
 
 const defaultPropGetter = () => ({});
@@ -110,7 +110,7 @@ export const Table: FC<TableProps> = ({
     });
   }
 
-  const tableInstance = useTable(tableOptions, ...plugins) as PaginatedTableInstance;
+  const tableInstance = useTable(tableOptions, ...plugins);
   const {
     getTableProps,
     getTableBodyProps,

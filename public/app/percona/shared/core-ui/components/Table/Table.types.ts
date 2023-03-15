@@ -47,17 +47,17 @@ export interface PaginatedTableState extends TableState {
   pageSize: number;
 }
 
-export interface PaginatedTableInstance extends TableInstance, UseRowSelectInstanceProps<any> {
-  page: Row[];
-  canPreviousPage: boolean;
-  canNextPage: boolean;
-  gotoPage: (page: number) => void;
-  previousPage: () => void;
-  nextPage: () => void;
-  pageCount: number;
-  setPageSize: (size: number) => void;
-  state: PaginatedTableState;
-}
+// export interface PaginatedTableInstance extends TableInstance, UseRowSelectInstanceProps<any> {
+//   page: Row[];
+//   canPreviousPage: boolean;
+//   canNextPage: boolean;
+//   gotoPage: (page: number) => void;
+//   previousPage: () => void;
+//   nextPage: () => void;
+//   pageCount: number;
+//   setPageSize: (size: number) => void;
+//   state: PaginatedTableState;
+// }
 
 export interface PaginatedTableOptions extends TableOptions<object> {
   manualPagination?: boolean;
