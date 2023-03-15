@@ -8,7 +8,7 @@ import { Messages } from './NetworkAndSecurity.messages';
 import { NetworkAndSecurityFields } from './NetworkAndSecurity.types';
 
 describe('DBClusterAdvancedOptions NetworkAndSecurity.tsx::', () => {
-  xit('render items correctly for create and edit mode', () => {
+  it('render items correctly for create and edit mode', () => {
     render(
       <Form
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{}] }}
@@ -17,12 +17,13 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity.tsx::', () => {
         render={() => <NetworkAndSecurity />}
       />
     );
-    // expect(screen.getByTestId('network-and-security').querySelector('legend')).toHaveTextContent(
-    //   Messages.fieldSets.networkAndSecurity
-    // );
-    expect(screen.getByTestId('expose-checkbox-input')).toBeInTheDocument();
-    expect(screen.getByTestId('expose-checkbox-input')).not.toBeDisabled();
-    // expect(screen.getByTestId('expose-field-label')).toHaveTextContent(Messages.labels.expose);
+
+    expect(screen.getByTestId('toggle-network-and-security')).toBeInTheDocument();
+    const checkbox = screen.getByTestId('toggle-network-and-security');
+
+    fireEvent.click(checkbox);
+
+    expect(screen.getByTestId('network-and-security')).toHaveTextContent(Messages.fieldSets.expose);
 
     expect(screen.getByTestId('internetFacing-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('internetFacing-checkbox-input')).not.toBeDisabled();
@@ -33,7 +34,7 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity.tsx::', () => {
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).not.toBeDisabled();
   });
-  xit('the delete button should not delete the first field', () => {
+  it('the delete button should not delete the first field', () => {
     render(
       <Form
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }] }}
@@ -42,12 +43,17 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity.tsx::', () => {
         render={() => <NetworkAndSecurity />}
       />
     );
+    expect(screen.getByTestId('toggle-network-and-security')).toBeInTheDocument();
+    const checkbox = screen.getByTestId('toggle-network-and-security');
+
+    fireEvent.click(checkbox);
+
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).toBeInTheDocument();
     const deleteBtn = screen.getByTestId('deleteButton-0');
     fireEvent.click(deleteBtn);
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).toBeInTheDocument();
   });
-  xit('the delete button should delete field from the form if it is not the first one ', () => {
+  it('the delete button should delete field from the form if it is not the first one ', () => {
     render(
       <Form
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }, { sourceRange: '2' }] }}
@@ -56,6 +62,11 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity.tsx::', () => {
         render={() => <NetworkAndSecurity />}
       />
     );
+    expect(screen.getByTestId('toggle-network-and-security')).toBeInTheDocument();
+    const checkbox = screen.getByTestId('toggle-network-and-security');
+
+    fireEvent.click(checkbox);
+
     expect(screen.getByTestId('sourceRanges[1].sourceRange-text-input')).toBeInTheDocument();
     const deleteBtn = screen.getByTestId('deleteButton-1');
     fireEvent.click(deleteBtn);
