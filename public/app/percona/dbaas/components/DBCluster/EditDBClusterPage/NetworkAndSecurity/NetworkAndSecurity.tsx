@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 
-import { Switch, useStyles, Button } from '@grafana/ui';
+import { Switch, useStyles, Button, Icon, Tooltip } from '@grafana/ui';
 
 import FieldSet from '../../../../../shared/components/Form/FieldSet/FieldSet';
 
@@ -20,6 +20,9 @@ export const NetworkAndSecurity: FC = () => {
       label={
         <div className={styles.fieldSetLabel}>
           <div>{Messages.fieldSets.expose}</div>
+          <Tooltip content={Messages.tooltips.expose}>
+            <Icon data-testid="eks-info-icon" name="info-circle" />
+          </Tooltip>
           <div className={styles.fieldSetSwitch}>
             <Field name={NetworkAndSecurityFields.expose} type="checkbox">
               {({ input }) => (
@@ -38,7 +41,12 @@ export const NetworkAndSecurity: FC = () => {
     >
       {enableNetworkAndSecurity ? (
         <>
-          <CheckboxField name={NetworkAndSecurityFields.internetFacing} label={Messages.labels.internetFacing} />
+          <CheckboxField
+            name={NetworkAndSecurityFields.internetFacing}
+            label={Messages.labels.internetFacing}
+            tooltipIcon="info-circle"
+            tooltipText={Messages.tooltips.internetFacing}
+          />
           <FieldArray name={NetworkAndSecurityFields.sourceRanges}>
             {({ fields }) => (
               <div className={styles.fieldsWrapper}>

@@ -1,10 +1,10 @@
 export const Messages = {
   labels: {
-    internetFacing: 'Internet Facing',
+    internetFacing: 'Internet Facing (EKS only)',
     sourceRange: 'Source Range',
   },
   fieldSets: {
-    expose: 'Expose',
+    expose: 'Enable external access',
   },
   buttons: {
     addNew: 'Add new',
@@ -12,6 +12,8 @@ export const Messages = {
   tooltips: {
     expose:
       'You will make this database cluster available to connect from the internet. To limit access you need to specify source ranges',
+    internetFacing:
+      'This is AWS specific configuration required if you want to access your database cluster out side of your VPC',
   },
   placeholders: {
     sourceRange: '181.170.213.40/32',
