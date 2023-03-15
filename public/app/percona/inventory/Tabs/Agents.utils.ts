@@ -1,45 +1,48 @@
+import { BadgeColor } from '@grafana/ui';
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 
-import { Agent, AgentType, ServiceAgentPayload } from '../Inventory.types';
+import { Agent, AgentType, ServiceAgentPayload, ServiceAgentStatus } from '../Inventory.types';
 
-const MAIN_COLUMNS = ['node_id', 'agent_id', 'node_name', 'address', 'custom_labels', 'type'];
+const MAIN_COLUMNS = ['node_id', 'agent_id', 'node_name', 'address', 'custom_labels', 'type', 'status', 'is_connected'];
 
-export const toAgentModel = (agentList: ServiceAgentPayload): Agent[] => {
+export const toAgentModel = (agentList: ServiceAgentPayload[]): Agent[] => {
   const result: Agent[] = [];
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  (Object.keys(agentList) as Array<keyof ServiceAgentPayload>).forEach((agentType) => {
-    const agentParams = agentList[agentType];
+  agentList.forEach(({ agent_type: agentType, status, is_connected, ...agentParams }) => {
+    const extraLabels: Record<string, string> = {};
+    let agentStatus = status || ServiceAgentStatus.UNKNOWN;
 
-    agentParams?.forEach((params) => {
-      const extraLabels: Record<string, string> = {};
+    if (is_connected !== undefined) {
+      agentStatus = is_connected ? ServiceAgentStatus.RUNNING : ServiceAgentStatus.UNKNOWN;
+    }
 
-      Object.entries(params)
-        .filter(([field]) => !MAIN_COLUMNS.includes(field))
-        .forEach(([key, value]: [string, string]) => {
-          if (typeof value !== 'object' || Array.isArray(value)) {
-            extraLabels[key] = value;
+    Object.entries(agentParams)
+      .filter(([field]) => !MAIN_COLUMNS.includes(field))
+      .forEach(([key, value]: [string, string]) => {
+        if (typeof value !== 'object' || Array.isArray(value)) {
+          extraLabels[key] = value;
 
-            if (key === 'username') {
-              extraLabels.password = '******';
-            }
-            // @ts-ignore
-            delete params[key];
+          if (key === 'username') {
+            extraLabels.password = '******';
           }
-        });
 
-      const camelCaseParams = payloadToCamelCase(params, ['custom_labels']);
-      // @ts-ignore
-      delete camelCaseParams['custom_labels'];
-
-      result.push({
-        type: agentType,
-        // @ts-ignore
-        params: {
-          ...camelCaseParams,
-          customLabels: { ...params['custom_labels'], ...extraLabels },
-        },
+          delete agentParams[key];
+        }
       });
+
+    const camelCaseParams = payloadToCamelCase(agentParams, ['custom_labels']);
+    // @ts-ignore
+    delete camelCaseParams['custom_labels'];
+
+    result.push({
+      type: agentType,
+      // @ts-ignore
+      params: {
+        ...camelCaseParams,
+        status: agentStatus,
+        customLabels: { ...agentParams['custom_labels'], ...extraLabels },
+      },
     });
   });
 
@@ -48,3 +51,6 @@ export const toAgentModel = (agentList: ServiceAgentPayload): Agent[] => {
 
 export const beautifyAgentType = (type: AgentType): string =>
   type.replace(/^\w/, (c) => c.toUpperCase()).replace(/[_-]/g, ' ');
+
+export const getAgentStatusColor = (status: ServiceAgentStatus): BadgeColor =>
+  status === ServiceAgentStatus.STARTING || status === ServiceAgentStatus.RUNNING ? 'green' : 'red';

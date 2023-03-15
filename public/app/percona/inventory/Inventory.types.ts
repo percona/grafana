@@ -49,19 +49,23 @@ export enum ServiceAgentStatus {
   UNKNOWN = 'UNKNOWN',
 }
 
-export type ServiceAgentPayload = {
-  [key in AgentType]?: Array<{
-    agent_id: string;
-    status?: ServiceAgentStatus;
-    custom_labels?: Record<string, string>;
-    // We don't need to care about all the other fields for now
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
-  }>;
+export interface ServiceAgentPayload {
+  agent_id: string;
+  agent_type: AgentType;
+  status?: ServiceAgentStatus;
+  is_connected?: boolean;
+  custom_labels?: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+export type ServiceAgentListPayload = {
+  agents: ServiceAgentPayload[];
 };
 
 export interface ServiceAgent {
   agentId: string;
+  status?: ServiceAgentStatus;
   customLabels?: Record<string, string>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;

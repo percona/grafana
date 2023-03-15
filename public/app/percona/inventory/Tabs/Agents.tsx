@@ -5,11 +5,11 @@ import { Form } from 'react-final-form';
 import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { formatServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
-import { Agent, ServiceAgentPayload } from 'app/percona/inventory/Inventory.types';
+import { Agent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
@@ -29,7 +29,7 @@ import { GET_AGENTS_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory
 import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
-import { beautifyAgentType, toAgentModel } from './Agents.utils';
+import { beautifyAgentType, getAgentStatusColor, toAgentModel } from './Agents.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }) => {
@@ -47,6 +47,13 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   const columns = useMemo(
     (): Array<Column<Agent>> => [
       {
+        Header: 'Status',
+        accessor: (row) => row.params.status,
+        Cell: ({ value }: { value: ServiceAgentStatus }) => (
+          <Badge text={`${value[0]}${value.substring(1).toLowerCase()}`} color={getAgentStatusColor(value)} />
+        ),
+      },
+      {
         Header: 'Agent Type',
         accessor: 'type',
         Cell: ({ value }) => beautifyAgentType(value),
@@ -63,12 +70,9 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const result: ServiceAgentPayload = await InventoryService.getAgents(
-        serviceId,
-        generateToken(GET_AGENTS_CANCEL_TOKEN)
-      );
+      const { agents = [] } = await InventoryService.getAgents(serviceId, generateToken(GET_AGENTS_CANCEL_TOKEN));
 
-      setData(toAgentModel(result));
+      setData(toAgentModel(agents));
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
