@@ -9,6 +9,7 @@ import {
   DBClusterComponentVersionStatus,
   DBClusterAllocatedResources,
   ResourcesWithUnits,
+  DBClusterTemplate,
 } from '../DBCluster.types';
 import { Operators } from '../EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
@@ -92,6 +93,42 @@ export const dbClustersStub: DBCluster[] = [
     finishedSteps: 5,
     totalSteps: 10,
   },
+  {
+    kubernetesClusterName: 'Kubernetes Cluster 1',
+    clusterName: 'dbcluster5',
+    databaseType: Databases.mysql,
+    clusterSize: 3,
+    memory: 1024,
+    cpu: 1,
+    disk: 25,
+    status: DBClusterStatus.upgrading,
+    finishedSteps: 5,
+    totalSteps: 10,
+  },
+  {
+    kubernetesClusterName: 'Kubernetes Cluster 1',
+    clusterName: 'dbcluster5',
+    databaseType: Databases.mysql,
+    clusterSize: 3,
+    memory: 1024,
+    cpu: 1,
+    disk: 25,
+    status: DBClusterStatus.changing,
+    finishedSteps: 5,
+    totalSteps: 10,
+  },
+  {
+    kubernetesClusterName: 'Kubernetes Cluster 1',
+    clusterName: 'dbcluster5',
+    databaseType: Databases.mysql,
+    clusterSize: 3,
+    memory: 1024,
+    cpu: 1,
+    disk: 25,
+    status: DBClusterStatus.deleting,
+    finishedSteps: 5,
+    totalSteps: 10,
+  },
 ];
 
 export const xtraDBClusterConnectionStub: DBClusterConnection = {
@@ -142,6 +179,13 @@ export const dbClusterLogsAPI = {
     },
   ],
 };
+
+export const dbClusterTemplatesApi: DBClusterTemplate[] = [
+  {
+    name: 'template-name',
+    kind: 'template-kind',
+  },
+];
 
 export const dbCLusterAllocatedResourcesStub: DBClusterAllocatedResources = {
   total: {
