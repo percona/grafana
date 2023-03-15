@@ -91,7 +91,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
       return (
         <DetailsRow>
           {!!labelKeys.length && (
-            <DetailsRow.Contents title="Labels" fullRow>
+            <DetailsRow.Contents title="Parameters" fullRow>
               <TagList
                 colorIndex={9}
                 className={styles.tagList}
