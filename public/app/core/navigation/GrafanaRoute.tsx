@@ -63,18 +63,20 @@ export function GrafanaRoute(props: Props) {
   const styles = getStyles();
 
   return (
-    <ErrorBoundary>
-      {({error, errorInfo}) => {
-        if (error) {
-          return <GrafanaRouteError error={error} errorInfo={errorInfo}/>;
-        }
-
+    <LocalStorageValueProvider<boolean> storageKey={LOCAL_STORAGE_KEY} defaultValue={false}>
+      {(isHelpCenterOpen, saveHelpCenterOpen) => {
         return (
-          <Suspense fallback={<GrafanaRouteLoading/>}>
-            <>
-              <LocalStorageValueProvider<boolean> storageKey={LOCAL_STORAGE_KEY} defaultValue={false}>
-                {(isHelpCenterOpen, saveHelpCenterOpen) => {
-                  return (
+          <>
+            {isHelpCenterOpen && <div className={styles.backdrop} onClick={() => saveHelpCenterOpen(false)} />}
+
+            <ErrorBoundary>
+              {({error, errorInfo}) => {
+                if (error) {
+                  return <GrafanaRouteError error={error} errorInfo={errorInfo}/>;
+                }
+
+                return (
+                  <Suspense fallback={<GrafanaRouteLoading/>}>
                     <>
                       {/*MODALS*/}
                       <>
@@ -126,15 +128,14 @@ export function GrafanaRoute(props: Props) {
                         )}
                       </div>
                     </>
-                  )
-                }}
-              </LocalStorageValueProvider>
-            </>
-          </Suspense>
-        )
-          ;
+                  </Suspense>
+                );
+              }}
+            </ErrorBoundary>
+          </>
+        );
       }}
-    </ErrorBoundary>
+    </LocalStorageValueProvider>
   );
 }
 
@@ -144,7 +145,22 @@ const getStyles = () => ({
     @media (max-width: 1279px) {
       width: 100%;
     }
-  `
+  `,
+  backdrop: css`
+    display: none;
+    @media (max-width: 1279px) {
+      display: block;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 1000%;
+      width: 100%;
+      z-index: 1200;
+      background-color: #22252b;
+      opacity: 0.8;
+    }
+  `,
 })
 
 function getPageClasses(route: RouteDescriptor) {
