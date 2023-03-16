@@ -32,7 +32,6 @@ describe('toAgentModel', () => {
           customLabels: {
             username: 'john',
             password: '******',
-            status: ServiceAgentStatus.RUNNING,
           },
         },
       },
@@ -42,7 +41,6 @@ describe('toAgentModel', () => {
           agentId: 'agent2',
           status: ServiceAgentStatus.STOPPING,
           customLabels: {
-            status: ServiceAgentStatus.STOPPING,
             listen_port: '3000',
             pmm_agent_id: 'pmm-server',
             aditional_prop: 'prop_value',
