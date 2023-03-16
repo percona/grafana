@@ -10,6 +10,7 @@ import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOp
 import { BasicOptionsFields, BasicOptionsFieldsProps } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
 import { DBaaSBackupProps } from './DBaaSBackups/DBaaSBackups.types';
 import { NetworkAndSecurityFields } from './NetworkAndSecurity/NetworkAndSecurity.types';
+import { RestoreFieldsProps } from './Restore/Restore.types';
 export type DBClusterPageMode = 'create' | 'edit' | 'list';
 
 export interface EditDBClusterPageProps {
@@ -31,7 +32,8 @@ export interface AddDBClusterFormValues
   extends ScheduledSectionFieldsValuesProps,
     DBClusterCommonFormValues,
     DBaaSBackupProps,
-    BasicOptionsFieldsProps {
+    BasicOptionsFieldsProps,
+    RestoreFieldsProps {
   [AdvancedOptionsFields.resources]: DBClusterResources;
 }
 

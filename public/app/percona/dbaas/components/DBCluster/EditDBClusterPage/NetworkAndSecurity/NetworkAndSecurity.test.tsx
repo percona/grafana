@@ -7,7 +7,7 @@ import NetworkAndSecurity from './NetworkAndSecurity';
 import { Messages } from './NetworkAndSecurity.messages';
 import { NetworkAndSecurityFields } from './NetworkAndSecurity.types';
 
-describe('DBClusterAdvancedOptions NetworkAndSecurity.tsx::', () => {
+describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
   it('render items correctly for create and edit mode', () => {
     render(
       <Form
