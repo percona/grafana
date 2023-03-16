@@ -6,7 +6,7 @@ const api = {
     return await apiTelemetryOnboarding.post<any, any>('/feedback', {
       feedback_rate: rate,
       feedback_description: description,
-      feedback_date: moment(new Date()).format('DD-MM-YYYY'),
+      feedback_date: moment(new Date()).format('YYYY-MM-DD'),
       pmm_server_id: pmmServerId,
     });
   },
