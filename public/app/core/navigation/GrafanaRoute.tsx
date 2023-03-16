@@ -1,6 +1,5 @@
 import { css } from '@emotion/css';
 import React, { Suspense, useEffect, useState } from 'react';
-import { Redirect } from 'react-router-dom';
 // @ts-ignore
 import Drop from 'tether-drop';
 
@@ -77,7 +76,7 @@ export function GrafanaRoute(props: Props) {
 
                 return (
                   <Suspense fallback={<GrafanaRouteLoading/>}>
-                    <>
+                    <PmmUi.ComponentsWrapper>
                       {/*MODALS*/}
                       <>
                         <PmmUi.ConnectPortalModal
@@ -119,7 +118,7 @@ export function GrafanaRoute(props: Props) {
                         {props.location.pathname === '/a/pmm-homescreen-app' ? (
                           <Suspense fallback={<div></div>}>
                             <>
-                            {(isConnectedUser) ? <PmmUi.HomePage onHelpCenterButtonClick={() => setHelpCenterToolTipVisible(true)}/> : <Redirect to="/" /> }
+                              <PmmUi.HomePage onHelpCenterButtonClick={() => setHelpCenterToolTipVisible(true)}/>
                             </>
                           </Suspense>
                         ) : (
@@ -127,7 +126,7 @@ export function GrafanaRoute(props: Props) {
                                                  queryParams={locationSearchToObject(props.location.search)}/>
                         )}
                       </div>
-                    </>
+                    </PmmUi.ComponentsWrapper>
                   </Suspense>
                 );
               }}
