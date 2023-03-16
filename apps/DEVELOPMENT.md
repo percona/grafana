@@ -25,10 +25,10 @@ PMM_CONTAINER=ritbl/pmm-x:v2.33.0-3
 ```
 
 In root, configure pmm-ui location, create file `.env` in root, add location of pmm-ui (that will be running locally):
+
 ```dotenv
 fd_pmm=http://localhost:3001
 ```
-
 
 # 2: Run core components
 
@@ -61,6 +61,11 @@ npm run dev:federation
 Following needs to be executed after frontend components (`make dev` configures configs used by server components):
 
 Run `grafana-server` run configuration from IntelliJ Idea.
+
+### 2.2.2: Add PMM Managed
+
+To mount pmm managed source code to the running container you have to override `PMM_MANAGED_DIR`.
+Value of this variable should be equal to path where is pmm manged is located on your local machine (see .env.example).
 
 ### 2.3: navigate to Grafana UI in browser
 
