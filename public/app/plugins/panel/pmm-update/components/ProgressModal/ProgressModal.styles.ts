@@ -12,7 +12,7 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     left: 0;
     margin-left: auto;
     margin-right: auto;
-    max-width: 750px;
+    max-width: 80vw;
     outline: none;
     position: fixed;
     right: 0;
@@ -32,11 +32,19 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     margin-right: 8px;
   `,
   output: css`
-    height: 200px;
+    height: 500px;
     margin-right: 0;
     margin-top: 15px;
     overflow-y: scroll;
     width: 100%;
+
+    pre {
+      height: 100%;
+    }
+
+    ${theme.breakpoints.down('sm')} {
+      height: 200px;
+    }
   `,
   outputContent: css`
     margin-top: 15px;
