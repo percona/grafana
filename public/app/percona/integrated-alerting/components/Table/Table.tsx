@@ -20,7 +20,7 @@ import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableCheckbox } from './Selection';
 import { getStyles } from './Table.styles';
-import { TableProps, PaginatedTableOptions, PaginatedTableState } from './Table.types';
+import { PaginatedTableOptions, PaginatedTableState, TableProps } from './Table.types';
 import { TableContent } from './TableContent';
 
 const defaultPropGetter = () => ({});
@@ -52,6 +52,7 @@ export const Table: FC<TableProps> = ({
   showFilter = false,
   hasBackendFiltering = false,
   getRowId,
+  tableKey,
 }) => {
   const [filterData, setFilteredData] = useState<Object[]>([]);
   const data = useMemo(() => (showFilter ? filterData : rawData), [showFilter, filterData, rawData]);
@@ -158,6 +159,7 @@ export const Table: FC<TableProps> = ({
             rawData={rawData}
             setFilteredData={setFilteredData}
             hasBackendFiltering={hasBackendFiltering}
+            tableKey={tableKey}
           />
         )}
         <div className={style.tableWrap} data-testid="table-outer-wrapper">
