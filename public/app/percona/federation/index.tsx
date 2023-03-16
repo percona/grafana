@@ -9,9 +9,13 @@ const HelpCenter = React.lazy(() => import('pmm_ui/HelpCenter'));
 // @ts-ignore
 const ConnectPortalModal = React.lazy(() => import('pmm_ui/ConnectPortalModal'));
 
+// @ts-ignore
+const ComponentsWrapper = React.lazy(() => import('pmm_ui/ComponentsWrapper'));
+
 export const PmmUi = {
   TopBar,
   HomePage,
   HelpCenter,
-  ConnectPortalModal
+  ConnectPortalModal,
+  ComponentsWrapper
 };
