@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { cx } from '@emotion/css';
 import { jsx } from '@emotion/react';
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { Field } from 'react-final-form';
 
 import { Switch, useStyles2 } from '@grafana/ui';

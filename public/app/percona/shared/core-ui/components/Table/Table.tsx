@@ -21,7 +21,7 @@ import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
 import { TableCheckbox } from './Selection';
 import { getStyles } from './Table.styles';
-import { PaginatedTableOptions, PaginatedTableState, TableProps } from './Table.types';
+import { PaginatedTableInstance, PaginatedTableOptions, PaginatedTableState, TableProps } from './Table.types';
 import { TableContent } from './TableContent';
 
 const defaultPropGetter = () => ({});
@@ -110,7 +110,7 @@ export const Table: FC<TableProps> = ({
     });
   }
 
-  const tableInstance = useTable(tableOptions, ...plugins);
+  const tableInstance = useTable(tableOptions, ...plugins) as PaginatedTableInstance;
   const {
     getTableProps,
     getTableBodyProps,

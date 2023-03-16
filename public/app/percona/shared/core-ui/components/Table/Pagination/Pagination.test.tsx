@@ -222,7 +222,7 @@ describe('Pagination', () => {
       />
     );
 
-    userEvent.click(screen.getByTestId('previous-page-button'), {}, { skipPointerEventsCheck: true });
+    userEvent.click(screen.getByTestId('previous-page-button'), {});
     expect(cb).not.toHaveBeenCalled();
   });
 
@@ -242,7 +242,7 @@ describe('Pagination', () => {
     );
 
     for (let i = 0; i < 5; i += 1) {
-      userEvent.click(screen.getByTestId('next-page-button'), {}, { skipPointerEventsCheck: true });
+      userEvent.click(screen.getByTestId('next-page-button'), {});
     }
 
     expect(cb).toHaveBeenCalledTimes(4);
@@ -281,7 +281,7 @@ describe('Pagination', () => {
     );
 
     for (let i = 0; i < 5; i += 1) {
-      userEvent.click(screen.getByTestId('next-page-button'), {}, { skipPointerEventsCheck: true });
+      userEvent.click(screen.getByTestId('next-page-button'), {});
     }
 
     userEvent.click(screen.getByTestId('first-page-button'));
@@ -319,14 +319,16 @@ describe('Pagination', () => {
     );
 
     for (let i = 0; i < 5; i += 1) {
-      userEvent.click(screen.getByTestId('next-page-button'), {}, { skipPointerEventsCheck: true });
+      userEvent.click(screen.getByTestId('next-page-button'), {});
     }
 
     // TODO: replace with the following line when data-testid will be available in the Select component
     // const select = screen.getByTestId('pagination-size-select');
     const select = document.querySelector('input');
 
-    userEvent.type(select, '{arrowdown}');
+    if (select) {
+      userEvent.type(select, '{arrowdown}');
+    }
 
     const lastOption = screen.getAllByLabelText('Select option').slice(-1)[0];
 
