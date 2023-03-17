@@ -63,9 +63,12 @@ services:
       - ${PMM_MANAGED_DIR:-../../pmm}/Makefile.devcontainer:/root/go/src/github.com/percona/pmm/Makefile:ro # change Makefile in devcontainer
 
       # configs
-      # -- grafana in dev mode
-      - "../public:/usr/share/grafana/public"
-      - ../conf/grafana.local-dev.ini:/usr/share/grafana/conf/defaults.ini
+      #- ./.config/etc/grafana.ini:/etc/grafana/grafana.ini
+      - ./.config/etc/supervisord.d/grafana.ini:/etc/supervisord.d/grafana.ini:ro
+      - ${PMM_SVC_CONFIG:-./.config/etc/supervisord.d/pmm.ini}:/etc/supervisord.d/pmm.ini:ro
+      - ./.config/etc/supervisord.d/victoriametrics.ini:/etc/supervisord.d/victoriametrics.ini:ro
+      - ./.config/etc/nginx/conf.d/pmm.conf:/etc/nginx/conf.d/pmm.conf:ro
+      - ./.config/etc/nginx/conf.d/pmm-ssl.conf:/etc/nginx/conf.d/pmm-ssl.conf:ro
       # workspace
       - ../:/workspace
       - ./Makefile.devcontainer:/workspace/Makefile

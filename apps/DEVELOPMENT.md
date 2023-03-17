@@ -2,7 +2,7 @@
 
 This guide will help you run core grafana components:
 
-- Grafana Server
+- Grafana Server (optional)
 - Grafana FrontendEnd
 - PMM-UI micro-frontend
 - PMM devcontainer for the rest of components
@@ -42,8 +42,16 @@ correctly. If you want to work in both of them you need to open them separatly.
 
 You can run new devcontainer and grafana ui build (with watch) by running in `apps` directory
 
+Use grafana server in devcontainer:
+
 ```shell
 make dev
+```
+
+Use local grafana server:
+
+```shell
+make dev-local-ds
 ```
 
 ### 2.1.2: PMM-UI
