@@ -6,8 +6,8 @@ init:								## Prepares local development environment.
 	cd ./apps/pmm-ui && npm install
 
 dev:								## Starts local development.
-	make env-down-local-gs
-	make env-up-local-gs
+	make env-down
+	make env-up
 	find ./.config/grafana/plugins ! -name '.gitkeep' -type f -exec rm -f {} +
 	docker cp pmm-grafana-dev:/srv/grafana/plugins/. ./.config/grafana/plugins/
 	find ./.config/grafana/percona-dashboards ! -name '.gitkeep' -type f -exec rm -f {} +
