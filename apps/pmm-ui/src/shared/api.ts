@@ -54,3 +54,4 @@ export class ApiRequest {
 }
 
 export const apiTelemetryOnboarding = new ApiRequest({ baseURL: '/v1/telemetry/onboarding' });
+export const apiOnboarding = new ApiRequest({ baseURL: '/v1/onboarding' });

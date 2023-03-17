@@ -14,13 +14,30 @@ interface TipProps {
   opened: boolean;
   completed?: boolean;
   onClick?: () => void;
+
+  buttonUrl?: string;
 }
 
 export const Tip: FC<TipProps> = (props) => {
-  const { title, number, tipText, opened, onClick, completed, buttonText, buttonIcon, buttonTooltipText } = props;
+  const {
+    title,
+    number,
+    tipText,
+    opened,
+    onClick,
+    completed,
+    buttonText,
+    buttonIcon,
+    buttonTooltipText,
+    buttonUrl,
+  } = props;
   const styles = useStyles2(getStyles);
 
   let active: boolean = opened && !completed;
+
+  console.log("title: ", title);
+  console.log("opened: ", opened);
+  console.log("active: ", active);
   return (
     <div className={`${styles.tipContainer} ${!active ? styles.tipContainerNoPadding : ''}`}>
       <div className={`${styles.tipHeader} ${!active ? styles.tipPointer : ''}`} onClick={onClick}>
@@ -38,12 +55,24 @@ export const Tip: FC<TipProps> = (props) => {
         <div className={styles.tipText}>{tipText}</div>
         {buttonTooltipText ? (
           <Tooltip content={buttonTooltipText} placement="top" interactive={true}>
-            <Button variant="secondary" size="md" type="button" icon={buttonIcon}>
+            <Button
+              variant="secondary"
+              size="md"
+              type="button"
+              icon={buttonIcon}
+              onClick={() => window.open(buttonUrl, '_blank', 'noopener,noreferrer')}
+            >
               {buttonText}
             </Button>
           </Tooltip>
         ) : (
-          <Button variant="secondary" size="md" type="button" icon={buttonIcon}>
+          <Button
+            variant="secondary"
+            size="md"
+            type="button"
+            icon={buttonIcon}
+            onClick={() => window.open(buttonUrl, '_blank', 'noopener,noreferrer')}
+          >
             {buttonText}
           </Button>
         )}
@@ -60,7 +89,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     margin-bottom: 16px;
 
     width: 100%;
-    padding-bottom: 16px;
 
     background: ${theme.colors.background.secondary};
     border-radius: 8px;
@@ -120,7 +148,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     opacity: 0.67;
   `,
   tipBody: css`
-    padding: 16px 16px 0;
+    padding: 16px;
     font-weight: 400;
     font-size: 14px;
     line-height: 21px;

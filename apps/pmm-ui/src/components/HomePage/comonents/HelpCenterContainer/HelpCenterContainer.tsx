@@ -3,8 +3,17 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
 import { TipsContainer } from '../../../HelpCenter/components/TipsContainer/TipsContainer';
+import { useSelector } from "react-redux";
+import { StoreState } from "../../../../reducers/store";
+import { setSystemTipsCurrentlySelected } from "../../../../reducers/tips/tips";
 
-export const HelpCenterContainer: FC = () => {
+interface HelpCenterContainerProps {
+  userId: number;
+}
+
+export const HelpCenterContainer: FC<HelpCenterContainerProps> = ({ userId }) => {
+  const {systemTips: {loading, tips, currentlySelected}}=useSelector((state: StoreState) => state.tips);
+
   const styles = useStyles2(getStyles);
 
   const rocketEmoji = String.fromCodePoint(128640);
@@ -17,7 +26,14 @@ export const HelpCenterContainer: FC = () => {
         <h2>{helpCenterHeading}</h2>
         <span>{helpCenterText}</span>
       </div>
-      <TipsContainer className={styles.helpCenterActionsContainer} />
+      <TipsContainer
+        key="3"
+        tips={tips}
+        loading={loading}
+        currentlySelectedTipId={currentlySelected}
+        userId={userId}
+        setTipSelected={setSystemTipsCurrentlySelected}
+      />
     </div>
   );
 };
