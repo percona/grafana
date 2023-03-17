@@ -1,5 +1,6 @@
 # Dev
 .env
+.devcontainer
 .config/grafana/plugins
 .config/grafana/percona-dashboards
 .config/grafana/workdir

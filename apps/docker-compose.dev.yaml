@@ -79,6 +79,7 @@ services:
       - root-cache:/root/.cache
       # development
       - ./share:/share
+      - ./.devcontainer/logs:/srv/logs
 
 volumes:
   go-modules:
