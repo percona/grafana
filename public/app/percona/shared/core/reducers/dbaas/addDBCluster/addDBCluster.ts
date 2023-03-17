@@ -6,6 +6,7 @@ import { newDBClusterService } from '../../../../../dbaas/components/DBCluster/D
 import { getCronStringFromValues } from '../../../../helpers/cron/cron';
 import { SETTINGS_TIMEOUT } from '../../../constants';
 import { updateSettingsAction } from '../../index';
+import { prepareSourceRanges } from '../dbaas.utils';
 
 import { AddDBClusterArgs, PerconaAddDBClusterState } from './addDBCluster.types';
 
@@ -71,6 +72,7 @@ export const addDbClusterAction = createAsyncThunk(
       secretsName,
       enableRestore,
       enableBackups,
+      template,
     } = args.values;
 
     const dbClusterService = newDBClusterService(databaseType.value);
@@ -89,6 +91,8 @@ export const addDbClusterAction = createAsyncThunk(
       startMinute!.map((m: { value: any }) => m.value!)
     );
 
+    const preparedSourceRanges = prepareSourceRanges(sourceRanges);
+
     await withAppEvents(
       dbClusterService.addDBCluster({
         kubernetesClusterName: kubernetesCluster?.value,
@@ -101,7 +105,7 @@ export const addDbClusterAction = createAsyncThunk(
         databaseImage: databaseVersion?.value,
         expose,
         internetFacing,
-        sourceRanges: sourceRanges?.map((item: any) => item?.sourceRange || ''),
+        sourceRanges: preparedSourceRanges,
         configuration,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
         ...(args.settings?.backupEnabled &&
@@ -120,6 +124,12 @@ export const addDbClusterAction = createAsyncThunk(
               secretsName: secretsName?.value || '',
             },
           }),
+        ...(template && {
+          template: {
+            name: template.label,
+            kind: template.value,
+          },
+        }),
       }),
       {
         successMessage: 'Cluster was successfully added',
