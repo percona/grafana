@@ -31,7 +31,6 @@ describe('toAgentModel', () => {
           status: ServiceAgentStatus.RUNNING,
           customLabels: {
             username: 'john',
-            password: '******',
           },
         },
       },
