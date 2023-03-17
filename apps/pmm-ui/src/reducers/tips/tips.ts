@@ -116,8 +116,6 @@ export const fetchSystemTipsAction=createAsyncThunk(
 
       const newTips: TipModel[] = [];
 
-      console.log("set loading system tips")
-      console.log(systemTipsData)
       for (let tip of systemTipsData) {
         const res=await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.SYSTEM}/user/${args.userId}`)
         newTips.push({
@@ -143,9 +141,6 @@ export const fetchUserTipsAction=createAsyncThunk(
     (async () => {
       thunkAPI.dispatch(setUserTipsLoading());
 
-      console.log("set loading user tips")
-      console.log(userTipsData)
-
       const newTips: TipModel[] = [];
       for (let tip of userTipsData) {
         const res=await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.USER}/user/${args.userId}`)
@@ -161,7 +156,6 @@ export const fetchUserTipsAction=createAsyncThunk(
       // @ts-ignore
       const initial=notCompletedTip !== undefined ? notCompletedTip.id : 0;
 
-      console.log("setUserTipsCurrentlySelected", initial);
       thunkAPI.dispatch(setUserTipsCurrentlySelected(initial));
     })()
 );

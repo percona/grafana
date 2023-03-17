@@ -16,8 +16,6 @@ export const TipsContainer: FC<TipsContainerProps> = (props) => {
   const { className, tips, currentlySelectedTipId, setTipSelected } = props;
   const dispatch = useDispatch();
 
-  console.log("currentlySelectedTipId", currentlySelectedTipId);
-  console.log("tips", tips);
   return <div className={className}>
       {tips.map((t, i) => (
         <Tip
