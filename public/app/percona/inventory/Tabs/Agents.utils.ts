@@ -23,10 +23,6 @@ export const toAgentModel = (agentList: ServiceAgentPayload[]): Agent[] => {
         if (typeof value !== 'object' || Array.isArray(value)) {
           extraLabels[key] = value;
 
-          if (key === 'username') {
-            extraLabels.password = '******';
-          }
-
           delete agentParams[key];
         }
       });
