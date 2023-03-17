@@ -51,7 +51,7 @@ make dev
 Use local grafana server:
 
 ```shell
-make dev-local-ds
+make dev-local-gs
 ```
 
 ### 2.1.2: PMM-UI
