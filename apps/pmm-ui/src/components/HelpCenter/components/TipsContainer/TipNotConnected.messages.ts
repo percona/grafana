@@ -1,6 +1,6 @@
 export const Messages = {
   title: 'Get more out of PMM',
-  connectingInfo: 'By simply connecting PMM to Percona Platform',
+  connectingInfo: 'Simply connect PMM to Percona Platform to get more Advisors and have insights on:',
   getMore: 'Get more ',
   advisors: 'Advisors',
   advisorsDescription: ' to automatically check your system status.',
@@ -11,7 +11,7 @@ export const Messages = {
   premiumPlansDescription: ' to discover all benefits and growth potential for your projects.',
 
   button: {
-    connectToPlatform: 'Connect to platform',
+    connectToPlatform: 'Connect to Percona Platform',
   },
   link: {
     alertsTemplate:

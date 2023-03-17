@@ -3,9 +3,6 @@ import headerImg from "../../assets/milestone.svg";
 import {GrafanaTheme2} from "@grafana/data";
 import {Button, useStyles2} from "@grafana/ui";
 import {css} from "@emotion/css";
-import {
-  SECURITY_CREDENTIALS_DOC_LINK
-} from "../../../../../../../public/app/percona/add-instance/components/AzureDiscovery/components/Credentials/Credentials.constants";
 
 export const EmptyTip: FC = () => {
   const styles = useStyles2(getStyles);
@@ -16,7 +13,7 @@ export const EmptyTip: FC = () => {
       </div>
       <div>
         <h3 className={styles.header}>You reached the top!</h3>
-        <p className={styles.text}>There are no tips to show at the moment, but you can always learn more elsewhere.</p>
+        <p className={styles.text}>There are no tips to show at the moment, but you can always get insights on better database performance in Percona resources.</p>
       </div>
       <div className={styles.buttonContainer}>
         <Button fill="text" icon="comments-alt" size="md" variant="secondary" onClick={() => window.open("https://docs.percona.com/percona-monitoring-and-management/index.html", '_blank')}>Community forum</Button>

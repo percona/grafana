@@ -58,6 +58,7 @@ export function GrafanaRoute(props: Props) {
   const { serverId = '' } = useSelector(getPerconaServer);
   const [isConnectedUser, setIsConnectedUser] = useState(result?.isConnectedToPortal || false);
   const isAdmin = contextSrv.isGrafanaAdmin;
+  const userId = contextSrv.user.id;
   const styles = getStyles();
 
   return (
@@ -110,13 +111,17 @@ export function GrafanaRoute(props: Props) {
                         onClose={() => saveHelpCenterOpen(false)}
                         width="416px"
                         isConnectedUser={isConnectedUser}
+                        userId={userId}
                       />
                       {/*TODO:WIP: refactor*/}
                       <div className={isHelpCenterOpen ? styles.openedHelpCenter : ''}>
                         {props.location.pathname === '/a/pmm-homescreen-app' ? (
                           <Suspense fallback={<div></div>}>
                             <>
-                              <PmmUi.HomePage onHelpCenterButtonClick={() => setHelpCenterToolTipVisible(true)}/>
+                              <PmmUi.HomePage
+                                onHelpCenterButtonClick={() => setHelpCenterToolTipVisible(true)}
+                                userId={userId}
+                              />
                             </>
                           </Suspense>
                         ) : (

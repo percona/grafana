@@ -12,11 +12,13 @@ import { HelpCenterContainer } from './comonents/HelpCenterContainer';
 
 interface HomePageProps {
   onHelpCenterButtonClick?: () => void;
+  userId: number;
 }
 
-export const HomePage: FC<HomePageProps> = ({ onHelpCenterButtonClick }) => {
+export const HomePage: FC<HomePageProps> = (props) => {
   const styles = useStyles2(getStyles);
 
+  const { onHelpCenterButtonClick, userId } = props;
   const wavingHandEmoji = String.fromCodePoint(128075);
   const ringBuoyEmoji = String.fromCodePoint(128735);
   const welcomeHeader = `${wavingHandEmoji} Welcome to PMM`;
@@ -44,7 +46,7 @@ export const HomePage: FC<HomePageProps> = ({ onHelpCenterButtonClick }) => {
             <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
           </div>
         </ActionContainer>
-        <HelpCenterContainer />
+        <HelpCenterContainer userId={userId} />
         <ActionContainer
           headerType="h2"
           header={helpBlockHeader}

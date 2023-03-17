@@ -55,8 +55,8 @@ const getStyles = (theme: GrafanaTheme2) => ({
     color: ${theme.colors.text.link};
   `,
   tipsButton: css`
-    width: 170px;
-    padding: 0px 0px 0px 0px;
+    width: 230px;
+    padding: 0;
   `,
   buttonImage: css`
     width: 20px;
@@ -66,7 +66,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
   perconaButtonLabel: css`
     padding: 8px;
     justify-content: center;
-    width: 120px;
+    width: 180px;
     font-size: ${theme.typography.body.fontSize};
     display: flex;
     margin-right: 8px;

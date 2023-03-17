@@ -1,41 +1,37 @@
 import React, { FC, useEffect } from 'react';
 import { Tip } from '../Tip';
-import { IconName, Spinner } from '@grafana/ui';
-import { useDispatch, useSelector } from 'react-redux';
-import { StoreState } from '../../../../reducers/store';
-import { fetchTipsAction, setCurrentlySelected } from '../../../../reducers/tips/tips';
+import { IconName, Spinner } from '@grafana/ui';import { useDispatch, useSelector } from 'react-redux';
+import { AllTipsState, setSystemTipsCurrentlySelected, TipModel } from '../../../../reducers/tips/tips';
 
 export interface TipsContainerProps {
   className?: string;
+  userId: number;
+  loading: boolean;
+  tips: TipModel[];
+  currentlySelectedTipId: number;
+  setTipSelected: any;
 }
 
-export const TipsContainer: FC<TipsContainerProps> = ({ className }) => {
-  const { loading, tips, currentlySelected } = useSelector((state: StoreState) => state.tips);
+export const TipsContainer: FC<TipsContainerProps> = (props) => {
+  const { className, tips, currentlySelectedTipId, setTipSelected } = props;
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchTipsAction({}));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  return loading ? (
-    <div>
-      <Spinner size={30} />
-    </div>
-  ) : (
-    <div className={className}>
-      {tips.map((t) => (
+  console.log("currentlySelectedTipId", currentlySelectedTipId);
+  console.log("tips", tips);
+  return <div className={className}>
+      {tips.map((t, i) => (
         <Tip
           title={t.title}
-          number={t.id}
+          number={i + 1}
           buttonText={t.buttonText}
           buttonIcon={t.buttonIcon as IconName}
           buttonTooltipText={t.buttonTooltipText}
+          buttonUrl={t.url}
           tipText={t.text}
-          onClick={!t.completed ? () => dispatch(setCurrentlySelected(t.id)) : () => {}}
+          onClick={!t.completed ? () => dispatch(setTipSelected(t.id)) : () => {}}
           completed={t.completed}
-          opened={currentlySelected === t.id}
+          opened={currentlySelectedTipId === t.id}
         />
       ))}
     </div>
-  );
 };
