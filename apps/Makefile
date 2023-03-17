@@ -1,27 +1,39 @@
 include Makefile.include
 
 init:								## Prepares local development environment.
-	cd ../ && make build-go; \
-	yarn install --immutable; \
+	cd ../ && make build-go
+	yarn install --immutable
 	cd ./apps/pmm-ui && npm install
 
 dev:								## Starts local development.
-	make env-down; \
-	make env-up; \
-	find ./.config/grafana/plugins ! -name '.gitkeep' -type f -exec rm -f {} +; \
-	docker cp pmm-grafana-dev:/srv/grafana/plugins/. ./.config/grafana/plugins/; \
-	find ./.config/grafana/percona-dashboards ! -name '.gitkeep' -type f -exec rm -f {} +; \
-	docker cp pmm-grafana-dev:/usr/share/percona-dashboards/. ./.config/grafana/percona-dashboards/; \
+	make env-down
+	make env-up
+	yarn start
+
+dev-local-gs:				## Starts local development with local grafana server.
+	make env-down-local-gs
+	make env-up-local-gs
+	find ./.config/grafana/plugins ! -name '.gitkeep' -type f -exec rm -f {} +
+	docker cp pmm-grafana-dev:/srv/grafana/plugins/. ./.config/grafana/plugins/
+	find ./.config/grafana/percona-dashboards ! -name '.gitkeep' -type f -exec rm -f {} +
+	docker cp pmm-grafana-dev:/usr/share/percona-dashboards/. ./.config/grafana/percona-dashboards/
 	yarn start
 
 env-up:								## Starts devcontainer.
 	docker-compose -f docker-compose.dev.yaml build --no-cache; \
 	docker-compose -f docker-compose.dev.yaml up -d
 
+env-up-local-gs:			## Starts devcontainer with local grafana server.
+	docker-compose -f docker-compose.local-gs.dev.yaml build --no-cache; \
+	docker-compose -f docker-compose.local-gs.dev.yaml up -d
+
 ui-up:
 	cd pmm-ui && npm run dev:federation
 
 env-down:							## Stops devcontainer.
+	docker-compose -f docker-compose.dev.yaml down --remove-orphans
+
+env-down-local-gs:							## Stops devcontainer.
 	docker-compose -f docker-compose.dev.yaml down --remove-orphans
 
 TARGET ?= _bash

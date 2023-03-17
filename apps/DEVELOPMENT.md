@@ -2,7 +2,7 @@
 
 This guide will help you run core grafana components:
 
-- Grafana Server
+- Grafana Server (optional)
 - Grafana FrontendEnd
 - PMM-UI micro-frontend
 - PMM devcontainer for the rest of components
@@ -21,10 +21,10 @@ For optimized ARM64 image, in `.env`, uncomment `PMM_CONTAINER`, use latest avai
 Example:
 
 ```dotenv
-PMM_CONTAINER=ritbl/pmm-x:v2.33.0-3
+PMM_CONTAINER=ritbl/pmm-x:v2.36.0-3
 ```
 
-In root, configure pmm-ui location, create file `.env` in root, add location of pmm-ui (that will be running locally):
+In project root, configure pmm-ui location, create file `.env`, add location of pmm-ui (that will be running locally):
 
 ```dotenv
 fd_pmm=http://localhost:3001
@@ -40,10 +40,18 @@ correctly. If you want to work in both of them you need to open them separatly.
 
 ### 2.1.1: Grafana UI
 
-You can run new devcontainer and grafana build (with watch) by running in `apps` directory:
+You can run new devcontainer and grafana ui build (with watch) by running in `apps` directory
+
+With grafana server running in devcontainer:
 
 ```shell
 make dev
+```
+
+With grafana server running locally:
+
+```shell
+make dev-local-gs
 ```
 
 ### 2.1.2: PMM-UI
@@ -56,7 +64,9 @@ npm run dev:federation
 
 ## 2.2: BackEnd Components
 
-### 2.2.1: Grafana Server
+### 2.2.1: Grafana Server (Optional)
+
+Execute this in case you run devcontainer with `make dev-local-gs`.
 
 Following needs to be executed after frontend components (`make dev` configures configs used by server components):
 
