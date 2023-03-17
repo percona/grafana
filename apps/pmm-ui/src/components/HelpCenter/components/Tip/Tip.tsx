@@ -35,9 +35,6 @@ export const Tip: FC<TipProps> = (props) => {
 
   let active: boolean = opened && !completed;
 
-  console.log("title: ", title);
-  console.log("opened: ", opened);
-  console.log("active: ", active);
   return (
     <div className={`${styles.tipContainer} ${!active ? styles.tipContainerNoPadding : ''}`}>
       <div className={`${styles.tipHeader} ${!active ? styles.tipPointer : ''}`} onClick={onClick}>
