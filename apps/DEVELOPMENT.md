@@ -2,7 +2,7 @@
 
 This guide will help you run core grafana components:
 
-- Grafana Server (optional)
+- Grafana Server
 - Grafana FrontendEnd
 - PMM-UI micro-frontend
 - PMM devcontainer for the rest of components
@@ -42,16 +42,8 @@ correctly. If you want to work in both of them you need to open them separatly.
 
 You can run new devcontainer and grafana ui build (with watch) by running in `apps` directory
 
-With grafana server running in devcontainer:
-
 ```shell
 make dev
-```
-
-With grafana server running locally:
-
-```shell
-make dev-local-gs
 ```
 
 ### 2.1.2: PMM-UI
@@ -64,9 +56,7 @@ npm run dev:federation
 
 ## 2.2: BackEnd Components
 
-### 2.2.1: Grafana Server (Optional)
-
-Execute this in case you run devcontainer with `make dev-local-gs`.
+### 2.2.1: Grafana Server
 
 Following needs to be executed after frontend components (`make dev` configures configs used by server components):
 
