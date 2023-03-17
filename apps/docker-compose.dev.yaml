@@ -59,8 +59,8 @@ services:
       # VM
       - ${PMM_PORT_VM:-9090}:9090
     volumes:
-      - ${PMM_MANAGED_DIR:-./}:/root/go/src/github.com/percona/pmm
-      - ${PMM_MANAGED_DIR:-./}/Makefile.devcontainer:/root/go/src/github.com/percona/pmm/Makefile:ro # change Makefile in devcontainer
+      - ${PMM_MANAGED_DIR:-../../pmm}:/root/go/src/github.com/percona/pmm
+      - ${PMM_MANAGED_DIR:-../../pmm}/Makefile.devcontainer:/root/go/src/github.com/percona/pmm/Makefile:ro # change Makefile in devcontainer
 
       # configs
       #- ./.config/etc/grafana.ini:/etc/grafana/grafana.ini
