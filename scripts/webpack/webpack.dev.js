@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const { DefinePlugin } = require('webpack');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 const { merge } = require('webpack-merge');
 
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
@@ -113,6 +114,9 @@ module.exports = (env = {}) =>
         'process.env': {
           NODE_ENV: JSON.stringify('development'),
         },
+      }),
+      new LiveReloadPlugin({
+        delay: 1000,
       }),
       // new BundleAnalyzerPlugin({
       //   analyzerPort: 8889

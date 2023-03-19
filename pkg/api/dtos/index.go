@@ -31,4 +31,5 @@ type IndexViewData struct {
 	LoadingLogo             template.URL
 	// Nonce is a cryptographic identifier for use with Content Security Policy.
 	Nonce string
+	Env   string
 }

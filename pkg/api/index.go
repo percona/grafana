@@ -61,6 +61,7 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 
 	appURL := setting.AppUrl
 	appSubURL := hs.Cfg.AppSubURL
+	env := hs.Cfg.Env
 
 	// special case when doing localhost call from image renderer
 	if c.IsRenderCall && !hs.Cfg.ServeFromSubPath {
@@ -120,6 +121,7 @@ func (hs *HTTPServer) setIndexViewData(c *models.ReqContext) (*dtos.IndexViewDat
 		Nonce:                   c.RequestNonce,
 		ContentDeliveryURL:      hs.Cfg.GetContentDeliveryURL(hs.License.ContentDeliveryPrefix()),
 		LoadingLogo:             "public/img/grafana_icon.svg",
+		Env:                     env,
 	}
 
 	if !hs.AccessControl.IsDisabled() {
