@@ -2,7 +2,6 @@
 
 const ESLintPlugin = require('eslint-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const LiveReloadPlugin = require('webpack-livereload-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
@@ -137,7 +136,6 @@ module.exports = (env = {}) =>
           }
         }),
       }),
-      new LiveReloadPlugin(),
       federation,
       // new BundleAnalyzerPlugin({
       //   analyzerPort: 8889
