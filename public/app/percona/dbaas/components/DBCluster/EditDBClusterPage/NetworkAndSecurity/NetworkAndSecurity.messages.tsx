@@ -13,7 +13,7 @@ export const Messages = {
     expose:
       'You will make this database cluster available to connect from the internet. To limit access you need to specify source ranges',
     internetFacing:
-      'This is AWS specific configuration required if you want to access your database cluster out side of your VPC',
+      'This is an AWS specific configuration required if you want to access your database cluster outside of your VPC',
   },
   placeholders: {
     sourceRange: '181.170.213.40/32',
