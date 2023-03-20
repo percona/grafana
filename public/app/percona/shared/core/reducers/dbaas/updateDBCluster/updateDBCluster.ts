@@ -63,7 +63,7 @@ export const updateDBClusterAction = createAsyncThunk(
         memory,
         disk,
         expose: !!expose,
-        internetFacing: expose && !!internetFacing,
+        internetFacing: !!expose && !!internetFacing,
         configuration,
         sourceRanges: preparedSourceRanges,
         ...(storageClass?.value && { storageClass: storageClass?.value }),

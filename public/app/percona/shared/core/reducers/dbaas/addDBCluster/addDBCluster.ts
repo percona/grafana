@@ -104,7 +104,7 @@ export const addDbClusterAction = createAsyncThunk(
         disk,
         databaseImage: databaseVersion?.value,
         expose: !!expose,
-        internetFacing: expose && !!internetFacing,
+        internetFacing: !!expose && !!internetFacing,
         sourceRanges: preparedSourceRanges,
         configuration,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
