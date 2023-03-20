@@ -63,13 +63,13 @@ export const Services = () => {
         },
       },
       {
-        content: 'Dashboard',
+        content: Messages.services.actions.dashboard,
         action: () => {
           locationService.push(getDashboardLinkForService(row.original.type, row.original.params.serviceName));
         },
       },
       {
-        content: 'QAN',
+        content: Messages.services.actions.qan,
         action: () => {
           locationService.push(`/d/pmm-qan/pmm-query-analytics?var-service_name=${row.original.params.serviceName}`);
         },
@@ -81,18 +81,18 @@ export const Services = () => {
   const columns = useMemo(
     (): Array<Column<Service>> => [
       {
-        Header: 'Service Name',
+        Header: Messages.services.columns.serviceName,
         accessor: (row) => row.params.serviceName,
         Cell: ({ value, row }: { row: Row<Service>; value: string }) => (
           <ServiceIconWithText text={value} dbType={row.original.type} />
         ),
       },
       {
-        Header: 'Node Name',
+        Header: Messages.services.columns.nodeName,
         accessor: (row) => row.params.nodeName,
       },
       {
-        Header: 'Monitoring',
+        Header: Messages.services.columns.monitoring,
         accessor: 'params',
         width: '70px',
         Cell: ({ value, row }) => (
@@ -100,11 +100,11 @@ export const Services = () => {
         ),
       },
       {
-        Header: 'Address',
+        Header: Messages.services.columns.address,
         accessor: (row) => row.params.address,
       },
       {
-        Header: 'Port',
+        Header: Messages.services.columns.port,
         accessor: (row) => row.params.port,
         width: '100px',
       },
@@ -116,9 +116,7 @@ export const Services = () => {
   const deletionMsg = useMemo(() => {
     const servicesToDelete = actionItem ? [actionItem] : selected;
 
-    return `Are you sure that you want to permanently delete ${servicesToDelete.length} service${
-      servicesToDelete.length ? 's' : ''
-    }`;
+    return Messages.services.deleteConfirmation(servicesToDelete.length);
   }, [actionItem, selected]);
 
   const loadData = useCallback(async () => {
@@ -155,7 +153,7 @@ export const Services = () => {
         const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
 
         appEvents.emit(AppEvents.alertSuccess, [
-          `${successfullyDeleted} of ${servicesToDelete.length} services successfully deleted`,
+          Messages.services.servicesDeleted(successfullyDeleted, servicesToDelete.length),
         ]);
 
         if (actionItem) {
@@ -187,18 +185,18 @@ export const Services = () => {
       return (
         <DetailsRow>
           {!!agents.length && (
-            <DetailsRow.Contents title="Agents">
+            <DetailsRow.Contents title={Messages.services.details.agents}>
               <StatusBadge
                 strippedServiceId={stripServiceId(row.original.params.serviceId)}
                 agents={row.original.params.agents || []}
               />
             </DetailsRow.Contents>
           )}
-          <DetailsRow.Contents title="Service ID">
+          <DetailsRow.Contents title={Messages.services.details.serviceId}>
             <span>{row.original.params.serviceId}</span>
           </DetailsRow.Contents>
           {!!labelKeys.length && (
-            <DetailsRow.Contents title="Labels" fullRow>
+            <DetailsRow.Contents title={Messages.services.details.labels} fullRow>
               <TagList
                 colorIndex={9}
                 className={styles.tagList}
@@ -286,7 +284,7 @@ export const Services = () => {
             showPagination
             pageSize={25}
             allRowsSelectionMode="page"
-            emptyMessage="No services Available"
+            emptyMessage={Messages.services.emptyTable}
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}

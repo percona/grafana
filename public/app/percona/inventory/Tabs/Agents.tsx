@@ -48,19 +48,19 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   const columns = useMemo(
     (): Array<Column<Agent>> => [
       {
-        Header: 'Status',
+        Header: Messages.agents.columns.status,
         accessor: (row) => row.params.status,
         Cell: ({ value }: { value: ServiceAgentStatus }) => (
           <Badge text={capitalizeText(value)} color={getAgentStatusColor(value)} />
         ),
       },
       {
-        Header: 'Agent Type',
+        Header: Messages.agents.columns.agentType,
         accessor: 'type',
         Cell: ({ value }) => beautifyAgentType(value),
       },
       {
-        Header: 'Agent ID',
+        Header: Messages.agents.columns.agentId,
         accessor: (row) => row.params.agentId,
       },
       getExpandAndActionsCol(),
@@ -92,7 +92,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
       return (
         <DetailsRow>
           {!!labelKeys.length && (
-            <DetailsRow.Contents title="Parameters" fullRow>
+            <DetailsRow.Contents title={Messages.agents.details.parameters} fullRow>
               <TagList
                 colorIndex={9}
                 className={styles.tagList}
@@ -105,6 +105,8 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
     },
     [styles.tagList]
   );
+
+  const deletionMsg = useMemo(() => Messages.agents.deleteConfirmation(selected.length), [selected]);
 
   useEffect(() => {
     if (!service) {
@@ -126,9 +128,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
 
         const successfullyDeleted = results.filter(filterFulfilled).length;
 
-        appEvents.emit(AppEvents.alertSuccess, [
-          `${successfullyDeleted} of ${agents.length} agents successfully deleted`,
-        ]);
+        appEvents.emit(AppEvents.alertSuccess, [Messages.agents.agentsDeleted(successfullyDeleted, agents.length)]);
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
@@ -185,16 +185,11 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
               render={({ form, handleSubmit }) => (
                 <form onSubmit={handleSubmit}>
                   <>
-                    <h4 className={styles.confirmationText}>
-                      Are you sure that you want to permanently delete {selected.length}{' '}
-                      {selected.length === 1 ? 'agent' : 'agents'}?
-                    </h4>
+                    <h4 className={styles.confirmationText}>{deletionMsg}</h4>
                     <FormElement
                       dataTestId="form-field-force"
-                      label="Force mode"
-                      element={
-                        <CheckboxField name="force" label="Force mode is going to delete all associated agents" />
-                      }
+                      label={Messages.forceMode}
+                      element={<CheckboxField name="force" label={Messages.agents.forceConfirmation} />}
                     />
 
                     <HorizontalGroup justify="space-between" spacing="md">

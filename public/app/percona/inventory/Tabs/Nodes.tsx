@@ -40,19 +40,19 @@ export const NodesTab = () => {
   const columns = useMemo(
     (): Array<Column<Node>> => [
       {
-        Header: 'Node Name',
+        Header: Messages.nodes.columns.nodeName,
         accessor: (row) => row.params.nodeName,
       },
       {
-        Header: 'Node ID',
+        Header: Messages.nodes.columns.nodeId,
         accessor: (row) => row.params.nodeId,
       },
       {
-        Header: 'Node Type',
+        Header: Messages.nodes.columns.nodeType,
         accessor: 'type',
       },
       {
-        Header: 'Addresses',
+        Header: Messages.nodes.columns.address,
         accessor: (row) => row.params.address,
       },
       getExpandAndActionsCol(),
@@ -94,6 +94,8 @@ export const NodesTab = () => {
     [styles.tagList]
   );
 
+  const deletionMsg = useMemo(() => Messages.nodes.deleteConfirmation(selected.length), [selected]);
+
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,9 +112,7 @@ export const NodesTab = () => {
 
         const successfullyDeleted = await dispatch(removeNodesAction({ nodes: requests })).unwrap();
 
-        appEvents.emit(AppEvents.alertSuccess, [
-          `${successfullyDeleted} of ${nodes.length} nodes successfully deleted`,
-        ]);
+        appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.nodesDeleted(successfullyDeleted, nodes.length)]);
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
@@ -168,13 +168,10 @@ export const NodesTab = () => {
               render={({ handleSubmit }) => (
                 <form onSubmit={handleSubmit}>
                   <>
-                    <h4 className={styles.confirmationText}>
-                      Are you sure that you want to permanently delete {selected.length}{' '}
-                      {selected.length === 1 ? 'node' : 'nodes'}?
-                    </h4>
+                    <h4 className={styles.confirmationText}>{deletionMsg}</h4>
                     <FormElement
                       dataTestId="form-field-force"
-                      label="Force mode"
+                      label={Messages.forceMode}
                       element={<CheckboxField name="force" label={Messages.nodes.forceConfirmation} />}
                     />
                     <HorizontalGroup justify="space-between" spacing="md">
