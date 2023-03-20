@@ -3,16 +3,18 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
 import { TipsContainer } from '../../../HelpCenter/components/TipsContainer/TipsContainer';
-import { useSelector } from "react-redux";
-import { StoreState } from "../../../../reducers/store";
-import { setSystemTipsCurrentlySelected } from "../../../../reducers/tips/tips";
+import { useSelector } from 'react-redux';
+import { StoreState } from '../../../../reducers/store';
+import { setSystemTipsCurrentlySelected } from '../../../../reducers/tips/tips';
 
 interface HelpCenterContainerProps {
   userId: number;
 }
 
 export const HelpCenterContainer: FC<HelpCenterContainerProps> = ({ userId }) => {
-  const {systemTips: {loading, tips, currentlySelected}}=useSelector((state: StoreState) => state.tips);
+  const {
+    systemTips: { loading, tips, currentlySelected },
+  } = useSelector((state: StoreState) => state.tips);
 
   const styles = useStyles2(getStyles);
 
@@ -26,14 +28,16 @@ export const HelpCenterContainer: FC<HelpCenterContainerProps> = ({ userId }) =>
         <h2>{helpCenterHeading}</h2>
         <span>{helpCenterText}</span>
       </div>
-      <TipsContainer
-        key="3"
-        tips={tips}
-        loading={loading}
-        currentlySelectedTipId={currentlySelected}
-        userId={userId}
-        setTipSelected={setSystemTipsCurrentlySelected}
-      />
+      <div className={styles.helpCenterTipsContainer}>
+        <TipsContainer
+          key="3"
+          tips={tips}
+          loading={loading}
+          currentlySelectedTipId={currentlySelected}
+          userId={userId}
+          setTipSelected={setSystemTipsCurrentlySelected}
+        />
+      </div>
     </div>
   );
 };
@@ -62,7 +66,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     align-items: flex-start;
     padding: 0;
     gap: 8px;
-    width: 38%;
+    width: 42%;
     @media (max-width: 768px) {
       width: 100%;
       flex-direction: row;
@@ -80,5 +84,8 @@ const getStyles = (theme: GrafanaTheme2) => ({
       flex-direction: row;
       flex-wrap: wrap;
     }
+  `,
+  helpCenterTipsContainer: css`
+    width: 58%;
   `,
 });
