@@ -9,12 +9,12 @@ export const toAgentModel = (agentList: ServiceAgentPayload[]): Agent[] => {
   const result: Agent[] = [];
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  agentList.forEach(({ agent_type: agentType, status, is_connected, ...agentParams }) => {
+  agentList.forEach(({ agent_type: agentType, status, is_connected: isConnected, ...agentParams }) => {
     const extraLabels: Record<string, string> = {};
     let agentStatus = status || ServiceAgentStatus.UNKNOWN;
 
-    if (is_connected !== undefined) {
-      agentStatus = is_connected ? ServiceAgentStatus.RUNNING : ServiceAgentStatus.UNKNOWN;
+    if (isConnected !== undefined) {
+      agentStatus = isConnected ? ServiceAgentStatus.RUNNING : ServiceAgentStatus.UNKNOWN;
     }
 
     Object.entries(agentParams)
