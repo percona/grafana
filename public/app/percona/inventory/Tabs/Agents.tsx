@@ -222,6 +222,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             data={data}
             totalItems={data.length}
             rowSelection
+            autoResetSelectedRows={false}
             onRowSelection={handleSelectionChange}
             showPagination
             pageSize={25}
@@ -231,6 +232,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             pendingRequest={agentsLoading || servicesLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
+            getRowId={useCallback((row: Agent) => row.params.agentId, [])}
           />
         </FeatureLoader>
       </Page.Contents>

@@ -290,6 +290,8 @@ export const Services = () => {
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
+            autoResetSelectedRows={false}
+            getRowId={useCallback((row: Service) => row.params.serviceId, [])}
           />
         </FeatureLoader>
       </OldPage.Contents>

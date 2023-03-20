@@ -196,6 +196,7 @@ export const NodesTab = () => {
             data={nodes}
             totalItems={nodes.length}
             rowSelection
+            autoResetSelectedRows={false}
             onRowSelection={handleSelectionChange}
             showPagination
             pageSize={25}
@@ -205,6 +206,7 @@ export const NodesTab = () => {
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
+            getRowId={useCallback((row: Node) => row.params.nodeId, [])}
           />
         </FeatureLoader>
       </OldPage.Contents>
