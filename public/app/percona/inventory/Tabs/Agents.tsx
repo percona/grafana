@@ -19,6 +19,7 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { dispatch } from 'app/store/store';
@@ -50,7 +51,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
         Header: 'Status',
         accessor: (row) => row.params.status,
         Cell: ({ value }: { value: ServiceAgentStatus }) => (
-          <Badge text={`${value[0]}${value.substring(1).toLowerCase()}`} color={getAgentStatusColor(value)} />
+          <Badge text={capitalizeText(value)} color={getAgentStatusColor(value)} />
         ),
       },
       {
