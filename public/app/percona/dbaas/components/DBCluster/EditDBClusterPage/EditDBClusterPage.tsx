@@ -120,7 +120,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
                   <div className={styles.switchOptionsWrapper}>
                     {!!settings?.backupEnabled && <Restore form={form} />}
                     <NetworkAndSecurity />
-                    {settings?.backupEnabled && mode === 'create' && (
+                    {!!settings?.backupEnabled && mode === 'create' && (
                       <DBaaSBackups
                         handleSubmit={handleSubmit}
                         pristine={pristine}
