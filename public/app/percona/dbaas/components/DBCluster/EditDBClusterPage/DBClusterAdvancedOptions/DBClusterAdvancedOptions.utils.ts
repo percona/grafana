@@ -28,8 +28,5 @@ export const canGetExpectedResources = (
 };
 
 export const nodesValidator = (value?: string): string | undefined => {
-  if (value && +value > 2147483647) {
-    return 'The number of nodes is too large';
-  }
   return value === '2' ? 'Only 1, 3 or more nodes allowed' : undefined;
 };

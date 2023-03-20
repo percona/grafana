@@ -109,6 +109,13 @@ export const validators = {
 
       return result;
     },
+  int32: (value: string) => {
+    if (Math.abs(+value) <= 2147483647) {
+      return undefined;
+    }
+
+    return `The number of nodes is too large`;
+  },
 };
 
 export default validators;

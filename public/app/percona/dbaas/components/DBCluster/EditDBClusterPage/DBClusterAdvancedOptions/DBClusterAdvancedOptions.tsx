@@ -66,10 +66,10 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
   const [loadingExpectedResources, setLoadingExpectedResources] = useState(false);
 
   const mounted = { current: true };
-  const { required, min } = validators;
+  const { required, min, int32 } = validators;
   const { change } = form;
   const diskValidators = [required, min(MIN_DISK_SIZE)];
-  const nodeValidators = [required, min(MIN_NODES), nodesValidator];
+  const nodeValidators = [required, min(MIN_NODES), nodesValidator, int32];
   const parameterValidators = [required, min(MIN_RESOURCES), resourceValidator];
   const { name, kubernetesCluster, topology, resources, memory, cpu, databaseType, disk, nodes, single } = values;
   const resourcesInputProps = { step: '0.1' };
