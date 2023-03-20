@@ -12,10 +12,14 @@ const ConnectPortalModal = React.lazy(() => import('pmm_ui/ConnectPortalModal'))
 // @ts-ignore
 const StoreProvider = React.lazy(() => import('pmm_ui/StoreProvider'));
 
+// @ts-ignore
+const HomePageRouter = React.lazy(() => import('pmm_ui/HomePageRouter'));
+
 export const PmmUi = {
   TopBar,
   HomePage,
   HelpCenter,
   ConnectPortalModal,
-  StoreProvider
+  StoreProvider,
+  HomePageRouter
 };

@@ -1,5 +1,6 @@
 import { css } from '@emotion/css';
 import React, { Suspense, useEffect, useState } from 'react';
+import { Redirect } from 'react-router-dom';
 // @ts-ignore
 import Drop from 'tether-drop';
 
@@ -115,7 +116,12 @@ export function GrafanaRoute(props: Props) {
                       />
                       {/*TODO:WIP: refactor*/}
                       <div className={isHelpCenterOpen ? styles.openedHelpCenter : ''}>
-                        {props.location.pathname === '/a/pmm-homescreen-app' ? (
+                        { props.location.pathname === '/' ? <PmmUi.HomePageRouter
+                            userId={userId}
+                            defaultHomePage={<Redirect to="/d/pmm-home/home-dashboard" />}
+                            overrideHomePage={<Redirect to="/a/pmm-homescreen-app" />}
+                          />
+                          : props.location.pathname === '/a/pmm-homescreen-app' ? (
                           <Suspense fallback={<div></div>}>
                             <>
                               <PmmUi.HomePage
