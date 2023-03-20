@@ -223,7 +223,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             showPagination
             pageSize={25}
             allRowsSelectionMode="page"
-            emptyMessage={Messages.agents.noAgents}
+            emptyMessage={Messages.agents.emptyTable}
             emptyMessageClassName={styles.emptyMessage}
             pendingRequest={agentsLoading || servicesLoading}
             overlayClassName={styles.overlay}

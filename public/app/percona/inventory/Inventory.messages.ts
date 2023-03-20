@@ -17,7 +17,7 @@ export const Messages = {
       serviceId: 'Service ID',
       labels: 'Labels',
     },
-    emptyTable: 'No services Available',
+    emptyTable: 'No services available',
     forceConfirmation: 'Force mode is going to delete all associated agents',
     deleteConfirmation: (nrItems: number) =>
       `Are you sure that you want to permanently delete ${nrItems} service${nrItems ? 's' : ''}`,
@@ -27,7 +27,7 @@ export const Messages = {
   agents: {
     goBack: 'Go back to services',
     breadcrumb: (serviceName: string) => `Service ${serviceName} / Agents`,
-    noAgents: 'No agents Available',
+    emptyTable: 'No agents available',
     deleteConfirmation: (nrItems: number) =>
       `Are you sure that you want to permanently delete ${nrItems} agent${nrItems ? 's' : ''}`,
     agentsDeleted: (deletedItems: number, totalItems: number) =>
@@ -44,6 +44,7 @@ export const Messages = {
   },
   nodes: {
     forceConfirmation: 'Force mode is going to delete all agents and services associated with the nodes',
+    emptyTable: 'No nodes available',
     columns: {
       nodeName: 'Node Name',
       nodeId: 'Node ID',

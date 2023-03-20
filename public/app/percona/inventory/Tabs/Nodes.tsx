@@ -198,7 +198,7 @@ export const NodesTab = () => {
             showPagination
             pageSize={25}
             allRowsSelectionMode="page"
-            emptyMessage="No nodes Available"
+            emptyMessage={Messages.nodes.emptyTable}
             emptyMessageClassName={styles.emptyMessage}
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
