@@ -76,7 +76,7 @@ export function GrafanaRoute(props: Props) {
 
                 return (
                   <Suspense fallback={<GrafanaRouteLoading/>}>
-                    <PmmUi.ComponentsWrapper>
+                    <PmmUi.StoreProvider>
                       {/*MODALS*/}
                       <>
                         <PmmUi.ConnectPortalModal
@@ -129,7 +129,7 @@ export function GrafanaRoute(props: Props) {
                                                  queryParams={locationSearchToObject(props.location.search)}/>
                         )}
                       </div>
-                    </PmmUi.ComponentsWrapper>
+                    </PmmUi.StoreProvider>
                   </Suspense>
                 );
               }}
