@@ -39,7 +39,7 @@ export const Messages = {
       agentId: 'Agent ID',
     },
     details: {
-      parameters: 'Parameters',
+      properties: 'Properties',
     },
   },
   nodes: {
