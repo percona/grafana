@@ -53,6 +53,11 @@ export interface TableProps {
   pagesPerView?: number;
   autoResetPage?: boolean;
   autoResetExpanded?: boolean;
+  emptyMessageClassName?: string;
+  overlayClassName?: string;
+  rowSelection?: boolean;
+  allRowsSelectionMode?: 'all' | 'page';
+  onRowSelection?: (rows: Row[]) => void;
   onPaginationChanged?: (pageSize: number, pageIndex: number) => void;
   children?: (rows: Row[], table: TableInstance) => React.ReactNode;
   renderExpandedRow?: (row: Row<any>) => React.ReactNode;

@@ -5,13 +5,14 @@ import { Form } from 'react-final-form';
 import { AppEvents } from '@grafana/data';
 import { Button, HorizontalGroup, Modal } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { InventoryDataService, Model } from 'app/percona/inventory/Inventory.tools';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { CheckboxField, logger, Table } from 'app/percona/shared/core-ui';
+import { CheckboxField, logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 

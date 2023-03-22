@@ -2,7 +2,7 @@
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 
-import { Table } from 'app/percona/shared/core-ui';
+import { Table } from '../integrated-alerting/components/Table';
 
 import { AGENTS_COLUMNS, NODES_COLUMNS, SERVICES_COLUMNS } from './Inventory.constants';
 import { InventoryDataService } from './Inventory.tools';

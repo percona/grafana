@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { css } from '@emotion/css';
-import React, { FC, useMemo, useState } from 'react';
-import { useExpanded, usePagination, useTable } from 'react-table';
+import React, { FC, useEffect, useMemo, useState } from 'react';
+import {
+  ColumnInstance,
+  Row,
+  useExpanded,
+  usePagination,
+  useRowSelect,
+  UseRowSelectInstanceProps,
+  UseRowSelectRowProps,
+  useTable,
+} from 'react-table';
 
 import { useStyles } from '@grafana/ui';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
@@ -8,6 +18,7 @@ import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay'
 import { Filter } from './Filter/Filter';
 import { Pagination } from './Pagination';
 import { PAGE_SIZES } from './Pagination/Pagination.constants';
+import { TableCheckbox } from './Selection';
 import { getStyles } from './Table.styles';
 import { PaginatedTableOptions, PaginatedTableState, TableProps } from './Table.types';
 import { TableContent } from './TableContent';
@@ -19,9 +30,12 @@ export const Table: FC<TableProps> = ({
   data: rawData,
   columns,
   showPagination,
+  rowSelection,
   totalPages,
   onPaginationChanged = () => null,
   emptyMessage = '',
+  emptyMessageClassName,
+  overlayClassName,
   totalItems,
   pageSize: propPageSize,
   pageIndex: propPageIndex = 0,
@@ -30,6 +44,8 @@ export const Table: FC<TableProps> = ({
   autoResetExpanded = true,
   autoResetPage = true,
   renderExpandedRow = () => <></>,
+  onRowSelection,
+  allRowsSelectionMode = 'all',
   getHeaderProps = defaultPropGetter,
   getRowProps = defaultPropGetter,
   getColumnProps = defaultPropGetter,
@@ -55,7 +71,6 @@ export const Table: FC<TableProps> = ({
     autoResetPage,
     getRowId,
   };
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const plugins: any[] = [useExpanded];
 
   if (showPagination) {
@@ -82,6 +97,7 @@ export const Table: FC<TableProps> = ({
     pageCount,
     setPageSize,
     gotoPage,
+    selectedFlatRows,
     state: { pageSize, pageIndex },
   } = tableInstance;
   const hasData = data.length > 0;
@@ -97,6 +113,44 @@ export const Table: FC<TableProps> = ({
     onPaginationChanged(newPageSize, 0);
   };
 
+  if (rowSelection) {
+    plugins.push(useRowSelect);
+    plugins.push((hooks: any) => {
+      hooks.visibleColumns.push((cols: Array<ColumnInstance<any>>) => [
+        {
+          id: 'selection',
+          width: '50px',
+          Header: ({
+            getToggleAllRowsSelectedProps,
+            getToggleAllPageRowsSelectedProps,
+          }: UseRowSelectInstanceProps<any>) => (
+            <div data-testid="select-all">
+              <TableCheckbox
+                id="all"
+                {...(allRowsSelectionMode === 'all' || !showPagination
+                  ? getToggleAllRowsSelectedProps()
+                  : getToggleAllPageRowsSelectedProps())}
+              />
+            </div>
+          ),
+          Cell: ({ row }: { row: UseRowSelectRowProps<any> & Row<any> }) => (
+            <div data-testid="select-row">
+              <TableCheckbox id={row.id} {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...cols,
+      ]);
+    });
+  }
+
+  useEffect(() => {
+    if (onRowSelection) {
+      onRowSelection(selectedFlatRows);
+      console.log('useEffect , selectedFlatRows:', selectedFlatRows);
+    }
+  }, [onRowSelection, selectedFlatRows]);
+
   return (
     <>
       <Overlay dataTestId="table-loading" isPending={pendingRequest}>
@@ -111,12 +165,17 @@ export const Table: FC<TableProps> = ({
         )}
         <div className={style.tableWrap} data-testid="table-outer-wrapper">
           <div className={style.table} data-testid="table-inner-wrapper">
-            <TableContent loading={pendingRequest} hasData={hasData} emptyMessage={emptyMessage}>
+            <TableContent
+              loading={pendingRequest}
+              hasData={hasData}
+              emptyMessage={emptyMessage}
+              emptyMessageClassName={emptyMessageClassName}
+            >
               <table {...getTableProps()} data-testid="table">
                 <thead data-testid="table-thead">
                   {headerGroups.map((headerGroup) => (
                     /* eslint-disable-next-line react/jsx-key */
-                    <tr {...headerGroup.getHeaderGroupProps()}>
+                    <tr data-testid="table-tbody-tr" {...headerGroup.getHeaderGroupProps()}>
                       {headerGroup.headers.map((column) => (
                         /* eslint-disable-next-line react/jsx-key */
                         <th
@@ -145,7 +204,7 @@ export const Table: FC<TableProps> = ({
                         prepareRow(row);
                         return (
                           <React.Fragment key={row.id}>
-                            <tr {...row.getRowProps(getRowProps(row))}>
+                            <tr data-testid="table-tbody-tr" {...row.getRowProps(getRowProps(row))}>
                               {row.cells.map((cell) => {
                                 return (
                                   <td
