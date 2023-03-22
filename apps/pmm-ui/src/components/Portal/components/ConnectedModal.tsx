@@ -23,14 +23,14 @@ export const ConnectedModal: FC<ConnectedModalProps> = ({ isOpen, onClose }) => 
           <li className={styles.liStyle}>
             {Messages.advisorsDescription}
             <br />
-            <a href="#" className={styles.link}>
+            <a href={Messages.link.alerts} className={styles.link} target="_blank" rel="noreferrer">
               {Messages.advisorsLinkDescription}
             </a>
           </li>
           <li className={styles.liStyle}>
             {Messages.alertTemplatesDescription}
             <br />
-            <a href="#" className={styles.link}>
+            <a href={Messages.link.alerts} className={styles.link} target="_blank" rel="noreferrer">
               {Messages.alertTemplatesLinkDescription}
             </a>
           </li>

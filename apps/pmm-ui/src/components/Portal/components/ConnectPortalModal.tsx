@@ -29,14 +29,14 @@ export const ConnectPortalModal: FC<ConnectPortalModalProps> = ({ isOpen, onClos
         <ul className={styles.unorderedList}>
           <li>
             {Messages.advisors1}
-            <a href="#" className={styles.link}>
+            <a href={Messages.link.advisors} className={styles.link} target="_blank" rel="noreferrer">
               {Messages.advisorsLinkDescription}
             </a>
             {Messages.advisors2}
           </li>
           <li>
             {Messages.alerts1}
-            <a href="#" className={styles.link}>
+            <a href={Messages.link.alerts} className={styles.link} target="_blank" rel="noreferrer">
               {Messages.alertsLinkDescription}
             </a>
             {Messages.alerts2}
