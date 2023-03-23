@@ -21,7 +21,7 @@ import { useSelector } from 'app/types';
 import { appEvents } from '../../../../core/core';
 import { fetchDBClustersAction } from '../../../shared/core/reducers/dbaas/dbClusters/dbClusters';
 import { selectDBCluster, selectKubernetesCluster } from '../../../shared/core/reducers/dbaas/dbaas';
-import { useUpdateOfKubernetesList } from '../../hooks/useKubernetesList';
+import { useKubernetesList } from '../../hooks/useKubernetesList';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 import { KubernetesClusterStatus } from '../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
@@ -47,7 +47,7 @@ export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const [kubernetes = [], kubernetesLoading] = useUpdateOfKubernetesList();
+  const [kubernetes = [], kubernetesLoading] = useKubernetesList();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
