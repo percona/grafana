@@ -281,6 +281,20 @@ export const Advanced: FC = () => {
                     dataTestId="advanced-backup"
                     component={SwitchRow}
                   />
+                  <Field
+                    name="dbaas"
+                    type="checkbox"
+                    label={dbaasLabel}
+                    tooltip={dbaasTooltip}
+                    tooltipLinkText={tooltipLinkText}
+                    link={dbaasLink}
+                    dataTestId="advanced-dbaas"
+                    component={SwitchRow}
+                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>, input: any) => {
+                      dBaaSToggleOnChange(event, input, mutators);
+                    }}
+                  />
                   <div className={styles.advancedRow}>
                     <div className={cx(styles.advancedCol, styles.publicAddressLabelWrapper)}>
                       <div className={settingsStyles.labelWrapper} data-testid="public-address-label">
@@ -339,20 +353,6 @@ export const Advanced: FC = () => {
                         </a>
                       </p>
                     </div>
-                    <Field
-                      name="dbaas"
-                      type="checkbox"
-                      label={dbaasLabel}
-                      tooltip={dbaasTooltip}
-                      tooltipLinkText={tooltipLinkText}
-                      link={dbaasLink}
-                      dataTestId="advanced-dbaas"
-                      component={SwitchRow}
-                      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                      onChange={(event: React.ChangeEvent<HTMLInputElement>, input: any) => {
-                        dBaaSToggleOnChange(event, input, mutators);
-                      }}
-                    />
                     <Field
                       name="azureDiscover"
                       type="checkbox"
