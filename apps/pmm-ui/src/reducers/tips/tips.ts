@@ -124,11 +124,12 @@ export const fetchSystemTipsAction = createAsyncThunk(
             completed: !!res.isCompleted,
           });
         }
-      } finally {
+      } catch (e) {
         newTips = systemTipsData.map((t) => {
           return { ...t, completed: false };
         });
         thunkAPI.dispatch(setSystemTips(newTips));
+        throw e;
       }
 
       const notCompletedTip = newTips.find((tipData) => !tipData.completed);
