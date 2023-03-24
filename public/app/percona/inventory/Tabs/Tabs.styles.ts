@@ -41,6 +41,14 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
   `,
   agentBreadcrumb: css`
     margin-top: ${spacing(4)};
+    display: flex;
+
+    & > span:first-child {
+      max-width: 70%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   `,
   goBack: css`
     vertical-align: middle;

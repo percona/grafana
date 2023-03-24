@@ -26,7 +26,8 @@ export const Messages = {
   },
   agents: {
     goBack: 'Go back to services',
-    breadcrumb: (serviceName: string) => `Service ${serviceName} / Agents`,
+    breadcrumbLeft: (serviceName: string) => `Service ${serviceName}`,
+    breadcrumbRight: ` / Agents`,
     emptyTable: 'No agents available',
     deleteConfirmation: (nrItems: number) =>
       `Are you sure that you want to permanently delete ${nrItems} agent${nrItems ? 's' : ''}`,

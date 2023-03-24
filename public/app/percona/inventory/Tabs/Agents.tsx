@@ -156,7 +156,10 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             </Link>
           </HorizontalGroup>
           {service && !servicesLoading && (
-            <h5 className={styles.agentBreadcrumb}>{Messages.agents.breadcrumb(service.params.serviceName)}</h5>
+            <h5 className={styles.agentBreadcrumb}>
+              <span>{Messages.agents.breadcrumbLeft(service.params.serviceName)}</span>
+              <span>{Messages.agents.breadcrumbRight}</span>
+            </h5>
           )}
           <HorizontalGroup height={40} justify="flex-end" align="flex-start">
             <Button
