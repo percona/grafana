@@ -3,6 +3,7 @@ import { css } from '@emotion/css';
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
   ColumnInstance,
+  PluginHook,
   Row,
   useExpanded,
   usePagination,
@@ -13,7 +14,7 @@ import {
 } from 'react-table';
 
 import { useStyles } from '@grafana/ui';
-import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
+import { Overlay } from 'app/percona/shared/core-ui/components/Overlay';
 
 import { Filter } from './Filter/Filter';
 import { Pagination } from './Pagination';
@@ -71,7 +72,7 @@ export const Table: FC<TableProps> = ({
     autoResetPage,
     getRowId,
   };
-  const plugins: any[] = [useExpanded];
+  const plugins: Array<PluginHook<any>> = [useExpanded];
 
   if (showPagination) {
     plugins.push(usePagination);
@@ -84,34 +85,6 @@ export const Table: FC<TableProps> = ({
       initialState.pageSize = propPageSize;
     }
   }
-
-  const tableInstance = useTable(tableOptions, ...plugins);
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    rows,
-    prepareRow,
-    visibleColumns,
-    pageCount,
-    setPageSize,
-    gotoPage,
-    selectedFlatRows,
-    state: { pageSize, pageIndex },
-  } = tableInstance;
-  const hasData = data.length > 0;
-
-  const onPageChanged = (newPageIndex: number) => {
-    gotoPage(newPageIndex);
-    onPaginationChanged(pageSize, newPageIndex);
-  };
-
-  const onPageSizeChanged = (newPageSize: number) => {
-    gotoPage(0);
-    setPageSize(newPageSize);
-    onPaginationChanged(newPageSize, 0);
-  };
 
   if (rowSelection) {
     plugins.push(useRowSelect);
@@ -144,16 +117,43 @@ export const Table: FC<TableProps> = ({
     });
   }
 
+  const tableInstance = useTable(tableOptions, ...plugins);
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    page,
+    rows,
+    prepareRow,
+    visibleColumns,
+    pageCount,
+    setPageSize,
+    gotoPage,
+    selectedFlatRows,
+    state: { pageSize, pageIndex },
+  } = tableInstance;
+  const hasData = data.length > 0;
+
+  const onPageChanged = (newPageIndex: number) => {
+    gotoPage(newPageIndex);
+    onPaginationChanged(pageSize, newPageIndex);
+  };
+
+  const onPageSizeChanged = (newPageSize: number) => {
+    gotoPage(0);
+    setPageSize(newPageSize);
+    onPaginationChanged(newPageSize, 0);
+  };
+
   useEffect(() => {
     if (onRowSelection) {
       onRowSelection(selectedFlatRows);
-      console.log('useEffect , selectedFlatRows:', selectedFlatRows);
     }
   }, [onRowSelection, selectedFlatRows]);
 
   return (
     <>
-      <Overlay dataTestId="table-loading" isPending={pendingRequest}>
+      <Overlay dataTestId="table-loading" isPending={pendingRequest} overlayClassName={overlayClassName}>
         {showFilter && (
           <Filter
             columns={columns}
