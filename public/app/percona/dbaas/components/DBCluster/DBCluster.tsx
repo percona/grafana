@@ -21,7 +21,7 @@ import { useSelector } from 'app/types';
 import { appEvents } from '../../../../core/core';
 import { fetchDBClustersAction } from '../../../shared/core/reducers/dbaas/dbClusters/dbClusters';
 import { selectDBCluster, selectKubernetesCluster } from '../../../shared/core/reducers/dbaas/dbaas';
-import { useKubernetesList } from '../../hooks/useKubernetesList';
+import { useUpdateOfKubernetesList } from '../../hooks/useKubernetesList';
 import { AddClusterButton } from '../AddClusterButton/AddClusterButton';
 import { isKubernetesListUnavailable } from '../Kubernetes/Kubernetes.utils';
 import { KubernetesClusterStatus } from '../Kubernetes/KubernetesClusterStatus/KubernetesClusterStatus.types';
@@ -47,7 +47,7 @@ export const DBCluster: FC = () => {
   const styles = useStyles(getStyles);
   const history = useHistory();
   const dispatch = useAppDispatch();
-  const [kubernetes = [], kubernetesLoading] = useKubernetesList();
+  const [kubernetes = [], kubernetesLoading] = useUpdateOfKubernetesList();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
@@ -90,7 +90,7 @@ export const DBCluster: FC = () => {
 
   const getDBClusters = useCallback(
     async (triggerLoading = true) => {
-      if (!kubernetes.length) {
+      if (!availableK8s.length) {
         return;
       }
 
@@ -113,7 +113,7 @@ export const DBCluster: FC = () => {
       setLoading(false);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [kubernetes]
+    [availableK8s]
   );
 
   const columns = useMemo(
@@ -188,7 +188,7 @@ export const DBCluster: FC = () => {
   useEffect(() => {
     getDBClusters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kubernetes]);
+  }, [availableK8s]);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
