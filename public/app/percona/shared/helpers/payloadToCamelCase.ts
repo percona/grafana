@@ -5,20 +5,18 @@ export const payloadToCamelCase = <T extends object, R extends object>(object: T
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recursive = (o: any): any => {
     if (o === Object(o) && !Array.isArray(o) && typeof o !== 'function') {
-      const n = {};
+      const n: Record<string, unknown> = {};
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       (Object.keys(o) as Array<keyof T>).forEach((key) => {
         const toStrKey = key.toString();
 
         if (ignoredKeys.includes(toStrKey)) {
-          // @ts-ignore
-          n[key] = o[key];
+          n[toStrKey] = o[key];
         } else {
           const camelCaseKey = toStrKey.replace(/([-_][a-z])/gi, ($1) =>
             $1.toUpperCase().replace('_', '').replace('-', '')
           );
 
-          // @ts-ignore
           n[camelCaseKey] = recursive(o[key]);
         }
       });
