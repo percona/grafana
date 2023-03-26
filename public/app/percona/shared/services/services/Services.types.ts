@@ -12,6 +12,12 @@ export enum ServiceType {
   external = 'EXTERNAL_SERVICE',
 }
 
+export enum ServiceStatus {
+  UP = 'UP',
+  DOWN = 'DOWN',
+  UNKNOWN = 'UNKNOWN',
+}
+
 export interface ListServicesBody {
   node_id: string;
   service_type: ServiceType;
@@ -24,6 +30,7 @@ export interface DbServicePayload {
   service_name: string;
   node_id: string;
   node_name: string;
+  status: ServiceStatus;
   enviroment?: string;
   cluster?: string;
   replication_set?: string;
@@ -66,6 +73,7 @@ export interface DbService {
   nodeId: string;
   nodeName: string;
   environment?: string;
+  status: ServiceStatus;
   cluster?: string;
   replicationSet?: string;
   customLabels?: Record<string, string>;
