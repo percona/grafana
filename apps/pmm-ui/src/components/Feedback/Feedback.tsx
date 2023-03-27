@@ -14,11 +14,12 @@ enum Step {
 
 interface FeedbackContainerProps {
   pmmServerId?: string;
+  onFinish?: () => void;
 }
 
 const DISPLAY_TIME_FEEDBACK_SENT = 10000;
 
-export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId }) => {
+export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) => {
   const [currentStep, setCurrentStep] = useState(Step.STEP1);
   const [feedbackNote, setFeedbackNote] = useState('');
   const [feedbackDescription, setFeedbackDescription] = useState('');
@@ -27,6 +28,10 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId }) => {
     FeedbackService.createFeedback(feedbackNote, feedbackDescription, pmmServerId || '')
       .catch(() => {})
       .finally(() => {
+        if (onFinish) {
+          onFinish();
+        }
+
         setFeedbackDescription('');
         setFeedbackNote('');
         setCurrentStep(Step.STEP1);
