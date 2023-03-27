@@ -6,7 +6,7 @@ services:
     image: perconalab/pmm-server:dev-container
     volumes:
       - "./:/workspace"
-      - "../grafana/public:/usr/share/grafana/public"
+      - "./public:/usr/share/grafana/public"
       - "./conf/grafana.local-dev.ini:/usr/share/grafana/conf/defaults.ini"
     ports:
       - 80:80
