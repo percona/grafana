@@ -128,7 +128,9 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
 
         const successfullyDeleted = results.filter(filterFulfilled).length;
 
-        appEvents.emit(AppEvents.alertSuccess, [Messages.agents.agentsDeleted(successfullyDeleted, agents.length)]);
+        if (successfullyDeleted > 0) {
+          appEvents.emit(AppEvents.alertSuccess, [Messages.agents.agentsDeleted(successfullyDeleted, agents.length)]);
+        }
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
