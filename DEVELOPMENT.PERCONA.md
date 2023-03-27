@@ -15,6 +15,7 @@ docker-compose up
 2: in separate terminal:
 
 ```shell
+make deps-js # run this only after initial clone, it installs dependencies
 yarn start
 ```
 
