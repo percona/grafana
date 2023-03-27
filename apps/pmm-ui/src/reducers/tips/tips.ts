@@ -118,7 +118,7 @@ export const fetchSystemTipsAction = createAsyncThunk(
 
       try {
         for (let tip of systemTipsData) {
-          const res=await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.SYSTEM}/user/${args.userId}`);
+          const res = await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.SYSTEM}/user/${args.userId}`);
           // @ts-ignore
           newTips.push({
             ...tip,
