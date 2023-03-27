@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React, { FC } from 'react';
 
 import { startUpdate } from '../UpdatePanel.service';
+import { UpdateMethod } from '../types';
 
 import { useInitializeUpdate } from './useInitializeUpdate';
 
@@ -14,7 +15,7 @@ const HookWrapper: FC = () => {
       <span data-testid="hook-wrapper-token">{authToken}</span>
       <span data-testid="hook-wrapper-offset">{logOffset}</span>
       {updateFailed && <span data-testid="hook-wrapper-update-failed" />}
-      <button data-testid="hook-wrapper-update" onClick={initializeUpdate} />
+      <button data-testid="hook-wrapper-update" onClick={() => initializeUpdate(UpdateMethod.legacy)} />
     </>
   );
 };

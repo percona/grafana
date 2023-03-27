@@ -1,13 +1,13 @@
 import { logger } from '@percona/platform-core';
 import React, { useEffect, useState, FC, MouseEvent } from 'react';
 
-import { Button, IconName, Spinner, useStyles2 } from '@grafana/ui';
+import { Spinner } from '@grafana/ui';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
-import { Messages } from './UpdatePanel.messages';
-import { getStyles } from './UpdatePanel.styles';
-import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck, ProgressModal } from './components';
+import { styles } from './UpdatePanel.styles';
+import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck, ProgressModal, UpgradeButton } from './components';
 import { useVersionDetails, usePerformUpdate } from './hooks';
+import { UpdateMethod } from './types';
 
 export const UpdatePanel: FC<{}> = () => {
   const isOnline = navigator.onLine;
@@ -26,7 +26,6 @@ export const UpdatePanel: FC<{}> = () => {
   ] = useVersionDetails();
   const [output, updateErrorMessage, isUpdated, updateFailed, launchUpdate] = usePerformUpdate();
   const isLoading = isLoadingVersionDetails || isLoadingSettings;
-  const styles = useStyles2(getStyles);
 
   const getSettings = async () => {
     setLoadingSettings(true);
@@ -73,7 +72,7 @@ export const UpdatePanel: FC<{}> = () => {
 
   const handleUpdate = () => {
     setShowModal(true);
-    launchUpdate();
+    launchUpdate(isUpgradeServiceAvailable ? UpdateMethod.server : UpdateMethod.legacy);
   };
 
   return (
@@ -91,22 +90,11 @@ export const UpdatePanel: FC<{}> = () => {
           <>
             {(isUpdateAvailable || forceUpdate) && !updatesDisabled && !hasNoAccess && isOnline ? (
               <div className={styles.middleSectionWrapper}>
-                <>
-                  {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
-                  <Button onClick={handleUpdate} icon={'fa fa-download' as IconName} variant="secondary">
-                    {Messages.upgradeTo(nextVersionDetails?.nextVersion)}
-                  </Button>
-                  {!isUpgradeServiceAvailable && (
-                    // TODO: update wording and docs link
-                    <p className={styles.notAvailable}>
-                      {Messages.upgradeServiceUnavailable.first}
-                      <a className={styles.link} href="/">
-                        {Messages.upgradeServiceUnavailable.docs}
-                      </a>
-                      {Messages.upgradeServiceUnavailable.last}
-                    </p>
-                  )}
-                </>
+                <UpgradeButton
+                  onClick={handleUpdate}
+                  upgradeServiceAvailable={isUpgradeServiceAvailable}
+                  nextVersion={nextVersionDetails?.nextVersion}
+                />
               </div>
             ) : (
               <InfoBox

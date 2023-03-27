@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { getUpdateStatus } from '../UpdatePanel.service';
-import { UpdateStatus } from '../types';
+import { UpdateMethod, UpdateStatus } from '../types';
 
 import { useInitializeUpdate } from './useInitializeUpdate';
 
@@ -12,10 +12,12 @@ export const usePerformUpdate = (): UpdateStatus => {
   const [updateFinished, setUpdateFinished] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
 
-  const [authToken, initialLogOffset, initializationFailed, launchUpdate] = useInitializeUpdate();
+  const [authToken, initialLogOffset, initializationFailed, launchUpdate, updateMethod] = useInitializeUpdate();
 
   useEffect(() => {
-    if (!authToken || initialLogOffset === undefined) {
+    console.log({ authToken, initialLogOffset, updateMethod });
+
+    if (!authToken || initialLogOffset === undefined || updateMethod === UpdateMethod.invalid) {
       return;
     }
 
@@ -32,7 +34,7 @@ export const usePerformUpdate = (): UpdateStatus => {
       let newIsUpdated = false;
 
       try {
-        const response = await getUpdateStatus({ auth_token: authToken, log_offset: logOffset });
+        const response = await getUpdateStatus({ auth_token: authToken, log_offset: logOffset, method: updateMethod });
 
         if (!response) {
           throw Error('Invalid response received');
@@ -71,11 +73,11 @@ export const usePerformUpdate = (): UpdateStatus => {
       clearTimeout(timeoutId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken, initialLogOffset]);
+  }, [authToken, initialLogOffset, updateMethod]);
 
   useEffect(() => {
     setUpdateFailed(initializationFailed);
   }, [initializationFailed]);
 
-  return [output, errorMessage, updateFinished, updateFailed, launchUpdate];
+  return [output, errorMessage, updateFinished, updateFailed, launchUpdate, updateMethod];
 };

@@ -9,6 +9,7 @@ import {
   GetUpdatesResponse,
   InstalledVersionDetails,
   NextVersionDetails,
+  UpdateMethod,
 } from '../types';
 
 export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVersionDetails => {
@@ -83,6 +84,7 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
       nextVersionDetails,
       isUpdateAvailable,
       isUpgradeServiceAvailable,
+      preferredUpdateMethod: isUpgradeServiceAvailable ? UpdateMethod.server : UpdateMethod.legacy,
     },
     errorMessage,
     isLoading,

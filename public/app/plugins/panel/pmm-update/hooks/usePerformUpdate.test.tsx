@@ -6,6 +6,7 @@ import { act } from 'react-dom/test-utils';
 
 import { getUpdateStatus } from '../UpdatePanel.service';
 import { useInitializeUpdate, usePerformUpdate } from '../hooks';
+import { UpdateMethod } from '../types';
 
 const fakeLaunchUpdate = jest.fn();
 
@@ -18,7 +19,7 @@ const HookWrapper: FC = () => {
       <span data-testid="hook-wrapper-error">{errorMessage}</span>
       {isUpdated && <span data-testid="hook-wrapper-updated" />}
       {updateFailed && <span data-testid="hook-wrapper-update-failed" />}
-      <button data-testid="hook-wrapper-update" onClick={launchUpdate} />
+      <button data-testid="hook-wrapper-update" onClick={() => launchUpdate(UpdateMethod.legacy)} />
     </>
   );
 };

@@ -18,6 +18,7 @@ export interface GetUpdatesBody {
 export interface GetUpdateStatusBody {
   auth_token: string;
   log_offset: number;
+  method: UpdateMethod;
 }
 
 export interface GetUpdatesResponse {
@@ -69,6 +70,7 @@ export type CurrentOrNextVersionDetails = [
     nextVersionDetails: NextVersionDetails;
     isUpdateAvailable: boolean;
     isUpgradeServiceAvailable: boolean;
+    preferredUpdateMethod: UpdateMethod;
   },
   string,
   boolean,
@@ -108,15 +110,21 @@ export interface InfoBoxProps {
   isOnline?: boolean;
 }
 
+export interface UpgradeButtonProps {
+  onClick: () => void;
+  upgradeServiceAvailable: boolean;
+  nextVersion?: string;
+}
+
 export interface AvailableUpdateProps {
   nextVersionDetails: NextVersionDetails;
 }
 
-export type UpdateStatus = [string, string, boolean, boolean, () => void];
+export type UpdateStatus = [string, string, boolean, boolean, (method: UpdateMethod) => void, UpdateMethod];
 
 export type ApiCall<R, A> = [R | undefined, string, boolean, (args?: A) => void];
 
-export type UpdateInitialization = [string, number, boolean, () => void];
+export type UpdateInitialization = [string, number, boolean, (method: UpdateMethod) => void, UpdateMethod];
 
 export enum UpdateMethod {
   server = 'PMM_SERVER_UPGRADE',

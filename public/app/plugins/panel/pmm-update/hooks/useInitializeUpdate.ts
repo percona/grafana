@@ -9,12 +9,13 @@ import { useVersionDetails } from './useVersionDetails';
 export const useInitializeUpdate = (): UpdateInitialization => {
   const [updateFailed, setUpdateFailed] = useState(false);
   const [authToken, setAuthToken] = useState('');
+  const [updateMethod, setUpdateMethod] = useState(UpdateMethod.invalid);
   const [initialLogOffset, setInitialLogOffset] = useState(0);
-  const [{ isUpgradeServiceAvailable }] = useVersionDetails();
+  const [{}] = useVersionDetails();
 
-  const launchUpdate = async () => {
+  const launchUpdate = async (method: UpdateMethod) => {
     try {
-      const data = await startUpdate(isUpgradeServiceAvailable ? UpdateMethod.server : UpdateMethod.legacy);
+      const data = await startUpdate(method);
 
       if (!data) {
         throw Error('Invalid response received');
@@ -22,6 +23,7 @@ export const useInitializeUpdate = (): UpdateInitialization => {
 
       const { auth_token, log_offset } = data;
 
+      setUpdateMethod(method);
       setAuthToken(auth_token);
       setInitialLogOffset(log_offset);
     } catch (e) {
@@ -30,5 +32,5 @@ export const useInitializeUpdate = (): UpdateInitialization => {
     }
   };
 
-  return [authToken, initialLogOffset, updateFailed, launchUpdate];
+  return [authToken, initialLogOffset, updateFailed, launchUpdate, updateMethod];
 };
