@@ -118,7 +118,8 @@ export const fetchSystemTipsAction = createAsyncThunk(
 
       try {
         for (let tip of systemTipsData) {
-          const res = await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.SYSTEM}/user/${args.userId}`);
+          const res=await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.SYSTEM}/user/${args.userId}`);
+          // @ts-ignore
           newTips.push({
             ...tip,
             completed: !!res.isCompleted,
@@ -128,18 +129,22 @@ export const fetchSystemTipsAction = createAsyncThunk(
         newTips = systemTipsData.map((t) => {
           return { ...t, completed: false };
         });
+        // @ts-ignore
         thunkAPI.dispatch(setSystemTips(newTips));
         throw e;
       }
-
+      // @ts-ignore
+      thunkAPI.dispatch(setSystemTips(newTips));
+      // @ts-ignore
       const notCompletedTip = newTips.find((tipData) => !tipData.completed);
+      // @ts-ignore
       const initial = notCompletedTip !== undefined ? notCompletedTip.id : 0;
       thunkAPI.dispatch(setSystemTipsCurrentlySelected(initial));
     })();
   }
 );
 
-export const fetchUserTipsAction = createAsyncThunk(
+export const fetchUserTipsAction=createAsyncThunk(
   'percona/fetchUserTips',
   (args: { userId: number }, thunkAPI): Promise<void> =>
     (async () => {
