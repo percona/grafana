@@ -1,12 +1,12 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import { Tip } from '../Tip';
-import { IconName, Spinner } from '@grafana/ui';import { useDispatch, useSelector } from 'react-redux';
-import { AllTipsState, setSystemTipsCurrentlySelected, TipModel } from '../../../../reducers/tips/tips';
+import { IconName } from '@grafana/ui';
+import { useDispatch } from 'react-redux';
+import { TipModel } from '../../../../reducers/tips/tips';
 
 export interface TipsContainerProps {
   className?: string;
   userId: number;
-  loading: boolean;
   tips: TipModel[];
   currentlySelectedTipId: number;
   setTipSelected: any;

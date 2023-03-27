@@ -7,13 +7,13 @@ import { useSelector } from 'react-redux';
 import { StoreState } from '../../../../reducers/store';
 import { setSystemTipsCurrentlySelected } from '../../../../reducers/tips/tips';
 
-interface HelpCenterContainerProps {
+interface HomePageTipsContainerProps {
   userId: number;
 }
 
-export const HelpCenterContainer: FC<HelpCenterContainerProps> = ({ userId }) => {
+export const HomePageTipsContainer: FC<HomePageTipsContainerProps> = ({ userId }) => {
   const {
-    systemTips: { loading, tips, currentlySelected },
+    systemTips: { tips, currentlySelected },
   } = useSelector((state: StoreState) => state.tips);
 
   const styles = useStyles2(getStyles);
@@ -32,7 +32,6 @@ export const HelpCenterContainer: FC<HelpCenterContainerProps> = ({ userId }) =>
         <TipsContainer
           key="3"
           tips={tips}
-          loading={loading}
           currentlySelectedTipId={currentlySelected}
           userId={userId}
           setTipSelected={setSystemTipsCurrentlySelected}

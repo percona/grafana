@@ -3,12 +3,8 @@ import React__default, { FC, useState } from 'react';
 import { IconButton, Tab, TabsBar, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
-import { StartMonitoringTipsContainer } from './components/TipsContainer/StartMonitoringTipsContainer';
 import { ResourcesContainer } from './components/ResourcesContainer';
-import {EmptyTip} from "./components/TipsContainer/EmptyTip";
-import {TipNotConnected} from "./components/TipsContainer/TipNotConnected";
-import { FeedbackContainer } from "./components/FeedbackContainer/FeedbackContainer";
-import { ExploreYourNewPowerUpsTipsContainer } from "./components/TipsContainer/ExploreYourNewPowerUpsTipsContainer";
+import { HelpCenterTipsContainer } from "./components/HelpCenterTipsContainer/HelpCenterTipsContainer";
 
 interface HelpCenterProps {
   open: boolean;
@@ -53,12 +49,10 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
             <Tab label="Resources" active={activeTab === 'resources'} onChangeTab={changeTab('resources')} />
           </TabsBar>
         </TabsBar>
-        {activeTab === 'tips' && <>
-          <StartMonitoringTipsContainer userId={userId} />
-          <TipNotConnected />
-          <ExploreYourNewPowerUpsTipsContainer userId={userId} />
-          <FeedbackContainer />
-        </>}
+        {activeTab === 'tips' && <HelpCenterTipsContainer
+            userId={userId}
+            isConnectedUser={isConnectedUser}
+        />}
 
         {activeTab === 'resources' && <ResourcesContainer />}
       </div>

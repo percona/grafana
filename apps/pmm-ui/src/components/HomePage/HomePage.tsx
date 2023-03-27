@@ -8,7 +8,7 @@ import imgDiscoverPatterns from './assets/discover-patterns.svg';
 import imgOptimizeAndImprove from './assets/optimize-and-improve.svg';
 import imgMaintainPerformance from './assets/maintain-performance.svg';
 import { ActionContainer } from './comonents/ActionContainer';
-import { HelpCenterContainer } from './comonents/HelpCenterContainer';
+import { HomePageTipsContainer } from './comonents/HomePageTipsContainer';
 
 interface HomePageProps {
   onHelpCenterButtonClick?: () => void;
@@ -46,7 +46,7 @@ export const HomePage: FC<HomePageProps> = (props) => {
             <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
           </div>
         </ActionContainer>
-        <HelpCenterContainer userId={userId} />
+        <HomePageTipsContainer userId={userId} />
         <ActionContainer
           headerType="h2"
           header={helpBlockHeader}
