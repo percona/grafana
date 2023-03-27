@@ -128,10 +128,9 @@ export const fetchSystemTipsAction = createAsyncThunk(
         newTips = systemTipsData.map((t) => {
           return { ...t, completed: false };
         });
-        thunkAPI.dispatch(setSystemTips(newTips));
-        throw e;
       }
 
+      thunkAPI.dispatch(setSystemTips(newTips));
       const notCompletedTip = newTips.find((tipData) => !tipData.completed);
       const initial = notCompletedTip !== undefined ? notCompletedTip.id : 0;
       thunkAPI.dispatch(setSystemTipsCurrentlySelected(initial));
