@@ -4,10 +4,9 @@ import React, { useEffect, useState, FC, MouseEvent } from 'react';
 import { Spinner } from '@grafana/ui';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
-import { styles } from './UpdatePanel.styles';
+import * as styles from './UpdatePanel.styles';
 import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck, ProgressModal, UpgradeButton } from './components';
 import { useVersionDetails, usePerformUpdate } from './hooks';
-import { UpdateMethod } from './types';
 
 export const UpdatePanel: FC<{}> = () => {
   const isOnline = navigator.onLine;
@@ -18,7 +17,14 @@ export const UpdatePanel: FC<{}> = () => {
   const [isLoadingSettings, setLoadingSettings] = useState(true);
   const [hasNoAccess, setHasNoAccess] = useState(false);
   const [
-    { installedVersionDetails, lastCheckDate, nextVersionDetails, isUpdateAvailable, isUpgradeServiceAvailable },
+    {
+      installedVersionDetails,
+      lastCheckDate,
+      nextVersionDetails,
+      isUpdateAvailable,
+      isUpgradeServiceAvailable,
+      preferredUpdateMethod,
+    },
     fetchVersionErrorMessage,
     isLoadingVersionDetails,
     isDefaultView,
@@ -72,7 +78,7 @@ export const UpdatePanel: FC<{}> = () => {
 
   const handleUpdate = () => {
     setShowModal(true);
-    launchUpdate(isUpgradeServiceAvailable ? UpdateMethod.server : UpdateMethod.legacy);
+    launchUpdate(preferredUpdateMethod);
   };
 
   return (

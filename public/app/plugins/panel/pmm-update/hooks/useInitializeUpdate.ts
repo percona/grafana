@@ -4,14 +4,11 @@ import { useState } from 'react';
 import { startUpdate } from '../UpdatePanel.service';
 import { UpdateInitialization, UpdateMethod } from '../types';
 
-import { useVersionDetails } from './useVersionDetails';
-
 export const useInitializeUpdate = (): UpdateInitialization => {
   const [updateFailed, setUpdateFailed] = useState(false);
   const [authToken, setAuthToken] = useState('');
   const [updateMethod, setUpdateMethod] = useState(UpdateMethod.invalid);
   const [initialLogOffset, setInitialLogOffset] = useState(0);
-  const [{}] = useVersionDetails();
 
   const launchUpdate = async (method: UpdateMethod) => {
     try {
