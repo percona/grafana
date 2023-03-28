@@ -1,8 +1,7 @@
 export const Messages = {
   upgradeTo: (version: string) => `Upgrade to ${version}`,
-  upgradeServiceUnavailable: {
-    first: 'Server upgrade not available, see ',
-    docs: 'docs',
-    last: ' for more.',
+  serverStopped: {
+    title: 'PMM Upgrade: Instance stopped',
+    description: 'PMM will now upgrade in the background. ',
   },
 };

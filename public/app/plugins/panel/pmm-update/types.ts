@@ -111,9 +111,15 @@ export interface InfoBoxProps {
 }
 
 export interface UpgradeButtonProps {
-  onClick: () => void;
+  onUpdateStart: () => void;
   upgradeServiceAvailable: boolean;
   nextVersion?: string;
+}
+
+export interface ConfirmUpdateModalProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
 export interface AvailableUpdateProps {

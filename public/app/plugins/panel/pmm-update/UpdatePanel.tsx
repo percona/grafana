@@ -97,7 +97,7 @@ export const UpdatePanel: FC<{}> = () => {
             {(isUpdateAvailable || forceUpdate) && !updatesDisabled && !hasNoAccess && isOnline ? (
               <div className={styles.middleSectionWrapper}>
                 <UpgradeButton
-                  onClick={handleUpdate}
+                  onUpdateStart={handleUpdate}
                   upgradeServiceAvailable={isUpgradeServiceAvailable}
                   nextVersion={nextVersionDetails?.nextVersion}
                 />

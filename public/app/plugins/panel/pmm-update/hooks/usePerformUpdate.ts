@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
 
+import { AppEvents } from '@grafana/data';
+import appEvents from 'app/core/app_events';
+
+import { Messages } from '../UpdatePanel.messages';
 import { getUpdateStatus } from '../UpdatePanel.service';
 import { UpdateMethod, UpdateStatus } from '../types';
 
@@ -41,6 +45,11 @@ export const usePerformUpdate = (): UpdateStatus => {
         }
 
         const { done, log_offset, log_lines } = response;
+
+        // Check if PMM server has stopped
+        if (log_lines.some((line) => line.includes('Stopping PMM Server in container'))) {
+          appEvents.emit(AppEvents.alertWarning, [Messages.serverStopped.title, Messages.serverStopped.description]);
+        }
 
         setOutput((previousOutput) => {
           const logLines = log_lines ?? [];
