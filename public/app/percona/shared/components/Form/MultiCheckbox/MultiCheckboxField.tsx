@@ -4,7 +4,8 @@ import React, { ChangeEvent, FC, FocusEvent, useCallback, useEffect, useMemo, us
 import { Field, FieldInputProps } from 'react-final-form';
 
 import { useStyles } from '@grafana/ui';
-import { CheckboxField, validators } from 'app/percona/shared/core-ui';
+import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
+import { validators } from 'app/percona/shared/core-ui';
 
 import { Label } from '../Label';
 

@@ -2,7 +2,8 @@ import React, { FC } from 'react';
 import { FieldArray } from 'react-final-form-arrays';
 
 import { Button, useStyles } from '@grafana/ui';
-import { CheckboxField, TextInputField } from 'app/percona/shared/core-ui';
+import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
+import { TextInputField } from 'app/percona/shared/core-ui';
 
 import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet';
 import { Messages } from '../DBClusterAdvancedOptions.messages';

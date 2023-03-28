@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { FieldInputAttrs, LabeledFieldProps } from '../../shared/types';
-import { Label } from '../Label';
+import { Label } from '../../../core-ui/components/Label';
+import { FieldInputAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
 
 import { getStyles } from './Checkbox.styles';
 

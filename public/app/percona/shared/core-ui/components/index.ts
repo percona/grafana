@@ -1,4 +1,3 @@
-export * from './Checkbox';
 export * from './Chip';
 export * from './Dropdown';
 export * from './Icon';

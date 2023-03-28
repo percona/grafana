@@ -6,13 +6,14 @@ import { Column } from 'react-table';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
+import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { Table } from 'app/percona/shared/components/Elements/Table';
 import { TechnicalPreview } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { useCatchCancellationError } from 'app/percona/shared/components/hooks/catchCancellationError';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { CheckboxField, Modal } from 'app/percona/shared/core-ui';
+import { Modal } from 'app/percona/shared/core-ui';
 import { deleteKubernetesAction, fetchKubernetesAction } from 'app/percona/shared/core/reducers';
 import {
   getAddKubernetes,

@@ -3,9 +3,9 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { useStyles } from '@grafana/ui';
 import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
+import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { Databases } from 'app/percona/shared/core';
 import {
-  CheckboxField,
   NumberInputField,
   RadioButtonGroupField,
   validators as platformCoreValidators,

@@ -7,9 +7,9 @@ import { AppEvents } from '@grafana/data';
 import { Button, Spinner, useStyles2 } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { EmailAuthType } from 'app/percona/settings/Settings.types';
+import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import {
-  CheckboxField,
   logger,
   PasswordInputField,
   RadioButtonGroupField,

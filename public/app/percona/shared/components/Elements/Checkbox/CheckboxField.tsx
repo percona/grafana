@@ -1,8 +1,8 @@
 import React, { FC, useMemo } from 'react';
-import { Field, UseFieldConfig, FieldMetaState, FieldInputProps } from 'react-final-form';
+import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-final-form';
 
-import { FieldInputAttrs, LabeledFieldProps } from '../../shared/types';
-import { Validator, compose } from '../../shared/validators';
+import { FieldInputAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
+import { compose, Validator } from '../../../core-ui/shared/validators';
 
 import { BaseCheckbox } from './Checkbox';
 
