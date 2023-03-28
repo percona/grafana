@@ -12,6 +12,12 @@ Follow these steps:
 docker-compose up
 ```
 
+Alternatively, you can run devcontainer in background, in this case you can reuse terminal session:
+
+```shell
+docker-compose up -d
+```
+
 2: in separate terminal:
 
 ```shell
