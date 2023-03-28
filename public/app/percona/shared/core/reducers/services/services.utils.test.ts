@@ -1,5 +1,5 @@
 import { ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
-import { Service, ServiceListPayload } from 'app/percona/shared/services/services/Services.types';
+import { Service, ServiceListPayload, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 
 import { Databases } from '../../types';
 
@@ -15,6 +15,7 @@ describe('toDbServicesModel', () => {
           service_name: 'postgres one',
           node_id: 'node_1',
           node_name: 'node one',
+          status: ServiceStatus.UP,
           database_name: 'db1',
           address: 'localhost',
           port: 80,
@@ -32,6 +33,7 @@ describe('toDbServicesModel', () => {
           service_name: 'postgres two',
           node_id: 'node_1',
           node_name: 'node one',
+          status: ServiceStatus.UP,
           database_name: 'db2',
           address: 'localhost',
           port: 81,
@@ -43,6 +45,7 @@ describe('toDbServicesModel', () => {
           service_name: 'mongo one',
           node_id: 'node_2',
           node_name: 'node two',
+          status: ServiceStatus.DOWN,
           address: 'localhost',
           port: 83,
           socket: '',
@@ -54,6 +57,7 @@ describe('toDbServicesModel', () => {
           service_type: 'external',
           service_id: 'external1',
           service_name: 'external one',
+          status: ServiceStatus.UNKNOWN,
           node_id: 'node_1',
           node_name: 'node one',
           group: 'g1',
@@ -74,6 +78,7 @@ describe('toDbServicesModel', () => {
           nodeName: 'node one',
           address: 'localhost',
           port: 80,
+          status: ServiceStatus.UP,
           customLabels: {
             database_name: 'db1',
             socket: '',
@@ -93,6 +98,7 @@ describe('toDbServicesModel', () => {
           serviceName: 'postgres two',
           nodeId: 'node_1',
           nodeName: 'node one',
+          status: ServiceStatus.UP,
           address: 'localhost',
           port: 81,
           customLabels: {
@@ -108,6 +114,7 @@ describe('toDbServicesModel', () => {
           serviceName: 'mongo one',
           nodeId: 'node_2',
           nodeName: 'node two',
+          status: ServiceStatus.DOWN,
           address: 'localhost',
           port: 83,
           customLabels: {
@@ -123,6 +130,7 @@ describe('toDbServicesModel', () => {
           serviceName: 'external one',
           nodeId: 'node_1',
           nodeName: 'node one',
+          status: ServiceStatus.UNKNOWN,
           customLabels: {
             group: 'g1',
             env_name: 'dev',
