@@ -34,12 +34,7 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
 
   useEffect(() => {
     dispatch(fetchSystemTipsAction({ userId: userId }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     dispatch(fetchUserTipsAction({ userId: userId }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const showEmptyStageTip = !feedbackVisible && systemsTipsCompleted && isConnectedUser && userTipsCompleted;
@@ -55,7 +50,7 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
         />
       )}
       {!isConnectedUser && <TipNotConnected />}
-      {!userTipsCompleted && (
+      {isConnectedUser && !userTipsCompleted && (
         <ExploreYourNewPowerUpsTipsContainer
           userId={userId}
           tips={userTips.tips}
