@@ -1,5 +1,6 @@
-import { AsyncSelectField } from '@percona/platform-core';
 import React, { FC } from 'react';
+
+import { AsyncSelectField } from 'app/percona/shared/core-ui';
 
 import { AdvancedOptionsFields } from '../DBClusterAdvancedOptions.types';
 
