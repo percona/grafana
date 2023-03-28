@@ -4,13 +4,13 @@ import React, { FC, useMemo } from 'react';
 import { Field, FieldInputProps, UseFieldConfig } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
-import { AsyncSelect, SelectAsyncProps, useStyles2, ActionMeta, SelectCommonProps } from '@grafana/ui';
+import { ActionMeta, AsyncSelect, SelectAsyncProps, SelectCommonProps, useStyles2 } from '@grafana/ui';
 
-import { LabeledFieldProps } from '../../shared/types';
-import { compose, GetSelectValueFunction, Validator } from '../../shared/validators';
-import { Label } from '../Label';
+import { Label } from '../../../core-ui/components/Label';
+import { LabeledFieldProps } from '../../../core-ui/shared/types';
+import { compose, GetSelectValueFunction, Validator } from '../../../core-ui/shared/validators';
 
-import { getStyles } from './AsyncSelectField.styles';
+import { getStyles } from './AsyncSelectFieldCore.styles';
 
 interface AsyncSelectProps<T> extends Omit<SelectCommonProps<T>, 'options'>, SelectAsyncProps<T> {
   value?: SelectableValue<T> | null;
@@ -32,7 +32,7 @@ export interface AsyncSelectFieldProps<T>
   getValueForValidators?: GetSelectValueFunction<SelectableValue<T> | null>;
 }
 
-export const AsyncSelectField: FC<AsyncSelectFieldProps<any>> = ({
+export const AsyncSelectFieldCore: FC<AsyncSelectFieldProps<any>> = ({
   label,
   name,
   required,

@@ -1,10 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
-import { generateOptions } from '../../__mocks__/mockAsyncSelectOptions';
-import { FormWrapper, validators } from '../../shared';
+import { FormWrapper, validators } from '../../../core-ui/shared';
 
-import { AsyncSelectField } from './AsyncSelectField';
+import { AsyncSelectFieldCore } from './AsyncSelectFieldCore';
+import { generateOptions } from './__mocks__/mockAsyncSelectOptions';
 
 const { email, minLength } = validators;
 
@@ -24,7 +24,7 @@ describe('AsyncSelectField::', () => {
   it('should render a field container with input', async () => {
     const { container } = render(
       <FormWrapper>
-        <AsyncSelectField name="test" />
+        <AsyncSelectFieldCore name="test" />
       </FormWrapper>
     );
 
@@ -35,7 +35,7 @@ describe('AsyncSelectField::', () => {
   it('should render a label', () => {
     render(
       <FormWrapper>
-        <AsyncSelectField name="test" label="test label" />
+        <AsyncSelectFieldCore name="test" label="test label" />
       </FormWrapper>
     );
 
@@ -46,7 +46,7 @@ describe('AsyncSelectField::', () => {
   it('should show the loader', async () => {
     render(
       <FormWrapper>
-        <AsyncSelectField defaultOptions name="test" label="test label" loadOptions={getOptions()} isOpen />
+        <AsyncSelectFieldCore defaultOptions name="test" label="test label" loadOptions={getOptions()} isOpen />
       </FormWrapper>
     );
 
@@ -61,7 +61,7 @@ describe('AsyncSelectField::', () => {
   it('should react on multiple validators', async () => {
     render(
       <FormWrapper>
-        <AsyncSelectField
+        <AsyncSelectFieldCore
           defaultOptions
           name="test"
           label="test-label"
@@ -87,7 +87,7 @@ describe('AsyncSelectField::', () => {
   it('should show an error below the input', async () => {
     render(
       <FormWrapper>
-        <AsyncSelectField
+        <AsyncSelectFieldCore
           defaultOptions
           name="test"
           label="test-label"

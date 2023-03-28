@@ -1,4 +1,3 @@
-export * from './AsyncSelect';
 export * from './Checkbox';
 export * from './Chip';
 export * from './Dropdown';
