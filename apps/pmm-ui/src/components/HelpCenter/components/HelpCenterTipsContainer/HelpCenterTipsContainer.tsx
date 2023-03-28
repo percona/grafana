@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { StoreState } from '../../../../reducers/store';
 import { fetchSystemTipsAction, fetchUserTipsAction } from '../../../../reducers/tips/tips';
 import { useLocalStorage } from '../../../../shared/localStorage';
+import { EmptyTip } from "../TipsContainer/EmptyTip";
 
 export interface HelpCenterTipsContainerProps {
   userId: number;
@@ -41,8 +42,11 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const showEmptyStageTip = !feedbackVisible && systemsTipsCompleted && isConnectedUser && userTipsCompleted;
   return (
     <>
+      {showEmptyStageTip && <EmptyTip />}
+
       {!systemsTipsCompleted && (
         <StartMonitoringTipsContainer
           userId={userId}
