@@ -6,8 +6,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const { DefinePlugin } = require('webpack');
-const LiveReloadPlugin = require('webpack-livereload-plugin');
 const { merge } = require('webpack-merge');
+
+// @PERCONA
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
@@ -115,6 +117,8 @@ module.exports = (env = {}) =>
           NODE_ENV: JSON.stringify('development'),
         },
       }),
+
+      // @PERCONA
       new LiveReloadPlugin({
         delay: 1000,
       }),
