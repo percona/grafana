@@ -9,7 +9,7 @@ const options = [
   { label: 'Lowest', value: 'lowest', icon: 'bolt' },
   { label: 'Medium', value: 'medium', icon: 'arrow-right' },
   { label: 'High', value: 'high', icon: 'arrow-up' },
-  { label: 'Highest', value: 'highest', icon: 'clock' },
+  { label: 'Highest', value: 'highest', icon: 'cloud' },
 ];
 
 const initialValues = { test: 'lowest' };

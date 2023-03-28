@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
-import { act, fireEvent, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { Dropdown } from './Dropdown';
@@ -14,12 +13,6 @@ const Toggle = React.forwardRef<HTMLButtonElement, ButtonProps>(function toggle(
     </button>
   );
 });
-
-const asyncClick = async (ref: any) => {
-  await act(async () => {
-    userEvent.click(ref);
-  });
-};
 
 const DATA_QA_MENU = 'dropdown-menu-menu';
 const DATA_QA_TOGGLE = 'dropdown-menu-toggle';
@@ -47,10 +40,10 @@ describe('Dropdown ::', () => {
     const toggle = await screen.getByTestId(DATA_QA_TOGGLE);
 
     expect(screen.queryByTestId(DATA_QA_MENU)).not.toBeInTheDocument();
-    await asyncClick(toggle);
+    await waitFor(() => fireEvent.click(toggle));
 
     expect(screen.getByTestId(DATA_QA_MENU)).toBeInTheDocument();
-    await asyncClick(toggle);
+    await waitFor(() => fireEvent.click(toggle));
 
     expect(screen.queryByTestId(DATA_QA_MENU)).not.toBeInTheDocument();
   });
@@ -67,7 +60,7 @@ describe('Dropdown ::', () => {
 
     const toggle = screen.getByTestId(DATA_QA_TOGGLE);
 
-    await asyncClick(toggle);
+    await waitFor(() => fireEvent.click(toggle));
 
     expect(screen.getByTestId(DATA_QA_MENU)).toBeInTheDocument();
 
@@ -90,7 +83,7 @@ describe('Dropdown ::', () => {
 
     const toggle = screen.getByTestId(DATA_QA_TOGGLE);
 
-    await asyncClick(toggle);
+    await waitFor(() => fireEvent.click(toggle));
     fireEvent.mouseDown(toggle);
 
     const menu = screen.getByTestId(DATA_QA_MENU);
@@ -116,11 +109,11 @@ describe('Dropdown ::', () => {
 
     expect(menuAction).toBeCalledTimes(0);
 
-    await asyncClick(toggle);
+    await waitFor(() => fireEvent.click(toggle));
 
     const menuItem = screen.getByTestId('menu-item');
 
-    await asyncClick(menuItem);
+    await waitFor(() => fireEvent.click(menuItem));
 
     expect(menuAction).toBeCalledTimes(1);
   });
@@ -137,12 +130,12 @@ describe('Dropdown ::', () => {
 
     const toggle = await screen.getByTestId(DATA_QA_TOGGLE);
 
-    await asyncClick(toggle);
+    await waitFor(() => fireEvent.click(toggle));
 
     const menuItem = await screen.getByTestId('menu-item');
 
-    await asyncClick(menuItem);
-    await asyncClick(toggle);
+    await waitFor(() => fireEvent.click(menuItem));
+    await waitFor(() => fireEvent.click(toggle));
 
     expect(menuItem?.className.includes('active')).toBeFalsy();
   });

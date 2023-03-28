@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { generateOptions } from '../../__mocks__/mockAsyncSelectOptions';
@@ -50,7 +50,8 @@ describe('AsyncSelectField::', () => {
       </FormWrapper>
     );
 
-    expect(screen.getByTestId('test-field-container').children[1]).toHaveTextContent('Loading options...');
+    expect(screen.getByTestId('test-field-container').children[1]).toHaveTextContent('Choose');
+    expect(screen.getByTestId('Spinner')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getAllByLabelText('Select option')).toHaveLength(4);

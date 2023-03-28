@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -55,8 +55,7 @@ describe('CheckboxField::', () => {
     userEvent.click(checkbox);
     // In this case we need to fire `blur`, otherwise the error will not show up
     fireEvent.blur(checkbox);
-
-    expect(validatorOne).toBeCalledTimes(2);
+    expect(validatorOne).toBeCalledTimes(1);
     expect(validatorTwo).toBeCalledTimes(0);
 
     expect(screen.getByText('some error')).toBeInTheDocument();
