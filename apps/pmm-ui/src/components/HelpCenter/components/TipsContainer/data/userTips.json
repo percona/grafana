@@ -5,7 +5,7 @@
     "text": "You now have access to extra Advisors for a more thorough check of your system health.",
     "buttonText": "See your new Advisors",
     "buttonTooltipText": "",
-    "url": "/graph/alerting/alert-rule-templates",
+    "url": "/graph/advisors/insights",
     "completed": false,
     "canUserComplete": true
   }
