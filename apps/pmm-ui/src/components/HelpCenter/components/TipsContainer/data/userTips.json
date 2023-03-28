@@ -6,6 +6,7 @@
     "buttonText": "See your new Advisors",
     "buttonTooltipText": "",
     "url": "/graph/alerting/alert-rule-templates",
-    "completed": false
+    "completed": false,
+    "canUserComplete": true
   }
 ]

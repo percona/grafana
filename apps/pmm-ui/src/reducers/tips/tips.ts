@@ -23,6 +23,7 @@ export interface TipModel {
   buttonIcon?: string;
   url: string;
   completed: boolean;
+  canUserComplete?: boolean;
 }
 
 const initialTipsState: AllTipsState = {
@@ -40,7 +41,7 @@ const initialTipsState: AllTipsState = {
   },
 };
 
-const perconaTipsSlice = createSlice({
+const perconaTipsSlice = createSlice ({
   name: 'perconaTips',
   initialState: initialTipsState,
   reducers: {
@@ -108,64 +109,90 @@ enum TipType {
   USER = 1,
 }
 
-export const fetchSystemTipsAction = createAsyncThunk(
+export const fetchSystemTipsAction = createAsyncThunk (
   'percona/fetchSystemTips',
-  (args: { userId: number }, thunkAPI): Promise<void> => {
+  (args: {userId: number}, thunkAPI): Promise<void> => {
     return (async () => {
-      thunkAPI.dispatch(setSystemTipsLoading());
+      thunkAPI.dispatch (setSystemTipsLoading ());
 
       let newTips: TipModel[] = [];
 
       try {
         for (let tip of systemTipsData) {
-          const res = await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.SYSTEM}/user/${args.userId}`);
+          const res = await apiOnboarding.get<any, any> (`/tips/${tip.id}/type/${TipType.SYSTEM}/user/${args.userId}`);
           // @ts-ignore
-          newTips.push({
+          newTips.push ({
             ...tip,
             completed: !!res.isCompleted,
           });
         }
       } catch (e) {
-        newTips = systemTipsData.map((t) => {
-          return { ...t, completed: false };
+        newTips = systemTipsData.map ((t) => {
+          return {...t, completed: false};
         });
         // @ts-ignore
-        thunkAPI.dispatch(setSystemTips(newTips));
+        thunkAPI.dispatch (setSystemTips (newTips));
         throw e;
       }
       // @ts-ignore
-      thunkAPI.dispatch(setSystemTips(newTips));
+      thunkAPI.dispatch (setSystemTips (newTips));
       // @ts-ignore
-      const notCompletedTip = newTips.find((tipData) => !tipData.completed);
+      const notCompletedTip = newTips.find ((tipData) => !tipData.completed);
       // @ts-ignore
       const initial = notCompletedTip !== undefined ? notCompletedTip.id : 0;
-      thunkAPI.dispatch(setSystemTipsCurrentlySelected(initial));
-    })();
+      thunkAPI.dispatch (setSystemTipsCurrentlySelected (initial));
+    }) ();
   }
 );
 
-export const fetchUserTipsAction=createAsyncThunk(
+export const fetchUserTipsAction = createAsyncThunk (
   'percona/fetchUserTips',
-  (args: { userId: number }, thunkAPI): Promise<void> =>
+  (args: {userId: number}, thunkAPI): Promise<void> =>
     (async () => {
-      thunkAPI.dispatch(setUserTipsLoading());
+      thunkAPI.dispatch (setUserTipsLoading ());
 
       const newTips: TipModel[] = [];
       for (let tip of userTipsData) {
-        const res = await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.USER}/user/${args.userId}`);
-        newTips.push({
+        const res = await apiOnboarding.get<any, any> (`/tips/${tip.id}/type/${TipType.USER}/user/${args.userId}`);
+        newTips.push ({
           ...tip,
           completed: !!res.isCompleted,
         });
       }
       // @ts-ignore
-      thunkAPI.dispatch(setUserTips(newTips));
+      thunkAPI.dispatch (setUserTips (newTips));
       // @ts-ignore
-      const notCompletedTip = newTips.find((tipData) => !tipData.completed);
+      const notCompletedTip = newTips.find ((tipData) => !tipData.completed);
       // @ts-ignore
       const initial = notCompletedTip !== undefined ? notCompletedTip.id : 0;
 
-      thunkAPI.dispatch(setUserTipsCurrentlySelected(initial));
+      thunkAPI.dispatch (setUserTipsCurrentlySelected (initial));
+    }) ()
+);
+
+export const completeUserTip = createAsyncThunk(
+  'percona/completeUserTips',
+  (args: { tipId: number, userId: number }, thunkAPI): Promise<void> =>
+    (async () => {
+      const res = await apiOnboarding.post<any, any>(`/tips`, {
+        tipId: args.tipId,
+        userId: args.userId,
+      });
+      if (res.errorCode) {
+        console.error(res.errorCode)
+        console.error(res.errorMessage)
+      } else {
+        const newTips: TipModel[] = [];
+        for (let tip of userTipsData) {
+          const res=await apiOnboarding.get<any, any>(`/tips/${tip.id}/type/${TipType.USER}/user/${args.userId}`)
+          newTips.push({
+            ...tip,
+            completed: !!res.isCompleted,
+          })
+        }
+        // @ts-ignore
+        thunkAPI.dispatch(setUserTips(newTips));
+      }
     })()
 );
 

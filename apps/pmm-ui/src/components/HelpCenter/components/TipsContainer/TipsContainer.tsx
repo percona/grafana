@@ -13,7 +13,7 @@ export interface TipsContainerProps {
 }
 
 export const TipsContainer: FC<TipsContainerProps> = (props) => {
-  const { className, tips, currentlySelectedTipId, setTipSelected } = props;
+  const { className, userId, tips, currentlySelectedTipId, setTipSelected } = props;
   const dispatch = useDispatch();
 
   return <div className={className}>
@@ -29,6 +29,9 @@ export const TipsContainer: FC<TipsContainerProps> = (props) => {
           onClick={!t.completed ? () => dispatch(setTipSelected(t.id)) : () => {}}
           completed={t.completed}
           opened={currentlySelectedTipId === t.id}
+          canUserComplete={t.canUserComplete}
+          userId={userId}
+          tipId={t.id}
         />
       ))}
     </div>

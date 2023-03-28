@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
-import { Button, IconName, Tooltip, useStyles2 } from '@grafana/ui';
+import React, { FC, useState } from 'react';
+import { Button, IconName, Tooltip, useStyles2, Checkbox } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import checkMarkImg from '../../assets/check-mark.svg';
+import { useDispatch } from "react-redux";
+import { completeUserTip } from "../../../../reducers/tips/tips";
 
 interface TipProps {
   title: string;
@@ -14,8 +16,10 @@ interface TipProps {
   opened: boolean;
   completed?: boolean;
   onClick?: () => void;
-
   buttonUrl?: string;
+  canUserComplete?: boolean;
+  userId: number;
+  tipId: number;
 }
 
 export const Tip: FC<TipProps> = (props) => {
@@ -30,10 +34,23 @@ export const Tip: FC<TipProps> = (props) => {
     buttonIcon,
     buttonTooltipText,
     buttonUrl,
+    canUserComplete,
+    userId,
+    tipId,
   } = props;
   const styles = useStyles2(getStyles);
+  const dispatch=useDispatch();
 
   let active: boolean = opened && !completed;
+
+  const [checked, setChecked] = useState(false);
+  const onChange = (e: any) => {
+    if (e.currentTarget.checked) {
+      dispatch(completeUserTip({tipId: tipId, userId: userId}));
+      //todo: handle error
+      setChecked(e.currentTarget.checked);
+    }
+  };
 
   return (
     <div className={`${styles.tipContainer} ${!active ? styles.tipContainerNoPadding : ''}`}>
@@ -50,8 +67,20 @@ export const Tip: FC<TipProps> = (props) => {
       </div>
       <div className={`${styles.tipBody} ${!active ? styles.tipBodyHidden : ''}`}>
         <div className={styles.tipText}>{tipText}</div>
-        {buttonTooltipText ? (
-          <Tooltip content={buttonTooltipText} placement="top" interactive={true}>
+        <div className={styles.buttonsContainer}>
+          {buttonTooltipText ? (
+            <Tooltip content={buttonTooltipText} placement="top" interactive={true}>
+              <Button
+                variant="secondary"
+                size="md"
+                type="button"
+                icon={buttonIcon}
+                onClick={() => window.open(buttonUrl, '_blank', 'noopener,noreferrer')}
+              >
+                {buttonText}
+              </Button>
+            </Tooltip>
+          ) : (
             <Button
               variant="secondary"
               size="md"
@@ -61,18 +90,12 @@ export const Tip: FC<TipProps> = (props) => {
             >
               {buttonText}
             </Button>
-          </Tooltip>
-        ) : (
-          <Button
-            variant="secondary"
-            size="md"
-            type="button"
-            icon={buttonIcon}
-            onClick={() => window.open(buttonUrl, '_blank', 'noopener,noreferrer')}
-          >
-            {buttonText}
-          </Button>
-        )}
+          )}
+          {canUserComplete && <div>
+            <Checkbox className={styles.completeCheckbox} value={checked} onChange={onChange} label="Complete" />
+          </div>
+          }
+        </div>
       </div>
     </div>
   );
@@ -166,4 +189,15 @@ const getStyles = (theme: GrafanaTheme2) => ({
   tipText: css`
     margin-bottom: 16px;
   `,
+  buttonsContainer: css`
+    display: flex;
+  `,
+  completeCheckbox: css`
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.01071em;
+
+    padding-left: 16px;
+    padding-top: 8px;
+  `
 });
