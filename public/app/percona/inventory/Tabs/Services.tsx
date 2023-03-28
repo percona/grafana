@@ -165,9 +165,11 @@ export const Services = () => {
         }));
         const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
 
-        appEvents.emit(AppEvents.alertSuccess, [
-          Messages.services.servicesDeleted(successfullyDeleted, servicesToDelete.length),
-        ]);
+        if (successfullyDeleted > 0) {
+          appEvents.emit(AppEvents.alertSuccess, [
+            Messages.services.servicesDeleted(successfullyDeleted, servicesToDelete.length),
+          ]);
+        }
 
         if (actionItem) {
           setActionItem(null);

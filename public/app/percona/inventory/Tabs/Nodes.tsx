@@ -112,7 +112,9 @@ export const NodesTab = () => {
 
         const successfullyDeleted = await dispatch(removeNodesAction({ nodes: requests })).unwrap();
 
-        appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.nodesDeleted(successfullyDeleted, nodes.length)]);
+        if (successfullyDeleted > 0) {
+          appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.nodesDeleted(successfullyDeleted, nodes.length)]);
+        }
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
