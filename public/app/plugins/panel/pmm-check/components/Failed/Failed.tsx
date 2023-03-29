@@ -11,6 +11,7 @@ import { useSelector } from 'app/types';
 import { PMM_DATABASE_CHECKS_PANEL_URL, PMM_SETTINGS_URL } from '../../CheckPanel.constants';
 import { splitSeverities } from '../../CheckPanel.utils';
 
+import { Messages } from './Failed.messages';
 import { getStyles } from './Failed.styles';
 import { TooltipText } from './TooltipText';
 
@@ -45,7 +46,7 @@ export const Failed: FC = () => {
   if (!isAuthorized) {
     return (
       <div className={styles.Empty} data-testid="unauthorized">
-        Insufficient access permissions.
+        {Messages.insufficientPermissions}
       </div>
     );
   }
@@ -53,11 +54,11 @@ export const Failed: FC = () => {
   if (!settings?.sttEnabled) {
     return (
       <div className={styles.Empty} data-testid="db-check-panel-settings-link">
-        Advisors feature is disabled.
+        {Messages.featureDisabled}
         <br />
-        {'Check '}
+        {Messages.check}
         <a className={styles.Link} href={PMM_SETTINGS_URL}>
-          PMM Settings.
+          {Messages.pmmSettings}
         </a>
       </div>
     );
