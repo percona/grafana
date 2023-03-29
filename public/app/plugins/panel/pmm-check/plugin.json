@@ -1,10 +1,10 @@
 {
   "type": "panel",
-  "name": "PMM Advisor Checks",
+  "name": "PMM Advisors",
   "id": "pmm-check-panel",
   "skipDataQuery": true,
   "info": {
-    "description": "A panel to visualize advisor checks results.",
+    "description": "A panel to visualize results from advisors.",
     "author": {
       "name": "Percona",
       "url": "https://percona.com"

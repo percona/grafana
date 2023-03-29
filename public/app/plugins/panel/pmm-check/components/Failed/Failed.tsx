@@ -53,7 +53,7 @@ export const Failed: FC = () => {
   if (!settings?.sttEnabled) {
     return (
       <div className={styles.Empty} data-testid="db-check-panel-settings-link">
-        Advisor Checks feature is disabled.
+        Advisors feature is disabled.
         <br />
         {'Check '}
         <a className={styles.Link} href={PMM_SETTINGS_URL}>

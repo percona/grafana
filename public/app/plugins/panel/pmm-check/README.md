@@ -1,3 +1,3 @@
-# PMM Checks
+# PMM Advisors
 
-This panel lists advisor checks results.
+This panel lists results from advisors.
