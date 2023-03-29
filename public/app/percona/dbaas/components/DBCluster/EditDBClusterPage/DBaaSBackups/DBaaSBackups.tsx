@@ -3,7 +3,8 @@ import React, { FC, useState } from 'react';
 import { Field, FormRenderProps } from 'react-final-form';
 
 import { FieldSet, Switch, useStyles } from '@grafana/ui';
-import { NumberInputField, validators } from 'app/percona/shared/core-ui';
+import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
+import { validators } from 'app/percona/shared/core-ui';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
 
 import { useSelector } from '../../../../../../types';

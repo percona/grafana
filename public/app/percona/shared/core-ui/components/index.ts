@@ -1,4 +1,3 @@
-export * from './NumberInput';
 export * from './Overlay';
 export * from './PasswordInput';
 export * from './RadioButtonGroup';

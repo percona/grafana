@@ -3,7 +3,8 @@ import React from 'react';
 
 import { useStyles } from '@grafana/ui';
 import { RetryMode } from 'app/percona/backup/Backup.types';
-import { NumberInputField, RadioButtonGroupField } from 'app/percona/shared/core-ui';
+import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
+import { RadioButtonGroupField } from 'app/percona/shared/core-ui';
 
 import { RETRY_MODE_OPTIONS } from '../AddBackupPage.constants';
 import { Messages } from '../AddBackupPage.messages';

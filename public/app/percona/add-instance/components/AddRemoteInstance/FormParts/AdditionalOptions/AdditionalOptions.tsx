@@ -4,12 +4,9 @@ import React, { FC, useEffect, useState } from 'react';
 import { useStyles } from '@grafana/ui';
 import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
+import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { Databases } from 'app/percona/shared/core';
-import {
-  NumberInputField,
-  RadioButtonGroupField,
-  validators as platformCoreValidators,
-} from 'app/percona/shared/core-ui';
+import { RadioButtonGroupField, validators as platformCoreValidators } from 'app/percona/shared/core-ui';
 
 import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
 import { Messages } from '../FormParts.messages';
