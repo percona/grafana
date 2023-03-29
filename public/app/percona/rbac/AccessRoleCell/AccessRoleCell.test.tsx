@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import selectEvent from 'react-select-event';
 
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
+import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -11,6 +12,8 @@ import AccessRolesEnabledCheck from '../AccessRolesEnabledCheck/AccessRolesEnabl
 import { stubRoles, stubUsers, stubUserSingleRole, stubUsersMap, subUserMultipleRoles } from '../__mocks__/stubs';
 
 import AccessRoleCell from './AccessRoleCell';
+
+const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
 
 const wrapWithTable = (element: ReactElement) => (
   <table>
@@ -48,6 +51,10 @@ const wrapWithProvider = (element: ReactElement, enableAccessControl = true) => 
 );
 
 describe('AccessRoleCell', () => {
+  beforeEach(() => {
+    assignRoleActionSpy.mockClear();
+  });
+
   it('shows cell when access roles are enabled', () => {
     render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
 
@@ -83,7 +90,6 @@ describe('AccessRoleCell', () => {
   });
 
   it('calls api when role has been selected', async () => {
-    const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
     render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
 
     const roleSelect = screen.getByLabelText('Access Roles');
@@ -93,11 +99,11 @@ describe('AccessRoleCell', () => {
     expect(assignRoleActionSpy).toHaveBeenCalledWith({
       userId: 2,
       roleIds: [1, 2],
+      entityType: AccessRoleEntity.user,
     });
   });
 
   it('calls api when role has been removed', async () => {
-    const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
     render(wrapWithProvider(<AccessRoleCell user={subUserMultipleRoles} />));
 
     const removeButton = screen.getByLabelText('Remove Role #1');
@@ -107,6 +113,7 @@ describe('AccessRoleCell', () => {
     expect(assignRoleActionSpy).toHaveBeenCalledWith({
       userId: 3,
       roleIds: [2],
+      entityType: AccessRoleEntity.user,
     });
   });
 });

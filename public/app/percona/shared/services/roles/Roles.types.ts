@@ -10,8 +10,8 @@ export interface AccessRole {
 }
 
 export enum AccessRoleEntity {
-  invalid = 0,
-  user = 1,
+  invalid = 'INVALID',
+  user = 'USER',
 }
 
 export interface AccessRoleResponse {
