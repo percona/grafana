@@ -1,5 +1,5 @@
 import { CheckboxField, TextInputField } from '@percona/platform-core';
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 
@@ -9,11 +9,11 @@ import FieldSet from '../../../../../shared/components/Form/FieldSet/FieldSet';
 
 import { Messages } from './NetworkAndSecurity.messages';
 import { getStyles } from './NetworkAndSecurity.styles';
-import { NetworkAndSecurityFields } from './NetworkAndSecurity.types';
+import { NetworkAndSecurityFields, NetworkAndSecurityProps } from './NetworkAndSecurity.types';
 
-export const NetworkAndSecurity: FC = () => {
+export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ form }) => {
   const styles = useStyles(getStyles);
-  const [enableNetworkAndSecurity, setEnableNetworkAndSecurity] = useState(false);
+  const { expose } = form.getState().values;
 
   return (
     <FieldSet
@@ -27,10 +27,10 @@ export const NetworkAndSecurity: FC = () => {
             <Field name={NetworkAndSecurityFields.expose} type="checkbox">
               {({ input }) => (
                 <Switch
-                  onClick={() => setEnableNetworkAndSecurity((prevState) => !prevState)}
                   data-testid="toggle-network-and-security"
                   {...input}
                   checked={undefined}
+                  value={input.checked}
                 />
               )}
             </Field>
@@ -39,7 +39,7 @@ export const NetworkAndSecurity: FC = () => {
       }
       data-testid="network-and-security"
     >
-      {enableNetworkAndSecurity ? (
+      {!!expose ? (
         <>
           <CheckboxField
             name={NetworkAndSecurityFields.internetFacing}

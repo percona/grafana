@@ -14,7 +14,7 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{}] }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
-        render={() => <NetworkAndSecurity />}
+        render={({ form }) => <NetworkAndSecurity form={form} />}
       />
     );
 
@@ -40,7 +40,7 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }] }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
-        render={() => <NetworkAndSecurity />}
+        render={({ form }) => <NetworkAndSecurity form={form} />}
       />
     );
     expect(screen.getByTestId('toggle-network-and-security')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }, { sourceRange: '2' }] }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
-        render={() => <NetworkAndSecurity />}
+        render={({ form }) => <NetworkAndSecurity form={form} />}
       />
     );
     expect(screen.getByTestId('toggle-network-and-security')).toBeInTheDocument();

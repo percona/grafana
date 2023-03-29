@@ -119,7 +119,7 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
                   {mode === 'create' && <DBClusterBasicOptions kubernetes={kubernetes} form={form} />}
                   <div className={styles.switchOptionsWrapper}>
                     {!!settings?.backupEnabled && <Restore form={form} />}
-                    <NetworkAndSecurity />
+                    <NetworkAndSecurity form={form} />
                     {!!settings?.backupEnabled && mode === 'create' && (
                       <DBaaSBackups
                         handleSubmit={handleSubmit}
