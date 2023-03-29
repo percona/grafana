@@ -2,7 +2,7 @@
 import React, { FC, Fragment } from 'react';
 
 import { IconButton, useTheme } from '@grafana/ui';
-import { Dropdown } from 'app/percona/shared/core-ui';
+import { Dropdown } from 'app/percona/shared/components/Elements/Dropdown';
 
 import { getStyles } from './MultipleActions.styles';
 import { MultipleActionsProps } from './MultipleActions.types';
