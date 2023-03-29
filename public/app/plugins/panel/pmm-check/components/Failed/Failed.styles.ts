@@ -2,12 +2,12 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ v1: { palette, colors } }: GrafanaTheme2) => ({
+export const getStyles = ({ v1: { palette, colors }, visualization }: GrafanaTheme2) => ({
   TooltipWrapper: css`
     padding: 0.5em;
   `,
   TooltipHeader: css`
-    border-bottom: 1px solid #8e8e8e;
+    border-bottom: 1px solid ${palette.gray2};
     padding: 0em 0.5em;
     margin-bottom: 0.5em;
   `,
@@ -16,22 +16,22 @@ export const getStyles = ({ v1: { palette, colors } }: GrafanaTheme2) => ({
     font-weight: normal;
   `,
   InfoIcon: css`
-    color: #6495ed;
+    color: ${visualization.getColorByName('cornflowerblue')};
   `,
   FailedDiv: css`
     margin-right: 0.5em;
     font-size: 30px;
   `,
   Green: css`
-    color: #299c46;
+    color: ${palette.greenBase};
   `,
   Empty: css`
     text-align: center;
   `,
   Link: css`
-    color: rgb(51, 181, 229);
+    color: ${colors.linkExternal};
     &:hover {
-      color: rgb(87, 148, 242);
+      color: ${colors.textBlue};
     }
   `,
   Critical: css`
