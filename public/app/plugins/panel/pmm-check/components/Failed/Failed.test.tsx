@@ -110,32 +110,6 @@ describe('Failed::', () => {
     await waitFor(() => expect(screen.getByTestId('db-check-panel-zero-checks')).toBeInTheDocument());
   });
 
-  // it('should render an inner tooltip component', () => {
-  //   const root = shallow(
-  //     <Failed
-  //       failed={[{
-  //         serviceName: '',
-  //         serviceId: '',
-  //         counts: {
-  //           critical: 1,
-  //           warning: 0,
-  //           notice: 1,
-  //           alert: 0,
-  //           info: 0,
-  //           debug: 0,
-  //           emergency: 0,
-  //           error: 0,
-  //         },
-  //       }]}
-  //       isSttEnabled
-  //       hasNoAccess={false}
-  //     />,
-  //   );
-
-  //   expect(root.find(Tippy).length).toEqual(1);
-  //   root.unmount();
-  // });
-
   it('should render a message when the user only has reader access', async () => {
     render(
       <Provider
