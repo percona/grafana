@@ -49,6 +49,7 @@ describe('DBClusterAdvancedOptions::', () => {
     const advancedOptions = screen.getByTestId('dbCluster-advanced-settings');
     waitFor(() => fireEvent.click(advancedOptions));
 
+    expect(await screen.getByTestId('template-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('nodes-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('resources-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('memory-number-input')).toBeInTheDocument();
@@ -81,6 +82,7 @@ describe('DBClusterAdvancedOptions::', () => {
       )
     );
 
+    expect(await screen.getByTestId('template-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('nodes-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('resources-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('memory-number-input')).toBeInTheDocument();
@@ -205,6 +207,7 @@ describe('DBClusterAdvancedOptions::', () => {
     await waitFor(() =>
       render(
         <Form
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (

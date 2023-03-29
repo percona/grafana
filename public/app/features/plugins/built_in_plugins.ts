@@ -59,6 +59,7 @@ import * as nodeGraph from 'app/plugins/panel/nodeGraph/module';
 import * as pieChartPanel from 'app/plugins/panel/piechart/module';
 // @PERCONA
 import * as pmmCheckPanel from 'app/plugins/panel/pmm-check/module';
+import * as pmmUpdatePanel from 'app/plugins/panel/pmm-update/module';
 import * as statPanel from 'app/plugins/panel/stat/module';
 import * as stateTimelinePanel from 'app/plugins/panel/state-timeline/module';
 import * as statusHistoryPanel from 'app/plugins/panel/status-history/module';
@@ -148,6 +149,7 @@ const builtInPlugins: any = {
   'app/plugins/panel/alertGroups/module': alertGroupsPanel,
   // @PERCONA
   'app/plugins/panel/pmm-check/module': pmmCheckPanel,
+  'app/plugins/panel/pmm-update/module': pmmUpdatePanel,
 };
 
 export default builtInPlugins;

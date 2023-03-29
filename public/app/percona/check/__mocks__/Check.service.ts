@@ -8,26 +8,6 @@ export const CheckService = {
   async runDbChecks(): Promise<void | {}> {
     return {};
   },
-  async getAllChecks(): Promise<CheckDetails[]> {
-    return [
-      {
-        summary: 'Test',
-        name: 'test enabled',
-        description: 'test enabled description',
-        interval: 'STANDARD',
-        disabled: false,
-        category: 'performance',
-      },
-      {
-        summary: 'Test disabled',
-        name: 'test disabled',
-        description: 'test disabled description',
-        interval: 'RARE',
-        disabled: true,
-        category: 'security',
-      },
-    ];
-  },
   async changeCheck(): Promise<void | {}> {
     return {};
   },
