@@ -30,7 +30,7 @@ export const UpdatePanel: FC<{}> = () => {
     isDefaultView,
     getCurrentVersionDetails,
   ] = useVersionDetails();
-  const [output, updateErrorMessage, isUpdated, updateFailed, launchUpdate] = usePerformUpdate();
+  const [output, updateErrorMessage, isUpdated, updateFailed, launchUpdate, , pmmServerStopped] = usePerformUpdate();
   const isLoading = isLoadingVersionDetails || isLoadingSettings;
 
   const getSettings = async () => {
@@ -125,6 +125,7 @@ export const UpdatePanel: FC<{}> = () => {
         output={output}
         updateFailed={updateFailed}
         version={nextVersionDetails?.nextVersion}
+        pmmServerStopped={pmmServerStopped}
       />
     </>
   );

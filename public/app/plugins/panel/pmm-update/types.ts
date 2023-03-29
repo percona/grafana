@@ -85,6 +85,7 @@ export interface ProgressModalProps {
   isUpdated?: boolean;
   output?: string;
   updateFailed?: boolean;
+  pmmServerStopped?: boolean;
 }
 
 export interface LastCheckProps {
@@ -126,7 +127,7 @@ export interface AvailableUpdateProps {
   nextVersionDetails: NextVersionDetails;
 }
 
-export type UpdateStatus = [string, string, boolean, boolean, (method: UpdateMethod) => void, UpdateMethod];
+export type UpdateStatus = [string, string, boolean, boolean, (method: UpdateMethod) => void, UpdateMethod, boolean];
 
 export type ApiCall<R, A> = [R | undefined, string, boolean, (args?: A) => void];
 

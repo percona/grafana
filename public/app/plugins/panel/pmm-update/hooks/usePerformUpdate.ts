@@ -1,9 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import { AppEvents } from '@grafana/data';
-import appEvents from 'app/core/app_events';
-
-import { Messages } from '../UpdatePanel.messages';
 import { getUpdateStatus } from '../UpdatePanel.service';
 import { UpdateMethod, UpdateStatus } from '../types';
 
@@ -15,8 +11,9 @@ export const usePerformUpdate = (): UpdateStatus => {
   const [output, setOutput] = useState('');
   const [updateFinished, setUpdateFinished] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
+  const [pmmServerStopped, setPmmServerStopped] = useState(false);
 
-  const [authToken, initialLogOffset, initializationFailed, launchUpdate, updateMethod] = useInitializeUpdate();
+  const [authToken, initialLogOffset, initializationFailed, launchUpdate, updateMethod, ,] = useInitializeUpdate();
 
   useEffect(() => {
     console.log({ authToken, initialLogOffset, updateMethod });
@@ -48,7 +45,7 @@ export const usePerformUpdate = (): UpdateStatus => {
 
         // Check if PMM server has stopped
         if (log_lines.some((line) => line.includes('Stopping PMM Server in container'))) {
-          appEvents.emit(AppEvents.alertWarning, [Messages.serverStopped.title, Messages.serverStopped.description]);
+          setPmmServerStopped(true);
         }
 
         setOutput((previousOutput) => {
@@ -65,6 +62,7 @@ export const usePerformUpdate = (): UpdateStatus => {
         setErrorMessage(e.message);
       } finally {
         if (newIsUpdated) {
+          setPmmServerStopped(false);
           setUpdateFinished(newIsUpdated);
         } else {
           const timeout = setTimeout(updateStatus, 500, newLogOffset, newErrorsCount);
@@ -88,5 +86,5 @@ export const usePerformUpdate = (): UpdateStatus => {
     setUpdateFailed(initializationFailed);
   }, [initializationFailed]);
 
-  return [output, errorMessage, updateFinished, updateFailed, launchUpdate, updateMethod];
+  return [output, errorMessage, updateFinished, updateFailed, launchUpdate, updateMethod, pmmServerStopped];
 };

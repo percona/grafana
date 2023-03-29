@@ -61,4 +61,7 @@ export const getStyles = (theme: GrafanaTheme2) => ({
   closeModal: css`
     align-self: center;
   `,
+  stopped: css`
+    margin-top: 10px;
+  `,
 });

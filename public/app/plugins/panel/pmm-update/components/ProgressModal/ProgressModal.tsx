@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef, useState, FC } from 'react';
 
-import { ClipboardButton, Icon, Button, Modal, IconName, useStyles2 } from '@grafana/ui';
+import { ClipboardButton, Icon, Button, Modal, IconName, useStyles2, Alert } from '@grafana/ui';
 
 import { ProgressModalHeader } from '../../components';
 import { useClickOutside } from '../../hooks';
@@ -16,6 +16,7 @@ export const ProgressModal: FC<ProgressModalProps> = ({
   isUpdated = false,
   output = '',
   updateFailed = false,
+  pmmServerStopped = false,
 }) => {
   const styles = useStyles2(getStyles);
   const outputRef = useRef<HTMLPreElement>(null);
@@ -77,6 +78,11 @@ export const ProgressModal: FC<ProgressModalProps> = ({
                 {Messages.copyToClipboard}
               </ClipboardButton>
             </div>
+            {pmmServerStopped && (
+              <Alert className={styles.stopped} title={Messages.serverStopped.title} severity="warning">
+                {Messages.serverStopped.description}
+              </Alert>
+            )}
             {isOutputShown && (
               <div className={styles.output}>
                 <pre data-testid="modal-output-pre" ref={outputRef}>
