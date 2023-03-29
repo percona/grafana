@@ -4,6 +4,7 @@ import { useStyles2 } from '@grafana/ui';
 import { FailedChecksCounts } from 'app/percona/check/types';
 
 import { getStyles } from './Failed.styles';
+import { Messages } from './TooltipText.messages';
 
 interface TooltipTextProps {
   counts: FailedChecksCounts;
@@ -21,16 +22,34 @@ export const TooltipText: FC<TooltipTextProps> = ({
 
   return (
     <div className={styles.TooltipWrapper}>
-      <div className={styles.TooltipHeader}>Failed checks:&nbsp;{sum}</div>
+      <div className={styles.TooltipHeader}>
+        {Messages.failedChecks}&nbsp;{sum}
+      </div>
       <div className={styles.TooltipBody} data-testid="checks-tooltip-body">
-        <div>Emergency &ndash;&nbsp;{emergency}</div>
-        <div>Alert &ndash;&nbsp;{alert}</div>
-        <div>Critical &ndash;&nbsp;{critical}</div>
-        <div>Error &ndash;&nbsp;{error}</div>
-        <div>Warning &ndash;&nbsp;{warning}</div>
-        <div>Notice &ndash;&nbsp;{notice}</div>
-        <div>Info &ndash;&nbsp;{info}</div>
-        <div>Debug &ndash;&nbsp;{debug}</div>
+        <div>
+          {Messages.emergency} &ndash;&nbsp;{emergency}
+        </div>
+        <div>
+          {Messages.alert} &ndash;&nbsp;{alert}
+        </div>
+        <div>
+          {Messages.critical} &ndash;&nbsp;{critical}
+        </div>
+        <div>
+          {Messages.error} &ndash;&nbsp;{error}
+        </div>
+        <div>
+          {Messages.warning} &ndash;&nbsp;{warning}
+        </div>
+        <div>
+          {Messages.notice} &ndash;&nbsp;{notice}
+        </div>
+        <div>
+          {Messages.info} &ndash;&nbsp;{info}
+        </div>
+        <div>
+          {Messages.debug} &ndash;&nbsp;{debug}
+        </div>
       </div>
     </div>
   );
