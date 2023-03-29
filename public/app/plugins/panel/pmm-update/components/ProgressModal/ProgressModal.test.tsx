@@ -57,4 +57,10 @@ describe('ProgressModal::', () => {
 
     expect(mockedReload).toBeCalledTimes(1);
   });
+
+  it('should show alert when pmm server is stopped', () => {
+    render(<ProgressModal isOpen version={version} pmmServerStopped />);
+
+    expect(screen.getByText(Messages.serverStopped.description)).toBeInTheDocument();
+  });
 });
