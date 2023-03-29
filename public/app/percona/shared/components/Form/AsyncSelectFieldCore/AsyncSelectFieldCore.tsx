@@ -6,9 +6,9 @@ import { Field, FieldInputProps, UseFieldConfig } from 'react-final-form';
 import { SelectableValue } from '@grafana/data';
 import { ActionMeta, AsyncSelect, SelectAsyncProps, SelectCommonProps, useStyles2 } from '@grafana/ui';
 
-import { Label } from '../../../core-ui/components/Label';
 import { LabeledFieldProps } from '../../../core-ui/shared/types';
 import { compose, GetSelectValueFunction, Validator } from '../../../core-ui/shared/validators';
+import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './AsyncSelectFieldCore.styles';
 
@@ -71,7 +71,7 @@ export const AsyncSelectFieldCore: FC<AsyncSelectFieldProps<any>> = ({
         return (
           <div className={cx(styles.field, fieldClassName)} data-testid={`${name}-field-container`}>
             {!!label && (
-              <Label
+              <LabelCore
                 name={name}
                 label={label}
                 required={required}

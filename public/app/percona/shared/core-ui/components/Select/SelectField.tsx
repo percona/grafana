@@ -4,11 +4,11 @@ import React, { FC, useMemo } from 'react';
 import { Field, FieldInputProps, UseFieldConfig } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
-import { Select, SelectCommonProps, useStyles2, ActionMeta } from '@grafana/ui';
+import { ActionMeta, Select, SelectCommonProps, useStyles2 } from '@grafana/ui';
 
+import { LabelCore } from '../../../components/Form/LabelCore';
 import { LabeledFieldProps } from '../../shared/types';
-import { Validator, GetSelectValueFunction, compose } from '../../shared/validators';
-import { Label } from '../Label';
+import { compose, GetSelectValueFunction, Validator } from '../../shared/validators';
 
 import { getStyles } from './SelectField.styles';
 
@@ -67,7 +67,7 @@ export const SelectField: FC<SelectFieldProps<any>> = ({
         return (
           <div className={cx(styles.field, fieldClassName)} data-testid={`${name}-field-container`}>
             {!!label && (
-              <Label
+              <LabelCore
                 name={name}
                 label={label}
                 required={required}

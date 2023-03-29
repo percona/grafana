@@ -1,4 +1,4 @@
-export * from './Label';
+export * from '../../components/Form/LabelCore';
 export * from './LoaderButton';
 export * from './Modal';
 export * from './NumberInput';

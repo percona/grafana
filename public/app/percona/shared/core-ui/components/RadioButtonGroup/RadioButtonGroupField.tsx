@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import { cx } from '@emotion/css';
 import React, { useCallback, useMemo } from 'react';
-import { Field, FieldMetaState, FieldInputProps, UseFieldConfig } from 'react-final-form';
+import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
 import { Icon, IconName, useStyles2 } from '@grafana/ui';
 
+import { LabelCore } from '../../../components/Form/LabelCore';
 import { FieldInputAttrs, LabeledFieldProps } from '../../shared/types';
-import { Validator, compose } from '../../shared/validators';
-import { Label } from '../Label';
+import { compose, Validator } from '../../shared/validators';
 
-import { RadioButtonSize, RadioButton } from './RadioButton';
+import { RadioButton, RadioButtonSize } from './RadioButton';
 import { getStyles } from './RadioButtonGroup.styles';
 
 type RadionButtonGroupOptions = Array<SelectableValue<string> & { disabled?: boolean }>;
@@ -72,7 +72,7 @@ export function RadioButtonGroupField({
 
         return (
           <div className={cx(styles.wrapper, className)}>
-            <Label
+            <LabelCore
               name={name}
               label={label}
               required={required}

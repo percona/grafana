@@ -3,12 +3,12 @@ import React, { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { LabeledFieldProps } from '../../shared/types';
-import { LinkTooltip } from '../LinkTooltip';
+import { LinkTooltip } from '../../../core-ui/components/LinkTooltip';
+import { LabeledFieldProps } from '../../../core-ui/shared/types';
 
-import { getStyles } from './Label.styles';
+import { getStyles } from './LabelCore.styles';
 
-export const Label: FC<LabeledFieldProps> = ({
+export const LabelCore: FC<LabeledFieldProps> = ({
   name,
   label,
   labelWrapperClassName,

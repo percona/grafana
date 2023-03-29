@@ -6,8 +6,8 @@ import { Field } from 'react-final-form';
 
 import { Switch, useStyles2 } from '@grafana/ui';
 
+import { LabelCore } from '../../../components/Form/LabelCore';
 import { compose } from '../../shared/validators';
-import { Label } from '../Label';
 
 import { getStyles } from './Switch.styles';
 import { SwitchFieldProps, SwitchFieldRenderProps } from './Switch.types';
@@ -35,7 +35,7 @@ export const SwitchField: FC<SwitchFieldProps> = ({
     <Field<boolean> {...fieldConfig} type="checkbox" name={name} validate={validate}>
       {({ input, meta }: SwitchFieldRenderProps) => (
         <div className={cx(styles.field, fieldClassName)} data-testid={`${name}-field-container`}>
-          <Label
+          <LabelCore
             name={name}
             label={label}
             inputId={inputId}

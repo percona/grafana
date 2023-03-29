@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 
 import { Select } from '@grafana/ui';
 import { SelectCommonProps } from '@grafana/ui/src/components/Select/types';
-import { Label } from 'app/percona/shared/core-ui';
+import { LabelCore } from 'app/percona/shared/core-ui';
 import { LabeledFieldProps } from 'app/percona/shared/core-ui/shared/types';
 
 import { withSelectStyles } from '../withSelectStyles/withSelectStyles';
@@ -22,7 +22,7 @@ const SelectFieldWrapper: FC<LabeledFieldProps & SelectCommonProps<any>> = ({
   ...props
 }) => (
   <>
-    <Label
+    <LabelCore
       name={name}
       label={label}
       required={required}

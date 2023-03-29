@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { Label } from '../../../core-ui/components/Label';
 import { FieldInputAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
+import { LabelCore } from '../../Form/LabelCore';
 
 import { getStyles } from './Checkbox.styles';
 
@@ -46,7 +46,7 @@ export const BaseCheckbox: FC<BaseCheckboxProps> = ({
           className={styles.input}
         />
         <span className={styles.checkmark} />
-        <Label
+        <LabelCore
           name={name}
           label={label}
           labelWrapperClassName={styles.checkmarkLabel}

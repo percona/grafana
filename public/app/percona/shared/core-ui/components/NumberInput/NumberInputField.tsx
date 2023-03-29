@@ -1,12 +1,12 @@
 import { cx } from '@emotion/css';
-import React, { FC, useCallback, useRef, useMemo } from 'react';
-import { Field, FieldMetaState, FieldInputProps, UseFieldConfig } from 'react-final-form';
+import React, { FC, useCallback, useMemo, useRef } from 'react';
+import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
 
+import { LabelCore } from '../../../components/Form/LabelCore';
 import { FieldInputAttrs, LabeledFieldProps } from '../../shared/types';
-import { Validator, compose } from '../../shared/validators';
-import { Label } from '../Label';
+import { compose, Validator } from '../../shared/validators';
 
 import { getStyles } from './NumberInput.styles';
 
@@ -85,7 +85,7 @@ export const NumberInputField: FC<NumberInputFieldProps> = React.memo(
 
           return (
             <div className={cx(styles.field, fieldClassName)} data-testid={`${name}-field-container`}>
-              <Label
+              <LabelCore
                 name={name}
                 label={label}
                 required={required}
