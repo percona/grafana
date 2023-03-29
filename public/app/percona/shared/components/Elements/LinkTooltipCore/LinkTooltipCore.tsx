@@ -2,11 +2,11 @@ import React, { FC } from 'react';
 
 import { Icon, Tooltip, useStyles2 } from '@grafana/ui';
 
-import { LabelTooltipProps } from '../../shared/types';
+import { LabelTooltipProps } from '../../../core-ui/shared/types';
 
-import { getStyles } from './LinkTooltip.styles';
+import { getStyles } from './LinkTooltipCore.styles';
 
-export const LinkTooltip: FC<LabelTooltipProps> = ({
+export const LinkTooltipCore: FC<LabelTooltipProps> = ({
   tooltipText,
   tooltipLink,
   tooltipLinkText = 'Read more',

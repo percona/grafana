@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { LinkTooltip } from '../../../core-ui/components/LinkTooltip';
 import { LabeledFieldProps } from '../../../core-ui/shared/types';
+import { LinkTooltipCore } from '../../Elements/LinkTooltipCore';
 
 import { getStyles } from './LabelCore.styles';
 
@@ -26,7 +26,7 @@ export const LabelCore: FC<LabeledFieldProps> = ({
         {label}
         {required ? ' *' : ''}
       </label>
-      {tooltipText && <LinkTooltip tooltipText={tooltipText} {...linkTooltipProps} />}
+      {tooltipText && <LinkTooltipCore tooltipText={tooltipText} {...linkTooltipProps} />}
     </div>
   ) : null;
 };
