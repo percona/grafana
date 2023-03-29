@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useState } from 'react';
 
 import { IconButton, useStyles2 } from '@grafana/ui';
-import { LoaderButton } from 'app/percona/shared/core-ui';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 
 import { Messages } from '../AllChecksTab.messages';
 

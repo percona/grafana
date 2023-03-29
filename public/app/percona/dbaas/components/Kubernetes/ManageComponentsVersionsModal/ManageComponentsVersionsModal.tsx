@@ -6,11 +6,12 @@ import { Field, Form, FormRenderProps } from 'react-final-form';
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
 import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { MultiCheckboxField } from 'app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField';
 import { Databases } from 'app/percona/shared/core';
-import { LoaderButton, logger, Modal } from 'app/percona/shared/core-ui';
+import { logger, Modal } from 'app/percona/shared/core-ui';
 
 import { DATABASE_OPERATORS } from '../../DBCluster/DBCluster.constants';
 import { newDBClusterService } from '../../DBCluster/DBCluster.utils';

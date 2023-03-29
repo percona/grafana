@@ -4,8 +4,8 @@ import { withTypes } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import {
-  LoaderButton,
   Modal,
   RadioButtonGroupField,
   TextareaInputField,

@@ -5,10 +5,11 @@ import { Field, withTypes } from 'react-final-form';
 import { DateTime, SelectableValue, toUtc } from '@grafana/data';
 import { Alert, Button, DateTimePicker, HorizontalGroup, useStyles2 } from '@grafana/ui';
 import { BackupMode } from 'app/percona/backup/Backup.types';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { Label } from 'app/percona/shared/components/Form/Label';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { LoaderButton, Modal, RadioButtonGroupField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { Modal, RadioButtonGroupField, TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
 import { LocationType } from '../../StorageLocations/StorageLocations.types';

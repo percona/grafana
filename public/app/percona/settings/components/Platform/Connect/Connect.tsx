@@ -4,8 +4,9 @@ import { Form, FormRenderProps } from 'react-final-form';
 
 import { Button, useStyles2 } from '@grafana/ui';
 import { PMMServerUrlWarning } from 'app/percona/dbaas/components/PMMServerURLWarning/PMMServerUrlWarning';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
-import { LoaderButton, TextInputField } from 'app/percona/shared/core-ui';
+import { TextInputField } from 'app/percona/shared/core-ui';
 import { getPerconaServer } from 'app/percona/shared/core/selectors';
 import validators from 'app/percona/shared/helpers/validators';
 import { useSelector } from 'app/types';

@@ -9,13 +9,13 @@ import { CollapsableSection, CustomScrollbar, LinkButton, PageToolbar, useStyles
 import appEvents from 'app/core/app_events';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { PageSwitcherValue } from 'app/percona/shared/components/Elements/PageSwitcherCard/PageSwitcherCard.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import {
-  LoaderButton,
   logger,
   Overlay,
   RadioButtonGroupField,

@@ -5,7 +5,8 @@ import { AppEvents } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { CheckService } from 'app/percona/check/Check.service';
-import { LoaderButton, logger, Modal, RadioButtonGroupField } from 'app/percona/shared/core-ui';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
+import { logger, Modal, RadioButtonGroupField } from 'app/percona/shared/core-ui';
 
 import { checkIntervalOptions } from './ChangeCheckIntervalModal.constants';
 import { Messages } from './ChangeCheckIntervalModal.messages';

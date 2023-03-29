@@ -5,7 +5,7 @@ import React, { FC, useCallback, useState } from 'react';
 import { withTypes } from 'react-final-form';
 
 import { Collapse, HorizontalGroup, useStyles2 } from '@grafana/ui';
-import { LoaderButton } from 'app/percona/shared/core-ui';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 
 import { getStyles } from './FilterSection.styles';
 import { FilterSectionProps } from './FilterSection.types';
