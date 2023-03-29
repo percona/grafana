@@ -1,4 +1,4 @@
-import { CheckDetails, FailedCheckSummary, ServiceFailedCheck } from 'app/percona/check/types';
+import { FailedCheckSummary, ServiceFailedCheck } from 'app/percona/check/types';
 import { PaginatedFomattedResponse, Severity } from 'app/percona/shared/core';
 
 /**
