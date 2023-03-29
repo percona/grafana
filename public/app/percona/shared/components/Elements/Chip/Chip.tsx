@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { Icon } from '../Icon';
+import { Icon } from '../../../core-ui/components/Icon';
 
 import { getStyles } from './Chip.styles';
 

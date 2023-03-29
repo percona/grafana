@@ -1,4 +1,3 @@
-export * from './Chip';
 export * from './Dropdown';
 export * from './Icon';
 export * from './Label';
