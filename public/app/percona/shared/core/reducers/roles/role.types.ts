@@ -6,7 +6,7 @@ export interface RolesState {
 }
 
 export interface AssignRoleParams {
-  userId: number;
+  entityId: number;
   roleIds: number[];
   entityType: AccessRoleEntity;
 }

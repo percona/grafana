@@ -3,6 +3,7 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { Select } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
+import { AssignRoleParams } from 'app/percona/shared/core/reducers/roles/role.types';
 import { assignRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { getAccessRoles, getUsersInfo } from 'app/percona/shared/core/selectors';
 import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types';
@@ -36,9 +37,9 @@ const AccessRoleCell: FC<AccessRoleCellProps> = ({ user }) => {
     // value will always be defined
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const ids = roleIds.map((v) => v.value as number);
-    const payload = {
+    const payload: AssignRoleParams = {
       roleIds: ids,
-      userId: user.userId,
+      entityId: user.userId,
       entityType: AccessRoleEntity.user,
     };
     await dispatch(assignRoleAction(payload));

@@ -41,7 +41,6 @@ export interface DeleteAccessRolePayload {
 
 export interface AssignRolePayload {
   role_ids: number[];
-  user_id: number;
   entity_type: AccessRoleEntity;
   entity_id: number;
 }

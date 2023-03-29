@@ -15,7 +15,7 @@ import {
   UpdateAccessRole,
   UpdateAccessRolePayload,
 } from './Roles.types';
-import { entityTypeToId, toAccessRole, toCreateBody, toUpdateBody } from './Roles.utils';
+import { toAccessRole, toCreateBody, toUpdateBody } from './Roles.utils';
 
 const BASE_URL = '/v1/management/Role';
 
@@ -40,12 +40,11 @@ const RolesService = {
       replacement_role_id: role.replacementRoleId,
     });
   },
-  async assign(roleIds: number[], userId: number, entity: AccessRoleEntity): Promise<void> {
+  async assign(roleIds: number[], entityId: number, entity: AccessRoleEntity): Promise<void> {
     await api.post<void, AssignRolePayload>(`${BASE_URL}/Assign`, {
       role_ids: roleIds,
-      user_id: userId,
+      entity_id: entityId,
       entity_type: entity,
-      entity_id: entityTypeToId(entity),
     });
   },
   async setDefault(roleId: number): Promise<void> {

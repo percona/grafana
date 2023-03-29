@@ -97,7 +97,7 @@ describe('AccessRoleCell', () => {
     await selectEvent.select(roleSelect, ['Role #1', 'Role #2'], { container: document.body });
 
     expect(assignRoleActionSpy).toHaveBeenCalledWith({
-      userId: 2,
+      entityId: 2,
       roleIds: [1, 2],
       entityType: AccessRoleEntity.user,
     });
@@ -111,7 +111,7 @@ describe('AccessRoleCell', () => {
     removeButton.click();
 
     expect(assignRoleActionSpy).toHaveBeenCalledWith({
-      userId: 3,
+      entityId: 3,
       roleIds: [2],
       entityType: AccessRoleEntity.user,
     });
