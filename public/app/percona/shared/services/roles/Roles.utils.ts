@@ -1,5 +1,6 @@
 import {
   AccessRole,
+  AccessRoleEntity,
   AccessRoleResponse,
   CreateAccessRole,
   CreateAccessRolePayload,
@@ -22,3 +23,5 @@ export const toUpdateBody = (payload: UpdateAccessRole): UpdateAccessRolePayload
 export const toCreateBody = (payload: CreateAccessRole): CreateAccessRolePayload => ({
   ...payload,
 });
+
+export const entityTypeToId = (entity: AccessRoleEntity): number => (entity === AccessRoleEntity.user ? 1 : 0);

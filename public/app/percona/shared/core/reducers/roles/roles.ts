@@ -91,12 +91,14 @@ export const setAsDefaultRoleAction = createAsyncThunk(
     )
 );
 
-export const assignRoleAction = createAsyncThunk('percona/assignRole', async ({ roleIds, userId }: AssignRoleParams) =>
-  withSerializedError(
-    (async () => {
-      await RolesService.assign(roleIds, userId);
-    })()
-  )
+export const assignRoleAction = createAsyncThunk(
+  'percona/assignRole',
+  async ({ roleIds, userId, entityType }: AssignRoleParams) =>
+    withSerializedError(
+      (async () => {
+        await RolesService.assign(roleIds, userId, entityType);
+      })()
+    )
 );
 
 export default rolesSlice.reducer;

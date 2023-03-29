@@ -5,6 +5,7 @@ import { Select } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { assignRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { getAccessRoles, getUsersInfo } from 'app/percona/shared/core/selectors';
+import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types';
 import { useAppDispatch } from 'app/store/store';
 import { OrgUser, useSelector } from 'app/types';
 
@@ -38,6 +39,7 @@ const AccessRoleCell: FC<AccessRoleCellProps> = ({ user }) => {
     const payload = {
       roleIds: ids,
       userId: user.userId,
+      entityType: AccessRoleEntity.user,
     };
     await dispatch(assignRoleAction(payload));
     appEvents.emit(AppEvents.alertSuccess, [Messages.success.title(user.name || user.login), Messages.success.body]);

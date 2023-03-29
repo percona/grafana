@@ -9,6 +9,11 @@ export interface AccessRole {
   description?: string;
 }
 
+export enum AccessRoleEntity {
+  invalid = 0,
+  user = 1,
+}
+
 export interface AccessRoleResponse {
   role_id: number;
   title: string;
@@ -37,6 +42,8 @@ export interface DeleteAccessRolePayload {
 export interface AssignRolePayload {
   role_ids: number[];
   user_id: number;
+  entity_type: AccessRoleEntity;
+  entity_id: number;
 }
 
 export interface SetDefaultRolePayload {
