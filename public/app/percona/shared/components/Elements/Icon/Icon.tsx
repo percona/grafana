@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { MinusSquare, PlusSquare, EnabledSquare, DisabledSquare, Cross } from '../../shared/icons';
+import { Cross, DisabledSquare, EnabledSquare, MinusSquare, PlusSquare } from '../../../core-ui/shared/icons';
 
 import { AvailableIcons, Icons } from './types';
 
