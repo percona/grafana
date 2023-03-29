@@ -44,7 +44,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     align-items: flex-start;
     margin-bottom: 16px;
 
-    width: 384px;
     margin-top: 24px;
     padding-bottom: 16px;
 

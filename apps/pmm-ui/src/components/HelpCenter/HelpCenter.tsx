@@ -43,18 +43,20 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
           <div className="flex-grow-1" />
           <IconButton aria-label="Close 'Add Panel' widget" name="times" size="xl" onClick={onClose} />
         </div>
-        <TabsBar hideBorder>
+        <TabsBar>
           <TabsBar>
             <Tab label="Tips" active={activeTab === 'tips'} onChangeTab={changeTab('tips')} />
             <Tab label="Resources" active={activeTab === 'resources'} onChangeTab={changeTab('resources')} />
           </TabsBar>
         </TabsBar>
-        {activeTab === 'tips' && <HelpCenterTipsContainer
-            userId={userId}
-            isConnectedUser={isConnectedUser}
-        />}
+        <div className={styles.containerContentTabs}>
+          {activeTab === 'tips' && <HelpCenterTipsContainer
+              userId={userId}
+              isConnectedUser={isConnectedUser}
+          />}
 
-        {activeTab === 'resources' && <ResourcesContainer />}
+          {activeTab === 'resources' && <ResourcesContainer />}
+        </div>
       </div>
       <div className={styles.indentContainer} />
     </div>
@@ -70,10 +72,10 @@ const getStyles = (open: boolean) => (theme: GrafanaTheme2) => ({
     top: 56px;
     position: fixed;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: hidden;
     border-left: none;
     background-color: ${theme.colors.background.canvas};
-    z-index: 1200;
+    z-index: 1000;
     visibility: ${open ? 'visible' : 'hidden' };
 
     @media (max-width: 1279px) {
@@ -92,6 +94,10 @@ const getStyles = (open: boolean) => (theme: GrafanaTheme2) => ({
     @media (max-width: 1279px) {
       border-left: none;
     }
+  `,
+  containerContentTabs: css`
+    overflow-y: auto;
+    height: calc(100% - 80px);
   `,
   indentContainer: css`
     height: 16px;
