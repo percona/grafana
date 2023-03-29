@@ -7,7 +7,8 @@ import { Button, HorizontalGroup, Icon, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { Messages } from 'app/percona/integrated-alerting/IntegratedAlerting.messages';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
-import { logger, Modal, TextareaInputField, validators } from 'app/percona/shared/core-ui';
+import { Modal } from 'app/percona/shared/components/Elements/Modal';
+import { logger, TextareaInputField, validators } from 'app/percona/shared/core-ui';
 
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 

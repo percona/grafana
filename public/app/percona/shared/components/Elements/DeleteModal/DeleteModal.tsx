@@ -4,7 +4,7 @@ import { withTypes } from 'react-final-form';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
-import { Modal } from 'app/percona/shared/core-ui';
+import { Modal } from 'app/percona/shared/components/Elements/Modal';
 
 import { Messages } from './DeleteModal.messages';
 import { getStyles } from './DeleteModal.styles';

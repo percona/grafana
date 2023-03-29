@@ -5,13 +5,8 @@ import { withTypes } from 'react-final-form';
 import { SelectableValue } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
-import {
-  Modal,
-  RadioButtonGroupField,
-  TextareaInputField,
-  TextInputField,
-  validators,
-} from 'app/percona/shared/core-ui';
+import { Modal } from 'app/percona/shared/components/Elements/Modal';
+import { RadioButtonGroupField, TextareaInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { LocationType } from '../StorageLocations.types';
 

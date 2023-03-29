@@ -5,8 +5,9 @@ import { AppEvents } from '@grafana/data';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
+import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { WarningBlock } from 'app/percona/shared/components/Elements/WarningBlock';
-import { logger, Modal, TextareaInputField, validators } from 'app/percona/shared/core-ui';
+import { logger, TextareaInputField, validators } from 'app/percona/shared/core-ui';
 
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 

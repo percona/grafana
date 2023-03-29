@@ -1,5 +1,3 @@
-export * from '../../components/Form/LabelCore';
-export * from './Modal';
 export * from './NumberInput';
 export * from './Overlay';
 export * from './PasswordInput';
