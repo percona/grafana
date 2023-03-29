@@ -5,7 +5,7 @@ import { Spinner } from '@grafana/ui';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 
 import * as styles from './UpdatePanel.styles';
-import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck, ProgressModal, UpgradeButton } from './components';
+import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck, ProgressModal, UpgradeSection } from './components';
 import { useVersionDetails, usePerformUpdate } from './hooks';
 
 export const UpdatePanel: FC<{}> = () => {
@@ -96,7 +96,7 @@ export const UpdatePanel: FC<{}> = () => {
           <>
             {(isUpdateAvailable || forceUpdate) && !updatesDisabled && !hasNoAccess && isOnline ? (
               <div className={styles.middleSectionWrapper}>
-                <UpgradeButton
+                <UpgradeSection
                   onUpdateStart={handleUpdate}
                   upgradeServiceAvailable={isUpgradeServiceAvailable}
                   nextVersion={nextVersionDetails?.nextVersion}

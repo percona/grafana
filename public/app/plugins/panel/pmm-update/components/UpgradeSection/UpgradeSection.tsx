@@ -2,13 +2,13 @@ import React, { FC, useState } from 'react';
 
 import { Button, IconName, useStyles2 } from '@grafana/ui';
 
-import { UpgradeButtonProps } from '../../types';
+import { UpgradeSectionProps } from '../../types';
 import { ConfirmUpdateModal } from '../ConfirmUpdateModal/ConfirmUpdateModal';
 
-import { Messages } from './UpgradeButton.messages';
-import { getStyles } from './UpgradeButton.styles';
+import { Messages } from './UpgradeSection.messages';
+import { getStyles } from './UpgradeSection.styles';
 
-export const UpgradeButton: FC<UpgradeButtonProps> = ({ onUpdateStart, upgradeServiceAvailable, nextVersion }) => {
+export const UpgradeSection: FC<UpgradeSectionProps> = ({ onUpdateStart, upgradeServiceAvailable, nextVersion }) => {
   const styles = useStyles2(getStyles);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export const UpgradeButton: FC<UpgradeButtonProps> = ({ onUpdateStart, upgradeSe
     <div className={styles.container}>
       <ConfirmUpdateModal isOpen={isModalOpen} onCancel={handleCancel} onConfirm={handleConfirm} />
       {/* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */}
-      <Button onClick={handleOpen} icon={'fa fa-download' as IconName} variant="secondary">
+      <Button data-testid="upgrade-button" onClick={handleOpen} icon={'fa fa-download' as IconName} variant="secondary">
         {Messages.upgradeTo(nextVersion)}
       </Button>
       {!upgradeServiceAvailable && (

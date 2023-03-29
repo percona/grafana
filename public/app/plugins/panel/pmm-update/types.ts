@@ -111,7 +111,7 @@ export interface InfoBoxProps {
   isOnline?: boolean;
 }
 
-export interface UpgradeButtonProps {
+export interface UpgradeSectionProps {
   onUpdateStart: () => void;
   upgradeServiceAvailable: boolean;
   nextVersion?: string;

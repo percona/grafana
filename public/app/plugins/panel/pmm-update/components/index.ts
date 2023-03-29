@@ -5,4 +5,4 @@ export { InfoBox } from './InfoBox/InfoBox';
 export { LastCheck } from './LastCheck/LastCheck';
 export { ProgressModal } from './ProgressModal/ProgressModal';
 export { ProgressModalHeader } from './ProgressModalHeader/ProgressModalHeader';
-export { UpgradeButton } from './UpgradeButton/UpgradeButton';
+export { UpgradeSection } from './UpgradeSection/UpgradeSection';
