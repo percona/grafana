@@ -10,6 +10,7 @@ import appEvents from 'app/core/app_events';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { PageSwitcherValue } from 'app/percona/shared/components/Elements/PageSwitcherCard/PageSwitcherCard.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
@@ -17,7 +18,6 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import {
   logger,
-  Overlay,
   RadioButtonGroupField,
   TextareaInputField,
   TextInputField,

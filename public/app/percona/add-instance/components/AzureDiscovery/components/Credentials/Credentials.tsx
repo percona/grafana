@@ -2,7 +2,8 @@ import React, { FC, useCallback } from 'react';
 import { Form as FormFinal } from 'react-final-form';
 
 import { Button, useStyles } from '@grafana/ui';
-import { PasswordInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
+import { TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { SECURITY_CREDENTIALS_DOC_LINK } from './Credentials.constants';
 import { Messages } from './Credentials.messages';

@@ -2,7 +2,8 @@ import React, { FC, useCallback, useMemo } from 'react';
 
 import { useStyles } from '@grafana/ui';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
-import { PasswordInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
+import { TextInputField, validators } from 'app/percona/shared/core-ui';
 import Validators from 'app/percona/shared/helpers/validators';
 
 import { Messages } from '../FormParts.messages';

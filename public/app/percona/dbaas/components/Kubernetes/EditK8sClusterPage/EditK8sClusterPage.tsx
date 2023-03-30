@@ -3,7 +3,8 @@ import { Form, FormRenderProps } from 'react-final-form';
 import { useHistory } from 'react-router-dom';
 
 import { Button, Icon, Tooltip, useStyles } from '@grafana/ui/src';
-import { PasswordInputField, TextareaInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
+import { TextareaInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
 import { useDispatch, useSelector } from 'app/types';
 
 import { FeatureLoader } from '../../../../shared/components/Elements/FeatureLoader';
