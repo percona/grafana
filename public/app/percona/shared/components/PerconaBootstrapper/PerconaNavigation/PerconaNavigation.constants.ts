@@ -183,6 +183,11 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
       url: `${config.appSubUrl}/settings/am-integration`,
     },
     {
+      id: 'settings-prometheus-configuration',
+      text: 'Prometheus configuration editor',
+      url: `${config.appSubUrl}/settings/prometheus-configuration`,
+    },
+    {
       id: 'settings-percona-platform',
       text: 'Percona Platform',
       url: `${config.appSubUrl}/settings/percona-platform`,

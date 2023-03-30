@@ -731,6 +731,15 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
+      path: '/settings/prometheus-configuration',
+      component: SafeDynamicImport(
+        () =>
+          import(
+            /* webpackChunkName: "PrometheusConfigurationSettingsPage" */ 'app/percona/settings/components/PrometheusConfiguration/PrometheusConfiguration'
+          )
+      ),
+    },
+    {
       path: '/inventory',
       // eslint-disable-next-line react/display-name
       component: () => <Redirect to="/inventory/services" />,
