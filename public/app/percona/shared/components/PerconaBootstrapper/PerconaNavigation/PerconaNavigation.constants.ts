@@ -184,7 +184,7 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
     },
     {
       id: 'settings-prometheus-configuration',
-      text: 'Prometheus configuration editor',
+      text: 'Prometheus Configuration',
       url: `${config.appSubUrl}/settings/prometheus-configuration`,
     },
     {
