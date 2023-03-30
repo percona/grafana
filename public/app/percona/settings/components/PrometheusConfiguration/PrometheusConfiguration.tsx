@@ -72,10 +72,15 @@ export const PrometheusConfiguration: React.FC = () => {
                 <Field
                   name="configuration"
                   render={({ input }) => (
-                    <TextArea {...input} className={styles.configuration} data-testid="alertmanager-rules" />
+                    <TextArea {...input} className={styles.configuration} data-testid="configuration-input" />
                   )}
                 />
-                <Button type="submit" onClick={handleSubmit} disabled={submitting || !dirty}>
+                <Button
+                  data-testid="submit-configuration"
+                  type="submit"
+                  onClick={handleSubmit}
+                  disabled={submitting || !dirty}
+                >
                   {Messages.submit}
                 </Button>
               </>
