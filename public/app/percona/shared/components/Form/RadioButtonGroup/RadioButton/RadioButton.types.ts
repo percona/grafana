@@ -1,4 +1,4 @@
-import { FieldInputAttrs } from '../../../shared/types';
+import { FieldInputAttrs } from '../../../../core-ui/shared/types';
 
 export type RadioButtonSize = 'sm' | 'md';
 

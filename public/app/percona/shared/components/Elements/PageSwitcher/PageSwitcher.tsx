@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { Field } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
-import { RadioButton } from 'app/percona/shared/core-ui/components/RadioButtonGroup/RadioButton';
+import { RadioButton } from 'app/percona/shared/components/Form/RadioButtonGroup/RadioButton';
 
 import { getStyles } from './PageSwitcher.styles';
 import { PageSwitcherProps } from './PageSwitcher.types';

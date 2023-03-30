@@ -3,7 +3,8 @@ import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { useStyles } from '@grafana/ui';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
-import { RadioButtonGroupField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
+import { TextInputField, validators } from 'app/percona/shared/core-ui';
 import Validators from 'app/percona/shared/helpers/validators';
 
 import { metricsParametersOptions, schemaOptions } from '../FormParts.constants';

@@ -13,16 +13,11 @@ import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButto
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { PageSwitcherValue } from 'app/percona/shared/components/Elements/PageSwitcherCard/PageSwitcherCard.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import {
-  logger,
-  RadioButtonGroupField,
-  TextareaInputField,
-  TextInputField,
-  validators,
-} from 'app/percona/shared/core-ui';
+import { logger, TextareaInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';

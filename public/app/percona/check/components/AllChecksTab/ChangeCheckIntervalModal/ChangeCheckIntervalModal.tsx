@@ -7,7 +7,8 @@ import { appEvents } from 'app/core/app_events';
 import { CheckService } from 'app/percona/check/Check.service';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
-import { logger, RadioButtonGroupField } from 'app/percona/shared/core-ui';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
+import { logger } from 'app/percona/shared/core-ui';
 
 import { checkIntervalOptions } from './ChangeCheckIntervalModal.constants';
 import { Messages } from './ChangeCheckIntervalModal.messages';

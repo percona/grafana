@@ -2,7 +2,7 @@ import React, { FC, useMemo, useRef } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { generateId } from '../../../shared';
+import { generateId } from '../../../../core-ui/shared';
 
 import { getStylesFn } from './RadioButton.styles';
 import { RadioButtonProps } from './RadioButton.types';

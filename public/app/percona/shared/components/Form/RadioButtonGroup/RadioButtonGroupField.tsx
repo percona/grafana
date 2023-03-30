@@ -6,9 +6,9 @@ import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-fi
 import { SelectableValue } from '@grafana/data';
 import { Icon, IconName, useStyles2 } from '@grafana/ui';
 
-import { LabelCore } from '../../../components/Form/LabelCore';
-import { FieldInputAttrs, LabeledFieldProps } from '../../shared/types';
-import { compose, Validator } from '../../shared/validators';
+import { FieldInputAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
+import { compose, Validator } from '../../../core-ui/shared/validators';
+import { LabelCore } from '../LabelCore';
 
 import { RadioButton, RadioButtonSize } from './RadioButton';
 import { getStyles } from './RadioButtonGroup.styles';

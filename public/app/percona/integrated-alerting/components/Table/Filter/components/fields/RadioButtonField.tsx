@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useStyles2 } from '@grafana/ui';
-import { RadioButtonGroupField } from 'app/percona/shared/core-ui';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 
 import { ExtendedColumn } from '../../..';
 import { ALL_VALUE } from '../../Filter.constants';

@@ -10,7 +10,8 @@ import { EmailAuthType } from 'app/percona/settings/Settings.types';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
-import { logger, RadioButtonGroupField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
+import { logger, TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { getSettingsStyles } from '../../../Settings.styles';
 import { Messages } from '../Communication.messages';

@@ -9,8 +9,9 @@ import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButto
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { Label } from 'app/percona/shared/components/Form/Label';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { RadioButtonGroupField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
 import { LocationType } from '../../StorageLocations/StorageLocations.types';
