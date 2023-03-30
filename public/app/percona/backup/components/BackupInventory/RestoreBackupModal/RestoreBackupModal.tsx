@@ -10,8 +10,9 @@ import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { Label } from 'app/percona/shared/components/Form/Label';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { TextInputField, validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/core-ui';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
 import { LocationType } from '../../StorageLocations/StorageLocations.types';

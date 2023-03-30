@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Button, Spinner, useStyles2 } from '@grafana/ui';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/LinkTooltip';
-import { TextInputField } from 'app/percona/shared/core-ui';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 
 import { LoadingCallback } from '../../../Settings.service';
 import { SlackPayload, SlackSettings } from '../../../Settings.types';

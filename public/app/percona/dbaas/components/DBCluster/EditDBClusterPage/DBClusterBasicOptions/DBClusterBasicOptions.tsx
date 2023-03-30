@@ -7,7 +7,8 @@ import {
   AsyncSelectFieldAdapter,
   SelectFieldAdapter,
 } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
-import { TextInputField, validators } from 'app/percona/shared/core-ui';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
+import { validators } from 'app/percona/shared/core-ui';
 
 import { useSelector } from '../../../../../../types';
 import { getPerconaSettings } from '../../../../../shared/core/selectors';

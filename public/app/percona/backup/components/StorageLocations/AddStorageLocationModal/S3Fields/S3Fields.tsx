@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
 
 import { SecretToggler } from 'app/percona/shared/components/Elements/SecretToggler';
-import { TextInputField, validators } from 'app/percona/shared/core-ui';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
+import { validators } from 'app/percona/shared/core-ui';
 
 import { Messages } from './S3Fields.Messages';
 import { MAX_LENGTH } from './S3Fields.constants';

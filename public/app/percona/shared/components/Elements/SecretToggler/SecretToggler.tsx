@@ -2,7 +2,7 @@ import { cx } from '@emotion/css';
 import React, { FC, useMemo, useState } from 'react';
 
 import { Icon, useStyles } from '@grafana/ui';
-import { TextInputField } from 'app/percona/shared/core-ui';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 
 import { getStyles } from './SecretToggler.styles';
 import { SecretTogglerProps } from './SecretToggler.types';

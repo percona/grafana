@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
-import { FormWrapper } from '../../shared';
-import { email } from '../../shared/validators';
+import { FormWrapper } from '../../../core-ui/shared';
+import { email } from '../../../core-ui/shared/validators';
 
 import { TextInputField } from './TextInputField';
 

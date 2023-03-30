@@ -15,10 +15,11 @@ import { PageSwitcherValue } from 'app/percona/shared/components/Elements/PageSw
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { logger, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { logger, validators } from 'app/percona/shared/core-ui';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';

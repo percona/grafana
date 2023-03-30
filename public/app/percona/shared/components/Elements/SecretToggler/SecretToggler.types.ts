@@ -1,4 +1,4 @@
-import { TextInputFieldProps } from 'app/percona/shared/core-ui';
+import { TextInputFieldProps } from 'app/percona/shared/components/Form/TextInput';
 
 export interface SecretTogglerProps {
   secret?: string;

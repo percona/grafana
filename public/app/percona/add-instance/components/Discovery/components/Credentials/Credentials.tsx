@@ -3,7 +3,7 @@ import { Form as FormFinal } from 'react-final-form';
 
 import { Button, useStyles } from '@grafana/ui';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
-import { TextInputField } from 'app/percona/shared/core-ui';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 
 import { Messages } from './Credentials.messages';
 import { getStyles } from './Credentials.styles';
