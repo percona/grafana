@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
-import { FormWrapper } from '../../shared';
+import { FormWrapper } from '../../../core-ui/shared';
 
 import { SwitchField } from './Switch';
 
