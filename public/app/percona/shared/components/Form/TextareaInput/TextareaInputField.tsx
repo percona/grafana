@@ -4,9 +4,9 @@ import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-fi
 
 import { useStyles2 } from '@grafana/ui';
 
-import { LabelCore } from '../../../components/Form/LabelCore';
-import { FieldTextareaAttrs, LabeledFieldProps } from '../../shared/types';
-import { compose, Validator } from '../../shared/validators';
+import { FieldTextareaAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
+import { compose, Validator } from '../../../core-ui/shared/validators';
+import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './TextareaInput.styles';
 

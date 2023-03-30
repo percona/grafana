@@ -7,7 +7,8 @@ import { appEvents } from 'app/core/app_events';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { WarningBlock } from 'app/percona/shared/components/Elements/WarningBlock';
-import { logger, TextareaInputField, validators } from 'app/percona/shared/core-ui';
+import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
+import { logger, validators } from 'app/percona/shared/core-ui';
 
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';
 

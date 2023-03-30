@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
-import { TextareaInputField } from 'app/percona/shared/core-ui';
+import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
 
 import { Messages } from '../FormParts.messages';
 import { FormPartProps } from '../FormParts.types';

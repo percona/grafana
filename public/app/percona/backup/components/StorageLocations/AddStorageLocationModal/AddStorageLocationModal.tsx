@@ -7,7 +7,8 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
-import { TextareaInputField, TextInputField, validators } from 'app/percona/shared/core-ui';
+import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
+import { TextInputField, validators } from 'app/percona/shared/core-ui';
 
 import { LocationType } from '../StorageLocations.types';
 
