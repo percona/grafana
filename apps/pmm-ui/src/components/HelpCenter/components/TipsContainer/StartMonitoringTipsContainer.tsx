@@ -16,7 +16,7 @@ export const StartMonitoringTipsContainer: FC<StartMonitoringTipsContainerProps>
   const styles = useStyles2 (getStyles);
 
   return (
-    <>
+    <div className={styles.tipContainer}>
       <div className={styles.top}/>
       <div className={styles.headerContainer}>
         <h3 className={styles.tipsLabel}>Start Monitoring with PMM</h3>
@@ -28,7 +28,7 @@ export const StartMonitoringTipsContainer: FC<StartMonitoringTipsContainerProps>
         userId={userId}
         setTipSelected={setSystemTipsCurrentlySelected}
       />
-    </>
+    </div>
   );
 };
 
@@ -46,6 +46,9 @@ const getStyles = (theme: GrafanaTheme2) => {
     headerContainer: css`
       display: flex;
       justify-content: flex-start;
+    `,
+    tipContainer: css`
+      margin-bottom: ${theme.spacing (4)};
     `,
   };
 };

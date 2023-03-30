@@ -89,6 +89,7 @@ const getStyles = (open: boolean) => (theme: GrafanaTheme2) => ({
     padding-left: 16px;
     padding-right: 16px;
     border-left: solid;
+    border-width: 1px;
     height: 100%;
     border-left-color: ${theme.colors.background.secondary};
     @media (max-width: 1279px) {

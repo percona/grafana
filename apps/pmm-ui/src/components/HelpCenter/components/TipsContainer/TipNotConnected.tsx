@@ -6,44 +6,46 @@ import { Messages } from './TipNotConnected.messages';
 import tipIcon from '../../assets/pmm-percona-icon-purple.svg';
 
 export const TipNotConnected: FC = () => {
-  const styles = useStyles2(getStyles);
+  const styles = useStyles2 (getStyles);
 
   return (
-    <div className={styles.resourceContainer}>
-      <div className={styles.header}>
-        <div className={styles.title}>{Messages.title}</div>
+    <div className={styles.tipContainer}>
+      <div className={styles.headerContainer}>
+        <h3 className={styles.tipsLabel}>{Messages.title} PMM</h3>
       </div>
-      <div className={styles.body}>
-        {Messages.connectingInfo}
-        <ul className={styles.unorderedList}>
-          <li>
-            {Messages.getMore}
-            <a className={styles.link} href={Messages.link.advisors} target="_blank" rel="noreferrer">
-              {Messages.advisors}
+      <div className={styles.resourceContainer}>
+        <div className={styles.body}>
+          {Messages.connectingInfo}
+          <ul className={styles.unorderedList}>
+            <li>
+              {Messages.getMore}
+              <a className={styles.link} href={Messages.link.advisors} target="_blank" rel="noreferrer">
+                {Messages.advisors}
+              </a>
+              {Messages.advisorsDescription}
+            </li>
+            <li>
+              {Messages.getMore}
+              <a className={styles.link} href={Messages.link.alertsTemplate} target="_blank" rel="noreferrer">
+                {Messages.alertsTemplate}
+              </a>
+              {Messages.alertsTemplateDescription}
+            </li>
+          </ul>
+          <p>
+            {Messages.visitOur}
+            <a className={styles.link} href={Messages.link.premiumPlans} target="_blank" rel="noreferrer">
+              {Messages.premiumPlans}
             </a>
-            {Messages.advisorsDescription}
-          </li>
-          <li>
-            {Messages.getMore}
-            <a className={styles.link} href={Messages.link.alertsTemplate} target="_blank" rel="noreferrer">
-              {Messages.alertsTemplate}
-            </a>
-            {Messages.alertsTemplateDescription}
-          </li>
-        </ul>
-        <p>
-          {Messages.visitOur}
-          <a className={styles.link} href={Messages.link.premiumPlans} target="_blank" rel="noreferrer">
-            {Messages.premiumPlans}
-          </a>
-          {Messages.premiumPlansDescription}
-        </p>
+            {Messages.premiumPlansDescription}
+          </p>
 
-        <div>
-          <Button className={styles.tipsButton} fullWidth variant="secondary">
-            <img className={styles.buttonImage} alt="pmm-logo" src={tipIcon} />
-            <div className={styles.perconaButtonLabel}>{Messages.button.connectToPlatform}</div>
-          </Button>
+          <div>
+            <Button className={styles.tipsButton} fullWidth variant="secondary">
+              <img className={styles.buttonImage} alt="pmm-logo" src={tipIcon}/>
+              <div className={styles.perconaButtonLabel}>{Messages.button.connectToPlatform}</div>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -51,6 +53,16 @@ export const TipNotConnected: FC = () => {
 };
 
 const getStyles = (theme: GrafanaTheme2) => ({
+  tipsLabel: css`
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: ${theme.colors.text.primary};
+  `,
+  headerContainer: css`
+    display: flex;
+    justify-content: flex-start;
+  `,
   link: css`
     color: ${theme.colors.text.link};
   `,
@@ -74,16 +86,15 @@ const getStyles = (theme: GrafanaTheme2) => ({
   resourceContainer: css`
     flex-direction: column;
 
-    margin-top: ${theme.spacing(3)};
-    margin-bottom: ${theme.spacing(2)};
+    margin-bottom: ${theme.spacing (2)};
 
-    padding-bottom: ${theme.spacing(2)};
+    padding-bottom: ${theme.spacing (2)};
 
     background: ${theme.colors.background.secondary};
     border-radius: 8px;
   `,
   header: css`
-    padding: ${theme.spacing(2, 2)};
+    padding: ${theme.spacing (2, 2)};
   `,
   title: css`
     font-weight: 400;
@@ -97,6 +108,9 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
 
   unorderedList: css`
-    padding: ${theme.spacing(2, 3)};
+    padding: ${theme.spacing (2, 3)};
+  `,
+  tipContainer: css`
+    margin-bottom: ${theme.spacing (4)};
   `,
 });
