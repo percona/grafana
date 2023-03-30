@@ -3,7 +3,7 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 
 import { locationService } from '@grafana/runtime';
-import { dataTestId } from 'app/percona/shared/core-ui';
+import { dataTestId } from 'app/percona/shared/helpers/utils';
 
 import { formattedTemplateStubs } from '../__mocks__/alertRuleTemplateStubs';
 

@@ -2,8 +2,9 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
+import { FormWrapper } from 'app/percona/shared/helpers/utils';
 
-import { FormWrapper, validators } from '../../../core-ui/shared';
+import { validators } from '../../../core-ui/shared';
 
 import { SelectField } from './SelectFieldCore';
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions, no-console */
-import { truncate } from '../utils/truncate';
+import { truncate } from '../../../helpers/utils/truncate';
 
 import { LOG_LEVELS } from './config';
 

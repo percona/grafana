@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 
-import { FormWrapper } from '../../../core-ui/shared';
+import { FormWrapper } from 'app/percona/shared/helpers/utils';
+
 import { email } from '../../../core-ui/shared/validators';
 
 import { TextInputField } from './TextInputField';

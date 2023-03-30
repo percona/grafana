@@ -1,6 +1,6 @@
 import { SelectableValue } from '@grafana/data';
 
-import { generateOptions } from '../../../components/Form/AsyncSelectFieldCore/__mocks__/mockAsyncSelectOptions';
+import { generateOptions } from '../../components/Form/AsyncSelectFieldCore/__mocks__/mockAsyncSelectOptions';
 
 export const loadAsyncOptions = () =>
   new Promise<Array<SelectableValue<string>>>((resolve) => {

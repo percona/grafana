@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
 
-import { dataTestId } from 'app/percona/shared/core-ui';
+import { dataTestId } from 'app/percona/shared/helpers/utils';
 
 import { dbClustersStub } from '../__mocks__/dbClustersStubs';
 

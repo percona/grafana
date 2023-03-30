@@ -2,7 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import { dataQa, FormWrapper } from '../../../core-ui/shared';
+import { dataQa, FormWrapper } from 'app/percona/shared/helpers/utils';
+
 import { requiredTrue } from '../../../core-ui/shared/validators';
 
 import { CheckboxField } from './CheckboxField';

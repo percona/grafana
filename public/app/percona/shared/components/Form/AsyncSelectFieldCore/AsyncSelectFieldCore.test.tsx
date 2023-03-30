@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
-import { FormWrapper, validators } from '../../../core-ui/shared';
+import { FormWrapper } from 'app/percona/shared/helpers/utils';
+
+import { validators } from '../../../core-ui/shared';
 
 import { AsyncSelectFieldCore } from './AsyncSelectFieldCore';
 import { generateOptions } from './__mocks__/mockAsyncSelectOptions';
