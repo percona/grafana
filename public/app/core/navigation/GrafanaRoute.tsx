@@ -164,7 +164,7 @@ const getStyles = () => ({
       left: 0;
       height: 1000%;
       width: 100%;
-      z-index: 1200;
+      z-index: 1000;
       background-color: #22252b;
       opacity: 0.8;
     }
