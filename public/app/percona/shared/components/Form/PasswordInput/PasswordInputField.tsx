@@ -5,7 +5,7 @@ import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-fi
 import { useStyles2 } from '@grafana/ui';
 import { compose, Validator } from 'app/percona/shared/helpers/validatorsForm';
 
-import { FieldInputAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
+import { FieldInputAttrs, LabeledFieldProps } from '../../../helpers/types';
 import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './PasswordInput.styles';

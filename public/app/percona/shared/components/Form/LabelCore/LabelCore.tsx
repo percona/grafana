@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { LabeledFieldProps } from '../../../core-ui/shared/types';
+import { LabeledFieldProps } from '../../../helpers/types';
 import { LinkTooltipCore } from '../../Elements/LinkTooltipCore';
 
 import { getStyles } from './LabelCore.styles';

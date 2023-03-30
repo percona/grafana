@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import { Icon, Tooltip, useStyles2 } from '@grafana/ui';
 
-import { LabelTooltipProps } from '../../../core-ui/shared/types';
+import { LabelTooltipProps } from '../../../helpers/types';
 
 import { getStyles } from './LinkTooltipCore.styles';
 

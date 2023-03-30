@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-final-form';
 
 import { IconName } from '@grafana/ui';
-import { FieldInputAttrs } from 'app/percona/shared/core-ui/shared/types';
+import { FieldInputAttrs } from 'app/percona/shared/helpers/types';
 import { Validator } from 'app/percona/shared/helpers/validatorsForm';
 
 export interface SwitchFieldRenderProps {

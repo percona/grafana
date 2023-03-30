@@ -7,7 +7,7 @@ import { SelectableValue } from '@grafana/data';
 import { ActionMeta, Select, SelectCommonProps, useStyles2 } from '@grafana/ui';
 import { compose, GetSelectValueFunction, Validator } from 'app/percona/shared/helpers/validatorsForm';
 
-import { LabeledFieldProps } from '../../../core-ui/shared/types';
+import { LabeledFieldProps } from '../../../helpers/types';
 import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './SelectFieldCore.styles';
