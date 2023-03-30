@@ -3,11 +3,11 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { CollapsableSection } from '@grafana/ui/src/components';
 import { OldPage } from 'app/core/components/Page/Page';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { logger } from 'app/percona/shared/core-ui';
 import { StoreState, useSelector } from 'app/types';
 
-import { Overlay } from '../shared/components/Elements/Overlay/Overlay';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from '../shared/helpers/api';

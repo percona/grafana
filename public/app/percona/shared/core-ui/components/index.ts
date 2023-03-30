@@ -1,4 +1,4 @@
-export * from './Overlay';
+export * from '../../components/Elements/Overlay';
 export * from './PasswordInput';
 export * from './RadioButtonGroup';
 export * from './Select';

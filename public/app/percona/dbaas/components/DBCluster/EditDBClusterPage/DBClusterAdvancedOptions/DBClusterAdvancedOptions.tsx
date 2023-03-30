@@ -3,7 +3,7 @@ import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 're
 import { FormRenderProps } from 'react-final-form';
 
 import { useStyles } from '@grafana/ui/src';
-import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { Databases } from 'app/percona/shared/core';
 import { logger, SelectField } from 'app/percona/shared/core-ui';

@@ -8,7 +8,7 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
-import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { MultiCheckboxField } from 'app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField';
 import { Databases } from 'app/percona/shared/core';

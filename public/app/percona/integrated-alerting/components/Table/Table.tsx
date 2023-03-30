@@ -14,7 +14,7 @@ import {
 } from 'react-table';
 
 import { useStyles } from '@grafana/ui';
-import { Overlay } from 'app/percona/shared/core-ui/components/Overlay';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 
 import { Filter } from './Filter/Filter';
 import { Pagination } from './Pagination';

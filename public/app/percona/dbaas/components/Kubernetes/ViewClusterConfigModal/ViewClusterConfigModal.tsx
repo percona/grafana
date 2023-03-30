@@ -4,7 +4,7 @@ import { AppEvents } from '@grafana/data';
 import { Button, ClipboardButton, HorizontalGroup, useTheme } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
-import { Overlay } from 'app/percona/shared/components/Elements/Overlay/Overlay';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
