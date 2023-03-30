@@ -5,9 +5,9 @@ import { Field, FieldInputProps, UseFieldConfig } from 'react-final-form';
 
 import { SelectableValue } from '@grafana/data';
 import { ActionMeta, AsyncSelect, SelectAsyncProps, SelectCommonProps, useStyles2 } from '@grafana/ui';
+import { compose, GetSelectValueFunction, Validator } from 'app/percona/shared/helpers/validatorsForm';
 
 import { LabeledFieldProps } from '../../../core-ui/shared/types';
-import { compose, GetSelectValueFunction, Validator } from '../../../core-ui/shared/validators';
 import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './AsyncSelectFieldCore.styles';

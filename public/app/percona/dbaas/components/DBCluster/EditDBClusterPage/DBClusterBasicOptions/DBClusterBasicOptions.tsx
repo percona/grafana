@@ -8,7 +8,7 @@ import {
   SelectFieldAdapter,
 } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
-import { validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { useSelector } from '../../../../../../types';
 import { getPerconaSettings } from '../../../../../shared/core/selectors';

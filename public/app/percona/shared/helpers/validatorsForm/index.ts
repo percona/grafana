@@ -11,3 +11,4 @@ export { required } from './required';
 export { requiredTrue } from './requiredTrue';
 export { minTags } from './minTags';
 export * from './validator.types';
+export * as validators from '.';

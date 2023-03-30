@@ -3,9 +3,9 @@ import React, { FC, useMemo } from 'react';
 import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
+import { compose, Validator } from 'app/percona/shared/helpers/validatorsForm';
 
 import { FieldInputAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
-import { compose, Validator } from '../../../core-ui/shared/validators';
 import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './TextInput.styles';

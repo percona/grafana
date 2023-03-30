@@ -3,7 +3,7 @@ import { FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-final-for
 
 import { IconName } from '@grafana/ui';
 import { FieldInputAttrs } from 'app/percona/shared/core-ui/shared/types';
-import { Validator } from 'app/percona/shared/core-ui/shared/validators';
+import { Validator } from 'app/percona/shared/helpers/validatorsForm';
 
 export interface SwitchFieldRenderProps {
   input: FieldInputProps<string, HTMLInputElement>;

@@ -3,8 +3,8 @@ import React from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
-import { validators } from 'app/percona/shared/core-ui';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { MAX_RETENTION, MIN_RETENTION } from '../AddBackupPage.constants';
 import { Messages } from '../AddBackupPage.messages';

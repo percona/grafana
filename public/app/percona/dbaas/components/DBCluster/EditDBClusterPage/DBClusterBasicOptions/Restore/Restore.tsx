@@ -3,7 +3,7 @@ import { Field } from 'react-final-form';
 
 import { FieldSet, Switch, useStyles } from '@grafana/ui';
 import { AsyncSelectFieldCore } from 'app/percona/shared/components/Form/AsyncSelectFieldCore';
-import { validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { useSelector } from '../../../../../../../types';
 import { SelectField } from '../../../../../../shared/components/Form/SelectField';

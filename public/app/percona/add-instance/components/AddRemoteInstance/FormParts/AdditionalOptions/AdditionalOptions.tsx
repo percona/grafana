@@ -7,7 +7,7 @@ import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { Databases } from 'app/percona/shared/core';
-import { validators as platformCoreValidators } from 'app/percona/shared/core-ui';
+import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
 import { Messages } from '../FormParts.messages';

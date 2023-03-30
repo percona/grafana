@@ -12,7 +12,7 @@ import { Label } from 'app/percona/shared/components/Form/Label';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { BackupErrorSection } from '../../BackupErrorSection/BackupErrorSection';
 import { LocationType } from '../../StorageLocations/StorageLocations.types';

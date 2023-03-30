@@ -6,7 +6,7 @@ import { Button, Icon, Tooltip, useStyles } from '@grafana/ui/src';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
-import { validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { useDispatch, useSelector } from 'app/types';
 
 import { FeatureLoader } from '../../../../shared/components/Elements/FeatureLoader';

@@ -9,7 +9,7 @@ import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
-import { validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { LocationType } from '../StorageLocations.types';
 

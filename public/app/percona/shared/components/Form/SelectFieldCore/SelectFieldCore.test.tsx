@@ -3,8 +3,7 @@ import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
 import { FormWrapper } from 'app/percona/shared/helpers/utils';
-
-import { validators } from '../../../core-ui/shared';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { SelectField } from './SelectFieldCore';
 

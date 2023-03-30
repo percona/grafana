@@ -4,7 +4,7 @@ import { Form as FormFinal } from 'react-final-form';
 import { Button, useStyles } from '@grafana/ui';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
-import { validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { SECURITY_CREDENTIALS_DOC_LINK } from './Credentials.constants';
 import { Messages } from './Credentials.messages';

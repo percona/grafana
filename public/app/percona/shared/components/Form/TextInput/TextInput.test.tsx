@@ -3,7 +3,7 @@ import React from 'react';
 
 import { FormWrapper } from 'app/percona/shared/helpers/utils';
 
-import { email } from '../../../core-ui/shared/validators';
+import { email } from '../../../helpers/validatorsForm';
 
 import { TextInputField } from './TextInputField';
 

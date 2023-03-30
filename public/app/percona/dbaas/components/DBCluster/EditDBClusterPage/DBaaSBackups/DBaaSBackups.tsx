@@ -4,8 +4,8 @@ import { Field, FormRenderProps } from 'react-final-form';
 
 import { FieldSet, Switch, useStyles } from '@grafana/ui';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
-import { validators } from 'app/percona/shared/core-ui';
 import { validators as customValidators } from 'app/percona/shared/helpers/validators';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { useSelector } from '../../../../../../types';
 import { MAX_RETENTION, MIN_RETENTION } from '../../../../../backup/components/AddBackupPage/AddBackupPage.constants';

@@ -5,7 +5,7 @@ import { Field, FieldInputProps, FieldMetaState, UseFieldConfig } from 'react-fi
 import { useStyles2 } from '@grafana/ui';
 
 import { FieldInputAttrs, LabeledFieldProps } from '../../../core-ui/shared/types';
-import { compose, Validator } from '../../../core-ui/shared/validators';
+import { compose, Validator } from '../../../helpers/validatorsForm';
 import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './NumberInput.styles';

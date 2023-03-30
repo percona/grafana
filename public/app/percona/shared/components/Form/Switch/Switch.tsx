@@ -6,7 +6,7 @@ import { Field } from 'react-final-form';
 
 import { Switch, useStyles2 } from '@grafana/ui';
 
-import { compose } from '../../../core-ui/shared/validators';
+import { compose } from '../../../helpers/validatorsForm';
 import { LabelCore } from '../LabelCore';
 
 import { getStyles } from './Switch.styles';

@@ -5,7 +5,7 @@ import { Field, FieldInputProps } from 'react-final-form';
 
 import { useStyles } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
-import { validators } from 'app/percona/shared/core-ui';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { Label } from '../Label';
 

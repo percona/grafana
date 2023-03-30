@@ -4,7 +4,7 @@ import React from 'react';
 
 import { dataQa, FormWrapper } from 'app/percona/shared/helpers/utils';
 
-import { requiredTrue } from '../../../core-ui/shared/validators';
+import { requiredTrue } from '../../../helpers/validatorsForm';
 
 import { CheckboxField } from './CheckboxField';
 
