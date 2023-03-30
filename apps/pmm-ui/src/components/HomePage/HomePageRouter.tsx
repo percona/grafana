@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreState } from '../../reducers/store';
-import { fetchSystemTipsAction } from '../../reducers/tips/tips';
+import { fetchSystemAndUserTipsAction } from '../../reducers/tips/tips';
 import { LoadingPlaceholder, useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 
@@ -16,7 +16,7 @@ export const HomePageRouter: FC<HomePageRouterProps> = (props) => {
   const allTipsCovered = loading === false && tips.every((t) => t.completed);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchSystemTipsAction({ userId: props.userId }));
+    dispatch(fetchSystemAndUserTipsAction({ userId: props.userId }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return loading ? (

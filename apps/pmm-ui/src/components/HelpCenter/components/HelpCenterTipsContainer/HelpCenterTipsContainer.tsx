@@ -5,7 +5,7 @@ import { TipNotConnected } from '../TipsContainer/TipNotConnected';
 import { FeedbackContainer } from '../FeedbackContainer/FeedbackContainer';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreState } from '../../../../reducers/store';
-import { fetchSystemTipsAction, fetchUserTipsAction } from '../../../../reducers/tips/tips';
+import { fetchSystemAndUserTipsAction } from '../../../../reducers/tips/tips';
 import { useLocalStorage } from '../../../../shared/localStorage';
 import { EmptyTip } from "../TipsContainer/EmptyTip";
 
@@ -33,8 +33,7 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
   });
 
   useEffect(() => {
-    dispatch(fetchSystemTipsAction({ userId: userId }));
-    dispatch(fetchUserTipsAction({ userId: userId }));
+    dispatch(fetchSystemAndUserTipsAction({ userId: userId }));
   }, []);
 
   const showEmptyStageTip = !feedbackVisible && systemsTipsCompleted && isConnectedUser && userTipsCompleted;

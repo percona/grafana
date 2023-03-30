@@ -1,6 +1,5 @@
-[
-  {
-    "id": 1000,
+{
+  "1000": {
     "title": "See your new Advisors",
     "text": "You now have access to extra Advisors for a more thorough check of your system health.",
     "buttonText": "See your new Advisors",
@@ -9,4 +8,4 @@
     "completed": false,
     "canUserComplete": true
   }
-]
+}

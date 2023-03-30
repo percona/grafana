@@ -1,5 +1,5 @@
-[
-  {
+{
+  "1": {
     "id": 1,
     "title": "Install PMM server",
     "text": "",
@@ -8,7 +8,7 @@
     "url": "",
     "completed": false
   },
-  {
+  "2": {
     "id": 2,
     "text": "Install PMM Client on your nodes and register them with PMM Server. Learn how to do it in our documentation.",
     "title": "Install PMM Client",
@@ -18,8 +18,7 @@
     "url": "https://docs.percona.com/percona-monitoring-and-management/setting-up/client/index.html",
     "completed": false
   },
-  {
-    "id": 3,
+  "3": {
     "title": "Connect your services",
     "text": "Quickly add services to this PMM Server instance to start monitoring your database.",
     "buttonText": "Add service",
@@ -28,5 +27,4 @@
     "url": "/graph/add-instance",
     "completed": false
   }
-]
-
+}
