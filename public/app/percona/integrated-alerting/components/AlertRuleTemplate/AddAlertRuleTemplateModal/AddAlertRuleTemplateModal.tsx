@@ -9,7 +9,7 @@ import { Messages } from 'app/percona/integrated-alerting/IntegratedAlerting.mes
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';

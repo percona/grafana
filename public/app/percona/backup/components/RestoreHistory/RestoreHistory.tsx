@@ -9,10 +9,10 @@ import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoa
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
-import { logger } from 'app/percona/shared/core-ui';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 

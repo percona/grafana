@@ -14,9 +14,9 @@ import { CustomCollapsableSection } from 'app/percona/shared/components/Elements
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { logger } from 'app/percona/shared/core-ui';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { getAdvisors, getCategorizedAdvisors, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { dispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 

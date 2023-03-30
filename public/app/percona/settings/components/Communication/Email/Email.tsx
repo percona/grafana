@@ -12,7 +12,7 @@ import { LinkTooltip } from 'app/percona/shared/components/Elements/LinkTooltip/
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { getSettingsStyles } from '../../../Settings.styles';

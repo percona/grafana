@@ -3,9 +3,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { AppEvents } from '@grafana/data';
 import { ClipboardButton, Icon, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
-import { logger } from 'app/percona/shared/core-ui';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useSelector } from 'app/types';
 
 import { useCancelToken } from '../../../shared/components/hooks/cancelToken.hook';

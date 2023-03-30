@@ -11,9 +11,9 @@ import { ExtendedTableCellProps, ExtendedTableRowProps, Table } from 'app/percon
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { logger } from 'app/percona/shared/core-ui';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { ChecksInfoAlert } from '../CheckInfoAlert/CheckInfoAlert';

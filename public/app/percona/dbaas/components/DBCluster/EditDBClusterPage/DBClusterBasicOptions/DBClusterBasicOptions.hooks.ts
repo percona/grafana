@@ -2,7 +2,7 @@ import { FormApi } from 'final-form';
 import { useEffect } from 'react';
 
 import { SelectableValue } from '@grafana/data/src';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { isOptionEmpty, newDBClusterService } from '../../DBCluster.utils';
 

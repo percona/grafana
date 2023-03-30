@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { SelectableValue } from '@grafana/data';
 import { Databases } from 'app/percona/shared/core';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { DATABASE_OPERATORS } from '../../DBCluster/DBCluster.constants';
 import { DBClusterVersion } from '../../DBCluster/DBCluster.types';

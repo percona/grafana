@@ -4,7 +4,7 @@ import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { newDBClusterService } from '../DBCluster.utils';
 

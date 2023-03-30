@@ -7,8 +7,8 @@ import { Form as FormFinal } from 'react-final-form';
 import { Button, useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases } from 'app/percona/shared/core';
-import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { InstanceAvailableType, InstanceTypes, InstanceTypesExtra, INSTANCE_TYPES_LABELS } from '../../panel.types';
 

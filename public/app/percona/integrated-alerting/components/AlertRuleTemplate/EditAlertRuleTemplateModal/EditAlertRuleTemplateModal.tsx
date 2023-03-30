@@ -8,7 +8,7 @@ import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButto
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
 import { WarningBlock } from 'app/percona/shared/components/Elements/WarningBlock';
 import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { AlertRuleTemplateService } from '../AlertRuleTemplate.service';

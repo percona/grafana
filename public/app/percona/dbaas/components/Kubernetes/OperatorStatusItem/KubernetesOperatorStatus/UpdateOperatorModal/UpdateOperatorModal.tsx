@@ -3,8 +3,8 @@ import React, { FC, useCallback } from 'react';
 import { Button, HorizontalGroup, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
-import { logger } from 'app/percona/shared/core-ui';
 import { instalKuberneteslOperatorAction } from 'app/percona/shared/core/reducers';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useDispatch } from 'app/types';
 
 import { getStyles } from './UpdateOperatorModal.styles';

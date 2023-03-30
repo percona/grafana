@@ -1,7 +1,7 @@
 import { CancelToken } from 'axios';
 
-import { logger } from 'app/percona/shared/core-ui';
 import { api } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { Settings, SettingsAPIChangePayload, SettingsAPIResponse, SettingsPayload } from './Settings.types';
 

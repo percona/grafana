@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useDispatch } from 'app/types';
 
 import { selectDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';

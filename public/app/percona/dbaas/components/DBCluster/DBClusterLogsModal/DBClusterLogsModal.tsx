@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { Button, Icon, Spinner, useStyles } from '@grafana/ui';
 import { Modal } from 'app/percona/shared/components/Elements/Modal';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { DBClusterService } from '../DBCluster.service';
 import { DBClusterLogs } from '../DBCluster.types';

@@ -12,7 +12,7 @@ import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { SelectFieldAdapter } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 import { MultiCheckboxField } from 'app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField';
 import { Databases } from 'app/percona/shared/core';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { DATABASE_OPERATORS } from '../../DBCluster/DBCluster.constants';
 import { newDBClusterService } from '../../DBCluster/DBCluster.utils';

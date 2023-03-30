@@ -4,7 +4,7 @@ import { Cell, Column, Row } from 'react-table';
 import { useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useSelector } from 'app/types';
 
 import { Table } from '../integrated-alerting/components/Table';

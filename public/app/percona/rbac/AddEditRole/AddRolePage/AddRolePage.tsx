@@ -4,8 +4,8 @@ import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
-import { logger } from 'app/percona/shared/core-ui';
 import { createRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
 
 import AddEditRoleForm, { AddEditFormValues } from '../components/AddEditRoleForm';

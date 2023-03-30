@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Databases } from 'app/percona/shared/core';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { InstanceAvailableType, INSTANCE_TYPES_LABELS } from '../../panel.types';
 

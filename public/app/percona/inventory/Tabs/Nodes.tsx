@@ -13,8 +13,8 @@ import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table'
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 
 import { appEvents } from '../../../core/app_events';

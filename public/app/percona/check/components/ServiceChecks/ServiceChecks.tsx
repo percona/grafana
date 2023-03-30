@@ -13,8 +13,8 @@ import { ExpandableCell } from 'app/percona/shared/components/Elements/Expandabl
 import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { CheckService } from '../../Check.service';
 import { ServiceFailedCheck } from '../../types';

@@ -13,7 +13,6 @@ import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { logger } from 'app/percona/shared/core-ui';
 import {
   fetchActiveServiceTypesAction,
   fetchServicesAction,
@@ -22,6 +21,7 @@ import {
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 

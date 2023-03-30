@@ -9,9 +9,9 @@ import { OldPage } from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { logger } from 'app/percona/shared/core-ui';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { Messages } from '../../IntegratedAlerting.messages';
 import { useStoredTablePageSize } from '../Table/Pagination';

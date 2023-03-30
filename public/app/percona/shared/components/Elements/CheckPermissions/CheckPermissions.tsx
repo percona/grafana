@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { Spinner, useStyles } from '@grafana/ui';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { EmptyBlock } from 'app/percona/shared/components/Elements/EmptyBlock';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { Messages } from './CheckPermissions.messages';
 import { getStyles } from './CheckPermissions.styles';

@@ -2,8 +2,8 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import { ClipboardButton, useStyles } from '@grafana/ui';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { logger } from 'app/percona/shared/core-ui';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { BackupLogChunk } from '../../Backup.types';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';

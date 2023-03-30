@@ -14,8 +14,8 @@ jest.mock('../../DBCluster.service');
 jest.mock('../../PSMDB.service');
 jest.mock('../../XtraDB.service');
 
-jest.mock('app/percona/shared/core-ui', () => {
-  const originalModule = jest.requireActual('app/percona/shared/core-ui');
+jest.mock('app/percona/shared/helpers/logger', () => {
+  const originalModule = jest.requireActual('app/percona/shared/helpers/logger');
   return {
     ...originalModule,
     logger: {

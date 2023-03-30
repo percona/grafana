@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { Spinner, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { DBClusterConnection as ConnectionParams, DBClusterConnectionAPI, DBClusterStatus } from '../DBCluster.types';
 import { newDBClusterService } from '../DBCluster.utils';

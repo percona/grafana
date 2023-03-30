@@ -3,14 +3,14 @@ import React from 'react';
 import { Provider } from 'react-redux';
 
 import { CheckService } from 'app/percona/check/Check.service';
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
 import { FailedChecksTab } from './FailedChecksTab';
 
-jest.mock('app/percona/shared/core-ui', () => {
-  const originalModule = jest.requireActual('app/percona/shared/core-ui');
+jest.mock('app/percona/shared/helpers/logger', () => {
+  const originalModule = jest.requireActual('app/percona/shared/helpers/logger');
   return {
     ...originalModule,
     logger: {

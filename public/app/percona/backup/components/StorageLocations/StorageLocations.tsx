@@ -9,8 +9,8 @@ import { OldPage } from 'app/core/components/Page/Page';
 import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { logger } from 'app/percona/shared/core-ui';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { Messages } from '../../Backup.messages';
 

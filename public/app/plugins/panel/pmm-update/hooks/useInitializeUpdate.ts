@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { logger } from 'app/percona/shared/core-ui';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { startUpdate } from '../UpdatePanel.service';
 import { UpdateInitialization } from '../types';

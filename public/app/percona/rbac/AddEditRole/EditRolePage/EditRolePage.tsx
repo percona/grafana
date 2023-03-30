@@ -5,8 +5,8 @@ import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Page } from 'app/core/components/Page/Page';
 import { appEvents } from 'app/core/core';
-import { logger } from 'app/percona/shared/core-ui';
 import { updateRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
+import { logger } from 'app/percona/shared/helpers/logger';
 import RolesService from 'app/percona/shared/services/roles/Roles.service';
 import { useAppDispatch } from 'app/store/store';
 
