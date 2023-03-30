@@ -36,7 +36,7 @@ export const UpgradeSection: FC<UpgradeSectionProps> = ({ onUpdateStart, upgrade
         // TODO: update wording and docs link
         <p data-testid="upgrade-service-unavailable-message" className={styles.notAvailable}>
           {Messages.upgradeServiceUnavailable.first}
-          <a className={styles.link} href="/">
+          <a className={styles.link} rel="noopener noreferrer" target="_blank" href="/">
             {Messages.upgradeServiceUnavailable.docs}
           </a>
           {Messages.upgradeServiceUnavailable.last}
