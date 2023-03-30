@@ -6,11 +6,11 @@ import { Field, FieldInputProps, UseFieldConfig } from 'react-final-form';
 import { SelectableValue } from '@grafana/data';
 import { ActionMeta, Select, SelectCommonProps, useStyles2 } from '@grafana/ui';
 
-import { LabelCore } from '../../../components/Form/LabelCore';
-import { LabeledFieldProps } from '../../shared/types';
-import { compose, GetSelectValueFunction, Validator } from '../../shared/validators';
+import { LabeledFieldProps } from '../../../core-ui/shared/types';
+import { compose, GetSelectValueFunction, Validator } from '../../../core-ui/shared/validators';
+import { LabelCore } from '../LabelCore';
 
-import { getStyles } from './SelectField.styles';
+import { getStyles } from './SelectFieldCore.styles';
 
 export interface SelectFieldProps<T>
   extends Omit<UseFieldConfig<T>, 'value' | 'defaultValue'>,

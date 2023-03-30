@@ -3,7 +3,8 @@ import { Field } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
-import { SelectField, validators } from 'app/percona/shared/core-ui';
+import { SelectField } from 'app/percona/shared/components/Form/SelectFieldCore';
+import { validators } from 'app/percona/shared/core-ui';
 
 import {
   DAY_OPTIONS,

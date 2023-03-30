@@ -3,9 +3,9 @@ import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
 
-import { FormWrapper, validators } from '../../shared';
+import { FormWrapper, validators } from '../../../core-ui/shared';
 
-import { SelectField } from './SelectField';
+import { SelectField } from './SelectFieldCore';
 
 const { email, minLength } = validators;
 
