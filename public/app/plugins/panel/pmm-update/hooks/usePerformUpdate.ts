@@ -16,8 +16,6 @@ export const usePerformUpdate = (): UpdateStatus => {
   const [authToken, initialLogOffset, initializationFailed, launchUpdate, updateMethod, ,] = useInitializeUpdate();
 
   useEffect(() => {
-    console.log({ authToken, initialLogOffset, updateMethod });
-
     if (!authToken || initialLogOffset === undefined || updateMethod === UpdateMethod.invalid) {
       return;
     }
