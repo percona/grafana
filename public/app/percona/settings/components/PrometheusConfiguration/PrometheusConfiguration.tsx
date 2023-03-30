@@ -28,7 +28,7 @@ export const PrometheusConfiguration: React.FC = () => {
     const result = await FileService.get(PROMETHEUS_BASE_FILE);
 
     setInitialValues({
-      configuration: result.content || '',
+      configuration: result.content ? window.atob(result.content) : '',
     });
 
     setIsLoading(false);
@@ -38,7 +38,7 @@ export const PrometheusConfiguration: React.FC = () => {
     try {
       await FileService.update({
         name: PROMETHEUS_BASE_FILE,
-        content: values.configuration,
+        content: values.configuration ? window.btoa(values.configuration) : '',
       });
 
       appEvents.emit(AppEvents.alertSuccess, [Messages.success]);
@@ -58,7 +58,7 @@ export const PrometheusConfiguration: React.FC = () => {
           <p>
             {Messages.description}
             {/* TODO: add docs link */}
-            <a className={styles.link} href="/">
+            <a rel="noopener noreferrer" target="_blank" className={styles.link} href="/">
               {Messages.docs}
             </a>
             {Messages.dot}
