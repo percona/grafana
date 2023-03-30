@@ -13,7 +13,7 @@ interface HomePageTipsContainerProps {
 
 export const HomePageTipsContainer: FC<HomePageTipsContainerProps> = ({ userId }) => {
   const {
-    systemTips: { tips, currentlySelected },
+    systemTips: { tips, currentlySelected, loading },
   } = useSelector((state: StoreState) => state.tips);
 
   const styles = useStyles2(getStyles);
@@ -22,7 +22,10 @@ export const HomePageTipsContainer: FC<HomePageTipsContainerProps> = ({ userId }
   const helpCenterHeading = `${rocketEmoji} Start monitoring databases with PMM`;
   const helpCenterText =
     'Get your PMM running so you can detect what’s going on with your databases in a blink of an eye.';
-  return (
+  const allTipsCovered = loading === false && tips.every((t) => t.completed);
+  return allTipsCovered ? (
+    <></>
+  ) : (
     <div className={styles.helpCenterContainer}>
       <div className={styles.helpCenterTextContainer}>
         <h2>{helpCenterHeading}</h2>

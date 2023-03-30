@@ -60,14 +60,22 @@ export const HomePage: FC<HomePageProps> = (props) => {
           <Button
             variant="secondary"
             icon="external-link-alt"
-            onClick={() => window.open('https://docs.percona.com/percona-monitoring-and-management/')}
+            onClick={() =>
+              window.open(
+                'https://docs.percona.com/percona-monitoring-and-management/?utm_source=pmm&utm_medium=welcome_page&utm_campaign=pmm_documentation&utm_term=PMM+Documentaiton'
+              )
+            }
           >
             PMM Documentation
           </Button>
           <Button
             variant="secondary"
             icon="external-link-alt"
-            onClick={() => window.open('https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none ')}
+            onClick={() =>
+              window.open(
+                'https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none?utm_source=pmm&utm_medium=welcome_page&utm_campaign=community_forum&utm_term=Community+Forum'
+              )
+            }
           >
             Community Forum
           </Button>

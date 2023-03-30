@@ -201,7 +201,7 @@ func AddPerconaRoutes() []*navtree.NavLink {
 	navTree = append(navTree, &navtree.NavLink{
 		Text:         "Home Screen",
 		Id:           "pmm-home-screen",
-		Icon:         "pmm-logo",
+		Icon:         "home",
 		Url:          "/a/pmm-homescreen-app",
 		SortWeight:   navtree.WeightDashboard,
 		Section:      navtree.NavSectionPlugin,
