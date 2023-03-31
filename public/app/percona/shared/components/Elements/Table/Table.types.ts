@@ -55,6 +55,7 @@ export interface TableProps {
   autoResetExpanded?: boolean;
   emptyMessageClassName?: string;
   overlayClassName?: string;
+  autoResetSelectedRows?: boolean;
   rowSelection?: boolean;
   allRowsSelectionMode?: 'all' | 'page';
   onRowSelection?: (rows: Row[]) => void;
@@ -81,4 +82,5 @@ export interface PaginatedTableOptions extends TableOptions<object> {
   pageCount?: number;
   autoResetPage?: boolean;
   autoResetExpanded?: boolean;
+  autoResetSelectedRows?: boolean;
 }
