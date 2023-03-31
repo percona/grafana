@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 
-import { Table as PerconaTable } from '../../../integrated-alerting/components/Table';
+import { Table as PerconaTable } from '../../../../../shared/components/Elements/Table';
 
 import { getStyles } from './Table.styles';
 import { TableProps } from './Table.types';

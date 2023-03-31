@@ -2,7 +2,7 @@
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 
-import { Table } from '../integrated-alerting/components/Table';
+import { Table } from '../shared/components/Elements/Table';
 
 import { AGENTS_COLUMNS, NODES_COLUMNS, SERVICES_COLUMNS } from './Inventory.constants';
 import { InventoryDataService } from './Inventory.tools';

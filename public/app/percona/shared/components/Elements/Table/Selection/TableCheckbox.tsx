@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BaseCheckbox } from '../../../../shared/components/Elements/Checkbox';
+import { BaseCheckbox } from '../../Checkbox';
 
 import { TableCheckboxProps } from './TableCheckbox.types';
 

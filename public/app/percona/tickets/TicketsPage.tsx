@@ -7,8 +7,8 @@ import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaN
 import { logger } from 'app/percona/shared/helpers/logger';
 import { useSelector } from 'app/types';
 
-import { Table } from '../integrated-alerting/components/Table';
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
+import { Table } from '../shared/components/Elements/Table';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { getPerconaUser } from '../shared/core/selectors';
 import { isApiCancelError } from '../shared/helpers/api';
