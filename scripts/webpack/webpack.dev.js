@@ -8,6 +8,9 @@ const path = require('path');
 const { DefinePlugin } = require('webpack');
 const { merge } = require('webpack-merge');
 
+// @PERCONA
+const LiveReloadPlugin = require('webpack-livereload-plugin');
+
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -137,6 +140,11 @@ module.exports = (env = {}) =>
         }),
       }),
       federation,
+
+      // @PERCONA
+      new LiveReloadPlugin({
+        delay: 1000,
+      }),
       // new BundleAnalyzerPlugin({
       //   analyzerPort: 8889
       // })
