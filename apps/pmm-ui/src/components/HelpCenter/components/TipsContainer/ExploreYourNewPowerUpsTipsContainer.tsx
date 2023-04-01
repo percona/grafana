@@ -19,7 +19,6 @@ export const ExploreYourNewPowerUpsTipsContainer: FC<ExploreYourNewPowerUpsTipsC
 
   return (
     <>
-      <div className={ styles.top }/>
       <div className={ styles.headerContainer }>
         <h3 className={ styles.tipsLabel }>Explore PMM benefits</h3>
         <div
@@ -74,9 +73,6 @@ const getStyles = (theme: GrafanaTheme2) => {
   `;
 
   return {
-    top: css`
-      height: 24px;
-    `,
     tipsLabel: css`
       font-weight: 400;
       font-size: 18px;
@@ -86,6 +82,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     headerContainer: css`
       display: flex;
       justify-content: flex-start;
+      margin-top: ${theme.spacing(3)}
     `,
     notificationMarker: css`
       width: 8px;

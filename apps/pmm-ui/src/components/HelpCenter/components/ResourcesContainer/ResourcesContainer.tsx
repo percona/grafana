@@ -14,7 +14,7 @@ export const ResourcesContainer: FC<ResourcesContainerProps> = (props) => {
   const { openKeyboardShortcut } = props;
 
   return (
-    <div>
+    <div className={styles.resourceContainer}>
       <div>
         {resourcesData.map ((r) => (
           <Resource
@@ -47,6 +47,9 @@ export const ResourcesContainer: FC<ResourcesContainerProps> = (props) => {
 }
 
 const getStyles = (theme: GrafanaTheme2) => ({
+  resourceContainer: css`
+    margin-top: ${theme.spacing(3)};
+  `,
   shortcutContainer: css`
     margin-bottom: ${theme.spacing(2)};
     margin-top: ${theme.spacing(3)};

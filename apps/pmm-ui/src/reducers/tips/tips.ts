@@ -121,6 +121,8 @@ export const fetchSystemAndUserTipsAction = createAsyncThunk (
           completed: !!tip.isCompleted,
         });
       }
+
+      sortTipsByID(retrievedSystemTips);
       // @ts-ignore
       thunkAPI.dispatch (setSystemTips (retrievedSystemTips));
       // @ts-ignore
@@ -138,8 +140,11 @@ export const fetchSystemAndUserTipsAction = createAsyncThunk (
           completed: !!tip.isCompleted,
         });
       }
+
+      sortTipsByID(retrievedUserTips);
+
       // @ts-ignore
-      thunkAPI.dispatch (setUserTips (retrievedUserTips));
+      thunkAPI.dispatch(setUserTips(retrievedUserTips));
       // @ts-ignore
       const notCompletedUserTip = retrievedUserTips.find((tipData) => !tipData.completed);
       // @ts-ignore
@@ -175,6 +180,8 @@ export const completeUserTip = createAsyncThunk (
           });
         }
 
+        sortTipsByID(retrievedUserTips);
+
         // @ts-ignore
         thunkAPI.dispatch(setUserTips(retrievedUserTips));
         // @ts-ignore
@@ -185,6 +192,17 @@ export const completeUserTip = createAsyncThunk (
       }
     }) ()
 );
+
+const sortTipsByID = (tips: TipModel[]) => {
+  tips.sort((a: TipModel, b: TipModel) => {
+    if (a.id > b.id) {
+      return 1;
+    } else if (a.id === b.id) {
+      return 0
+    }
+    return -1;
+  });
+}
 
 export const {
   setSystemTips,

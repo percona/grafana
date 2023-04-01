@@ -194,10 +194,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
   `,
   completeCheckbox: css`
-    font-size: 14px;
-    line-height: 21px;
-    letter-spacing: 0.01071em;
-
     padding-left: 16px;
     padding-top: 8px;
   `

@@ -11,7 +11,7 @@ export const TipNotConnected: FC = () => {
   return (
     <div className={styles.tipContainer}>
       <div className={styles.headerContainer}>
-        <h3 className={styles.tipsLabel}>{Messages.title} PMM</h3>
+        <h3 className={styles.tipsLabel}>{Messages.title}</h3>
       </div>
       <div className={styles.resourceContainer}>
         <div className={styles.body}>
@@ -108,9 +108,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
 
   unorderedList: css`
-    padding: ${theme.spacing (2, 3)};
+    padding: ${theme.spacing(2, 3)};
   `,
   tipContainer: css`
-    margin-bottom: ${theme.spacing (4)};
+    margin-bottom: ${theme.spacing(4)};
+    margin-top: ${theme.spacing(3)};
   `,
 });

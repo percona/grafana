@@ -42,11 +42,9 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: ${theme.spacing(2)};
 
-    margin-top: 24px;
-    padding-bottom: 16px;
-
+    padding-bottom: ${theme.spacing(2)};
     background: ${theme.colors.background.secondary};
     border-radius: 8px;
   `,
@@ -83,6 +81,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
   text: css`
     opacity: 0.65;
-    margin-bottom: 16px;
+    margin-bottom: ${theme.spacing(2)};
   `,
 });
