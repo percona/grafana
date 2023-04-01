@@ -13,6 +13,8 @@ interface HelpCenterProps {
   width: string;
   isConnectedUser?: boolean;
   userId: number;
+
+  openKeyboardShortcut: () => void;
 }
 
 type TabName = 'tips' | 'resources' | 'wnatsnew';
@@ -20,7 +22,7 @@ type TabName = 'tips' | 'resources' | 'wnatsnew';
 export const HelpCenter: FC<HelpCenterProps> = (props) => {
   const [activeTab, setActiveTab] = useState<TabName>('tips');
 
-  const { open, onClose, width, isConnectedUser, userId } = props;
+  const { open, onClose, width, isConnectedUser, userId, openKeyboardShortcut } = props;
   const styles = useStyles2(getStyles(open));
 
   const changeTab = (tab: TabName) => {
@@ -55,7 +57,7 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
               isConnectedUser={isConnectedUser}
           />}
 
-          {activeTab === 'resources' && <ResourcesContainer />}
+          {activeTab === 'resources' && <ResourcesContainer openKeyboardShortcut={openKeyboardShortcut}/>}
         </div>
       </div>
       <div className={styles.indentContainer} />

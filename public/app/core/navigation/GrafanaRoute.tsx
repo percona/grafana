@@ -6,9 +6,12 @@ import Drop from 'tether-drop';
 
 import { locationSearchToObject, navigationLogger, reportPageview } from '@grafana/runtime';
 import { ErrorBoundary } from '@grafana/ui';
+import appEvents from "app/core/app_events";
+import { HelpModal } from "app/core/components/help/HelpModal";
 import { contextSrv } from 'app/core/core';
 import {getPerconaServer, getPerconaSettings} from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
+import { ShowModalReactEvent } from "app/types/events";
 
 import { PmmUi } from '../../percona/federation';
 import { LocalStorageValueProvider } from "../components/LocalStorageValueProvider";
@@ -113,6 +116,9 @@ export function GrafanaRoute(props: Props) {
                         width="416px"
                         isConnectedUser={isConnectedUser}
                         userId={userId}
+                        openKeyboardShortcut={() => {
+                          appEvents.publish(new ShowModalReactEvent({ component: HelpModal }));
+                        }}
                       />
                       {/*TODO:WIP: refactor*/}
                       <div className={isHelpCenterOpen ? styles.openedHelpCenter : ''}>
