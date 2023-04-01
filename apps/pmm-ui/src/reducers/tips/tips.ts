@@ -112,9 +112,10 @@ export const fetchSystemAndUserTipsAction = createAsyncThunk (
       thunkAPI.dispatch (setUserTipsLoading());
 
       let retrievedSystemTips: TipModel[] = [];
-      const res = await apiOnboarding.get<any, any> (`/${args.userId}`);
+      const res = await apiOnboarding.get<any, any> (``);
       for (let tip of res.systemTips) {
         retrievedSystemTips.push ({
+          // @ts-ignore
           ...systemTipsData[tip.tipId],
           id: tip.tipId,
           completed: !!tip.isCompleted,
@@ -128,10 +129,10 @@ export const fetchSystemAndUserTipsAction = createAsyncThunk (
       const notCompletedSystemTipID = notCompletedSystemTip !== undefined ? notCompletedSystemTip.id : 0;
       thunkAPI.dispatch(setSystemTipsCurrentlySelected(notCompletedSystemTipID));
 
-
       let retrievedUserTips: TipModel[] = [];
       for (let tip of res.userTips) {
         retrievedUserTips.push({
+          // @ts-ignore
           ...userTipsData[tip.tipId],
           id: tip.tipId,
           completed: !!tip.isCompleted,
@@ -164,9 +165,10 @@ export const completeUserTip = createAsyncThunk (
       } else {
         let retrievedUserTips: TipModel[] = [];
 
-        const res = await apiOnboarding.get<any, any>(`/${args.userId}`);
+        const res = await apiOnboarding.get<any, any>(``);
         for (let tip of res.userTips) {
           retrievedUserTips.push({
+            // @ts-ignore
             ...userTipsData[tip.tipId],
             id: tip.tipId,
             completed: !!tip.isCompleted,

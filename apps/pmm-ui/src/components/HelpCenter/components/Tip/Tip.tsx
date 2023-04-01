@@ -91,10 +91,11 @@ export const Tip: FC<TipProps> = (props) => {
               {buttonText}
             </Button>
           )}
-          {canUserComplete && <div>
-            <Checkbox className={styles.completeCheckbox} value={checked} onChange={onChange} label="Complete" />
-          </div>
-          }
+          {canUserComplete && (
+            <div className={styles.completeCheckbox}>
+              <Checkbox value={checked} onChange={onChange} label="Complete" />
+            </div>
+          )}
         </div>
       </div>
     </div>
