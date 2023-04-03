@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import { Button, HorizontalGroup, Icon, Modal, useStyles2, useTheme2 } from '@grafana/ui';
 import { contextSrv } from 'app/core/services/context_srv';
@@ -15,8 +14,6 @@ import {
   fetchUserStatusAction,
   setAuthorized,
 } from 'app/percona/shared/core/reducers/user/user';
-import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { EventStore } from 'app/percona/ui-events/EventStore';
 import { useAppDispatch } from 'app/store/store';
 
 import { Telemetry } from '../../../ui-events/components/Telemetry';
@@ -92,18 +89,9 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     }
   }, [dispatch, isLoggedIn, setSteps, onReady]);
 
-  const { result } = useSelector(getPerconaSettings);
-  const isTelemetryEnabled = !!result?.telemetryEnabled;
-  let telemetry = null;
-  if (isLoggedIn && isTelemetryEnabled) {
-    telemetry = <Telemetry />;
-  } else {
-    EventStore.clear();
-  }
-
   return (
     <>
-      {telemetry}
+      {isLoggedIn && <Telemetry />}
       <PerconaNavigation />
       <PerconaTourBootstrapper />
       {isLoggedIn && showTour && (

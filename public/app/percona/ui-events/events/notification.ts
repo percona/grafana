@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 
-import { EventStore, EventType } from 'app/percona/ui-events/EventStore';
+import { EventStore } from 'app/percona/ui-events/EventStore';
 import { Action } from 'app/percona/ui-events/reducer';
 
 interface NotificationPayload {
@@ -35,5 +35,5 @@ export const processNotificationEvents = (state: any = {}, action: Action) => {
     location: window.location.pathname,
     location_params: window.location.search,
   };
-  EventStore.add(EventType.NotificationError, event);
+  EventStore.notificationErrors.push(event);
 };

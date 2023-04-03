@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/consistent-type-assertions, */
 
 import { DashboardModel } from 'app/features/dashboard/state';
-import { EventStore, EventType } from 'app/percona/ui-events/EventStore';
+import { EventStore } from 'app/percona/ui-events/EventStore';
 import { Action } from 'app/percona/ui-events/reducer';
 
 export interface DashboardUsageEvent {
@@ -40,7 +40,7 @@ export const processDashboardEvents = (state: any = {}, action: Action) => {
           location: window.location.pathname,
           location_params: window.location.search,
         };
-        EventStore.add(EventType.DashboardUsage, event);
+        EventStore.dashboardUsage.push(event);
       }
       loadingStarted = null;
     }

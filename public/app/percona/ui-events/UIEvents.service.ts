@@ -15,12 +15,10 @@ interface UIEventsStoreRequest {
   dashboard_usage: DashboardUsageEvent[];
 }
 
-interface TelemetryStoreResponse {}
-
 export const UIEventsService = {
   async store(body: UIEventsStoreRequest): Promise<void> {
     try {
-      await api.post<TelemetryStoreResponse, any>('/Store', body, true);
+      await api.post('/Store', body, true);
     } catch (e) {
       logger.error(e);
     }
