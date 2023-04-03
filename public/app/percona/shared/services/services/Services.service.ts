@@ -7,8 +7,8 @@ import { ListServicesBody, ListTypesPayload, RemoveServiceBody, ServiceListPaylo
 const BASE_URL = `/v1/inventory/Services`;
 
 export const ServicesService = {
-  getActive(token?: CancelToken) {
-    return api.post<ListTypesPayload, {}>(`${BASE_URL}/ListTypes`, {}, false, token);
+  getActive(token?: CancelToken, disableNotifications?: boolean) {
+    return api.post<ListTypesPayload, {}>(`${BASE_URL}/ListTypes`, {}, disableNotifications, token);
   },
   getServices(body: Partial<ListServicesBody> = {}, token?: CancelToken) {
     return api.post<ServiceListPayload, Partial<ListServicesBody>>(`${BASE_URL}/List`, body, false, token);
