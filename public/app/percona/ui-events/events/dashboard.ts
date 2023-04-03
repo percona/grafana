@@ -20,9 +20,9 @@ const supportedEvents = [startLoadingEvent, endLoadingEvent];
 
 let loadingStarted: null | number = null;
 
-export const processDashboardEvents = (state: any = {}, action: Action) => {
+export const processDashboardEvents = (state: any = {}, action: Action): any => {
   if (!supportedEvents.find((each) => action.type.startsWith(each))) {
-    return;
+    return state;
   }
 
   if (action.type === startLoadingEvent) {
@@ -45,4 +45,6 @@ export const processDashboardEvents = (state: any = {}, action: Action) => {
       loadingStarted = null;
     }
   }
+
+  return state;
 };

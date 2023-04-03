@@ -24,7 +24,7 @@ export interface NotificationErrorEvent {
 
 export const processNotificationEvents = (state: any = {}, action: Action) => {
   if (!action.type.startsWith('appNotifications/')) {
-    return;
+    return state;
   }
 
   const payload = action.payload as NotificationPayload;
@@ -36,4 +36,6 @@ export const processNotificationEvents = (state: any = {}, action: Action) => {
     location_params: window.location.search,
   };
   EventStore.notificationErrors.push(event);
+
+  return state;
 };

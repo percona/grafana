@@ -17,7 +17,7 @@ interface FetchingPayload {
 
 export interface FetchingEvent {
   component: string;
-  loadTime: number;
+  load_time: number;
   location: string;
   location_params: string;
 }
@@ -29,9 +29,9 @@ const supportedEvents = [startFetchingEvent, endFetchingEvent];
 
 const fetchingEvents = new Map();
 
-export const processFetchingEvents = (state: any = {}, action: Action) => {
+export const processFetchingEvents = (state: any = {}, action: Action): any => {
   if (!supportedEvents.find((each) => action.type.startsWith(each))) {
-    return;
+    return state;
   }
 
   let payload = action.payload as FetchingPayload;
@@ -47,11 +47,13 @@ export const processFetchingEvents = (state: any = {}, action: Action) => {
       fetchingEvents.delete(component);
       const event: FetchingEvent = {
         component,
-        loadTime: now - start,
+        load_time: now - start,
         location: window.location.pathname,
         location_params: window.location.search,
       };
       EventStore.fetching.push(event);
     }
   }
+
+  return state;
 };

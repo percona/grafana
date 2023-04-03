@@ -3,8 +3,15 @@
 import { processDashboardEvents } from 'app/percona/ui-events/events/dashboard';
 import { processFetchingEvents } from 'app/percona/ui-events/events/fetching';
 import { processNotificationEvents } from 'app/percona/ui-events/events/notification';
+import { processUserFlowEvent } from "app/percona/ui-events/events/userFlow";
 
-const skipPrefixes = ['@@', 'navIndex/', 'navBarTree/', 'panels/removePanels', 'appNotifications/hideAppNotification'];
+const skipPrefixes = [
+  '@@',
+  'navIndex/',
+  'navBarTree/',
+  'panels/removePanels',
+  'appNotifications/hideAppNotification'
+];
 
 const shouldProcess = (type: string): boolean => {
   if (!type) {
@@ -25,9 +32,10 @@ export const uiEventsReducer = (state: any = {}, action: Action) => {
       return;
     }
 
-    processNotificationEvents(state, action);
-    processFetchingEvents(state, action);
-    processDashboardEvents(state, action);
+    state = processNotificationEvents(state, action);
+    state = processFetchingEvents(state, action);
+    state = processDashboardEvents(state, action);
+    state = processUserFlowEvent(state, action);
   } finally {
     // we should not block execution nor override state
     // noinspection ReturnInsideFinallyBlockJS

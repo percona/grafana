@@ -31,6 +31,7 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
               notifications: EventStore.notificationErrors,
               fetching: EventStore.fetching,
               dashboard_usage: EventStore.dashboardUsage,
+              user_flow_events: EventStore.userFlowEvents,
             })
               .then(() => {
                 EventStore.clear();
@@ -40,7 +41,7 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
             console.log('No UI events to send');
           }
         }
-      }, 20_000); //TODO: extract to settings
+      }, 10_000); //TODO: extract to settings
 
       return () => clearInterval(interval);
     } else {
