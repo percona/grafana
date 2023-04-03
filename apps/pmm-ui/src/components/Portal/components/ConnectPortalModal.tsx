@@ -25,23 +25,14 @@ export const ConnectPortalModal: FC<ConnectPortalModalProps> = ({ isOpen, onClos
         <img alt="pmm-platform-icon" src={pmmPlatformIcon} className={styles.icon} />
       </div>
       <div>
-        <h3>{Messages.title}</h3>
-        <ul className={styles.unorderedList}>
-          <li>
-            {Messages.advisors1}
-            <a href={Messages.link.advisors} className={styles.link} target="_blank" rel="noreferrer">
-              {Messages.advisorsLinkDescription}
-            </a>
-            {Messages.advisors2}
-          </li>
-          <li>
-            {Messages.alerts1}
-            <a href={Messages.link.alerts} className={styles.link} target="_blank" rel="noreferrer">
-              {Messages.alertsLinkDescription}
-            </a>
-            {Messages.alerts2}
-          </li>
-        </ul>
+        <p>
+          {Messages.advisors1}
+          <a href={Messages.link.advisors} className={styles.link} target="_blank" rel="noreferrer">
+            {Messages.advisorsLinkDescription}
+          </a>
+          {Messages.advisors2}
+        </p>
+
         {isAdmin ? (
           <p>{Messages.adminDescription}</p>
         ) : (

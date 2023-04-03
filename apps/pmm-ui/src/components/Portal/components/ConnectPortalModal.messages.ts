@@ -1,26 +1,19 @@
 export const Messages = {
-  title: 'Get more out of PMM by connecting to Percona Platform',
-
-  advisors1: 'Get more ',
+  advisors1: 'Connect PMM to Percona Platform and get advanced ',
   advisorsLinkDescription: 'Advisors',
-  advisors2: ' to automatically check your system health status.',
-
-  alerts1: 'Get more ',
-  alertsLinkDescription: 'Alerts Templates',
-  alerts2: ' to notify you when something happens.',
+  advisors2: ' for a more thorough check of your system health status.',
 
   adminDescription:
-    'By clicking on Continue to Platform you’ll be taken to the Percona Platform to sign in and give permissions to Percona to access this PMM instance details.',
+    'By clicking "Continue to Platform" you’ll be taken to Percona Platform where you can sign in and authorize Percona to read the general details for this PMM instance.',
   nonAdminWarningTitle: 'Contact your PMM administrator',
   nonAdminDescription:
-    'In order to get advantage of the above you need to contact your PMM administrator to connect it with Percona Platform.',
+    'To leverage the benefits mentioned above, you should contact your PMM administrator to connect your PMM instance with Percona Platform.',
 
   button: {
-    continue: 'Continue to platform',
+    continue: 'Continue to Percona Platform',
     close: 'Close',
   },
   link: {
     advisors: 'https://docs.percona.com/percona-monitoring-and-management/how-to/configure.html#advisors',
-    alerts: 'https://docs.percona.com/percona-monitoring-and-management/get-started/alerting.html#create-a-percona-templated-alert'
   },
 };
