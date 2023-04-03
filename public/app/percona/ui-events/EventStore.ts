@@ -12,7 +12,7 @@ class _EventStore {
   }
 
   isEmpty(): boolean {
-    return this.dashboardUsage.length > 0 || this.fetching.length > 0 || this.notificationErrors.length > 0;
+    return this.dashboardUsage.length === 0 || this.fetching.length === 0 || this.notificationErrors.length === 0;
   }
 
   clear(): void {
