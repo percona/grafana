@@ -36,6 +36,8 @@ export const Step1: FC<Step1Props> = ({ onSubmit }) => {
 
 const fixedIconStyle = (image: any) =>
   css`
+    width: 102px;
+
     & > div > svg {
       background-color: currentColor;
       -webkit-mask-image: url(${image});

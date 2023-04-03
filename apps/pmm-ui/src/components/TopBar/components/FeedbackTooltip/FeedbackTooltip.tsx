@@ -12,7 +12,7 @@ interface FeedbackTooltipProps {
   onClose?: () => void;
 }
 
-export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, onClose, pmmServerId}) => {
+export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, onClose, pmmServerId }) => {
   const styles = useStyles2(getStyles);
 
   const feedbackClose = () => {
@@ -25,7 +25,7 @@ export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, o
     <>
       {/* close button */}
       <div className={styles.modalHeaderClose}>
-        <IconButton data-testid="modal-close-button" name="times" size="lg" onClick={feedbackClose} />
+        <IconButton data-testid="modal-close-button" name="times" size="xl" onClick={feedbackClose} />
       </div>
 
       <div className={styles.feedbackContentForm}>
@@ -46,6 +46,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    margin-right: -8px;
   `,
   feedbackContentForm: css`
     padding: 0 24px 24px 24px;

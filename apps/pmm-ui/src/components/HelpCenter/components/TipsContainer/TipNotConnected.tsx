@@ -5,16 +5,22 @@ import { Button, useStyles2 } from '@grafana/ui';
 import { Messages } from './TipNotConnected.messages';
 import tipIcon from '../../assets/pmm-percona-icon-purple.svg';
 
-export const TipNotConnected: FC = () => {
+interface TipNotConnectedProps {
+  showTitle?: boolean;
+}
+
+export const TipNotConnected: FC<TipNotConnectedProps> = ({ showTitle }) => {
   const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.tipContainer}>
+      {showTitle && (
+        <div className={styles.headerContainer}>
+          <h3 className={styles.tipsLabel}>{Messages.title}</h3>
+        </div>
+      )}
       <div className={styles.resourceContainer}>
         <div className={styles.body}>
-          <div className={styles.headerContainer}>
-            <h3 className={styles.tipsLabel}>{Messages.title}</h3>
-          </div>
           {Messages.connectingInfo}
           <ul className={styles.unorderedList}>
             <li>{Messages.li1}</li>

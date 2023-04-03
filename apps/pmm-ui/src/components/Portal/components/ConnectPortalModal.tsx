@@ -21,7 +21,7 @@ export const ConnectPortalModal: FC<ConnectPortalModalProps> = ({ isOpen, onClos
     <Modal title="" isOpen={isOpen} className={styles.modal} onDismiss={onClose}>
       <div className={styles.verticalGroup}>
         <img alt="pmm-app-icon" src={pmmAppIcon} className={styles.icon} />
-        <img alt="swap" src={swapIcon} />
+        <img alt="swap" src={swapIcon} className={styles.swapIcon} />
         <img alt="pmm-platform-icon" src={pmmPlatformIcon} className={styles.icon} />
       </div>
       <div>
@@ -66,6 +66,12 @@ const getStyles = (theme: GrafanaTheme2) => ({
   icon: css`
     width: 64px;
     height: 64px;
+    margin-right: 12px;
+  `,
+  swapIcon: css`
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
   `,
   unorderedList: css`
     padding-left: ${theme.spacing(3)};

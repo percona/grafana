@@ -15,6 +15,7 @@ export const Messages = {
   },
   link: {
     advisors: 'https://docs.percona.com/percona-monitoring-and-management/how-to/configure.html#advisors',
-    alerts: 'https://docs.percona.com/percona-monitoring-and-management/get-started/alerting.html#create-a-percona-templated-alert'
+    alerts:
+      'https://docs.percona.com/percona-monitoring-and-management/get-started/alerting.html#create-a-percona-templated-alert',
   },
 };

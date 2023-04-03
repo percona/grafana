@@ -78,7 +78,6 @@ export const TopBar: FC<TopBarProps> = ({
         </nav>
       </div>
       <ToolbarButtonRow alignment="right">
-        {showHelpCenterNotificationMarker && <div className={styles.notificationMarker} />}
         {showSignIn &&
           (connectedToPortal ? (
             <>
@@ -88,7 +87,6 @@ export const TopBar: FC<TopBarProps> = ({
             </>
           ) : (
             <>
-              <div className={styles.notificationMarker} />
               <div className={styles.tooltip}>
                 {Messages.legend}
                 <Icon name="arrow-right" />
@@ -120,7 +118,10 @@ export const TopBar: FC<TopBarProps> = ({
         {showHelpCenterButton && (
           <>
             <HelpCenterTooltip visible={!!showHelpCenterToolTip} onClose={onCloseHelpCenterTooltip}>
-              <Button variant="secondary" icon="question-circle" onClick={onHelpCenterClick} />
+              <>
+                <Button variant="secondary" icon="question-circle" onClick={onHelpCenterClick} />
+                {showHelpCenterNotificationMarker && <div className={styles.notificationMarker} />}
+              </>
             </HelpCenterTooltip>
           </>
         )}
@@ -140,6 +141,7 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     gap: ${theme.spacing(2)};
     justify-content: space-between;
     padding: ${theme.spacing(1.5, 2)};
+    border-bottom: 1px solid ${theme.colors.border.medium};
   `,
   pmmIconHolder: css`
     display: inline-block;
@@ -160,6 +162,9 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
     padding-right: 15px;
     align-items: center;
+    @media (max-width: 768px) {
+      padding-left: ${theme.spacing(5)};
+    }
   `,
   h1Styles: css`
     margin: 0;
@@ -168,6 +173,9 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     font-weight: ${theme.typography.fontWeightBold};
     font-size: ${theme.typography.body.fontSize};
     color: ${theme.colors.text.primary};
+    @media (max-width: 835px) {
+      display: none;
+    }
   `,
   notificationMarker: css`
     position: absolute;
@@ -184,6 +192,9 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     font-size: ${theme.typography.bodySmall.fontSize};
     color: ${theme.colors.text.secondary};
     margin-right: 24px;
+    @media (max-width: 835px) {
+      display: none;
+    }
   `,
   connectButton: css`
     & > div > svg {

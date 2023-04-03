@@ -40,7 +40,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: flex;
   `,
   imageChecked: css`
-    padding: ${theme.spacing(0.5)};
+    padding: ${theme.spacing(0, 0.5, 0.5)};
   `,
   text: css`
     margin-left: ${theme.spacing(2)};

@@ -9,7 +9,7 @@ export const Messages = {
     logout: 'Sign out',
   },
   connectedToPlatformTitle: 'PMM',
-  title: 'Percona monitoring and management',
+  title: 'Percona Monitoring and Management',
   legend: 'Get more out of PMM',
   button: {
     connectToPortal: 'Connect to platform',
