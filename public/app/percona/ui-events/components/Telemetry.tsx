@@ -1,4 +1,3 @@
-import { logger } from '@percona/platform-core';
 import React, { FC, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -24,7 +23,7 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
 
   useEffect(() => {
     if (telemetryEnabled) {
-      logger.info('Telemetry is enabled');
+      console.log('Telemetry is enabled');
       const interval = setInterval(() => {
         if (telemetryEnabled) {
           if (EventStore.isNotEmpty()) {
@@ -36,16 +35,16 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
               .then(() => {
                 EventStore.clear();
               })
-              .catch((e) => logger.error(e));
+              .catch((e) => console.error(e));
           } else {
-            logger.debug('No UI events to send');
+            console.log('No UI events to send');
           }
         }
       }, 20_000); //TODO: extract to settings
 
       return () => clearInterval(interval);
     } else {
-      logger.info('Telemetry is disabled');
+      console.info('Telemetry is disabled');
       return () => {};
     }
   }, [telemetryEnabled]);
