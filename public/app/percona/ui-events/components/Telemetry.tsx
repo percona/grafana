@@ -26,18 +26,20 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
     if (telemetryEnabled) {
       logger.info('Telemetry is enabled');
       const interval = setInterval(() => {
-        if (telemetryEnabled && EventStore.isNotEmpty()) {
-          UIEventsService.store({
-            notifications: EventStore.notificationErrors,
-            fetching: EventStore.fetching,
-            dashboard_usage: EventStore.dashboardUsage,
-          })
-            .then(() => {
-              EventStore.clear();
+        if (telemetryEnabled) {
+          if (EventStore.isNotEmpty()) {
+            UIEventsService.store({
+              notifications: EventStore.notificationErrors,
+              fetching: EventStore.fetching,
+              dashboard_usage: EventStore.dashboardUsage,
             })
-            .catch((e) => logger.error(e));
-        } else {
-          logger.debug('No UI events to send');
+              .then(() => {
+                EventStore.clear();
+              })
+              .catch((e) => logger.error(e));
+          } else {
+            logger.debug('No UI events to send');
+          }
         }
       }, 20_000); //TODO: extract to settings
 
