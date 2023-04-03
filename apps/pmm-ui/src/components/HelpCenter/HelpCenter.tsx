@@ -71,7 +71,7 @@ const getStyles = (open: boolean) => (theme: GrafanaTheme2) => ({
     right: 0;
     flex: 1 0 auto;
     height: calc(100% - 80px);
-    top: 56px;
+    top: 57px;
     position: fixed;
     box-sizing: border-box;
     overflow-y: hidden;
