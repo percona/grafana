@@ -12,6 +12,8 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
 import { api } from 'app/percona/shared/helpers/api';
 
+import { DBClusterService } from '../../../dbaas/components/DBCluster/DBCluster.service';
+import { DBClusterType } from '../../../dbaas/components/DBCluster/DBCluster.types';
 import { ServerInfo } from '../types';
 
 import advisorsReducers from './advisors/advisors';
@@ -211,6 +213,17 @@ export const fetchTemplatesAction = createAsyncThunk(
         },
       })
     )
+);
+
+export const fetchDBaaSTemplatesAction = createAsyncThunk(
+  'percona/fetchDBaaSTemplates',
+  async (args: { k8sClusterName: string; dbClusterType: DBClusterType }): Promise<any> => {
+    const result = await DBClusterService.getDBClusterSecrets('name');
+    // const result = await DBClusterService.getDBClusterTemplates('name', DBClusterType.psmdb);
+    // const result = await KubernetesService.getKubernetes();
+
+    return result;
+  }
 );
 
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
