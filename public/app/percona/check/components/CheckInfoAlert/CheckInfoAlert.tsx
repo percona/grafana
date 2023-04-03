@@ -3,7 +3,7 @@ import React from 'react';
 import { locationService } from '@grafana/runtime/src/services/LocationService';
 import { useStyles2 } from '@grafana/ui';
 import { AlertLocalStorage } from 'app/percona/shared/components/Elements/AlertLocalStorage/AlertLocalStorage';
-import { getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { getPerconaServer, getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
 
 import { Messages } from './CheckInfoAlert.messages';
@@ -13,6 +13,7 @@ export const ChecksInfoAlert = () => {
   const { result } = useSelector(getPerconaSettings);
   const { isConnectedToPortal } = result!;
   const styles = useStyles2(getStyles);
+  const { serverId } = useSelector(getPerconaServer);
 
   if (isConnectedToPortal) {
     return null;
@@ -30,7 +31,7 @@ export const ChecksInfoAlert = () => {
           data-testid="read-more-link"
           target="_blank"
           rel="noreferrer"
-          href={'https://per.co.na/subscribemore'}
+          href={`https://www.percona.com/software/percona-platform/subscription?utm_source=pmm-${serverId}&utm_medium=banner&utm_campaign=advisors_getmore`}
           className={styles.link}
         >
           {Messages.link}
