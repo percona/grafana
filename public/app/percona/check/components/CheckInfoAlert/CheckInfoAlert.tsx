@@ -31,7 +31,7 @@ export const ChecksInfoAlert = () => {
           data-testid="read-more-link"
           target="_blank"
           rel="noreferrer"
-          href={`https://www.percona.com/software/percona-platform/subscription?utm_source=pmm-${serverId}&utm_medium=banner&utm_campaign=advisors_getmore`}
+          href={`https://per.co.na/subscribemore?umt_source=pmm-${serverId}`}
           className={styles.link}
         >
           {Messages.link}
