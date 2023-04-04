@@ -78,3 +78,17 @@ Value of this variable should be equal to path where is pmm manged is located on
 ### 2.3: navigate to Grafana UI in browser
 
 After running 2.1.1, 2.1.2, 2.2.1 navigate to grafana `http:localhost/`
+
+## 3: Troubleshooting
+
+### 3.1: "Grafana has failed"
+
+Often happens when running grafana server in devcontainer.
+
+Usually, it can be fixed by restarting grafana server:
+
+```shell
+cd ./grafana/apps
+make env
+supervisorctl restart grafana
+```
