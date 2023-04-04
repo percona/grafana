@@ -7,6 +7,8 @@ import { TeamRolePicker } from 'app/core/components/RolePicker/TeamRolePicker';
 import { fetchRoleOptions } from 'app/core/components/RolePicker/api';
 import { config } from 'app/core/config';
 import { contextSrv, User } from 'app/core/services/context_srv';
+import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
+import { AccessRolesTeamHeader, AccessRolesTeamSelect } from 'app/percona/rbac/Team';
 import { AccessControlAction, Role, StoreState, Team } from 'app/types';
 
 import { connectWithCleanUp } from '../../core/components/connectWithCleanUp';
@@ -111,6 +113,12 @@ export class TeamList extends PureComponent<Props, State> {
         {displayRolePicker && (
           <td>{canSeeTeamRoles && <TeamRolePicker teamId={team.id} roleOptions={this.state.roleOptions} />}</td>
         )}
+        {/* PERCONA */}
+        <AccessRolesEnabledCheck>
+          <td>
+            <AccessRolesTeamSelect id={team.id} name={team.name} />
+          </td>
+        </AccessRolesEnabledCheck>
         <td className="text-right">
           <DeleteButton
             aria-label={`Delete team ${team.name}`}
@@ -178,6 +186,10 @@ export class TeamList extends PureComponent<Props, State> {
                   <th>Email</th>
                   <th>Members</th>
                   {displayRolePicker && <th>Roles</th>}
+                  {/* PERCONA */}
+                  <AccessRolesEnabledCheck>
+                    <AccessRolesTeamHeader />
+                  </AccessRolesEnabledCheck>
                   <th style={{ width: '1%' }} />
                 </tr>
               </thead>

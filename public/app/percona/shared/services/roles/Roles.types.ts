@@ -12,6 +12,7 @@ export interface AccessRole {
 export enum AccessRoleEntity {
   invalid = 'INVALID',
   user = 'USER',
+  team = 'TEAM',
 }
 
 export interface AccessRoleResponse {

@@ -1,17 +1,17 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 
-import { AppEvents, SelectableValue } from '@grafana/data';
-import { Select } from '@grafana/ui';
+import { AppEvents } from '@grafana/data';
 import appEvents from 'app/core/app_events';
 import { AssignRoleParams } from 'app/percona/shared/core/reducers/roles/role.types';
 import { assignRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
-import { getAccessRoles, getUsersInfo } from 'app/percona/shared/core/selectors';
+import { getUsersInfo } from 'app/percona/shared/core/selectors';
 import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types';
 import { useAppDispatch } from 'app/store/store';
 import { OrgUser, useSelector } from 'app/types';
 
+import AccessRolesSelect from '../AccessRolesSelect/AccessRolesSelect';
+
 import { Messages } from './AccessRoleCell.messages';
-import { idsToOptions, toOptions } from './AccessRoleCell.utils';
 
 interface AccessRoleCellProps {
   user: OrgUser;
@@ -19,24 +19,10 @@ interface AccessRoleCellProps {
 
 const AccessRoleCell: FC<AccessRoleCellProps> = ({ user }) => {
   const dispatch = useAppDispatch();
-  const { roles, isLoading: rolesLoading } = useSelector(getAccessRoles);
   const { usersMap, isLoading: usersLoading } = useSelector(getUsersInfo);
   const roleIds = useMemo<number[]>(() => usersMap[user.userId]?.roleIds || [], [usersMap, user.userId]);
-  const options = useMemo<Array<SelectableValue<number>>>(() => toOptions(roles), [roles]);
-  const [value, setValue] = useState<Array<SelectableValue<number>>>([]);
-  const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    setValue(idsToOptions(roleIds, roles));
-  }, [roles, roleIds]);
-
-  const handleChange = async (selected: SelectableValue<number>) => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const roleIds = selected as Array<SelectableValue<number>>;
-    setValue(roleIds);
-    // value will always be defined
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const ids = roleIds.map((v) => v.value as number);
+  const handleChange = async (ids: number[]) => {
     const payload: AssignRoleParams = {
       roleIds: ids,
       entityId: user.userId,
@@ -48,18 +34,7 @@ const AccessRoleCell: FC<AccessRoleCellProps> = ({ user }) => {
 
   return (
     <td>
-      <Select
-        aria-label={Messages.label}
-        isMulti={isOpen || value.length !== 1}
-        value={value}
-        onChange={handleChange}
-        options={options}
-        isClearable={false}
-        closeMenuOnSelect={false}
-        isLoading={rolesLoading || usersLoading}
-        onOpenMenu={() => setIsOpen(true)}
-        onCloseMenu={() => setIsOpen(false)}
-      />
+      <AccessRolesSelect label={Messages.label} isLoading={usersLoading} roleIds={roleIds} onChange={handleChange} />
     </td>
   );
 };
