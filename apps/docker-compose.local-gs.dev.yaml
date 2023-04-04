@@ -68,6 +68,7 @@ services:
       - ${PMM_PORT_VMALERT:-8880}:8880
       # alertmanager
       - ${PMM_PORT_ALERTMANAGER:-9093}:9093
+      - ${PMM_PORT_DELVE:-2345}:2345
     volumes:
       - ${PMM_MANAGED_DIR:-../../pmm}:/root/go/src/github.com/percona/pmm
       - ${PMM_MANAGED_DIR:-../../pmm}/Makefile.devcontainer:/root/go/src/github.com/percona/pmm/Makefile:ro # change Makefile in devcontainer
