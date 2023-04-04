@@ -15,8 +15,12 @@ dev-local-gs:								## Starts local development with local grafana server.
 	make env-up-local-gs
 	find ./.config/grafana/plugins ! -name '.gitkeep' -type f -exec rm -f {} +
 	docker cp pmm-grafana-dev:/srv/grafana/plugins/. ./.config/grafana/plugins/
+	find ./.config/grafana/workdir/conf ! -name '.gitkeep' -type f -exec rm -f {} +
+	docker cp pmm-grafana-dev:/usr/share/grafana/conf/. ./.config/grafana/workdir/conf/
 	find ./.config/grafana/percona-dashboards ! -name '.gitkeep' -type f -exec rm -f {} +
 	docker cp pmm-grafana-dev:/usr/share/percona-dashboards/. ./.config/grafana/percona-dashboards/
+	cp -fr ./.config/grafana/provisioning/ ./.config/grafana/workdir/conf/provisioning
+	rm -f ./.config/grafana/workdir/data/grafana.db
 	yarn start
 
 env-up:								## Starts devcontainer.
@@ -38,7 +42,7 @@ env-down-local-gs:							## Stops devcontainer.
 
 TARGET ?= _bash
 DEV_CONTAINER ?= pmm-grafana-dev
-DEV_WORKSPACE_LOCATION ?= /root/go/src/github.com/percona/pmm
+DEV_WORKSPACE_LOCATION ?= /workspace
 DEV_PMM_WORKSPACE_LOCATION ?= /root/go/src/github.com/percona/pmm
 
 .PHONY: env
