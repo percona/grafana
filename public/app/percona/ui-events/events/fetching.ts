@@ -34,9 +34,8 @@ export const processFetchingEvents = (state: any = {}, action: Action): any => {
     return state;
   }
 
-  let payload = action.payload as FetchingPayload;
-
-  let component = `${payload.key}-${payload.action.payload.id}`;
+  const payload = action.payload as FetchingPayload;
+  const component = `${payload.key}-${payload.action.payload.id}`;
 
   if (action.type === startFetchingEvent) {
     fetchingEvents.set(component, Date.now());

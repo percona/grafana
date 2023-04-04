@@ -5,7 +5,7 @@ export interface StartFlowPayload {
 
 export interface EmitEventPayload {
   event: string;
-  params: { [key: string]: string };
+  params: Record<string, string>;
 }
 
 export const { startFlow, emitEvent } = {

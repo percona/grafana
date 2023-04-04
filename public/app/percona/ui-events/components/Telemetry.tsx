@@ -10,7 +10,7 @@ export interface UiEventsProps {}
 const _Telemetry: FC<UiEventsProps> = ({}) => {
   const { result } = useSelector(getPerconaSettings);
 
-  let telemetryEnabled = !!result?.telemetryEnabled;
+  const telemetryEnabled = !!result?.telemetryEnabled;
 
   // cleanup
   useEffect(() => {

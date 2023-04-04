@@ -23,7 +23,7 @@ export interface UserFlowEvent {
   // Logical step in the journey, step of the flow. All steps in the flow share same flowId.
   event: string;
   // Optional params, that help in user's journey analysis.
-  params: { [key: string]: string };
+  params: Record<string, string>;
 }
 
 export const processUserFlowEvent = (state: UserFlowState = initialState, action: Action): UserFlowState => {
