@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 import { Button, Modal, useStyles2 } from '@grafana/ui';
 
@@ -8,7 +8,7 @@ import { ConfirmUpdateModalProps } from '../../types';
 import { Messages } from './ConfirmUpdateModal.messages';
 import { getStyles } from './ConfirmUpdateModal.styles';
 
-export const ConfirmUpdateModal: React.FC<ConfirmUpdateModalProps> = ({ isOpen, onCancel, onConfirm }) => {
+export const ConfirmUpdateModal: FC<ConfirmUpdateModalProps> = ({ isOpen, onCancel, onConfirm }) => {
   const styles = useStyles2(getStyles);
   const [{ installedVersionDetails, nextVersionDetails }] = useVersionDetails();
 

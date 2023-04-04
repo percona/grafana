@@ -1,7 +1,7 @@
 export const Messages = {
   title: 'PMM Upgrade',
   version: (oldVersion: string, newVersion: string) =>
-    `Your PMM is currently in the version is ${oldVersion} and you’re about to upgrade to the version ${newVersion}. `,
+    `Your PMM is currently in the version ${oldVersion} and you’re about to upgrade to the version ${newVersion}. `,
   checkWhatsNew: "Check what's new in this version",
   dot: '.',
   instanceStop:
