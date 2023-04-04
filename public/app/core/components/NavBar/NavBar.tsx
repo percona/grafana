@@ -62,7 +62,7 @@ export const NavBar = React.memo(() => {
       id: 'home',
       text: 'Home',
       url: config.bootData.user.isSignedIn ? config.appSubUrl || '/' : '/login',
-      icon: 'grafana',
+      icon: 'home',
     },
     menuOpen
   );
@@ -85,8 +85,7 @@ export const NavBar = React.memo(() => {
     // @PERCONA
     .map((item) => enrichWithClickDispatch(item, dispatch, dispatchOffset));
 
-  const activeItem = isSearchActive(location) ? searchItem : getActiveItem(navTree, location.pathname);
-
+  const activeItem = isSearchActive(location) ? searchItem : getActiveItem([homeItem, ...navTree], location.pathname);
   if (shouldHideNavBar(location)) {
     return null;
   }
@@ -124,6 +123,7 @@ export const NavBar = React.memo(() => {
                 className={styles.grafanaLogo}
                 url={homeItem.url}
                 onClick={homeItem.onClick}
+                isActive={activeItem === homeItem}
               >
                 <NavBarItemIcon link={homeItem} />
               </NavBarItemWithoutMenu>

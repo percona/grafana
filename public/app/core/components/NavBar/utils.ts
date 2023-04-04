@@ -7,6 +7,7 @@ import { config } from 'app/core/config';
 import { updateMenuTree } from 'app/core/reducers/navBarTree';
 import { contextSrv } from 'app/core/services/context_srv';
 
+import { PmmUi } from "../../../percona/federation";
 import { ShowModalReactEvent } from '../../../types/events';
 import appEvents from '../../app_events';
 import { getFooterLinks } from '../Footer/Footer';
@@ -183,6 +184,10 @@ export const getActiveItem = (
           currentBestMatch = link;
         }
       }
+    // @PERCONA
+    } else if (pathname.startsWith(PmmUi.HomePageRoute)) {
+      currentBestMatch = link;
+      break;
     }
     if (link.children) {
       currentBestMatch = getActiveItem(link.children, pathname, currentBestMatch);
