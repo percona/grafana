@@ -77,7 +77,7 @@ Value of this variable should be equal to path where is pmm manged is located on
 
 ### 2.3: navigate to Grafana UI in browser
 
-After running 2.1.1, 2.1.2, 2.2.1 navigate to grafana `http:localhost/`
+After running 2.1.1, 2.1.2, 2.2.1 navigate to grafana `http:localhost:1080/`
 
 ## 3: Troubleshooting
 
