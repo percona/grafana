@@ -31,7 +31,7 @@ export const ChecksInfoAlert = () => {
           data-testid="read-more-link"
           target="_blank"
           rel="noreferrer"
-          href={`https://per.co.na/subscribemore?umt_source=pmm-${serverId}`}
+          href={`https://per.co.na/subscription2?umt_source=pmm-${serverId}`}
           className={styles.link}
         >
           {Messages.link}
