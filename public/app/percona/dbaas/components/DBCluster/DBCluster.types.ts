@@ -3,6 +3,7 @@ import { BadgeColor } from '@grafana/ui';
 import { Databases } from 'app/percona/shared/core';
 
 import { DBClusterService } from './DBCluster.service';
+import { DBClusterTemplate } from './EditDBClusterPage/DBClusterAdvancedOptions/Templates/Templates.types';
 import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 export type AddDBClusterAction = (dbCluster: DBCluster) => void;
@@ -265,19 +266,6 @@ export interface DBClusterSecretsResponse {
 
 export interface DBClusterSecretsRequest {
   kubernetes_cluster_name: string;
-}
-
-export interface DBClusterTemplate {
-  name: string;
-  kind: string;
-}
-export interface DBClusterTemplatesResponse {
-  templates: DBClusterTemplate[];
-}
-
-export interface DBClusterTemplatesRequest {
-  kubernetes_cluster_name: string;
-  cluster_type: DBClusterType;
 }
 
 export interface DBClusterSecret {

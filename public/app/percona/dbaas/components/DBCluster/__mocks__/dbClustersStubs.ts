@@ -9,8 +9,8 @@ import {
   DBClusterComponentVersionStatus,
   DBClusterAllocatedResources,
   ResourcesWithUnits,
-  DBClusterTemplate,
 } from '../DBCluster.types';
+import { DBClusterTemplate } from '../EditDBClusterPage/DBClusterAdvancedOptions/Templates/Templates.types';
 import { Operators } from '../EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 export const dbClustersStub: DBCluster[] = [

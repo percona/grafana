@@ -3,6 +3,7 @@ import { combineReducers, createAsyncThunk, createSlice, PayloadAction } from '@
 import { CancelToken } from 'axios';
 
 import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
+import { DBClusterTemplatesResponse } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Templates/Templates.types';
 import { KubernetesService } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.service';
 import { ComponentToUpdate, Kubernetes } from 'app/percona/dbaas/components/Kubernetes/Kubernetes.types';
 import { AlertRuleTemplateService } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.service';
@@ -12,6 +13,8 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
 import { api } from 'app/percona/shared/helpers/api';
 
+import { DBClusterType } from '../../../dbaas/components/DBCluster/DBCluster.types';
+import { TemplatesService } from '../../../dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Templates/Templates.service';
 import { ServerInfo } from '../types';
 
 import advisorsReducers from './advisors/advisors';
@@ -213,6 +216,12 @@ export const fetchTemplatesAction = createAsyncThunk(
     )
 );
 
+export const fetchDBaaSTemplatesAction = createAsyncThunk(
+  'percona/fetchDbaaSTemplates',
+  async (args: { k8sClusterName: string; dbClusterType: DBClusterType }): Promise<DBClusterTemplatesResponse> =>
+    withSerializedError(TemplatesService.getDBaaSTemplates(args?.k8sClusterName, args?.dbClusterType))
+);
+
 const deleteKubernetesReducer = createAsyncSlice('deleteKubernetes', deleteKubernetesAction).reducer;
 const installKubernetesOperatorReducer = createAsyncSlice(
   'instalKuberneteslOperator',
@@ -221,6 +230,7 @@ const installKubernetesOperatorReducer = createAsyncSlice(
 const settingsReducer = createAsyncSlice('settings', fetchSettingsAction, initialSettingsState).reducer;
 const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsAction).reducer;
 const templatesReducer = createAsyncSlice('templates', fetchTemplatesAction).reducer;
+const dbaasTemplatesReducer = createAsyncSlice('dbaasTemplates', fetchDBaaSTemplatesAction).reducer;
 
 export default {
   percona: combineReducers({
@@ -228,6 +238,7 @@ export default {
     updateSettings: updateSettingsReducer,
     user: perconaUserReducers,
     dbaas: perconaDBaaSReducer,
+    dbaasTemplates: dbaasTemplatesReducer,
     kubernetes: perconaK8SClusterListReducer,
     deleteKubernetes: deleteKubernetesReducer,
     addKubernetes: perconaK8SCluster,
