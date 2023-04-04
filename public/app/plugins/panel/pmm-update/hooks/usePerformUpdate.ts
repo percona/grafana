@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 
 import { getUpdateStatus } from '../UpdatePanel.service';
@@ -41,11 +42,6 @@ export const usePerformUpdate = (): UpdateStatus => {
 
         const { done, log_offset, log_lines } = response;
 
-        // Check if PMM server has stopped
-        if (log_lines.some((line) => line.includes('Stopping PMM Server in container'))) {
-          setPmmServerStopped(true);
-        }
-
         setOutput((previousOutput) => {
           const logLines = log_lines ?? [];
 
@@ -55,6 +51,13 @@ export const usePerformUpdate = (): UpdateStatus => {
         newErrorsCount = 0;
         newIsUpdated = done ?? false;
       } catch (e) {
+        // Check if PMM server has stopped
+        // so we can show an alert to the user
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        if (updateMethod === UpdateMethod.server && (e as AxiosError).code === 'ERR_NETWORK') {
+          setPmmServerStopped(true);
+        }
+
         newErrorsCount += 1;
         //@ts-ignore
         setErrorMessage(e.message);
