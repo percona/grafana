@@ -15,11 +15,14 @@ const StoreProvider = React.lazy(() => import('pmm_ui/StoreProvider'));
 // @ts-ignore
 const HomePageRouter = React.lazy(() => import('pmm_ui/HomePageRouter'));
 
+const HomePageRoute = '/a/pmm-homescreen-app';
+
 export const PmmUi = {
   TopBar,
   HomePage,
   HelpCenter,
   ConnectPortalModal,
   StoreProvider,
-  HomePageRouter
+  HomePageRouter,
+  HomePageRoute
 };

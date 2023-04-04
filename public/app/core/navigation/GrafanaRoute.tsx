@@ -124,10 +124,11 @@ export function GrafanaRoute(props: Props) {
                       <div className={isHelpCenterOpen ? styles.openedHelpCenter : ''}>
                         { props.location.pathname === '/' ? <PmmUi.HomePageRouter
                             userId={userId}
-                            defaultHomePage={<Redirect to="/d/pmm-home/home-dashboard" />}
-                            overrideHomePage={<Redirect to="/a/pmm-homescreen-app" />}
+                            defaultHomePage={<props.route.component {...props}
+                                                                    queryParams={locationSearchToObject(props.location.search)}/>}
+                            overrideHomePage={<Redirect to={PmmUi.HomePageRoute} />}
                           />
-                          : props.location.pathname === '/a/pmm-homescreen-app' ? (
+                          : props.location.pathname === PmmUi.HomePageRoute ? (
                           <Suspense fallback={<div></div>}>
                             <>
                               <PmmUi.HomePage
