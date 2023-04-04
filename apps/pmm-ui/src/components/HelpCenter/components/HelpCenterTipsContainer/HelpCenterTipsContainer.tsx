@@ -27,6 +27,8 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
   }, []);
 
   const showEmptyStageTip = !feedbackVisible && systemTips.completed && isConnectedUser && userTips.completed;
+  const showTipForNonCompletedTip = !systemTips.completed;
+
   return (
     <>
       {showEmptyStageTip && <EmptyTip />}
@@ -38,7 +40,7 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
           currentlySelectedTipId={systemTips.currentlySelected}
         />
       )}
-      {!isConnectedUser && <TipNotConnected />}
+      {!isConnectedUser && <TipNotConnected showTitle={showTipForNonCompletedTip} />}
       {isConnectedUser && !userTips.completed && (
         <ExploreYourNewPowerUpsTipsContainer
           userId={userId}
