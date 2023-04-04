@@ -10,21 +10,21 @@ export interface EmitEventPayload {
 
 export const { startFlow, emitEvent } = {
   startFlow: (flowId: string, storyId: string) => {
-    return ({
-      type: "userFlow/startFlow",
+    return {
+      type: 'userFlow/startFlow',
       payload: {
         flowId,
         storyId,
       },
-    });
+    };
   },
   emitEvent: (event: string, params: { [key: string]: string } = {}) => {
-    return ({
-      type: "userFlow/emitEvent",
+    return {
+      type: 'userFlow/emitEvent',
       payload: {
         event,
         params,
       },
-    });
+    };
   },
 };

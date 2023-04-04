@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 
-import { EmitEventPayload, StartFlowPayload } from "app/percona/shared/core/reducers/userFlow";
+import { EmitEventPayload, StartFlowPayload } from 'app/percona/shared/core/reducers/userFlow';
 import { EventStore } from 'app/percona/ui-events/EventStore';
-import { Action } from "app/percona/ui-events/reducer";
+import { Action } from 'app/percona/ui-events/reducer';
 
 export interface UserFlowState {
   flowId: string | null;
@@ -11,7 +11,7 @@ export interface UserFlowState {
 
 const initialState: UserFlowState = {
   flowId: null,
-  storyId: null
+  storyId: null,
 };
 
 export interface UserFlowEvent {
@@ -42,8 +42,8 @@ export const processUserFlowEvent = (state: UserFlowState = initialState, action
     const payload = action.payload as EmitEventPayload;
 
     const event: UserFlowEvent = {
-      flow_id: state.flowId || "???",
-      story_id: state.storyId || "???",
+      flow_id: state.flowId || '???',
+      story_id: state.storyId || '???',
       event: payload.event,
       params: payload.params,
     };
@@ -51,6 +51,6 @@ export const processUserFlowEvent = (state: UserFlowState = initialState, action
 
     return state;
   }
-  console.warn(action.type, "is not supported");
+  console.warn(action.type, 'is not supported');
   return state;
 };

@@ -1,7 +1,7 @@
 import { DashboardUsageEvent } from 'app/percona/ui-events/events/dashboard';
 import { FetchingEvent } from 'app/percona/ui-events/events/fetching';
 import { NotificationErrorEvent } from 'app/percona/ui-events/events/notification';
-import { UserFlowEvent } from "app/percona/ui-events/events/userFlow";
+import { UserFlowEvent } from 'app/percona/ui-events/events/userFlow';
 
 class _EventStore {
   dashboardUsage: DashboardUsageEvent[] = [];
@@ -14,10 +14,12 @@ class _EventStore {
   }
 
   isEmpty(): boolean {
-    return this.dashboardUsage.length === 0 &&
+    return (
+      this.dashboardUsage.length === 0 &&
       this.fetching.length === 0 &&
       this.notificationErrors.length === 0 &&
-      this.userFlowEvents.length === 0;
+      this.userFlowEvents.length === 0
+    );
   }
 
   clear(): void {

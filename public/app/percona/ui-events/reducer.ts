@@ -3,15 +3,9 @@
 import { processDashboardEvents } from 'app/percona/ui-events/events/dashboard';
 import { processFetchingEvents } from 'app/percona/ui-events/events/fetching';
 import { processNotificationEvents } from 'app/percona/ui-events/events/notification';
-import { processUserFlowEvent } from "app/percona/ui-events/events/userFlow";
+import { processUserFlowEvent } from 'app/percona/ui-events/events/userFlow';
 
-const skipPrefixes = [
-  '@@',
-  'navIndex/',
-  'navBarTree/',
-  'panels/removePanels',
-  'appNotifications/hideAppNotification'
-];
+const skipPrefixes = ['@@', 'navIndex/', 'navBarTree/', 'panels/removePanels', 'appNotifications/hideAppNotification'];
 
 const shouldProcess = (type: string): boolean => {
   if (!type) {

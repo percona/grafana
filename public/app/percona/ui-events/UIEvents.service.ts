@@ -6,7 +6,7 @@ import { ApiRequest } from 'app/percona/shared/helpers/api';
 import { DashboardUsageEvent } from 'app/percona/ui-events/events/dashboard';
 import { FetchingEvent } from 'app/percona/ui-events/events/fetching';
 import { NotificationErrorEvent } from 'app/percona/ui-events/events/notification';
-import { UserFlowEvent } from "app/percona/ui-events/events/userFlow";
+import { UserFlowEvent } from 'app/percona/ui-events/events/userFlow';
 
 const api = new ApiRequest({ baseURL: '/v1/ui-events' });
 
