@@ -12,6 +12,7 @@ export interface TipsState {
   loading: boolean;
   tips: TipModel[];
   currentlySelected: number;
+  completed: boolean;
 }
 
 export interface TipModel {
@@ -32,12 +33,14 @@ const initialTipsState: AllTipsState = {
     tips: [],
     currentlySelected: 0,
     loading: false,
+    completed: false,
   },
   systemTips: {
     // @ts-ignore
     tips: [],
     currentlySelected: 0,
     loading: true,
+    completed: false,
   },
 };
 
@@ -101,6 +104,24 @@ const perconaTipsSlice = createSlice ({
         },
       };
     },
+    setSystemTipsCompleted: (state, action: PayloadAction<boolean>): AllTipsState => {
+      return {
+        ...state,
+        systemTips: {
+          ...state.systemTips,
+          completed: action.payload,
+        },
+      };
+    },
+    setUserTipsCompleted: (state, action: PayloadAction<boolean>): AllTipsState => {
+      return {
+        ...state,
+        userTips: {
+          ...state.userTips,
+          completed: action.payload,
+        },
+      };
+    },
   },
 });
 
@@ -150,6 +171,18 @@ export const fetchSystemAndUserTipsAction = createAsyncThunk (
       // @ts-ignore
       const notCompletedUserTipID = notCompletedUserTip !== undefined ? notCompletedUserTip.id : 0;
       thunkAPI.dispatch(setUserTipsCurrentlySelected(notCompletedUserTipID));
+
+      let systemsTipsCompleted = true;
+      retrievedSystemTips.forEach((t) => {
+        systemsTipsCompleted = systemsTipsCompleted && t.completed;
+      });
+      thunkAPI.dispatch(setSystemTipsCompleted(systemsTipsCompleted));
+
+      let userTipsCompleted = true;
+      retrievedUserTips.forEach((t) => {
+        userTipsCompleted = userTipsCompleted && t.completed;
+      });
+      thunkAPI.dispatch(setUserTipsCompleted(userTipsCompleted));
     }) ();
   }
 );
@@ -211,6 +244,8 @@ export const {
   setUserTipsLoading,
   setSystemTipsCurrentlySelected,
   setUserTipsCurrentlySelected,
+  setSystemTipsCompleted,
+  setUserTipsCompleted,
 } = perconaTipsSlice.actions;
 
 export default perconaTipsSlice.reducer;

@@ -22,26 +22,16 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
   const feedbackLocalStorageKey = `grafana.onboarding.feedback.visible.${userId}`;
   const [feedbackVisible, setFeedbackVisible] = useLocalStorage(feedbackLocalStorageKey, true);
 
-  let systemsTipsCompleted = true;
-  systemTips.tips.forEach((t) => {
-    systemsTipsCompleted = systemsTipsCompleted && t.completed;
-  });
-
-  let userTipsCompleted = true;
-  userTips.tips.forEach((t) => {
-    userTipsCompleted = userTipsCompleted && t.completed;
-  });
-
   useEffect(() => {
     dispatch(fetchSystemAndUserTipsAction({ userId: userId }));
   }, []);
 
-  const showEmptyStageTip = !feedbackVisible && systemsTipsCompleted && isConnectedUser && userTipsCompleted;
+  const showEmptyStageTip = !feedbackVisible && systemTips.completed && isConnectedUser && userTips.completed;
   return (
     <>
       {showEmptyStageTip && <EmptyTip />}
 
-      {!systemsTipsCompleted && (
+      {!systemTips.completed && (
         <StartMonitoringTipsContainer
           userId={userId}
           tips={systemTips.tips}
@@ -49,7 +39,7 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
         />
       )}
       {!isConnectedUser && <TipNotConnected />}
-      {isConnectedUser && !userTipsCompleted && (
+      {isConnectedUser && !userTips.completed && (
         <ExploreYourNewPowerUpsTipsContainer
           userId={userId}
           tips={userTips.tips}
