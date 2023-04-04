@@ -39,10 +39,15 @@ env-down-local-gs:							## Stops devcontainer.
 TARGET ?= _bash
 DEV_CONTAINER ?= pmm-grafana-dev
 DEV_WORKSPACE_LOCATION ?= /workspace
+DEV_PMM_WORKSPACE_LOCATION ?= /root/go/src/github.com/percona/pmm
 
 .PHONY: env
 env:								## Runs `make TARGET` in devcontainer (`make env TARGET=help`); TARGET defaults to bash.
 	docker exec -it --workdir=$(DEV_WORKSPACE_LOCATION) $(DEV_CONTAINER) make $(TARGET)
+
+.PHONY: env-pmm
+env-pmm:								## Runs `make TARGET` in devcontainer (`make env TARGET=help`); TARGET defaults to bash.
+	docker exec -it --workdir=$(DEV_PMM_WORKSPACE_LOCATION) $(DEV_CONTAINER) make $(TARGET)
 
 .PHONY: help
 default: help

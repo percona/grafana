@@ -18,6 +18,7 @@ services:
       args:
         PMM_CONTAINER: ${PMM_CONTAINER:-perconalab/pmm-server:dev-container}
     environment:
+      - PERCONA_TEST_INTERFACE_TO_BIND=0.0.0.0
       - ENABLE_DBAAS=${ENABLE_DBAAS:-0}
       - ENABLE_BACKUP_MANAGEMENT=1
       #      - PERCONA_TEST_PLATFORM_ADDRESS=https://check.localhost
@@ -53,21 +54,30 @@ services:
       memlock: 67108864
 
     ports:
-      - ${PMM_PORT_HTTP:-80}:80
-      - ${PMM_PORT_HTTPS:-443}:443
+      - ${PMM_PORT_HTTP:-1080}:80
+      - ${PMM_PORT_HTTPS:-1443}:443
       - ${GRAFANA_SERVER:-3333}:3000
       # VM
       - ${PMM_PORT_VM:-9090}:9090
+      # PG
+      - ${PMM_PORT_PG:-15432}:5432
+      # CH
+      - ${PMM_PORT_CH_TCP:-11000}:9000
+      - ${PMM_PORT_CH_HTTP:-11123}:8123
+      # vmalert
+      - ${PMM_PORT_VMALERT:-8880}:8880
+      # alertmanager
+      - ${PMM_PORT_ALERTMANAGER:-9093}:9093
     volumes:
       - ${PMM_MANAGED_DIR:-../../pmm}:/root/go/src/github.com/percona/pmm
       - ${PMM_MANAGED_DIR:-../../pmm}/Makefile.devcontainer:/root/go/src/github.com/percona/pmm/Makefile:ro # change Makefile in devcontainer
 
+      # -- grafana in dev mode
+      - "../public:/usr/share/grafana/public"
+      - ../conf/grafana.local-dev.ini:/usr/share/grafana/conf/defaults.ini
       # configs
-      #- ./.config/etc/grafana.ini:/etc/grafana/grafana.ini
-      - ./.config/etc/supervisord.d/grafana.ini:/etc/supervisord.d/grafana.ini:ro
-      - ${PMM_SVC_CONFIG:-./.config/etc/supervisord.d/pmm.ini}:/etc/supervisord.d/pmm.ini:ro
-      - ./.config/etc/supervisord.d/victoriametrics.ini:/etc/supervisord.d/victoriametrics.ini:ro
       - ./.config/etc/nginx/conf.d/pmm.conf:/etc/nginx/conf.d/pmm.conf:ro
+      - ${PMM_SVC_CONFIG:-./.config/etc/supervisord.d/pmm.ini}:/etc/supervisord.d/pmm.ini:ro
       - ./.config/etc/nginx/conf.d/pmm-ssl.conf:/etc/nginx/conf.d/pmm-ssl.conf:ro
       # workspace
       - ../:/workspace
