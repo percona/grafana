@@ -46,7 +46,7 @@ export const Tip: FC<TipProps> = (props) => {
   const [checked, setChecked] = useState(false);
   const onChange = (e: any) => {
     if (e.currentTarget.checked) {
-      dispatch(completeUserTip({tipId: tipId, userId: userId}));
+      dispatch(completeUserTip({tipId: tipId}));
       //todo: handle error
       setChecked(e.currentTarget.checked);
     }

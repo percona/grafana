@@ -190,10 +190,10 @@ export const fetchSystemAndUserTipsAction = createAsyncThunk (
 
 export const completeUserTip = createAsyncThunk (
   'percona/completeUserTips',
-  (args: {tipId: number; userId: number}, thunkAPI): Promise<void> =>
+  (args: {tipId: number}, thunkAPI): Promise<void> =>
     (async () => {
-      const res = await apiOnboarding.post<any, any>(`/tips/${args.tipId}/complete`, {
-        userId: args.userId,
+      const res = await apiOnboarding.post<any, any>("/tips/complete", {
+        tipId: args.tipId,
       });
 
       if (res.errorCode) {
