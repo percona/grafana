@@ -10,5 +10,5 @@ export const getTemplatesOptions = (
     label: template.name,
     value: template.kind,
   }));
-  return options?.length ? [...options, { label: 'Not selected', value: '' }] : [];
+  return options?.length ? [...options, { label: 'Not selected', value: '' }] : [{ label: 'Not selected', value: '' }];
 };
