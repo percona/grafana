@@ -38,7 +38,7 @@ env-down-local-gs:							## Stops devcontainer.
 
 TARGET ?= _bash
 DEV_CONTAINER ?= pmm-grafana-dev
-DEV_WORKSPACE_LOCATION ?= /root/go/src/github.com/percona/pmm
+DEV_WORKSPACE_LOCATION ?= /workspace
 DEV_PMM_WORKSPACE_LOCATION ?= /root/go/src/github.com/percona/pmm
 
 .PHONY: env
