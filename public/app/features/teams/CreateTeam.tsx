@@ -8,11 +8,16 @@ import { TeamRolePicker } from 'app/core/components/RolePicker/TeamRolePicker';
 import { updateTeamRoles } from 'app/core/components/RolePicker/api';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { contextSrv } from 'app/core/core';
+import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
+import { AccessRolesTeamField } from 'app/percona/rbac/Team/AccessRolesTeamField/AccessRolesTeamField';
+import { useAccessRolesTeam } from 'app/percona/rbac/hooks';
 import { AccessControlAction, Role } from 'app/types';
 
 interface TeamDTO {
   email: string;
   name: string;
+  // @PERCONA
+  roleIds: number[];
 }
 
 const pageNav: NavModelItem = {
@@ -27,6 +32,8 @@ export const CreateTeam = (): JSX.Element => {
   const currentOrgId = contextSrv.user.orgId;
   const [pendingRoles, setPendingRoles] = useState<Role[]>([]);
   const [{ roleOptions }] = useRoleOptions(currentOrgId);
+  // @PERCONA
+  const { submitTeamAccessRoles } = useAccessRolesTeam();
 
   const canUpdateRoles =
     contextSrv.hasPermission(AccessControlAction.ActionUserRolesAdd) &&
@@ -40,6 +47,10 @@ export const CreateTeam = (): JSX.Element => {
         if (contextSrv.licensedAccessControlEnabled() && canUpdateRoles) {
           await updateTeamRoles(pendingRoles, newTeam.teamId, newTeam.orgId);
         }
+        // @PERCONA
+        if (formModel.roleIds?.length) {
+          submitTeamAccessRoles(newTeam.teamId, formModel.roleIds);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -51,7 +62,7 @@ export const CreateTeam = (): JSX.Element => {
     <Page navId="teams" pageNav={pageNav}>
       <Page.Contents>
         <Form onSubmit={createTeam}>
-          {({ register, errors }) => (
+          {({ register, errors, control }) => (
             <FieldSet>
               <Field label="Name" required invalid={!!errors.name} error="Team name is required">
                 <Input {...register('name', { required: true })} id="team-name" />
@@ -69,6 +80,10 @@ export const CreateTeam = (): JSX.Element => {
                   />
                 </Field>
               )}
+              {/* @PERCONA */}
+              <AccessRolesEnabledCheck>
+                <AccessRolesTeamField control={control} />
+              </AccessRolesEnabledCheck>
               <Field
                 label={'Email'}
                 description={'This is optional and is primarily used for allowing custom team avatars.'}
