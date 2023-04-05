@@ -190,7 +190,7 @@ export const getStyles = (theme: GrafanaTheme2) => ({
   `,
   tooltip: css`
     font-size: ${theme.typography.bodySmall.fontSize};
-    color: ${theme.colors.text.secondary};
+    color: ${theme.colors.text.primary};
     margin-right: 24px;
     @media (max-width: 835px) {
       display: none;
