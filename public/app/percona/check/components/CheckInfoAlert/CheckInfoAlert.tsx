@@ -11,9 +11,9 @@ import { getStyles } from './CheckInfoAlert.styles';
 
 export const ChecksInfoAlert = () => {
   const { result } = useSelector(getPerconaSettings);
-  const { isConnectedToPortal } = result!;
+  const { isConnectedToPortal, telemetryEnabled } = result!;
   const styles = useStyles2(getStyles);
-  const { serverId } = useSelector(getPerconaServer);
+  const { serverId, serverTelemetryId } = useSelector(getPerconaServer);
 
   if (isConnectedToPortal) {
     return null;
@@ -31,7 +31,13 @@ export const ChecksInfoAlert = () => {
           data-testid="read-more-link"
           target="_blank"
           rel="noreferrer"
-          href={`https://per.co.na/subscription2?utm_source=pmm-${serverId}`}
+          href={
+            telemetryEnabled
+              ? serverTelemetryId
+                ? `https://per.co.na/subscription2?utm_source=pmm-tid-${serverTelemetryId}`
+                : `https://per.co.na/subscription2?utm_source=pmm-sid-${serverId}`
+              : 'https://per.co.na/subscribemore'
+          }
           className={styles.link}
         >
           {Messages.link}
