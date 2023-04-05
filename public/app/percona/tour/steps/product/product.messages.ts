@@ -56,7 +56,7 @@ export const Messages = {
     changeOrg: 'Change the organization role assigned to the user account.',
   },
   advisors: {
-    title: 'Advisor checks',
+    title: 'Advisors',
     pmmIncludes:
       'PMM includes a set of Advisors that run checks against the databases connected to PMM. The checks identify and alert you of potential security threats, performance degradation, data loss, data corruption, non-compliance issues, etc.',
     findOutMore: 'To find out more, check out the ',
@@ -78,7 +78,7 @@ export const Messages = {
   backup: {
     title: 'Backup',
     feature:
-      'The backup feature allows you to back up the databases that PMM is monitoring. PMM supports backup for MySQL and MongoDB (Point-In-Time-Recoverable DBaaSBackups) databases.',
+      'The backup feature allows you to back up the databases that PMM is monitoring. PMM supports backup for MySQL and MongoDB (Point-In-Time-Recoverable Backups) databases.',
     onDemand:
       'You can set up backup on demand. In case of failures, you can predefine the retry mode, either manual or auto, along with the retry times and retry intervals.',
     shedule:
