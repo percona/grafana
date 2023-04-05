@@ -5,7 +5,7 @@
     "title": "Documentation",
     "text": "Visit out up-to-date, detailed guides on how to use PMM effectively.",
     "buttonText": "Open documentation",
-    "url": "https://docs.percona.com/percona-monitoring-and-management/index.html"
+    "url": "https://docs.percona.com/percona-monitoring-and-management/index.html?utm_source=pmm&utm_medium=help-center&utm_campaign=product-documentation&utm_term=product-documentation"
   },
   {
     "id": 2,
@@ -13,6 +13,6 @@
     "title": "Community Forum",
     "text": "Dive into our growing worldwide community of database experts.",
     "buttonText": "Open Community Forum",
-    "url": "https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none"
+    "url": "https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none?utm_source=pmm&utm_medium=help-center&utm_campaign=community-forum&utm_term=community-forum"
   }
 ]
