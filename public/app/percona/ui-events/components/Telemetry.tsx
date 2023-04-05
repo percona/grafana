@@ -50,7 +50,7 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
     }
   }, [telemetryEnabled]);
 
-  return <></>;
+  return null;
 };
 
 export const Telemetry = React.memo(_Telemetry);
