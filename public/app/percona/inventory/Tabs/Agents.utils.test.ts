@@ -10,6 +10,10 @@ describe('toAgentModel', () => {
         agent_id: 'agent1',
         status: ServiceAgentStatus.RUNNING,
         username: 'john',
+        mongo_db_options: {
+          mongo_opt_1: true,
+          mongo_opt_2: ['foo', 'bar'],
+        },
       },
       {
         agent_type: AgentType.mongodb,
@@ -31,6 +35,8 @@ describe('toAgentModel', () => {
           status: ServiceAgentStatus.RUNNING,
           customLabels: {
             username: 'john',
+            mongo_opt_1: 'true',
+            mongo_opt_2: 'foo,bar',
           },
         },
       },
