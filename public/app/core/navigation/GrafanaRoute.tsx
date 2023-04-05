@@ -121,7 +121,7 @@ export function GrafanaRoute(props: Props) {
                         }}
                       />
                       {/*TODO:WIP: refactor*/}
-                      <div className={isHelpCenterOpen ? styles.openedHelpCenter : ''}>
+                      <div className={`${styles.mainContainer} ${isHelpCenterOpen ? styles.openedHelpCenter : ''}`}>
                         { props.location.pathname === '/' ? <PmmUi.HomePageRouter
                             userId={userId}
                             defaultHomePage={<props.route.component {...props}
@@ -155,6 +155,12 @@ export function GrafanaRoute(props: Props) {
 }
 
 const getStyles = () => ({
+  mainContainer: css`
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  `,
   openedHelpCenter: css`
     width: calc(100% - 430px);
     @media (max-width: 1279px) {
