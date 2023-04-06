@@ -27,6 +27,16 @@ export interface TipModel {
   canUserComplete?: boolean;
 }
 
+interface ApiTipModel {
+  tipId: number;
+  isCompleted: boolean;
+}
+
+interface OnboardingResponse {
+  systemTips: ApiTipModel[];
+  userTips: ApiTipModel[];
+}
+
 const initialTipsState: AllTipsState = {
   userTips: {
     // @ts-ignore
@@ -44,7 +54,7 @@ const initialTipsState: AllTipsState = {
   },
 };
 
-const perconaTipsSlice = createSlice ({
+const perconaTipsSlice = createSlice({
   name: 'perconaTips',
   initialState: initialTipsState,
   reducers: {
@@ -125,105 +135,87 @@ const perconaTipsSlice = createSlice ({
   },
 });
 
-export const fetchSystemAndUserTipsAction = createAsyncThunk (
+export const fetchSystemAndUserTipsAction = createAsyncThunk(
   'percona/fetchSystemAndUserTipsAction',
-  (args: {userId: number}, thunkAPI): Promise<void> => {
+  (args: { userId: number }, thunkAPI): Promise<void> => {
     return (async () => {
-      thunkAPI.dispatch (setSystemTipsLoading());
-      thunkAPI.dispatch (setUserTipsLoading());
+      thunkAPI.dispatch(setSystemTipsLoading());
+      thunkAPI.dispatch(setUserTipsLoading());
 
-      let retrievedSystemTips: TipModel[] = [];
-      const res = await apiOnboarding.get<any, any> (``);
-      for (let tip of res.systemTips) {
-        retrievedSystemTips.push ({
-          // @ts-ignore
-          ...systemTipsData[tip.tipId],
-          id: tip.tipId,
-          completed: !!tip.isCompleted,
-        });
+      let systemTips: ApiTipModel[] = [];
+      let userTips: ApiTipModel[] = [];
+      try {
+        const res = await apiOnboarding.get<OnboardingResponse, any>(``);
+        systemTips = res.systemTips;
+        userTips = res.userTips;
+      } catch (e) {
+        systemTips = Array.from(new Map(Object.entries(systemTipsData)).values())
+          .map((t) => t as TipModel)
+          .map((t) => {
+            return { tipId: t.id, isCompleted: false } as ApiTipModel;
+          });
+        userTips = Array.from(new Map(Object.entries(userTipsData)).values())
+          .map((t) => t as TipModel)
+          .map((t) => {
+            return { tipId: t.id, isCompleted: false } as ApiTipModel;
+          });
+        throw e;
+      } finally {
+        processFetchedTips(
+          systemTips,
+          systemTipsData as unknown as Map<number, TipModel>,
+          (t) => thunkAPI.dispatch(setSystemTips(t)),
+          (id) => thunkAPI.dispatch(setSystemTipsCurrentlySelected(id)),
+          (allCompleted) => thunkAPI.dispatch(setSystemTipsCompleted(allCompleted))
+        );
+
+        processFetchedTips(
+          userTips,
+          userTipsData as unknown as Map<number, TipModel>,
+          (t) => thunkAPI.dispatch(setUserTips(t)),
+          (id) => thunkAPI.dispatch(setUserTipsCurrentlySelected(id)),
+          (allCompleted) => thunkAPI.dispatch(setUserTipsCompleted(allCompleted))
+        );
       }
-
-      sortTipsByID(retrievedSystemTips);
-      // @ts-ignore
-      thunkAPI.dispatch (setSystemTips (retrievedSystemTips));
-      // @ts-ignore
-      const notCompletedSystemTip = retrievedSystemTips.find((tipData) => !tipData.completed);
-      // @ts-ignore
-      const notCompletedSystemTipID = notCompletedSystemTip !== undefined ? notCompletedSystemTip.id : 0;
-      thunkAPI.dispatch(setSystemTipsCurrentlySelected(notCompletedSystemTipID));
-
-      let retrievedUserTips: TipModel[] = [];
-      for (let tip of res.userTips) {
-        retrievedUserTips.push({
-          // @ts-ignore
-          ...userTipsData[tip.tipId],
-          id: tip.tipId,
-          completed: !!tip.isCompleted,
-        });
-      }
-
-      sortTipsByID(retrievedUserTips);
-
-      // @ts-ignore
-      thunkAPI.dispatch(setUserTips(retrievedUserTips));
-      // @ts-ignore
-      const notCompletedUserTip = retrievedUserTips.find((tipData) => !tipData.completed);
-      // @ts-ignore
-      const notCompletedUserTipID = notCompletedUserTip !== undefined ? notCompletedUserTip.id : 0;
-      thunkAPI.dispatch(setUserTipsCurrentlySelected(notCompletedUserTipID));
-
-      let systemsTipsCompleted = true;
-      retrievedSystemTips.forEach((t) => {
-        systemsTipsCompleted = systemsTipsCompleted && t.completed;
-      });
-      thunkAPI.dispatch(setSystemTipsCompleted(systemsTipsCompleted));
-
-      let userTipsCompleted = true;
-      retrievedUserTips.forEach((t) => {
-        userTipsCompleted = userTipsCompleted && t.completed;
-      });
-      thunkAPI.dispatch(setUserTipsCompleted(userTipsCompleted));
-    }) ();
+    })();
   }
 );
 
-
-export const completeUserTip = createAsyncThunk (
+export const completeUserTip = createAsyncThunk(
   'percona/completeUserTips',
-  (args: {tipId: number}, thunkAPI): Promise<void> =>
+  (args: { tipId: number }, thunkAPI): Promise<void> =>
     (async () => {
-      const res = await apiOnboarding.post<any, any>("/tips/complete", {
+      const res = await apiOnboarding.post<any, any>('/tips/complete', {
         tipId: args.tipId,
       });
 
       if (res.errorCode) {
         console.error(res.errorCode);
         console.error(res.errorMessage);
-        throw Error(res.errorMessage)
+        throw Error(res.errorMessage);
       } else {
-        let retrievedUserTips: TipModel[] = [];
-
-        const res = await apiOnboarding.get<any, any>(``);
-        for (let tip of res.userTips) {
-          retrievedUserTips.push({
-            // @ts-ignore
-            ...userTipsData[tip.tipId],
-            id: tip.tipId,
-            completed: !!tip.isCompleted,
-          });
+        let userTips: ApiTipModel[] = [];
+        try {
+          const res = await apiOnboarding.get<OnboardingResponse, any>(``);
+          userTips = res.userTips;
+        } catch (e) {
+          userTips = Array.from(new Map(Object.entries(userTipsData)).values())
+            .map((t) => t as TipModel)
+            .map((t) => {
+              return { tipId: t.id, isCompleted: false } as ApiTipModel;
+            });
+          throw e;
+        } finally {
+          processFetchedTips(
+            userTips,
+            userTipsData as unknown as Map<number, TipModel>,
+            (t) => thunkAPI.dispatch(setUserTips(t)),
+            (id) => thunkAPI.dispatch(setUserTipsCurrentlySelected(id)),
+            (allCompleted) => thunkAPI.dispatch(setUserTipsCompleted(allCompleted))
+          );
         }
-
-        sortTipsByID(retrievedUserTips);
-
-        // @ts-ignore
-        thunkAPI.dispatch(setUserTips(retrievedUserTips));
-        // @ts-ignore
-        const notCompletedUserTip = retrievedUserTips.find((tipData) => !tipData.completed);
-        // @ts-ignore
-        const notCompletedUserTipID = notCompletedUserTip !== undefined ? notCompletedUserTip.id : 0;
-        thunkAPI.dispatch (setUserTipsCurrentlySelected(notCompletedUserTipID));
       }
-    }) ()
+    })()
 );
 
 const sortTipsByID = (tips: TipModel[]) => {
@@ -231,11 +223,40 @@ const sortTipsByID = (tips: TipModel[]) => {
     if (a.id > b.id) {
       return 1;
     } else if (a.id === b.id) {
-      return 0
+      return 0;
     }
     return -1;
   });
-}
+};
+
+const findUncompletedTipId = (tips: TipModel[]): number => {
+  const notCompletedTip = tips.find((tipData) => !tipData.completed);
+  // @ts-ignore
+  return notCompletedTip !== undefined ? notCompletedTip.id : 0;
+};
+
+const processFetchedTips = (
+  fetchedTips: ApiTipModel[],
+  constantTips: Map<number, TipModel>,
+  setTipsStateDispatcher: (tips: TipModel[]) => void,
+  setSelectedTipDispatcher: (tipId: number) => void,
+  setAllTipsCompletedDispatcher: (areAllTipsCompleted: boolean) => void
+) => {
+  let processedTips: TipModel[] = [];
+  for (let tip of fetchedTips) {
+    processedTips.push({
+      // @ts-ignore
+      ...constantTips[tip.tipId],
+      id: tip.tipId,
+      completed: tip.isCompleted,
+    });
+  }
+
+  sortTipsByID(processedTips);
+  setTipsStateDispatcher(processedTips);
+  setSelectedTipDispatcher(findUncompletedTipId(processedTips));
+  setAllTipsCompletedDispatcher(processedTips.every((t) => t.completed));
+};
 
 export const {
   setSystemTips,
