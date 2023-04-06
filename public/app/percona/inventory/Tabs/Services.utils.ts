@@ -6,12 +6,15 @@ const SERVICE_STATUS_TO_BADGE_COLOR: Record<ServiceStatus, BadgeColor> = {
   [ServiceStatus.DOWN]: 'red',
   /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
   [ServiceStatus.UNKNOWN]: '#d7d7d7' as BadgeColor,
+  /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
+  [ServiceStatus.NA]: '#d7d7d7' as BadgeColor,
 };
 
 const SERVICE_STATUS_TO_BADGE_ICON: Record<ServiceStatus, IconName> = {
   [ServiceStatus.UP]: 'check-circle',
   [ServiceStatus.DOWN]: 'times-circle',
   [ServiceStatus.UNKNOWN]: 'question-circle',
+  [ServiceStatus.NA]: 'question-circle',
 };
 
 export const getBadgeColorForServiceStatus = (status: ServiceStatus) => {

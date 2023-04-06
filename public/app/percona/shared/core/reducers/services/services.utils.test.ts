@@ -57,7 +57,6 @@ describe('toDbServicesModel', () => {
           service_type: 'external',
           service_id: 'external1',
           service_name: 'external one',
-          status: ServiceStatus.UNKNOWN,
           node_id: 'node_1',
           node_name: 'node one',
           group: 'g1',
@@ -130,7 +129,7 @@ describe('toDbServicesModel', () => {
           serviceName: 'external one',
           nodeId: 'node_1',
           nodeName: 'node one',
-          status: ServiceStatus.UNKNOWN,
+          status: ServiceStatus.NA,
           customLabels: {
             group: 'g1',
             env_name: 'dev',

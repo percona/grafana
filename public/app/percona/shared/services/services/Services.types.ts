@@ -16,6 +16,7 @@ export enum ServiceStatus {
   UP = 'UP',
   DOWN = 'DOWN',
   UNKNOWN = 'UNKNOWN',
+  NA = 'N/A',
 }
 
 export interface ListServicesBody {
@@ -30,7 +31,7 @@ export interface DbServicePayload {
   service_name: string;
   node_id: string;
   node_name: string;
-  status: ServiceStatus;
+  status?: ServiceStatus;
   enviroment?: string;
   cluster?: string;
   replication_set?: string;

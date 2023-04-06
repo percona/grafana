@@ -60,7 +60,7 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
       // @ts-ignore
       params: {
         ...camelCaseParams,
-        status: status || ServiceStatus.UNKNOWN,
+        status: status || ServiceStatus.NA,
         customLabels: { ...serviceParams['custom_labels'], ...extraLabels },
       },
     });
