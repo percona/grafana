@@ -55,12 +55,16 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
     // @ts-ignore
     delete camelCaseParams['custom_labels'];
 
+    if (!status || status === 'STATUS_INVALID') {
+      status = ServiceStatus.NA;
+    }
+
     result.push({
       type: serviceType,
       // @ts-ignore
       params: {
         ...camelCaseParams,
-        status: status || ServiceStatus.NA,
+        status,
         customLabels: { ...serviceParams['custom_labels'], ...extraLabels },
       },
     });

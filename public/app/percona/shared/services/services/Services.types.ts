@@ -31,7 +31,7 @@ export interface DbServicePayload {
   service_name: string;
   node_id: string;
   node_name: string;
-  status?: ServiceStatus;
+  status?: ServiceStatus | 'STATUS_INVALID';
   enviroment?: string;
   cluster?: string;
   replication_set?: string;

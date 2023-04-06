@@ -45,7 +45,7 @@ describe('toDbServicesModel', () => {
           service_name: 'mongo one',
           node_id: 'node_2',
           node_name: 'node two',
-          status: ServiceStatus.DOWN,
+          status: 'STATUS_INVALID',
           address: 'localhost',
           port: 83,
           socket: '',
@@ -113,7 +113,7 @@ describe('toDbServicesModel', () => {
           serviceName: 'mongo one',
           nodeId: 'node_2',
           nodeName: 'node two',
-          status: ServiceStatus.DOWN,
+          status: ServiceStatus.NA,
           address: 'localhost',
           port: 83,
           customLabels: {
