@@ -19,12 +19,16 @@ export const toAgentModel = (agentList: ServiceAgentPayload[]): Agent[] => {
 
     Object.entries(agentParams)
       .filter(([field]) => !MAIN_COLUMNS.includes(field))
-      .forEach(([key, value]: [string, string]) => {
-        if (typeof value !== 'object' || Array.isArray(value)) {
-          extraLabels[key] = value;
-
-          delete agentParams[key];
+      .forEach(([key, value]: [string, string | object | []]) => {
+        if (Array.isArray(value) || typeof value !== 'object') {
+          extraLabels[key] = value.toString();
+        } else {
+          Object.entries(value).forEach(([nestedKey, nestedValue]: [string, string]) => {
+            extraLabels[nestedKey] = nestedValue.toString();
+          });
         }
+
+        delete agentParams[key];
       });
 
     const camelCaseParams = payloadToCamelCase(agentParams, ['custom_labels']);
