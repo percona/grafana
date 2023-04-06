@@ -156,10 +156,9 @@ export function GrafanaRoute(props: Props) {
 
 const getStyles = () => ({
   mainContainer: css`
-    display: flex;
     width: 100%;
     height: 100%;
-    min-height: 0;
+    overflow-y: hidden;
   `,
   openedHelpCenter: css`
     width: calc(100% - 430px);

@@ -118,11 +118,9 @@ export const TopBar: FC<TopBarProps> = ({
         {showHelpCenterButton && (
           <>
             <HelpCenterTooltip visible={!!showHelpCenterToolTip} onClose={onCloseHelpCenterTooltip}>
-              <>
-                <Button variant="secondary" icon="question-circle" onClick={onHelpCenterClick} />
-                {showHelpCenterNotificationMarker && <div className={styles.notificationMarker} />}
-              </>
+              <Button variant="secondary" icon="question-circle" onClick={onHelpCenterClick} />
             </HelpCenterTooltip>
+            {showHelpCenterNotificationMarker && <div className={styles.notificationMarker} />}
           </>
         )}
       </ToolbarButtonRow>

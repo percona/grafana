@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Button, useStyles2 } from '@grafana/ui';
+import { CustomScrollbar, Button, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { ActionCard } from './comonents/ActionCard';
@@ -28,60 +28,62 @@ export const HomePage: FC<HomePageProps> = (props) => {
   const helpBlockText =
     "We've got you covered. Check out our Help Center, official documentation, and community forums to find the answers you need and connect with other PMM users.";
   return (
-    <div className={styles.welcomePage}>
-      <div className={styles.welcomePageContent}>
-        <ActionContainer
-          headerType="h1"
-          header={welcomeHeader}
-          text={welcomeText}
-          actionsSpacing="none"
-          actionsJustify="center"
-        >
-          <div className={styles.actionCardPair}>
-            <ActionCard text="Monitor database health" imgSrc={imgDbHealth} imgAlt="Monitor database health" />
-            <ActionCard text="Discover patterns" imgSrc={imgDiscoverPatterns} imgAlt="Discover patterns" />
-          </div>
-          <div className={styles.actionCardPair}>
-            <ActionCard text="Optimize and improve" imgSrc={imgOptimizeAndImprove} imgAlt="Optimize and improve" />
-            <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
-          </div>
-        </ActionContainer>
-        <HomePageTipsContainer userId={userId} />
-        <ActionContainer
-          headerType="h2"
-          header={helpBlockHeader}
-          text={helpBlockText}
-          actionsSpacing="md"
-          actionsJustify="flex-start"
-        >
-          <Button variant="secondary" onClick={onHelpCenterButtonClick}>
-            Open Help Center
-          </Button>
-          <Button
-            variant="secondary"
-            icon="external-link-alt"
-            onClick={() =>
-              window.open(
-                'https://docs.percona.com/percona-monitoring-and-management/?utm_source=pmm&utm_medium=welcome_page&utm_campaign=pmm_documentation&utm_term=PMM+Documentaiton'
-              )
-            }
+    <CustomScrollbar>
+      <div className={styles.welcomePage}>
+        <div className={styles.welcomePageContent}>
+          <ActionContainer
+            headerType="h1"
+            header={welcomeHeader}
+            text={welcomeText}
+            actionsSpacing="none"
+            actionsJustify="center"
           >
-            PMM Documentation
-          </Button>
-          <Button
-            variant="secondary"
-            icon="external-link-alt"
-            onClick={() =>
-              window.open(
-                'https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none?utm_source=pmm&utm_medium=welcome_page&utm_campaign=community_forum&utm_term=Community+Forum'
-              )
-            }
+            <div className={styles.actionCardPair}>
+              <ActionCard text="Monitor database health" imgSrc={imgDbHealth} imgAlt="Monitor database health" />
+              <ActionCard text="Discover patterns" imgSrc={imgDiscoverPatterns} imgAlt="Discover patterns" />
+            </div>
+            <div className={styles.actionCardPair}>
+              <ActionCard text="Optimize and improve" imgSrc={imgOptimizeAndImprove} imgAlt="Optimize and improve" />
+              <ActionCard text="Maintain performance" imgSrc={imgMaintainPerformance} imgAlt="Maintain performance" />
+            </div>
+          </ActionContainer>
+          <HomePageTipsContainer userId={userId} />
+          <ActionContainer
+            headerType="h2"
+            header={helpBlockHeader}
+            text={helpBlockText}
+            actionsSpacing="md"
+            actionsJustify="flex-start"
           >
-            Community Forum
-          </Button>
-        </ActionContainer>
+            <Button variant="secondary" onClick={onHelpCenterButtonClick}>
+              Open Help Center
+            </Button>
+            <Button
+              variant="secondary"
+              icon="external-link-alt"
+              onClick={() =>
+                window.open(
+                  'https://docs.percona.com/percona-monitoring-and-management/?utm_source=pmm&utm_medium=welcome_page&utm_campaign=pmm_documentation&utm_term=PMM+Documentaiton'
+                )
+              }
+            >
+              PMM Documentation
+            </Button>
+            <Button
+              variant="secondary"
+              icon="external-link-alt"
+              onClick={() =>
+                window.open(
+                  'https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none?utm_source=pmm&utm_medium=welcome_page&utm_campaign=community_forum&utm_term=Community+Forum'
+                )
+              }
+            >
+              Community Forum
+            </Button>
+          </ActionContainer>
+        </div>
       </div>
-    </div>
+    </CustomScrollbar>
   );
 };
 
@@ -94,6 +96,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     align-items: flex-start;
     padding: 16px;
     gap: 10px;
+    height: auto;
   `,
   welcomePageContent: css`
     display: flex;
