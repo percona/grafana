@@ -100,7 +100,6 @@ export function GrafanaRoute(props: Props) {
                         showSignIn
                         showFeedbackButton
                         showHelpCenterButton
-                        showHelpCenterNotificationMarker
                         pmmServerId={serverId}
                         onSignInClick={() => {
                           setConnectPortalModalVisible(true);

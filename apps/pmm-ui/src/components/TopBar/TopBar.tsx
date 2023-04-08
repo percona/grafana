@@ -2,6 +2,8 @@ import React, { FC, useState } from 'react';
 import { Button, Dropdown, Icon, Menu, ToolbarButtonRow, useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
+import { useSelector } from 'react-redux';
+import { StoreState } from '../../reducers/store';
 import perconaIcon from './assets/pmm-percona-icon.svg';
 import appIcon from '../../assets/pmm-app-icon.svg';
 import platformIcon from '../../assets/pmm-platform-purple.svg';
@@ -18,7 +20,6 @@ export interface TopBarProps {
 
   onSignInClick: () => void;
   onHelpCenterClick: () => void;
-  showHelpCenterNotificationMarker?: boolean;
   showHelpCenterToolTip?: boolean;
   onCloseHelpCenterTooltip: () => void;
 }
@@ -31,11 +32,13 @@ export const TopBar: FC<TopBarProps> = ({
   showHelpCenterButton,
   onSignInClick,
   onHelpCenterClick,
-  showHelpCenterNotificationMarker,
   showHelpCenterToolTip,
   onCloseHelpCenterTooltip,
 }) => {
   const [visibleFeedback, setVisibleFeedback] = useState(false);
+
+  const { systemTips, userTips } = useSelector((state: StoreState) => state.tips);
+  const showHelpCenterNotificationMarker = !systemTips.completed || !userTips.completed;
 
   // TODO: consider passing proper appSubUrl
   const appSubUrl = '/graph';

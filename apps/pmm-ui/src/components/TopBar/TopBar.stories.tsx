@@ -21,7 +21,6 @@ const Template: ComponentStory<typeof TopBar> = (args) => {
         showSignIn
         showFeedbackButton
         showHelpCenterButton
-        showHelpCenterNotificationMarker
         onSignInClick={() => {
           setMessage('sign in');
           setUserContext('something_here');
