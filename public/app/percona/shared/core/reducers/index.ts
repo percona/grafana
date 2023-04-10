@@ -151,6 +151,7 @@ export const initialServerState: PerconaServerState = {
   serverName: '',
   serverId: '',
   saasHost: 'https://portal.percona.com',
+  serverTelemetryId: '',
 };
 
 const perconaServerSlice = createSlice({
@@ -161,6 +162,7 @@ const perconaServerSlice = createSlice({
       ...state,
       serverName: action.payload.serverName,
       serverId: action.payload.serverId,
+      serverTelemetryId: action.payload.serverTelemetryId,
     }),
     setServerSaasHost: (state, action: PayloadAction<string>): PerconaServerState => ({
       ...state,
@@ -178,12 +180,17 @@ export const fetchServerInfoAction = createAsyncThunk(
   (_, thunkAPI): Promise<void> =>
     withSerializedError(
       (async () => {
-        const { pmm_server_id = '', pmm_server_name = '' } = await PlatformService.getServerInfo();
+        const {
+          pmm_server_id = '',
+          pmm_server_name = '',
+          pmm_server_telemetry_id = '',
+        } = await PlatformService.getServerInfo();
 
         thunkAPI.dispatch(
           setServerInfo({
             serverName: pmm_server_name,
             serverId: pmm_server_id,
+            serverTelemetryId: pmm_server_telemetry_id,
           })
         );
       })()
