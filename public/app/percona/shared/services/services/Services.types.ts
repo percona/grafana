@@ -18,6 +18,12 @@ export interface ListServicesBody {
   external_group: string;
 }
 
+export interface DbServiceAgentPayload {
+  agent_id: string;
+  status?: ServiceAgentStatus;
+  is_connected?: boolean;
+}
+
 export interface DbServicePayload {
   service_type: Databases | 'external';
   service_id: string;
@@ -28,7 +34,7 @@ export interface DbServicePayload {
   cluster?: string;
   replication_set?: string;
   custom_labels?: Record<string, string>;
-  agents?: Array<{ agent_id: string; status?: ServiceAgentStatus; is_connected?: boolean }>;
+  agents?: DbServiceAgentPayload[];
 }
 
 export interface DbServiceWithAddressPayload extends DbServicePayload {
