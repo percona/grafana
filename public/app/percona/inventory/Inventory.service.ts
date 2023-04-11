@@ -23,26 +23,28 @@ interface RemoveNodeBody {
 
 export const InventoryService = {
   getAgents(body = {}, token?: CancelToken) {
-    return api.post<any, any>(`${BASE_URL}/Agents/List`, body, false, token);
+    return api.post<void, object>(`${BASE_URL}/Agents/List`, body, false, token);
   },
   removeAgent(body: RemoveAgentBody, token?: CancelToken) {
-    return api.post<any, any>(`${BASE_URL}/Agents/Remove`, body, false, token);
+    return api.post<void, object>(`${BASE_URL}/Agents/Remove`, body, false, token);
   },
   getServices(body = {}, token?: CancelToken) {
-    return api.post<any, any>(`${BASE_URL}/Services/List`, body, false, token);
+    return api.post<void, object>(`${BASE_URL}/Services/List`, body, false, token);
   },
   // TODO unify typings and this function with getServices()
   async getDbServices(token?: CancelToken): Promise<DBServiceList> {
-    const response = await api.post<ServiceListPayload, any>(`${BASE_URL}/Services/List`, {}, false, token);
+    const response = await api.post<ServiceListPayload, object>(`${BASE_URL}/Services/List`, {}, false, token);
     const result: DBServiceList = {};
 
-    Object.keys(response).forEach((db) => {
-      const dbServices = response[db as Databases];
+    // @ts-ignore
+    Object.keys(response).forEach((db: Databases) => {
+      const dbServices = response[db];
 
       if (dbServices?.length) {
-        result[db as Databases] = dbServices.map(({ service_id, service_name }) => ({
+        result[db] = dbServices.map(({ service_id, service_name, cluster }) => ({
           id: service_id,
           name: service_name,
+          cluster,
         }));
       }
     });
@@ -50,12 +52,12 @@ export const InventoryService = {
     return result;
   },
   removeService(body: RemoveServiceBody, token?: CancelToken) {
-    return api.post<any, any>(`${BASE_URL}/Services/Remove`, body, false, token);
+    return api.post<void, RemoveServiceBody>(`${BASE_URL}/Services/Remove`, body, false, token);
   },
   getNodes(body = {}, token?: CancelToken) {
-    return api.post<any, any>(`${BASE_URL}/Nodes/List`, body, false, token);
+    return api.post<void, object>(`${BASE_URL}/Nodes/List`, body, false, token);
   },
   removeNode(body: RemoveNodeBody, token?: CancelToken) {
-    return api.post<any, any>(`${BASE_URL}/Nodes/Remove`, body, false, token);
+    return api.post<void, RemoveNodeBody>(`${BASE_URL}/Nodes/Remove`, body, false, token);
   },
 };
