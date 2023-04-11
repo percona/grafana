@@ -1,6 +1,6 @@
 export const Messages = {
   copyToClipboard: 'Copy to clipboard',
-  updateSuccessNotice: 'PMM has been successfully upgraded to version',
+  updateSuccessNotice: 'PMM has been upgraded to version',
   log: 'Log',
   close: 'Close',
   serverStopped: {

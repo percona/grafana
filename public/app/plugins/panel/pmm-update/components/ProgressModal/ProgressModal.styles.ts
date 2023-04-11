@@ -55,7 +55,7 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     margin-right: 5px;
   `,
   successNote: css`
-    padding: 80px;
+    padding: 10px;
     text-align: center;
   `,
   closeModal: css`

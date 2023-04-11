@@ -30,7 +30,7 @@ describe('ProgressModal::', () => {
     expect(screen.getByTestId('modal-close')).toBeInTheDocument();
     expect(screen.queryByTestId(Messages.copyToClipboard)).not.toBeInTheDocument();
     expect(screen.queryByTestId('modal-chevron-icon-angle-down')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('modal-output-pre')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('modal-output-pre')).toBeInTheDocument();
   });
 
   it('should toggle the upgrade output on click on the chevron icon', () => {

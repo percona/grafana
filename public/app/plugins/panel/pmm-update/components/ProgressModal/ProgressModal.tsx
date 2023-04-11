@@ -59,39 +59,33 @@ export const ProgressModal: FC<ProgressModalProps> = ({
     <Modal title="" isOpen={isOpen}>
       <div ref={modalRef} className={styles.modal} role="document" data-testid="progress-modal-container">
         <ProgressModalHeader isUpdated={isUpdated} updateFailed={updateFailed} errorMessage={errorMessage} />
-        {!isUpdated ? (
-          <div className={styles.outputContent}>
-            <div className={styles.outputHeader}>
-              <Icon
-                className={styles.outputVisibilityToggle}
-                data-testid={`modal-chevron-icon-${chevronIcon}`}
-                name={chevronIcon}
-                onClick={handleToggleShowOutput}
-              />
-              <span>{Messages.log}</span>
-              <ClipboardButton
-                getText={copyToClipboard}
-                className={styles.clipboardButton}
-                variant="secondary"
-                size="sm"
-              >
-                {Messages.copyToClipboard}
-              </ClipboardButton>
-            </div>
-            {pmmServerStopped && (
-              <Alert className={styles.stopped} title={Messages.serverStopped.title} severity="warning">
-                {Messages.serverStopped.description}
-              </Alert>
-            )}
-            {isOutputShown && (
-              <div className={styles.output}>
-                <pre data-testid="modal-output-pre" ref={outputRef}>
-                  {output}
-                </pre>
-              </div>
-            )}
+        <div className={styles.outputContent}>
+          <div className={styles.outputHeader}>
+            <Icon
+              className={styles.outputVisibilityToggle}
+              data-testid={`modal-chevron-icon-${chevronIcon}`}
+              name={chevronIcon}
+              onClick={handleToggleShowOutput}
+            />
+            <span>{Messages.log}</span>
+            <ClipboardButton getText={copyToClipboard} className={styles.clipboardButton} variant="secondary" size="sm">
+              {Messages.copyToClipboard}
+            </ClipboardButton>
           </div>
-        ) : (
+          {pmmServerStopped && (
+            <Alert className={styles.stopped} title={Messages.serverStopped.title} severity="warning">
+              {Messages.serverStopped.description}
+            </Alert>
+          )}
+          {isOutputShown && (
+            <div className={styles.output}>
+              <pre data-testid="modal-output-pre" ref={outputRef}>
+                {output}
+              </pre>
+            </div>
+          )}
+        </div>
+        {isUpdated && (
           <>
             <div className={styles.successNote}>
               <h6 data-testid="modal-update-success-text">
