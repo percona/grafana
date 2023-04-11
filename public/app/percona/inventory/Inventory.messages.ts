@@ -2,6 +2,7 @@ export const Messages = {
   services: {
     add: 'Add Service',
     columns: {
+      status: 'Status',
       serviceName: 'Service Name',
       nodeName: 'Node Name',
       monitoring: 'Monitoring',
