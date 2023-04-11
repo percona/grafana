@@ -54,7 +54,7 @@ export const Services = () => {
         content: (
           <HorizontalGroup spacing="sm">
             <Icon name="trash-alt" />
-            <span className={styles.deleteItemTxtSpan}>Delete</span>
+            <span className={styles.deleteItemTxtSpan}>{Messages.delete}</span>
           </HorizontalGroup>
         ),
         action: () => {
