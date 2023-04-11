@@ -6,7 +6,7 @@ import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
@@ -24,9 +24,10 @@ import {
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getDashboardLinkForService } from 'app/percona/shared/helpers/getDashboardLinkForService';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
-import { Service } from 'app/percona/shared/services/services/Services.types';
+import { Service, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -36,6 +37,7 @@ import { Messages } from '../Inventory.messages';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
+import { getBadgeColorForServiceStatus, getBadgeIconForServiceStatus } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Services = () => {
@@ -80,6 +82,17 @@ export const Services = () => {
 
   const columns = useMemo(
     (): Array<Column<Service>> => [
+      {
+        Header: Messages.services.columns.status,
+        accessor: (row) => row.params.status,
+        Cell: ({ value }: { value: ServiceStatus }) => (
+          <Badge
+            text={capitalizeText(value)}
+            color={getBadgeColorForServiceStatus(value)}
+            icon={getBadgeIconForServiceStatus(value)}
+          />
+        ),
+      },
       {
         Header: Messages.services.columns.serviceName,
         accessor: (row) => row.params.serviceName,

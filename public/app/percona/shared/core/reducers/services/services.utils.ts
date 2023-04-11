@@ -4,6 +4,7 @@ import {
   RemoveServiceBody,
   Service,
   ServiceListPayload,
+  ServiceStatus,
 } from 'app/percona/shared/services/services/Services.types';
 
 import { ListServicesParams, RemoveServiceParams } from './services.types';
@@ -18,6 +19,7 @@ export const MAIN_COLUMNS = [
   'port',
   'agents',
   'node_name',
+  'status',
 ];
 
 export const toRemoveServiceBody = (params: RemoveServiceParams): RemoveServiceBody => ({
@@ -35,7 +37,7 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
   const result: Service[] = [];
   const { services = [] } = serviceList;
 
-  services.forEach(({ service_type: serviceType, ...serviceParams }) => {
+  services.forEach(({ service_type: serviceType, status, ...serviceParams }) => {
     const extraLabels: Record<string, string> = {};
 
     Object.entries(serviceParams)
@@ -53,11 +55,16 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
     // @ts-ignore
     delete camelCaseParams['custom_labels'];
 
+    if (!status || status === 'STATUS_INVALID') {
+      status = ServiceStatus.NA;
+    }
+
     result.push({
       type: serviceType,
       // @ts-ignore
       params: {
         ...camelCaseParams,
+        status,
         customLabels: { ...serviceParams['custom_labels'], ...extraLabels },
       },
     });
