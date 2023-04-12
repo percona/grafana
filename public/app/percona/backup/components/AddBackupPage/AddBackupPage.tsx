@@ -211,6 +211,11 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
               }
             }
           },
+          changeFolder: ([cluster]: [string], state, tools) => {
+            if (!!cluster && !state.fields['folder'].modified) {
+              tools.changeValue(state, 'folder', () => cluster);
+            }
+          },
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
           <form onSubmit={handleSubmit} className={styles.form}>
@@ -265,6 +270,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                               onChange={(service: SelectableValue<SelectableService>) => {
                                 input.onChange(service);
                                 form.mutators.changeVendor(service.value!.vendor);
+                                form.mutators.changeFolder(service.value!.cluster);
                               }}
                               className={styles.selectField}
                               data-testid="service-select-input"
@@ -307,8 +313,17 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                           )}
                         </Field>
                       </span>
+                      <span className={cx(styles.wideField, styles.folderField)}>
+                        <TextInputField
+                          fieldClassName={styles.textAreaField}
+                          name="folder"
+                          label={Messages.folder}
+                          validators={[validators.required]}
+                          disabled={editing}
+                        />
+                      </span>
                       {scheduleMode && (
-                        <span className={styles.wideField}>
+                        <span className={styles.descriptionField}>
                           <TextareaInputField
                             fieldClassName={styles.textAreaField}
                             name="description"
@@ -316,8 +331,8 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                           />
                         </span>
                       )}
-                      <span className={cx(styles.radioButtonField, styles.backupTypeField)}>
-                        {values.type === BackupType.SCHEDULED && (
+                      {values.type === BackupType.SCHEDULED && (
+                        <span className={cx(styles.radioButtonField, styles.backupTypeField)}>
                           <RadioButtonGroupField
                             options={getBackupModeOptions(values.vendor)}
                             name="mode"
@@ -330,8 +345,8 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                                 form.mutators.changeDataModel(e.target.labels),
                             }}
                           />
-                        )}
-                      </span>
+                        </span>
+                      )}
                     </div>
                     <div className={styles.advanceSection}>
                       {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}

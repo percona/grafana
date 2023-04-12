@@ -6,6 +6,7 @@ export const Messages = {
   databases: 'Databases',
   backupName: 'Backup name',
   description: 'Description',
+  folder: 'Folder',
   location: 'Location',
   retryMode: 'Retry mode',
   cancelAction: 'Cancel',
