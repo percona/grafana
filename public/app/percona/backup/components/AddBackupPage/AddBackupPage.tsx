@@ -216,7 +216,6 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
           },
           changeFolder: ([cluster]: [string], state, tools) => {
             if (!cluster) {
-              console.log('OPEN SECTIOn');
               setAdvancedSectionOpen(true);
             }
 
@@ -363,6 +362,8 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                             label={Messages.folder}
                             validators={[validators.required]}
                             disabled={editing}
+                            tooltipText={Messages.folderTooltip}
+                            tooltipLink={Messages.folderTooltipLink}
                           />
                         </CollapsableSection>
                         {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
