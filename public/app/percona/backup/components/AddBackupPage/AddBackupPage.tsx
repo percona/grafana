@@ -63,6 +63,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || match.params.type === SCHEDULED_TYPE;
   const [backup, setBackup] = useState<Backup | ScheduledBackup | null>(null);
   const [pending, setPending] = useState(false);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
@@ -164,6 +165,8 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     setModalTitle(Messages.getModalTitle(true, editing));
   }, [editing, setQueryParams]);
 
+  const onToggle = useCallback((open) => setAdvancedSectionOpen(open), []);
+
   const pageSwitcherValues: Array<PageSwitcherValue<BackupType>> = useMemo(
     () => [
       {
@@ -212,9 +215,12 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
             }
           },
           changeFolder: ([cluster]: [string], state, tools) => {
-            if (!!cluster && !state.fields['folder'].modified) {
-              tools.changeValue(state, 'folder', () => cluster);
+            if (!cluster) {
+              console.log('OPEN SECTIOn');
+              setAdvancedSectionOpen(true);
             }
+
+            tools.changeValue(state, 'folder', () => cluster);
           },
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
@@ -236,6 +242,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                 disabled={
                   !valid ||
                   pristine ||
+                  !values.folder ||
                   (values.vendor === Databases.mysql && values.location?.type === LocationType.CLIENT)
                 }
                 loading={submitting}
@@ -313,15 +320,6 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                           )}
                         </Field>
                       </span>
-                      <span className={cx(styles.wideField, styles.folderField)}>
-                        <TextInputField
-                          fieldClassName={styles.textAreaField}
-                          name="folder"
-                          label={Messages.folder}
-                          validators={[validators.required]}
-                          disabled={editing}
-                        />
-                      </span>
                       {scheduleMode && (
                         <span className={styles.descriptionField}>
                           <TextareaInputField
@@ -353,10 +351,19 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       <div className={styles.collapsableSection}>
                         <CollapsableSection
                           label={Messages.advanceSettings}
-                          isOpen={false}
+                          isOpen={advancedSectionOpen}
+                          onToggle={onToggle}
+                          controlled
                           buttonDataTestId="add-backup-advanced-settings"
                         >
                           <RetryModeSelector retryMode={values.retryMode} />
+                          <TextInputField
+                            fieldClassName={styles.textAreaField}
+                            name="folder"
+                            label={Messages.folder}
+                            validators={[validators.required]}
+                            disabled={editing}
+                          />
                         </CollapsableSection>
                         {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
                       </div>

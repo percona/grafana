@@ -76,9 +76,6 @@ export const getStyles = ({ breakpoints, colors, shape, spacing, v1: { spacing: 
   pageSwitcher: css`
     margin-bottom: ${spacingV1.lg};
   `,
-  folderField: css`
-    grid-row-start: 3;
-  `,
   descriptionField: css`
     grid-column: span 4;
   `,
