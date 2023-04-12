@@ -7,7 +7,7 @@ import { Messages } from './BackupInventoryDetails.messages';
 import { getStyles } from './BackupInventoryDetails.styles';
 import { BackupInventoryDetailsProps } from './BackupInventoryDetails.types';
 
-export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, status, dataModel }) => {
+export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, folder, dataModel }) => {
   const styles = useStyles(getStyles);
   const dataModelMsg = formatDataModel(dataModel);
 
@@ -18,6 +18,9 @@ export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, 
       </span>
       <span data-testid="backup-artifact-details-data-model">
         <span className={styles.detailLabel}>{Messages.dataModel}</span> <span>{dataModelMsg}</span>
+      </span>
+      <span data-testid="backup-artifact-details-folder">
+        <span className={styles.detailLabel}>Folder</span> <span>{folder}</span>
       </span>
     </div>
   );
