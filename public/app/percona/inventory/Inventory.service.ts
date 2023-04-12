@@ -2,42 +2,45 @@ import { CancelToken } from 'axios';
 
 import { api } from 'app/percona/shared/helpers/api';
 
-import { Databases } from '../shared/core';
+import { NodeListPayload } from '../shared/services/nodes/Nodes.types';
 
-import { DBServiceList, ServiceListPayload } from './Inventory.types';
+import { DBServiceList, CompatibleServiceListPayload, ServiceAgentListPayload } from './Inventory.types';
 
 const BASE_URL = `/v1/inventory`;
 
-interface RemoveServiceBody {
-  service_id: string;
-  force: boolean;
-}
 interface RemoveAgentBody {
   agent_id: string;
   force: boolean;
 }
-interface RemoveNodeBody {
+export interface RemoveNodeBody {
   node_id: string;
   force: boolean;
 }
 
 export const InventoryService = {
-  getAgents(body = {}, token?: CancelToken) {
-    return api.post<void, object>(`${BASE_URL}/Agents/List`, body, false, token);
+  getAgents(serviceId: string, token?: CancelToken) {
+    return api.post<ServiceAgentListPayload, object>(
+      '/v1/management/Agent/List',
+      { service_id: serviceId },
+      false,
+      token
+    );
   },
   removeAgent(body: RemoveAgentBody, token?: CancelToken) {
     return api.post<void, object>(`${BASE_URL}/Agents/Remove`, body, false, token);
   },
-  getServices(body = {}, token?: CancelToken) {
-    return api.post<void, object>(`${BASE_URL}/Services/List`, body, false, token);
-  },
   // TODO unify typings and this function with getServices()
   async getDbServices(token?: CancelToken): Promise<DBServiceList> {
-    const response = await api.post<ServiceListPayload, object>(`${BASE_URL}/Services/List`, {}, false, token);
+    const response = await api.post<CompatibleServiceListPayload, object>(
+      `${BASE_URL}/Services/List`,
+      {},
+      false,
+      token
+    );
     const result: DBServiceList = {};
 
-    // @ts-ignore
-    Object.keys(response).forEach((db: Databases) => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    (Object.keys(response) as Array<keyof CompatibleServiceListPayload>).forEach((db) => {
       const dbServices = response[db];
 
       if (dbServices?.length) {
@@ -51,11 +54,8 @@ export const InventoryService = {
 
     return result;
   },
-  removeService(body: RemoveServiceBody, token?: CancelToken) {
-    return api.post<void, RemoveServiceBody>(`${BASE_URL}/Services/Remove`, body, false, token);
-  },
   getNodes(body = {}, token?: CancelToken) {
-    return api.post<void, object>(`${BASE_URL}/Nodes/List`, body, false, token);
+    return api.post<NodeListPayload, object>(`${BASE_URL}/Nodes/List`, body, false, token);
   },
   removeNode(body: RemoveNodeBody, token?: CancelToken) {
     return api.post<void, RemoveNodeBody>(`${BASE_URL}/Nodes/Remove`, body, false, token);
