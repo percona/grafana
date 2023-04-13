@@ -1,5 +1,5 @@
-import AccessRolesTeamHeader from './AccessRolesTeamHeader';
+export { AccessRolesTeamHeader } from './AccessRolesTeamHeader/AccessRolesTeamHeader';
 import AccessRolesTeamSelect from './AccessRolesTeamSelect';
 export { AccessRolesTeamField } from './AccessRolesTeamField/AccessRolesTeamField';
 
-export { AccessRolesTeamHeader, AccessRolesTeamSelect };
+export { AccessRolesTeamSelect };

@@ -5,10 +5,10 @@ import { Field } from '@grafana/ui';
 
 import AccessRolesSelect from '../../AccessRolesSelect';
 
-import { Messages } from './AccessRolesTeamField.messages';
-import { AccessRolesTeamFieldProps } from './AccessRolesTeamField.types';
+import { Messages } from './AccessRolesUserField.messages';
+import { AccessRolesUserFieldProps } from './AccessRolesUserField.types';
 
-export const AccessRolesTeamField: FC<AccessRolesTeamFieldProps> = ({ control }) => (
+export const AccessRolesUserField: FC<AccessRolesUserFieldProps> = ({ control }) => (
   <Field label={Messages.label}>
     <Controller
       control={control}

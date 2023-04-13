@@ -7,7 +7,7 @@ import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from './AccessRolesTeamHeader.messages';
 
-const AccessRolesTeamHeader: FC = () => {
+export const AccessRolesTeamHeader: FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {

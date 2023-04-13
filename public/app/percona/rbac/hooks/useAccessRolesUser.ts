@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 import { AssignRoleParams } from 'app/percona/shared/core/reducers/roles/role.types';
 import { assignRoleAction, fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
@@ -7,22 +7,21 @@ import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types'
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
-export const useAccessRolesTeam = () => {
+export const useAccessRolesUser = () => {
   const dispatch = useAppDispatch();
   const { result } = useSelector(getPerconaSettings);
 
-  const submitTeamAccessRoles = useCallback(
-    async (teamId: number, roleIds: number[]) => {
+  const submitUserAccessRoles = useCallback(
+    async (userId: number, roleIds: number[]) => {
       const payload: AssignRoleParams = {
         roleIds: roleIds,
-        entityId: teamId,
-        entityType: AccessRoleEntity.team,
+        entityId: userId,
+        entityType: AccessRoleEntity.user,
       };
       if (result?.enableAccessControl) {
         await dispatch(assignRoleAction(payload));
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [result?.enableAccessControl, dispatch]
   );
 
@@ -30,5 +29,5 @@ export const useAccessRolesTeam = () => {
     dispatch(fetchRolesAction());
   }, [dispatch]);
 
-  return { submitTeamAccessRoles };
+  return { submitUserAccessRoles };
 };

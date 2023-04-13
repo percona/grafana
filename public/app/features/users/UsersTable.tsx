@@ -5,9 +5,9 @@ import { Button, ConfirmModal } from '@grafana/ui';
 import { UserRolePicker } from 'app/core/components/RolePicker/UserRolePicker';
 import { fetchRoleOptions } from 'app/core/components/RolePicker/api';
 import { contextSrv } from 'app/core/core';
-import AccessRoleCell from 'app/percona/rbac/AccessRoleCell';
 import AccessRoleHeader from 'app/percona/rbac/AccessRoleHeader';
 import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
+import { AccessRolesUserSelect } from 'app/percona/rbac/user';
 import { AccessControlAction, OrgUser, Role } from 'app/types';
 
 import { OrgRolePicker } from '../admin/OrgRolePicker';
@@ -106,7 +106,9 @@ const UsersTable: FC<Props> = (props) => {
 
                 {/* PERCONA */}
                 <AccessRolesEnabledCheck>
-                  <AccessRoleCell user={user} />
+                  <td>
+                    <AccessRolesUserSelect id={user.userId} name={user.name} />
+                  </td>
                 </AccessRolesEnabledCheck>
 
                 <td className="width-1 text-center">

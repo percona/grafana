@@ -1,3 +1,4 @@
+import { TeamDetail } from 'app/percona/shared/core/reducers/team/team.types';
 import { UserItem } from 'app/percona/shared/core/reducers/users/users.types';
 import { AccessRole } from 'app/percona/shared/services/roles/Roles.types';
 import { PrometheusDatasource } from 'app/plugins/datasource/prometheus/datasource';
@@ -42,6 +43,41 @@ export const stubUsers: UserItem[] = [
 export const stubUsersMap: Record<number, UserItem> = {
   2: stubUsers[0],
   3: stubUsers[1],
+};
+
+export const stubTeamNoRoles = {
+  id: 1,
+  name: 'Team #1',
+};
+
+export const stubTeamSingleRole = {
+  id: 2,
+  name: 'Team #2',
+};
+
+export const stubTeamMultiRoles = {
+  id: 3,
+  name: 'Team #3',
+};
+
+export const stubTeamDetails: TeamDetail[] = [
+  {
+    teamId: 1,
+    roleIds: [],
+  },
+  {
+    teamId: 2,
+    roleIds: [1],
+  },
+  {
+    teamId: 3,
+    roleIds: [1, 2],
+  },
+];
+
+export const stubTeamDetailsMap: Record<number, TeamDetail> = {
+  2: stubTeamDetails[1],
+  3: stubTeamDetails[2],
 };
 
 export const dataSourceMock = {

@@ -16,6 +16,9 @@ import {
 import { Page } from 'app/core/components/Page/Page';
 import { TagBadge } from 'app/core/components/TagFilter/TagBadge';
 import { contextSrv } from 'app/core/core';
+import AccessRoleHeader from 'app/percona/rbac/AccessRoleHeader';
+import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
+import { AccessRolesUserSelect } from 'app/percona/rbac/user';
 
 import PageLoader from '../../core/components/PageLoader/PageLoader';
 import { AccessControlAction, StoreState, Unit, UserDTO, UserFilter } from '../../types';
@@ -151,6 +154,10 @@ const UserListAdminPageUnConnected = ({
                         <Icon name="question-circle" />
                       </Tooltip>
                     </th>
+                    {/* @PERCONA */}
+                    <AccessRolesEnabledCheck>
+                      <AccessRoleHeader />
+                    </AccessRolesEnabledCheck>
                     <th style={{ width: '1%' }}></th>
                   </tr>
                 </thead>
@@ -248,6 +255,12 @@ const UserListItem = memo(({ user, showLicensedRole }: UserListItemProps) => {
           </a>
         )}
       </td>
+      {/* @PERCONA */}
+      <AccessRolesEnabledCheck>
+        <td>
+          <AccessRolesUserSelect id={user.id} name={user.name} />
+        </td>
+      </AccessRolesEnabledCheck>
       <td className="text-right">
         {Array.isArray(user.authLabels) && user.authLabels.length > 0 && (
           <TagBadge label={user.authLabels[0]} removeIcon={false} count={0} />
