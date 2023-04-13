@@ -1,5 +1,5 @@
 import { TextareaInputField, AsyncSelectField } from '@percona/platform-core';
-import React, { FC, useMemo } from 'react';
+import React, { FC } from 'react';
 
 import FieldSet from '../../../../../../shared/components/Form/FieldSet/FieldSet';
 import { Databases } from '../../../../../../shared/core';
@@ -9,24 +9,10 @@ import { ConfigurationService } from './Configurations.service';
 import { ConfigurationFields, ConfigurationProps } from './Configurations.types';
 
 export const Configurations: FC<ConfigurationProps> = ({ form, mode, databaseType, k8sClusterName }) => {
-  const label = useMemo(
-    () =>
-      databaseType === Databases.mysql
-        ? Messages.labels.pxcConfiguration
-        : databaseType === Databases.mongodb
-        ? Messages.labels.mongodbConfiguration
-        : Messages.labels.commonConfiguration,
-    [databaseType]
-  );
-  const fieldSetLabel = useMemo(
-    () =>
-      databaseType === Databases.mysql
-        ? Messages.fieldSets.pxcConfiguration
-        : databaseType === Databases.mongodb
-        ? Messages.fieldSets.mongodbConfiguration
-        : Messages.fieldSets.commonConfiguration,
-    [databaseType]
-  );
+  const label = databaseType ? Messages.labels.configuration(databaseType) : Messages.labels.commonConfiguration;
+  const fieldSetLabel = databaseType
+    ? Messages.fieldSets.configuration(databaseType)
+    : Messages.fieldSets.commonConfiguration;
 
   return (
     <FieldSet label={fieldSetLabel} data-testid="configurations">
@@ -38,15 +24,17 @@ export const Configurations: FC<ConfigurationProps> = ({ form, mode, databaseTyp
         label={Messages.labels.storageClass}
         disabled={mode === 'edit'}
       />
-      <TextareaInputField
-        name={ConfigurationFields.configuration}
-        label={label}
-        inputProps={{
-          onBlur: (event) => {
-            form.mutators.trimConfiguration(event?.target?.value);
-          },
-        }}
-      />
+      {databaseType !== Databases.postgresql && (
+        <TextareaInputField
+          name={ConfigurationFields.configuration}
+          label={label}
+          inputProps={{
+            onBlur: (event) => {
+              form.mutators.trimConfiguration(event?.target?.value);
+            },
+          }}
+        />
+      )}
     </FieldSet>
   );
 };

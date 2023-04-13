@@ -24,6 +24,7 @@ describe('Kubernetes.utils:: ', () => {
         operators: {
           psmdb: { status: KubernetesOperatorStatus.invalid },
           pxc: { status: KubernetesOperatorStatus.unavailable },
+          pg: { status: KubernetesOperatorStatus.unavailable },
         },
       },
       {
@@ -31,6 +32,7 @@ describe('Kubernetes.utils:: ', () => {
         operators: {
           psmdb: { status: KubernetesOperatorStatus.unsupported },
           pxc: { status: KubernetesOperatorStatus.unavailable },
+          pg: { status: KubernetesOperatorStatus.unavailable },
         },
       },
     ];
@@ -40,13 +42,18 @@ describe('Kubernetes.utils:: ', () => {
     const kubernetes = [
       {
         ...kubernetesStub[0],
-        operators: { psmdb: { status: KubernetesOperatorStatus.ok }, pxc: { status: KubernetesOperatorStatus.ok } },
+        operators: {
+          psmdb: { status: KubernetesOperatorStatus.ok },
+          pxc: { status: KubernetesOperatorStatus.ok },
+          pg: { status: KubernetesOperatorStatus.ok },
+        },
       },
       {
         ...kubernetesStub[1],
         operators: {
           psmdb: { status: KubernetesOperatorStatus.ok },
           pxc: { status: KubernetesOperatorStatus.unavailable },
+          pg: { status: KubernetesOperatorStatus.unavailable },
         },
       },
     ];
@@ -59,6 +66,7 @@ describe('Kubernetes.utils:: ', () => {
         operators: {
           psmdb: { status: KubernetesOperatorStatus.ok },
           pxc: { status: KubernetesOperatorStatus.unavailable },
+          pg: { status: KubernetesOperatorStatus.unavailable },
         },
       },
       {
@@ -66,6 +74,7 @@ describe('Kubernetes.utils:: ', () => {
         operators: {
           psmdb: { status: KubernetesOperatorStatus.unsupported },
           pxc: { status: KubernetesOperatorStatus.unavailable },
+          pg: { status: KubernetesOperatorStatus.unavailable },
         },
       },
     ];

@@ -14,6 +14,7 @@ export interface DBClusterBasicOptionsProps {
 export enum Operators {
   pxc = 'pxc',
   psmdb = 'psmdb',
+  pg = 'pg',
 }
 
 export interface DatabaseOption {

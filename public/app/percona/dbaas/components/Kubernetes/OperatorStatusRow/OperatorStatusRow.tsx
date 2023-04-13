@@ -42,25 +42,29 @@ export const OperatorStatusRow: FC<OperatorStatusRowProps> = ({
     [element]
   );
 
+  const operators = useMemo(
+    () => [
+      { databaseType: Databases.mysql, operator: element.operators.pxc },
+      { databaseType: Databases.mongodb, operator: element.operators.psmdb },
+      { databaseType: Databases.postgresql, operator: element.operators.pg },
+    ],
+    [element]
+  );
+
   return (
     <div data-testid={`${element.kubernetesClusterName}-kubernetes-row-wrapper`} className={styles.operatorRowWrapper}>
       <div>
-        <OperatorStatusItem
-          databaseType={Databases.mysql}
-          operator={element.operators.pxc}
-          kubernetes={element}
-          setSelectedCluster={setSelectedCluster}
-          setOperatorToUpdate={setOperatorToUpdate}
-          setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
-        />
-        <OperatorStatusItem
-          databaseType={Databases.mongodb}
-          operator={element.operators.psmdb}
-          kubernetes={element}
-          setSelectedCluster={setSelectedCluster}
-          setOperatorToUpdate={setOperatorToUpdate}
-          setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
-        />
+        {operators.map((item) => (
+          <OperatorStatusItem
+            key={`${item.operator}`}
+            databaseType={item.databaseType}
+            operator={item.operator}
+            kubernetes={element}
+            setSelectedCluster={setSelectedCluster}
+            setOperatorToUpdate={setOperatorToUpdate}
+            setUpdateOperatorModalVisible={setUpdateOperatorModalVisible}
+          />
+        ))}
       </div>
       <AddClusterButton
         label={Messages.dbcluster.addAction}

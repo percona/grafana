@@ -22,12 +22,14 @@ export interface ManageComponentsVersionsRenderProps {
 export interface PossibleComponentOptions {
   [Operators.pxc]?: SelectableValue[];
   [Operators.psmdb]?: SelectableValue[];
+  [Operators.pg]?: SelectableValue[];
 }
 
 export enum SupportedComponents {
   pxc = 'pxc',
   haproxy = 'haproxy',
   mongod = 'mongod',
+  pg = 'postgresql',
 }
 
 export enum ManageComponentVersionsFields {

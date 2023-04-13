@@ -9,6 +9,7 @@ import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/sh
 import { useSelector, useDispatch } from 'app/types';
 
 import { FeatureLoader } from '../../../../shared/components/Elements/FeatureLoader';
+import { Databases } from '../../../../shared/core';
 import { fetchStorageLocations } from '../../../../shared/core/reducers/backups/backupLocations';
 import { resetAddDBClusterState } from '../../../../shared/core/reducers/dbaas/addDBCluster/addDBCluster';
 import { resetDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
@@ -115,15 +116,17 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
                 {showPMMAddressWarning && <PMMServerUrlWarning />}
                 <div className={styles.optionsWrapper}>
                   {mode === 'create' && <DBClusterBasicOptions kubernetes={kubernetes} form={form} />}
-                  {settings?.backupEnabled && mode === 'create' && (
-                    <DBaaSBackups
-                      handleSubmit={handleSubmit}
-                      pristine={pristine}
-                      valid={valid}
-                      form={form}
-                      {...props}
-                    />
-                  )}
+                  {settings?.backupEnabled &&
+                    mode === 'create' &&
+                    form.getState().values.databaseType.value !== Databases.postgresql && (
+                      <DBaaSBackups
+                        handleSubmit={handleSubmit}
+                        pristine={pristine}
+                        valid={valid}
+                        form={form}
+                        {...props}
+                      />
+                    )}
                   <DBClusterAdvancedOptions
                     showUnsafeConfigurationWarning={showUnsafeConfigurationWarning}
                     mode={mode}

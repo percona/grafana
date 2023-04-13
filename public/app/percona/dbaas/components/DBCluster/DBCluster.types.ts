@@ -13,6 +13,7 @@ export type ManageDBClusters = [DBCluster[], GetDBClustersAction, SetDBClustersL
 export enum DBClusterType {
   pxc = 'DB_CLUSTER_TYPE_PXC',
   psmdb = 'DB_CLUSTER_TYPE_PSMDB',
+  pg = 'DB_CLUSTER_TYPE_POSTGRESQL',
 }
 
 export const DatabaseToDBClusterTypeMapping: Partial<Record<Databases, DBClusterType>> = {
@@ -230,6 +231,8 @@ export interface DBClusterParamsAPI {
   image?: string;
   backup?: DBaaSBackupPayload;
   restore?: DBaaSRestorePayload;
+  instance?: DBClusterContainerAPI;
+  pgbouncer?: Omit<DBClusterContainerAPI, 'configuration' | 'storage_class'>;
 }
 
 interface DBClusterContainerAPI {
@@ -329,6 +332,7 @@ export interface DBClusterMatrix {
   backup?: DBClusterComponent;
   operator?: DBClusterComponent;
   log_collector?: DBClusterComponent;
+  postgresql?: DBClusterComponent;
 }
 
 export interface DBClusterComponent {
@@ -368,6 +372,7 @@ export interface DBClusterChangeComponentVersionAPI {
 export interface DBClusterListResponse {
   pxc_clusters?: DBClusterResponse[];
   psmdb_clusters?: DBClusterResponse[];
+  postgresql_clusters?: DBClusterResponse[];
 }
 
 export interface DBClusterSuspendResumeRequest {

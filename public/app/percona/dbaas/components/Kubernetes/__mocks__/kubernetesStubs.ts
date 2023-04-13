@@ -11,6 +11,9 @@ export const kubernetesStub = [
       pxc: {
         status: KubernetesOperatorStatus.ok,
       },
+      pg: {
+        status: KubernetesOperatorStatus.ok,
+      },
     },
     status: KubernetesClusterStatus.ok,
   },
@@ -21,6 +24,9 @@ export const kubernetesStub = [
         status: KubernetesOperatorStatus.ok,
       },
       pxc: {
+        status: KubernetesOperatorStatus.ok,
+      },
+      pg: {
         status: KubernetesOperatorStatus.ok,
       },
     },
@@ -37,6 +43,9 @@ export const addActionStub = jest.fn(() => {
         status: KubernetesOperatorStatus.ok,
       },
       pxc: {
+        status: KubernetesOperatorStatus.ok,
+      },
+      pg: {
         status: KubernetesOperatorStatus.ok,
       },
     },

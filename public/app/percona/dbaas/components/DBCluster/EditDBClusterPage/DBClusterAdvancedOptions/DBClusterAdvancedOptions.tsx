@@ -93,6 +93,11 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
     [allocatedResources, styles.resourcesBar, styles.resourcesBarEmpty]
   );
 
+  const dbTypeValue = useMemo(
+    () => (selectedCluster ? selectedCluster.databaseType : databaseType?.value),
+    [selectedCluster, databaseType]
+  );
+
   const getAllocatedResources = async (triggerLoading = true) => {
     try {
       if (allocatedTimer) {
@@ -156,8 +161,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
 
   useEffect(() => {
     const getExpectedResources = async () => {
-      const dbTypeValue = selectedCluster ? selectedCluster.databaseType : databaseType?.value;
-
       try {
         const dbClusterService = newDBClusterService(dbTypeValue);
         setLoadingExpectedResources(true);
@@ -194,23 +197,24 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
     }
 
     return () => clearTimeout(expectedTimer);
-  }, [memory, cpu, disk, kubernetesCluster, topology, nodes, single, databaseType]);
+  }, [memory, cpu, disk, kubernetesCluster, topology, nodes, single, dbTypeValue]);
 
   useEffect(() => {
-    const dbTypeValue = selectedCluster ? selectedCluster.databaseType : databaseType?.value;
     if (dbTypeValue === Databases.mongodb) {
       setShowUnsafeConfigurationWarning(nodes === 1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [databaseType, nodes]);
+  }, [databaseType, nodes, dbTypeValue]);
 
   return (
     <FieldSet label={Messages.fieldSets.advancedSettings} {...collapsableProps}>
       <>{showUnsafeConfigurationWarning && <UnsafeConfigurationWarning />}</>
-      <Templates
-        k8sClusterName={selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster?.value}
-        databaseType={databaseType?.value}
-      />
+      {dbTypeValue !== Databases.postgresql && (
+        <Templates
+          k8sClusterName={selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster?.value}
+          databaseType={databaseType?.value}
+        />
+      )}
       <div className={styles.line}>
         <NumberInputField
           name={AdvancedOptionsFields.nodes}
@@ -284,12 +288,12 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
         </div>
       </div>
       <Configurations
-        databaseType={selectedCluster ? selectedCluster.databaseType : databaseType?.value}
+        databaseType={dbTypeValue}
         k8sClusterName={selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster?.value}
         mode={mode}
         form={form}
       />
-      <NetworkAndSecurity />
+      <NetworkAndSecurity databaseType={dbTypeValue} />
     </FieldSet>
   );
 };

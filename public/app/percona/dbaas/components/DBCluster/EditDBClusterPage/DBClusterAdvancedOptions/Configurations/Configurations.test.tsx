@@ -41,9 +41,11 @@ describe('DBClusterAdvancedOptions Configurations::', () => {
       )
     );
     expect(screen.getByTestId('configurations').querySelector('legend')).toHaveTextContent(
-      Messages.fieldSets.pxcConfiguration
+      Messages.fieldSets.configuration(Databases.mysql)
     );
-    expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(Messages.labels.pxcConfiguration);
+    expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(
+      Messages.labels.configuration(Databases.mysql)
+    );
   });
 
   it('shows labels correctly for mongoDB', async () => {
@@ -58,9 +60,11 @@ describe('DBClusterAdvancedOptions Configurations::', () => {
       )
     );
     expect(screen.getByTestId('configurations').querySelector('legend')).toHaveTextContent(
-      Messages.fieldSets.mongodbConfiguration
+      Messages.fieldSets.configuration(Databases.mongodb)
     );
-    expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(Messages.labels.mongodbConfiguration);
+    expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(
+      Messages.labels.configuration(Databases.mongodb)
+    );
   });
 
   it('storageClass is disabled for edit mode', async () => {

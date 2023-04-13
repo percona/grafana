@@ -1,8 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import arrayMutators from 'final-form-arrays';
 import React from 'react';
 import { Form } from 'react-final-form';
 
+import { Databases } from '../../../../../../shared/core';
 import { Messages } from '../DBClusterAdvancedOptions.messages';
 
 import NetworkAndSecurity from './NetworkAndSecurity';
@@ -15,7 +16,7 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{}] }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
-        render={() => <NetworkAndSecurity />}
+        render={() => <NetworkAndSecurity databaseType={Databases.mysql} />}
       />
     );
     expect(screen.getByTestId('network-and-security').querySelector('legend')).toHaveTextContent(
@@ -34,13 +35,38 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).toBeInTheDocument();
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).not.toBeDisabled();
   });
+
+  it('render items correctly for create and edit mode with postgreSQL', () => {
+    render(
+      <Form
+        initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{}] }}
+        onSubmit={jest.fn()}
+        mutators={{ ...arrayMutators }}
+        render={() => <NetworkAndSecurity databaseType={Databases.postgresql} />}
+      />
+    );
+    expect(screen.getByTestId('network-and-security').querySelector('legend')).toHaveTextContent(
+      Messages.fieldSets.networkAndSecurity
+    );
+    expect(screen.getByTestId('expose-checkbox-input')).toBeInTheDocument();
+    expect(screen.getByTestId('expose-checkbox-input')).not.toBeDisabled();
+    expect(screen.getByTestId('expose-field-label')).toHaveTextContent(Messages.labels.expose);
+
+    expect(screen.getByTestId('internetFacing-checkbox-input')).toBeInTheDocument();
+    expect(screen.getByTestId('internetFacing-checkbox-input')).not.toBeDisabled();
+    expect(screen.getByTestId('internetFacing-field-label')).toHaveTextContent(Messages.labels.internetFacing);
+
+    expect(screen.getByTestId('network-and-security')).toHaveTextContent('Add new');
+    expect(screen.queryByTestId('sourceRanges[0].sourceRange-field-label')).not.toBeInTheDocument();
+  });
+
   it('the delete button should not delete the first field', () => {
     render(
       <Form
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }] }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
-        render={() => <NetworkAndSecurity />}
+        render={() => <NetworkAndSecurity databaseType={Databases.mongodb} />}
       />
     );
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).toBeInTheDocument();
@@ -48,13 +74,14 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
     fireEvent.click(deleteBtn);
     expect(screen.getByTestId('sourceRanges[0].sourceRange-text-input')).toBeInTheDocument();
   });
+
   it('the delete button should delete field from the form if it is not the first one ', () => {
     render(
       <Form
         initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }, { sourceRange: '2' }] }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
-        render={() => <NetworkAndSecurity />}
+        render={() => <NetworkAndSecurity databaseType={Databases.mysql} />}
       />
     );
     expect(screen.getByTestId('sourceRanges[1].sourceRange-text-input')).toBeInTheDocument();

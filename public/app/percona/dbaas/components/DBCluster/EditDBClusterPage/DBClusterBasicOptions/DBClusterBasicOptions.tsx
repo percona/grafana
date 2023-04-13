@@ -10,6 +10,7 @@ import {
 } from 'app/percona/shared/components/Form/FieldAdapters/FieldAdapters';
 
 import { useSelector } from '../../../../../../types';
+import { Databases } from '../../../../../shared/core';
 import { getPerconaSettings } from '../../../../../shared/core/selectors';
 import { Kubernetes, Operator } from '../../../Kubernetes/Kubernetes.types';
 import { getDatabaseOptionFromOperator } from '../../../Kubernetes/Kubernetes.utils';
@@ -127,7 +128,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
         label={Messages.labels.clusterName}
         validators={[required, kubernetesClusterNameValidator, maxLength(CLUSTER_NAME_MAX_LENGTH)]}
       />
-      {settings?.backupEnabled && <Restore form={form} />}
+      {settings?.backupEnabled && databaseType.value !== Databases.postgresql && <Restore form={form} />}
     </div>
   );
 };
