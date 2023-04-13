@@ -9,7 +9,7 @@ import { updateTeamRoles } from 'app/core/components/RolePicker/api';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { contextSrv } from 'app/core/core';
 import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
-import { useAccessRolesTeam } from 'app/percona/rbac/hooks';
+import { useAccessRoles } from 'app/percona/rbac/hooks';
 import { AccessRolesTeamField } from 'app/percona/rbac/team/AccessRolesTeamField/AccessRolesTeamField';
 import { AccessControlAction, Role } from 'app/types';
 
@@ -33,7 +33,7 @@ export const CreateTeam = (): JSX.Element => {
   const [pendingRoles, setPendingRoles] = useState<Role[]>([]);
   const [{ roleOptions }] = useRoleOptions(currentOrgId);
   // @PERCONA
-  const { submitTeamAccessRoles } = useAccessRolesTeam();
+  const { submitTeamAccessRoles } = useAccessRoles();
 
   const canUpdateRoles =
     contextSrv.hasPermission(AccessControlAction.ActionUserRolesAdd) &&

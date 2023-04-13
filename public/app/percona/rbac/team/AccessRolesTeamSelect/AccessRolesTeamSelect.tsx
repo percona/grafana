@@ -6,7 +6,7 @@ import { getTeamDetails } from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
 
 import AccessRolesSelect from '../../AccessRolesSelect';
-import { useAccessRolesTeam } from '../../hooks';
+import { useAccessRoles } from '../../hooks';
 
 import { Messages } from './AccessRolesTeamSelect.messages';
 import { AccessRolesTeamSelectProps } from './AccessRolesTeamSelect.types';
@@ -14,7 +14,7 @@ import { AccessRolesTeamSelectProps } from './AccessRolesTeamSelect.types';
 export const AccessRolesTeamSelect: FC<AccessRolesTeamSelectProps> = ({ id, name }) => {
   const { detailsMap, isLoading: teamLoading } = useSelector(getTeamDetails);
   const roleIds = useMemo<number[]>(() => detailsMap[id]?.roleIds || [], [detailsMap, id]);
-  const { submitTeamAccessRoles } = useAccessRolesTeam();
+  const { submitTeamAccessRoles } = useAccessRoles();
 
   const handleChange = async (ids: number[]) => {
     await submitTeamAccessRoles(id, ids);

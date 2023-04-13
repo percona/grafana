@@ -7,16 +7,16 @@ import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types'
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
-export const useAccessRolesTeam = () => {
+export const useAccessRoles = () => {
   const dispatch = useAppDispatch();
   const { result } = useSelector(getPerconaSettings);
 
-  const submitTeamAccessRoles = useCallback(
-    async (teamId: number, roleIds: number[]) => {
+  const submitAccessRoles = useCallback(
+    async (entityId: number, roleIds: number[], entityType: AccessRoleEntity) => {
       const payload: AssignRoleParams = {
-        roleIds: roleIds,
-        entityId: teamId,
-        entityType: AccessRoleEntity.team,
+        roleIds,
+        entityId,
+        entityType,
       };
       if (result?.enableAccessControl) {
         await dispatch(assignRoleAction(payload));
@@ -26,9 +26,19 @@ export const useAccessRolesTeam = () => {
     [result?.enableAccessControl, dispatch]
   );
 
+  const submitUserAccessRoles = useCallback(
+    (entityId: number, roleIds: number[]) => submitAccessRoles(entityId, roleIds, AccessRoleEntity.user),
+    [submitAccessRoles]
+  );
+
+  const submitTeamAccessRoles = useCallback(
+    (entityId: number, roleIds: number[]) => submitAccessRoles(entityId, roleIds, AccessRoleEntity.team),
+    [submitAccessRoles]
+  );
+
   useEffect(() => {
     dispatch(fetchRolesAction());
   }, [dispatch]);
 
-  return { submitTeamAccessRoles };
+  return { submitAccessRoles, submitUserAccessRoles, submitTeamAccessRoles };
 };

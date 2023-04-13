@@ -5,7 +5,7 @@ import { NavModelItem } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { Form, Button, Input, Field } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
-import { useAccessRolesUser } from 'app/percona/rbac/hooks';
+import { useAccessRoles } from 'app/percona/rbac/hooks';
 import { AccessRolesUserField } from 'app/percona/rbac/user';
 
 interface UserDTO {
@@ -29,13 +29,12 @@ const pageNav: NavModelItem = {
 
 const UserCreatePage: React.FC = () => {
   const history = useHistory();
-  const { submitUserAccessRoles } = useAccessRolesUser();
+  const { submitUserAccessRoles } = useAccessRoles();
 
   const onSubmit = useCallback(
     async (data: UserDTO) => {
-      const { id, ...rest } = await createUser(data);
+      const { id } = await createUser(data);
 
-      console.log(id, rest);
       // @PERCONA
       if (data.roleIds && data.roleIds.length) {
         await submitUserAccessRoles(id, data.roleIds);
