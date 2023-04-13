@@ -5,7 +5,7 @@ import { Button, ConfirmModal } from '@grafana/ui';
 import { UserRolePicker } from 'app/core/components/RolePicker/UserRolePicker';
 import { fetchRoleOptions } from 'app/core/components/RolePicker/api';
 import { contextSrv } from 'app/core/core';
-import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
+import { AccessRolesEnabledCheck } from 'app/percona/rbac/components';
 import { AccessRolesUserHeader, AccessRolesUserSelect } from 'app/percona/rbac/user';
 import { AccessControlAction, OrgUser, Role } from 'app/types';
 

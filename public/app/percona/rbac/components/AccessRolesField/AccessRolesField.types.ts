@@ -1,6 +1,6 @@
 import { Control } from 'react-hook-form';
 
-export interface AccessRolesTeamFieldProps {
+export interface AccessRolesFieldProps {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   control: Control<any>;
 }

@@ -3,7 +3,7 @@ import React, { FC } from 'react';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
 
-const AccessRolesEnabledCheck: FC = ({ children }) => {
+export const AccessRolesEnabledCheck: FC = ({ children }) => {
   const { result: settings } = useSelector(getPerconaSettings);
 
   if (!settings?.enableAccessControl) {
@@ -12,5 +12,3 @@ const AccessRolesEnabledCheck: FC = ({ children }) => {
 
   return <>{children}</>;
 };
-
-export default AccessRolesEnabledCheck;

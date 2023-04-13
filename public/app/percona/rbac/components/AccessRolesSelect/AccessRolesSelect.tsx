@@ -8,7 +8,7 @@ import { useSelector } from 'app/types';
 import { AccessRolesSelectProps } from './AccessRolesSelect.types';
 import { idsToOptions, toOptions } from './AccessRolesSelect.utils';
 
-const AccessRolesSelect: FC<AccessRolesSelectProps> = ({ allowEmpty, label, isLoading, roleIds, onChange }) => {
+export const AccessRolesSelect: FC<AccessRolesSelectProps> = ({ allowEmpty, label, isLoading, roleIds, onChange }) => {
   const { roles, isLoading: rolesLoading } = useSelector(getAccessRoles);
   const options = useMemo<Array<SelectableValue<number>>>(() => toOptions(roles), [roles]);
   const [value, setValue] = useState<Array<SelectableValue<number>>>([]);

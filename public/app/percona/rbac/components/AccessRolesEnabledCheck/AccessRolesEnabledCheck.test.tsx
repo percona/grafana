@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
-import AccessRolesEnabledCheck from './AccessRolesEnabledCheck';
+import { AccessRolesEnabledCheck } from './AccessRolesEnabledCheck';
 
 const wrapWithProvider = (element: ReactElement, enableAccessControl = true) => (
   <Provider

@@ -5,8 +5,8 @@ import { NavModelItem } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { Form, Button, Input, Field } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
+import { AccessRolesField } from 'app/percona/rbac/components';
 import { useAccessRoles } from 'app/percona/rbac/hooks';
-import { AccessRolesUserField } from 'app/percona/rbac/user';
 
 interface UserDTO {
   name: string;
@@ -66,7 +66,7 @@ const UserCreatePage: React.FC = () => {
                 </Field>
 
                 {/* @PERCONA */}
-                <AccessRolesUserField control={control} />
+                <AccessRolesField control={control} />
 
                 <Field label="Username">
                   <Input id="username-input" {...register('login')} />

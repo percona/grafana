@@ -9,7 +9,7 @@ import { StoreState } from 'app/types';
 
 import { stubRoles, stubTeamDetails, stubTeamDetailsMap } from '../../__mocks__/stubs';
 
-import { AccessRolesTeamField } from './AccessRolesTeamField';
+import { AccessRolesField } from './AccessRolesField';
 
 const onSubmitMock = jest.fn();
 
@@ -42,7 +42,7 @@ const withForm = (roleIds: number[] = []) => (
     >
       {({ control }) => (
         <>
-          <AccessRolesTeamField control={control} />
+          <AccessRolesField control={control} />
           <button type="submit">Submit</button>
         </>
       )}
@@ -50,7 +50,7 @@ const withForm = (roleIds: number[] = []) => (
   </Provider>
 );
 
-describe('AccessRolesTeamField::', () => {
+describe('AccessRolesField::', () => {
   beforeEach(() => {
     onSubmitMock.mockClear();
   });

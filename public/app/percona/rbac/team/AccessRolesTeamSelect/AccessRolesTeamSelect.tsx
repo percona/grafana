@@ -5,7 +5,7 @@ import appEvents from 'app/core/app_events';
 import { getTeamDetails } from 'app/percona/shared/core/selectors';
 import { useSelector } from 'app/types';
 
-import AccessRolesSelect from '../../AccessRolesSelect';
+import AccessRolesSelect from '../../components/AccessRolesSelect';
 import { useAccessRoles } from '../../hooks';
 
 import { Messages } from './AccessRolesTeamSelect.messages';

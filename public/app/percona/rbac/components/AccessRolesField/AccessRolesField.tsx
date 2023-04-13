@@ -3,12 +3,12 @@ import { Controller } from 'react-hook-form';
 
 import { Field } from '@grafana/ui';
 
-import AccessRolesSelect from '../../AccessRolesSelect';
+import AccessRolesSelect from '../AccessRolesSelect';
 
-import { Messages } from './AccessRolesTeamField.messages';
-import { AccessRolesTeamFieldProps } from './AccessRolesTeamField.types';
+import { Messages } from './AccessRolesField.messages';
+import { AccessRolesFieldProps } from './AccessRolesField.types';
 
-export const AccessRolesTeamField: FC<AccessRolesTeamFieldProps> = ({ control }) => (
+export const AccessRolesField: FC<AccessRolesFieldProps> = ({ control }) => (
   <Field label={Messages.label}>
     <Controller
       control={control}

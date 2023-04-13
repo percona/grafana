@@ -16,7 +16,7 @@ import {
 import { Page } from 'app/core/components/Page/Page';
 import { TagBadge } from 'app/core/components/TagFilter/TagBadge';
 import { contextSrv } from 'app/core/core';
-import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
+import { AccessRolesEnabledCheck } from 'app/percona/rbac/components';
 import { AccessRolesUserSelect, AccessRolesUserHeader } from 'app/percona/rbac/user';
 
 import PageLoader from '../../core/components/PageLoader/PageLoader';

@@ -8,8 +8,8 @@ import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types'
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
-import AccessRolesEnabledCheck from '../../AccessRolesEnabledCheck';
 import { stubRoles, stubUsers, stubUserSingleRole, stubUsersMap, subUserMultipleRoles } from '../../__mocks__/stubs';
+import { AccessRolesEnabledCheck } from '../../components';
 
 import { AccessRolesUserSelect } from './AccessRolesUserSelect';
 

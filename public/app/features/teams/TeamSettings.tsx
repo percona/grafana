@@ -7,7 +7,7 @@ import { updateTeamRoles } from 'app/core/components/RolePicker/api';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { SharedPreferences } from 'app/core/components/SharedPreferences/SharedPreferences';
 import { contextSrv } from 'app/core/services/context_srv';
-import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
+import { AccessRolesEnabledCheck } from 'app/percona/rbac/components';
 import { useFetchTeamDetails } from 'app/percona/rbac/hooks';
 import { AccessRolesTeamSelect } from 'app/percona/rbac/team';
 import { AccessControlAction, Role, Team } from 'app/types';

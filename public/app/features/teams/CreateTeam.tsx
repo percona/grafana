@@ -8,9 +8,8 @@ import { TeamRolePicker } from 'app/core/components/RolePicker/TeamRolePicker';
 import { updateTeamRoles } from 'app/core/components/RolePicker/api';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { contextSrv } from 'app/core/core';
-import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
+import { AccessRolesField, AccessRolesEnabledCheck } from 'app/percona/rbac/components';
 import { useAccessRoles } from 'app/percona/rbac/hooks';
-import { AccessRolesTeamField } from 'app/percona/rbac/team/AccessRolesTeamField/AccessRolesTeamField';
 import { AccessControlAction, Role } from 'app/types';
 
 interface TeamDTO {
@@ -82,7 +81,7 @@ export const CreateTeam = (): JSX.Element => {
               )}
               {/* @PERCONA */}
               <AccessRolesEnabledCheck>
-                <AccessRolesTeamField control={control} />
+                <AccessRolesField control={control} />
               </AccessRolesEnabledCheck>
               <Field
                 label={'Email'}
