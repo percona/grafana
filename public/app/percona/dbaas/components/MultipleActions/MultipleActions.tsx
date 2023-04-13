@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 import React, { FC, Fragment } from 'react';
 
-import { IconButton, useTheme } from '@grafana/ui';
+import { IconButton, Tooltip, useTheme } from '@grafana/ui';
 import { Dropdown } from 'app/percona/shared/components/Elements/Dropdown';
 
 import { getStyles } from './MultipleActions.styles';
@@ -12,17 +12,19 @@ export const MultipleActions: FC<MultipleActionsProps> = ({ actions, disabled, d
   const styles = getStyles(theme);
 
   const Toggle = React.forwardRef<HTMLButtonElement>((props, ref) => (
-    <span className={styles.iconWrapper}>
-      <IconButton
-        name="ellipsis-v"
-        size="xl"
-        disabled={disabled}
-        data-testid={dataTestId}
-        ref={ref}
-        className={styles.icon}
-        {...props}
-      />
-    </span>
+    <Tooltip content="Actions" placement="top">
+      <span className={styles.iconWrapper}>
+        <IconButton
+          name="ellipsis-v"
+          size="xl"
+          disabled={disabled}
+          data-testid={dataTestId}
+          ref={ref}
+          className={styles.icon}
+          {...props}
+        />
+      </span>
+    </Tooltip>
   ));
 
   return (

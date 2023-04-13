@@ -75,14 +75,14 @@ export const getProductTourSteps = (
   ...(isPmmAdmin && !!settings?.sttEnabled
     ? [
         {
-          selector: '.dropdown > [aria-label="Advisor Checks"]',
+          selector: '.dropdown > [aria-label="Advisors"]',
           content: (
             <SidebarStep title={Messages.advisors.title}>
               <p>{Messages.advisors.pmmIncludes}</p>
               <p>
                 {Messages.advisors.findOutMore}
                 <a
-                  href="https://docs.percona.com/percona-platform/checks.html"
+                  href="https://docs.percona.com/percona-platform/advisors.html"
                   target="_blank"
                   rel="noreferrer noopener"
                 >

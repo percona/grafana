@@ -34,7 +34,6 @@ import { Messages } from './DBClusterAdvancedOptions.messages';
 import { getStyles } from './DBClusterAdvancedOptions.styles';
 import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOptions.types';
 import { canGetExpectedResources, nodesValidator, resourceValidator } from './DBClusterAdvancedOptions.utils';
-import NetworkAndSecurity from './NetworkAndSecurity/NetworkAndSecurity';
 import Templates from './Templates/Templates';
 
 export interface DBClusterAdvancedOptionsProps extends FormRenderProps {
@@ -291,7 +290,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
         mode={mode}
         form={form}
       />
-      <NetworkAndSecurity />
     </FieldSet>
   );
 };

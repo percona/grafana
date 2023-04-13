@@ -47,7 +47,7 @@ export const DBaaSBackups: FC<FormRenderProps> = ({ values }) => {
           </div>
         </div>
       }
-      data-testid="configurations"
+      data-testid="dbaas-backups"
     >
       {enableBackups ? (
         <>

@@ -41,6 +41,9 @@ export const getStyles = ({ isLight, palette }: GrafanaTheme) => {
           padding: 0.5rem;
           border-bottom: 1px solid ${borderColor};
           border-right: 1px solid ${borderColor};
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
 
           :last-child {
             border-right: 0;
