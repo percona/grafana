@@ -1,11 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { withSerializedError } from 'app/features/alerting/unified/utils/redux';
+import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 import { TeamService } from 'app/percona/shared/services/team/Team.service';
+import { TeamListItemResponse } from 'app/percona/shared/services/team/Team.types';
 import { createAsyncThunk } from 'app/types';
 
 import { TeamDetail, TeamState } from './team.types';
-import { toDetailMap, toTeamDetail } from './team.utils';
+import { toDetailMap } from './team.utils';
 
 export const initialState: TeamState = {
   isLoading: false,
@@ -43,7 +45,7 @@ export const fetchTeamDetailsAction = createAsyncThunk(
     withSerializedError(
       (async () => {
         const response = await TeamService.listDetails();
-        return response.teams.map(toTeamDetail);
+        return response.teams.map((team) => payloadToCamelCase<TeamListItemResponse, TeamDetail>(team));
       })()
     )
 );

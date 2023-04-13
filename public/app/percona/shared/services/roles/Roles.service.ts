@@ -1,5 +1,7 @@
 import { api } from 'app/percona/shared/helpers/api';
 
+import { payloadToCamelCase } from '../../helpers/payloadToCamelCase';
+
 import {
   AccessRole,
   AccessRoleEntity,
@@ -15,24 +17,28 @@ import {
   UpdateAccessRole,
   UpdateAccessRolePayload,
 } from './Roles.types';
-import { toAccessRole, toCreateBody, toUpdateBody } from './Roles.utils';
 
 const BASE_URL = '/v1/management/Role';
 
 const RolesService = {
   async get(roleId: number): Promise<AccessRole> {
     const response = await api.post<AccessRoleResponse, GetRoleParams>(`${BASE_URL}/Get`, { role_id: roleId });
-    return toAccessRole(response);
+    return payloadToCamelCase(response);
   },
   async list(): Promise<AccessRole[]> {
     const response = await api.post<ListRolesResponse, void>(`${BASE_URL}/List`, undefined);
-    return response.roles.map((role) => toAccessRole(role));
+    return response.roles.map((role) => payloadToCamelCase(role));
   },
   async create(role: CreateAccessRole): Promise<void> {
-    await api.post<void, CreateAccessRolePayload>(`${BASE_URL}/Create`, toCreateBody(role));
+    await api.post<void, CreateAccessRolePayload>(`${BASE_URL}/Create`, role);
   },
   async update(role: UpdateAccessRole): Promise<void> {
-    await api.post<void, UpdateAccessRolePayload>(`${BASE_URL}/Update`, toUpdateBody(role));
+    await api.post<void, UpdateAccessRolePayload>(`${BASE_URL}/Update`, {
+      role_id: role.roleId,
+      description: role.description,
+      filter: role.filter,
+      title: role.title,
+    });
   },
   async delete(role: DeleteAccessRole): Promise<void> {
     await api.post<void, DeleteAccessRolePayload>(`${BASE_URL}/Delete`, {
