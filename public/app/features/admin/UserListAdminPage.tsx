@@ -16,9 +16,8 @@ import {
 import { Page } from 'app/core/components/Page/Page';
 import { TagBadge } from 'app/core/components/TagFilter/TagBadge';
 import { contextSrv } from 'app/core/core';
-import AccessRoleHeader from 'app/percona/rbac/AccessRoleHeader';
-import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
-import { AccessRolesUserSelect } from 'app/percona/rbac/user';
+import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
+import { AccessRolesUserSelect, AccessRolesUserHeader } from 'app/percona/rbac/user';
 
 import PageLoader from '../../core/components/PageLoader/PageLoader';
 import { AccessControlAction, StoreState, Unit, UserDTO, UserFilter } from '../../types';
@@ -156,7 +155,7 @@ const UserListAdminPageUnConnected = ({
                     </th>
                     {/* @PERCONA */}
                     <AccessRolesEnabledCheck>
-                      <AccessRoleHeader />
+                      <AccessRolesUserHeader />
                     </AccessRolesEnabledCheck>
                     <th style={{ width: '1%' }}></th>
                   </tr>

@@ -7,9 +7,9 @@ import { updateTeamRoles } from 'app/core/components/RolePicker/api';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { SharedPreferences } from 'app/core/components/SharedPreferences/SharedPreferences';
 import { contextSrv } from 'app/core/services/context_srv';
-import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
-import { AccessRolesTeamSelect } from 'app/percona/rbac/Team';
-import { useFetchTeamRoles } from 'app/percona/rbac/hooks';
+import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
+import { useFetchTeamDetails } from 'app/percona/rbac/hooks';
+import { AccessRolesTeamSelect } from 'app/percona/rbac/team';
 import { AccessControlAction, Role, Team } from 'app/types';
 
 import { updateTeam } from './state/actions';
@@ -29,7 +29,7 @@ export const TeamSettings: FC<Props> = ({ team, updateTeam }) => {
   const canWriteTeamSettings = contextSrv.hasPermissionInMetadata(AccessControlAction.ActionTeamsWrite, team);
   const currentOrgId = contextSrv.user.orgId;
   // @PERCONA
-  useFetchTeamRoles();
+  useFetchTeamDetails();
 
   const [{ roleOptions }] = useRoleOptions(currentOrgId);
   const [pendingRoles, setPendingRoles] = useState<Role[]>([]);

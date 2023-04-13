@@ -8,9 +8,9 @@ import { TeamRolePicker } from 'app/core/components/RolePicker/TeamRolePicker';
 import { updateTeamRoles } from 'app/core/components/RolePicker/api';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { contextSrv } from 'app/core/core';
-import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck/AccessRolesEnabledCheck';
-import { AccessRolesTeamField } from 'app/percona/rbac/Team/AccessRolesTeamField/AccessRolesTeamField';
+import AccessRolesEnabledCheck from 'app/percona/rbac/AccessRolesEnabledCheck';
 import { useAccessRolesTeam } from 'app/percona/rbac/hooks';
+import { AccessRolesTeamField } from 'app/percona/rbac/team/AccessRolesTeamField/AccessRolesTeamField';
 import { AccessControlAction, Role } from 'app/types';
 
 interface TeamDTO {

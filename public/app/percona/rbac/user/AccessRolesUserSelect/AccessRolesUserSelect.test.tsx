@@ -8,14 +8,8 @@ import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types'
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
-import AccessRolesEnabledCheck from '../../AccessRolesEnabledCheck/AccessRolesEnabledCheck';
-import {
-  stubRoles,
-  stubTeamDetails,
-  stubTeamDetailsMap,
-  stubUserSingleRole,
-  subUserMultipleRoles,
-} from '../../__mocks__/stubs';
+import AccessRolesEnabledCheck from '../../AccessRolesEnabledCheck';
+import { stubRoles, stubUsers, stubUserSingleRole, stubUsersMap, subUserMultipleRoles } from '../../__mocks__/stubs';
 
 import { AccessRolesUserSelect } from './AccessRolesUserSelect';
 
@@ -30,10 +24,10 @@ const withProvider = (element: ReactElement, enableAccessControl = true) => (
             enableAccessControl,
           },
         },
-        team: {
+        users: {
           isLoading: false,
-          details: stubTeamDetails,
-          detailsMap: stubTeamDetailsMap,
+          users: stubUsers,
+          usersMap: stubUsersMap,
         },
         roles: {
           isLoading: false,
