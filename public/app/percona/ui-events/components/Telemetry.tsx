@@ -39,7 +39,7 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
                 EventStore.clear();
               })
               .catch((e) => {
-                console.error(e)
+                console.error(e);
               });
           } else {
             console.log('No UI events to send');
