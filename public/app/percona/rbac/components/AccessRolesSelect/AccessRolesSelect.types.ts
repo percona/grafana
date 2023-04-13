@@ -1,5 +1,5 @@
 export interface AccessRolesSelectProps {
-  label: string;
+  label?: string;
   isLoading?: boolean;
   roleIds: number[];
   allowEmpty?: boolean;
