@@ -1,4 +1,5 @@
 import { Databases } from '../shared/core';
+import { DbNode, NodeType } from '../shared/services/nodes/Nodes.types';
 import { DbService, DbServiceWithAddress } from '../shared/services/services/Services.types';
 
 export interface CompatibleServicePayload {
@@ -85,3 +86,7 @@ export type FlattenService = DbService &
   Partial<DbServiceWithAddress> & {
     type: Databases | 'external';
   };
+
+export type FlattenNode = DbNode & {
+  type: NodeType;
+};

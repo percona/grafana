@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { CheckboxField, Table, logger } from '@percona/platform-core';
+import { CheckboxField, logger } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { Column, Row } from 'react-table';
+import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table';
@@ -18,13 +19,13 @@ import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/red
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
-import { Node } from 'app/percona/shared/services/nodes/Nodes.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
+import { FlattenNode } from '../Inventory.types';
 
 import { getStyles } from './Tabs.styles';
 
@@ -37,23 +38,29 @@ export const NodesTab = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
 
+  const flattenNodes = useMemo(() => nodes.map((value) => ({ type: value.type, ...value.params })), [nodes]);
+
   const columns = useMemo(
-    (): Array<Column<Node>> => [
+    (): Array<ExtendedColumn<FlattenNode>> => [
       {
         Header: Messages.nodes.columns.nodeName,
-        accessor: (row) => row.params.nodeName,
+        accessor: 'nodeName',
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.nodes.columns.nodeId,
-        accessor: (row) => row.params.nodeId,
+        accessor: 'nodeId',
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.nodes.columns.nodeType,
         accessor: 'type',
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.nodes.columns.address,
-        accessor: (row) => row.params.address,
+        accessor: 'address',
+        type: FilterFieldTypes.TEXT,
       },
       getExpandAndActionsCol(),
     ],
@@ -73,8 +80,8 @@ export const NodesTab = () => {
   }, []);
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row<Node>) => {
-      const labels = row.original.params.customLabels || {};
+    (row: Row<FlattenNode>) => {
+      const labels = row.original.customLabels || {};
       const labelKeys = Object.keys(labels);
 
       return (
@@ -102,11 +109,11 @@ export const NodesTab = () => {
   }, []);
 
   const removeNodes = useCallback(
-    async (nodes: Array<SelectedTableRows<Node>>, forceMode: boolean) => {
+    async (nodes: Array<SelectedTableRows<FlattenNode>>, forceMode: boolean) => {
       try {
         // eslint-disable-next-line max-len
         const requests = nodes.map<RemoveNodeParams>((node) => ({
-          nodeId: node.original.params.nodeId,
+          nodeId: node.original.nodeId,
           force: forceMode,
         }));
 
@@ -190,10 +197,9 @@ export const NodesTab = () => {
             />
           </Modal>
           <Table
-            // @ts-ignore
             columns={columns}
-            data={nodes}
-            totalItems={nodes.length}
+            data={flattenNodes}
+            totalItems={flattenNodes.length}
             rowSelection
             autoResetSelectedRows={false}
             onRowSelection={handleSelectionChange}
@@ -201,11 +207,12 @@ export const NodesTab = () => {
             pageSize={25}
             allRowsSelectionMode="page"
             emptyMessage={Messages.nodes.emptyTable}
-            emptyMessageClassName={styles.emptyMessage}
+            //emptyMessageClassName={styles.emptyMessage}
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
-            getRowId={useCallback((row: Node) => row.params.nodeId, [])}
+            getRowId={useCallback((row: FlattenNode) => row.nodeId, [])}
+            showFilter
           />
         </FeatureLoader>
       </OldPage.Contents>
