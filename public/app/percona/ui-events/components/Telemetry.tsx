@@ -8,8 +8,6 @@ import { UIEventsService } from 'app/percona/ui-events/UIEvents.service';
 export interface UiEventsProps {}
 
 const _Telemetry: FC<UiEventsProps> = ({}) => {
-  const defaultTimeoutSendingEvents = 10_000;
-
   const { result } = useSelector(getPerconaSettings);
 
   const telemetryEnabled = !!result?.telemetryEnabled;
@@ -45,7 +43,7 @@ const _Telemetry: FC<UiEventsProps> = ({}) => {
             console.log('No UI events to send');
           }
         }
-      }, defaultTimeoutSendingEvents); //TODO: extract to settings
+      }, 10_000); //TODO: extract to settings
 
       return () => clearInterval(interval);
     } else {
