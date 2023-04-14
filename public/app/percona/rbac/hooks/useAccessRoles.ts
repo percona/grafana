@@ -37,8 +37,10 @@ export const useAccessRoles = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchRolesAction());
-  }, [dispatch]);
+    if (result?.enableAccessControl) {
+      dispatch(fetchRolesAction());
+    }
+  }, [result?.enableAccessControl, dispatch]);
 
   return { submitAccessRoles, submitUserAccessRoles, submitTeamAccessRoles };
 };
