@@ -11,6 +11,7 @@ import { SettingsService } from 'app/percona/settings/Settings.service';
 import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Settings.types';
 import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
 import { api } from 'app/percona/shared/helpers/api';
+import { uiEventsReducer } from 'app/percona/ui-events/reducer';
 
 import { ServerInfo } from '../types';
 
@@ -22,6 +23,7 @@ import perconaDBaaSReducer from './dbaas/dbaas';
 import perconaK8SCluster from './dbaas/k8sCluster/k8sCluster';
 import perconaK8SClusterListReducer, { fetchK8sListAction } from './dbaas/k8sClusterList/k8sClusterList';
 import perconaUpdateDBCluster from './dbaas/updateDBCluster/updateDBCluster';
+import nodesReducer from './nodes';
 import rolesReducers from './roles/roles';
 import servicesReducer from './services';
 import tourReducer from './tour/tour';
@@ -150,6 +152,7 @@ export const initialServerState: PerconaServerState = {
   serverName: '',
   serverId: '',
   saasHost: 'https://portal.percona.com',
+  serverTelemetryId: '',
 };
 
 const perconaServerSlice = createSlice({
@@ -160,6 +163,7 @@ const perconaServerSlice = createSlice({
       ...state,
       serverName: action.payload.serverName,
       serverId: action.payload.serverId,
+      serverTelemetryId: action.payload.serverTelemetryId,
     }),
     setServerSaasHost: (state, action: PayloadAction<string>): PerconaServerState => ({
       ...state,
@@ -177,12 +181,17 @@ export const fetchServerInfoAction = createAsyncThunk(
   (_, thunkAPI): Promise<void> =>
     withSerializedError(
       (async () => {
-        const { pmm_server_id = '', pmm_server_name = '' } = await PlatformService.getServerInfo();
+        const {
+          pmm_server_id = '',
+          pmm_server_name = '',
+          pmm_server_telemetry_id = '',
+        } = await PlatformService.getServerInfo();
 
         thunkAPI.dispatch(
           setServerInfo({
             serverName: pmm_server_name,
             serverId: pmm_server_id,
+            serverTelemetryId: pmm_server_telemetry_id,
           })
         );
       })()
@@ -238,8 +247,10 @@ export default {
     server: perconaServerReducers,
     templates: templatesReducer,
     services: servicesReducer,
+    nodes: nodesReducer,
     backupLocations: perconaBackupLocations,
     tour: tourReducer,
+    telemetry: uiEventsReducer,
     roles: rolesReducers,
     users: usersReducers,
     advisors: advisorsReducers,
