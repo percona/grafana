@@ -9,7 +9,7 @@ import { Messages } from './AccessRolesField.messages';
 import { AccessRolesFieldProps } from './AccessRolesField.types';
 
 export const AccessRolesField: FC<AccessRolesFieldProps> = ({ control }) => (
-  <Field label={Messages.label}>
+  <Field label={Messages.label} description={Messages.description}>
     <Controller
       control={control}
       name="roleIds"

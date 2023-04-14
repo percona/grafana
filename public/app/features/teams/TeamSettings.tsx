@@ -77,7 +77,7 @@ export const TeamSettings: FC<Props> = ({ team, updateTeam }) => {
             )}
             {/* @PERCONA */}
             <AccessRolesEnabledCheck>
-              <Field label="Access Roles">
+              <Field label="Access Roles" description="You can define these roles in the Configuration → Access roles.">
                 <AccessRolesTeamSelect id={team.id} name={team.name} />
               </Field>
             </AccessRolesEnabledCheck>
