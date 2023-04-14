@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { CheckboxField, Table, logger } from '@percona/platform-core';
+import { CheckboxField, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { Column, Row } from 'react-table';
+import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { formatServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
-import { Agent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
+import { Agent, FlattenAgent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table/Table.types';
@@ -44,24 +45,28 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   const styles = useStyles2(getStyles);
   const serviceId = formatServiceId(match.params.id);
   const service = services.find((s) => s.params.serviceId === serviceId);
+  const flattenAgents = useMemo(() => data.map((value) => ({ type: value.type, ...value.params })), [data]);
 
   const columns = useMemo(
-    (): Array<Column<Agent>> => [
+    (): Array<ExtendedColumn<FlattenAgent>> => [
       {
         Header: Messages.agents.columns.status,
-        accessor: (row) => row.params.status,
+        accessor: 'status',
         Cell: ({ value }: { value: ServiceAgentStatus }) => (
           <Badge text={capitalizeText(value)} color={getAgentStatusColor(value)} />
         ),
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.agents.columns.agentType,
         accessor: 'type',
         Cell: ({ value }) => beautifyAgentType(value),
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.agents.columns.agentId,
-        accessor: (row) => row.params.agentId,
+        accessor: 'agentId',
+        type: FilterFieldTypes.TEXT,
       },
       getExpandAndActionsCol(),
     ],
@@ -85,8 +90,8 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   }, []);
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row<Agent>) => {
-      const labels = row.original.params.customLabels || {};
+    (row: Row<FlattenAgent>) => {
+      const labels = row.original.customLabels || {};
       const labelKeys = Object.keys(labels);
 
       return (
@@ -117,12 +122,12 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
   }, [generateToken, loadData, service]);
 
   const removeAgents = useCallback(
-    async (agents: Array<SelectedTableRows<Agent>>, forceMode) => {
+    async (agents: Array<SelectedTableRows<FlattenAgent>>, forceMode) => {
       try {
         setLoading(true);
         // eslint-disable-next-line max-len
         const requests = agents.map((agent) =>
-          InventoryService.removeAgent({ agent_id: agent.original.params.agentId, force: forceMode })
+          InventoryService.removeAgent({ agent_id: agent.original.agentId, force: forceMode })
         );
         const results = await processPromiseResults(requests);
 
@@ -218,10 +223,9 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             />
           </Modal>
           <Table
-            // @ts-ignore
             columns={columns}
-            data={data}
-            totalItems={data.length}
+            data={flattenAgents}
+            totalItems={flattenAgents.length}
             rowSelection
             autoResetSelectedRows={false}
             onRowSelection={handleSelectionChange}
@@ -229,11 +233,12 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             pageSize={25}
             allRowsSelectionMode="page"
             emptyMessage={Messages.agents.emptyTable}
-            emptyMessageClassName={styles.emptyMessage}
+            // emptyMessageClassName={styles.emptyMessage}
             pendingRequest={agentsLoading || servicesLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
-            getRowId={useCallback((row: Agent) => row.params.agentId, [])}
+            getRowId={useCallback((row: FlattenAgent) => row.agentId, [])}
+            showFilter
           />
         </FeatureLoader>
       </Page.Contents>

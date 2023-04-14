@@ -64,20 +64,24 @@ export type ServiceAgentListPayload = {
   agents: ServiceAgentPayload[];
 };
 
-export interface ServiceAgent {
+export type ServiceAgent = {
   agentId: string;
   status?: ServiceAgentStatus;
   customLabels?: Record<string, string>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
-}
+};
 
 export interface Agent {
   type: AgentType;
   params: ServiceAgent;
 }
 
-export type FlattenService = {
-  type: Databases | 'external';
-} & DbService &
-  Partial<DbServiceWithAddress>;
+export type FlattenAgent = ServiceAgent & {
+  type: AgentType;
+};
+
+export type FlattenService = DbService &
+  Partial<DbServiceWithAddress> & {
+    type: Databases | 'external';
+  };
