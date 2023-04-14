@@ -174,7 +174,6 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
     },
 
     pgbouncer: {
-      image: dbCluster.databaseImage,
       compute_resources: {
         cpu_m: dbCluster.cpu * THOUSAND,
         memory_bytes: dbCluster.memory * BILLION,
