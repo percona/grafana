@@ -333,6 +333,7 @@ export interface DBClusterMatrix {
   operator?: DBClusterComponent;
   log_collector?: DBClusterComponent;
   postgresql?: DBClusterComponent;
+  pgbouncer?: DBClusterComponent;
 }
 
 export interface DBClusterComponent {
@@ -356,6 +357,8 @@ export interface DBClusterChangeComponentsAPI {
   pxc?: DBClusterChangeComponentAPI;
   haproxy?: DBClusterChangeComponentAPI;
   mongod?: DBClusterChangeComponentAPI;
+  postgresql?: DBClusterChangeComponentAPI;
+  pgbouncer?: DBClusterChangeComponentAPI;
 }
 
 export interface DBClusterChangeComponentAPI {

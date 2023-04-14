@@ -30,6 +30,7 @@ export enum SupportedComponents {
   haproxy = 'haproxy',
   mongod = 'mongod',
   pg = 'postgresql',
+  pgbouncer = 'pgbouncer',
 }
 
 export enum ManageComponentVersionsFields {

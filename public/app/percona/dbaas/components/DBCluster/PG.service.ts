@@ -88,7 +88,8 @@ export class PGService /*extends DBClusterService*/ {
   setComponents(kubernetesClusterName: string, componentsVersions: ManageComponentsVersionsRenderProps): Promise<void> {
     return apiManagement.post<void, DBClusterChangeComponentsAPI>('/DBaaS/Components/ChangePG', {
       kubernetes_cluster_name: kubernetesClusterName,
-      mongod: getComponentChange(Operators.pg, SupportedComponents.pg, componentsVersions),
+      postgresql: getComponentChange(Operators.pg, SupportedComponents.pg, componentsVersions),
+      pgbouncer: getComponentChange(Operators.pg, SupportedComponents.pgbouncer, componentsVersions),
     });
   }
 
