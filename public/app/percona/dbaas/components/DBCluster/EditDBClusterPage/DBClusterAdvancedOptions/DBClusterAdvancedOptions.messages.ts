@@ -27,17 +27,7 @@ export const Messages = {
     large: 'Large',
     custom: 'Custom',
   },
-
-  buttons: {
-    addNew: 'Add new',
-  },
-
-  tooltips: {
-    expose:
-      'You will make this database cluster available to connect from the internet. To limit access you need to specify source ranges',
-  },
   placeholders: {
     storageClass: 'storage class',
-    sourceRange: '181.170.213.40/32',
   },
 };

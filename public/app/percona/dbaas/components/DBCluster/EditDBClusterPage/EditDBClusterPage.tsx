@@ -5,6 +5,8 @@ import { Form } from 'react-final-form';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { Spinner, useStyles2 } from '@grafana/ui/src';
+import NetworkAndSecurity from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/NetworkAndSecurity/NetworkAndSecurity';
+import Restore from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/Restore/Restore';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { useSelector, useDispatch } from 'app/types';
 
@@ -116,17 +118,22 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
                 {showPMMAddressWarning && <PMMServerUrlWarning />}
                 <div className={styles.optionsWrapper}>
                   {mode === 'create' && <DBClusterBasicOptions kubernetes={kubernetes} form={form} />}
-                  {settings?.backupEnabled &&
-                    mode === 'create' &&
-                    form.getState().values.databaseType.value !== Databases.postgresql && (
-                      <DBaaSBackups
-                        handleSubmit={handleSubmit}
-                        pristine={pristine}
-                        valid={valid}
-                        form={form}
-                        {...props}
-                      />
-                    )}
+                  <div className={styles.switchOptionsWrapper}>
+                    {!!settings?.backupEnabled &&
+                      form.getState().values.databaseType.value !== Databases.postgresql && <Restore form={form} />}
+                    <NetworkAndSecurity form={form} />
+                    {!!settings?.backupEnabled &&
+                      mode === 'create' &&
+                      form.getState().values.databaseType.value !== Databases.postgresql && (
+                        <DBaaSBackups
+                          handleSubmit={handleSubmit}
+                          pristine={pristine}
+                          valid={valid}
+                          form={form}
+                          {...props}
+                        />
+                      )}
+                  </div>
                   <DBClusterAdvancedOptions
                     showUnsafeConfigurationWarning={showUnsafeConfigurationWarning}
                     mode={mode}

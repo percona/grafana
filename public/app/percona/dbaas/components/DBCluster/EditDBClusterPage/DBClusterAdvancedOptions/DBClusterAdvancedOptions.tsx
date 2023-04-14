@@ -32,7 +32,6 @@ import { Messages } from './DBClusterAdvancedOptions.messages';
 import { getStyles } from './DBClusterAdvancedOptions.styles';
 import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOptions.types';
 import { canGetExpectedResources, nodesValidator, resourceValidator } from './DBClusterAdvancedOptions.utils';
-import NetworkAndSecurity from './NetworkAndSecurity/NetworkAndSecurity';
 import Templates from './Templates/Templates';
 
 export interface DBClusterAdvancedOptionsProps extends FormRenderProps {
@@ -204,7 +203,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
       setShowUnsafeConfigurationWarning(nodes === 1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [databaseType, nodes, dbTypeValue]);
+  }, [nodes, dbTypeValue]);
 
   return (
     <FieldSet label={Messages.fieldSets.advancedSettings} {...collapsableProps}>
@@ -293,7 +292,6 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
         mode={mode}
         form={form}
       />
-      <NetworkAndSecurity databaseType={dbTypeValue} />
     </FieldSet>
   );
 };

@@ -24,5 +24,6 @@ export const Messages = {
     backup: 'Backup',
     mongod: 'Percona Operator for MongoDB',
     postgresql: 'Percona Operator for PostgreSQL',
+    pgbouncer: 'PostgreSQL Bouncer',
   },
 };
