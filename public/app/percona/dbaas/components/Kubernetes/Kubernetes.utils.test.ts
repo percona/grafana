@@ -57,7 +57,7 @@ describe('Kubernetes.utils:: ', () => {
         },
       },
     ];
-    expect(getActiveOperators(kubernetes).length).toBe(2);
+    expect(getActiveOperators(kubernetes).length).toBe(3);
   });
   it('should return list with one active operator', () => {
     const kubernetes = [
