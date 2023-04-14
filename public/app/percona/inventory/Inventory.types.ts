@@ -1,4 +1,5 @@
 import { Databases } from '../shared/core';
+import { DbService, DbServiceWithAddress } from '../shared/services/services/Services.types';
 
 export interface CompatibleServicePayload {
   service_id: string;
@@ -75,3 +76,8 @@ export interface Agent {
   type: AgentType;
   params: ServiceAgent;
 }
+
+export type FlattenService = {
+  type: Databases | 'external';
+} & DbService &
+  Partial<DbServiceWithAddress>;
