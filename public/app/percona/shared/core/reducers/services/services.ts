@@ -2,31 +2,17 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { ServicesService } from 'app/percona/shared/services/services/Services.service';
-import { ServiceListPayload, ServiceType } from 'app/percona/shared/services/services/Services.types';
+import { Service, ServiceType } from 'app/percona/shared/services/services/Services.types';
 import { createAsyncThunk } from 'app/types';
 
 import { filterFulfilled, processPromiseResults } from '../../../helpers/promises';
 
-import {
-  ListServicesParams,
-  RemoveServiceParams,
-  RemoveServicesParams,
-  ServicesState,
-  UpdateServiceParams,
-} from './services.types';
-import {
-  didStandardLabelsChange,
-  hasLabelsToAddOrUpdate,
-  hasLabelsToRemove,
-  toCustomLabelsBodies,
-  toListServicesBody,
-  toRemoveServiceBody,
-  toUpdateServiceBody,
-} from './services.utils';
+import { ListServicesParams, RemoveServiceParams, RemoveServicesParams, ServicesState, UpdateServiceParams } from './services.types';
+import { didStandardLabelsChange, hasLabelsToAddOrUpdate, hasLabelsToRemove, toCustomLabelsBodies, toDbServicesModel, toListServicesBody, toRemoveServiceBody, toUpdateServiceBody } from './services.utils';
 
 const initialState: ServicesState = {
   activeTypes: [],
-  services: {},
+  services: [],
   isLoading: false,
 };
 
@@ -34,7 +20,7 @@ const servicesSlice = createSlice({
   name: 'services',
   initialState,
   reducers: {
-    setServices: (state, action: PayloadAction<ServiceListPayload>): ServicesState => ({
+    setServices: (state, action: PayloadAction<Service[]>): ServicesState => ({
       ...state,
       services: action.payload,
     }),
@@ -74,11 +60,13 @@ export const fetchActiveServiceTypesAction = createAsyncThunk<ServiceType[]>(
   }
 );
 
-export const fetchServicesAction = createAsyncThunk<ServiceListPayload, Partial<ListServicesParams>>(
+export const fetchServicesAction = createAsyncThunk<Service[], Partial<ListServicesParams>>(
   'percona/fetchServices',
   async (params = {}) => {
     const body = toListServicesBody(params);
-    return await ServicesService.getServices(body, params.token);
+    const payload = await ServicesService.getServices(body, params.token);
+
+    return toDbServicesModel(payload);
   }
 );
 

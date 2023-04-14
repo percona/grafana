@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { withAppEvents } from '../../../../../../features/alerting/unified/utils/redux';
-import { newDBClusterService } from '../../../../../dbaas/components/DBCluster/DBCluster.utils';
-import { getCronStringFromValues } from '../../../../helpers/cron/cron';
-import { SETTINGS_TIMEOUT } from '../../../constants';
-import { updateSettingsAction } from '../../index';
+import { withAppEvents } from 'app/features/alerting/unified/utils/redux';
+import { newDBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.utils';
+import { SETTINGS_TIMEOUT } from 'app/percona/shared/core/constants';
+import { prepareSourceRanges } from 'app/percona/shared/core/reducers/dbaas/dbaas.utils';
+import { updateSettingsAction } from 'app/percona/shared/core/reducers/index';
+import { getCronStringFromValues } from 'app/percona/shared/helpers/cron/cron';
 
 import { AddDBClusterArgs, PerconaAddDBClusterState } from './addDBCluster.types';
 
@@ -71,6 +72,7 @@ export const addDbClusterAction = createAsyncThunk(
       secretsName,
       enableRestore,
       enableBackups,
+      template,
     } = args.values;
 
     const dbClusterService = newDBClusterService(databaseType.value);
@@ -89,6 +91,8 @@ export const addDbClusterAction = createAsyncThunk(
       startMinute!.map((m: { value: any }) => m.value!)
     );
 
+    const preparedSourceRanges = prepareSourceRanges(sourceRanges);
+
     await withAppEvents(
       dbClusterService.addDBCluster({
         kubernetesClusterName: kubernetesCluster?.value,
@@ -99,9 +103,9 @@ export const addDbClusterAction = createAsyncThunk(
         memory,
         disk,
         databaseImage: databaseVersion?.value,
-        expose,
-        internetFacing,
-        sourceRanges: sourceRanges?.map((item: any) => item?.sourceRange || ''),
+        expose: !!expose,
+        internetFacing: !!expose && !!internetFacing,
+        sourceRanges: preparedSourceRanges,
         configuration,
         ...(storageClass?.value && { storageClass: storageClass?.value }),
         ...(args.settings?.backupEnabled &&
@@ -120,6 +124,12 @@ export const addDbClusterAction = createAsyncThunk(
               secretsName: secretsName?.value || '',
             },
           }),
+        ...(template && {
+          template: {
+            name: template.label,
+            kind: template.value,
+          },
+        }),
       }),
       {
         successMessage: 'Cluster was successfully added',
