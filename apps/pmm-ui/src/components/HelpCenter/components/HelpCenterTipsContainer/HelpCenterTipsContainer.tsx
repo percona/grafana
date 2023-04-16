@@ -4,9 +4,9 @@ import { StartMonitoringTipsContainer } from '../TipsContainer/StartMonitoringTi
 import { TipNotConnected } from '../TipsContainer/TipNotConnected';
 import { FeedbackContainer } from '../FeedbackContainer/FeedbackContainer';
 import { useDispatch, useSelector } from 'react-redux';
-import { StoreState } from '../../../../reducers/store';
-import { fetchSystemAndUserTipsAction } from '../../../../reducers/tips/tips';
-import { useLocalStorage } from '../../../../shared/localStorage';
+import { StoreState } from 'reducers/store';
+import { fetchSystemAndUserTipsAction } from 'reducers/tips/tips';
+import { useLocalStorage } from 'hooks/localStorage';
 import { EmptyTip } from "../TipsContainer/EmptyTip";
 
 export interface HelpCenterTipsContainerProps {

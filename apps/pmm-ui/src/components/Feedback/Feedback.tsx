@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { Step1 } from './steps/Step1';
 import { Step2 } from './steps/Step2';
 import { Step3 } from './steps/Step3';
-import FeedbackService from './Feedback.service';
+import { PortalAPI } from 'api';
 
 export type FeedbackNote = 'bad' | 'fair' | 'good';
 
@@ -25,7 +25,7 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
   const [feedbackDescription, setFeedbackDescription] = useState('');
 
   const saveFeedback = () => {
-    FeedbackService.createFeedback(feedbackNote, feedbackDescription, pmmServerId || '')
+    PortalAPI.createFeedback(feedbackNote, feedbackDescription, pmmServerId || '')
       .catch(() => {})
       .finally(() => {
         if (onFinish) {

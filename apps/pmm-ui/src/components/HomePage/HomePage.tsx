@@ -9,6 +9,7 @@ import imgOptimizeAndImprove from './assets/optimize-and-improve.svg';
 import imgMaintainPerformance from './assets/maintain-performance.svg';
 import { ActionContainer } from './comonents/ActionContainer';
 import { HomePageTipsContainer } from './comonents/HomePageTipsContainer';
+import {Config} from "../../config";
 
 interface HomePageProps {
   onHelpCenterButtonClick?: () => void;
@@ -17,6 +18,8 @@ interface HomePageProps {
 
 export const HomePage: FC<HomePageProps> = (props) => {
   const styles = useStyles2(getStyles);
+
+  console.log(Config.portal.baseUrl)
 
   const { onHelpCenterButtonClick, userId } = props;
   const wavingHandEmoji = String.fromCodePoint(128075);

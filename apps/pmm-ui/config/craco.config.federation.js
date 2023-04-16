@@ -2,6 +2,8 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const fs = require('fs');
 
 const deps = require('../package.json').dependencies;
+const {DefinePlugin} = require('webpack');
+require('dotenv').config({path: './.env'});
 
 const exposeDirectory = (dirName) =>
   fs.readdirSync(dirName).reduce((exposes, file) => {
@@ -23,6 +25,14 @@ module.exports = {
       }
 
       config.plugins.unshift(
+        new DefinePlugin({
+          'process.env': JSON.stringify({
+            ...process.env,
+            ...{
+              NODE_ENV: JSON.stringify('development'),
+            }
+          }),
+        }),
         new ModuleFederationPlugin({
           name: 'pmm_ui',
           filename: 'remoteEntry.js',
