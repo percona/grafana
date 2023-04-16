@@ -31,6 +31,7 @@ services:
       - PERCONA_TEST_PMM_CLICKHOUSE_DATABASE=pmm
       - PERCONA_TEST_PMM_CLICKHOUSE_BLOCK_SIZE=10000
       - PERCONA_TEST_PMM_CLICKHOUSE_POOL_SIZE=2
+      - PERCONA_TEST_GRAFANA_ADDR=host.docker.internal:3000
       #      - PMM_DEBUG=1
       - ENABLE_DBAAS=1
       - ENABLE_ALERTING=1
@@ -78,7 +79,6 @@ services:
       - ../conf/grafana.local-dev.ini:/usr/share/grafana/conf/defaults.ini
       # configs
       - ./.config/etc/nginx/conf.d/pmm.conf:/etc/nginx/conf.d/pmm.conf:ro
-      - ${PMM_SVC_CONFIG:-./.config/etc/supervisord.d/pmm.ini}:/etc/supervisord.d/pmm.ini:ro
       - ./.config/etc/nginx/conf.d/pmm-ssl.conf:/etc/nginx/conf.d/pmm-ssl.conf:ro
       # workspace
       - ../:/workspace
