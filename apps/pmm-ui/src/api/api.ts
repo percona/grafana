@@ -1,6 +1,6 @@
-import axios, { CancelToken, AxiosInstance, CreateAxiosDefaults } from 'axios';
+import axios, { AxiosInstance, CancelToken, CreateAxiosDefaults } from 'axios';
 
-export class ApiRequest {
+export class ApiResource {
   axiosInstance: AxiosInstance;
 
   constructor(params: CreateAxiosDefaults<any>) {
@@ -52,6 +52,3 @@ export class ApiRequest {
       });
   }
 }
-
-export const apiTelemetryOnboarding = new ApiRequest({ baseURL: '/v1/telemetry/onboarding' });
-export const apiOnboarding = new ApiRequest({ baseURL: '/v1/onboarding' });

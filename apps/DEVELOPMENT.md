@@ -42,16 +42,16 @@ correctly. If you want to work in both of them you need to open them separatly.
 
 You can run new devcontainer and grafana ui build (with watch) by running in `apps` directory
 
-Use grafana server in devcontainer:
-
-```shell
-make dev
-```
-
-Use local grafana server:
+Option 1 (preferred): you want to use local grafana server:
 
 ```shell
 make dev-local-gs
+```
+
+Option 2: you want to use Grafana Server in devcontainer:
+
+```shell
+make dev
 ```
 
 ### 2.1.2: PMM-UI

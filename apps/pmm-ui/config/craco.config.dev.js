@@ -1,3 +1,6 @@
+const {DefinePlugin} = require("webpack");
+require('dotenv').config({path: './.env'});
+
 module.exports = {
   webpack: {
     devServer: {
@@ -11,7 +14,16 @@ module.exports = {
         config.plugins = [];
       }
 
-      config.plugins.unshift();
+      config.plugins.unshift(
+        new DefinePlugin({
+          'process.env': JSON.stringify({
+            ...process.env,
+            ...{
+              NODE_ENV: JSON.stringify('development'),
+            }
+          }),
+        }),
+      );
 
       config.ignoreWarnings = [
         function ignoreSourcemapsloaderWarnings(warning) {

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import systemTipsData from '../../components/HelpCenter/components/TipsContainer/data/systemTips.json';
 import userTipsData from '../../components/HelpCenter/components/TipsContainer/data/userTips.json';
-import { apiOnboarding } from '../../shared/api';
+import { ApiTipModel, OnboardingAPI } from 'api';
 
 export interface AllTipsState {
   systemTips: TipsState;
@@ -25,16 +25,6 @@ export interface TipModel {
   url: string;
   completed: boolean;
   canUserComplete?: boolean;
-}
-
-interface ApiTipModel {
-  tipId: number;
-  isCompleted: boolean;
-}
-
-interface OnboardingResponse {
-  systemTips: ApiTipModel[];
-  userTips: ApiTipModel[];
 }
 
 const initialTipsState: AllTipsState = {
@@ -145,7 +135,7 @@ export const fetchSystemAndUserTipsAction = createAsyncThunk(
       let systemTips: ApiTipModel[] = [];
       let userTips: ApiTipModel[] = [];
       try {
-        const res = await apiOnboarding.get<OnboardingResponse, any>(``);
+        const res = await OnboardingAPI.getOnboardingState();
         systemTips = res.systemTips;
         userTips = res.userTips;
       } catch (e) {
@@ -185,9 +175,7 @@ export const completeUserTip = createAsyncThunk(
   'percona/completeUserTips',
   (args: { tipId: number }, thunkAPI): Promise<void> =>
     (async () => {
-      const res = await apiOnboarding.post<any, any>('/tips/complete', {
-        tipId: args.tipId,
-      });
+      const res = await OnboardingAPI.completeTip(args.tipId);
 
       if (res.errorCode) {
         console.error(res.errorCode);
@@ -196,7 +184,7 @@ export const completeUserTip = createAsyncThunk(
       } else {
         let userTips: ApiTipModel[] = [];
         try {
-          const res = await apiOnboarding.get<OnboardingResponse, any>(``);
+          const res = await OnboardingAPI.getOnboardingState();
           userTips = res.userTips;
         } catch (e) {
           userTips = Array.from(new Map(Object.entries(userTipsData)).values())
