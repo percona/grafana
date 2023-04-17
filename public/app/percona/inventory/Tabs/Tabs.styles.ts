@@ -36,7 +36,7 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
     align-items: center;
     background-color: transparent;
   `,
-  deleteItemTxtSpan: css`
+  actionItemTxtSpan: css`
     line-height: 15px;
   `,
   agentBreadcrumb: css`

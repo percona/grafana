@@ -51,7 +51,7 @@ export const toLabelValue = (original?: string, current?: string): string | unde
 
 export const toUpdateServiceBody = ({ serviceId, labels, current }: UpdateServiceParams): UpdateServiceBody => ({
   service_id: serviceId,
-  environment: toLabelValue(current.environment, labels.environment),
+  environment: toLabelValue(current.enviroment, labels.environment),
   cluster: toLabelValue(current.cluster, labels.cluster),
   replication_set: toLabelValue(current.replication_set, labels.replication_set),
 });
@@ -101,7 +101,7 @@ export const toCustomLabelsBodies = (params: UpdateServiceParams): [AddCustomLab
 };
 
 export const didStandardLabelsChange = ({ current, labels }: UpdateServiceParams): boolean =>
-  current.environment !== labels.environment ||
+  current.enviroment !== labels.environment ||
   current.cluster !== labels.cluster ||
   current.replication_set !== labels.replication_set;
 

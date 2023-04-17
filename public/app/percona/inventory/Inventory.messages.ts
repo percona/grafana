@@ -59,6 +59,7 @@ export const Messages = {
       `${deletedItems} of ${totalItems} nodes successfully deleted`,
   },
   delete: 'Delete',
+  edit: 'Edit',
   cancel: 'Cancel',
   proceed: 'Proceed',
   forceMode: 'Force mode',

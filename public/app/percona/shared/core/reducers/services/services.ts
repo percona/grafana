@@ -7,8 +7,23 @@ import { createAsyncThunk } from 'app/types';
 
 import { filterFulfilled, processPromiseResults } from '../../../helpers/promises';
 
-import { ListServicesParams, RemoveServiceParams, RemoveServicesParams, ServicesState, UpdateServiceParams } from './services.types';
-import { didStandardLabelsChange, hasLabelsToAddOrUpdate, hasLabelsToRemove, toCustomLabelsBodies, toDbServicesModel, toListServicesBody, toRemoveServiceBody, toUpdateServiceBody } from './services.utils';
+import {
+  ListServicesParams,
+  RemoveServiceParams,
+  RemoveServicesParams,
+  ServicesState,
+  UpdateServiceParams,
+} from './services.types';
+import {
+  didStandardLabelsChange,
+  hasLabelsToAddOrUpdate,
+  hasLabelsToRemove,
+  toCustomLabelsBodies,
+  toDbServicesModel,
+  toListServicesBody,
+  toRemoveServiceBody,
+  toUpdateServiceBody,
+} from './services.utils';
 
 const initialState: ServicesState = {
   activeTypes: [],

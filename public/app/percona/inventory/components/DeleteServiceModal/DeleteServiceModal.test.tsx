@@ -6,7 +6,6 @@ import * as ServicesReducer from 'app/percona/shared/core/reducers/services/serv
 import { configureStore } from 'app/store/configureStore';
 
 import DeleteServiceModal from './DeleteServiceModal';
-import { Messages } from './DeleteServiceModal.messages';
 
 const cancelFn = jest.fn();
 
@@ -27,12 +26,12 @@ describe('DeleteServiceModal::', () => {
 
   it("doesn't render if not opened", () => {
     renderDefaults(false);
-    expect(screen.queryByText(Messages.description('service_name'))).toBe(null);
+    expect(screen.queryByTestId('delete-service-description')).toBe(null);
   });
 
   it('renders when opened', () => {
     renderDefaults();
-    expect(screen.queryByText(Messages.description('service_name'))).toBeInTheDocument();
+    expect(screen.queryByTestId('delete-service-description')).toBeInTheDocument();
   });
 
   it('can be cancelled', () => {
@@ -67,11 +66,39 @@ describe('DeleteServiceModal::', () => {
     await waitFor(() => fireEvent.click(forceModeCheck));
 
     const confirmButton = screen.getByTestId('delete-service-confirm');
-    fireEvent.click(confirmButton);
+    await waitFor(() => fireEvent.click(confirmButton));
 
     expect(removeServiceActionSpy).toHaveBeenCalledWith({
       force: true,
       serviceId: 'service_id',
     });
+  });
+
+  it('resets force mode after submit', async () => {
+    renderDefaults();
+
+    const forceModeCheck = screen.getByTestId('delete-service-force-mode');
+    await waitFor(() => fireEvent.click(forceModeCheck));
+
+    expect(forceModeCheck).toBeChecked();
+
+    const confirmButton = screen.getByTestId('delete-service-confirm');
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => expect(forceModeCheck).not.toBeChecked());
+  });
+
+  it('resets force mode after dismiss', async () => {
+    renderDefaults();
+
+    const forceModeCheck = screen.getByTestId('delete-service-force-mode');
+    await waitFor(() => fireEvent.click(forceModeCheck));
+
+    expect(forceModeCheck).toBeChecked();
+
+    const cancelButton = screen.getByTestId('delete-service-cancel');
+    fireEvent.click(cancelButton);
+
+    await waitFor(() => expect(forceModeCheck).not.toBeChecked());
   });
 });

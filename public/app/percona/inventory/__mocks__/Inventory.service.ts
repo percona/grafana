@@ -33,8 +33,6 @@ export const InventoryService = jest.genMockFromModule<typeof service>(
   'app/percona/inventory/Inventory.service'
 ).InventoryService;
 
-InventoryService.removeService = () => Promise.resolve();
-
 InventoryService.getDbServices = () => Promise.resolve(stubs);
 
 InventoryService.getService = () =>

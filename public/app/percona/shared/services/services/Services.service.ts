@@ -23,12 +23,12 @@ export const ServicesService = {
     return api.post<{}, RemoveServiceBody>('/v1/inventory/Services/Remove', body, false, token);
   },
   updateService(body: UpdateServiceBody, token?: CancelToken) {
-    return api.post<{}, UpdateServiceBody>(`${BASE_URL}/Change`, body, false, token);
+    return api.post<{}, UpdateServiceBody>('/v1/inventory/Change', body, false, token);
   },
   addCustomLabels(body: AddCustomLabelsBody, token?: CancelToken) {
-    return api.post<{}, UpdateServiceBody>(`${BASE_URL}/CustomLabels/Add`, body, false, token);
+    return api.post<{}, UpdateServiceBody>('/v1/inventory/CustomLabels/Add', body, false, token);
   },
   removeCustomLabels(body: RemoveCustomLabelsBody, token?: CancelToken) {
-    return api.post<{}, UpdateServiceBody>(`${BASE_URL}/CustomLabels/Remove`, body, false, token);
+    return api.post<{}, UpdateServiceBody>('/v1/inventory/CustomLabels/Remove', body, false, token);
   },
 };

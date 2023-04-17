@@ -32,6 +32,8 @@ const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({ serviceId, serv
       await dispatch(removeServiceAction(params)).unwrap();
 
       appEvents.emit(AppEvents.alertSuccess, [Messages.success(serviceName)]);
+
+      setForceActive(false);
       onCancel();
     } catch (e) {
       if (isApiCancelError(e)) {
@@ -41,15 +43,21 @@ const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({ serviceId, serv
     }
   };
 
+  const handleDismiss = () => {
+    setForceActive(false);
+    onCancel();
+  };
+
   return (
-    <Modal isOpen={isOpen} title={Messages.title} onDismiss={onCancel} className={styles.Modal}>
+    <Modal isOpen={isOpen} title={Messages.title} onDismiss={handleDismiss} className={styles.Modal}>
       <Alert title={Messages.warning} severity="warning" />
-      <p>{Messages.description(serviceName)}</p>
+      <p data-testid="delete-service-description">{Messages.description(serviceName)}</p>
       <div>
         <Checkbox
           data-testid="delete-service-force-mode"
           label={Messages.forceMode.label}
           description={Messages.forceMode.description}
+          checked={forceModeActive}
           value={forceModeActive}
           onChange={() => setForceActive((active) => !active)}
         />
@@ -58,7 +66,7 @@ const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({ serviceId, serv
         <Button data-testid="delete-service-confirm" onClick={handleDelete}>
           {Messages.submit}
         </Button>
-        <Button data-testid="delete-service-cancel" variant="secondary" onClick={onCancel}>
+        <Button data-testid="delete-service-cancel" variant="secondary" onClick={handleDismiss}>
           {Messages.cancel}
         </Button>
       </Modal.ButtonRow>
