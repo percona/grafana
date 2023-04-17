@@ -201,6 +201,11 @@ export const Table: FC<TableProps> = ({
                               {row.cells.map((cell) => {
                                 return (
                                   <td
+                                    title={
+                                      typeof cell.value === 'string' || typeof cell.value === 'number'
+                                        ? cell.value.toString()
+                                        : undefined
+                                    }
                                     {...cell.getCellProps([
                                       {
                                         className: cx(
