@@ -17,6 +17,9 @@ const HomePageRouter = React.lazy(() => import('pmm_ui/HomePageRouter'));
 
 const HomePageRoute = '/a/pmm-homescreen-app';
 
+// @ts-ignore
+const PlatformConnectionSettings = React.lazy(() => import('pmm_ui/PlatformConnectionSettings'));
+
 export const PmmUi = {
   TopBar,
   HomePage,
@@ -24,5 +27,6 @@ export const PmmUi = {
   ConnectPortalModal,
   StoreProvider,
   HomePageRouter,
-  HomePageRoute
+  HomePageRoute,
+  PlatformConnectionSettings
 };

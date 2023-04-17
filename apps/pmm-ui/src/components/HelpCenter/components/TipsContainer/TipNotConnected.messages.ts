@@ -6,7 +6,8 @@ export const Messages = {
   li3: 'How to tighten your database security',
   li4: 'How to tune your database performancez',
 
-  howConnectToPortalHelpLink: 'https://docs.percona.com/percona-platform/connect-pmm.html?utm_source=pmm&utm_medium=pmm-platform-connection&utm_campaign=modal&utm_term=learn-how-to-connect-Percona-Platform',
+  howConnectToPortalHelpLink:
+    'https://docs.percona.com/percona-platform/connect-pmm.html?utm_source=pmm&utm_medium=pmm-platform-connection&utm_campaign=modal&utm_term=learn-how-to-connect-Percona-Platform',
 
   button: {
     connectToPlatform: 'Connect to Percona Platform',

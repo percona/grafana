@@ -77,17 +77,17 @@ export const TopBar: FC<TopBarProps> = ({
         </nav>
       </div>
       <ToolbarButtonRow alignment="right">
-        {!connectedToPortal &&
-            <>
-              <div className={styles.tooltip}>
-                {Messages.legend}
-                <Icon name="arrow-right" />
-              </div>
-              <Button className={styles.connectButton} icon="info" variant="secondary" onClick={onSignInClick}>
-                {Messages.button.connectToPortal}
-              </Button>
-            </>
-        }
+        {!connectedToPortal && (
+          <>
+            <div className={styles.tooltip}>
+              {Messages.legend}
+              <Icon name="arrow-right" />
+            </div>
+            <Button className={styles.connectButton} icon="info" variant="secondary" onClick={onSignInClick}>
+              {Messages.button.connectToPortal}
+            </Button>
+          </>
+        )}
         {showFeedbackButton && (
           <>
             <FeedbackTooltip
