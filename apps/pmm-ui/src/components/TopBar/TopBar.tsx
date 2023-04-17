@@ -12,10 +12,9 @@ import { FeedbackTooltip } from './components/FeedbackTooltip';
 import { HelpCenterTooltip } from './components/HelpCenterTooltip';
 
 export interface TopBarProps {
-  showSignIn?: boolean;
+  connectedToPortal?: boolean;
   showFeedbackButton?: boolean;
   showHelpCenterButton?: boolean;
-  userContext?: any;
   pmmServerId?: any;
 
   onSignInClick: () => void;
@@ -25,9 +24,8 @@ export interface TopBarProps {
 }
 
 export const TopBar: FC<TopBarProps> = ({
-  userContext,
   pmmServerId,
-  showSignIn,
+  connectedToPortal,
   showFeedbackButton,
   showHelpCenterButton,
   onSignInClick,
@@ -58,8 +56,6 @@ export const TopBar: FC<TopBarProps> = ({
     </Menu>
   );
 
-  const connectedToPortal = userContext;
-
   return (
     <nav className={styles.toolbar}>
       <div className={styles.leftWrapper}>
@@ -81,14 +77,7 @@ export const TopBar: FC<TopBarProps> = ({
         </nav>
       </div>
       <ToolbarButtonRow alignment="right">
-        {showSignIn &&
-          (connectedToPortal ? (
-            <>
-              <Dropdown overlay={userMenu} placement="bottom">
-                <Button variant="secondary">John Doe</Button>
-              </Dropdown>
-            </>
-          ) : (
+        {!connectedToPortal &&
             <>
               <div className={styles.tooltip}>
                 {Messages.legend}
@@ -98,7 +87,7 @@ export const TopBar: FC<TopBarProps> = ({
                 {Messages.button.connectToPortal}
               </Button>
             </>
-          ))}
+        }
         {showFeedbackButton && (
           <>
             <FeedbackTooltip

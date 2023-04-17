@@ -52,7 +52,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
   verticalGroup: css`
     padding-left: 8px;
     padding-right: 8px;
-    align-items: center
+    align-items: center;
     width: auto;
     /* decrease Modal's default padding */
     transform: translateY(-24px);

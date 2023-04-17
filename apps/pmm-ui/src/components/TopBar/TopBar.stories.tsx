@@ -17,8 +17,6 @@ const Template: ComponentStory<typeof TopBar> = (args) => {
   return (
     <>
       <TopBar
-        userContext={userContext}
-        showSignIn
         showFeedbackButton
         showHelpCenterButton
         onSignInClick={() => {

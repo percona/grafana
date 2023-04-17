@@ -55,12 +55,10 @@ export function GrafanaRoute(props: Props) {
   navigationLogger('GrafanaRoute', false, 'Rendered', props.route);
 
   //TODO:WIP:
-  const [userContext, setUserContext]=useState('');
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
   const [helpCenterToolTipVisible, setHelpCenterToolTipVisible] = useState(false);
   const { result } = useSelector(getPerconaSettings);
   const { serverId = '' } = useSelector(getPerconaServer);
-  const [isConnectedUser, setIsConnectedUser] = useState(result?.isConnectedToPortal || false);
   const isAdmin = contextSrv.isGrafanaAdmin;
   const userId = contextSrv.user.id;
   const styles = getStyles();
@@ -85,19 +83,14 @@ export function GrafanaRoute(props: Props) {
                       <>
                         <PmmUi.ConnectPortalModal
                           onClose={() => setConnectPortalModalVisible(false)}
-                          onConfirm={() => {
-                            setConnectPortalModalVisible(false);
-                            setUserContext('something_here');
-                            setIsConnectedUser(true);
-                          }}
+                          onConfirm={() => window.open("https://docs.percona.com/percona-platform/connect-pmm.html?utm_source=pmm&utm_medium=pmm-platform-connection&utm_campaign=modal&utm_term=learn-how-to-connect-Percona-Platform", '_blank', 'noopener,noreferrer')}
                           isAdmin={isAdmin}
                           isOpen={connectPortalModalVisible}
                         />
                       </>
 
                       <PmmUi.TopBar
-                        userContext={userContext}
-                        showSignIn
+                        connectedToPortal={result?.isConnectedToPortal}
                         showFeedbackButton
                         showHelpCenterButton
                         pmmServerId={serverId}
@@ -113,7 +106,7 @@ export function GrafanaRoute(props: Props) {
                         open={isHelpCenterOpen}
                         onClose={() => saveHelpCenterOpen(false)}
                         width="416px"
-                        isConnectedUser={isConnectedUser}
+                        isConnectedUser={result?.isConnectedToPortal}
                         userId={userId}
                         openKeyboardShortcut={() => {
                           appEvents.publish(new ShowModalReactEvent({ component: HelpModal }));
@@ -176,8 +169,8 @@ const getStyles = () => ({
       height: 1000%;
       width: 100%;
       z-index: 1000;
-      background-color: #22252b;
-      opacity: 0.8;
+      background-color: rgba(63, 62, 62, 0.45);
+      backdrop-filter: blur(1px);
     }
   `,
 })

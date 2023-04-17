@@ -30,7 +30,12 @@ export const TipNotConnected: FC<TipNotConnectedProps> = ({ showTitle }) => {
           </ul>
 
           <div>
-            <Button className={styles.tipsButton} fullWidth variant="secondary">
+            <Button
+              className={styles.tipsButton}
+              fullWidth
+              variant="secondary"
+              onClick={() => window.open(Messages.howConnectToPortalHelpLink, '_blank', 'noopener,noreferrer')}
+            >
               <img className={styles.buttonImage} alt="pmm-logo" src={tipIcon} />
               <div className={styles.perconaButtonLabel}>{Messages.button.connectToPlatform}</div>
             </Button>
