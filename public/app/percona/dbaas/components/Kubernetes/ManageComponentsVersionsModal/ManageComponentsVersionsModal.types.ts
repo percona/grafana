@@ -29,7 +29,7 @@ export enum SupportedComponents {
   pxc = 'pxc',
   haproxy = 'haproxy',
   mongod = 'mongod',
-  pg = 'postgresql',
+  postgresql = 'postgresql',
   pgbouncer = 'pgbouncer',
 }
 

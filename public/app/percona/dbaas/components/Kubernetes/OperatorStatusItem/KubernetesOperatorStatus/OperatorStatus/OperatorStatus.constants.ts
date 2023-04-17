@@ -9,6 +9,7 @@ export const OPERATORS_DOCS_URL = {
   [Databases.proxysql]: '',
   [Databases.mariadb]: '',
   [Databases.haproxy]: '',
+  [Databases.pgbouncer]: '',
 };
 
 export const VERSION_PLACEHOLDER = '<version>';
@@ -20,6 +21,7 @@ export const OPERATORS_RN_URL = {
   [Databases.proxysql]: '',
   [Databases.mariadb]: '',
   [Databases.haproxy]: '',
+  [Databases.pgbouncer]: '',
 };
 
 export const STATUS_DATA_QA = {

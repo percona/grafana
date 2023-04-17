@@ -262,7 +262,7 @@ export const pgComponentsVersionsStubs = {
       product: Operators.pg,
       operator: '1',
       matrix: {
-        postgres: versionsStub,
+        postgresql: versionsStub,
         pgbouncer: versionsStub,
       },
     },
