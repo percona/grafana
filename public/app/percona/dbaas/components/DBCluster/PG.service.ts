@@ -1,5 +1,6 @@
 import { omit, pick } from 'lodash';
 
+import { DBClusterService } from 'app/percona/dbaas/components/DBCluster/DBCluster.service';
 import { Databases } from 'app/percona/shared/core';
 import { apiManagement } from 'app/percona/shared/helpers/api';
 
@@ -29,7 +30,7 @@ import {
 } from './DBCluster.types';
 import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
-export class PGService /*extends DBClusterService*/ {
+export class PGService extends DBClusterService {
   addDBCluster(dbCluster: DBCluster): Promise<void | DBClusterPayload> {
     return apiManagement.post<void, DBClusterPayload>('/DBaaS/PostgresqlCluster/Create', toAPI(dbCluster));
   }
