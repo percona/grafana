@@ -3,6 +3,9 @@ import arrayMutators from 'final-form-arrays';
 import React from 'react';
 import { Form } from 'react-final-form';
 
+import { BasicOptionsFields } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
+import { Databases } from 'app/percona/shared/core';
+
 import NetworkAndSecurity from './NetworkAndSecurity';
 import { Messages } from './NetworkAndSecurity.messages';
 import { NetworkAndSecurityFields } from './NetworkAndSecurity.types';
@@ -11,7 +14,10 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
   it('render items correctly for create and edit mode', () => {
     render(
       <Form
-        initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{}] }}
+        initialValues={{
+          [NetworkAndSecurityFields.sourceRanges]: [{}],
+          [BasicOptionsFields.databaseType]: { value: Databases.mysql },
+        }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
         render={({ form }) => <NetworkAndSecurity form={form} />}
@@ -38,7 +44,10 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
   it('the delete button should not delete the first field', () => {
     render(
       <Form
-        initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }] }}
+        initialValues={{
+          [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }],
+          [BasicOptionsFields.databaseType]: { value: Databases.mongodb },
+        }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
         render={({ form }) => <NetworkAndSecurity form={form} />}
@@ -58,7 +67,10 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
   it('the delete button should delete field from the form if it is not the first one ', () => {
     render(
       <Form
-        initialValues={{ [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }, { sourceRange: '2' }] }}
+        initialValues={{
+          [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }, { sourceRange: '2' }],
+          [BasicOptionsFields.databaseType]: { value: Databases.mysql },
+        }}
         onSubmit={jest.fn()}
         mutators={{ ...arrayMutators }}
         render={({ form }) => <NetworkAndSecurity form={form} />}
@@ -73,5 +85,24 @@ describe('DBClusterAdvancedOptions NetworkAndSecurity::', () => {
     const deleteBtn = screen.getByTestId('deleteButton-1');
     fireEvent.click(deleteBtn);
     expect(screen.queryByTestId('sourceRanges[1].sourceRange-text-input')).not.toBeInTheDocument();
+  });
+  it('source range field should be hidden whe database is postgreSQL ', () => {
+    render(
+      <Form
+        initialValues={{
+          [NetworkAndSecurityFields.sourceRanges]: [{ sourceRange: '1' }],
+          [BasicOptionsFields.databaseType]: { value: Databases.postgresql },
+        }}
+        onSubmit={jest.fn()}
+        mutators={{ ...arrayMutators }}
+        render={({ form }) => <NetworkAndSecurity form={form} />}
+      />
+    );
+    expect(screen.getByTestId('toggle-network-and-security')).toBeInTheDocument();
+    const checkbox = screen.getByTestId('toggle-network-and-security');
+
+    fireEvent.click(checkbox);
+
+    expect(screen.queryByTestId('source-ranges')).not.toBeInTheDocument();
   });
 });

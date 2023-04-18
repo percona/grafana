@@ -21,11 +21,13 @@ describe('DBClusterAdvancedOptions Configurations::', () => {
       )
     );
     expect(screen.getByTestId('configurations').querySelector('legend')).toHaveTextContent(
-      Messages.fieldSets.commonConfiguration
+      Messages.fieldSets.configuration(Databases.haproxy)
     );
     expect(screen.getByTestId('storageClass-field-label')).toHaveTextContent(Messages.labels.storageClass);
     expect(screen.getByTestId('storageClass-field-container').querySelector('input')).toBeTruthy();
-    expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(Messages.labels.commonConfiguration);
+    expect(screen.getByTestId('configuration-field-label')).toHaveTextContent(
+      Messages.labels.configuration(Databases.haproxy)
+    );
     expect(screen.getByTestId('configuration-textarea-input')).toBeInTheDocument();
   });
 

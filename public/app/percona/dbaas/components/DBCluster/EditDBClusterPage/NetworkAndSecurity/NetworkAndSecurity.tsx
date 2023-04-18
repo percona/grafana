@@ -51,7 +51,7 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ form }) => {
           {databaseType.value !== Databases.postgresql && (
             <FieldArray name={NetworkAndSecurityFields.sourceRanges}>
               {({ fields }) => (
-                <div className={styles.fieldsWrapper}>
+                <div className={styles.fieldsWrapper} data-testid="source-ranges">
                   <Button
                     className={styles.button}
                     variant="secondary"

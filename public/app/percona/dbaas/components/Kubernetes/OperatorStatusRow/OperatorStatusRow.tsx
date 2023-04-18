@@ -56,7 +56,7 @@ export const OperatorStatusRow: FC<OperatorStatusRowProps> = ({
       <div>
         {operators.map((item) => (
           <OperatorStatusItem
-            key={`${item.operator}`}
+            key={`${item.databaseType}-${element.kubernetesClusterName}-operator`}
             databaseType={item.databaseType}
             operator={item.operator}
             kubernetes={element}
