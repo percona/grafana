@@ -55,7 +55,33 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
         Cell: ({ value }: { value: ServiceAgentStatus }) => (
           <Badge text={capitalizeText(value)} color={getAgentStatusColor(value)} />
         ),
-        type: FilterFieldTypes.TEXT,
+        type: FilterFieldTypes.DROPDOWN,
+        options: [
+          {
+            label: 'Done',
+            value: ServiceAgentStatus.DONE,
+          },
+          {
+            label: 'Running',
+            value: ServiceAgentStatus.RUNNING,
+          },
+          {
+            label: 'Starting',
+            value: ServiceAgentStatus.STARTING,
+          },
+          {
+            label: 'Stopping',
+            value: ServiceAgentStatus.STOPPING,
+          },
+          {
+            label: 'Unknown',
+            value: ServiceAgentStatus.UNKNOWN,
+          },
+          {
+            label: 'Waiting',
+            value: ServiceAgentStatus.WAITING,
+          },
+        ],
       },
       {
         Header: Messages.agents.columns.agentType,
