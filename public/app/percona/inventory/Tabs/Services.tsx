@@ -229,6 +229,7 @@ export const Services = () => {
               serviceName={actionItem.params.serviceName}
               isOpen={modalVisible}
               onCancel={onModalClose}
+              onSuccess={onDeleteSuccess}
             />
           ) : (
             <DeleteServicesModal

@@ -9,15 +9,15 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from './DeleteServiceModal.messages';
+import { DeleteServiceModalProps } from './DeleteServiceModal.types';
 
-interface DeleteServiceModalProps {
-  serviceId: string;
-  serviceName: string;
-  isOpen: boolean;
-  onCancel: () => void;
-}
-
-const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({ serviceId, serviceName, isOpen, onCancel }) => {
+const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({
+  serviceId,
+  serviceName,
+  isOpen,
+  onCancel,
+  onSuccess,
+}) => {
   const [forceModeActive, setForceActive] = useState(false);
   const dispatch = useAppDispatch();
 
@@ -33,7 +33,7 @@ const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({ serviceId, serv
       appEvents.emit(AppEvents.alertSuccess, [Messages.success(serviceName)]);
 
       setForceActive(false);
-      onCancel();
+      onSuccess();
     } catch (e) {
       if (isApiCancelError(e)) {
         return;

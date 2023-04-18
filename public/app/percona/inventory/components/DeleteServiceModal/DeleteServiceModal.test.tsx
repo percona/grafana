@@ -8,6 +8,8 @@ import { configureStore } from 'app/store/configureStore';
 import DeleteServiceModal from './DeleteServiceModal';
 
 const cancelFn = jest.fn();
+const successFn = jest.fn();
+const removeServiceActionSpy = jest.spyOn(ServicesReducer, 'removeServiceAction');
 
 jest.mock('app/percona/inventory/Inventory.service');
 jest.mock('app/percona/shared/services/services/Services.service');
@@ -15,13 +17,21 @@ jest.mock('app/percona/shared/services/services/Services.service');
 const renderDefaults = (isOpen = true) =>
   render(
     <Provider store={configureStore()}>
-      <DeleteServiceModal onCancel={cancelFn} isOpen={isOpen} serviceId="service_id" serviceName="service_name" />
+      <DeleteServiceModal
+        onCancel={cancelFn}
+        onSuccess={successFn}
+        isOpen={isOpen}
+        serviceId="service_id"
+        serviceName="service_name"
+      />
     </Provider>
   );
 
 describe('DeleteServiceModal::', () => {
   beforeEach(() => {
+    removeServiceActionSpy.mockClear();
     cancelFn.mockClear();
+    successFn.mockClear();
   });
 
   it("doesn't render if not opened", () => {
@@ -44,8 +54,6 @@ describe('DeleteServiceModal::', () => {
   });
 
   it('calls delete', () => {
-    const removeServiceActionSpy = jest.spyOn(ServicesReducer, 'removeServiceAction');
-
     renderDefaults();
 
     const confirmButton = screen.getByTestId('delete-service-confirm');
@@ -57,9 +65,16 @@ describe('DeleteServiceModal::', () => {
     });
   });
 
-  it('calls delete with force mode', async () => {
-    const removeServiceActionSpy = jest.spyOn(ServicesReducer, 'removeServiceAction');
+  it('call on success after deletion', async () => {
+    renderDefaults();
 
+    const confirmButton = screen.getByTestId('delete-service-confirm');
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => expect(successFn).toHaveBeenCalled());
+  });
+
+  it('calls delete with force mode', async () => {
     renderDefaults();
 
     const forceModeCheck = screen.getByTestId('delete-service-force-mode');
