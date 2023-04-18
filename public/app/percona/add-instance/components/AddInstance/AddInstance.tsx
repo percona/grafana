@@ -56,6 +56,7 @@ export const AddInstance: FC<AddInstanceProps> = ({ selectedInstanceType, onSele
         type,
       })
     );
+    /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
     onSelectInstanceType({ type: type as InstanceAvailableType });
   };
 

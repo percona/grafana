@@ -13,8 +13,8 @@ import {
 } from './Services.types';
 
 export const ServicesService = {
-  getActive(token?: CancelToken) {
-    return api.post<ListTypesPayload, {}>('/v1/inventory/Services/ListTypes', {}, false, token);
+  getActive(token?: CancelToken, disableNotifications?: boolean) {
+    return api.post<ListTypesPayload, {}>('/v1/inventory/Services/ListTypes', {}, disableNotifications, token);
   },
   getServices(body: Partial<ListServicesBody> = {}, token?: CancelToken) {
     return api.post<ServiceListPayload, Partial<ListServicesBody>>('/v1/management/Service/List', body, false, token);
