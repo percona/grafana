@@ -9,7 +9,6 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from './DeleteServiceModal.messages';
-import { styles } from './DeleteServiceModal.styles';
 
 interface DeleteServiceModalProps {
   serviceId: string;
@@ -49,7 +48,7 @@ const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({ serviceId, serv
   };
 
   return (
-    <Modal isOpen={isOpen} title={Messages.title} onDismiss={handleDismiss} className={styles.Modal}>
+    <Modal isOpen={isOpen} title={Messages.title} onDismiss={handleDismiss}>
       <Alert title={Messages.warning} severity="warning" />
       <p data-testid="delete-service-description">{Messages.description(serviceName)}</p>
       <div>

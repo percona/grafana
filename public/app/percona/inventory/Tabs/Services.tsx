@@ -198,10 +198,10 @@ export const Services = () => {
   }, []);
 
   const onDeleteSuccess = useCallback(() => {
-    setModalVisible(false);
     setSelectedRows([]);
+    onModalClose();
     loadData();
-  }, [loadData]);
+  }, [onModalClose, loadData]);
 
   return (
     <OldPage navModel={navModel}>
@@ -223,18 +223,19 @@ export const Services = () => {
               {Messages.services.add}
             </Button>
           </HorizontalGroup>
-          <DeleteServicesModal
-            services={selected}
-            isOpen={modalVisible}
-            onSuccess={onDeleteSuccess}
-            onDismiss={onModalClose}
-          />
-          {!!actionItem && (
+          {actionItem ? (
             <DeleteServiceModal
               serviceId={actionItem.params.serviceId}
               serviceName={actionItem.params.serviceName}
               isOpen={modalVisible}
               onCancel={onModalClose}
+            />
+          ) : (
+            <DeleteServicesModal
+              services={selected}
+              isOpen={modalVisible}
+              onSuccess={onDeleteSuccess}
+              onDismiss={onModalClose}
             />
           )}
           <Table
