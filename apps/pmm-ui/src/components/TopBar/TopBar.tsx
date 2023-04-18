@@ -16,11 +16,13 @@ export interface TopBarProps {
   showFeedbackButton?: boolean;
   showHelpCenterButton?: boolean;
   pmmServerId?: any;
+  visibleFeedback: boolean;
 
   onSignInClick: () => void;
   onHelpCenterClick: () => void;
   showHelpCenterToolTip?: boolean;
   onCloseHelpCenterTooltip: () => void;
+  setVisibleFeedback: (visible: boolean) => void;
 }
 
 export const TopBar: FC<TopBarProps> = ({
@@ -32,9 +34,9 @@ export const TopBar: FC<TopBarProps> = ({
   onHelpCenterClick,
   showHelpCenterToolTip,
   onCloseHelpCenterTooltip,
+  visibleFeedback,
+  setVisibleFeedback,
 }) => {
-  const [visibleFeedback, setVisibleFeedback] = useState(false);
-
   const { systemTips, userTips } = useSelector((state: StoreState) => state.tips);
   const showHelpCenterNotificationMarker = !systemTips.completed || !userTips.completed;
 
@@ -120,7 +122,7 @@ export const TopBar: FC<TopBarProps> = ({
   );
 };
 
-export const getStyles = (theme: GrafanaTheme2) => ({
+const getStyles = (theme: GrafanaTheme2) => ({
   componentStyle: css`
     width: 100%;
   `,
@@ -176,7 +178,6 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     background: #ff5286;
     border: 2px solid ${theme.colors.background.canvas};
     border-radius: 16px;
-    z-index: 2;
   `,
   tooltip: css`
     font-size: ${theme.typography.bodySmall.fontSize};

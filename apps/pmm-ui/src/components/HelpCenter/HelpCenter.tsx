@@ -23,7 +23,7 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
   const [activeTab, setActiveTab] = useState<TabName>('tips');
 
   const { open, onClose, width, isConnectedUser, userId, openKeyboardShortcut } = props;
-  const styles = useStyles2(getStyles(open));
+  const styles = useStyles2(getStyles);
 
   const changeTab = (tab: TabName) => {
     return (e?: React__default.MouseEvent<HTMLAnchorElement>) => {
@@ -65,7 +65,7 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
   );
 };
 
-const getStyles = (open: boolean) => (theme: GrafanaTheme2) => ({
+const getStyles = (theme: GrafanaTheme2) => ({
   drawer: css`
     left: auto;
     right: 0;
@@ -78,7 +78,6 @@ const getStyles = (open: boolean) => (theme: GrafanaTheme2) => ({
     border-left: none;
     background-color: ${theme.colors.background.canvas};
     z-index: 1000;
-    visibility: ${open ? 'visible' : 'hidden' };
 
     @media (max-width: 1279px) {
       height: 100%;

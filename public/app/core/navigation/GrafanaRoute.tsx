@@ -57,6 +57,8 @@ export function GrafanaRoute(props: Props) {
   //TODO:WIP:
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
   const [helpCenterToolTipVisible, setHelpCenterToolTipVisible] = useState(false);
+  const [visibleFeedback, setVisibleFeedback] = useState(false);
+
   const { result } = useSelector(getPerconaSettings);
   const { serverId = '' } = useSelector(getPerconaServer);
   const { isOpened: isHelpCenterOpened } = useSelector(getHelpCenterState);
@@ -98,12 +100,23 @@ export function GrafanaRoute(props: Props) {
                   showFeedbackButton
                   showHelpCenterButton
                   pmmServerId={serverId}
+                  visibleFeedback={visibleFeedback}
+                  setVisibleFeedback={(visibleFeedback: boolean) => {
+                    setVisibleFeedback(visibleFeedback);
+                    // close help center when open feedback popup
+                    if (visibleFeedback) {
+                      dispatch(setHelpCenterOpened(false));
+                    }
+                  }}
                   onSignInClick={() => {
                     setConnectPortalModalVisible(true);
                   }}
                   onHelpCenterClick={() => {
-                    console.log('open help center');
                     dispatch(setHelpCenterOpened(!isHelpCenterOpened));
+                    // close feedback popup when open help center
+                    if (!isHelpCenterOpened) {
+                      setVisibleFeedback(false);
+                    }
                   }}
                   showHelpCenterToolTip={helpCenterToolTipVisible}
                   onCloseHelpCenterTooltip={() => setHelpCenterToolTipVisible(false)}

@@ -14,6 +14,8 @@ export default {
 const Template: ComponentStory<typeof TopBar> = (args) => {
   const [message, setMessage] = useState('');
   const [userContext, setUserContext] = useState('');
+  const [visibleFeedback, setVisibleFeedback] = useState(false);
+
   return (
     <>
       <TopBar
@@ -25,6 +27,8 @@ const Template: ComponentStory<typeof TopBar> = (args) => {
         }}
         onHelpCenterClick={() => setMessage('help center')}
         onCloseHelpCenterTooltip={() => setMessage('close tooltip')}
+        visibleFeedback={visibleFeedback}
+        setVisibleFeedback={setVisibleFeedback}
       />
       <p>{message}</p>
     </>
