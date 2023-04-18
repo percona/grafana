@@ -1,5 +1,5 @@
 import { logger } from '@percona/platform-core';
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
 import { Alert, Button, Checkbox, Modal } from '@grafana/ui';
@@ -11,13 +11,7 @@ import { useAppDispatch } from 'app/store/store';
 import { Messages } from './DeleteServiceModal.messages';
 import { DeleteServiceModalProps } from './DeleteServiceModal.types';
 
-const DeleteServiceModal: React.FC<DeleteServiceModalProps> = ({
-  serviceId,
-  serviceName,
-  isOpen,
-  onCancel,
-  onSuccess,
-}) => {
+const DeleteServiceModal: FC<DeleteServiceModalProps> = ({ serviceId, serviceName, isOpen, onCancel, onSuccess }) => {
   const [forceModeActive, setForceActive] = useState(false);
   const dispatch = useAppDispatch();
 
