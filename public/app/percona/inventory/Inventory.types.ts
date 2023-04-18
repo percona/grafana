@@ -51,6 +51,11 @@ export enum ServiceAgentStatus {
   UNKNOWN = 'UNKNOWN',
 }
 
+export enum MonitoringStatus {
+  OK = 'OK',
+  FAILED = 'Failed',
+}
+
 export interface ServiceAgentPayload {
   agent_id: string;
   agent_type: AgentType;
@@ -85,6 +90,7 @@ export type FlattenAgent = ServiceAgent & {
 export type FlattenService = DbService &
   Partial<DbServiceWithAddress> & {
     type: Databases | 'external';
+    agentsStatus: string;
   };
 
 export type FlattenNode = DbNode & {

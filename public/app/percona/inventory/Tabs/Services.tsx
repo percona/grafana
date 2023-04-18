@@ -34,11 +34,15 @@ import { useSelector } from 'app/types';
 import { appEvents } from '../../../core/app_events';
 import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
-import { FlattenService } from '../Inventory.types';
+import { FlattenService, MonitoringStatus } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
-import { getBadgeColorForServiceStatus, getBadgeIconForServiceStatus } from './Services.utils';
+import {
+  getAgentsMonitoringStatus,
+  getBadgeColorForServiceStatus,
+  getBadgeIconForServiceStatus,
+} from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Services = () => {
@@ -51,7 +55,14 @@ export const Services = () => {
   const { isLoading, services: fetchedServices } = useSelector(getServices);
   const styles = useStyles2(getStyles);
   const flattenServices = useMemo(
-    () => fetchedServices.map((value) => ({ type: value.type, ...value.params })),
+    () =>
+      fetchedServices.map((value) => {
+        return {
+          type: value.type,
+          ...value.params,
+          agentsStatus: getAgentsMonitoringStatus(value.params.agents ?? []),
+        };
+      }),
     [fetchedServices]
   );
 
@@ -97,7 +108,25 @@ export const Services = () => {
             icon={getBadgeIconForServiceStatus(value)}
           />
         ),
-        type: FilterFieldTypes.TEXT,
+        type: FilterFieldTypes.DROPDOWN,
+        options: [
+          {
+            label: 'Up',
+            value: ServiceStatus.UP,
+          },
+          {
+            label: 'Down',
+            value: ServiceStatus.DOWN,
+          },
+          {
+            label: 'Unknown',
+            value: ServiceStatus.UNKNOWN,
+          },
+          {
+            label: 'N/A',
+            value: ServiceStatus.NA,
+          },
+        ],
       },
       {
         Header: Messages.services.columns.serviceName,
@@ -114,11 +143,22 @@ export const Services = () => {
       },
       {
         Header: Messages.services.columns.monitoring,
-        accessor: 'agents',
+        accessor: 'agentsStatus',
         width: '70px',
         Cell: ({ value, row }) => (
-          <StatusLink strippedServiceId={stripServiceId(row.original.serviceId)} agents={value || []} />
+          <StatusLink strippedServiceId={stripServiceId(row.original.serviceId)} agentsStatus={value} />
         ),
+        type: FilterFieldTypes.RADIO_BUTTON,
+        options: [
+          {
+            label: MonitoringStatus.OK,
+            value: MonitoringStatus.OK,
+          },
+          {
+            label: MonitoringStatus.FAILED,
+            value: MonitoringStatus.FAILED,
+          },
+        ],
       },
       {
         Header: Messages.services.columns.address,

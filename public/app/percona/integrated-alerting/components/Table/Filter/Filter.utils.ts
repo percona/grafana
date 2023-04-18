@@ -114,7 +114,7 @@ export const isValueInTextColumn = (
 };
 
 export const isTextIncluded = (needle: string, haystack: string): boolean =>
-  haystack.toLowerCase().includes(needle.toLowerCase());
+  haystack.toString().toLowerCase().includes(needle.toLowerCase());
 
 export const isInOptions = (
   columns: Array<ExtendedColumn<any>>,
