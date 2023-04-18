@@ -38,6 +38,7 @@ describe('EditDBClusterPage::', () => {
                   operators: {
                     psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
                     pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
                   },
                 },
               ],
@@ -87,6 +88,7 @@ describe('EditDBClusterPage::', () => {
                   operators: {
                     psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
                     pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
                   },
                 },
               ],
@@ -130,6 +132,7 @@ describe('EditDBClusterPage::', () => {
                     operators: {
                       psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
                       pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                      pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
                     },
                   },
                 ],
