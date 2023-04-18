@@ -60,6 +60,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     @media (max-width: 768px) {
       flex-wrap: wrap;
       width: 100%;
+      padding: 16px;
     }
   `,
   helpCenterTextContainer: css`
@@ -89,5 +90,8 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
   helpCenterTipsContainer: css`
     width: 58%;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   `,
 });
