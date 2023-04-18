@@ -131,6 +131,9 @@ export function GrafanaRoute(props: Props) {
                   openKeyboardShortcut={() => {
                     appEvents.publish(new ShowModalReactEvent({ component: HelpModal }));
                   }}
+                  onConnectToPlatformClick={() => {
+                    setConnectPortalModalVisible(true);
+                  }}
                 />
                 {/*TODO:WIP: refactor*/}
                 <div className={`${styles.mainContainer} ${isHelpCenterOpened ? styles.openedHelpCenter : ''}`}>

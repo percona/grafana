@@ -7,9 +7,11 @@ import tipIcon from '../../assets/pmm-percona-icon-purple.svg';
 
 interface TipNotConnectedProps {
   showTitle?: boolean;
+
+  onConnectToPlatformClick: () => void;
 }
 
-export const TipNotConnected: FC<TipNotConnectedProps> = ({ showTitle }) => {
+export const TipNotConnected: FC<TipNotConnectedProps> = ({ showTitle, onConnectToPlatformClick }) => {
   const styles = useStyles2(getStyles);
 
   return (
@@ -34,7 +36,7 @@ export const TipNotConnected: FC<TipNotConnectedProps> = ({ showTitle }) => {
               className={styles.tipsButton}
               fullWidth
               variant="secondary"
-              onClick={() => window.open(Messages.howConnectToPortalHelpLink, '_blank', 'noopener,noreferrer')}
+              onClick={onConnectToPlatformClick}
             >
               <img className={styles.buttonImage} alt="pmm-logo" src={tipIcon} />
               <div className={styles.perconaButtonLabel}>{Messages.button.connectToPlatform}</div>

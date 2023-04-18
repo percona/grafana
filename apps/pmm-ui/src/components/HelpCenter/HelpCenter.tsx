@@ -15,6 +15,7 @@ interface HelpCenterProps {
   userId: number;
 
   openKeyboardShortcut: () => void;
+  onConnectToPlatformClick: () => void;
 }
 
 type TabName = 'tips' | 'resources' | 'wnatsnew';
@@ -22,7 +23,15 @@ type TabName = 'tips' | 'resources' | 'wnatsnew';
 export const HelpCenter: FC<HelpCenterProps> = (props) => {
   const [activeTab, setActiveTab] = useState<TabName>('tips');
 
-  const { open, onClose, width, isConnectedUser, userId, openKeyboardShortcut } = props;
+  const {
+    open,
+    onClose,
+    width,
+    isConnectedUser,
+    userId,
+    openKeyboardShortcut,
+    onConnectToPlatformClick,
+  } = props;
   const styles = useStyles2(getStyles);
 
   const changeTab = (tab: TabName) => {
@@ -55,6 +64,7 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
           {activeTab === 'tips' && <HelpCenterTipsContainer
               userId={userId}
               isConnectedUser={isConnectedUser}
+              onConnectToPlatformClick={onConnectToPlatformClick}
           />}
 
           {activeTab === 'resources' && <ResourcesContainer openKeyboardShortcut={openKeyboardShortcut}/>}

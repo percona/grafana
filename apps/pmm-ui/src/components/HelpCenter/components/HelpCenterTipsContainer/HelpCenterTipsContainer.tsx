@@ -12,10 +12,16 @@ import { EmptyTip } from "../TipsContainer/EmptyTip";
 export interface HelpCenterTipsContainerProps {
   userId: number;
   isConnectedUser?: boolean;
+
+  onConnectToPlatformClick: () => void;
 }
 
 export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props) => {
-  const { isConnectedUser, userId } = props;
+  const {
+    isConnectedUser,
+    userId,
+    onConnectToPlatformClick,
+  } = props;
   const { systemTips, userTips } = useSelector((state: StoreState) => state.tips);
   const dispatch = useDispatch();
 
@@ -40,7 +46,10 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
           currentlySelectedTipId={systemTips.currentlySelected}
         />
       )}
-      {!isConnectedUser && <TipNotConnected showTitle={showTipForNonCompletedTip} />}
+      {!isConnectedUser && <TipNotConnected
+          showTitle={showTipForNonCompletedTip}
+          onConnectToPlatformClick={onConnectToPlatformClick}
+      />}
       {isConnectedUser && !userTips.completed && (
         <ExploreYourNewPowerUpsTipsContainer
           userId={userId}
