@@ -11,14 +11,24 @@ export const initialValuesStubs = {
   psmdbmongod: versionsStubs,
   pxcpxc: versionsStubs,
   pxchaproxy: versionsStubs,
+  pgpostgresql: versionsStubs,
+  pgpgbouncer: versionsStubs,
   psmdbmongoddefault: versionsStubs[1],
   pxchaproxydefault: versionsStubs[1],
   pxcpxcdefault: versionsStubs[1],
+  pgpgbouncerdefault: versionsStubs[1],
+  pgpostgresqldefault: versionsStubs[1],
 };
 
 // use to omit default labels form testing
 // due to parsing the label to a component to show the recommended option
-export const omitDefaultLabels = ['psmdbmongoddefault.label', 'pxchaproxydefault.label', 'pxcpxcdefault.label'];
+export const omitDefaultLabels = [
+  'psmdbmongoddefault.label',
+  'pxchaproxydefault.label',
+  'pxcpxcdefault.label',
+  'pgpgbouncerdefault.label',
+  'pgpostgresqldefault.label',
+];
 
 export const possibleComponentOptionsStubs = {
   psmdb: [{ name: 'mongod', value: 'mongod', label: 'Percona Operator for MongoDB' }],
@@ -26,11 +36,16 @@ export const possibleComponentOptionsStubs = {
     { name: 'pxc', value: 'pxc', label: 'Percona Operator for MySQL' },
     { name: 'haproxy', value: 'haproxy', label: 'HAProxy' },
   ],
+  pg: [
+    { name: 'postgresql', value: 'postgresql', label: 'Percona Operator for PostgreSQL' },
+    { name: 'pgbouncer', value: 'pgbouncer', label: 'PostgreSQL Bouncer' },
+  ],
 };
 
 export const operatorsOptionsStubs = [
   { name: 'psmdb', value: 'psmdb', label: 'Percona Operator for MongoDB 1' },
   { name: 'pxc', value: 'pxc', label: 'Percona Operator for MySQL 1' },
+  { name: 'pg', value: 'pg', label: 'Percona Operator for PostgreSQL 1' },
 ];
 
 export const psmdbComponentOptionsStubs = [{ name: 'mongod', value: 'mongod', label: 'Percona Operator for MongoDB' }];

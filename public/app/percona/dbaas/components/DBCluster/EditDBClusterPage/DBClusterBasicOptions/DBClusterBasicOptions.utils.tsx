@@ -8,7 +8,7 @@ import { DatabaseVersion } from '../../DBCluster.types';
 import { OptionContent } from '../../OptionContent/OptionContent';
 import { Messages } from '../EditDBClusterPage.messages';
 
-import { DatabaseOperators, OPERATORS } from './DBClusterBasicOptions.constants';
+import { DatabaseOperatorsLabels, OPERATORS } from './DBClusterBasicOptions.constants';
 import { KubernetesOption as KubernetesOptionInterface, KubernetesOptionProps } from './DBClusterBasicOptions.types';
 
 export const kubernetesClusterNameValidator = (value: string) => {
@@ -25,8 +25,8 @@ const KubernetesOption: FC<KubernetesOptionProps> = ({
   <OptionContent
     title={kubernetesClusterName}
     description={disabledOperators.length ? Messages.validationMessages.notInstalledOperator : ''}
-    tags={availableOperators.map((databaseType) => DatabaseOperators[databaseType])}
-    disabledTags={disabledOperators.map((databaseType) => DatabaseOperators[databaseType])}
+    tags={availableOperators.map((databaseType) => DatabaseOperatorsLabels[databaseType])}
+    disabledTags={disabledOperators.map((databaseType) => DatabaseOperatorsLabels[databaseType])}
     dataTestId="kubernetes-option"
   />
 );
@@ -36,9 +36,9 @@ export const getKubernetesOptions = (kubernetes: Kubernetes[]): KubernetesOption
     .map((kubernetesCluster) => {
       const { kubernetesClusterName, operators } = kubernetesCluster;
 
-      const availableOperators = OPERATORS.filter(
-        (databaseType) => operators[databaseType].status === KubernetesOperatorStatus.ok
-      );
+      const availableOperators = OPERATORS.filter((databaseType) => {
+        return operators[databaseType].status === KubernetesOperatorStatus.ok;
+      });
       const disabledOperators = OPERATORS.filter(
         (databaseType) => operators[databaseType].status !== KubernetesOperatorStatus.ok
       );

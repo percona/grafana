@@ -8,4 +8,6 @@ export const DASHBOARD_URL_MAP: DashboardURLMap = {
     `/graph/d/pxc-cluster-summary/pxc-galera-cluster-summary?var-cluster=${clusterName}-pxc`,
   [Databases.mongodb]: (clusterName: string) =>
     `/graph/d/mongodb-cluster-summary/mongodb-cluster-summary?var-cluster=${clusterName}`,
+  //TODO (no dashboard for pg)
+  [Databases.postgresql]: (clusterName: string) => `${clusterName}`,
 };

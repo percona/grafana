@@ -21,6 +21,7 @@ export interface OperatorToUpdate extends Operator {
 export interface OperatorsList {
   psmdb: Operator;
   pxc: Operator;
+  pg: Operator;
 }
 
 export interface KubernetesAPI {
@@ -63,6 +64,7 @@ export interface ComponentToUpdateAPI {
 export interface OperatorToUpdateAPI {
   [ComponentToUpdate.psmdb]: ComponentVersionAPI;
   [ComponentToUpdate.pxc]: ComponentVersionAPI;
+  [ComponentToUpdate.pg]: ComponentVersionAPI;
 }
 
 export interface ComponentVersionAPI {
@@ -72,6 +74,7 @@ export interface ComponentVersionAPI {
 export enum ComponentToUpdate {
   psmdb = 'psmdb-operator',
   pxc = 'pxc-operator',
+  pg = 'pg-operator',
 }
 
 export type DatabaseComponentToUpdateMap = { [key in Databases]?: ComponentToUpdate };

@@ -145,6 +145,12 @@ export const mongoDBClusterConnectionStub: DBClusterConnection = {
   username: 'root',
 };
 
+export const pgDBClusterConnectionStub: DBClusterConnection = {
+  host: 'dbcluster-pg',
+  password: '1234',
+  port: 3000,
+  username: 'root',
+};
 export const getDBClustersActionStub = jest.fn();
 
 export const dbClusterLogsAPI = {
@@ -245,6 +251,19 @@ export const psmdbComponentsVersionsStubs = {
       operator: '1',
       matrix: {
         mongod: versionsStub,
+      },
+    },
+  ],
+};
+
+export const pgComponentsVersionsStubs = {
+  versions: [
+    {
+      product: Operators.pg,
+      operator: '1',
+      matrix: {
+        postgresql: versionsStub,
+        pgbouncer: versionsStub,
       },
     },
   ],

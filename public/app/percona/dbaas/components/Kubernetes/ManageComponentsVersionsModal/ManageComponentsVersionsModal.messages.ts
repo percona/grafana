@@ -16,11 +16,14 @@ export const Messages = {
   operatorLabel: {
     [Operators.pxc]: (version: string) => `Percona Operator for MySQL ${version}`,
     [Operators.psmdb]: (version: string) => `Percona Operator for MongoDB ${version}`,
+    [Operators.pg]: (version: string) => `Percona Operator for PostgreSQL ${version}`,
   },
   componentLabel: {
     pxc: 'Percona Operator for MySQL',
     haproxy: 'HAProxy',
     backup: 'Backup',
     mongod: 'Percona Operator for MongoDB',
+    postgresql: 'Percona Operator for PostgreSQL',
+    pgbouncer: 'PostgreSQL Bouncer',
   },
 };

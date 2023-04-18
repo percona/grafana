@@ -50,6 +50,7 @@ export const INSTANCE_TYPES_LABELS = {
   [Databases.mariadb]: 'MariaDB',
   [Databases.mongodb]: 'MongoDB',
   [Databases.postgresql]: 'PostgreSQL',
+  [Databases.pgbouncer]: 'PGBouncer',
   [Databases.proxysql]: 'ProxySQL',
   [Databases.haproxy]: 'HAProxy',
   [InstanceTypesExtra.azure]: '',

@@ -1,9 +1,12 @@
+import { INSTANCE_TYPES_LABELS } from '../../../../../add-instance/panel.types';
+import { Databases } from '../../../../../shared/core';
+
 export const Messages = {
   fieldSets: {
     advancedSettings: 'Advanced Settings',
-    pxcConfiguration: 'MySQL Configurations',
-    mongodbConfiguration: 'MongoDB Configurations',
     commonConfiguration: 'Database Configurations',
+    configuration: (databaseType: Databases) => `${INSTANCE_TYPES_LABELS[databaseType]} Configurations`,
+    networkAndSecurity: 'Network and Security',
   },
   labels: {
     nodes: 'Number of Nodes',
@@ -12,9 +15,11 @@ export const Messages = {
     memory: 'Memory (GB)',
     disk: 'Disk (GB)',
     storageClass: 'Storage Class',
-    pxcConfiguration: 'MySQL Configuration',
-    mongodbConfiguration: 'MongoDB Configuration',
     commonConfiguration: 'Database Configuration',
+    configuration: (databaseType: Databases) => `${INSTANCE_TYPES_LABELS[databaseType]} Configuration`,
+    expose: 'Expose',
+    internetFacing: 'Internet Facing',
+    sourceRange: 'Source Range',
   },
   resources: {
     small: 'Small',

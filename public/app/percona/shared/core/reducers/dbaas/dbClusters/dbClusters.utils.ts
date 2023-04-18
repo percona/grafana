@@ -16,9 +16,11 @@ export const formatDBClusters = (results: DBClusterListResponse[], kubernetes: K
   return results.reduce((acc: DBCluster[], r, index) => {
     const pxcClusters: DBClusterResponse[] = r.pxc_clusters ?? [];
     const psmdbClusters: DBClusterResponse[] = r.psmdb_clusters ?? [];
+    const pgClusters: DBClusterResponse[] = r.postgresql_clusters ?? [];
     const pxcClustersModel = clustersToModel(Databases.mysql, pxcClusters, kubernetes, index);
     const psmdbClustersModel = clustersToModel(Databases.mongodb, psmdbClusters, kubernetes, index);
+    const pgClusterModel = clustersToModel(Databases.postgresql, pgClusters, kubernetes, index);
 
-    return acc.concat([...pxcClustersModel, ...psmdbClustersModel]);
+    return acc.concat([...pxcClustersModel, ...psmdbClustersModel, ...pgClusterModel]);
   }, []);
 };

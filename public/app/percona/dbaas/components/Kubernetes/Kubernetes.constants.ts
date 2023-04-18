@@ -7,11 +7,13 @@ import { ComponentToUpdate, DatabaseComponentToUpdateMap } from './Kubernetes.ty
 export const OPERATOR_COMPONENT_TO_UPDATE_MAP = {
   [Operators.pxc]: ComponentToUpdate.pxc,
   [Operators.psmdb]: ComponentToUpdate.psmdb,
+  [Operators.pg]: ComponentToUpdate.pg,
 };
 
 export const DATABASE_COMPONENT_TO_UPDATE_MAP: DatabaseComponentToUpdateMap = {
   [Databases.mysql]: ComponentToUpdate.pxc,
   [Databases.mongodb]: ComponentToUpdate.psmdb,
+  [Databases.postgresql]: ComponentToUpdate.pg,
 };
 
 export const GET_KUBERNETES_CANCEL_TOKEN = 'getKubernetes';
