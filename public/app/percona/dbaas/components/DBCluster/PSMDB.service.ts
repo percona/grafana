@@ -169,6 +169,7 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
       },
       storage_class: dbCluster.storageClass,
       disk_size: dbCluster.disk * BILLION,
+      configuration: dbCluster.configuration,
     },
     image: dbCluster.databaseImage,
     ...(dbCluster.backup && {
