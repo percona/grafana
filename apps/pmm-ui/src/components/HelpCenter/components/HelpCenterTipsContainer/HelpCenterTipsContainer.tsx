@@ -8,6 +8,7 @@ import { StoreState } from 'reducers/store';
 import { fetchSystemAndUserTipsAction } from 'reducers/tips/tips';
 import { useLocalStorage } from 'hooks/localStorage';
 import { EmptyTip } from "../TipsContainer/EmptyTip";
+import { getTips } from "../../../../reducers/selectors";
 
 export interface HelpCenterTipsContainerProps {
   userId: number;
@@ -22,15 +23,10 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
     userId,
     onConnectToPlatformClick,
   } = props;
-  const { systemTips, userTips } = useSelector((state: StoreState) => state.tips);
-  const dispatch = useDispatch();
+  const { systemTips, userTips } = useSelector(getTips);
 
   const feedbackLocalStorageKey = `grafana.onboarding.feedback.visible.${userId}`;
   const [feedbackVisible, setFeedbackVisible] = useLocalStorage(feedbackLocalStorageKey, true);
-
-  useEffect(() => {
-    dispatch(fetchSystemAndUserTipsAction({ userId: userId }));
-  }, []);
 
   const showEmptyStageTip = !feedbackVisible && systemTips.completed && isConnectedUser && userTips.completed;
   const showTipForNonCompletedTip = !systemTips.completed;

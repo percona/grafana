@@ -1,10 +1,12 @@
 import React from 'react';
-import React__default, { FC, useState } from 'react';
+import React__default, { FC, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { IconButton, Tab, TabsBar, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { ResourcesContainer } from './components/ResourcesContainer';
 import { HelpCenterTipsContainer } from "./components/HelpCenterTipsContainer/HelpCenterTipsContainer";
+import { fetchSystemAndUserTipsAction } from 'reducers/tips/tips';
 
 interface HelpCenterProps {
   open: boolean;
@@ -40,6 +42,12 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
       setActiveTab(tab);
     };
   };
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchSystemAndUserTipsAction({ userId: props.userId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={styles.drawer} style={{

@@ -1,7 +1,6 @@
-import React, { FC, ReactNode, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { FC, ReactNode } from 'react';
+import { useSelector } from 'react-redux';
 import { StoreState } from '../../reducers/store';
-import { fetchSystemAndUserTipsAction } from '../../reducers/tips/tips';
 import { LoadingPlaceholder, useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
 
@@ -14,11 +13,7 @@ export const HomePageRouter: FC<HomePageRouterProps> = (props) => {
   const styles = useStyles2(getStyles);
   const { loading, tips } = useSelector((state: StoreState) => state.tips.systemTips);
   const allTipsCovered = loading === false && tips.every((t) => t.completed);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchSystemAndUserTipsAction({ userId: props.userId }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
   return loading ? (
     <div className={styles.loadingPage}>
       <LoadingPlaceholder text={'Loading...'} />
