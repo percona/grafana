@@ -4,13 +4,13 @@ export const Messages = {
   advisors2: ' for a more thorough check of your system health status.',
 
   adminDescription:
-    'By clicking "Continue to Platform" you’ll be taken to Percona Platform where you can sign in and authorize Percona to read the general details for this PMM instance.',
+    'By clicking the button below, you will be directed to the instruction documentation where you can find the advantages and steps for PMM-Platform Connection.\n',
   nonAdminWarningTitle: 'Contact your PMM administrator',
   nonAdminDescription:
     'To leverage the benefits mentioned above, you should contact your PMM administrator to connect your PMM instance with Percona Platform.',
 
   button: {
-    continue: 'Continue to Percona Platform',
+    continue: 'Learn How to Connect to Percona Platform',
     close: 'Close',
   },
   link: {
