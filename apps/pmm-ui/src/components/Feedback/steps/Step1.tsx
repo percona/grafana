@@ -19,13 +19,13 @@ export const Step1: FC<Step1Props> = ({ onSubmit }) => {
     <div className={styles.main}>
       <div className={styles.contentTitle}>{Messages.step1Title}</div>
       <div className={styles.rating}>
-        <Button variant="secondary" icon="info" onClick={() => onSubmit('bad')} className={fixedIconStyle(sadImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit(FeedbackNote.BAD)} className={fixedIconStyle(sadImage)}>
           {Messages.button.badFeedback}
         </Button>
-        <Button variant="secondary" icon="info" onClick={() => onSubmit('fair')} className={fixedIconStyle(mehImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit(FeedbackNote.FAIR)} className={fixedIconStyle(mehImage)}>
           {Messages.button.fairFeedback}
         </Button>
-        <Button variant="secondary" icon="info" onClick={() => onSubmit('good')} className={fixedIconStyle(smileImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit(FeedbackNote.GOOD)} className={fixedIconStyle(smileImage)}>
           {Messages.button.goodFeedback}
         </Button>
       </div>

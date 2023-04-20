@@ -4,7 +4,11 @@ import { Step2 } from './steps/Step2';
 import { Step3 } from './steps/Step3';
 import { PortalAPI } from 'api';
 
-export type FeedbackNote = 'bad' | 'fair' | 'good';
+export enum FeedbackNote {
+  BAD,
+  FAIR,
+  GOOD,
+}
 
 enum Step {
   STEP1,
@@ -34,7 +38,6 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
 
         setFeedbackDescription('');
         setFeedbackNote('');
-        setCurrentStep(Step.STEP1);
       });
   };
 
@@ -43,8 +46,9 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
       {currentStep === Step.STEP1 && (
         <Step1
           onSubmit={(val) => {
-            setFeedbackNote(val);
-            if (val === 'good') {
+            setFeedbackNote(FeedbackNote[val]);
+            if (val === FeedbackNote.GOOD) {
+              saveFeedback();
               setCurrentStep(Step.STEP3);
             } else {
               setCurrentStep(Step.STEP2);
@@ -56,16 +60,16 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
         <Step2
           onSubmit={(description) => {
             setFeedbackDescription(description);
+            saveFeedback();
             setCurrentStep(Step.STEP3);
           }}
           onDismiss={() => {
-            setFeedbackDescription('');
             setCurrentStep(Step.STEP3);
           }}
         />
       )}
       {currentStep === Step.STEP3 && (
-        <Step3 onFinish={() => saveFeedback()} displayTimeMs={DISPLAY_TIME_FEEDBACK_SENT} />
+        <Step3 onFinish={() => setCurrentStep(Step.STEP1)} displayTimeMs={DISPLAY_TIME_FEEDBACK_SENT} />
       )}
     </>
   );
