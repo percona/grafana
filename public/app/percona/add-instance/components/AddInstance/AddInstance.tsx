@@ -56,6 +56,7 @@ export const AddInstance: FC<AddInstanceProps> = ({ onSelectInstanceType, showAz
         type,
       })
     );
+    /* eslint-disable-next-line @typescript-eslint/consistent-type-assertions */
     onSelectInstanceType({ type: type as InstanceAvailableType });
   };
 
