@@ -11,7 +11,7 @@ describe('Overlay::', () => {
         <p>Child 2</p>
       </Overlay>
     );
-    const wrapper = screen.getByTestId('overlay-wrapper');
+    const wrapper = screen.getByTestId('pmm-overlay-wrapper');
 
     expect(wrapper.children).toHaveLength(2);
   });
@@ -23,7 +23,7 @@ describe('Overlay::', () => {
       </Overlay>
     );
 
-    expect(screen.getByTestId('overlay-wrapper').children).toHaveLength(2);
+    expect(screen.getByTestId('pmm-overlay-wrapper').children).toHaveLength(2);
     expect(screen.queryByTestId('overlay-spinner')).toBeInTheDocument();
   });
 

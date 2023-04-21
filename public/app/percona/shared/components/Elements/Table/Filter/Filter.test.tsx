@@ -107,7 +107,7 @@ describe('Filter', () => {
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
     expect(screen.getByTestId('advance-filter-button')).toBeInTheDocument();
     expect(screen.getByTestId('clear-all-button')).toBeInTheDocument();
-    expect(screen.getByTestId('filter-label')).toBeInTheDocument();
+    expect(screen.getByTestId('filter')).toBeInTheDocument();
   });
 
   it('should open correctly text fields', async () => {
