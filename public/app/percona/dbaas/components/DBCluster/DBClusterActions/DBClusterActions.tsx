@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
 import { MultipleActions } from 'app/percona/dbaas/components/MultipleActions/MultipleActions';
+import { Databases } from 'app/percona/shared/core';
 import { useDispatch } from 'app/types';
 
 import { selectDBCluster } from '../../../../shared/core/reducers/dbaas/dbaas';
@@ -56,7 +57,10 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
       },
       {
         content: Messages.dbcluster.table.actions.restartCluster,
-        disabled: isClusterChanging(dbCluster) || dbCluster.status === DBClusterStatus.suspended,
+        disabled:
+          isClusterChanging(dbCluster) ||
+          dbCluster.status === DBClusterStatus.suspended ||
+          dbCluster.databaseType === Databases.postgresql,
         action: async () => {
           try {
             const dbClusterService = newDBClusterService(dbCluster.databaseType);
@@ -73,7 +77,9 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
           dbCluster.status === DBClusterStatus.ready
             ? Messages.dbcluster.table.actions.suspend
             : Messages.dbcluster.table.actions.resume,
-        disabled: dbCluster.status !== DBClusterStatus.ready && dbCluster.status !== DBClusterStatus.suspended,
+        disabled:
+          (dbCluster.status !== DBClusterStatus.ready && dbCluster.status !== DBClusterStatus.suspended) ||
+          dbCluster.databaseType === Databases.postgresql,
         action: async () => {
           try {
             const dbClusterService = newDBClusterService(dbCluster.databaseType);

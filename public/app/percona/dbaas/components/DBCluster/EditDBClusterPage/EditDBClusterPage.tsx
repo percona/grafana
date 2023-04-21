@@ -5,6 +5,8 @@ import { Form } from 'react-final-form';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { Spinner, useStyles2 } from '@grafana/ui/src';
+import NetworkAndSecurity from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/NetworkAndSecurity/NetworkAndSecurity';
+import Restore from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/Restore/Restore';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { useSelector, useDispatch } from 'app/types';
 
@@ -33,8 +35,6 @@ import { Messages } from './EditDBClusterPage.messages';
 import { getStyles } from './EditDBClusterPage.styles';
 import { EditDBClusterPageProps } from './EditDBClusterPage.types';
 import { generateUID } from './EditDBClusterPage.utils';
-import NetworkAndSecurity from './NetworkAndSecurity/NetworkAndSecurity';
-import Restore from './Restore/Restore';
 import { useDefaultMode } from './hooks/useDefaultMode';
 import { useEditDBClusterFormSubmit } from './hooks/useEditDBClusterFormSubmit';
 import { useEditDBClusterPageDefaultValues } from './hooks/useEditDBClusterPageDefaultValues';

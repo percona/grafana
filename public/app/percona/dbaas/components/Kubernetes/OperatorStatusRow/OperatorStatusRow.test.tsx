@@ -17,6 +17,7 @@ describe('OperatorStatusRow::', () => {
       operators: {
         psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
         pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+        pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
       },
     };
     render(
@@ -47,6 +48,7 @@ describe('OperatorStatusRow::', () => {
       operators: {
         psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
         pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+        pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
       },
     };
     render(
@@ -76,6 +78,7 @@ describe('OperatorStatusRow::', () => {
       operators: {
         psmdb: { status: KubernetesOperatorStatus.invalid, version: '1', availableVersion: '1' },
         pxc: { status: KubernetesOperatorStatus.unsupported, version: '1', availableVersion: '1' },
+        pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
       },
     };
     render(
@@ -105,6 +108,7 @@ describe('OperatorStatusRow::', () => {
       operators: {
         psmdb: { status: KubernetesOperatorStatus.unavailable, version: '1', availableVersion: '1' },
         pxc: { status: KubernetesOperatorStatus.invalid, version: '1', availableVersion: '1' },
+        pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
       },
     };
     render(
@@ -134,6 +138,7 @@ describe('OperatorStatusRow::', () => {
       operators: {
         psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
         pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+        pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
       },
     };
     render(

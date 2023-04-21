@@ -17,6 +17,7 @@ import {
 
 jest.mock('../../DBCluster/XtraDB.service');
 jest.mock('../../DBCluster/PSMDB.service');
+jest.mock('../../DBCluster/PG.service');
 
 describe('ManageComponentsVersions.hooks::', () => {
   it('returns operator components options, versions and initial values with two operators', async () => {
@@ -41,7 +42,7 @@ describe('ManageComponentsVersions.hooks::', () => {
     expect(versionsFieldName).toEqual(versionsFieldNameStub);
   });
   it('returns operator components options, versions and initial values with one operator', async () => {
-    const newOps = omit(kubernetesStub[0], 'operators.pxc');
+    const newOps = omit(kubernetesStub[0], 'operators.pxc', 'operators.pg');
     const wrapper = renderHook(() => useOperatorsComponentsVersions(newOps));
     await wrapper.waitForNextUpdate();
 
@@ -55,9 +56,21 @@ describe('ManageComponentsVersions.hooks::', () => {
     ] = wrapper.result.current;
 
     expect(omit(initialValues, omitDefaultLabels)).toEqual(
-      omit(initialValuesStubs, ['pxcpxc', 'pxchaproxy', 'pxcpxcdefault', 'pxchaproxydefault'].concat(omitDefaultLabels))
+      omit(
+        initialValuesStubs,
+        [
+          'pxcpxc',
+          'pxchaproxy',
+          'pxcpxcdefault',
+          'pxchaproxydefault',
+          'pgpostgresql',
+          'pgpgbouncer',
+          'pgpgbouncerdefault',
+          'pgpostgresqldefault',
+        ].concat(omitDefaultLabels)
+      )
     );
-    expect(possibleComponentOptions).toEqual(omit(possibleComponentOptionsStubs, 'pxc'));
+    expect(possibleComponentOptions).toEqual(omit(possibleComponentOptionsStubs, 'pxc', 'pg'));
     expect(operatorsOptions).toEqual([operatorsOptionsStubs[0]]);
     expect(componentOptions).toEqual(psmdbComponentOptionsStubs);
     expect(versionsOptions).toEqual(versionsStubs);

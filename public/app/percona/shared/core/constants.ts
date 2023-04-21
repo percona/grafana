@@ -12,6 +12,7 @@ export const DATABASE_LABELS = {
   [Databases.proxysql]: 'ProxySQL',
   [Databases.mariadb]: 'MariaDB',
   [Databases.haproxy]: 'HAProxy',
+  [Databases.pgbouncer]: 'PGBouncer',
 };
 
 export const OPERATOR_LABELS = {
@@ -21,6 +22,7 @@ export const OPERATOR_LABELS = {
   [Databases.proxysql]: '',
   [Databases.mariadb]: '',
   [Databases.haproxy]: '',
+  [Databases.pgbouncer]: '',
 };
 
 export const OPERATOR_FULL_LABELS = {
@@ -30,6 +32,7 @@ export const OPERATOR_FULL_LABELS = {
   [Databases.proxysql]: '',
   [Databases.mariadb]: '',
   [Databases.haproxy]: '',
+  [Databases.pgbouncer]: '',
 };
 
 export const PERCONA_CANCELLED_ERROR_NAME = 'percona-cancelled-request';
@@ -54,4 +57,5 @@ export const DATABASE_ICONS: Record<Databases, string> = {
   [Databases.proxysql]: 'percona-database-proxysql',
   [Databases.mariadb]: 'percona-database-mysql',
   [Databases.haproxy]: 'percona-database-haproxy',
+  [Databases.pgbouncer]: 'percona-database-postgresql',
 };

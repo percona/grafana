@@ -25,6 +25,7 @@ const kubernetes: Kubernetes[] = [
     operators: {
       psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
       pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+      pg: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
     },
   },
   {
@@ -33,6 +34,7 @@ const kubernetes: Kubernetes[] = [
     operators: {
       psmdb: { status: KubernetesOperatorStatus.ok, version: '2', availableVersion: '2' },
       pxc: { status: KubernetesOperatorStatus.ok, version: '2', availableVersion: '2' },
+      pg: { status: KubernetesOperatorStatus.ok, version: '2', availableVersion: '2' },
     },
   },
 ];

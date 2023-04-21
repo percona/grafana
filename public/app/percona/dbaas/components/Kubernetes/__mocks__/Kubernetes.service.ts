@@ -9,12 +9,20 @@ export const KubernetesService = {
         {
           kubernetes_cluster_name: 'cluster_1',
           status: KubernetesClusterStatus.ok,
-          operators: { psmdb: { status: KubernetesOperatorStatus.ok }, pxc: { status: KubernetesOperatorStatus.ok } },
+          operators: {
+            psmdb: { status: KubernetesOperatorStatus.ok },
+            pxc: { status: KubernetesOperatorStatus.ok },
+            pg: { status: KubernetesOperatorStatus.ok },
+          },
         },
         {
           kubernetes_cluster_name: 'cluster_2',
           status: KubernetesClusterStatus.ok,
-          operators: { psmdb: { status: KubernetesOperatorStatus.ok }, pxc: { status: KubernetesOperatorStatus.ok } },
+          operators: {
+            psmdb: { status: KubernetesOperatorStatus.ok },
+            pxc: { status: KubernetesOperatorStatus.ok },
+            pg: { status: KubernetesOperatorStatus.ok },
+          },
         },
       ],
     }),
@@ -25,12 +33,14 @@ export const KubernetesService = {
           component_to_update_information: {
             'psmdb-operator': { available_version: '1' },
             'pxc-operator': { available_version: '1' },
+            'pg-operator': { available_version: '1' },
           },
         },
         cluster_2: {
           component_to_update_information: {
             'psmdb-operator': { available_version: '1' },
             'pxc-operator': { available_version: '1' },
+            'pg-operator': { available_version: '1' },
           },
         },
       },

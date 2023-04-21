@@ -4,6 +4,7 @@ import { Field } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 
 import { Switch, useStyles, Button, Icon, Tooltip } from '@grafana/ui';
+import { Databases } from 'app/percona/shared/core';
 
 import FieldSet from '../../../../../shared/components/Form/FieldSet/FieldSet';
 
@@ -13,7 +14,7 @@ import { NetworkAndSecurityFields, NetworkAndSecurityProps } from './NetworkAndS
 
 export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ form }) => {
   const styles = useStyles(getStyles);
-  const { expose } = form.getState().values;
+  const { expose, databaseType } = form.getState().values;
 
   return (
     <FieldSet
@@ -47,37 +48,39 @@ export const NetworkAndSecurity: FC<NetworkAndSecurityProps> = ({ form }) => {
             tooltipIcon="info-circle"
             tooltipText={Messages.tooltips.internetFacing}
           />
-          <FieldArray name={NetworkAndSecurityFields.sourceRanges}>
-            {({ fields }) => (
-              <div className={styles.fieldsWrapper}>
-                <Button
-                  className={styles.button}
-                  variant="secondary"
-                  onClick={() => fields.push({ sourceRange: '' })}
-                  icon="plus"
-                >
-                  {Messages.buttons.addNew}
-                </Button>
-                {fields.map((name, index) => (
-                  <div key={name} className={styles.fieldWrapper}>
-                    <TextInputField
-                      name={`${name}.sourceRange`}
-                      label={index === 0 ? Messages.labels.sourceRange : ''}
-                      placeholder={Messages.placeholders.sourceRange}
-                      fieldClassName={styles.field}
-                    />
-                    <Button
-                      data-testid={`deleteButton-${index}`}
-                      className={styles.deleteButton}
-                      variant="secondary"
-                      onClick={() => (index > 0 ? fields.remove(index) : fields.update(0, ''))}
-                      icon="trash-alt"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </FieldArray>
+          {databaseType.value !== Databases.postgresql && (
+            <FieldArray name={NetworkAndSecurityFields.sourceRanges}>
+              {({ fields }) => (
+                <div className={styles.fieldsWrapper} data-testid="source-ranges">
+                  <Button
+                    className={styles.button}
+                    variant="secondary"
+                    onClick={() => fields.push({ sourceRange: '' })}
+                    icon="plus"
+                  >
+                    {Messages.buttons.addNew}
+                  </Button>
+                  {fields.map((name, index) => (
+                    <div key={name} className={styles.fieldWrapper}>
+                      <TextInputField
+                        name={`${name}.sourceRange`}
+                        label={index === 0 ? Messages.labels.sourceRange : ''}
+                        placeholder={Messages.placeholders.sourceRange}
+                        fieldClassName={styles.field}
+                      />
+                      <Button
+                        data-testid={`deleteButton-${index}`}
+                        className={styles.deleteButton}
+                        variant="secondary"
+                        onClick={() => (index > 0 ? fields.remove(index) : fields.update(0, ''))}
+                        icon="trash-alt"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </FieldArray>
+          )}
         </>
       ) : (
         <div />
