@@ -9,6 +9,7 @@ export interface LabelTooltipProps {
   tooltipIcon?: IconName;
   tooltipDataTestId?: string;
   tooltipLinkTarget?: string;
+  tooltipInteractive?: boolean;
 }
 
 export interface LabeledFieldProps extends LabelTooltipProps {

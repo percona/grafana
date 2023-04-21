@@ -13,6 +13,7 @@ export const LinkTooltipCore: FC<LabelTooltipProps> = ({
   tooltipIcon = 'info-circle',
   tooltipDataTestId,
   tooltipLinkTarget = '_blank',
+  tooltipInteractive,
 }) => {
   const styles = useStyles2(getStyles);
 
@@ -29,6 +30,7 @@ export const LinkTooltipCore: FC<LabelTooltipProps> = ({
         </div>
       }
       data-testid={tooltipDataTestId}
+      interactive={!!tooltipLink ? true : !!tooltipInteractive}
     >
       <div>
         <Icon name={tooltipIcon} />

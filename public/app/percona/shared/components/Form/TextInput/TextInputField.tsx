@@ -50,6 +50,7 @@ export const TextInputField: FC<TextInputFieldProps> = React.memo(
     tooltipIcon,
     tooltipDataTestId,
     tooltipLinkTarget,
+    tooltipInteractive,
     ...fieldConfig
   }) => {
     const styles = useStyles2(getStyles);
@@ -74,6 +75,7 @@ export const TextInputField: FC<TextInputFieldProps> = React.memo(
                 tooltipDataTestId={tooltipDataTestId}
                 tooltipLinkTarget={tooltipLinkTarget}
                 tooltipIcon={tooltipIcon}
+                tooltipInteractive={tooltipInteractive}
               />
               <input
                 id={inputId}
