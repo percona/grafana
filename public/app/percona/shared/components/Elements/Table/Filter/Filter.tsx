@@ -120,7 +120,7 @@ export const Filter = ({ columns, rawData, setFilteredData, hasBackendFiltering 
           }}
         >
           <div className={styles.filterWrapper}>
-            <span className={styles.filterLabel} data-testid="filter-label">
+            <span className={styles.filterLabel} data-testid="filter">
               {Messages.filterLabel}
             </span>
             <div className={styles.filterActionsWrapper}>
