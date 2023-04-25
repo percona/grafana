@@ -57,6 +57,11 @@ export const Messages = {
       `Are you sure that you want to permanently delete ${nrItems} node${nrItems ? 's' : ''}`,
     nodesDeleted: (deletedItems: number, totalItems: number) =>
       `${deletedItems} of ${totalItems} nodes successfully deleted`,
+    details: {
+      properties: 'Properties',
+      nodeId: 'Node ID',
+      serviceNames: 'Service Names',
+    },
   },
   delete: 'Delete',
   cancel: 'Cancel',

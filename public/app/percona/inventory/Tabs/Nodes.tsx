@@ -18,21 +18,23 @@ import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/red
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
-import { Node } from 'app/percona/shared/services/nodes/Nodes.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
+import { NodeFe } from '../Inventory.service';
+import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 
+import { stripNodeId } from './Nodes.utils';
 import { getStyles } from './Tabs.styles';
 
 export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
-  const [actionItem, setActionItem] = useState<Node | null>(null);
+  const [actionItem, setActionItem] = useState<NodeFe | null>(null);
   const navModel = usePerconaNavModel('inventory-nodes');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
@@ -41,7 +43,7 @@ export const NodesTab = () => {
   console.log(nodes);
 
   const getActions = useCallback(
-    (row: Row<Node>): Action[] => [
+    (row: Row<NodeFe>): Action[] => [
       {
         content: (
           <HorizontalGroup spacing="sm">
@@ -59,22 +61,22 @@ export const NodesTab = () => {
   );
 
   const columns = useMemo(
-    (): Array<Column<Node>> => [
+    (): Array<Column<NodeFe>> => [
       {
         Header: Messages.nodes.columns.nodeName,
-        accessor: (row) => row.params.nodeName,
+        accessor: (row) => row.nodeName,
       },
       {
         Header: Messages.nodes.columns.nodeId,
-        accessor: (row) => row.params.nodeId,
+        accessor: (row) => row.nodeId,
       },
       {
         Header: Messages.nodes.columns.nodeType,
-        accessor: 'type',
+        accessor: (row) => row.nodeType,
       },
       {
         Header: Messages.nodes.columns.address,
-        accessor: (row) => row.params.address,
+        accessor: (row) => row.address,
       },
       getExpandAndActionsCol(getActions),
     ],
@@ -94,23 +96,31 @@ export const NodesTab = () => {
   }, []);
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row<Node>) => {
-      const labels = row.original.params.customLabels || {};
+    (row: Row<NodeFe>) => {
+      const labels = row.original.customLabels || {};
       const labelKeys = Object.keys(labels);
-      const agents = row.original.params.agents || [];
+      const agents = row.original.agents || [];
 
       return (
         <DetailsRow>
           {!!agents.length && (
             <DetailsRow.Contents title={Messages.services.details.agents}>
-              {/* <StatusBadge
-                strippedServiceId={stripServiceId(row.original.params.serviceId)}
-                agents={row.original.params.agents || []}
-              /> */}
+              <StatusBadge
+                type="nodes"
+                strippedId={stripNodeId(row.original.nodeId)}
+                agents={row.original.agents || []}
+              />
             </DetailsRow.Contents>
           )}
-          <DetailsRow.Contents title={Messages.services.details.serviceId}>
-            <span>{row.original.params.nodeId}</span>
+          <DetailsRow.Contents title={Messages.nodes.details.nodeId}>
+            <span>{row.original.nodeId}</span>
+          </DetailsRow.Contents>
+          <DetailsRow.Contents title={Messages.nodes.details.serviceNames}>
+            <span>
+              {row.original.services.map((service) => (
+                <div key={service.service_id}>{service.service_name}</div>
+              ))}
+            </span>
           </DetailsRow.Contents>
           {!!labelKeys.length && (
             <DetailsRow.Contents title={Messages.services.details.labels} fullRow>
@@ -249,7 +259,7 @@ export const NodesTab = () => {
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
-            getRowId={useCallback((row: Node) => row.params.nodeId, [])}
+            getRowId={useCallback((row: NodeFe) => row.nodeId, [])}
           />
         </FeatureLoader>
       </OldPage.Contents>

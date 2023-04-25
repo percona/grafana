@@ -10,7 +10,6 @@ export interface NodePayload {
   custom_labels?: Record<string, string>;
   agents?: DbServiceAgent[];
 }
-
 export interface GenericNodePayload extends NodePayload {
   distro?: string;
 }

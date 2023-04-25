@@ -2,5 +2,6 @@ import { DbServiceAgent } from 'app/percona/shared/services/services/Services.ty
 
 export interface StatusBadgeProps {
   agents: DbServiceAgent[];
-  strippedServiceId: string;
+  strippedId: string;
+  type: 'services' | 'nodes';
 }

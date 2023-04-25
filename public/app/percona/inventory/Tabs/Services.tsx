@@ -18,9 +18,9 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
+  fetchActiveServiceTypesAction,
   fetchServicesAction,
   removeServicesAction,
-  fetchActiveServiceTypesAction,
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -202,7 +202,8 @@ export const Services = () => {
           {!!agents.length && (
             <DetailsRow.Contents title={Messages.services.details.agents}>
               <StatusBadge
-                strippedServiceId={stripServiceId(row.original.params.serviceId)}
+                strippedId={stripServiceId(row.original.params.serviceId)}
+                type={'services'}
                 agents={row.original.params.agents || []}
               />
             </DetailsRow.Contents>
