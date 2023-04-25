@@ -4,7 +4,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { NodeListPayload } from '../shared/services/nodes/Nodes.types';
 
-import { DBServiceList, CompatibleServiceListPayload, ServiceAgentListPayload } from './Inventory.types';
+import { CompatibleServiceListPayload, DBServiceList, ServiceAgentListPayload } from './Inventory.types';
 
 const BASE_URL = `/v1/inventory`;
 
@@ -54,7 +54,7 @@ export const InventoryService = {
     return result;
   },
   getNodes(body = {}, token?: CancelToken) {
-    return api.post<NodeListPayload, object>(`${BASE_URL}/Nodes/List`, body, false, token);
+    return api.post<NodeListPayload, object>(`/v1/management/Node/List`, body, false, token);
   },
   removeNode(body: RemoveNodeBody, token?: CancelToken) {
     return api.post<void, RemoveNodeBody>(`${BASE_URL}/Nodes/Remove`, body, false, token);

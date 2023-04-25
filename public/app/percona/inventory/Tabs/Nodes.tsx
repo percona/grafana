@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { CheckboxField, Table, logger } from '@percona/platform-core';
+import { CheckboxField, logger, Table } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { SelectedTableRows } from 'app/percona/shared/components/Elements/Table';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -32,10 +32,31 @@ export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
+  const [actionItem, setActionItem] = useState<Node | null>(null);
   const navModel = usePerconaNavModel('inventory-nodes');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
+
+  console.log(nodes);
+
+  const getActions = useCallback(
+    (row: Row<Node>): Action[] => [
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="trash-alt" />
+            <span className={styles.deleteItemTxtSpan}>{Messages.delete}</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          setActionItem(row.original);
+          setModalVisible(true);
+        },
+      },
+    ],
+    [styles.deleteItemTxtSpan]
+  );
 
   const columns = useMemo(
     (): Array<Column<Node>> => [
@@ -55,9 +76,9 @@ export const NodesTab = () => {
         Header: Messages.nodes.columns.address,
         accessor: (row) => row.params.address,
       },
-      getExpandAndActionsCol(),
+      getExpandAndActionsCol(getActions),
     ],
-    []
+    [getActions]
   );
 
   const loadData = useCallback(async () => {
@@ -76,11 +97,23 @@ export const NodesTab = () => {
     (row: Row<Node>) => {
       const labels = row.original.params.customLabels || {};
       const labelKeys = Object.keys(labels);
+      const agents = row.original.params.agents || [];
 
       return (
         <DetailsRow>
+          {!!agents.length && (
+            <DetailsRow.Contents title={Messages.services.details.agents}>
+              {/* <StatusBadge
+                strippedServiceId={stripServiceId(row.original.params.serviceId)}
+                agents={row.original.params.agents || []}
+              /> */}
+            </DetailsRow.Contents>
+          )}
+          <DetailsRow.Contents title={Messages.services.details.serviceId}>
+            <span>{row.original.params.nodeId}</span>
+          </DetailsRow.Contents>
           {!!labelKeys.length && (
-            <DetailsRow.Contents title="Labels" fullRow>
+            <DetailsRow.Contents title={Messages.services.details.labels} fullRow>
               <TagList
                 colorIndex={9}
                 className={styles.tagList}
@@ -94,7 +127,11 @@ export const NodesTab = () => {
     [styles.tagList]
   );
 
-  const deletionMsg = useMemo(() => Messages.nodes.deleteConfirmation(selected.length), [selected]);
+  const deletionMsg = useMemo(() => {
+    const nodesToDelete = actionItem ? [actionItem] : selected;
+
+    return Messages.nodes.deleteConfirmation(nodesToDelete.length);
+  }, [actionItem, selected]);
 
   useEffect(() => {
     loadData();
@@ -102,18 +139,21 @@ export const NodesTab = () => {
   }, []);
 
   const removeNodes = useCallback(
-    async (nodes: Array<SelectedTableRows<Node>>, forceMode: boolean) => {
+    async (forceMode: boolean) => {
+      const nodesToDelete = actionItem ? [actionItem] : selected.map((s) => s.original);
       try {
         // eslint-disable-next-line max-len
-        const requests = nodes.map<RemoveNodeParams>((node) => ({
-          nodeId: node.original.params.nodeId,
+        const requests = nodesToDelete.map<RemoveNodeParams>((node) => ({
+          nodeId: node.params.nodeId,
           force: forceMode,
         }));
 
         const successfullyDeleted = await dispatch(removeNodesAction({ nodes: requests })).unwrap();
 
         if (successfullyDeleted > 0) {
-          appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.nodesDeleted(successfullyDeleted, nodes.length)]);
+          appEvents.emit(AppEvents.alertSuccess, [
+            Messages.nodes.nodesDeleted(successfullyDeleted, nodesToDelete.length),
+          ]);
         }
       } catch (e) {
         if (isApiCancelError(e)) {
@@ -121,18 +161,22 @@ export const NodesTab = () => {
         }
         logger.error(e);
       }
-      setSelectedRows([]);
+      if (actionItem) {
+        setActionItem(null);
+      } else {
+        setSelectedRows([]);
+      }
       loadData();
     },
-    [dispatch, loadData]
+    [actionItem, dispatch, loadData, selected]
   );
 
   const proceed = useCallback(
     async (values: Record<any, any>) => {
-      await removeNodes(selected, values.force);
+      await removeNodes(values.force);
       setModalVisible(false);
     },
-    [removeNodes, selected]
+    [removeNodes]
   );
 
   const handleSelectionChange = useCallback((rows: any[]) => {

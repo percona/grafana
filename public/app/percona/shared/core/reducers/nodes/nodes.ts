@@ -37,7 +37,7 @@ const nodesSlice = createSlice({
 export const fetchNodesAction = createAsyncThunk<Node[], { token?: CancelToken }>(
   'percona/fetchNodes',
   async (params = {}) => {
-    const nodes = await InventoryService.getNodes(params.token);
+    const nodes = await InventoryService.getNodes({}, params.token);
     return toDbNodesModel(nodes);
   }
 );
