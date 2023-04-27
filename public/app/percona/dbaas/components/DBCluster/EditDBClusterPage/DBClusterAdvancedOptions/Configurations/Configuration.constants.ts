@@ -1,5 +1,5 @@
 import { Databases } from 'app/percona/shared/core';
-export const PXCDefailtConfiguration =
+export const PXCDefaultConfiguration =
   'Configuration:                 [mysqld]\n' +
   'wsrep_provider_options="gcache.size=600M"\n' +
   "wsrep_trx_fragment_unit='bytes'\n" +
@@ -7,6 +7,6 @@ export const PXCDefailtConfiguration =
 export const PSMDBDefaultConfiguration = ' Configuration:  \n' + '      operationProfiling:\n' + '        mode: slowOp';
 
 export const DefaultDatabaseConfiguration: Partial<Record<Databases, string>> = {
-  [Databases.mysql]: PXCDefailtConfiguration,
+  [Databases.mysql]: PXCDefaultConfiguration,
   [Databases.mongodb]: PSMDBDefaultConfiguration,
 };
