@@ -52,6 +52,7 @@ export const DBClusterBasicOptions: FC<DBClusterBasicOptionsProps> = ({ kubernet
   const onChangeDatabase = useCallback((databaseType) => {
     change(BasicOptionsFields.databaseType, databaseType);
     form.mutators.setClusterName(databaseType.value);
+    form.mutators.changeConfiguration(databaseType.value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
