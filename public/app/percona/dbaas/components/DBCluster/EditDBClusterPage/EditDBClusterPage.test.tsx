@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router-dom';
 
 import { locationService } from '@grafana/runtime/src';
+import { PSMDBDefaultConfiguration } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Configurations/Configuration.constants';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -170,5 +171,46 @@ describe('EditDBClusterPage::', () => {
     );
 
     expect(screen.getByTestId('empty-block')).toBeInTheDocument();
+  });
+
+  it('show default database configuration in create mode', async () => {
+    locationService.push(DB_CLUSTER_CREATION_URL);
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: { isConnectedToPortal: true, alertingEnabled: true, dbaasEnabled: true },
+            },
+            kubernetes: {
+              loading: false,
+              result: [
+                {
+                  kubernetesClusterName: 'cluster1',
+                  status: KubernetesClusterStatus.ok,
+                  operators: {
+                    psmdb: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                    pxc: { status: KubernetesOperatorStatus.ok, version: '1', availableVersion: '1' },
+                  },
+                },
+              ],
+            },
+          },
+        } as StoreState)}
+      >
+        <Router history={locationService.getHistory()}>
+          <EditDBClusterPage kubernetes={kubernetesStub} />
+        </Router>
+      </Provider>
+    );
+
+    expect(screen.findByRole('form')).toBeTruthy();
+    const advancedSettingsButton = screen.getByTestId('dbCluster-advanced-settings');
+    await waitFor(() => fireEvent.click(advancedSettingsButton));
+
+    expect(screen.getByTestId('configuration-textarea-input')).toContainHTML(PSMDBDefaultConfiguration);
   });
 });
