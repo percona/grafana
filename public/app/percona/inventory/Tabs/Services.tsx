@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { CheckboxField, logger } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Row } from 'react-table';
@@ -10,10 +9,11 @@ import { Badge, Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from
 import { OldPage } from 'app/core/components/Page/Page';
 import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
-import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
+import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ServiceIconWithText } from 'app/percona/shared/components/Elements/ServiceIconWithText/ServiceIconWithText';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -27,6 +27,7 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getDashboardLinkForService } from 'app/percona/shared/helpers/getDashboardLinkForService';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
