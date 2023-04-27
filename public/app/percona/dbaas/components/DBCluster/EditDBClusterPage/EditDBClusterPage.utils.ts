@@ -1,4 +1,4 @@
-import { logger } from '@percona/platform-core';
+import { logger } from 'app/percona/shared/helpers/logger';
 
 import { DefaultDatabaseConfiguration } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Configurations/Configuration.constants';
 import { ConfigurationFields } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Configurations/Configurations.types';
