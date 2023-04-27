@@ -103,7 +103,7 @@ export const Services = () => {
         accessor: 'status',
         Cell: ({ value }: { value: ServiceStatus }) => (
           <Badge
-            text={capitalizeText(value)}
+            text={value === ServiceStatus.NA ? ServiceStatus.NA : capitalizeText(value)}
             color={getBadgeColorForServiceStatus(value)}
             icon={getBadgeIconForServiceStatus(value)}
           />

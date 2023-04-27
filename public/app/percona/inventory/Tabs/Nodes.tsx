@@ -19,6 +19,7 @@ import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/red
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
+import { NodeType } from 'app/percona/shared/services/nodes/Nodes.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -55,7 +56,29 @@ export const NodesTab = () => {
       {
         Header: Messages.nodes.columns.nodeType,
         accessor: 'type',
-        type: FilterFieldTypes.TEXT,
+        type: FilterFieldTypes.DROPDOWN,
+        options: [
+          {
+            label: 'Container',
+            value: NodeType.container,
+          },
+          {
+            label: 'Generic',
+            value: NodeType.generic,
+          },
+          {
+            label: 'Remote',
+            value: NodeType.remote,
+          },
+          {
+            label: 'RemoteAzureDB',
+            value: NodeType.remoteAzureDB,
+          },
+          {
+            label: 'RemoteRDS',
+            value: NodeType.remoteRDS,
+          },
+        ],
       },
       {
         Header: Messages.nodes.columns.address,
@@ -207,7 +230,6 @@ export const NodesTab = () => {
             pageSize={25}
             allRowsSelectionMode="page"
             emptyMessage={Messages.nodes.emptyTable}
-            //emptyMessageClassName={styles.emptyMessage}
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}

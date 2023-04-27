@@ -259,7 +259,6 @@ export const Agents: FC<GrafanaRouteComponentProps<{ id: string }>> = ({ match }
             pageSize={25}
             allRowsSelectionMode="page"
             emptyMessage={Messages.agents.emptyTable}
-            // emptyMessageClassName={styles.emptyMessage}
             pendingRequest={agentsLoading || servicesLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}

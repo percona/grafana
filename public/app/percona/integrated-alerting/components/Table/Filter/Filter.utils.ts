@@ -113,7 +113,7 @@ export const isValueInTextColumn = (
   return result;
 };
 
-export const isTextIncluded = (needle: string, haystack: string): boolean =>
+export const isTextIncluded = (needle: string, haystack: string | number): boolean =>
   haystack.toString().toLowerCase().includes(needle.toLowerCase());
 
 export const isInOptions = (
