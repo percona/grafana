@@ -54,6 +54,7 @@ export const Messages = {
       nodeId: 'Node ID',
       nodeType: 'Node Type',
       address: 'Address',
+      services: 'Services',
     },
     deleteConfirmation: (nrItems: number) =>
       `Are you sure that you want to permanently delete ${nrItems} node${nrItems ? 's' : ''}`,

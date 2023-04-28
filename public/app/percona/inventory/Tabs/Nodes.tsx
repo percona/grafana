@@ -5,7 +5,7 @@ import { Form } from 'react-final-form';
 import { Column, Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, HorizontalGroup, Icon, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
@@ -17,7 +17,9 @@ import { RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
+import { ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -26,12 +28,15 @@ import { GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { NodeFe } from '../Inventory.service';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
+import { StatusLink } from '../components/StatusLink/StatusLink';
 
 import { stripNodeId } from './Nodes.utils';
+import { getBadgeColorForServiceStatus, getBadgeIconForServiceStatus } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
+  console.log('NodesTab , nodes:', nodes);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const [actionItem, setActionItem] = useState<NodeFe | null>(null);
@@ -61,6 +66,17 @@ export const NodesTab = () => {
   const columns = useMemo(
     (): Array<Column<NodeFe>> => [
       {
+        Header: Messages.services.columns.status,
+        accessor: (row) => row.status,
+        Cell: ({ value }: { value: ServiceStatus }) => (
+          <Badge
+            text={capitalizeText(value)}
+            color={getBadgeColorForServiceStatus(value)}
+            icon={getBadgeIconForServiceStatus(value)}
+          />
+        ),
+      },
+      {
         Header: Messages.nodes.columns.nodeName,
         accessor: (row) => row.nodeName,
       },
@@ -71,6 +87,25 @@ export const NodesTab = () => {
       {
         Header: Messages.nodes.columns.nodeType,
         accessor: (row) => row.nodeType,
+      },
+      {
+        Header: Messages.services.columns.monitoring,
+        accessor: 'agents',
+        width: '70px',
+        Cell: ({ value, row }) => (
+          <StatusLink
+            type="nodes"
+            strippedId={row.original.nodeId === 'pmm-server' ? 'pmm-server' : stripNodeId(row.original.nodeId)}
+            agents={value || []}
+          />
+        ),
+      },
+      {
+        Header: Messages.nodes.columns.services,
+        accessor: 'services',
+        Cell: ({ value, row }) => {
+          return <div>{value.length > 1 ? `${value.length} services` : value[0].service_name}</div>;
+        },
       },
       {
         Header: Messages.nodes.columns.address,

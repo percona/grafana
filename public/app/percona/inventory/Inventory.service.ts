@@ -2,7 +2,7 @@ import { CancelToken } from 'axios';
 
 import { api } from 'app/percona/shared/helpers/api';
 
-import { DbAgent } from '../shared/services/services/Services.types';
+import { DbAgent, ServiceStatus } from '../shared/services/services/Services.types';
 
 import { CompatibleServiceListPayload, DBServiceList, ServiceAgentListPayload } from './Inventory.types';
 
@@ -20,15 +20,8 @@ export interface RemoveNodeBody {
 interface NodeFromDbAgent {
   agent_id: string;
   agent_type: string;
-  status: Status;
+  status: ServiceStatus;
   is_connected: boolean;
-}
-
-enum Status {
-  UP = 'UP',
-  DOWN = 'DOWN',
-  UNKNOWN = 'UNKNOWN',
-  NA = 'N/A',
 }
 
 interface ServiceInNodeList {
@@ -53,7 +46,7 @@ export interface NodeFe {
   agents?: DbAgent[];
   createdAt: string;
   updatedAt: string;
-  status: Status;
+  status: ServiceStatus;
   services: ServiceInNodeList[];
 }
 
@@ -73,7 +66,7 @@ export interface NodeFromDb {
   agents?: NodeFromDbAgent[];
   created_at: string;
   updated_at: string;
-  status: Status;
+  status: ServiceStatus;
   services: ServiceInNodeList[];
 }
 
