@@ -40,8 +40,6 @@ export const NodesTab = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
 
-  console.log(nodes);
-
   const getActions = useCallback(
     (row: Row<NodeFe>): Action[] => [
       {
@@ -98,16 +96,19 @@ export const NodesTab = () => {
   const renderSelectedSubRow = React.useCallback(
     (row: Row<NodeFe>) => {
       const labels = row.original.customLabels || {};
+      console.log('NodesTab , labels:', labels);
       const labelKeys = Object.keys(labels);
+      console.log('NodesTab , labelKeys:', labelKeys);
       const agents = row.original.agents || [];
-
+      console.log('NodesTab , agents:', agents);
+      console.log('original', row.original);
       return (
         <DetailsRow>
           {!!agents.length && (
             <DetailsRow.Contents title={Messages.services.details.agents}>
               <StatusBadge
                 type="nodes"
-                strippedId={stripNodeId(row.original.nodeId)}
+                strippedId={row.original.nodeId === 'pmm-server' ? 'pmm-server' : stripNodeId(row.original.nodeId)}
                 agents={row.original.agents || []}
               />
             </DetailsRow.Contents>
@@ -115,13 +116,15 @@ export const NodesTab = () => {
           <DetailsRow.Contents title={Messages.nodes.details.nodeId}>
             <span>{row.original.nodeId}</span>
           </DetailsRow.Contents>
-          <DetailsRow.Contents title={Messages.nodes.details.serviceNames}>
-            <span>
-              {row.original.services.map((service) => (
-                <div key={service.service_id}>{service.service_name}</div>
-              ))}
-            </span>
-          </DetailsRow.Contents>
+          {row.original.services && row.original.services.length && (
+            <DetailsRow.Contents title={Messages.nodes.details.serviceNames}>
+              <span>
+                {row.original.services.map((service) => (
+                  <div key={service.service_id}>{service.service_name}</div>
+                ))}
+              </span>
+            </DetailsRow.Contents>
+          )}
           {!!labelKeys.length && (
             <DetailsRow.Contents title={Messages.services.details.labels} fullRow>
               <TagList

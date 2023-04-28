@@ -3,7 +3,7 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 
 import { locationService } from '@grafana/runtime';
-import { DbServiceAgent } from 'app/percona/shared/services/services/Services.types';
+import { DbAgent } from 'app/percona/shared/services/services/Services.types';
 
 import { ServiceAgentStatus } from '../../Inventory.types';
 
@@ -11,7 +11,7 @@ import { StatusLink } from './StatusLink';
 
 describe('StatusLink', () => {
   it('should show "OK" if agents are running, starting or connected', () => {
-    const agents: DbServiceAgent[] = [
+    const agents: DbAgent[] = [
       {
         agentId: 'agent1',
         status: ServiceAgentStatus.RUNNING,
@@ -37,7 +37,7 @@ describe('StatusLink', () => {
   });
 
   it('should show "Failed" if some agent is not connected', () => {
-    const agents: DbServiceAgent[] = [
+    const agents: DbAgent[] = [
       {
         agentId: 'agent1',
         status: ServiceAgentStatus.RUNNING,
@@ -63,7 +63,7 @@ describe('StatusLink', () => {
   });
 
   it('should show "Failed" if some agent is not starting or running', () => {
-    const agents: DbServiceAgent[] = [
+    const agents: DbAgent[] = [
       {
         agentId: 'agent1',
         status: ServiceAgentStatus.RUNNING,

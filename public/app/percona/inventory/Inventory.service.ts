@@ -2,6 +2,8 @@ import { CancelToken } from 'axios';
 
 import { api } from 'app/percona/shared/helpers/api';
 
+import { DbAgent } from '../shared/services/services/Services.types';
+
 import { CompatibleServiceListPayload, DBServiceList, ServiceAgentListPayload } from './Inventory.types';
 
 const BASE_URL = `/v1/inventory`;
@@ -48,7 +50,7 @@ export interface NodeFe {
   containerId: string;
   containerName: string;
   customLabels?: Record<string, string>;
-  agents?: NodeFromDbAgent[];
+  agents?: DbAgent[];
   createdAt: string;
   updatedAt: string;
   status: Status;
@@ -80,10 +82,10 @@ export interface NodeListFromDBPayload {
 }
 
 export const InventoryService = {
-  getAgents(serviceId: string, token?: CancelToken) {
+  getAgents(serviceId: string | undefined, nodeId: string | undefined, token?: CancelToken) {
     return api.post<ServiceAgentListPayload, object>(
       '/v1/management/Agent/List',
-      { service_id: serviceId },
+      { service_id: serviceId, node_id: nodeId },
       false,
       token
     );

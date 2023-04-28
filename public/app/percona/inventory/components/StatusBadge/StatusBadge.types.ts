@@ -1,7 +1,7 @@
-import { DbServiceAgent } from 'app/percona/shared/services/services/Services.types';
+import { DbAgent } from 'app/percona/shared/services/services/Services.types';
 
 export interface StatusBadgeProps {
-  agents: DbServiceAgent[];
+  agents: DbAgent[];
   strippedId: string;
   type: 'services' | 'nodes';
 }

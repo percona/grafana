@@ -26,8 +26,10 @@ export const Messages = {
       `${deletedItems} of ${totalItems} services successfully deleted`,
   },
   agents: {
-    goBack: 'Go back to services',
-    breadcrumbLeft: (serviceName: string) => `Service ${serviceName}`,
+    goBackToServices: 'Go back to services',
+    goBackToNodes: 'Go back to nodes',
+    breadcrumbLeftService: (serviceName: string) => `Service ${serviceName}`,
+    breadcrumbLeftNode: (nodeName: string) => `Node ${nodeName}`,
     breadcrumbRight: ` / Agents`,
     emptyTable: 'No agents available',
     deleteConfirmation: (nrItems: number) =>

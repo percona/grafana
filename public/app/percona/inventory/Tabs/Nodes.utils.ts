@@ -1,6 +1,6 @@
-export const stripNodeId = (serviceId: string) => {
+export const stripNodeId = (nodeId: string) => {
   const regex = /\/node_id\/(.*)/gm;
-  const match = regex.exec(serviceId);
+  const match = regex.exec(nodeId);
 
   if (match && match.length > 0) {
     return match[1] || '';

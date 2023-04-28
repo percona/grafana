@@ -1,4 +1,4 @@
-import { DbServiceAgent } from '../services/Services.types';
+import { DbAgent } from '../services/Services.types';
 
 export interface NodePayload {
   node_id: string;
@@ -8,7 +8,7 @@ export interface NodePayload {
   region?: string;
   az?: string;
   custom_labels?: Record<string, string>;
-  agents?: DbServiceAgent[];
+  agents?: DbAgent[];
 }
 export interface GenericNodePayload extends NodePayload {
   distro?: string;
@@ -51,7 +51,7 @@ export interface DbNode {
   address: string;
   az?: string;
   customLabels?: Record<string, string>;
-  agents?: DbServiceAgent[];
+  agents?: DbAgent[];
 }
 
 export type RemoteDbNode = Node;

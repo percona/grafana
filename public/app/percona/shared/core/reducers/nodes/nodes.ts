@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 
@@ -33,25 +34,33 @@ const nodesSlice = createSlice({
 });
 
 const nodeFromDbMapper = (nodeFromDb: NodeFromDb[]) => {
-  return nodeFromDb.map((node) => ({
-    nodeId: node.node_id,
-    nodeType: node.node_type,
-    nodeName: node.node_name,
-    machineId: node.machine_id,
-    distro: node.distro,
-    address: node.address,
-    nodeModel: node.node_model,
-    region: node.region,
-    az: node.az,
-    containerId: node.container_id,
-    containerName: node.container_name,
-    customLabels: node.custom_labels,
-    agents: node.agents,
-    createdAt: node.created_at,
-    updatedAt: node.updated_at,
-    status: node.status,
-    services: node.services,
-  }));
+  return nodeFromDb.map(
+    (node) =>
+      ({
+        nodeId: node.node_id,
+        nodeType: node.node_type,
+        nodeName: node.node_name,
+        machineId: node.machine_id,
+        distro: node.distro,
+        address: node.address,
+        nodeModel: node.node_model,
+        region: node.region,
+        az: node.az,
+        containerId: node.container_id,
+        containerName: node.container_name,
+        customLabels: node.custom_labels,
+        agents: node.agents?.map((agent) => ({
+          agentId: agent.agent_id,
+          agentType: agent.agent_type,
+          status: agent.status,
+          isConnected: agent.is_connected,
+        })),
+        createdAt: node.created_at,
+        updatedAt: node.updated_at,
+        status: node.status,
+        services: node.services,
+      } as NodeFe)
+  );
 };
 
 export const fetchNodesAction = createAsyncThunk<NodeFe[], { token?: CancelToken }>(
