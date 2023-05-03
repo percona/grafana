@@ -1,3 +1,4 @@
+import React from 'react';
 import type {
   UseColumnOrderInstanceProps,
   UseColumnOrderState,
@@ -47,6 +48,8 @@ import type {
   UseSortByOptions,
   UseSortByState,
 } from 'react-table';
+
+import { PopoverContent } from '../components/Tooltip';
 
 declare module 'react-table' {
   export interface TableOptions<D extends Record<string, unknown>>
@@ -108,7 +111,9 @@ declare module 'react-table' {
     style?: CSSProperties;
     // @PERCONA
     // By default, cells with too much text get their content hidden using ellipsis. This allows to override that config.
+    // tooltipInfo allows for an "i" icon with tooltip content
     noHiddenOverflow?: boolean;
+    tooltipInfo?: PopoverContent;
   }
 
   export interface Cell<D extends Record<string, unknown> = Record<string, unknown>, V = any>
