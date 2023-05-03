@@ -30,12 +30,15 @@ node_modules: package.json yarn.lock ## Install node modules.
 	@echo "install frontend dependencies"
 	YARN_CHECKSUM_BEHAVIOR=update YARN_ENABLE_PROGRESS_BARS=false yarn install --immutable
 
+.PHONY: pmm-ui-deps
 pmm-ui-deps:
 	cd apps/pmm-ui && npm install
 
+.PHONY: pmm-ui-build
 pmm-ui-build:
 	cd apps/pmm-ui && npm run build:grafana
 
+.PHONY: pmm-ui
 pmm-ui: pmm-ui-deps pmm-ui-build
 
 ##@ Swagger
