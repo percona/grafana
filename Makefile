@@ -222,6 +222,7 @@ clean: ## Clean up intermediate build artifacts.
 	@echo "cleaning"
 	rm -rf node_modules
 	rm -rf public/build
+	cd apps && make clean
 
 gen-ts:
 	@echo "generating TypeScript definitions"

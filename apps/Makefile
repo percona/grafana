@@ -1,5 +1,9 @@
 include Makefile.include
 
+clean:							## Cleans up project
+	rm -rf ./pmm-ui/build
+	rm -rf ./pmm-ui/node_modules
+
 init:								## Prepares local development environment.
 	cd ../ && make build-go
 	yarn install --immutable
