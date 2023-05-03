@@ -3,13 +3,13 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { Button, useStyles2 } from '@grafana/ui';
 import { Messages } from './Step.messages';
-import { FeedbackNote } from '../Feedback';
+import { Rating } from '../Feedback';
 import sadImage from '../../TopBar/assets/sad.svg';
 import mehImage from '../../TopBar/assets/meh.svg';
 import smileImage from '../../TopBar/assets/smile.svg';
 
 interface Step1Props {
-  onSubmit: (val: FeedbackNote) => void;
+  onSubmit: (val: Rating) => void;
 }
 
 export const Step1: FC<Step1Props> = ({ onSubmit }) => {
@@ -19,13 +19,13 @@ export const Step1: FC<Step1Props> = ({ onSubmit }) => {
     <div className={styles.main}>
       <div className={styles.contentTitle}>{Messages.step1Title}</div>
       <div className={styles.rating}>
-        <Button variant="secondary" icon="info" onClick={() => onSubmit(FeedbackNote.BAD)} className={fixedIconStyle(sadImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit(Rating.BAD)} className={fixedIconStyle(sadImage)}>
           {Messages.button.badFeedback}
         </Button>
-        <Button variant="secondary" icon="info" onClick={() => onSubmit(FeedbackNote.FAIR)} className={fixedIconStyle(mehImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit(Rating.FAIR)} className={fixedIconStyle(mehImage)}>
           {Messages.button.fairFeedback}
         </Button>
-        <Button variant="secondary" icon="info" onClick={() => onSubmit(FeedbackNote.GOOD)} className={fixedIconStyle(smileImage)}>
+        <Button variant="secondary" icon="info" onClick={() => onSubmit(Rating.GOOD)} className={fixedIconStyle(smileImage)}>
           {Messages.button.goodFeedback}
         </Button>
       </div>

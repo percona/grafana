@@ -4,16 +4,16 @@ import { Step2 } from './steps/Step2';
 import { Step3 } from './steps/Step3';
 import { PortalAPI } from 'api';
 
-export enum FeedbackNote {
-  BAD,
-  FAIR,
-  GOOD,
+export enum Rating {
+  BAD = 1,
+  FAIR = 5,
+  GOOD = 10,
 }
 
 enum Step {
-  STEP1,
-  STEP2,
-  STEP3,
+  STEP1 = 0,
+  STEP2 = 1,
+  STEP3 = 2,
 }
 
 interface FeedbackContainerProps {
@@ -25,19 +25,22 @@ const DISPLAY_TIME_FEEDBACK_SENT = 10000;
 
 export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) => {
   const [currentStep, setCurrentStep] = useState(Step.STEP1);
-  const [feedbackNote, setFeedbackNote] = useState('');
-  const [feedbackDescription, setFeedbackDescription] = useState('');
+  const [rating, setRating] = useState<Rating | null>();
 
-  const saveFeedback = () => {
-    PortalAPI.createFeedback(feedbackNote, feedbackDescription, pmmServerId || '')
-      .catch(() => {})
+  const saveFeedback = (rating: Rating, description: string) => {
+    if (!rating) {
+      console.error(`[rating] ${rating} must be defined`);
+      return;
+    }
+    PortalAPI.createFeedback(rating, description, pmmServerId || '')
+      .catch(() => {
+      })
       .finally(() => {
         if (onFinish) {
           onFinish();
         }
 
-        setFeedbackDescription('');
-        setFeedbackNote('');
+        setRating(null);
       });
   };
 
@@ -45,10 +48,11 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
     <>
       {currentStep === Step.STEP1 && (
         <Step1
-          onSubmit={(val) => {
-            setFeedbackNote(FeedbackNote[val]);
-            if (val === FeedbackNote.GOOD) {
-              saveFeedback();
+          onSubmit={(rating) => {
+            setRating(rating);
+
+            if (rating === Rating.GOOD) {
+              saveFeedback(rating, "");
               setCurrentStep(Step.STEP3);
             } else {
               setCurrentStep(Step.STEP2);
@@ -59,8 +63,7 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
       {currentStep === Step.STEP2 && (
         <Step2
           onSubmit={(description) => {
-            setFeedbackDescription(description);
-            saveFeedback();
+            saveFeedback(rating!, description);
             setCurrentStep(Step.STEP3);
           }}
           onDismiss={() => {
@@ -69,7 +72,7 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
         />
       )}
       {currentStep === Step.STEP3 && (
-        <Step3 onFinish={() => setCurrentStep(Step.STEP1)} displayTimeMs={DISPLAY_TIME_FEEDBACK_SENT} />
+        <Step3 onFinish={() => setCurrentStep(Step.STEP1)} displayTimeMs={DISPLAY_TIME_FEEDBACK_SENT}/>
       )}
     </>
   );
