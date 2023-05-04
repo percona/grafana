@@ -5,7 +5,7 @@ import { api } from 'app/percona/shared/helpers/api';
 import {
   CompatibleServiceListPayload,
   DBServiceList,
-  NodeListFromDBPayload,
+  NodeListDBPayload,
   RemoveAgentBody,
   RemoveNodeBody,
   ServiceAgentListPayload,
@@ -50,7 +50,7 @@ export const InventoryService = {
     return result;
   },
   getNodes(body = {}, token?: CancelToken) {
-    return api.post<NodeListFromDBPayload, object>(`/v1/management/Node/List`, body, false, token);
+    return api.post<NodeListDBPayload, object>(`/v1/management/Node/List`, body, false, token);
   },
   removeNode(body: RemoveNodeBody, token?: CancelToken) {
     return api.post<void, RemoveNodeBody>(`${BASE_URL}/Nodes/Remove`, body, false, token);

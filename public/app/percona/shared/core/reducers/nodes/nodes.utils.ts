@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
-import { NodeFe, NodeFromDb } from 'app/percona/inventory/Inventory.types';
+import { Node, NodeDB } from 'app/percona/inventory/Inventory.types';
 
 const MAIN_COLUMNS = ['address', 'services', 'agents', 'node_type', 'node_id', 'node_name', 'status', 'custom_labels'];
 
-export const nodeFromDbMapper = (nodeFromDb: NodeFromDb[]) => {
+export const nodeFromDbMapper = (nodeFromDb: NodeDB[]) => {
   console.log(nodeFromDb);
   return nodeFromDb.map((node) => {
     const properties: Record<string, string> = {};
@@ -44,6 +44,6 @@ export const nodeFromDbMapper = (nodeFromDb: NodeFromDb[]) => {
         serviceName: service.service_name,
       })),
       properties: properties,
-    } as NodeFe;
+    } as Node;
   });
 };

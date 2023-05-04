@@ -1,9 +1,9 @@
 import { CancelToken } from 'axios';
 
-import { NodeFe } from 'app/percona/inventory/Inventory.types';
+import { Node } from 'app/percona/inventory/Inventory.types';
 
 export interface NodesState {
-  nodes: NodeFe[];
+  nodes: Node[];
   isLoading: boolean;
 }
 

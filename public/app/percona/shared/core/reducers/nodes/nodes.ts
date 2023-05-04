@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
-import { NodeFe, RemoveNodeBody } from 'app/percona/inventory/Inventory.types';
+import { Node, RemoveNodeBody } from 'app/percona/inventory/Inventory.types';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 
 import { NodesState, RemoveNodesParams } from './nodes.types';
@@ -35,7 +35,7 @@ const nodesSlice = createSlice({
   },
 });
 
-export const fetchNodesAction = createAsyncThunk<NodeFe[], { token?: CancelToken }>(
+export const fetchNodesAction = createAsyncThunk<Node[], { token?: CancelToken }>(
   'percona/fetchNodes',
   async (params = {}) => {
     const { nodes } = await InventoryService.getNodes(params.token);

@@ -39,17 +39,13 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const [agentsLoading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<Agent[]>([]);
-  console.log('agents:', data);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const serviceId = match.params.serviceId ? formatServiceId(match.params.serviceId) : undefined;
-  console.log('serviceId:', serviceId);
-  console.log('match', match.params.nodeId);
   const nodeId = match.params.nodeId
     ? match.params.nodeId === 'pmm-server'
       ? 'pmm-server'
       : formatNodeId(match.params.nodeId)
     : undefined;
-  console.log('nodeId:', nodeId);
   const navModel = usePerconaNavModel(serviceId ? 'inventory-services' : 'inventory-nodes');
   const [generateToken] = useCancelToken();
   const { isLoading: servicesLoading, services } = useSelector(getServices);
@@ -57,9 +53,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const styles = useStyles2(getStyles);
 
   const service = services.find((s) => s.params.serviceId === serviceId);
-  console.log('service:', service);
   const node = nodes.find((s) => s.nodeId === nodeId);
-  console.log('node:', node);
 
   const columns = useMemo(
     (): Array<Column<Agent>> => [
@@ -92,7 +86,6 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
         nodeId,
         generateToken(GET_AGENTS_CANCEL_TOKEN)
       );
-      console.log(agents);
       setData(toAgentModel(agents));
     } catch (e) {
       if (isApiCancelError(e)) {
@@ -130,13 +123,10 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
 
   useEffect(() => {
     if (!service && serviceId) {
-      console.log('service called');
       dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
     } else if (!node && nodeId) {
-      console.log('node called');
       dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) }));
     } else {
-      console.log('agents loaded');
       loadData();
     }
   }, [generateToken, loadData, service, nodeId, serviceId, node]);

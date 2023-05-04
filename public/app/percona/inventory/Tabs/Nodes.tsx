@@ -26,7 +26,7 @@ import { useSelector } from 'app/types';
 import { appEvents } from '../../../core/app_events';
 import { GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
-import { NodeFe } from '../Inventory.types';
+import { Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
@@ -38,14 +38,13 @@ export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
-  const [actionItem, setActionItem] = useState<NodeFe | null>(null);
+  const [actionItem, setActionItem] = useState<Node | null>(null);
   const navModel = usePerconaNavModel('inventory-nodes');
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
-  console.log('nodes', nodes);
   const getActions = useCallback(
-    (row: Row<NodeFe>): Action[] => [
+    (row: Row<Node>): Action[] => [
       {
         content: (
           <HorizontalGroup spacing="sm">
@@ -63,7 +62,7 @@ export const NodesTab = () => {
   );
 
   const columns = useMemo(
-    (): Array<Column<NodeFe>> => [
+    (): Array<Column<Node>> => [
       {
         Header: Messages.services.columns.status,
         accessor: 'status',
@@ -127,7 +126,7 @@ export const NodesTab = () => {
   }, []);
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row<NodeFe>) => {
+    (row: Row<Node>) => {
       const labels = row.original.customLabels || {};
       const labelKeys = Object.keys(labels);
       const extraProperties = row.original.properties || {};
@@ -300,7 +299,7 @@ export const NodesTab = () => {
             pendingRequest={isLoading}
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
-            getRowId={useCallback((row: NodeFe) => row.nodeId, [])}
+            getRowId={useCallback((row: Node) => row.nodeId, [])}
           />
         </FeatureLoader>
       </OldPage.Contents>

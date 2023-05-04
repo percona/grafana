@@ -85,26 +85,26 @@ export interface RemoveNodeBody {
   force: boolean;
 }
 
-interface NodeFromDbAgent {
+interface DbAgentNode {
   agent_id: string;
   agent_type: AgentType;
   status: ServiceStatus;
   is_connected?: boolean;
 }
 
-interface ServiceInNodeListDb {
+interface ServiceNodeListDB {
   service_id: string;
   service_type: ServiceType;
   service_name: string;
 }
 
-interface ServiceInNodeList {
+interface ServiceNodeList {
   serviceId: string;
   serviceType: ServiceType;
   serviceName: string;
 }
 
-export interface NodeFe {
+export interface Node {
   nodeId: string;
   nodeType: string;
   nodeName: string;
@@ -121,11 +121,11 @@ export interface NodeFe {
   createdAt: string;
   updatedAt: string;
   status: ServiceStatus;
-  services?: ServiceInNodeList[];
+  services?: ServiceNodeList[];
   properties?: Record<string, string>;
 }
 
-export interface NodeFromDb {
+export interface NodeDB {
   node_id: string;
   node_type: string;
   node_name: string;
@@ -138,13 +138,13 @@ export interface NodeFromDb {
   container_id?: string;
   container_name?: string;
   custom_labels?: Record<string, string>;
-  agents?: NodeFromDbAgent[];
+  agents?: DbAgentNode[];
   created_at: string;
   updated_at: string;
   status: ServiceStatus;
-  services?: ServiceInNodeListDb[];
+  services?: ServiceNodeListDB[];
 }
 
-export interface NodeListFromDBPayload {
-  nodes: NodeFromDb[];
+export interface NodeListDBPayload {
+  nodes: NodeDB[];
 }
