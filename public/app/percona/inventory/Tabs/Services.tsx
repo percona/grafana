@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { Column, Row } from 'react-table';
+import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
@@ -13,7 +13,7 @@ import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ServiceIconWithText } from 'app/percona/shared/components/Elements/ServiceIconWithText/ServiceIconWithText';
-import { Table } from 'app/percona/shared/components/Elements/Table';
+import { ExtendedColumn, Table } from 'app/percona/shared/components/Elements/Table';
 import { FormElement } from 'app/percona/shared/components/Form';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
@@ -24,7 +24,6 @@ import {
 } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getDashboardLinkForService } from 'app/percona/shared/helpers/getDashboardLinkForService';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
@@ -36,9 +35,14 @@ import { appEvents } from '../../../core/app_events';
 import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
+import { StatusInfo } from '../components/StatusInfo/StatusInfo';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
-import { getBadgeColorForServiceStatus, getBadgeIconForServiceStatus } from './Services.utils';
+import {
+  getBadgeColorForServiceStatus,
+  getBadgeIconForServiceStatus,
+  getBadgeTextForServiceStatus,
+} from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Services = () => {
@@ -82,17 +86,18 @@ export const Services = () => {
   );
 
   const columns = useMemo(
-    (): Array<Column<Service>> => [
+    (): Array<ExtendedColumn<Service>> => [
       {
         Header: Messages.services.columns.status,
         accessor: (row) => row.params.status,
         Cell: ({ value }: { value: ServiceStatus }) => (
           <Badge
-            text={capitalizeText(value)}
+            text={getBadgeTextForServiceStatus(value)}
             color={getBadgeColorForServiceStatus(value)}
             icon={getBadgeIconForServiceStatus(value)}
           />
         ),
+        tooltipInfo: <StatusInfo />,
       },
       {
         Header: Messages.services.columns.serviceName,
