@@ -17,8 +17,8 @@
   "dependencies": {
     "@emotion/css": "11.9.0",
     "@emotion/react": "11.9.3",
-    "@grafana/data": "9.2.5",
-    "@grafana/ui": "9.2.5",
+    "@grafana/data": "9.2.13",
+    "@grafana/ui": "9.2.13",
     "@reduxjs/toolkit": "1.8.5",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.4",
