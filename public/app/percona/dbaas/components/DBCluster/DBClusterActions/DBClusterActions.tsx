@@ -77,9 +77,7 @@ export const DBClusterActions: FC<DBClusterActionsProps> = ({
           dbCluster.status === DBClusterStatus.ready
             ? Messages.dbcluster.table.actions.suspend
             : Messages.dbcluster.table.actions.resume,
-        disabled:
-          (dbCluster.status !== DBClusterStatus.ready && dbCluster.status !== DBClusterStatus.suspended) ||
-          dbCluster.databaseType === Databases.postgresql,
+        disabled: dbCluster.status !== DBClusterStatus.ready && dbCluster.status !== DBClusterStatus.suspended,
         action: async () => {
           try {
             const dbClusterService = newDBClusterService(dbCluster.databaseType);
