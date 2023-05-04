@@ -36,7 +36,6 @@ import { getStyles } from './Tabs.styles';
 
 export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
-  console.log('NodesTab , nodes:', nodes);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const [actionItem, setActionItem] = useState<NodeFe | null>(null);
@@ -131,12 +130,8 @@ export const NodesTab = () => {
   const renderSelectedSubRow = React.useCallback(
     (row: Row<NodeFe>) => {
       const labels = row.original.customLabels || {};
-      console.log('NodesTab , labels:', labels);
       const labelKeys = Object.keys(labels);
-      console.log('NodesTab , labelKeys:', labelKeys);
       const agents = row.original.agents || [];
-      console.log('NodesTab , agents:', agents);
-      console.log('original', row.original);
       return (
         <DetailsRow>
           {!!agents.length && (
