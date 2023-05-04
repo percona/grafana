@@ -193,7 +193,7 @@ export const Table: FC<TableProps> = ({
                         >
                           {column.render('Header')}
                           {!!column.tooltipInfo && (
-                            <Tooltip interactive content={column.tooltipInfo}>
+                            <Tooltip interactive content={column.tooltipInfo} placement="bottom-end">
                               <Icon tabIndex={0} name="info-circle" size="sm" className={style.infoIcon} />
                             </Tooltip>
                           )}
