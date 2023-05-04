@@ -7,7 +7,7 @@ clean:							## Cleans up project
 init:								## Prepares local development environment.
 	cd ../ && make build-go
 	yarn install --immutable
-	cd ./pmm-ui && npm install
+	cd ./pmm-ui && npm ci
 
 dev:								## Starts local development.
 	make env-down
