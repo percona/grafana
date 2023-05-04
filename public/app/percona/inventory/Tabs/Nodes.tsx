@@ -26,7 +26,7 @@ import { useSelector } from 'app/types';
 import { appEvents } from '../../../core/app_events';
 import { GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
-import { NodeFe } from '../Inventory.service';
+import { NodeFe } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
@@ -43,7 +43,7 @@ export const NodesTab = () => {
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
-
+  console.log('nodes', nodes);
   const getActions = useCallback(
     (row: Row<NodeFe>): Action[] => [
       {
@@ -66,7 +66,7 @@ export const NodesTab = () => {
     (): Array<Column<NodeFe>> => [
       {
         Header: Messages.services.columns.status,
-        accessor: (row) => row.status,
+        accessor: 'status',
         Cell: ({ value }: { value: ServiceStatus }) => (
           <Badge
             text={capitalizeText(value)}
@@ -77,15 +77,11 @@ export const NodesTab = () => {
       },
       {
         Header: Messages.nodes.columns.nodeName,
-        accessor: (row) => row.nodeName,
-      },
-      {
-        Header: Messages.nodes.columns.nodeId,
-        accessor: (row) => row.nodeId,
+        accessor: 'nodeName',
       },
       {
         Header: Messages.nodes.columns.nodeType,
-        accessor: (row) => row.nodeType,
+        accessor: 'nodeType',
       },
       {
         Header: Messages.services.columns.monitoring,
@@ -100,15 +96,18 @@ export const NodesTab = () => {
         ),
       },
       {
+        Header: Messages.nodes.columns.address,
+        accessor: 'address',
+      },
+      {
         Header: Messages.nodes.columns.services,
         accessor: 'services',
         Cell: ({ value, row }) => {
-          return <div>{value.length > 1 ? `${value.length} services` : value[0].service_name}</div>;
+          if (!value || value.length < 1) {
+            return <div>{Messages.nodes.noServices}</div>;
+          }
+          return <div>{value.length > 1 ? `${value.length} services` : value[0].serviceName}</div>;
         },
-      },
-      {
-        Header: Messages.nodes.columns.address,
-        accessor: (row) => row.address,
       },
       getExpandAndActionsCol(getActions),
     ],
@@ -131,6 +130,8 @@ export const NodesTab = () => {
     (row: Row<NodeFe>) => {
       const labels = row.original.customLabels || {};
       const labelKeys = Object.keys(labels);
+      const extraProperties = row.original.properties || {};
+      const extraPropertiesKeys = Object.keys(extraProperties);
       const agents = row.original.agents || [];
       return (
         <DetailsRow>
@@ -148,11 +149,9 @@ export const NodesTab = () => {
           </DetailsRow.Contents>
           {row.original.services && row.original.services.length && (
             <DetailsRow.Contents title={Messages.nodes.details.serviceNames}>
-              <span>
-                {row.original.services.map((service) => (
-                  <div key={service.service_id}>{service.service_name}</div>
-                ))}
-              </span>
+              {row.original.services.map((service) => (
+                <div key={service.serviceId}>{service.serviceName}</div>
+              ))}
             </DetailsRow.Contents>
           )}
           {!!labelKeys.length && (
@@ -161,6 +160,15 @@ export const NodesTab = () => {
                 colorIndex={9}
                 className={styles.tagList}
                 tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
+              />
+            </DetailsRow.Contents>
+          )}
+          {!!extraPropertiesKeys.length && (
+            <DetailsRow.Contents title={Messages.services.details.properties} fullRow>
+              <TagList
+                colorIndex={9}
+                className={styles.tagList}
+                tags={extraPropertiesKeys.map((prop) => `${prop}=${extraProperties![prop]}`)}
               />
             </DetailsRow.Contents>
           )}

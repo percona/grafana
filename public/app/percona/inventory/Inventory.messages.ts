@@ -17,6 +17,7 @@ export const Messages = {
       agents: 'Agents',
       serviceId: 'Service ID',
       labels: 'Labels',
+      properties: 'Attributes',
     },
     emptyTable: 'No services available',
     forceConfirmation: 'Force mode is going to delete all associated agents',
@@ -49,6 +50,7 @@ export const Messages = {
   nodes: {
     forceConfirmation: 'Force mode is going to delete all agents and services associated with the nodes',
     emptyTable: 'No nodes available',
+    noServices: 'No services',
     columns: {
       nodeName: 'Node Name',
       nodeId: 'Node ID',

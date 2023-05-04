@@ -1,6 +1,6 @@
 import { CancelToken } from 'axios';
 
-import { NodeFe } from 'app/percona/inventory/Inventory.service';
+import { NodeFe } from 'app/percona/inventory/Inventory.types';
 
 export interface NodesState {
   nodes: NodeFe[];

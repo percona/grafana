@@ -1,5 +1,5 @@
 import { Databases } from '../shared/core';
-
+import { DbAgent, ServiceStatus, ServiceType } from '../shared/services/services/Services.types';
 export interface CompatibleServicePayload {
   service_id: string;
   service_name: string;
@@ -74,4 +74,77 @@ export interface ServiceAgent {
 export interface Agent {
   type: AgentType;
   params: ServiceAgent;
+}
+
+export interface RemoveAgentBody {
+  agent_id: string;
+  force: boolean;
+}
+export interface RemoveNodeBody {
+  node_id: string;
+  force: boolean;
+}
+
+interface NodeFromDbAgent {
+  agent_id: string;
+  agent_type: AgentType;
+  status: ServiceStatus;
+  is_connected?: boolean;
+}
+
+interface ServiceInNodeListDb {
+  service_id: string;
+  service_type: ServiceType;
+  service_name: string;
+}
+
+interface ServiceInNodeList {
+  serviceId: string;
+  serviceType: ServiceType;
+  serviceName: string;
+}
+
+export interface NodeFe {
+  nodeId: string;
+  nodeType: string;
+  nodeName: string;
+  machineId?: string;
+  distro?: string;
+  address: string;
+  nodeModel?: string;
+  region?: string;
+  az?: string;
+  containerId?: string;
+  containerName?: string;
+  customLabels?: Record<string, string>;
+  agents?: DbAgent[];
+  createdAt: string;
+  updatedAt: string;
+  status: ServiceStatus;
+  services?: ServiceInNodeList[];
+  properties?: Record<string, string>;
+}
+
+export interface NodeFromDb {
+  node_id: string;
+  node_type: string;
+  node_name: string;
+  machine_id?: string;
+  distro?: string;
+  address: string;
+  node_model?: string;
+  region?: string;
+  az?: string;
+  container_id?: string;
+  container_name?: string;
+  custom_labels?: Record<string, string>;
+  agents?: NodeFromDbAgent[];
+  created_at: string;
+  updated_at: string;
+  status: ServiceStatus;
+  services?: ServiceInNodeListDb[];
+}
+
+export interface NodeListFromDBPayload {
+  nodes: NodeFromDb[];
 }

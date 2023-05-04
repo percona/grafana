@@ -2,10 +2,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 
-import { InventoryService, NodeFe, NodeFromDb, RemoveNodeBody } from 'app/percona/inventory/Inventory.service';
+import { InventoryService } from 'app/percona/inventory/Inventory.service';
+import { NodeFe, RemoveNodeBody } from 'app/percona/inventory/Inventory.types';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 
 import { NodesState, RemoveNodesParams } from './nodes.types';
+import { nodeFromDbMapper } from './nodes.utils';
 
 const initialState: NodesState = {
   nodes: [],
@@ -33,42 +35,10 @@ const nodesSlice = createSlice({
   },
 });
 
-const nodeFromDbMapper = (nodeFromDb: NodeFromDb[]) => {
-  return nodeFromDb.map(
-    (node) =>
-      ({
-        nodeId: node.node_id,
-        nodeType: node.node_type,
-        nodeName: node.node_name,
-        machineId: node.machine_id,
-        distro: node.distro,
-        address: node.address,
-        nodeModel: node.node_model,
-        region: node.region,
-        az: node.az,
-        containerId: node.container_id,
-        containerName: node.container_name,
-        customLabels: node.custom_labels,
-        agents: node.agents?.map((agent) => ({
-          agentId: agent.agent_id,
-          agentType: agent.agent_type,
-          status: agent.status,
-          isConnected: agent.is_connected,
-        })),
-        createdAt: node.created_at,
-        updatedAt: node.updated_at,
-        status: node.status,
-        services: node.services,
-      } as NodeFe)
-  );
-};
-
 export const fetchNodesAction = createAsyncThunk<NodeFe[], { token?: CancelToken }>(
   'percona/fetchNodes',
   async (params = {}) => {
     const { nodes } = await InventoryService.getNodes(params.token);
-    console.log(nodes);
-    //return toDbNodesModel(nodes);
     return nodeFromDbMapper(nodes);
   }
 );
