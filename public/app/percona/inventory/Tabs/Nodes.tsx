@@ -196,7 +196,7 @@ export const NodesTab = () => {
       try {
         // eslint-disable-next-line max-len
         const requests = nodesToDelete.map<RemoveNodeParams>((node) => ({
-          nodeId: node.params.nodeId,
+          nodeId: node.nodeId,
           force: forceMode,
         }));
 
@@ -286,7 +286,6 @@ export const NodesTab = () => {
             />
           </Modal>
           <Table
-            // @ts-ignore
             columns={columns}
             data={nodes}
             totalItems={nodes.length}
