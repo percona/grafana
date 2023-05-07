@@ -5,7 +5,7 @@ import { IconButton, Tab, TabsBar, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { ResourcesContainer } from './components/ResourcesContainer';
-import { HelpCenterTipsContainer } from "./components/HelpCenterTipsContainer/HelpCenterTipsContainer";
+import { HelpCenterTipsContainer } from './components/HelpCenterTipsContainer/HelpCenterTipsContainer';
 import { fetchSystemAndUserTipsAction } from 'reducers/tips/tips';
 
 interface HelpCenterProps {
@@ -25,15 +25,7 @@ type TabName = 'tips' | 'resources' | 'wnatsnew';
 export const HelpCenter: FC<HelpCenterProps> = (props) => {
   const [activeTab, setActiveTab] = useState<TabName>('tips');
 
-  const {
-    open,
-    onClose,
-    width,
-    isConnectedUser,
-    userId,
-    openKeyboardShortcut,
-    onConnectToPlatformClick,
-  } = props;
+  const { open, onClose, width, isConnectedUser, userId, openKeyboardShortcut, onConnectToPlatformClick } = props;
   const styles = useStyles2(getStyles);
 
   const changeTab = (tab: TabName) => {
@@ -50,11 +42,14 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
   }, []);
 
   return (
-    <div className={styles.drawer} style={{
-      width: width,
-      transform: open ? `translateX(0)`: `translateX(${width})`,
-      transition: 'transform 225ms',
-    }}>
+    <div
+      className={styles.drawer}
+      style={{
+        width: width,
+        transform: open ? `translateX(0)` : `translateX(${width})`,
+        transition: 'transform 225ms',
+      }}
+    >
       <div className={styles.indentContainer} />
       <div className={styles.container}>
         <div className={styles.headerRow}>
@@ -69,13 +64,15 @@ export const HelpCenter: FC<HelpCenterProps> = (props) => {
           </TabsBar>
         </TabsBar>
         <div className={styles.containerContentTabs}>
-          {activeTab === 'tips' && <HelpCenterTipsContainer
+          {activeTab === 'tips' && (
+            <HelpCenterTipsContainer
               userId={userId}
               isConnectedUser={isConnectedUser}
               onConnectToPlatformClick={onConnectToPlatformClick}
-          />}
+            />
+          )}
 
-          {activeTab === 'resources' && <ResourcesContainer openKeyboardShortcut={openKeyboardShortcut}/>}
+          {activeTab === 'resources' && <ResourcesContainer openKeyboardShortcut={openKeyboardShortcut} />}
         </div>
       </div>
       <div className={styles.indentContainer} />

@@ -1,5 +1,5 @@
-const {DefinePlugin} = require("webpack");
-require('dotenv').config({path: './.env'});
+const { DefinePlugin } = require('webpack');
+require('dotenv').config({ path: './.env' });
 
 module.exports = {
   webpack: {
@@ -20,9 +20,9 @@ module.exports = {
             ...process.env,
             ...{
               NODE_ENV: JSON.stringify('development'),
-            }
+            },
           }),
-        }),
+        })
       );
 
       config.ignoreWarnings = [

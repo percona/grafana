@@ -27,7 +27,7 @@ npm run dev
 
 ## Testing with locally running Portal
 
-In `.env` of  `grafana/apps/pmm-ui` please make sure you have:
+In `.env` of `grafana/apps/pmm-ui` please make sure you have:
 
 ```dotenv
 PMM_UI_PORTAL_BASE_URL=https://check.localhost

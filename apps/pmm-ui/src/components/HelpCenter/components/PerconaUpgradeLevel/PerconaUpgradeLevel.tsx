@@ -3,7 +3,7 @@ import { Button, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import headerImg from '../../assets/percona-header.png';
-import { Messages } from "./PerconaUpgradeLevel.messages";
+import { Messages } from './PerconaUpgradeLevel.messages';
 
 interface PerconaUpgradeLevelProps {}
 

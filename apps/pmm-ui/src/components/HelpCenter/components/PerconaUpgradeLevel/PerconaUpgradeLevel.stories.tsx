@@ -9,7 +9,6 @@ export default {
   argTypes: {},
 } as ComponentMeta<typeof PerconaUpgradeLevel>;
 
-
 const Template: ComponentStory<typeof PerconaUpgradeLevel> = (args) => {
   return <PerconaUpgradeLevel {...args} />;
 };

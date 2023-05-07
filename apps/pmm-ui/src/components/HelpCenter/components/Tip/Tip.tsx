@@ -3,8 +3,8 @@ import { Button, IconName, Tooltip, useStyles2, Checkbox } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import checkMarkImg from '../../assets/check-mark.svg';
-import { useDispatch } from "react-redux";
-import { completeUserTip } from "../../../../reducers/tips/tips";
+import { useDispatch } from 'react-redux';
+import { completeUserTip } from '../../../../reducers/tips/tips';
 
 interface TipProps {
   title: string;
@@ -39,14 +39,14 @@ export const Tip: FC<TipProps> = (props) => {
     tipId,
   } = props;
   const styles = useStyles2(getStyles);
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
 
   const active: boolean = opened && !completed;
 
   const [checked, setChecked] = useState(false);
   const onChange = (e: any) => {
     if (e.currentTarget.checked) {
-      dispatch(completeUserTip({tipId: tipId}));
+      dispatch(completeUserTip({ tipId: tipId }));
       //todo: handle error
       setChecked(e.currentTarget.checked);
     }
@@ -196,5 +196,5 @@ const getStyles = (theme: GrafanaTheme2) => ({
   completeCheckbox: css`
     padding-left: 16px;
     padding-top: 8px;
-  `
+  `,
 });

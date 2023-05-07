@@ -9,7 +9,7 @@ import imgOptimizeAndImprove from './assets/optimize-and-improve.svg';
 import imgMaintainPerformance from './assets/maintain-performance.svg';
 import { ActionContainer } from './comonents/ActionContainer';
 import { HomePageTipsContainer } from './comonents/HomePageTipsContainer';
-import { Messages } from "./HomePage.messages";
+import { Messages } from './HomePage.messages';
 
 interface HomePageProps {
   onHelpCenterButtonClick?: () => void;

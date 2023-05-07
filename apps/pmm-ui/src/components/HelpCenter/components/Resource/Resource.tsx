@@ -1,7 +1,5 @@
 import React, { FC } from 'react';
-import {
-  Button, Icon, IconName, useStyles2,
-} from '@grafana/ui';
+import { Button, Icon, IconName, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 
@@ -14,22 +12,24 @@ interface ResourceProps {
 }
 
 export const Resource: FC<ResourceProps> = (props) => {
-  const {
-    title, text, buttonText, url, icon
-  } = props;
+  const { title, text, buttonText, url, icon } = props;
   const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.resourceContainer}>
       <div className={styles.header}>
-        { icon && (
-          <Icon name={icon} size="xl" />
-        )}
+        {icon && <Icon name={icon} size="xl" />}
         <div className={styles.title}>{title}</div>
       </div>
       <div className={styles.body}>
         <div className={styles.text}>{text}</div>
-        <Button icon="external-link-alt" variant="secondary" size="md" type="button" onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}>
+        <Button
+          icon="external-link-alt"
+          variant="secondary"
+          size="md"
+          type="button"
+          onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
+        >
           {buttonText}
         </Button>
       </div>

@@ -15,9 +15,9 @@ const Template: ComponentStory<typeof Resource> = (args) => {
 
 export const Primary = Template.bind({});
 Primary.args = {
-  icon: "book-open",
-  title: "Documentation",
-  text: "Visit out up-to-date, detailed guides on how to use PMM effectively.",
-  url: "https://docs.percona.com/percona-monitoring-and-management/index.html",
-  buttonText: "Open documentation",
+  icon: 'book-open',
+  title: 'Documentation',
+  text: 'Visit out up-to-date, detailed guides on how to use PMM effectively.',
+  url: 'https://docs.percona.com/percona-monitoring-and-management/index.html',
+  buttonText: 'Open documentation',
 };

@@ -3,12 +3,12 @@ export const Messages = {
 
   connected: {
     section1: {
-      main: 'Congratulations, you\'re all set! Your PMM instance is correctly connected to Percona Platform which gives you have access to advanced Advisors.',
+      main: "Congratulations, you're all set! Your PMM instance is correctly connected to Percona Platform which gives you have access to advanced Advisors.",
       subsection1: 'Read access to your PMM Server Name',
       subsection2: 'Read access to your PMM Server ID',
     },
     section2: {
-      main: 'This connection is active because you authorized Percona Platform to access the following data in accordance to Percona\'s Terms of Service and Privacy Policy.'
+      main: "This connection is active because you authorized Percona Platform to access the following data in accordance to Percona's Terms of Service and Privacy Policy.",
     },
   },
 

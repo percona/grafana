@@ -4,7 +4,7 @@ import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
 import { TipsContainer } from './TipsContainer';
 import { setSystemTipsCurrentlySelected, TipModel } from '../../../../reducers/tips/tips';
-import { Messages } from "components/HelpCenter/components/TipsContainer/StartMonitoringTipsContainer.messages";
+import { Messages } from 'components/HelpCenter/components/TipsContainer/StartMonitoringTipsContainer.messages';
 
 interface StartMonitoringTipsContainerProps {
   userId: number;
@@ -13,12 +13,12 @@ interface StartMonitoringTipsContainerProps {
 }
 
 export const StartMonitoringTipsContainer: FC<StartMonitoringTipsContainerProps> = (props) => {
-  const {userId, tips, currentlySelectedTipId} = props;
-  const styles = useStyles2 (getStyles);
+  const { userId, tips, currentlySelectedTipId } = props;
+  const styles = useStyles2(getStyles);
 
   return (
     <div className={styles.tipContainer}>
-      <div className={styles.top}/>
+      <div className={styles.top} />
       <div className={styles.headerContainer}>
         <h3 className={styles.tipsLabel}>{Messages.title}</h3>
       </div>
@@ -49,7 +49,7 @@ const getStyles = (theme: GrafanaTheme2) => {
       justify-content: flex-start;
     `,
     tipContainer: css`
-      margin-bottom: ${theme.spacing (4)};
+      margin-bottom: ${theme.spacing(4)};
     `,
   };
 };

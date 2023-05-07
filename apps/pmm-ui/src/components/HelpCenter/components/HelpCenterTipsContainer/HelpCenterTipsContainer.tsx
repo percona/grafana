@@ -7,8 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { StoreState } from 'reducers/store';
 import { fetchSystemAndUserTipsAction } from 'reducers/tips/tips';
 import { useLocalStorage } from 'hooks/localStorage';
-import { EmptyTip } from "../TipsContainer/EmptyTip";
-import { getTips } from "../../../../reducers/selectors";
+import { EmptyTip } from '../TipsContainer/EmptyTip';
+import { getTips } from '../../../../reducers/selectors';
 
 export interface HelpCenterTipsContainerProps {
   userId: number;
@@ -18,11 +18,7 @@ export interface HelpCenterTipsContainerProps {
 }
 
 export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props) => {
-  const {
-    isConnectedUser,
-    userId,
-    onConnectToPlatformClick,
-  } = props;
+  const { isConnectedUser, userId, onConnectToPlatformClick } = props;
   const { systemTips, userTips } = useSelector(getTips);
 
   const feedbackLocalStorageKey = `grafana.onboarding.feedback.visible.${userId}`;
@@ -42,10 +38,9 @@ export const HelpCenterTipsContainer: FC<HelpCenterTipsContainerProps> = (props)
           currentlySelectedTipId={systemTips.currentlySelected}
         />
       )}
-      {!isConnectedUser && <TipNotConnected
-          showTitle={showTipForNonCompletedTip}
-          onConnectToPlatformClick={onConnectToPlatformClick}
-      />}
+      {!isConnectedUser && (
+        <TipNotConnected showTitle={showTipForNonCompletedTip} onConnectToPlatformClick={onConnectToPlatformClick} />
+      )}
       {isConnectedUser && !userTips.completed && (
         <ExploreYourNewPowerUpsTipsContainer
           userId={userId}

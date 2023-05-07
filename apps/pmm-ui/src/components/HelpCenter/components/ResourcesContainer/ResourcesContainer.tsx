@@ -2,9 +2,9 @@ import React, { FC } from 'react';
 import { Icon, IconName, useStyles2 } from '@grafana/ui';
 import { Resource } from '../Resource';
 import resourcesData from './stub/resources.json';
-import { GrafanaTheme2 } from "@grafana/data";
-import { css } from "@emotion/css";
-import { Messages } from "./ResourcesContainer.messages";
+import { GrafanaTheme2 } from '@grafana/data';
+import { css } from '@emotion/css';
+import { Messages } from './ResourcesContainer.messages';
 
 interface ResourcesContainerProps {
   openKeyboardShortcut: () => void;
@@ -17,7 +17,7 @@ export const ResourcesContainer: FC<ResourcesContainerProps> = (props) => {
   return (
     <div className={styles.resourceContainer}>
       <div>
-        {resourcesData.map ((r) => (
+        {resourcesData.map((r) => (
           <Resource
             key={r.id}
             icon={r.icon as IconName}
@@ -31,21 +31,31 @@ export const ResourcesContainer: FC<ResourcesContainerProps> = (props) => {
       <div className={styles.shortcutContainer}>
         <div className={styles.border}>
           <div className={styles.shortcutHeader}>
-            <a href="#" onClick={openKeyboardShortcut}>{Messages.shortcut1}</a>
+            <a href="#" onClick={openKeyboardShortcut}>
+              {Messages.shortcut1}
+            </a>
           </div>
           <div className={styles.link}>
-            <Icon name="download-alt" size="lg"/>
-            <a className={styles.title} target="_blank" href="/logs.zip">{Messages.shortcut2}</a>
+            <Icon name="download-alt" size="lg" />
+            <a className={styles.title} target="_blank" href="/logs.zip">
+              {Messages.shortcut2}
+            </a>
           </div>
           <div className={styles.link}>
-            <Icon name="comments-alt" size="lg"/>
-            <a className={styles.title} target="_blank" href="https://www.percona.com/services/support?utm_source=pmm_footer">{Messages.shortcut3}</a>
+            <Icon name="comments-alt" size="lg" />
+            <a
+              className={styles.title}
+              target="_blank"
+              href="https://www.percona.com/services/support?utm_source=pmm_footer"
+            >
+              {Messages.shortcut3}
+            </a>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 const getStyles = (theme: GrafanaTheme2) => ({
   resourceContainer: css`
@@ -79,5 +89,5 @@ const getStyles = (theme: GrafanaTheme2) => ({
     font-size: 14px;
     line-height: 16px;
   `,
-  title: css``
+  title: css``,
 });

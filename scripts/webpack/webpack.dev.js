@@ -24,7 +24,7 @@ const federation = federationFactory((module) => {
     let fd = process.env.fd_pmm;
     let remote = '';
     if (!fd) {
-      console.log('ENV fd_pmm is not set, falling back to compiled remote')
+      console.log('ENV fd_pmm is not set, falling back to compiled remote');
       remote = `${module}@/graph/public/pmm-ui/remoteEntry.js`;
     } else {
       remote = `${module}@${fd}/remoteEntry.js`;
@@ -137,7 +137,7 @@ module.exports = (env = {}) =>
           ...process.env,
           ...{
             NODE_ENV: JSON.stringify('development'),
-          }
+          },
         }),
       }),
       federation,

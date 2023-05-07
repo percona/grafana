@@ -23,9 +23,7 @@ export const PlatformConnectionSettings: FC<PlatformConnectionSettingsProps> = (
           <li className={styles.liStyle}>{Messages.connected.section1.subsection2}</li>
         </ul>
       </p>
-      <p>
-
-      </p>
+      <p></p>
       <Button variant="secondary" className={styles.button}>
         {Messages.button.disconnectPlatform}
       </Button>

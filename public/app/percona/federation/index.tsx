@@ -28,5 +28,5 @@ export const PmmUi = {
   StoreProvider,
   HomePageRouter,
   HomePageRoute,
-  PlatformConnectionSettings
+  PlatformConnectionSettings,
 };

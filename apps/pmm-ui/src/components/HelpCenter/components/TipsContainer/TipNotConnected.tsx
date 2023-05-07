@@ -32,12 +32,7 @@ export const TipNotConnected: FC<TipNotConnectedProps> = ({ showTitle, onConnect
           </ul>
 
           <div>
-            <Button
-              className={styles.tipsButton}
-              fullWidth
-              variant="secondary"
-              onClick={onConnectToPlatformClick}
-            >
+            <Button className={styles.tipsButton} fullWidth variant="secondary" onClick={onConnectToPlatformClick}>
               <img className={styles.buttonImage} alt="pmm-logo" src={tipIcon} />
               <div className={styles.perconaButtonLabel}>{Messages.button.connectToPlatform}</div>
             </Button>

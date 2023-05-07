@@ -3,7 +3,7 @@ import { TextBlock } from '../TextBlock';
 import { HorizontalGroup, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
-import { Heading, Spacing, Justify } from "shared";
+import { Heading, Spacing, Justify } from 'shared';
 
 export interface ActionContainerProps {
   headerType: Heading;

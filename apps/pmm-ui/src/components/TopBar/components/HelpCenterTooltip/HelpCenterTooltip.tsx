@@ -3,7 +3,7 @@ import { IconButton, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { ToolTip } from '../../../ToolTip';
-import { Messages } from "./HelpCenterTooltip.messages";
+import { Messages } from './HelpCenterTooltip.messages';
 
 interface HelpCenterTooltipProps {
   visible: boolean;

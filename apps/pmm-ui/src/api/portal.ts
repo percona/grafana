@@ -1,6 +1,6 @@
 import { ApiResource } from './api';
 import { Config } from '../config';
-import { Rating } from "components/Feedback/Feedback";
+import { Rating } from 'components/Feedback/Feedback';
 
 const apiTelemetryOnboarding = new ApiResource({ baseURL: Config.portal.baseUrl });
 

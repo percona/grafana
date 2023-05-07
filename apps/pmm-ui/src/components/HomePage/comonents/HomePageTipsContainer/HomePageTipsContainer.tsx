@@ -6,7 +6,7 @@ import { TipsContainer } from '../../../HelpCenter/components/TipsContainer/Tips
 import { useSelector } from 'react-redux';
 import { StoreState } from 'reducers/store';
 import { setSystemTipsCurrentlySelected } from 'reducers/tips/tips';
-import { Messages } from "./HomePageTipsContainer.messages";
+import { Messages } from './HomePageTipsContainer.messages';
 
 interface HomePageTipsContainerProps {
   userId: number;

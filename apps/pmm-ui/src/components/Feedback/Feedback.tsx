@@ -33,8 +33,7 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
       return;
     }
     PortalAPI.createFeedback(rating, description, pmmServerId || '')
-      .catch(() => {
-      })
+      .catch(() => {})
       .finally(() => {
         if (onFinish) {
           onFinish();
@@ -52,7 +51,7 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
             setRating(rating);
 
             if (rating === Rating.GOOD) {
-              saveFeedback(rating, "");
+              saveFeedback(rating, '');
               setCurrentStep(Step.STEP3);
             } else {
               setCurrentStep(Step.STEP2);
@@ -72,7 +71,7 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
         />
       )}
       {currentStep === Step.STEP3 && (
-        <Step3 onFinish={() => setCurrentStep(Step.STEP1)} displayTimeMs={DISPLAY_TIME_FEEDBACK_SENT}/>
+        <Step3 onFinish={() => setCurrentStep(Step.STEP1)} displayTimeMs={DISPLAY_TIME_FEEDBACK_SENT} />
       )}
     </>
   );

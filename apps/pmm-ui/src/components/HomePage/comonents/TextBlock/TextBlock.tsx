@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Heading } from "shared";
+import { Heading } from 'shared';
 
 export interface WelcomeBlockProps {
   header: string;
