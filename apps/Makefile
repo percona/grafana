@@ -28,7 +28,7 @@ dev-local-gs:								## Starts local development with local grafana server.
 	yarn start
 
 env-up:								## Starts devcontainer.
-	docker-compose -f docker-compose.dev.yaml build --no-cache; \
+	docker compose -f docker-compose.dev.yaml build --no-cache; \
 	docker-compose -f docker-compose.dev.yaml up -d
 
 env-up-local-gs:								## Starts devcontainer with local grafana server.
