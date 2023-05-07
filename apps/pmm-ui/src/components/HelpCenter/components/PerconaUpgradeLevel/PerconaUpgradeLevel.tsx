@@ -3,6 +3,7 @@ import { Button, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import headerImg from '../../assets/percona-header.png';
+import { Messages } from "./PerconaUpgradeLevel.messages";
 
 interface PerconaUpgradeLevelProps {}
 
@@ -15,9 +16,9 @@ export const PerconaUpgradeLevel: FC<PerconaUpgradeLevelProps> = () => {
         <img alt="percona-logo" className={styles.headerImage} src={headerImg} />
       </div>
       <div className={styles.body}>
-        <div className={styles.text}>Scale your projects with Percona’s open source database solutions.</div>
+        <div className={styles.text}>{Messages.body}</div>
         <Button icon="external-link-alt" variant="secondary" size="md" type="button">
-          Upgrade subscription
+          {Messages.btn}
         </Button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { FC } from 'react';
+import { Heading } from "shared";
 
-declare type Heading = 'h1' | 'h2';
 export interface WelcomeBlockProps {
   header: string;
   headerType: Heading;

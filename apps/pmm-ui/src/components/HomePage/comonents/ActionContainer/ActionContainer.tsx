@@ -3,10 +3,8 @@ import { TextBlock } from '../TextBlock';
 import { HorizontalGroup, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
+import { Heading, Spacing, Justify } from "shared";
 
-declare type Heading = 'h1' | 'h2';
-declare type Spacing = 'none' | 'xs' | 'sm' | 'md' | 'lg';
-declare type Justify = 'flex-start' | 'flex-end' | 'space-between' | 'center';
 export interface ActionContainerProps {
   headerType: Heading;
   header: string;

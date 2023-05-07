@@ -54,7 +54,6 @@ export function GrafanaRoute(props: Props) {
 
   const dispatch = useAppDispatch();
 
-  //TODO:WIP:
   const [connectPortalModalVisible, setConnectPortalModalVisible] = useState(false);
   const [helpCenterToolTipVisible, setHelpCenterToolTipVisible] = useState(false);
   const [visibleFeedback, setVisibleFeedback] = useState(false);

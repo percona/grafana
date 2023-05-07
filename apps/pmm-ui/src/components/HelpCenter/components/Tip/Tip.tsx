@@ -41,7 +41,7 @@ export const Tip: FC<TipProps> = (props) => {
   const styles = useStyles2(getStyles);
   const dispatch=useDispatch();
 
-  let active: boolean = opened && !completed;
+  const active: boolean = opened && !completed;
 
   const [checked, setChecked] = useState(false);
   const onChange = (e: any) => {

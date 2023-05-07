@@ -9,7 +9,7 @@ import imgOptimizeAndImprove from './assets/optimize-and-improve.svg';
 import imgMaintainPerformance from './assets/maintain-performance.svg';
 import { ActionContainer } from './comonents/ActionContainer';
 import { HomePageTipsContainer } from './comonents/HomePageTipsContainer';
-import {Config} from "../../config";
+import { Messages } from "./HomePage.messages";
 
 interface HomePageProps {
   onHelpCenterButtonClick?: () => void;
@@ -19,25 +19,15 @@ interface HomePageProps {
 export const HomePage: FC<HomePageProps> = (props) => {
   const styles = useStyles2(getStyles);
 
-  console.log(Config.portal.baseUrl)
-
   const { onHelpCenterButtonClick, userId } = props;
-  const wavingHandEmoji = String.fromCodePoint(128075);
-  const ringBuoyEmoji = String.fromCodePoint(128735);
-  const welcomeHeader = `${wavingHandEmoji} Welcome to PMM`;
-  const welcomeText =
-    "We're glad to have you onboard in Percona Monitoring and Management (PMM). Get ready to monitor and optimize your database like a pro with our powerful and more user-friendly tool. Let's get started!";
-  const helpBlockHeader = `${ringBuoyEmoji} We’re here to help`;
-  const helpBlockText =
-    "We've got you covered. Check out our Help Center, official documentation, and community forums to find the answers you need and connect with other PMM users.";
   return (
     <CustomScrollbar>
       <div className={styles.welcomePage}>
         <div className={styles.welcomePageContent}>
           <ActionContainer
             headerType="h1"
-            header={welcomeHeader}
-            text={welcomeText}
+            header={Messages.welcomeHeader}
+            text={Messages.welcomeText}
             actionsSpacing="none"
             actionsJustify="center"
           >
@@ -53,8 +43,8 @@ export const HomePage: FC<HomePageProps> = (props) => {
           <HomePageTipsContainer userId={userId} />
           <ActionContainer
             headerType="h2"
-            header={helpBlockHeader}
-            text={helpBlockText}
+            header={Messages.helpBlockHeader}
+            text={Messages.helpBlockText}
             actionsSpacing="md"
             actionsJustify="flex-start"
           >

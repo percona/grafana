@@ -24,10 +24,6 @@ export class ApiResource {
       .post<T>(path, body, { cancelToken })
       .then((response): T => response.data)
       .catch((e) => {
-        if (!disableNotifications && !axios.isCancel(e)) {
-          // showErrorNotification({ message: e.response.data?.message ?? 'Unknown error' });
-        }
-
         throw e;
       });
   }

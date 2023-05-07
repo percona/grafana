@@ -4,8 +4,9 @@ import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
 import { TipsContainer } from '../../../HelpCenter/components/TipsContainer/TipsContainer';
 import { useSelector } from 'react-redux';
-import { StoreState } from '../../../../reducers/store';
-import { setSystemTipsCurrentlySelected } from '../../../../reducers/tips/tips';
+import { StoreState } from 'reducers/store';
+import { setSystemTipsCurrentlySelected } from 'reducers/tips/tips';
+import { Messages } from "./HomePageTipsContainer.messages";
 
 interface HomePageTipsContainerProps {
   userId: number;
@@ -18,18 +19,14 @@ export const HomePageTipsContainer: FC<HomePageTipsContainerProps> = ({ userId }
 
   const styles = useStyles2(getStyles);
 
-  const rocketEmoji = String.fromCodePoint(128640);
-  const helpCenterHeading = `${rocketEmoji} Start monitoring databases with PMM`;
-  const helpCenterText =
-    'Get your PMM running so you can detect what’s going on with your databases in a blink of an eye.';
   const allTipsCovered = loading === false && completed;
   return allTipsCovered ? (
     <></>
   ) : (
     <div className={styles.helpCenterContainer}>
       <div className={styles.helpCenterTextContainer}>
-        <h2>{helpCenterHeading}</h2>
-        <span>{helpCenterText}</span>
+        <h2>{Messages.helpCenterHeading}</h2>
+        <span>{Messages.helpCenterText}</span>
       </div>
       <div className={styles.helpCenterTipsContainer}>
         <TipsContainer

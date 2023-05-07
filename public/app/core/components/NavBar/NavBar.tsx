@@ -141,7 +141,6 @@ export const NavBar = React.memo(() => {
                     />
                   )),
                   pluginItems.map((link, index) => (
-                    // TODO: hideMenu=true needs to be set only for PerconaHome menu item
                     <NavBarItem
                       key={`${link.id}-${index}`}
                       isActive={isMatchOrInnerMatch(link, activeItem)}

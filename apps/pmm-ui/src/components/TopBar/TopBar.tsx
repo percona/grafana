@@ -40,7 +40,6 @@ export const TopBar: FC<TopBarProps> = ({
   const { systemTips, userTips } = useSelector((state: StoreState) => state.tips);
   const showHelpCenterNotificationMarker = !systemTips.completed || !userTips.completed;
 
-  // TODO: consider passing proper appSubUrl
   const appSubUrl = '/graph';
 
   const styles = useStyles2(getStyles);

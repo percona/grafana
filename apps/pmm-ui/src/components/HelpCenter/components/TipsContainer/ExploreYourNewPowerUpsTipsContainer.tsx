@@ -1,9 +1,10 @@
 import React, { FC, useState } from 'react';
 import { useStyles2 } from '@grafana/ui';
-import { setUserTipsCurrentlySelected, TipModel } from '../../../../reducers/tips/tips';
+import { setUserTipsCurrentlySelected, TipModel } from 'reducers/tips/tips';
 import { TipsContainer } from "./TipsContainer";
 import { GrafanaTheme2 } from "@grafana/data";
 import { css, keyframes } from "@emotion/css";
+import { Messages } from "./ExploreYourNewPowerUpsTipsContainer.messages";
 
 export interface ExploreYourNewPowerUpsTipsContainerProps {
   userId: number;
@@ -20,7 +21,7 @@ export const ExploreYourNewPowerUpsTipsContainer: FC<ExploreYourNewPowerUpsTipsC
   return (
     <>
       <div className={ styles.headerContainer }>
-        <h3 className={ styles.tipsLabel }>Explore PMM benefits</h3>
+        <h3 className={ styles.tipsLabel }>{Messages.title}</h3>
         <div
           className={ `${ styles.notificationMarker } ${ isHoveredMarker ? styles.notificationMarkerHidden : '' }` }
           onMouseEnter={ () => {

@@ -3,6 +3,7 @@ import { IconButton, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { ToolTip } from '../../../ToolTip';
+import { Messages } from "./HelpCenterTooltip.messages";
 
 interface HelpCenterTooltipProps {
   visible: boolean;
@@ -21,11 +22,8 @@ export const HelpCenterTooltip: FC<HelpCenterTooltipProps> = ({ visible, childre
 
       <div className={styles.modalText}>
         <>
-          <div className={styles.modalTitle}>Quick access to Help Center</div>
-          <div className={styles.modalDescription}>
-            From the top bar, get access to tips, contextual help and useful resources to get you going with getting the
-            most out of PMM.
-          </div>
+          <div className={styles.modalTitle}>{Messages.title}</div>
+          <div className={styles.modalDescription}>{Messages.description}</div>
         </>
       </div>
     </>

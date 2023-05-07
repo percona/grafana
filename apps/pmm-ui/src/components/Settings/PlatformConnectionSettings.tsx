@@ -17,16 +17,14 @@ export const PlatformConnectionSettings: FC<PlatformConnectionSettingsProps> = (
   const connectedContent = (
     <>
       <p>
-        Congratulations, you're all set! Your PMM instance is correctly connected to Percona Platform which gives you
-        have access to advanced Advisors.
+        {Messages.connected.section1.main}
         <ul className={styles.unorderedList}>
-          <li className={styles.liStyle}>Read access to your PMM Server Name</li>
-          <li className={styles.liStyle}>Read access to your PMM Server ID</li>
+          <li className={styles.liStyle}>{Messages.connected.section1.subsection1}</li>
+          <li className={styles.liStyle}>{Messages.connected.section1.subsection2}</li>
         </ul>
       </p>
       <p>
-        This connection is active because you authorized Percona Platform to access the following data in accordance to
-        Percona's Terms of Service and Privacy Policy.
+
       </p>
       <Button variant="secondary" className={styles.button}>
         {Messages.button.disconnectPlatform}
@@ -40,12 +38,12 @@ export const PlatformConnectionSettings: FC<PlatformConnectionSettingsProps> = (
   const disconnectedContent = (
     <>
       <p>
-        By simply connecting PMM to Percona Platform to get more Advisors and have insights on:
+        {Messages.disconnected.section1.main}
         <ul className={styles.unorderedListDisconnected}>
-          <li>How to configure your databases in the best way</li>
-          <li>What performance enhancements are available for your unique setup</li>
-          <li>How to tighten your database security</li>
-          <li>How to tune your database performance</li>
+          <li>{Messages.disconnected.section1.subsection1}</li>
+          <li>{Messages.disconnected.section1.subsection2}</li>
+          <li>{Messages.disconnected.section1.subsection3}</li>
+          <li>{Messages.disconnected.section1.subsection4}</li>
         </ul>
       </p>
       <Button>{Messages.button.connectToPlatform}</Button>

@@ -4,6 +4,7 @@ import { css } from '@emotion/css';
 import { useStyles2 } from '@grafana/ui';
 import { TipsContainer } from './TipsContainer';
 import { setSystemTipsCurrentlySelected, TipModel } from '../../../../reducers/tips/tips';
+import { Messages } from "components/HelpCenter/components/TipsContainer/StartMonitoringTipsContainer.messages";
 
 interface StartMonitoringTipsContainerProps {
   userId: number;
@@ -19,7 +20,7 @@ export const StartMonitoringTipsContainer: FC<StartMonitoringTipsContainerProps>
     <div className={styles.tipContainer}>
       <div className={styles.top}/>
       <div className={styles.headerContainer}>
-        <h3 className={styles.tipsLabel}>Start Monitoring with PMM</h3>
+        <h3 className={styles.tipsLabel}>{Messages.title}</h3>
       </div>
       <TipsContainer
         key="2"
