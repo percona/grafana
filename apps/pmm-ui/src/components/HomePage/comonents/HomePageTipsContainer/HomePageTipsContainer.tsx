@@ -35,6 +35,7 @@ export const HomePageTipsContainer: FC<HomePageTipsContainerProps> = ({ userId }
           currentlySelectedTipId={currentlySelected}
           userId={userId}
           setTipSelected={setSystemTipsCurrentlySelected}
+          utmMedium="welcome_page"
         />
       </div>
     </div>
