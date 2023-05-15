@@ -22,7 +22,7 @@ export const EmptyTip: FC = () => {
           icon="comments-alt"
           size="md"
           variant="secondary"
-          onClick={() => window.open('https://docs.percona.com/percona-monitoring-and-management/index.html', '_blank')}
+          onClick={() => window.open('https://docs.percona.com/percona-monitoring-and-management/index.html?utm_source=pmm&utm_medium=help-center&utm_campaign=product-documentation&utm_term=product-documentation', '_blank')}
         >
           {Messages.btn1}
         </Button>
@@ -32,7 +32,7 @@ export const EmptyTip: FC = () => {
           size="md"
           variant="secondary"
           onClick={() =>
-            window.open('https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none', '_blank')
+            window.open('https://forums.percona.com/c/percona-monitoring-and-management-pmm/30/none?utm_source=pmm&utm_medium=welcome_page&utm_campaign=community_forum&utm_term=Community+Forum', '_blank')
           }
         >
           {Messages.btn2}
