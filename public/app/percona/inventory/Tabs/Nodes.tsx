@@ -34,15 +34,11 @@ import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
 import { stripNodeId } from './Nodes.utils';
-import {
-  getAgentsMonitoringStatus,
-  getBadgeColorForServiceStatus,
-  getBadgeIconForServiceStatus,
-} from './Services.utils';
+import { getBadgeColorForServiceStatus, getBadgeIconForServiceStatus } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const NodesTab = () => {
-  const { isLoading, nodes: rawNodes } = useSelector(getNodes);
+  const { isLoading, nodes } = useSelector(getNodes);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const [actionItem, setActionItem] = useState<Node | null>(null);
@@ -50,18 +46,6 @@ export const NodesTab = () => {
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
-  const nodes = useMemo(
-    () =>
-      rawNodes.map((node) => {
-        return {
-          ...node,
-          agentsStatus: getAgentsMonitoringStatus(node.agents ?? []),
-        };
-      }),
-    [rawNodes]
-  );
-
-  console.log(nodes);
 
   const getActions = useCallback(
     (row: Row<Node>): Action[] => [

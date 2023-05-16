@@ -101,7 +101,7 @@ export interface RemoveNodeBody {
 interface DbAgentNode {
   agent_id: string;
   agent_type: AgentType;
-  status: ServiceStatus;
+  status: ServiceAgentStatus;
   is_connected?: boolean;
 }
 

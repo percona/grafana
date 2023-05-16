@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import { Node, NodeDB } from 'app/percona/inventory/Inventory.types';
+import { getAgentsMonitoringStatus } from 'app/percona/inventory/Tabs/Services.utils';
+import { DbAgent } from 'app/percona/shared/services/services/Services.types';
 
 const MAIN_COLUMNS = ['address', 'services', 'agents', 'node_type', 'node_id', 'node_name', 'status', 'custom_labels'];
 
@@ -15,6 +17,16 @@ export const nodeFromDbMapper = (nodeFromDb: NodeDB[]) => {
         }
       });
 
+    const agents: DbAgent[] | undefined = node.agents?.map(
+      (agent) =>
+        ({
+          agentId: agent.agent_id,
+          agentType: agent.agent_type,
+          status: agent.status,
+          isConnected: agent.is_connected,
+        } as DbAgent)
+    );
+
     return {
       nodeId: node.node_id,
       nodeType: node.node_type,
@@ -28,12 +40,7 @@ export const nodeFromDbMapper = (nodeFromDb: NodeDB[]) => {
       containerId: node.container_id,
       containerName: node.container_name,
       customLabels: node.custom_labels,
-      agents: node.agents?.map((agent) => ({
-        agentId: agent.agent_id,
-        agentType: agent.agent_type,
-        status: agent.status,
-        isConnected: agent.is_connected,
-      })),
+      agents: agents,
       createdAt: node.created_at,
       updatedAt: node.updated_at,
       status: node.status,
@@ -43,6 +50,7 @@ export const nodeFromDbMapper = (nodeFromDb: NodeDB[]) => {
         serviceName: service.service_name,
       })),
       properties: properties,
+      agentsStatus: getAgentsMonitoringStatus(agents ?? []),
     } as Node;
   });
 };
