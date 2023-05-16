@@ -188,7 +188,6 @@ export const availableIconsIndex = {
   x: true,
   'percona-add': true,
   'percona-alert': true,
-  'percona-analytics': true,
   'percona-cluster-computing': true,
   'percona-cluster-network': true,
   'percona-cluster': true,
@@ -226,8 +225,6 @@ export const availableIconsIndex = {
   'user-check': true,
   'user-square': true,
 };
-
-export type IconName = keyof typeof availableIconsIndex;
 
 export function isIconName(iconName: unknown): iconName is IconName {
   if (!iconName || typeof iconName !== 'string') {

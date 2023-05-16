@@ -5334,9 +5334,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@grafana-plugins/input-datasource@workspace:plugins-bundled/internal/input-datasource"
   dependencies:
-    "@grafana/data": 9.2.13
-    "@grafana/toolkit": 9.2.13
-    "@grafana/ui": 9.2.13
+    "@grafana/data": 9.2.18
+    "@grafana/toolkit": 9.2.18
+    "@grafana/ui": 9.2.18
     "@types/jest": 26.0.15
     "@types/lodash": 4.14.149
     "@types/react": 17.0.30
@@ -5380,12 +5380,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/data@9.2.13, @grafana/data@workspace:*, @grafana/data@workspace:packages/grafana-data":
+"@grafana/data@9.2.18, @grafana/data@workspace:*, @grafana/data@workspace:packages/grafana-data":
   version: 0.0.0-use.local
   resolution: "@grafana/data@workspace:packages/grafana-data"
   dependencies:
     "@braintree/sanitize-url": 6.0.0
-    "@grafana/schema": 9.2.13
+    "@grafana/schema": 9.2.18
     "@grafana/tsconfig": ^1.2.0-rc1
     "@rollup/plugin-commonjs": 22.0.1
     "@rollup/plugin-json": 4.1.0
@@ -5444,7 +5444,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@grafana/e2e-selectors@9.2.13, @grafana/e2e-selectors@workspace:*, @grafana/e2e-selectors@workspace:packages/grafana-e2e-selectors":
+"@grafana/e2e-selectors@9.2.18, @grafana/e2e-selectors@workspace:*, @grafana/e2e-selectors@workspace:packages/grafana-e2e-selectors":
   version: 0.0.0-use.local
   resolution: "@grafana/e2e-selectors@workspace:packages/grafana-e2e-selectors"
   dependencies:
@@ -5470,7 +5470,7 @@ __metadata:
     "@babel/core": 7.19.0
     "@babel/preset-env": 7.19.0
     "@cypress/webpack-preprocessor": 5.12.0
-    "@grafana/e2e-selectors": 9.2.13
+    "@grafana/e2e-selectors": 9.2.18
     "@grafana/tsconfig": ^1.2.0-rc1
     "@mochajs/json-file-reporter": ^1.2.0
     "@rollup/plugin-node-resolve": 13.3.0
@@ -5557,15 +5557,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/runtime@9.2.13, @grafana/runtime@workspace:*, @grafana/runtime@workspace:packages/grafana-runtime":
+"@grafana/runtime@9.2.18, @grafana/runtime@workspace:*, @grafana/runtime@workspace:packages/grafana-runtime":
   version: 0.0.0-use.local
   resolution: "@grafana/runtime@workspace:packages/grafana-runtime"
   dependencies:
     "@grafana/agent-web": ^0.4.0
-    "@grafana/data": 9.2.13
-    "@grafana/e2e-selectors": 9.2.13
+    "@grafana/data": 9.2.18
+    "@grafana/e2e-selectors": 9.2.18
     "@grafana/tsconfig": ^1.2.0-rc1
-    "@grafana/ui": 9.2.13
+    "@grafana/ui": 9.2.18
     "@rollup/plugin-commonjs": 22.0.1
     "@rollup/plugin-node-resolve": 13.3.0
     "@sentry/browser": 6.19.7
@@ -5601,7 +5601,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@grafana/schema@9.2.13, @grafana/schema@workspace:*, @grafana/schema@workspace:packages/grafana-schema":
+"@grafana/schema@9.2.18, @grafana/schema@workspace:*, @grafana/schema@workspace:packages/grafana-schema":
   version: 0.0.0-use.local
   resolution: "@grafana/schema@workspace:packages/grafana-schema"
   dependencies:
@@ -5621,7 +5621,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@grafana/toolkit@9.2.13, @grafana/toolkit@workspace:*, @grafana/toolkit@workspace:packages/grafana-toolkit":
+"@grafana/toolkit@9.2.18, @grafana/toolkit@workspace:*, @grafana/toolkit@workspace:packages/grafana-toolkit":
   version: 0.0.0-use.local
   resolution: "@grafana/toolkit@workspace:packages/grafana-toolkit"
   dependencies:
@@ -5637,10 +5637,10 @@ __metadata:
     "@babel/preset-env": 7.18.9
     "@babel/preset-react": 7.18.6
     "@babel/preset-typescript": 7.18.6
-    "@grafana/data": 9.2.13
+    "@grafana/data": 9.2.18
     "@grafana/eslint-config": 5.0.0
     "@grafana/tsconfig": ^1.2.0-rc1
-    "@grafana/ui": 9.2.13
+    "@grafana/ui": 9.2.18
     "@jest/core": 27.5.1
     "@types/command-exists": ^1.2.0
     "@types/eslint": 8.4.1
@@ -5721,16 +5721,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grafana/ui@9.2.13, @grafana/ui@workspace:*, @grafana/ui@workspace:packages/grafana-ui":
+"@grafana/ui@9.2.18, @grafana/ui@workspace:*, @grafana/ui@workspace:packages/grafana-ui":
   version: 0.0.0-use.local
   resolution: "@grafana/ui@workspace:packages/grafana-ui"
   dependencies:
     "@babel/core": 7.19.0
     "@emotion/css": 11.9.0
     "@emotion/react": 11.9.3
-    "@grafana/data": 9.2.13
-    "@grafana/e2e-selectors": 9.2.13
-    "@grafana/schema": 9.2.13
+    "@grafana/data": 9.2.18
+    "@grafana/e2e-selectors": 9.2.18
+    "@grafana/schema": 9.2.18
     "@grafana/tsconfig": ^1.2.0-rc1
     "@mdx-js/react": 1.6.22
     "@monaco-editor/react": 4.4.5
@@ -6013,11 +6013,11 @@ __metadata:
   resolution: "@jaegertracing/jaeger-ui-components@workspace:packages/jaeger-ui-components"
   dependencies:
     "@emotion/css": 11.9.0
-    "@grafana/data": 9.2.13
-    "@grafana/e2e-selectors": 9.2.13
-    "@grafana/runtime": 9.2.13
+    "@grafana/data": 9.2.18
+    "@grafana/e2e-selectors": 9.2.18
+    "@grafana/runtime": 9.2.18
     "@grafana/tsconfig": ^1.2.0-rc1
-    "@grafana/ui": 9.2.13
+    "@grafana/ui": 9.2.18
     "@testing-library/jest-dom": 5.16.4
     "@testing-library/react": 12.1.4
     "@testing-library/user-event": 14.4.3
@@ -8850,15 +8850,16 @@ __metadata:
   linkType: hard
 
 "@react-aria/interactions@npm:^3.9.1":
-  version: 3.14.0
-  resolution: "@react-aria/interactions@npm:3.14.0"
+  version: 3.15.0
+  resolution: "@react-aria/interactions@npm:3.15.0"
   dependencies:
-    "@react-aria/utils": ^3.15.0
-    "@react-types/shared": ^3.17.0
+    "@react-aria/ssr": ^3.6.0
+    "@react-aria/utils": ^3.16.0
+    "@react-types/shared": ^3.18.0
     "@swc/helpers": ^0.4.14
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: d4e2dd2617bdaa60025a9f50e2c314b2a74c56dba40cc536b909b78bb1c1268a25c5593f28661c86b1d2d37a443878dcacf86a3d6d597abfe8afee258b103ed8
+  checksum: ba3fa1f7130a2bfcb9dfb7978617f52f084958d76dc2418b3d176cae2b130d0549881948be5fdc47447e9b7a999be54ab19ac674293a0f6e729db40f94db9372
   languageName: node
   linkType: hard
 
@@ -8946,14 +8947,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-aria/ssr@npm:^3.5.0":
-  version: 3.5.0
-  resolution: "@react-aria/ssr@npm:3.5.0"
+"@react-aria/ssr@npm:^3.6.0":
+  version: 3.6.0
+  resolution: "@react-aria/ssr@npm:3.6.0"
   dependencies:
     "@swc/helpers": ^0.4.14
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 3287fe756ff458a3ce46ba0fabe2ede349bff0b232cce30aab0f50afa1c0ac7604809d229b8b19a62a5116cf12bc8099d2c9c72335126499c55c794dd3419dbd
+  checksum: fab5cf0efb6eea28ae27a74a1ae1724536731f6ea556f7e22f1100e809af5a27c7bfcf6898a0b4d880b374e4b11b782aeadb19b34e26ec10e4e75beb820293e1
   languageName: node
   linkType: hard
 
@@ -8972,18 +8973,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-aria/utils@npm:^3.13.1, @react-aria/utils@npm:^3.15.0":
-  version: 3.15.0
-  resolution: "@react-aria/utils@npm:3.15.0"
+"@react-aria/utils@npm:^3.13.1, @react-aria/utils@npm:^3.16.0":
+  version: 3.16.0
+  resolution: "@react-aria/utils@npm:3.16.0"
   dependencies:
-    "@react-aria/ssr": ^3.5.0
+    "@react-aria/ssr": ^3.6.0
     "@react-stately/utils": ^3.6.0
-    "@react-types/shared": ^3.17.0
+    "@react-types/shared": ^3.18.0
     "@swc/helpers": ^0.4.14
     clsx: ^1.1.1
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 9d852b3a8ca492b5e8c733f6258437430d050950d4cbdb99ab221d1a076ebca2625d45384bfb7b651072adc93368462445061c83ceac079418c8deafca2b47c3
+  checksum: e2ad55088d77fad425cb812eef77171cebba128759e12d85dba3bcf57fdb635a52075410238561ded049393744f0e7deac5bd0faf1db3a043663c202012c3a69
   languageName: node
   linkType: hard
 
@@ -9251,21 +9252,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-types/shared@npm:^3.13.1":
-  version: 3.13.1
-  resolution: "@react-types/shared@npm:3.13.1"
+"@react-types/shared@npm:^3.13.1, @react-types/shared@npm:^3.18.0":
+  version: 3.18.0
+  resolution: "@react-types/shared@npm:3.18.0"
   peerDependencies:
     react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 61eb674df29502292f7664aee55fa230609310a6cb92b5c07052155a50772e5407464a898c1dbaf6cbff7018ed26fa83045f78af557fbdc0a9c3df4994434b2e
-  languageName: node
-  linkType: hard
-
-"@react-types/shared@npm:^3.17.0":
-  version: 3.17.0
-  resolution: "@react-types/shared@npm:3.17.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 004fc58ab0d3d64a84ce5a98e7e201b88bbb64f8b4a8309d50be30fe6172d0f172f00c666074aa96f13bbbfbced8b986901ad6b35b6d2d32d8dc25e251fcdb31
+  checksum: 8fc56701e91f4f943f5b7c7cf968f103527c8dd5803430bd46e9210c24d3b410132fb3ded63841cf3c5cb20558385746b2705ba61204ff425c30fb1f0a64e342
   languageName: node
   linkType: hard
 
@@ -14145,7 +14137,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv-keywords@npm:^5.0.0":
+"ajv-keywords@npm:^5.1.0":
   version: 5.1.0
   resolution: "ajv-keywords@npm:5.1.0"
   dependencies:
@@ -14168,7 +14160,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:^8.0.0, ajv@npm:^8.8.0":
+"ajv@npm:^8.0.0":
   version: 8.8.2
   resolution: "ajv@npm:8.8.2"
   dependencies:
@@ -14189,6 +14181,18 @@ __metadata:
     require-from-string: ^2.0.2
     uri-js: ^4.2.2
   checksum: 690ffb9408415fdab43686b3f92037ba0c8362f5d0709a123ba3fb546e6ad81414455f80a2b5cc432ce924afe9864671198f022bc331a19c072d4ede152ec3ca
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^8.9.0":
+  version: 8.12.0
+  resolution: "ajv@npm:8.12.0"
+  dependencies:
+    fast-deep-equal: ^3.1.1
+    json-schema-traverse: ^1.0.0
+    require-from-string: ^2.0.2
+    uri-js: ^4.2.2
+  checksum: 4dc13714e316e67537c8b31bc063f99a1d9d9a497eb4bbd55191ac0dcd5e4985bbb71570352ad6f1e76684fb6d790928f96ba3b2d4fd6e10024be9612fe3f001
   languageName: node
   linkType: hard
 
@@ -33863,14 +33867,14 @@ __metadata:
   linkType: hard
 
 "schema-utils@npm:>1.0.0, schema-utils@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "schema-utils@npm:4.0.0"
+  version: 4.0.1
+  resolution: "schema-utils@npm:4.0.1"
   dependencies:
     "@types/json-schema": ^7.0.9
-    ajv: ^8.8.0
+    ajv: ^8.9.0
     ajv-formats: ^2.1.1
-    ajv-keywords: ^5.0.0
-  checksum: c843e92fdd1a5c145dbb6ffdae33e501867f9703afac67bdf35a685e49f85b1dcc10ea250033175a64bd9d31f0555bc6785b8359da0c90bcea30cf6dfbb55a8f
+    ajv-keywords: ^5.1.0
+  checksum: 745e7293c6b6c84940de16753c207311da821aa9911b9e2d158cfd9ffc5bf1f880147abbbe775b96cb8cd3c7f48890950fe0164f54eed9a8aabb948ebf8a3fdd
   languageName: node
   linkType: hard
 
