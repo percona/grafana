@@ -226,6 +226,8 @@ export const availableIconsIndex = {
   'user-square': true,
 };
 
+export type IconName = keyof typeof availableIconsIndex;
+
 export function isIconName(iconName: unknown): iconName is IconName {
   if (!iconName || typeof iconName !== 'string') {
     return false;
