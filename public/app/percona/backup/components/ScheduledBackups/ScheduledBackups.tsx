@@ -90,7 +90,7 @@ export const ScheduledBackups: FC = () => {
         dataModel,
         folder,
       } = backup;
-      const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
+      const newName = `${Messages.scheduledBackups.copyOf}${name}`;
       setActionPending(true);
       try {
         await BackupService.scheduleBackup(
