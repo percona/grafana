@@ -188,6 +188,7 @@ export const availableIconsIndex = {
   x: true,
   'percona-add': true,
   'percona-alert': true,
+  'percona-analytics': true,
   'percona-cluster-computing': true,
   'percona-cluster-network': true,
   'percona-cluster': true,
