@@ -6,6 +6,7 @@ import { locationService } from '@grafana/runtime';
 import { DbAgent } from 'app/percona/shared/services/services/Services.types';
 
 import { ServiceAgentStatus } from '../../Inventory.types';
+import { getAgentsMonitoringStatus } from '../../Tabs/Services.utils';
 
 import { StatusLink } from './StatusLink';
 
@@ -25,9 +26,11 @@ describe('StatusLink', () => {
         isConnected: true,
       },
     ];
+
+    const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
       <Router history={locationService.getHistory()}>
-        <StatusLink agents={agents} type="services" strippedId="service_id_1" />
+        <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
       </Router>
     );
     expect(screen.getByText('OK')).toBeInTheDocument();
@@ -48,9 +51,10 @@ describe('StatusLink', () => {
         isConnected: false,
       },
     ];
+    const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
       <Router history={locationService.getHistory()}>
-        <StatusLink agents={agents} type="services" strippedId="service_id_1" />
+        <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
       </Router>
     );
     expect(screen.queryByText('OK')).not.toBeInTheDocument();
@@ -71,9 +75,10 @@ describe('StatusLink', () => {
         isConnected: true,
       },
     ];
+    const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
       <Router history={locationService.getHistory()}>
-        <StatusLink agents={agents} type="services" strippedId="service_id_1" />
+        <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
       </Router>
     );
     expect(screen.queryByText('OK')).not.toBeInTheDocument();

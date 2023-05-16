@@ -1,7 +1,5 @@
-import { DbAgent } from 'app/percona/shared/services/services/Services.types';
-
 export interface StatusLinkProps {
-  agents: DbAgent[];
+  agentsStatus?: string;
   strippedId: string;
   type: 'services' | 'nodes';
 }

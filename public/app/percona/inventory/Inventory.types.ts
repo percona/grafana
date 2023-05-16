@@ -1,5 +1,13 @@
 import { Databases } from '../shared/core';
-import { DbAgent, ServiceStatus, ServiceType } from '../shared/services/services/Services.types';
+import { DbNode, NodeType } from '../shared/services/nodes/Nodes.types';
+import {
+  DbAgent,
+  DbService,
+  DbServiceWithAddress,
+  ServiceStatus,
+  ServiceType,
+} from '../shared/services/services/Services.types';
+
 export interface CompatibleServicePayload {
   service_id: string;
   service_name: string;
@@ -49,6 +57,11 @@ export enum ServiceAgentStatus {
   UNKNOWN = 'UNKNOWN',
 }
 
+export enum MonitoringStatus {
+  OK = 'OK',
+  FAILED = 'Failed',
+}
+
 export interface ServiceAgentPayload {
   agent_id: string;
   agent_type: AgentType;
@@ -63,13 +76,13 @@ export type ServiceAgentListPayload = {
   agents: ServiceAgentPayload[];
 };
 
-export interface ServiceAgent {
+export type ServiceAgent = {
   agentId: string;
   status?: ServiceAgentStatus;
   customLabels?: Record<string, string>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
-}
+};
 
 export interface Agent {
   type: AgentType;
@@ -123,6 +136,7 @@ export interface Node {
   status: ServiceStatus;
   services?: ServiceNodeList[];
   properties?: Record<string, string>;
+  agentsStatus?: string;
 }
 
 export interface NodeDB {
@@ -148,3 +162,16 @@ export interface NodeDB {
 export interface NodeListDBPayload {
   nodes: NodeDB[];
 }
+export type FlattenAgent = ServiceAgent & {
+  type: AgentType;
+};
+
+export type FlattenService = DbService &
+  Partial<DbServiceWithAddress> & {
+    type: Databases | 'external';
+    agentsStatus: string;
+  };
+
+export type FlattenNode = DbNode & {
+  type: NodeType;
+};
