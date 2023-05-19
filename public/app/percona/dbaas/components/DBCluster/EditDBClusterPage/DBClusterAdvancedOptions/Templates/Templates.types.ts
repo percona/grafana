@@ -1,9 +1,12 @@
+import { FormApi } from 'final-form';
+
 import { Databases } from '../../../../../../shared/core';
 import { DBClusterType } from '../../../DBCluster.types';
 
 export interface TemplatesProps {
   k8sClusterName: string;
   databaseType: Databases;
+  form: FormApi<Record<string, any>, Partial<Record<string, any>>>;
 }
 
 export interface DBClusterTemplate {

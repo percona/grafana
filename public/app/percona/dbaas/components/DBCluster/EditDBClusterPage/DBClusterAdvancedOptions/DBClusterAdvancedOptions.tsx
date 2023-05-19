@@ -211,6 +211,7 @@ export const DBClusterAdvancedOptions: FC<DBClusterAdvancedOptionsProps> = ({
       <Templates
         k8sClusterName={selectedCluster ? selectedCluster.kubernetesClusterName : kubernetesCluster?.value}
         databaseType={databaseType?.value}
+        form={form}
       />
       <div className={styles.line}>
         <NumberInputField

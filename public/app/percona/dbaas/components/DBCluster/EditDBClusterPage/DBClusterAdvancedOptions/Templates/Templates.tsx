@@ -11,9 +11,9 @@ import { AdvancedOptionsFields } from '../DBClusterAdvancedOptions.types';
 
 import { Messages } from './Templates.messages';
 import { TemplatesProps } from './Templates.types';
-import { getTemplatesOptions } from './Templates.utils';
+import { getTemplatesOptions, notSelectedOption } from './Templates.utils';
 
-export const Templates: FC<TemplatesProps> = ({ k8sClusterName, databaseType }) => {
+export const Templates: FC<TemplatesProps> = ({ k8sClusterName, databaseType, form }) => {
   const dispatch = useDispatch();
   const { result, loading } = useSelector(getDbaaSTemplates);
 
@@ -24,7 +24,15 @@ export const Templates: FC<TemplatesProps> = ({ k8sClusterName, databaseType }) 
     if (dbClusterType) {
       dispatch(fetchDBaaSTemplatesAction({ k8sClusterName, dbClusterType }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [databaseType, dispatch, k8sClusterName]);
+
+  useEffect(() => {
+    if (templatesOptions.length === 1) {
+      form.mutators.resetTemplate(notSelectedOption);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templatesOptions]);
 
   return (
     <Field
@@ -34,6 +42,7 @@ export const Templates: FC<TemplatesProps> = ({ k8sClusterName, databaseType }) 
       component={AsyncSelectFieldAdapter}
       loading={loading}
       options={templatesOptions}
+      defaultValue={notSelectedOption}
     />
   );
 };
