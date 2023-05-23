@@ -214,3 +214,13 @@ describe('validators compose', () => {
     expect(validate(120, {})).toEqual(errorMessage);
   });
 });
+
+describe('Validate int32 test', () => {
+  it('Validator should return undefined if the passed value is int32', () => {
+    // TODO
+  });
+
+  it('Validator should return error if the passed value is not int32', () => {
+   // TODO
+  });
+});
