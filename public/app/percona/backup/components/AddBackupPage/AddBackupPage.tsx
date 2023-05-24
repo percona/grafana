@@ -358,7 +358,6 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                             fieldClassName={styles.textAreaField}
                             name="folder"
                             label={Messages.folder}
-                            validators={[validators.required]}
                             disabled={editing}
                             tooltipText={Messages.folderTooltip}
                             tooltipLink={Messages.folderTooltipLink}
