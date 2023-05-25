@@ -239,7 +239,6 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                 disabled={
                   !valid ||
                   pristine ||
-                  !values.folder ||
                   (values.vendor === Databases.mysql && values.location?.type === LocationType.CLIENT)
                 }
                 loading={submitting}
