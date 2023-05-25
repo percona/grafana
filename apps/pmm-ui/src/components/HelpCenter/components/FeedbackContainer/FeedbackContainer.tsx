@@ -12,7 +12,7 @@ interface FeedbackContainerProps {
 export const FeedbackContainer: FC<FeedbackContainerProps> = ({ visible, onFinish }) => {
   const styles = useStyles2(getStyles);
 
-  return <div className={styles.container}>{visible && <Feedback onFinish={onFinish} />}</div>;
+  return <div className={styles.container}>{visible && <Feedback onFinish={onFinish} delayOnLastStep />}</div>;
 };
 
 const getStyles = (theme: GrafanaTheme2) => ({

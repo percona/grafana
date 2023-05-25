@@ -10,7 +10,7 @@ export enum Rating {
   GOOD = 10,
 }
 
-enum Step {
+export enum Step {
   STEP1 = 0,
   STEP2 = 1,
   STEP3 = 2,
@@ -19,12 +19,14 @@ enum Step {
 interface FeedbackContainerProps {
   pmmServerId?: string;
   onFinish?: () => void;
+  step?: Step;
+  delayOnLastStep?: boolean;
 }
 
 const DISPLAY_TIME_FEEDBACK_SENT = 10000;
 
-export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) => {
-  const [currentStep, setCurrentStep] = useState(Step.STEP1);
+export const Feedback: FC<FeedbackContainerProps> = ({ step, pmmServerId, onFinish, delayOnLastStep}) => {
+  const [currentStep, setCurrentStep] = useState(step || Step.STEP1);
   const [rating, setRating] = useState<Rating | null>();
 
   const saveFeedback = (rating: Rating, description: string) => {
@@ -35,10 +37,6 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
     PortalAPI.createFeedback(rating, description, pmmServerId || '')
       .catch(() => {})
       .finally(() => {
-        if (onFinish) {
-          onFinish();
-        }
-
         setRating(null);
       });
   };
@@ -71,7 +69,15 @@ export const Feedback: FC<FeedbackContainerProps> = ({ pmmServerId, onFinish }) 
         />
       )}
       {currentStep === Step.STEP3 && (
-        <Step3 onFinish={() => setCurrentStep(Step.STEP1)} displayTimeMs={DISPLAY_TIME_FEEDBACK_SENT} />
+        <Step3
+          onFinish={() => {
+            setCurrentStep(Step.STEP1);
+            if (onFinish) {
+              onFinish();
+            }}
+          }
+          displayTimeMs={delayOnLastStep ? DISPLAY_TIME_FEEDBACK_SENT : 0}
+        />
       )}
     </>
   );

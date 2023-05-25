@@ -16,7 +16,9 @@ export const Step3: FC<Step3Props> = ({ displayTimeMs, onFinish }) => {
   const styles = useStyles2(getStyles);
 
   useEffectOnce(() => {
-    setTimeout(() => onFinish(), displayTimeMs);
+    if (displayTimeMs > 0) {
+      setTimeout(() => onFinish(), displayTimeMs);
+    }
   });
 
   return (

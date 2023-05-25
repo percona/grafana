@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { IconButton, useStyles2 } from '@grafana/ui';
 import { GrafanaTheme2 } from '@grafana/data';
 import { css } from '@emotion/css';
 import { ToolTip } from '../../../ToolTip';
 import { Feedback } from '../../../Feedback';
+import { Step } from "components/Feedback/Feedback";
 
 interface FeedbackTooltipProps {
   visible: boolean;
@@ -14,9 +15,11 @@ interface FeedbackTooltipProps {
 
 export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, onClose, pmmServerId }) => {
   const styles = useStyles2(getStyles);
+  const [step, setStep] = useState(Step.STEP1);
 
   const feedbackClose = () => {
     if (onClose) {
+      setStep(Step.STEP1);
       onClose();
     }
   };
@@ -29,7 +32,7 @@ export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, o
       </div>
 
       <div className={styles.feedbackContentForm}>
-        <Feedback pmmServerId={pmmServerId} />
+        <Feedback pmmServerId={pmmServerId} step={step} />
       </div>
     </>
   );
