@@ -19,9 +19,11 @@ export const BackupInventoryDetails: FC<BackupInventoryDetailsProps> = ({ name, 
       <span data-testid="backup-artifact-details-data-model">
         <span className={styles.detailLabel}>{Messages.dataModel}</span> <span>{dataModelMsg}</span>
       </span>
-      <span data-testid="backup-artifact-details-folder">
-        <span className={styles.detailLabel}>{Messages.folder}</span> <span>{folder}</span>
-      </span>
+      {folder && (
+        <span data-testid="backup-artifact-details-folder">
+          <span className={styles.detailLabel}>{Messages.folder}</span> <span>{folder}</span>
+        </span>
+      )}
     </div>
   );
 };

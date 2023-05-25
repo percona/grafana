@@ -33,9 +33,11 @@ export const ScheduledBackupDetails: FC<ScheduledBackupDetailsProps> = ({
       <span data-testid="scheduled-backup-details-cron">
         <span className={styles.detailLabel}>{Messages.cronExpression}</span> <span>{cronExpression}</span>
       </span>
-      <span data-testid="scheduled-backup-details-folder">
-        <span className={styles.detailLabel}>{Messages.folder}</span> <span>{folder}</span>
-      </span>
+      {folder && (
+        <span data-testid="scheduled-backup-details-folder">
+          <span className={styles.detailLabel}>{Messages.folder}</span> <span>{folder}</span>
+        </span>
+      )}
     </div>
   );
 };
