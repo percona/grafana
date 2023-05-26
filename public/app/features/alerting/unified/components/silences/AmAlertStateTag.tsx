@@ -12,6 +12,9 @@ const alertStateToState: Record<AlertState, State> = {
 
 interface Props {
   state: AlertState;
+  silenced?: string;
 }
 
-export const AmAlertStateTag: FC<Props> = ({ state }) => <StateTag state={alertStateToState[state]}>{state}</StateTag>;
+export const AmAlertStateTag: FC<Props> = ({ state, silenced }) => (
+  <StateTag state={alertStateToState[state]}>{state === 'suppressed' ? silenced : state}</StateTag>
+);
