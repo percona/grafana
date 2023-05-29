@@ -12,9 +12,11 @@ const alertStateToState: Record<AlertState, State> = {
 
 interface Props {
   state: AlertState;
+  // @PERCONA
   silenced?: string;
 }
 
+// @PERCONA
 export const AmAlertStateTag: FC<Props> = ({ state, silenced }) => (
   <StateTag state={alertStateToState[state]}>{state === 'suppressed' ? silenced : state}</StateTag>
 );
