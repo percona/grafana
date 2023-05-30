@@ -18,5 +18,5 @@ interface Props {
 
 // @PERCONA
 export const AmAlertStateTag: FC<Props> = ({ state, silenced }) => (
-  <StateTag state={alertStateToState[state]}>{state === 'suppressed' ? silenced : state}</StateTag>
+  <StateTag state={alertStateToState[state]}>{state === 'suppressed' && silenced ? silenced : state}</StateTag>
 );
