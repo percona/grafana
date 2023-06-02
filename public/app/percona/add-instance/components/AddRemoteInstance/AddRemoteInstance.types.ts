@@ -93,6 +93,7 @@ export interface PostgreSQLPayload extends RemoteCommonPayload, TLSCommon {
   qan_postgresql_pgstatements_agent: boolean;
   qan_postgresql_pgstatmonitor_agent: boolean;
   disable_query_examples: boolean;
+  disable_comments_parsing: boolean;
   metrics_mode: string;
   disable_collectors: string[];
   tls_ca: string;

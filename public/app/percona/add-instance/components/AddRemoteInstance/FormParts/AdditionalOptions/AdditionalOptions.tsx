@@ -100,7 +100,13 @@ export const getAdditionalOptions = (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
           <PostgreTLSCertificate form={form} />
-          <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
+          <>
+            <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
+            <CheckboxField
+              label={Messages.form.labels.additionalOptions.disableCommentsParsing}
+              name="disable_comments_parsing"
+            />
+          </>
           <PostgreSQLAdditionalOptions
             isRDS={remoteInstanceCredentials.isRDS}
             isAzure={remoteInstanceCredentials.isAzure}

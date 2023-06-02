@@ -13,7 +13,7 @@ import { MainDetailsFormPart } from './MainDetails/MainDetails';
 
 const form: Partial<FormApi> = {
   change: jest.fn(),
-  getState: () => ({} as FormState<any>),
+  getState: () => ({} as FormState<Form>),
 };
 
 describe('MainDetailsFormPart ::', () => {
@@ -21,7 +21,7 @@ describe('MainDetailsFormPart ::', () => {
     const { container } = render(
       <Form
         onSubmit={jest.fn()}
-        render={({ form }) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: true }} />}
+        render={({ form }: Form) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: true }} />}
       />
     );
 
@@ -39,7 +39,7 @@ describe('MainDetailsFormPart ::', () => {
     const { container } = render(
       <Form
         onSubmit={jest.fn()}
-        render={({ form }) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: false }} />}
+        render={({ form }: Form) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: false }} />}
       />
     );
 
@@ -180,7 +180,7 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
     expect(trakingFields.length).toBe(trackingOptions.length);
-    expect(fields.length).toBe(6);
+    expect(fields.length).toBe(7);
   });
   it('should render correct for RDS PostgreSQL', async () => {
     const type = Databases.postgresql;
@@ -197,6 +197,6 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
     expect(trakingFields.length).toBe(rdsTrackingOptions.length);
-    expect(fields.length).toBe(7);
+    expect(fields.length).toBe(8);
   });
 });
