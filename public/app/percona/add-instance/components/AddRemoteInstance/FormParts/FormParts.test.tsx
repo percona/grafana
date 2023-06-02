@@ -13,7 +13,7 @@ import { MainDetailsFormPart } from './MainDetails/MainDetails';
 
 const form: Partial<FormApi> = {
   change: jest.fn(),
-  getState: () => ({} as FormState<Form>),
+  getState: () => ({} as FormState<any>),
 };
 
 describe('MainDetailsFormPart ::', () => {
@@ -21,7 +21,7 @@ describe('MainDetailsFormPart ::', () => {
     const { container } = render(
       <Form
         onSubmit={jest.fn()}
-        render={({ form }: Form) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: true }} />}
+        render={({ form }) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: true }} />}
       />
     );
 
@@ -39,7 +39,7 @@ describe('MainDetailsFormPart ::', () => {
     const { container } = render(
       <Form
         onSubmit={jest.fn()}
-        render={({ form }: Form) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: false }} />}
+        render={({ form }) => <MainDetailsFormPart form={form} remoteInstanceCredentials={{ isRDS: false }} />}
       />
     );
 
