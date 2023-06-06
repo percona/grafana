@@ -1,6 +1,8 @@
 import { BadgeColor, IconName } from '@grafana/ui';
 import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
-import { ServiceStatus } from 'app/percona/shared/services/services/Services.types';
+import { DbAgent, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
+
+import { MonitoringStatus, ServiceAgentStatus } from '../Inventory.types';
 
 const SERVICE_STATUS_TO_BADGE_COLOR: Record<ServiceStatus, BadgeColor> = {
   [ServiceStatus.UP]: 'green',
@@ -36,4 +38,12 @@ export const getBadgeTextForServiceStatus = (status: ServiceStatus): string => {
   }
 
   return capitalizeText(status);
+};
+
+export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
+  const allAgentsOk = agents?.every(
+    (agent) =>
+      agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected
+  );
+  return allAgentsOk ? MonitoringStatus.OK : MonitoringStatus.FAILED;
 };
