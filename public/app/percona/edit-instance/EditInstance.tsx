@@ -1,4 +1,3 @@
-import { logger } from '@percona/platform-core';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useHistory, useParams } from 'react-router-dom';
@@ -13,6 +12,7 @@ import { useAppDispatch } from 'app/store/store';
 import { Labels } from '../add-instance/components/AddRemoteInstance/FormParts';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { updateServiceAction } from '../shared/core/reducers/services';
+import { logger } from '../shared/helpers/logger';
 import { DbServicePayload } from '../shared/services/services/Services.types';
 
 import { EDIT_INSTANCE_DOCS_LINK, FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';

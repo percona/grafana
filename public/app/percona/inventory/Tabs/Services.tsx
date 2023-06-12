@@ -2,10 +2,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Row } from 'react-table';
 
-import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Badge, Button, HorizontalGroup, Icon, TagList, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
@@ -15,11 +13,7 @@ import { ServiceIconWithText } from 'app/percona/shared/components/Elements/Serv
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import {
-  fetchActiveServiceTypesAction,
-  fetchServicesAction,
-  removeServicesAction,
-} from 'app/percona/shared/core/reducers/services';
+import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getDashboardLinkForService } from 'app/percona/shared/helpers/getDashboardLinkForService';
@@ -211,39 +205,6 @@ export const Services = () => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const removeServices = useCallback(
-    async (forceMode) => {
-      const servicesToDelete = actionItem ? [actionItem] : selected.map((s) => s.original);
-
-      try {
-        const params = servicesToDelete.map((s) => ({
-          serviceId: s.serviceId,
-          force: forceMode,
-        }));
-        const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
-
-        if (successfullyDeleted > 0) {
-          appEvents.emit(AppEvents.alertSuccess, [
-            Messages.services.servicesDeleted(successfullyDeleted, servicesToDelete.length),
-          ]);
-        }
-
-        if (actionItem) {
-          setActionItem(null);
-        } else {
-          setSelectedRows([]);
-        }
-        loadData();
-      } catch (e) {
-        if (isApiCancelError(e)) {
-          return;
-        }
-        logger.error(e);
-      }
-    },
-    [actionItem, dispatch, loadData, selected]
-  );
 
   const handleSelectionChange = useCallback((rows: Array<Row<FlattenService>>) => {
     setSelectedRows(rows);

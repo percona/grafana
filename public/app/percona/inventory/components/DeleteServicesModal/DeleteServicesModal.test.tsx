@@ -7,6 +7,8 @@ import * as ServicesReducer from 'app/percona/shared/core/reducers/services/serv
 import { Service, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { configureStore } from 'app/store/configureStore';
 
+import { FlattenService } from '../../Inventory.types';
+
 import DeleteServiceModal from './DeleteServicesModal';
 
 const cancelFn = jest.fn();
@@ -60,7 +62,7 @@ const renderDefaults = (isOpen = true, services = servicesStub) =>
         onDismiss={cancelFn}
         isOpen={isOpen}
         onSuccess={successFn}
-        services={services as unknown as Array<Row<Service>>}
+        services={services as unknown as Array<Row<FlattenService>>}
       />
     </Provider>
   );

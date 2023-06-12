@@ -1,4 +1,3 @@
-import { logger } from '@percona/platform-core';
 import React, { FC, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
@@ -6,6 +5,7 @@ import { Alert, Button, Checkbox, Modal } from '@grafana/ui';
 import { appEvents } from 'app/core/core';
 import { removeServiceAction, RemoveServiceParams } from 'app/percona/shared/core/reducers/services';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from './DeleteServiceModal.messages';
