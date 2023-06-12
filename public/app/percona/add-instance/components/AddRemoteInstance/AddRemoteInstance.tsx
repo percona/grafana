@@ -51,10 +51,12 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
 
   if (type === Databases.mysql) {
     initialValues.qan_mysql_perfschema = true;
+    initialValues.disable_comments_parsing = true;
   }
 
   if (type === Databases.postgresql) {
     initialValues.tracking = TrackingOptions.pgStatements;
+    initialValues.disable_comments_parsing = true;
   }
 
   const onSubmit = useCallback(

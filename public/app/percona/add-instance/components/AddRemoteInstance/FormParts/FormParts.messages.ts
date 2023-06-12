@@ -66,6 +66,7 @@ export const Messages = {
         tablestatOptionsState: 'State',
         tablestatOptionsLimit: 'Limit value',
         azureDatabaseExporter: 'Enable Monitoring by Azure Metrics Exporter',
+        disableCommentsParsing: 'Disable comments parsing',
       },
     },
     placeholders: {
