@@ -43,6 +43,10 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
     margin-top: ${spacing(4)};
     display: flex;
 
+    span {
+      white-space: pre;
+    }
+
     & > span:first-child {
       max-width: 70%;
       overflow: hidden;
