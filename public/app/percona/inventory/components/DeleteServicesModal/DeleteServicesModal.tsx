@@ -1,4 +1,3 @@
-import { logger } from '@percona/platform-core';
 import React, { FC, useState } from 'react';
 
 import { AppEvents } from '@grafana/data';
@@ -6,6 +5,7 @@ import { Alert, Button, Checkbox, Modal } from '@grafana/ui';
 import { appEvents } from 'app/core/core';
 import { removeServicesAction } from 'app/percona/shared/core/reducers/services';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
 
 import { Messages } from './DeleteServicesModal.messages';
@@ -20,7 +20,7 @@ const DeleteServicesModal: FC<DeleteServicesModalProps> = ({ isOpen, onDismiss, 
 
     try {
       const params = servicesToDelete.map((s) => ({
-        serviceId: s.params.serviceId,
+        serviceId: s.serviceId,
         force: forceModeActive,
       }));
       const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();

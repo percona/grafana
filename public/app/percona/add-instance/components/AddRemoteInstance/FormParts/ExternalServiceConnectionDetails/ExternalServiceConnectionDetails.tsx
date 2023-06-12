@@ -1,8 +1,11 @@
-import { PasswordInputField, RadioButtonGroupField, TextInputField, validators } from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
+import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import Validators from 'app/percona/shared/helpers/validators';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { metricsParametersOptions, schemaOptions } from '../FormParts.constants';
 import { Messages } from '../FormParts.messages';

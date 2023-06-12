@@ -1,5 +1,4 @@
 /* eslint-disable react/display-name */
-import { logger } from '@percona/platform-core';
 import cronstrue from 'cronstrue';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Cell, Column, Row } from 'react-table';
@@ -9,15 +8,16 @@ import { locationService } from '@grafana/runtime';
 import { LinkButton, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
-import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { Table } from 'app/percona/shared/components/Elements/Table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -88,8 +88,9 @@ export const ScheduledBackups: FC = () => {
         retryTimes,
         mode,
         dataModel,
+        folder,
       } = backup;
-      const newName = `${Messages.scheduledBackups.copyOf} ${name}`;
+      const newName = `${Messages.scheduledBackups.copyOf}${name}`;
       setActionPending(true);
       try {
         await BackupService.scheduleBackup(
@@ -103,7 +104,8 @@ export const ScheduledBackups: FC = () => {
           retention,
           false,
           mode,
-          dataModel
+          dataModel,
+          folder
         );
         getData();
       } catch (e) {
@@ -199,6 +201,7 @@ export const ScheduledBackups: FC = () => {
         dataModel={row.original.dataModel}
         description={row.original.description}
         cronExpression={row.original.cronExpression}
+        folder={row.original.folder}
       />
     ),
     []

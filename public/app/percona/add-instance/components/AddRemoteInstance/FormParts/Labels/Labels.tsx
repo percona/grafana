@@ -1,7 +1,8 @@
-import { TextareaInputField, TextInputField } from '@percona/platform-core';
 import React, { FC, useMemo } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
+import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
 import Validators from 'app/percona/shared/helpers/validators';
 
 import { Messages } from '../FormParts.messages';

@@ -1,10 +1,10 @@
 import { Row } from 'react-table';
 
-import { Service } from 'app/percona/shared/services/services/Services.types';
+import { FlattenService } from '../../Inventory.types';
 
 export interface DeleteServicesModalProps {
   isOpen: boolean;
   onDismiss: () => void;
   onSuccess: () => void;
-  services: Array<Row<Service>>;
+  services: Array<Row<FlattenService>>;
 }

@@ -1,51 +1,74 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { logger } from '@percona/platform-core';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Column, Row } from 'react-table';
+import { Row } from 'react-table';
 
+import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Badge, Button, HorizontalGroup, Icon, TagList, useStyles2 } from '@grafana/ui';
+import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
-import { Table } from 'app/percona/integrated-alerting/components/Table';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ServiceIconWithText } from 'app/percona/shared/components/Elements/ServiceIconWithText/ServiceIconWithText';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
-import { fetchServicesAction, fetchActiveServiceTypesAction } from 'app/percona/shared/core/reducers/services';
+import {
+  fetchActiveServiceTypesAction,
+  fetchServicesAction,
+  removeServicesAction,
+} from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getDashboardLinkForService } from 'app/percona/shared/helpers/getDashboardLinkForService';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
-import { Service, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
+import { logger } from 'app/percona/shared/helpers/logger';
+import { ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
+import { FlattenService, MonitoringStatus } from '../Inventory.types';
 import DeleteServiceModal from '../components/DeleteServiceModal';
 import DeleteServicesModal from '../components/DeleteServicesModal';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
+import { StatusInfo } from '../components/StatusInfo/StatusInfo';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
-import { getBadgeColorForServiceStatus, getBadgeIconForServiceStatus } from './Services.utils';
+import {
+  getBadgeColorForServiceStatus,
+  getBadgeIconForServiceStatus,
+  getBadgeTextForServiceStatus,
+  getAgentsMonitoringStatus,
+} from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Services = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selected, setSelectedRows] = useState<Array<Row<Service>>>([]);
-  const [actionItem, setActionItem] = useState<Service | null>(null);
+  const [selected, setSelectedRows] = useState<Array<Row<FlattenService>>>([]);
+  const [actionItem, setActionItem] = useState<FlattenService | null>(null);
   const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
-  const { isLoading, services } = useSelector(getServices);
+  const { isLoading, services: fetchedServices } = useSelector(getServices);
   const styles = useStyles2(getStyles);
+  const flattenServices = useMemo(
+    () =>
+      fetchedServices.map((value) => {
+        return {
+          type: value.type,
+          ...value.params,
+          agentsStatus: getAgentsMonitoringStatus(value.params.agents ?? []),
+        };
+      }),
+    [fetchedServices]
+  );
 
   const getActions = useCallback(
-    (row: Row<Service>): Action[] => [
+    (row: Row<FlattenService>): Action[] => [
       {
         content: (
           <HorizontalGroup spacing="sm">
@@ -66,20 +89,20 @@ export const Services = () => {
           </HorizontalGroup>
         ),
         action: () => {
-          const serviceId = row.original.params.serviceId.split('/').pop();
+          const serviceId = row.original.serviceId.split('/').pop();
           locationService.push(`/edit-instance/${serviceId}`);
         },
       },
       {
         content: Messages.services.actions.dashboard,
         action: () => {
-          locationService.push(getDashboardLinkForService(row.original.type, row.original.params.serviceName));
+          locationService.push(getDashboardLinkForService(row.original.type, row.original.serviceName));
         },
       },
       {
         content: Messages.services.actions.qan,
         action: () => {
-          locationService.push(`/d/pmm-qan/pmm-query-analytics?var-service_name=${row.original.params.serviceName}`);
+          locationService.push(`/d/pmm-qan/pmm-query-analytics?var-service_name=${row.original.serviceName}`);
         },
       },
     ],
@@ -87,45 +110,80 @@ export const Services = () => {
   );
 
   const columns = useMemo(
-    (): Array<Column<Service>> => [
+    (): Array<ExtendedColumn<FlattenService>> => [
       {
         Header: Messages.services.columns.status,
-        accessor: (row) => row.params.status,
+        accessor: 'status',
         Cell: ({ value }: { value: ServiceStatus }) => (
           <Badge
-            text={capitalizeText(value)}
+            text={getBadgeTextForServiceStatus(value)}
             color={getBadgeColorForServiceStatus(value)}
             icon={getBadgeIconForServiceStatus(value)}
           />
         ),
+        tooltipInfo: <StatusInfo />,
+        type: FilterFieldTypes.DROPDOWN,
+        options: [
+          {
+            label: 'Up',
+            value: ServiceStatus.UP,
+          },
+          {
+            label: 'Down',
+            value: ServiceStatus.DOWN,
+          },
+          {
+            label: 'Unknown',
+            value: ServiceStatus.UNKNOWN,
+          },
+          {
+            label: 'N/A',
+            value: ServiceStatus.NA,
+          },
+        ],
       },
       {
         Header: Messages.services.columns.serviceName,
-        accessor: (row) => row.params.serviceName,
-        Cell: ({ value, row }: { row: Row<Service>; value: string }) => (
+        accessor: 'serviceName',
+        Cell: ({ value, row }: { row: Row<FlattenService>; value: string }) => (
           <ServiceIconWithText text={value} dbType={row.original.type} />
         ),
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.services.columns.nodeName,
-        accessor: (row) => row.params.nodeName,
+        accessor: 'nodeName',
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.services.columns.monitoring,
-        accessor: 'params',
+        accessor: 'agentsStatus',
         width: '70px',
         Cell: ({ value, row }) => (
-          <StatusLink strippedServiceId={stripServiceId(row.original.params.serviceId)} agents={value.agents || []} />
+          <StatusLink type="services" strippedId={stripServiceId(row.original.serviceId)} agentsStatus={value} />
         ),
+        type: FilterFieldTypes.RADIO_BUTTON,
+        options: [
+          {
+            label: MonitoringStatus.OK,
+            value: MonitoringStatus.OK,
+          },
+          {
+            label: MonitoringStatus.FAILED,
+            value: MonitoringStatus.FAILED,
+          },
+        ],
       },
       {
         Header: Messages.services.columns.address,
-        accessor: (row) => row.params.address,
+        accessor: 'address',
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.services.columns.port,
-        accessor: (row) => row.params.port,
+        accessor: 'port',
         width: '100px',
+        type: FilterFieldTypes.TEXT,
       },
       getExpandAndActionsCol(getActions),
     ],
@@ -154,28 +212,62 @@ export const Services = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSelectionChange = useCallback((rows: Array<Row<Service>>) => {
+  const removeServices = useCallback(
+    async (forceMode) => {
+      const servicesToDelete = actionItem ? [actionItem] : selected.map((s) => s.original);
+
+      try {
+        const params = servicesToDelete.map((s) => ({
+          serviceId: s.serviceId,
+          force: forceMode,
+        }));
+        const successfullyDeleted = await dispatch(removeServicesAction({ services: params })).unwrap();
+
+        if (successfullyDeleted > 0) {
+          appEvents.emit(AppEvents.alertSuccess, [
+            Messages.services.servicesDeleted(successfullyDeleted, servicesToDelete.length),
+          ]);
+        }
+
+        if (actionItem) {
+          setActionItem(null);
+        } else {
+          setSelectedRows([]);
+        }
+        loadData();
+      } catch (e) {
+        if (isApiCancelError(e)) {
+          return;
+        }
+        logger.error(e);
+      }
+    },
+    [actionItem, dispatch, loadData, selected]
+  );
+
+  const handleSelectionChange = useCallback((rows: Array<Row<FlattenService>>) => {
     setSelectedRows(rows);
   }, []);
 
   const renderSelectedSubRow = React.useCallback(
-    (row: Row<Service>) => {
-      const labels = row.original.params.customLabels || {};
+    (row: Row<FlattenService>) => {
+      const labels = row.original.customLabels || {};
       const labelKeys = Object.keys(labels);
-      const agents = row.original.params.agents || [];
+      const agents = row.original.agents || [];
 
       return (
         <DetailsRow>
           {!!agents.length && (
             <DetailsRow.Contents title={Messages.services.details.agents}>
               <StatusBadge
-                strippedServiceId={stripServiceId(row.original.params.serviceId)}
-                agents={row.original.params.agents || []}
+                strippedId={stripServiceId(row.original.serviceId)}
+                type={'services'}
+                agents={row.original.agents || []}
               />
             </DetailsRow.Contents>
           )}
           <DetailsRow.Contents title={Messages.services.details.serviceId}>
-            <span>{row.original.params.serviceId}</span>
+            <span>{row.original.serviceId}</span>
           </DetailsRow.Contents>
           {!!labelKeys.length && (
             <DetailsRow.Contents title={Messages.services.details.labels} fullRow>
@@ -225,8 +317,8 @@ export const Services = () => {
           </HorizontalGroup>
           {actionItem ? (
             <DeleteServiceModal
-              serviceId={actionItem.params.serviceId}
-              serviceName={actionItem.params.serviceName}
+              serviceId={actionItem.serviceId}
+              serviceName={actionItem.serviceName}
               isOpen={modalVisible}
               onCancel={onModalClose}
               onSuccess={onDeleteSuccess}
@@ -241,8 +333,8 @@ export const Services = () => {
           )}
           <Table
             columns={columns}
-            data={services}
-            totalItems={services.length}
+            data={flattenServices}
+            totalItems={flattenServices.length}
             rowSelection
             onRowSelection={handleSelectionChange}
             showPagination
@@ -253,7 +345,8 @@ export const Services = () => {
             overlayClassName={styles.overlay}
             renderExpandedRow={renderSelectedSubRow}
             autoResetSelectedRows={false}
-            getRowId={useCallback((row: Service) => row.params.serviceId, [])}
+            getRowId={useCallback((row: FlattenService) => row.serviceId, [])}
+            showFilter
           />
         </FeatureLoader>
       </OldPage.Contents>
