@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { Row } from 'react-table';
 
 import * as ServicesReducer from 'app/percona/shared/core/reducers/services/services';
-import { Service, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
+import { ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { configureStore } from 'app/store/configureStore';
 
 import { FlattenService } from '../../Inventory.types';
@@ -18,25 +18,23 @@ const removeServicesActionSpy = jest.spyOn(ServicesReducer, 'removeServicesActio
 jest.mock('app/percona/inventory/Inventory.service');
 jest.mock('app/percona/shared/services/services/Services.service');
 
-const serviceStub: Service = {
-  params: {
-    nodeId: 'Node #1',
-    nodeName: 'Node #1',
-    serviceId: 'Service #1',
-    serviceName: 'Service #1',
-    status: ServiceStatus.NA,
-  },
+const serviceStub: FlattenService = {
+  nodeId: 'Node #1',
+  nodeName: 'Node #1',
+  serviceId: 'Service #1',
+  serviceName: 'Service #1',
+  status: ServiceStatus.NA,
+  agentsStatus: 'N/A',
   type: 'external',
 };
 
-const serviceStub2: Service = {
-  params: {
-    nodeId: 'Node #2',
-    nodeName: 'Node #2',
-    serviceId: 'Service #2',
-    serviceName: 'Service #2',
-    status: ServiceStatus.NA,
-  },
+const serviceStub2: FlattenService = {
+  nodeId: 'Node #2',
+  nodeName: 'Node #2',
+  serviceId: 'Service #2',
+  serviceName: 'Service #2',
+  status: ServiceStatus.NA,
+  agentsStatus: 'N/A',
   type: 'external',
 };
 
@@ -101,7 +99,7 @@ describe('DeleteServicesModal::', () => {
     expect(removeServicesActionSpy).toHaveBeenCalledWith({
       services: [
         {
-          serviceId: serviceStub.params.serviceId,
+          serviceId: serviceStub.serviceId,
           force: false,
         },
       ],
@@ -117,11 +115,11 @@ describe('DeleteServicesModal::', () => {
     expect(removeServicesActionSpy).toHaveBeenCalledWith({
       services: [
         {
-          serviceId: serviceStub.params.serviceId,
+          serviceId: serviceStub.serviceId,
           force: false,
         },
         {
-          serviceId: serviceStub2.params.serviceId,
+          serviceId: serviceStub2.serviceId,
           force: false,
         },
       ],
@@ -140,7 +138,7 @@ describe('DeleteServicesModal::', () => {
     expect(removeServicesActionSpy).toHaveBeenCalledWith({
       services: [
         {
-          serviceId: serviceStub.params.serviceId,
+          serviceId: serviceStub.serviceId,
           force: true,
         },
       ],
