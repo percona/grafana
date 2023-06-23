@@ -1,3 +1,7 @@
+import { Databases } from 'app/percona/shared/core';
+
+import { BackupMode } from '../../Backup.types';
+
 export const Messages = {
   serviceName: 'Service name',
   vendor: 'DB technology',
@@ -6,6 +10,7 @@ export const Messages = {
   databases: 'Databases',
   backupName: 'Backup name',
   description: 'Description',
+  folder: 'Folder',
   location: 'Location',
   retryMode: 'Retry mode',
   cancelAction: 'Cancel',
@@ -40,4 +45,18 @@ export const Messages = {
   backupDescription: 'Create a backup of a database immediately, to store a snapshot of its current state and data.',
   scheduleBackupDescription:
     'Create a task that takes regular backups of a database, according to the schedule that you specify.',
+  folderTooltip: 'Changing the default folder, if available, is not recommended',
+  folderTooltipLink: (vendor: Databases | null, mode: BackupMode) => {
+    if (vendor === Databases.mysql) {
+      return 'https://docs.percona.com/percona-monitoring-and-management/get-started/backup/create_mysql_backup.html#folder-field';
+    }
+
+    if (vendor === Databases.mongodb) {
+      return mode === BackupMode.PITR
+        ? 'https://docs.percona.com/percona-monitoring-and-management/get-started/backup/create_PITR_mongo.html#folder-field'
+        : 'https://docs.percona.com/percona-monitoring-and-management/get-started/backup/create_mongo_on_demand.html#folder-field';
+    }
+
+    return;
+  },
 };

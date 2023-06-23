@@ -1,24 +1,23 @@
 ---
 aliases:
-  - /docs/grafana/latest/panels/working-with-panels/navigate-panel-editor/
-  - /docs/grafana/latest/panels/working-with-panels/navigate-inspector-panel/
-  - /docs/grafana/latest/dashboards/dashboard-create/
-  - /docs/grafana/latest/features/dashboard/dashboards/
-  - /docs/grafana/latest/panels/working-with-panels/add-panel/
-  - /docs/grafana/latest/dashboards/add-organize-panels/
-  - /docs/grafana/latest/panels/add-panels-dynamically/about-repeating-panels-rows/
-  - /docs/grafana/latest/panels/add-panels-dynamically/configure-repeating-rows/
-  - /docs/grafana/latest/panels/add-panels-dynamically/configure-repeating-panels/
-  - /docs/grafana/next/dashboards/build-dashboards/add-organize-panels/
-title: Add and organize panels
-menuTitle: Add and organize panels
-weight: 200
+  - ../../features/dashboard/dashboards/
+  - ../../panels/add-panels-dynamically/about-repeating-panels-rows/
+  - ../../panels/add-panels-dynamically/configure-repeating-panels/
+  - ../../panels/add-panels-dynamically/configure-repeating-rows/
+  - ../../panels/working-with-panels/add-panel/
+  - ../../panels/working-with-panels/navigate-inspector-panel/
+  - ../../panels/working-with-panels/navigate-panel-editor/
+  - ../add-organize-panels/
+  - ../dashboard-create/
 keywords:
   - panel
   - dashboard
   - dynamic
   - rows
   - add
+menuTitle: Add and organize panels
+title: Add and organize panels
+weight: 200
 ---
 
 # Add and organize panels
@@ -41,8 +40,8 @@ This section describes the areas of the Grafana panel editor.
 
 1. Data section: The data section contains tabs where you enter queries, transform your data, and create alert rules (if applicable).
 
-- **Query tab:** Select your data source and enter queries here. For more information, refer to [Add a query]({{< relref "../../../panels/query-a-data-source/add-a-query/" >}}).
-- **Transform tab:** Apply data transformations. For more information, refer to [Transform data]({{< relref "../../../panels/transform-data/" >}}).
+- **Query tab:** Select your data source and enter queries here. For more information, refer to [Add a query]({{< relref "../../../panels-visualizations/query-transform-data#add-a-query" >}}).
+- **Transform tab:** Apply data transformations. For more information, refer to [Transform data]({{< relref "../../../panels-visualizations/query-transform-data/transform-data" >}}).
 - **Alert tab:** Write alert rules. For more information, refer to [Overview of Grafana 8 alerting]({{< relref "../../../alerting/" >}}).
 
 1. Panel display options: The display options section contains tabs where you configure almost every aspect of your data visualization.
@@ -97,17 +96,17 @@ For more information about data sources, refer to [Data sources]({{< relref "../
 
    ![](/static/img/docs/panel-editor/select-visualization-8-0.png)
 
-For more information about individual visualizations, refer to [Visualizations options]({{< relref "../../../visualizations/" >}}).
+For more information about individual visualizations, refer to [Visualizations options]({{< relref "../../../panels-visualizations/visualizations" >}}).
 
 1. Refer to the following documentation for ways you can adjust panel settings.
 
    While not required, most visualizations need some adjustment before they properly display the information that you need.
 
-   - [Configure value mappings]({{< relref "../../../panels/configure-value-mappings" >}})
-   - [Visualization-specific options]({{< relref "../../../visualizations/" >}})
-   - [Override field values]({{< relref "../../../panels/configure-overrides/" >}})
-   - [Configure thresholds]({{< relref "../../../panels/configure-thresholds/" >}})
-   - [Configure standard options]({{< relref "../../../panels/configure-standard-options/" >}})
+   - [Configure value mappings]({{< relref "../../../panels-visualizations/configure-value-mappings" >}})
+   - [Visualization-specific options]({{< relref "../../../panels-visualizations/visualizations" >}})
+   - [Override field values]({{< relref "../../../panels-visualizations/configure-overrides" >}})
+   - [Configure thresholds]({{< relref "../../../panels-visualizations/configure-thresholds" >}})
+   - [Configure standard options]({{< relref "../../../panels-visualizations/configure-standard-options" >}})
 
 1. Add a note to describe the visualization (or describe your changes) and then click **Save** in the upper-right corner of the page.
 

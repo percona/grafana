@@ -1,7 +1,7 @@
 import { CancelToken } from 'axios';
 
 import { SelectableValue } from '@grafana/data';
-import { DBServiceList, ServiceListPayload } from 'app/percona/inventory/Inventory.types';
+import { DBServiceList, CompatibleServiceListPayload } from 'app/percona/inventory/Inventory.types';
 import { api } from 'app/percona/shared/helpers/api';
 
 import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
@@ -27,6 +27,7 @@ export const BackupInventoryService = {
         status,
         vendor,
         mode,
+        folder,
       }): Backup => ({
         id: artifact_id,
         name,
@@ -39,6 +40,7 @@ export const BackupInventoryService = {
         status,
         vendor,
         mode,
+        folder,
       })
     );
   },
@@ -109,7 +111,7 @@ export const BackupInventoryService = {
     };
   },
   async listCompatibleServices(artifactId: string): Promise<DBServiceList> {
-    const { mysql = [], mongodb = [] } = await api.post<ServiceListPayload, Object>(
+    const { mysql = [], mongodb = [] } = await api.post<CompatibleServiceListPayload, Object>(
       `${BASE_URL}/Backups/ListArtifactCompatibleServices`,
       {
         artifact_id: artifactId,

@@ -23,6 +23,7 @@ import {
 } from '../../Kubernetes/EditK8sClusterPage/EditK8sClusterPage.constants';
 import { PMMServerUrlWarning } from '../../PMMServerURLWarning/PMMServerUrlWarning';
 
+import { ConfigurationFields } from './DBClusterAdvancedOptions/Configurations/Configurations.types';
 import { DBClusterAdvancedOptions } from './DBClusterAdvancedOptions/DBClusterAdvancedOptions';
 import { DBClusterBasicOptions } from './DBClusterBasicOptions/DBClusterBasicOptions';
 import { BasicOptionsFields } from './DBClusterBasicOptions/DBClusterBasicOptions.types';
@@ -32,6 +33,8 @@ import { Messages } from './EditDBClusterPage.messages';
 import { getStyles } from './EditDBClusterPage.styles';
 import { EditDBClusterPageProps } from './EditDBClusterPage.types';
 import { generateUID } from './EditDBClusterPage.utils';
+import NetworkAndSecurity from './NetworkAndSecurity/NetworkAndSecurity';
+import Restore from './Restore/Restore';
 import { useDefaultMode } from './hooks/useDefaultMode';
 import { useEditDBClusterFormSubmit } from './hooks/useEditDBClusterFormSubmit';
 import { useEditDBClusterPageDefaultValues } from './hooks/useEditDBClusterPageDefaultValues';
@@ -87,6 +90,9 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
             setClusterName: (databaseTypeValue: string, state, { changeValue }) => {
               changeValue(state, `${BasicOptionsFields.name}`, () => `${databaseTypeValue}-${generateUID()}`);
             },
+            trimConfiguration: ([configuration]: string[], state, { changeValue }) => {
+              changeValue(state, ConfigurationFields.configuration, () => configuration.trim());
+            },
             ...arrayMutators,
           }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
@@ -111,23 +117,27 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
                 {showPMMAddressWarning && <PMMServerUrlWarning />}
                 <div className={styles.optionsWrapper}>
                   {mode === 'create' && <DBClusterBasicOptions kubernetes={kubernetes} form={form} />}
-                  {settings?.backupEnabled && mode === 'create' && (
-                    <DBaaSBackups
-                      handleSubmit={handleSubmit}
-                      pristine={pristine}
-                      valid={valid}
-                      form={form}
-                      {...props}
-                    />
-                  )}
+                  <div className={styles.switchOptionsWrapper}>
+                    {!!settings?.backupEnabled && <Restore form={form} />}
+                    <NetworkAndSecurity form={form} />
+                    {!!settings?.backupEnabled && mode === 'create' && (
+                      <DBaaSBackups
+                        handleSubmit={handleSubmit}
+                        pristine={pristine}
+                        valid={valid}
+                        form={form}
+                        {...props}
+                      />
+                    )}
+                  </div>
                   <DBClusterAdvancedOptions
-                    mode={mode}
                     showUnsafeConfigurationWarning={showUnsafeConfigurationWarning}
-                    setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}
+                    mode={mode}
                     form={form}
+                    setShowUnsafeConfigurationWarning={setShowUnsafeConfigurationWarning}
                     selectedCluster={selectedDBCluster}
-                    handleSubmit={handleSubmit}
                     pristine={pristine}
+                    handleSubmit={handleSubmit}
                     valid={valid}
                     {...props}
                   />

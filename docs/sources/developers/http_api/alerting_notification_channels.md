@@ -1,7 +1,6 @@
 ---
 aliases:
-  - /docs/grafana/latest/developers/http_api/alerting_notification_channels/
-  - /docs/grafana/latest/http_api/alerting_notification_channels/
+  - ../../http_api/alerting_notification_channels/
 description: Grafana Alerting Notification Channel HTTP API
 keywords:
   - grafana
@@ -14,7 +13,9 @@ keywords:
 title: 'Alerting Notification Channels HTTP API '
 ---
 
-# Alerting Notification Channels API
+# Legacy Alerting Notification Channels API
+
+> **Note:** Starting with v9.0, the Legacy Alerting Notification Channels API is deprecated. It will be removed in a future release.
 
 This page documents the Alerting Notification Channels API.
 

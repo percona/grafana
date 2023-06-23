@@ -1,10 +1,11 @@
-import { logger } from '@percona/platform-core';
+/*  eslint-disable @typescript-eslint/consistent-type-assertions */
 import React, { FC, useEffect, useState } from 'react';
 
 import { Spinner, useStyles } from '@grafana/ui';
 import { Messages } from 'app/percona/dbaas/DBaaS.messages';
+import { logger } from 'app/percona/shared/helpers/logger';
 
-import { DBClusterConnection as ConnectionParams, DBClusterStatus, DBClusterConnectionAPI } from '../DBCluster.types';
+import { DBClusterConnection as ConnectionParams, DBClusterStatus } from '../DBCluster.types';
 import { newDBClusterService } from '../DBCluster.utils';
 
 import { INITIAL_CONNECTION } from './DBClusterConnection.constants';
@@ -26,9 +27,11 @@ export const DBClusterConnection: FC<DBClusterConnectionProps> = ({ dbCluster })
       try {
         setLoading(true);
         const dbClusterService = newDBClusterService(databaseType);
-        const connection = (await dbClusterService.getDBClusterCredentials(dbCluster)) as DBClusterConnectionAPI;
+        const connection = await dbClusterService.getDBClusterCredentials(dbCluster);
 
-        setConnection(connection.connection_credentials);
+        if (connection) {
+          setConnection(connection.connection_credentials);
+        }
       } catch (e) {
         logger.error(e);
       } finally {

@@ -178,7 +178,7 @@ func (e *AzureResourceGraphDatasource) executeQuery(ctx context.Context, query *
 	tracer.Inject(ctx, req.Header, span)
 
 	azlog.Debug("AzureResourceGraph", "Request ApiURL", req.URL.String())
-	res, err := client.Do(req)
+	res, err := client.Do(req) //nolint:bodyclose // fixed in main
 	if err != nil {
 		return dataResponseErrorWithExecuted(err)
 	}
@@ -191,6 +191,10 @@ func (e *AzureResourceGraphDatasource) executeQuery(ctx context.Context, query *
 	frame, err := loganalytics.ResponseTableToFrame(&argResponse.Data, query.RefID, query.InterpolatedQuery)
 	if err != nil {
 		return dataResponseErrorWithExecuted(err)
+	}
+	if frame == nil {
+		// empty response
+		return dataResponse
 	}
 
 	azurePortalUrl, err := GetAzurePortalUrl(dsInfo.Cloud)

@@ -7,7 +7,7 @@ export const Messages = {
   whyConnect: 'Why connect?',
   connectionReason: `
       Connecting to Percona Platform will boost PMM's monitoring capabilities and give you access to advanced
-      Advisor checks and templates, private DBaaS, K8s operators, knowledge base articles and more.
+      Advisors and templates, private DBaaS, K8s operators, knowledge base articles and more.
   `,
   noPerconaAccount: "Don't have a Percona account?",
   createAnAccount: 'Create an account now to check all the Percona Platform advantages.',
@@ -21,5 +21,6 @@ export const Messages = {
   accessToken: 'Percona Platform Access Token',
   connect: 'Validate Platform connection',
   invalidToken:
-    'Your access token has expired. Go to Percona Portal and refresh the Profile Settings page to generate a new token.',
+    'Your access token is invalid. Go to Percona Portal and refresh the Profile Settings page to generate a new token.',
+  unknownError: 'Unknown error',
 };

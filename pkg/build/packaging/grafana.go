@@ -75,9 +75,13 @@ func PackageGrafana(
 	if err := packageGrafana(ctx, edition, version, grafanaDir, variants, shouldSign, p); err != nil {
 		return err
 	}
-	if err := signRPMPackages(edition, cfg, grafanaDir); err != nil {
-		return err
+
+	if cfg.SignPackages {
+		if err := signRPMPackages(edition, cfg, grafanaDir); err != nil {
+			return err
+		}
 	}
+
 	if err := checksumPackages(grafanaDir, edition); err != nil {
 		return err
 	}
@@ -180,30 +184,32 @@ func signRPMPackages(edition config.Edition, cfg config.Config, grafanaDir strin
 		return err
 	}
 
-	rpmArgs := append([]string{"--addsign"}, rpms...)
-	log.Printf("Invoking rpm with args: %+v", rpmArgs)
-	//nolint:gosec
-	cmd := exec.Command("rpm", rpmArgs...)
-	if output, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to sign RPM packages: %s", output)
-	}
-	if err := os.Remove(cfg.GPGPassPath); err != nil {
-		return fmt.Errorf("failed to remove %q: %w", cfg.GPGPassPath, err)
-	}
-
-	log.Printf("Verifying %s RPM packages...", edition)
-	// The output changed between rpm versions
-	reOutput := regexp.MustCompile("(?:digests signatures OK)|(?:pgp.+OK)")
-	for _, p := range rpms {
+	if len(rpms) > 0 {
+		rpmArgs := append([]string{"--addsign"}, rpms...)
+		log.Printf("Invoking rpm with args: %+v", rpmArgs)
 		//nolint:gosec
-		cmd := exec.Command("rpm", "-K", p)
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			return fmt.Errorf("failed to verify RPM signature: %w", err)
+		cmd := exec.Command("rpm", rpmArgs...)
+		if output, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("failed to sign RPM packages: %s", output)
+		}
+		if err := os.Remove(cfg.GPGPassPath); err != nil {
+			return fmt.Errorf("failed to remove %q: %w", cfg.GPGPassPath, err)
 		}
 
-		if !reOutput.Match(output) {
-			return fmt.Errorf("RPM package %q not verified: %s", p, output)
+		log.Printf("Verifying %s RPM packages...", edition)
+		// The output changed between rpm versions
+		reOutput := regexp.MustCompile("(?:digests signatures OK)|(?:pgp.+OK)")
+		for _, p := range rpms {
+			//nolint:gosec
+			cmd := exec.Command("rpm", "-K", p)
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				return fmt.Errorf("failed to verify RPM signature: %w", err)
+			}
+
+			if !reOutput.Match(output) {
+				return fmt.Errorf("RPM package %q not verified: %s", p, output)
+			}
 		}
 	}
 
@@ -282,6 +288,7 @@ func shaFile(fpath string) error {
 
 // createPackage creates a Linux package.
 func createPackage(srcDir string, options linuxPackageOptions) error {
+	binary := "grafana"
 	cliBinary := "grafana-cli"
 	serverBinary := "grafana-server"
 
@@ -310,10 +317,15 @@ func createPackage(srcDir string, options linuxPackageOptions) error {
 		}
 	}
 
-	if err := fs.CopyFile(options.cliBinaryWrapperSrc, filepath.Join(packageRoot, "usr", "sbin", cliBinary)); err != nil {
+	if err := fs.CopyFile(filepath.Join(options.wrapperFilePath, binary),
+		filepath.Join(packageRoot, "usr", "sbin", binary)); err != nil {
 		return err
 	}
-	if err := fs.CopyFile(filepath.Join(srcDir, "bin", serverBinary),
+	if err := fs.CopyFile(filepath.Join(options.wrapperFilePath, cliBinary),
+		filepath.Join(packageRoot, "usr", "sbin", cliBinary)); err != nil {
+		return err
+	}
+	if err := fs.CopyFile(filepath.Join(options.wrapperFilePath, serverBinary),
 		filepath.Join(packageRoot, "usr", "sbin", serverBinary)); err != nil {
 		return err
 	}
@@ -327,20 +339,6 @@ func createPackage(srcDir string, options linuxPackageOptions) error {
 		return err
 	}
 	if err := fs.CopyRecursive(srcDir, filepath.Join(packageRoot, options.homeDir)); err != nil {
-		return err
-	}
-	homeBinDir := filepath.Join(packageRoot, options.homeBinDir)
-	if err := os.RemoveAll(homeBinDir); err != nil {
-		return fmt.Errorf("failed to remove %q: %w", homeBinDir, err)
-	}
-	//nolint
-	if err := os.MkdirAll(homeBinDir, 0o755); err != nil {
-		return fmt.Errorf("failed to make directory %q: %w", homeBinDir, err)
-	}
-	// The grafana-cli binary is exposed through a wrapper to ensure a proper
-	// configuration is in place. To enable that, we need to store the original
-	// binary in a separate location to avoid conflicts.
-	if err := fs.CopyFile(filepath.Join(srcDir, "bin", cliBinary), filepath.Join(homeBinDir, cliBinary)); err != nil {
 		return err
 	}
 
@@ -469,43 +467,6 @@ func copyBinaries(grafanaDir, tmpDir string, args grafana.BuildArgs, edition con
 
 		if err := fs.CopyFile(srcPath, tgtPath); err != nil {
 			return err
-		}
-	}
-
-	return nil
-}
-
-// copyScripts copies scripts from grafanaDir into tmpDir.
-func copyScripts(grafanaDir, tmpDir string) error {
-	//nolint
-	if err := os.MkdirAll(filepath.Join(tmpDir, "scripts"), 0o755); err != nil {
-		return fmt.Errorf("failed to create dir %q: %w", filepath.Join(tmpDir, "scripts"), err)
-	}
-	scriptsDir := filepath.Join(grafanaDir, "scripts")
-	infos, err := os.ReadDir(scriptsDir)
-	if err != nil {
-		return fmt.Errorf("failed to list files in %q: %w", scriptsDir, err)
-	}
-	for _, file := range infos {
-		info, err := file.Info()
-		if err != nil {
-			return err
-		}
-
-		if info.IsDir() {
-			continue
-		}
-
-		if info.Mode()&os.ModeSymlink != 0 {
-			continue
-		}
-
-		path := ""
-
-		path = filepath.Join(scriptsDir, info.Name())
-
-		if err := fs.CopyFile(path, filepath.Join(tmpDir, "scripts", info.Name())); err != nil {
-			return fmt.Errorf("failed to copy %q to %q: %w", path, tmpDir, err)
 		}
 	}
 
@@ -717,9 +678,6 @@ func realPackageVariant(ctx context.Context, v config.Variant, edition config.Ed
 	if err := copyBinaries(grafanaDir, tmpDir, args, edition); err != nil {
 		return err
 	}
-	if err := copyScripts(grafanaDir, tmpDir); err != nil {
-		return err
-	}
 	if err := copyConfFiles(grafanaDir, tmpDir); err != nil {
 		return err
 	}
@@ -773,7 +731,7 @@ func realPackageVariant(ctx context.Context, v config.Variant, edition config.Ed
 			initdScriptSrc:         filepath.Join(grafanaDir, "packaging", "deb", "init.d", "grafana-server"),
 			defaultFileSrc:         filepath.Join(grafanaDir, "packaging", "deb", "default", "grafana-server"),
 			systemdFileSrc:         filepath.Join(grafanaDir, "packaging", "deb", "systemd", "grafana-server.service"),
-			cliBinaryWrapperSrc:    filepath.Join(grafanaDir, "packaging", "wrappers", "grafana-cli"),
+			wrapperFilePath:        filepath.Join(grafanaDir, "packaging", "wrappers"),
 			depends:                []string{"adduser", "libfontconfig1"},
 		}); err != nil {
 			return err
@@ -807,7 +765,7 @@ func realPackageVariant(ctx context.Context, v config.Variant, edition config.Ed
 		initdScriptSrc:         filepath.Join(grafanaDir, "packaging", "rpm", "init.d", "grafana-server"),
 		defaultFileSrc:         filepath.Join(grafanaDir, "packaging", "rpm", "sysconfig", "grafana-server"),
 		systemdFileSrc:         filepath.Join(grafanaDir, "packaging", "rpm", "systemd", "grafana-server.service"),
-		cliBinaryWrapperSrc:    filepath.Join(grafanaDir, "packaging", "wrappers", "grafana-cli"),
+		wrapperFilePath:        filepath.Join(grafanaDir, "packaging", "wrappers"),
 		// chkconfig is depended on since our systemd service wraps a SysV init script, and that requires chkconfig
 		depends: []string{"/sbin/service", "chkconfig", "fontconfig", "freetype", "urw-fonts"},
 	}); err != nil {
@@ -889,7 +847,7 @@ type linuxPackageOptions struct {
 	initdScriptSrc         string
 	defaultFileSrc         string
 	systemdFileSrc         string
-	cliBinaryWrapperSrc    string
+	wrapperFilePath        string
 
 	depends []string
 }
@@ -929,7 +887,7 @@ func createZip(srcDir, version, variantStr, sfx, grafanaDir string) error {
 		return fmt.Errorf("failed to create %q: %w", fpath, err)
 	}
 	defer func() {
-		if err := tgt.Close(); err != nil {
+		if err := tgt.Close(); err != nil && !errors.Is(err, os.ErrClosed) {
 			log.Println(err)
 		}
 	}()
@@ -1036,7 +994,7 @@ func createZip(srcDir, version, variantStr, sfx, grafanaDir string) error {
 	return nil
 }
 
-//nolint
+// nolint
 func createTarball(srcDir, version, variantStr, sfx, grafanaDir string) error {
 	fpath := filepath.Join(grafanaDir, "dist", fmt.Sprintf("grafana%s-%s.%s.tar.gz", sfx, version, variantStr))
 	//nolint:gosec
@@ -1045,7 +1003,7 @@ func createTarball(srcDir, version, variantStr, sfx, grafanaDir string) error {
 		return fmt.Errorf("failed to create %q: %w", fpath, err)
 	}
 	defer func() {
-		if err := tgt.Close(); err != nil {
+		if err := tgt.Close(); err != nil && !errors.Is(err, os.ErrClosed) {
 			log.Println(err)
 		}
 	}()

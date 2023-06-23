@@ -1,9 +1,8 @@
 ---
 aliases:
-  - /docs/grafana/latest/getting-started/get-started-grafana-prometheus/
-  - /docs/grafana/latest/getting-started/getting-started-prometheus/
-  - /docs/grafana/latest/guides/getting_started/
-  - /docs/grafana/latest/guides/gettingstarted/
+  - ../guides/getting_started/
+  - ../guides/gettingstarted/
+  - getting-started-prometheus/
 description: Learn how to build your first Prometheus dashboard in Grafana.
 title: Get started with Grafana and Prometheus
 weight: 300
@@ -12,8 +11,6 @@ weight: 300
 # Get started with Grafana and Prometheus
 
 Prometheus is an open source monitoring system for which Grafana provides out-of-the-box support. This topic walks you through the steps to create a series of dashboards in Grafana to display system metrics for a server monitored by Prometheus.
-
-{{< docs/shared "getting-started/first-step.md" >}}
 
 #### Download Prometheus and node_exporter
 

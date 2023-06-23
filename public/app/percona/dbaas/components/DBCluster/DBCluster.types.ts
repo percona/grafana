@@ -6,7 +6,7 @@ import { DBClusterService } from './DBCluster.service';
 import { Operators } from './EditDBClusterPage/DBClusterBasicOptions/DBClusterBasicOptions.types';
 
 export type AddDBClusterAction = (dbCluster: DBCluster) => void;
-export type GetDBClustersAction = () => void;
+export type GetDBClustersAction = (triggerLoading?: boolean) => Promise<void>;
 export type SetDBClustersLoadingAction = (loading: boolean) => void;
 export type ManageDBClusters = [DBCluster[], GetDBClustersAction, SetDBClustersLoadingAction, boolean];
 
@@ -14,6 +14,11 @@ export enum DBClusterType {
   pxc = 'DB_CLUSTER_TYPE_PXC',
   psmdb = 'DB_CLUSTER_TYPE_PSMDB',
 }
+
+export const DatabaseToDBClusterTypeMapping: Partial<Record<Databases, DBClusterType>> = {
+  [Databases.mysql]: DBClusterType.pxc,
+  [Databases.mongodb]: DBClusterType.psmdb,
+};
 
 export interface DBCluster {
   clusterName: string;
@@ -39,6 +44,7 @@ export interface DBCluster {
   storageClass?: string;
   backup?: DBaaSBackup;
   restore?: DBaaSRestore;
+  template?: DBClusterTemplate;
 }
 
 interface DBaaSBackup {
@@ -189,6 +195,24 @@ export interface DBClusterPayload {
   pxcConfiguration?: string;
   internet_facing?: boolean;
   source_ranges?: string[];
+  template?: DBClusterTemplate;
+}
+
+export interface DBClusterResponse {
+  name: string;
+  state?: DBClusterStatus;
+  operation?: DBClusterOperationAPI;
+  params: DBClusterParamsAPI;
+  suspend?: boolean;
+  resume?: boolean;
+  expose?: boolean;
+  exposed?: boolean;
+  installed_image?: string;
+  available_image?: string;
+  image?: string;
+  pxcConfiguration?: string;
+  internet_facing?: boolean;
+  source_ranges?: string[];
 }
 
 export interface DBClusterActionAPI {
@@ -241,6 +265,19 @@ export interface DBClusterSecretsResponse {
 
 export interface DBClusterSecretsRequest {
   kubernetes_cluster_name: string;
+}
+
+export interface DBClusterTemplate {
+  name: string;
+  kind: string;
+}
+export interface DBClusterTemplatesResponse {
+  templates: DBClusterTemplate[];
+}
+
+export interface DBClusterTemplatesRequest {
+  kubernetes_cluster_name: string;
+  cluster_type: DBClusterType;
 }
 
 export interface DBClusterSecret {
@@ -329,8 +366,8 @@ export interface DBClusterChangeComponentVersionAPI {
 }
 
 export interface DBClusterListResponse {
-  pxc_clusters: DBClusterPayload[];
-  psmdb_clusters: DBClusterPayload[];
+  pxc_clusters?: DBClusterResponse[];
+  psmdb_clusters?: DBClusterResponse[];
 }
 
 export interface DBClusterSuspendResumeRequest {

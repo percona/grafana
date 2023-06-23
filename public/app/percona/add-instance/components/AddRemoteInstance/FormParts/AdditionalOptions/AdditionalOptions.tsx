@@ -1,15 +1,13 @@
-import {
-  CheckboxField,
-  NumberInputField,
-  RadioButtonGroupField,
-  validators as platformCoreValidators,
-} from '@percona/platform-core';
 import { FormApi } from 'final-form';
 import React, { FC, useEffect, useState } from 'react';
 
 import { useStyles } from '@grafana/ui';
 import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
+import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
+import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { Databases } from 'app/percona/shared/core';
+import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
 import { Messages } from '../FormParts.messages';
@@ -102,7 +100,13 @@ export const getAdditionalOptions = (
         <>
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
           <PostgreTLSCertificate form={form} />
-          <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
+          <>
+            <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
+            <CheckboxField
+              label={Messages.form.labels.additionalOptions.disableCommentsParsing}
+              name="disable_comments_parsing"
+            />
+          </>
           <PostgreSQLAdditionalOptions
             isRDS={remoteInstanceCredentials.isRDS}
             isAzure={remoteInstanceCredentials.isAzure}
@@ -134,6 +138,10 @@ export const getAdditionalOptions = (
           <MysqlTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
           <MySQLOptions form={form} />
+          <CheckboxField
+            label={Messages.form.labels.additionalOptions.disableCommentsParsing}
+            name="disable_comments_parsing"
+          />
           <CheckboxField
             label={Messages.form.labels.additionalOptions.qanMysqlPerfschema}
             name="qan_mysql_perfschema"

@@ -1,8 +1,7 @@
 ---
 aliases:
-  - /docs/grafana/latest/alerting/alerting-rules/alert-annotation-label/
-  - /docs/grafana/latest/alerting/fundamentals/annotation-label/
-  - /docs/grafana/latest/alerting/unified-alerting/alerting-rules/alert-annotation-label/
+  - ../alerting-rules/alert-annotation-label/
+  - ../unified-alerting/alerting-rules/alert-annotation-label/
 description: Annotations and labels for alerting
 keywords:
   - grafana
@@ -16,7 +15,7 @@ weight: 401
 
 # Annotations and labels for alerting rules
 
-Annotations and labels are key value pairs associated with alerts originating from the alerting rule, datasource response, and as a result of alerting rule evaluation. They can be used in alert notifications directly or in [templates]({{< relref "../../contact-points/message-templating/" >}}) and [template functions]({{< relref "../../contact-points/fundamentals/annotation-label/template-functions/" >}}) to create notification content dynamically.
+Annotations and labels are key value pairs associated with alerts originating from the alerting rule, datasource response, and as a result of alerting rule evaluation. They can be used in alert notifications directly or in [templates]({{< relref "../../contact-points/message-templating" >}}) and [template functions]({{< relref "./template-functions" >}}) to create notification content dynamically.
 
 ## Annotations
 

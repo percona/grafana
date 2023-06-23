@@ -1,20 +1,22 @@
-import { LoaderButton, logger } from '@percona/platform-core';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
-import { AppEvents } from '@grafana/data';
+import { AppEvents, UrlQueryMap } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { CheckService } from 'app/percona/check/Check.service';
 import { CheckDetails, Interval } from 'app/percona/check/types';
-import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/integrated-alerting/components/Table';
 import { CustomCollapsableSection } from 'app/percona/shared/components/Elements/CustomCollapsableSection/CustomCollapsableSection';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { getAdvisors, getCategorizedAdvisors, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { dispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -36,10 +38,11 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   const { loading: advisorsPending } = useSelector(getAdvisors);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const advisors = categorizedAdvisors[category];
+  const [queryParams] = useQueryParams();
+
   if (navModel.main.id === 'not-found') {
     locationService.push('/advisors');
   }
-
   const getCheckNamesListInCategory = () => {
     return Object.values(advisors)
       .map((advisor) => advisor.checks)
@@ -108,6 +111,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
         Header: Messages.table.columns.description,
         accessor: 'description',
         type: FilterFieldTypes.TEXT,
+        noHiddenOverflow: true,
       },
       {
         Header: Messages.table.columns.status,
@@ -166,6 +170,10 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
 
+  const isFilterSet = (queryParams: UrlQueryMap, advisorName: string) => {
+    return Object.keys(queryParams).includes(advisorName);
+  };
+
   return (
     <OldPage navModel={navModel} tabsDataTestId="db-check-tabs-bar" data-testid="db-check-panel">
       <OldPage.Contents dataTestId="db-check-tab-content">
@@ -198,6 +206,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
                   mainLabel={summary}
                   content={advisors[summary].description}
                   sideLabel={advisors[summary].comment}
+                  isInitOpen={isFilterSet(queryParams, advisors[summary].name)}
                 >
                   <Table
                     totalItems={advisors[summary].checks.length}
@@ -205,6 +214,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
                     columns={columns}
                     pendingRequest={advisorsPending}
                     emptyMessage={Messages.table.noData}
+                    tableKey={advisors[summary].name}
                     showFilter
                   />
                   {!!selectedCheck && checkIntervalModalVisible && (

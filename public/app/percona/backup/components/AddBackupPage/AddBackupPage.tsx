@@ -1,14 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { cx } from '@emotion/css';
-import {
-  LoaderButton,
-  logger,
-  Overlay,
-  RadioButtonGroupField,
-  TextareaInputField,
-  TextInputField,
-  validators,
-} from '@percona/platform-core';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
@@ -18,18 +9,25 @@ import { CollapsableSection, CustomScrollbar, LinkButton, PageToolbar, useStyles
 import appEvents from 'app/core/app_events';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
+import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
+import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
+import { PageSwitcherValue } from 'app/percona/shared/components/Elements/PageSwitcherCard/PageSwitcherCard.types';
 import { AsyncSelectField } from 'app/percona/shared/components/Form/AsyncSelectField';
+import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { SelectField } from 'app/percona/shared/components/Form/SelectField';
-import { PageSwitcherValue } from 'app/percona/shared/components/PageSwitcherCard/PageSwitcherCard.types';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
+import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations } from 'app/percona/shared/core/selectors';
 import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
+import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
-import { PageSwitcherCard } from '../../../shared/components/PageSwitcherCard/PageSwitcherCard';
+import { PageSwitcherCard } from '../../../shared/components/Elements/PageSwitcherCard/PageSwitcherCard';
 import { BACKUP_INVENTORY_URL, BACKUP_SCHEDULED_URL } from '../../Backup.constants';
 import { Messages as MessagesBackup } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
@@ -63,6 +61,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const scheduleMode: boolean = (queryParams['scheduled'] as boolean) || match.params.type === SCHEDULED_TYPE;
   const [backup, setBackup] = useState<Backup | ScheduledBackup | null>(null);
   const [pending, setPending] = useState(false);
+  const [advancedSectionOpen, setAdvancedSectionOpen] = useState(false);
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const [modalTitle, setModalTitle] = useState(Messages.getModalTitle(scheduleMode, !!backup));
@@ -164,6 +163,8 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     setModalTitle(Messages.getModalTitle(true, editing));
   }, [editing, setQueryParams]);
 
+  const onToggle = useCallback((open) => setAdvancedSectionOpen(open), []);
+
   const pageSwitcherValues: Array<PageSwitcherValue<BackupType>> = useMemo(
     () => [
       {
@@ -210,6 +211,13 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                 tools.changeValue(state, 'dataModel', () => DataModel.LOGICAL);
               }
             }
+          },
+          changeFolder: ([cluster]: [string], state, tools) => {
+            if (!cluster) {
+              setAdvancedSectionOpen(true);
+            }
+
+            tools.changeValue(state, 'folder', () => cluster);
           },
         }}
         render={({ handleSubmit, valid, pristine, submitting, values, form }) => (
@@ -265,6 +273,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                               onChange={(service: SelectableValue<SelectableService>) => {
                                 input.onChange(service);
                                 form.mutators.changeVendor(service.value!.vendor);
+                                form.mutators.changeFolder(service.value!.cluster);
                               }}
                               className={styles.selectField}
                               data-testid="service-select-input"
@@ -308,7 +317,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                         </Field>
                       </span>
                       {scheduleMode && (
-                        <span className={styles.wideField}>
+                        <span className={styles.descriptionField}>
                           <TextareaInputField
                             fieldClassName={styles.textAreaField}
                             name="description"
@@ -316,8 +325,8 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                           />
                         </span>
                       )}
-                      <span className={cx(styles.radioButtonField, styles.backupTypeField)}>
-                        {values.type === BackupType.SCHEDULED && (
+                      {values.type === BackupType.SCHEDULED && (
+                        <span className={cx(styles.radioButtonField, styles.backupTypeField)}>
                           <RadioButtonGroupField
                             options={getBackupModeOptions(values.vendor)}
                             name="mode"
@@ -330,18 +339,28 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                                 form.mutators.changeDataModel(e.target.labels),
                             }}
                           />
-                        )}
-                      </span>
+                        </span>
+                      )}
                     </div>
                     <div className={styles.advanceSection}>
                       {values.type === BackupType.SCHEDULED && <ScheduleSection values={values} />}
                       <div className={styles.collapsableSection}>
                         <CollapsableSection
                           label={Messages.advanceSettings}
-                          isOpen={false}
+                          isOpen={advancedSectionOpen}
+                          onToggle={onToggle}
+                          controlled
                           buttonDataTestId="add-backup-advanced-settings"
                         >
                           <RetryModeSelector retryMode={values.retryMode} />
+                          <TextInputField
+                            fieldClassName={styles.textAreaField}
+                            name="folder"
+                            label={Messages.folder}
+                            disabled={editing}
+                            tooltipText={Messages.folderTooltip}
+                            tooltipLink={Messages.folderTooltipLink(values.vendor, values.mode)}
+                          />
                         </CollapsableSection>
                         {!!backupErrors.length && <BackupErrorSection backupErrors={backupErrors} />}
                       </div>

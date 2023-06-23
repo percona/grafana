@@ -1,7 +1,6 @@
 ---
 aliases:
-  - /docs/grafana/latest/administration/provisioning/
-  - /docs/grafana/latest/installation/provisioning/
+  - ../installation/provisioning/
 description: Describes provisioning settings for Grafana using configuration files.
 keywords:
   - grafana
@@ -1189,4 +1188,4 @@ The following sections detail the supported settings and secure settings for eac
 
 Grafana Enterprise supports provisioning for the following resources:
 
-- [Role-based access control provisioning]({{< relref "../roles-and-permissions/access-control/rbac-provisioning/" >}})
+- [Role-based access control provisioning]({{< relref "../roles-and-permissions/access-control/rbac-grafana-provisioning" >}})

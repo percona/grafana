@@ -1,7 +1,6 @@
 ---
 aliases:
-  - /docs/grafana/latest/developers/http_api/alerting/
-  - /docs/grafana/latest/http_api/alerting/
+  - ../../http_api/alerting/
 description: Grafana Alerts HTTP API
 keywords:
   - grafana
@@ -13,9 +12,9 @@ keywords:
 title: 'Alerting HTTP API '
 ---
 
-# Alerting API
+# Legacy Alerting API
 
-> **Note:** Starting with v9.0, the Alerting HTTP API is deprecated. It will be removed in a future release.
+> **Note:** Starting with v9.0, the Legacy Alerting HTTP API is deprecated. It will be removed in a future release.
 
 This topic is relevant for the [legacy dashboard alerts](https://grafana.com/docs/grafana/v8.5/alerting/old-alerting/) only.
 

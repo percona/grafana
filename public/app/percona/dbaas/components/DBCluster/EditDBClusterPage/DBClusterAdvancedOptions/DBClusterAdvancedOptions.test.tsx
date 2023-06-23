@@ -1,4 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
+
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import arrayMutators from 'final-form-arrays';
 import React from 'react';
 import { Form } from 'react-final-form';
@@ -11,9 +13,10 @@ import { AdvancedOptionsFields, DBClusterResources } from './DBClusterAdvancedOp
 jest.mock('../../DBCluster.service');
 jest.mock('../../PSMDB.service');
 jest.mock('../../XtraDB.service');
+jest.mock('app/percona/dbaas/components/Kubernetes/Kubernetes.service');
 
-jest.mock('@percona/platform-core', () => {
-  const originalModule = jest.requireActual('@percona/platform-core');
+jest.mock('app/percona/shared/helpers/logger', () => {
+  const originalModule = jest.requireActual('app/percona/shared/helpers/logger');
   return {
     ...originalModule,
     logger: {
@@ -47,15 +50,15 @@ describe('DBClusterAdvancedOptions::', () => {
     );
 
     const advancedOptions = screen.getByTestId('dbCluster-advanced-settings');
-    waitFor(() => fireEvent.click(advancedOptions));
+    await waitFor(() => fireEvent.click(advancedOptions));
 
+    expect(await screen.getByTestId('template-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('nodes-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('resources-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('memory-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('cpu-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('disk-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('configurations')).toBeInTheDocument();
-    expect(await screen.getByTestId('network-and-security')).toBeInTheDocument();
   });
 
   it('renders correctly in edit mode', async () => {
@@ -81,6 +84,7 @@ describe('DBClusterAdvancedOptions::', () => {
       )
     );
 
+    expect(await screen.getByTestId('template-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('nodes-number-input')).toBeInTheDocument();
     expect(await screen.getByTestId('resources-field-container')).toBeInTheDocument();
     expect(await screen.getByTestId('memory-number-input')).toBeInTheDocument();
@@ -89,7 +93,6 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(screen.getByTestId('dbcluster-resources-bar-memory')).toBeInTheDocument();
     expect(screen.getByTestId('dbcluster-resources-bar-cpu')).toBeInTheDocument();
     expect(await screen.getByTestId('configurations')).toBeInTheDocument();
-    expect(await screen.getByTestId('network-and-security')).toBeInTheDocument();
   });
 
   it('renders correctly with initial values', async () => {
@@ -116,7 +119,7 @@ describe('DBClusterAdvancedOptions::', () => {
       )
     );
     const advancedOptions = screen.getByTestId('dbCluster-advanced-settings');
-    waitFor(() => fireEvent.click(advancedOptions));
+    await waitFor(() => fireEvent.click(advancedOptions));
 
     const nodes = screen.getByTestId('nodes-number-input');
     expect(nodes.getAttribute('value')).toBe('3');
@@ -147,7 +150,7 @@ describe('DBClusterAdvancedOptions::', () => {
     );
 
     const advancedOptions = screen.getByTestId('dbCluster-advanced-settings');
-    waitFor(() => fireEvent.click(advancedOptions));
+    await waitFor(() => fireEvent.click(advancedOptions));
 
     const memory = screen.getByTestId('memory-number-input');
     const cpu = screen.getByTestId('cpu-number-input');
@@ -201,10 +204,11 @@ describe('DBClusterAdvancedOptions::', () => {
     expect(disk).toBeDisabled();
   });
 
-  it('should not show the arror button in edit mode ', async () => {
+  it('should not show the arrow button in edit mode ', async () => {
     await waitFor(() =>
       render(
         <Form
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           onSubmit={jest.fn() as (values: Record<string, any>) => Promise<void>}
           mutators={{ ...arrayMutators }}
           render={({ form, handleSubmit, valid, pristine, ...props }) => (
