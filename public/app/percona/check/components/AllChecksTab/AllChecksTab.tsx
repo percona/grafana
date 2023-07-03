@@ -130,6 +130,12 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
         ],
       },
       {
+        Header: Messages.table.columns.database,
+        accessor: 'database',
+        type: FilterFieldTypes.TEXT,
+        noHiddenOverflow: true,
+      },
+      {
         Header: Messages.table.columns.interval,
         accessor: 'interval',
         Cell: ({ value }) => Interval[value],
