@@ -75,7 +75,7 @@ describe('AllChecksTab::', () => {
             },
           },
           navIndex: navIndex,
-        })}
+        } as StoreState)}
       >
         <Router history={locationService.getHistory()}>
           <AllChecksTab
@@ -197,7 +197,7 @@ const AllChecksTabTesting = () => {
           },
         },
         navIndex: navIndex,
-      })}
+      } as StoreState)}
     >
       <Router history={locationService.getHistory()}>
         <AllChecksTab
@@ -237,7 +237,6 @@ const advisorsArray = [
           'This check returns errors if MongoDB or Percona Server for MongoDB version is less than the latest one with CVE fixes.',
         summary: 'MongoDB CVE Version',
         interval: 'RARE',
-        family: 'ADVISOR_CHECK_FAMILY_MYSQL',
       },
     ],
   },
@@ -255,7 +254,6 @@ const advisorsArray = [
           'This check returns warnings if MongoDB or Percona Server for MongoDB version is not the latest one.',
         summary: 'MongoDB Version',
         interval: 'FREQUENT',
-        family: 'ADVISOR_CHECK_FAMILY_MYSQL',
       },
       {
         name: 'mysql_version',
@@ -264,7 +262,6 @@ const advisorsArray = [
           'This check returns warnings if MySQL, Percona Server for MySQL, or MariaDB version is not the latest one.',
         summary: 'MySQL Version',
         interval: 'RARE',
-        family: 'ADVISOR_CHECK_FAMILY_POSTGRESQL',
       },
       {
         name: 'postgresql_version',
@@ -272,7 +269,6 @@ const advisorsArray = [
           'This check returns warnings if PostgreSQL minor version is not the latest one.\nAdditionally notice is returned if PostgreSQL major version is not the latest one.\nError is returned if the major version of PostgreSQL is 9.4 or older.\n',
         summary: 'PostgreSQL Version',
         interval: 'STANDARD',
-        family: 'ADVISOR_CHECK_FAMILY_MONGODB',
       },
     ],
   },
