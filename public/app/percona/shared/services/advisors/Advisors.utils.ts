@@ -8,7 +8,6 @@ export const groupAdvisorsIntoCategories = (advisors: Advisor[]): CategorizedAdv
 
     const modifiedChecks = checks.map((check) => ({
       ...check,
-      database: check.name.split('_')[0],
       disabled: check.disabled ? true : false,
     }));
 

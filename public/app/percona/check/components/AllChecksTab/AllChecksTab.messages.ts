@@ -11,7 +11,7 @@ export const Messages = {
       description: 'Description',
       category: 'Category',
       status: 'Status',
-      database: 'Database',
+      family: 'Technology',
       interval: 'Interval',
       actions: 'Actions',
     },

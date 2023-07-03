@@ -130,8 +130,8 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
         ],
       },
       {
-        Header: Messages.table.columns.database,
-        accessor: 'database',
+        Header: Messages.table.columns.family,
+        accessor: 'family',
         type: FilterFieldTypes.TEXT,
         noHiddenOverflow: true,
       },
