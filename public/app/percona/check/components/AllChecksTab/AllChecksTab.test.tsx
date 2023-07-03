@@ -237,6 +237,7 @@ const advisorsArray = [
           'This check returns errors if MongoDB or Percona Server for MongoDB version is less than the latest one with CVE fixes.',
         summary: 'MongoDB CVE Version',
         interval: 'RARE',
+        family: 'ADVISOR_CHECK_FAMILY_MYSQL',
       },
     ],
   },
