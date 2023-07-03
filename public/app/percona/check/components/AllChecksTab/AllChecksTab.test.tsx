@@ -75,7 +75,7 @@ describe('AllChecksTab::', () => {
             },
           },
           navIndex: navIndex,
-        } as StoreState)}
+        })}
       >
         <Router history={locationService.getHistory()}>
           <AllChecksTab
@@ -197,7 +197,7 @@ const AllChecksTabTesting = () => {
           },
         },
         navIndex: navIndex,
-      } as StoreState)}
+      })}
     >
       <Router history={locationService.getHistory()}>
         <AllChecksTab
