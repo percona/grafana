@@ -1,4 +1,3 @@
-import { Label, logger } from '@percona/platform-core';
 import React, { useEffect, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 
@@ -7,7 +6,9 @@ import { Button, TextArea, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { LabelCore } from 'app/percona/shared/components/Form/LabelCore';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { logger } from 'app/percona/shared/helpers/logger';
 import { FileService } from 'app/percona/shared/services/file/File.service';
 
 import { getSettingsStyles } from '../../Settings.styles';
@@ -25,13 +26,17 @@ export const PrometheusConfiguration: React.FC = () => {
   const [initialValues, setInitialValues] = useState<PrometheusFormValues>();
 
   const fetchConfiguration = async () => {
-    const result = await FileService.get(PROMETHEUS_BASE_FILE);
+    try {
+      const result = await FileService.get(PROMETHEUS_BASE_FILE);
 
-    setInitialValues({
-      configuration: result.content ? window.atob(result.content) : '',
-    });
-
-    setIsLoading(false);
+      setInitialValues({
+        configuration: result.content ? window.atob(result.content) : '',
+      });
+    } catch (error) {
+      logger.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async (values: PrometheusFormValues) => {
@@ -57,18 +62,19 @@ export const PrometheusConfiguration: React.FC = () => {
         <FeatureLoader>
           <p>
             {Messages.description}
-            {/* TODO: add docs link */}
+            {/* TODO: add back in when docs link is available */}
+            {/* {Messages.needHelp}
             <a rel="noopener noreferrer" target="_blank" className={styles.link} href="/">
               {Messages.docs}
-            </a>
-            {Messages.dot}
+            </a> 
+            {Messages.dot} */}
           </p>
           <Form
             initialValues={initialValues}
             onSubmit={handleSubmit}
             render={({ dirty, handleSubmit, submitting }) => (
               <>
-                <Label name="configuration" label={Messages.label} />
+                <LabelCore name="configuration" label={Messages.label} />
                 <Field
                   name="configuration"
                   render={({ input }) => (
