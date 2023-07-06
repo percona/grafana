@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
 import { FormApi } from 'final-form';
 
 import { Databases } from 'app/percona/shared/core';
@@ -12,5 +13,6 @@ export interface ConfigurationProps {
   databaseType: Databases;
   k8sClusterName: string;
   mode: DBClusterPageMode;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   form: FormApi<Record<string, any>, Partial<Record<string, any>>>;
 }

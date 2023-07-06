@@ -3,7 +3,7 @@
   "license": "AGPL-3.0-only",
   "private": true,
   "name": "grafana",
-  "version": "9.2.13",
+  "version": "9.2.20",
   "repository": "github:grafana/grafana",
   "scripts": {
     "api-tests": "jest --notify --watch --config=devenv/e2e-api-tests/jest.js",
@@ -279,7 +279,6 @@
     "@opentelemetry/api": "1.2.0",
     "@opentelemetry/exporter-collector": "0.25.0",
     "@opentelemetry/semantic-conventions": "1.7.0",
-    "@percona/platform-core": "^1.0.12",
     "@popperjs/core": "2.11.5",
     "@prometheus-io/lezer-promql": "^0.37.0-rc.1",
     "@react-aria/button": "3.6.1",

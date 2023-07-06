@@ -3286,6 +3286,12 @@
     "AlertStateType": {
       "type": "string"
     },
+    "AlertStateType": {
+      "type": "string"
+    },
+    "AlertStateType": {
+      "type": "string"
+    },
     "AlertingRule": {
       "description": "adapted from cortex",
       "type": "object",

@@ -1,3 +1,13 @@
+<!-- 9.2.15 START -->
+
+# 9.2.15 (2023-03-22)
+
+<!-- 9.2.15 END -->
+
+<!-- 9.2.13 START -->
+
+<!-- 9.2.13 END -->
+
 <!-- 9.2.10 START -->
 
 # 9.2.10 (2023-01-24)
@@ -76,6 +86,11 @@
 - **Tooltips:** Make tooltips in FormField and FormLabel interactive and keyboard friendly. [#57706](https://github.com/grafana/grafana/pull/57706), [@asimpson](https://github.com/asimpson)
 
 <!-- 9.2.5 END -->
+<!-- 9.2.18 START -->
+
+# 9.2.18 (2023-05-08)
+
+<!-- 9.2.18 END -->
 <!-- 9.2.4 START -->
 
 # 9.2.4 (2022-11-07)
