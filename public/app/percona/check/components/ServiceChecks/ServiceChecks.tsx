@@ -8,7 +8,6 @@ import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { Severity } from 'app/percona/integrated-alerting/components/Severity';
 import { Chip } from 'app/percona/shared/components/Elements/Chip';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
-import { SilenceBell } from 'app/percona/shared/components/Elements/SilenceBell';
 import { ExtendedColumn, Table } from 'app/percona/shared/components/Elements/Table';
 import { useStoredTablePageSize } from 'app/percona/shared/components/Elements/Table/Pagination';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
