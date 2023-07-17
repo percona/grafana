@@ -7,6 +7,9 @@ import { updateTeamRoles } from 'app/core/components/RolePicker/api';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { SharedPreferences } from 'app/core/components/SharedPreferences/SharedPreferences';
 import { contextSrv } from 'app/core/services/context_srv';
+import { AccessRolesEnabledCheck } from 'app/percona/rbac/components';
+import { useFetchTeamDetails } from 'app/percona/rbac/hooks';
+import { AccessRolesTeamSelect } from 'app/percona/rbac/team';
 import { AccessControlAction, Role, Team } from 'app/types';
 
 import { updateTeam } from './state/actions';
@@ -25,6 +28,8 @@ export type Props = ConnectedProps<typeof connector> & OwnProps;
 export const TeamSettings: FC<Props> = ({ team, updateTeam }) => {
   const canWriteTeamSettings = contextSrv.hasPermissionInMetadata(AccessControlAction.ActionTeamsWrite, team);
   const currentOrgId = contextSrv.user.orgId;
+  // @PERCONA
+  useFetchTeamDetails();
 
   const [{ roleOptions }] = useRoleOptions(currentOrgId);
   const [pendingRoles, setPendingRoles] = useState<Role[]>([]);
@@ -70,7 +75,12 @@ export const TeamSettings: FC<Props> = ({ team, updateTeam }) => {
                 />
               </Field>
             )}
-
+            {/* @PERCONA */}
+            <AccessRolesEnabledCheck>
+              <Field label="Access Roles" description="You can define these roles in the Configuration → Access roles.">
+                <AccessRolesTeamSelect id={team.id} name={team.name} />
+              </Field>
+            </AccessRolesEnabledCheck>
             <Field
               label="Email"
               description="This is optional and is primarily used to set the team profile avatar (via gravatar service)."

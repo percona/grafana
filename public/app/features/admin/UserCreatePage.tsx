@@ -5,12 +5,16 @@ import { NavModelItem } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 import { Form, Button, Input, Field } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
+import { AccessRolesEnabledCheck, AccessRolesField } from 'app/percona/rbac/components';
+import { useAccessRoles } from 'app/percona/rbac/hooks';
 
 interface UserDTO {
   name: string;
   password: string;
   email?: string;
   login?: string;
+  // @PERCONA
+  roleIds?: number[];
 }
 
 const createUser = async (user: UserDTO) => getBackendSrv().post('/api/admin/users', user);
@@ -25,21 +29,27 @@ const pageNav: NavModelItem = {
 
 const UserCreatePage: React.FC = () => {
   const history = useHistory();
+  const { submitUserAccessRoles } = useAccessRoles();
 
   const onSubmit = useCallback(
     async (data: UserDTO) => {
       const { id } = await createUser(data);
 
+      // @PERCONA
+      if (data.roleIds && data.roleIds.length) {
+        await submitUserAccessRoles(id, data.roleIds);
+      }
+
       history.push(`/admin/users/edit/${id}`);
     },
-    [history]
+    [history, submitUserAccessRoles]
   );
 
   return (
     <Page navId="global-users" pageNav={pageNav}>
       <Page.Contents>
         <Form onSubmit={onSubmit} validateOn="onBlur">
-          {({ register, errors }) => {
+          {({ register, errors, control }) => {
             return (
               <>
                 <Field
@@ -54,6 +64,11 @@ const UserCreatePage: React.FC = () => {
                 <Field label="Email">
                   <Input id="email-input" {...register('email')} />
                 </Field>
+
+                {/* @PERCONA */}
+                <AccessRolesEnabledCheck>
+                  <AccessRolesField control={control} />
+                </AccessRolesEnabledCheck>
 
                 <Field label="Username">
                   <Input id="username-input" {...register('login')} />

@@ -5,9 +5,9 @@ import { fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { fetchUsersListAction } from 'app/percona/shared/core/reducers/users/users';
 import { useAppDispatch } from 'app/store/store';
 
-import { Messages } from './AccessRoleHeader.messages';
+import { Messages } from './AccessRolesUserHeader.messages';
 
-const AccessRoleHeader: FC = () => {
+export const AccessRolesUserHeader: FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -28,5 +28,3 @@ const AccessRoleHeader: FC = () => {
     </th>
   );
 };
-
-export default AccessRoleHeader;

@@ -1,4 +1,4 @@
-import { AccessRole } from 'app/percona/shared/services/roles/Roles.types';
+import { AccessRole, AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types';
 
 export interface RolesState {
   isLoading: boolean;
@@ -6,6 +6,7 @@ export interface RolesState {
 }
 
 export interface AssignRoleParams {
-  userId: number;
+  entityId: number;
   roleIds: number[];
+  entityType: AccessRoleEntity;
 }

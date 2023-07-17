@@ -7,11 +7,11 @@ import * as UsersReducer from 'app/percona/shared/core/reducers/users/users';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
-import { stubRoles, stubUsers, stubUsersMap } from '../__mocks__/stubs';
+import { stubRoles, stubUsers, stubUsersMap } from '../../__mocks__/stubs';
 
-import AccessRoleHeader from './AccessRoleHeader';
+import { AccessRolesUserHeader } from './AccessRolesUserHeader';
 
-const wrapWithProvider = (children: ReactElement, enableAccessControl = true) => (
+const wrapWithProvider = (children: ReactElement) => (
   <Provider
     store={configureStore({
       percona: {
@@ -35,9 +35,9 @@ const wrapWithProvider = (children: ReactElement, enableAccessControl = true) =>
   </Provider>
 );
 
-describe('AccessRoleHeader', () => {
+describe('AccessRolesUserHeader::', () => {
   it('renders correctly', () => {
-    render(wrapWithProvider(<AccessRoleHeader />));
+    render(wrapWithProvider(<AccessRolesUserHeader />));
     expect(screen.getByTestId('access-role-header')).toHaveTextContent('Access Role');
   });
 
@@ -45,7 +45,7 @@ describe('AccessRoleHeader', () => {
     const fetchRolesActionSpy = jest.spyOn(RolesReducer, 'fetchRolesAction');
     const fetchUsersListActionSpy = jest.spyOn(UsersReducer, 'fetchUsersListAction');
 
-    render(wrapWithProvider(<AccessRoleHeader />));
+    render(wrapWithProvider(<AccessRolesUserHeader />));
 
     expect(fetchRolesActionSpy).toHaveBeenCalled();
     expect(fetchUsersListActionSpy).toHaveBeenCalled();

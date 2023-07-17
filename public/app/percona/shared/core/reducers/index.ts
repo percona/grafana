@@ -26,6 +26,7 @@ import perconaUpdateDBCluster from './dbaas/updateDBCluster/updateDBCluster';
 import nodesReducer from './nodes';
 import rolesReducers from './roles/roles';
 import servicesReducer from './services';
+import teamReducer from './team/team';
 import tourReducer from './tour/tour';
 import perconaUserReducers from './user/user';
 import usersReducers from './users/users';
@@ -254,5 +255,6 @@ export default {
     roles: rolesReducers,
     users: usersReducers,
     advisors: advisorsReducers,
+    team: teamReducer,
   }),
 };

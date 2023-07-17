@@ -4,25 +4,18 @@ import { Provider } from 'react-redux';
 import selectEvent from 'react-select-event';
 
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
+import { AccessRoleEntity } from 'app/percona/shared/services/roles/Roles.types';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
-import AccessRolesEnabledCheck from '../AccessRolesEnabledCheck/AccessRolesEnabledCheck';
-import { stubRoles, stubUsers, stubUserSingleRole, stubUsersMap, subUserMultipleRoles } from '../__mocks__/stubs';
+import { stubRoles, stubUsers, stubUserSingleRole, stubUsersMap, subUserMultipleRoles } from '../../__mocks__/stubs';
+import { AccessRolesEnabledCheck } from '../../components';
 
-import AccessRoleCell from './AccessRoleCell';
+import { AccessRolesUserSelect } from './AccessRolesUserSelect';
 
-const wrapWithTable = (element: ReactElement) => (
-  <table>
-    <tbody>
-      <tr>
-        <AccessRolesEnabledCheck>{element}</AccessRolesEnabledCheck>
-      </tr>
-    </tbody>
-  </table>
-);
+const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
 
-const wrapWithProvider = (element: ReactElement, enableAccessControl = true) => (
+const withProvider = (element: ReactElement, enableAccessControl = true) => (
   <Provider
     store={configureStore({
       percona: {
@@ -43,13 +36,17 @@ const wrapWithProvider = (element: ReactElement, enableAccessControl = true) => 
       },
     } as StoreState)}
   >
-    {wrapWithTable(element)}
+    <AccessRolesEnabledCheck>{element}</AccessRolesEnabledCheck>
   </Provider>
 );
 
-describe('AccessRoleCell', () => {
-  it('shows cell when access roles are enabled', () => {
-    render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
+describe('AccessRolesUserSelect::', () => {
+  beforeEach(() => {
+    assignRoleActionSpy.mockClear();
+  });
+
+  it('shows when access roles are enabled', () => {
+    render(withProvider(<AccessRolesUserSelect id={stubUserSingleRole.userId} name={stubUserSingleRole.name} />));
 
     const select = screen.queryByLabelText('Access Roles');
 
@@ -57,7 +54,9 @@ describe('AccessRoleCell', () => {
   });
 
   it("isn't shown when access roles are disabled", () => {
-    render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />, false));
+    render(
+      withProvider(<AccessRolesUserSelect id={stubUserSingleRole.userId} name={stubUserSingleRole.name} />, false)
+    );
 
     const select = screen.queryByLabelText('Access Roles');
 
@@ -65,7 +64,7 @@ describe('AccessRoleCell', () => {
   });
 
   it('shows the current users role', () => {
-    render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
+    render(withProvider(<AccessRolesUserSelect id={stubUserSingleRole.userId} name={stubUserSingleRole.name} />));
 
     const option = screen.queryByText(stubRoles[0].title);
 
@@ -73,7 +72,7 @@ describe('AccessRoleCell', () => {
   });
 
   it('shows the current users roles', () => {
-    render(wrapWithProvider(<AccessRoleCell user={subUserMultipleRoles} />));
+    render(withProvider(<AccessRolesUserSelect id={subUserMultipleRoles.userId} name={subUserMultipleRoles.name} />));
 
     const option1 = screen.queryByText(stubRoles[0].title);
     const option2 = screen.queryByText(stubRoles[1].title);
@@ -83,30 +82,30 @@ describe('AccessRoleCell', () => {
   });
 
   it('calls api when role has been selected', async () => {
-    const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
-    render(wrapWithProvider(<AccessRoleCell user={stubUserSingleRole} />));
+    render(withProvider(<AccessRolesUserSelect id={stubUserSingleRole.userId} name={stubUserSingleRole.name} />));
 
     const roleSelect = screen.getByLabelText('Access Roles');
 
     await selectEvent.select(roleSelect, ['Role #1', 'Role #2'], { container: document.body });
 
     expect(assignRoleActionSpy).toHaveBeenCalledWith({
-      userId: 2,
+      entityId: 2,
       roleIds: [1, 2],
+      entityType: AccessRoleEntity.user,
     });
   });
 
   it('calls api when role has been removed', async () => {
-    const assignRoleActionSpy = jest.spyOn(RolesReducer, 'assignRoleAction');
-    render(wrapWithProvider(<AccessRoleCell user={subUserMultipleRoles} />));
+    render(withProvider(<AccessRolesUserSelect id={subUserMultipleRoles.userId} name={subUserMultipleRoles.name} />));
 
     const removeButton = screen.getByLabelText('Remove Role #1');
 
     removeButton.click();
 
     expect(assignRoleActionSpy).toHaveBeenCalledWith({
-      userId: 3,
+      entityId: 3,
       roleIds: [2],
+      entityType: AccessRoleEntity.user,
     });
   });
 });
