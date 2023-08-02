@@ -35,6 +35,18 @@ describe('validateKeyValue test', () => {
     expect(validators.validateKeyValue(testString)).toEqual(undefined);
   });
 
+  it('returns empty string if value containts dash', () => {
+    const testString = 'key:value-';
+
+    expect(validators.validateKeyValue(testString)).toEqual(undefined);
+  });
+
+  it('returns empty string if key contains dash', () => {
+    const testString = 'key-:value';
+
+    expect(validators.validateKeyValue(testString)).toEqual(undefined);
+  });
+
   it('return correct error message when value is invalid', () => {
     const errorMessage = 'Values have to be in key:value format, and separated with new line or space';
     const testString = 'key:value-key2:value2';
