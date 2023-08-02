@@ -1,6 +1,6 @@
 // page is deprecated, so shortener is not needed
 const COMMUNICATION_LINK =
-  'https://docs.percona.com/percona-monitoring-and-management/how-to/integrate-platform.html#disconnect-a-pmm-instance#communication';
+  'https://docs.percona.com/percona-monitoring-and-management/how-to/integrate-platform.html#communication';
 
 export const Messages = {
   fields: {
