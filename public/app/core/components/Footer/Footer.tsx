@@ -25,7 +25,7 @@ export let getFooterLinks = (): FooterLink[] => {
       id: 'pmm-docs',
       text: 'Documentation',
       icon: 'document-info',
-      url: 'hhttps://per.co.na/pmm_documentation',
+      url: 'https://per.co.na/pmm_documentation',
       target: '_blank',
     },
     {
