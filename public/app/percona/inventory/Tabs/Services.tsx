@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Row } from 'react-table';
 
 import { locationService } from '@grafana/runtime';
-import { Badge, Button, HorizontalGroup, Icon, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, HorizontalGroup, Icon, Link, TagList, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { stripServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
@@ -37,6 +37,7 @@ import {
   getBadgeIconForServiceStatus,
   getBadgeTextForServiceStatus,
   getAgentsMonitoringStatus,
+  getNodeLink,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
@@ -106,6 +107,13 @@ export const Services = () => {
   const columns = useMemo(
     (): Array<ExtendedColumn<FlattenService>> => [
       {
+        Header: Messages.services.columns.serviceId,
+        id: 'serviceId',
+        accessor: 'serviceId',
+        hidden: true,
+        type: FilterFieldTypes.TEXT,
+      },
+      {
         Header: Messages.services.columns.status,
         accessor: 'status',
         Cell: ({ value }: { value: ServiceStatus }) => (
@@ -147,6 +155,11 @@ export const Services = () => {
       {
         Header: Messages.services.columns.nodeName,
         accessor: 'nodeName',
+        Cell: ({ value, row }: { row: Row<FlattenService>; value: string }) => (
+          <Link className={styles.link} href={getNodeLink(row.original)}>
+            {value}
+          </Link>
+        ),
         type: FilterFieldTypes.TEXT,
       },
       {
@@ -181,7 +194,7 @@ export const Services = () => {
       },
       getExpandAndActionsCol(getActions),
     ],
-    [getActions]
+    [styles, getActions]
   );
 
   const loadData = useCallback(async () => {
