@@ -51,7 +51,7 @@ export const validators = {
 
           // check key against prometheus data model
           // https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
-          if (/[a-zA-Z_][a-zA-Z0-9_]*/.test(key) && !!value && !rest.length) {
+          if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(key) && !key.startsWith('__') && !!value && !rest.length) {
             return true;
           }
 
