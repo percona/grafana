@@ -6,6 +6,7 @@ import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { TextareaInputField } from 'app/percona/shared/components/Form/TextareaInput';
 import Validators from 'app/percona/shared/helpers/validators';
 
+import CustomLabels from '../CustomLabels/CustomLabels';
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 
@@ -47,6 +48,7 @@ export const LabelsFormPart: FC = () => {
         placeholder={Messages.form.placeholders.labels.customLabels}
         validators={customLabelsValidators}
       />
+      <CustomLabels />
     </div>
   );
 };
