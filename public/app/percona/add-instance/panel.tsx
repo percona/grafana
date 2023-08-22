@@ -37,7 +37,6 @@ const AddInstancePanel = () => {
   const [selectedInstance, selectInstance] = useState<InstanceAvailable>({
     type: availableInstanceTypes.includes(instanceType as AvailableTypes) ? instanceType : '',
   });
-  const [formName, setFormName] = useState(instanceType ? ADD_INSTANCE_FORM_NAME : '');
   const [showSelection, setShowSelection] = useState(!instanceType);
   const [submitting, setSubmitting] = useState(false);
   const history = useHistory();
@@ -77,7 +76,7 @@ const AddInstancePanel = () => {
     [showSelection, selectedInstance]
   );
 
-  const handleCancel: MouseEventHandler = () => {
+  const handleCancel: MouseEventHandler = (e) => {
     if (showSelection) {
       history.push('/inventory/services');
     } else {
@@ -85,17 +84,12 @@ const AddInstancePanel = () => {
     }
     selectInstance({ type: '' });
     setShowSelection(true);
-    setFormName('');
   };
 
-  const handleShowConfiguration: MouseEventHandler = (e) => {
+  const handleSelectInstance = (instance: InstanceAvailable) => {
+    history.push('/add-instance/' + instance.type);
+    selectInstance(instance);
     setShowSelection(false);
-    history.push('/add-instance/' + selectedInstance.type);
-
-    if (showSelection) {
-      e.preventDefault();
-      setFormName(ADD_INSTANCE_FORM_NAME);
-    }
   };
 
   return (
@@ -107,14 +101,11 @@ const AddInstancePanel = () => {
         <ToolbarButton onClick={handleCancel}>
           {showSelection ? Messages.selectionStep.cancel : Messages.configurationStep.cancel}
         </ToolbarButton>
-        <ToolbarButton
-          form={formName}
-          disabled={!selectedInstance.type || submitting}
-          variant="primary"
-          onClick={handleShowConfiguration}
-        >
-          {submitLabel}
-        </ToolbarButton>
+        {!showSelection && (
+          <ToolbarButton form={ADD_INSTANCE_FORM_NAME} disabled={submitting} variant="primary">
+            {submitLabel}
+          </ToolbarButton>
+        )}
       </PageToolbar>
       <Page.Contents className={styles.page}>
         <FeatureLoader>
@@ -122,7 +113,7 @@ const AddInstancePanel = () => {
             <AddInstance
               showAzure={!!azureDiscoverEnabled}
               selectedInstanceType={selectedInstance}
-              onSelectInstanceType={selectInstance}
+              onSelectInstanceType={handleSelectInstance}
             />
           ) : (
             <InstanceForm />

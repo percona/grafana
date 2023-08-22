@@ -17,12 +17,7 @@ export const SelectInstance: FC<SelectInstanceProps> = ({ type, isSelected, icon
   const styles = useStyles2(getStyles);
 
   return (
-    <Card
-      data-testid={`${type}-instance`}
-      isSelected={isSelected}
-      onClick={selectInstanceType(type)}
-      className={styles.InstanceCard}
-    >
+    <Card data-testid={`${type}-instance`} onClick={selectInstanceType(type)} className={styles.InstanceCard}>
       <Card.Heading>{title}</Card.Heading>
       <Card.Description>{Messages.titles.addInstance}</Card.Description>
       <Card.Figure>
@@ -36,12 +31,12 @@ export const AddInstance: FC<AddInstanceProps> = ({ selectedInstanceType, onSele
   const styles2 = useStyles2(getStyles);
   const instanceList = useMemo<InstanceListItem[]>(
     () => [
-      { type: Databases.postgresql, title: Messages.titles.postgresql, icon: 'percona-database-postgresql' },
+      { type: InstanceTypesExtra.rds, title: Messages.titles.rds },
       { type: Databases.mysql, title: Messages.titles.mysql, icon: 'percona-database-mysql' },
       { type: Databases.mongodb, title: Messages.titles.mongodb, icon: 'percona-database-mongodb' },
+      { type: Databases.postgresql, title: Messages.titles.postgresql, icon: 'percona-database-postgresql' },
       { type: Databases.proxysql, title: Messages.titles.proxysql, icon: 'percona-database-proxysql' },
       { type: Databases.haproxy, title: Messages.titles.haproxy, icon: 'percona-database-haproxy' },
-      { type: InstanceTypesExtra.rds, title: Messages.titles.rds },
       { type: InstanceTypesExtra.external, title: Messages.titles.external },
       { type: InstanceTypesExtra.azure, title: Messages.titles.azure, isHidden: !showAzure },
     ],
