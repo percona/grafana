@@ -17,12 +17,7 @@ export const SelectInstance: FC<SelectInstanceProps> = ({ type, isSelected, icon
   const styles = useStyles2(getStyles);
 
   return (
-    <Card
-      data-testid={`${type}-instance`}
-      isSelected={isSelected}
-      onClick={selectInstanceType(type)}
-      className={styles.InstanceCard}
-    >
+    <Card data-testid={`${type}-instance`} onClick={selectInstanceType(type)} className={styles.InstanceCard}>
       <Card.Heading>{title}</Card.Heading>
       <Card.Description>{Messages.titles.addInstance}</Card.Description>
       <Card.Figure>

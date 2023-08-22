@@ -77,7 +77,7 @@ const AddInstancePanel = () => {
     [showSelection, selectedInstance]
   );
 
-  const handleCancel: MouseEventHandler = () => {
+  const handleCancel: MouseEventHandler = (e) => {
     if (showSelection) {
       history.push('/inventory/services');
     } else {
@@ -98,6 +98,10 @@ const AddInstancePanel = () => {
     }
   };
 
+  const onSelectInstance = (type: InstanceAvailable) => {
+    history.push('/add-instance/' + type);
+  };
+
   return (
     <Page>
       <PageToolbar
@@ -112,6 +116,7 @@ const AddInstancePanel = () => {
           disabled={!selectedInstance.type || submitting}
           variant="primary"
           onClick={handleShowConfiguration}
+          style={{ display: 'none' }}
         >
           {submitLabel}
         </ToolbarButton>
@@ -122,7 +127,7 @@ const AddInstancePanel = () => {
             <AddInstance
               showAzure={!!azureDiscoverEnabled}
               selectedInstanceType={selectedInstance}
-              onSelectInstanceType={selectInstance}
+              onSelectInstanceType={onSelectInstance}
             />
           ) : (
             <InstanceForm />
