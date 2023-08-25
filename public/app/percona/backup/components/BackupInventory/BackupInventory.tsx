@@ -1,16 +1,17 @@
 /* eslint-disable react/display-name */
 import { CancelToken } from 'axios';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Column, Row } from 'react-table';
+import { Row } from 'react-table';
 
-import { AppEvents } from '@grafana/data';
+import { AppEvents, SelectableValue } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Alert, LinkButton, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { OldPage } from 'app/core/components/Page/Page';
+import { BackupStatus } from 'app/percona/backup/Backup.types';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { Table } from 'app/percona/shared/components/Elements/Table';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { ApiVerboseError, Databases, DATABASE_LABELS } from 'app/percona/shared/core';
@@ -46,6 +47,7 @@ export const BackupInventory: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Backup[]>([]);
+  const [serviceModes, setServiceModes] = useState<Array<SelectableValue<string>>>([]);
   const dispatch = useAppDispatch();
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
   const backupLocationMap = useRef<Record<string, StorageLocation | undefined>>({});
@@ -55,11 +57,50 @@ export const BackupInventory: FC = () => {
   const { result: locations = [] } = useSelector(getBackupLocations);
 
   const columns = useMemo(
-    (): Array<Column<Backup>> => [
+    (): Array<ExtendedColumn<Backup>> => [
       {
         Header: Messages.backupInventory.table.columns.status,
         accessor: 'status',
+        type: FilterFieldTypes.DROPDOWN,
         width: '100px',
+        options: [
+          {
+            label: 'Success',
+            value: BackupStatus.BACKUP_STATUS_SUCCESS,
+          },
+          {
+            label: 'Error',
+            value: BackupStatus.BACKUP_STATUS_ERROR,
+          },
+          {
+            label: 'Pending',
+            value: BackupStatus.BACKUP_STATUS_PENDING,
+          },
+          {
+            label: 'Paused',
+            value: BackupStatus.BACKUP_STATUS_PAUSED,
+          },
+          {
+            label: 'Invalid',
+            value: BackupStatus.BACKUP_STATUS_INVALID,
+          },
+          {
+            label: 'In Progress',
+            value: BackupStatus.BACKUP_STATUS_IN_PROGRESS,
+          },
+          {
+            label: 'Failed To Delete',
+            value: BackupStatus.BACKUP_STATUS_FAILED_TO_DELETE,
+          },
+          {
+            label: 'Failed Not Supported By Agent',
+            value: BackupStatus.BACKUP_STATUS_FAILED_NOT_SUPPORTED_BY_AGENT,
+          },
+          {
+            label: 'Deleting',
+            value: BackupStatus.BACKUP_STATUS_DELETING,
+          },
+        ],
         Cell: ({ value, row }) => (
           <Status
             showLogsAction={row.original.vendor === Databases.mongodb}
@@ -72,30 +113,37 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.name,
         accessor: 'name',
         id: 'name',
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.backupInventory.table.columns.service,
         accessor: 'serviceName',
+        type: FilterFieldTypes.DROPDOWN,
+        options: serviceModes,
       },
       {
         Header: Messages.backupInventory.table.columns.vendor,
         accessor: ({ vendor }: Backup) => DATABASE_LABELS[vendor],
         width: '150px',
+        type: FilterFieldTypes.TEXT,
       },
       {
         Header: Messages.backupInventory.table.columns.created,
         accessor: 'created',
         width: '200px',
+        type: FilterFieldTypes.TEXT,
         Cell: ({ value }) => <DetailedDate date={value} />,
       },
       {
         Header: Messages.backupInventory.table.columns.type,
         accessor: 'mode',
+        type: FilterFieldTypes.TEXT,
         Cell: ({ value }) => formatBackupMode(value),
       },
       {
         Header: Messages.backupInventory.table.columns.location,
         accessor: 'locationName',
+        type: FilterFieldTypes.TEXT,
         width: '250px',
         Cell: ({ row, value }) => (
           <span>
@@ -106,6 +154,7 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.actions,
         accessor: 'id',
+        type: FilterFieldTypes.TEXT,
         Cell: ({ row }) => (
           <BackupInventoryActions
             row={row}
@@ -119,7 +168,7 @@ export const BackupInventory: FC = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [backupLocationMap]
+    [backupLocationMap, serviceModes]
   );
   const styles = useStyles2(getStyles);
 
@@ -176,6 +225,12 @@ export const BackupInventory: FC = () => {
             );
           }
         });
+        setServiceModes(
+          backups.map((item) => ({
+            label: item.serviceName,
+            value: item.serviceName,
+          }))
+        );
         setData(backups);
       } catch (e) {
         if (isApiCancelError(e)) {
@@ -265,6 +320,7 @@ export const BackupInventory: FC = () => {
             autoResetExpanded={false}
             renderExpandedRow={renderSelectedSubRow}
             getRowId={useCallback((row: Backup) => row.id, [])}
+            showFilter
           ></Table>
           {restoreModalVisible && (
             <RestoreBackupModal
