@@ -2,10 +2,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Row } from 'react-table';
+import { useLocalStorage } from 'react-use';
 
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { Button, HorizontalGroup, Modal, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, InlineSwitch, Modal, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -29,6 +30,7 @@ import { Messages } from '../Inventory.messages';
 import { FlattenService } from '../Inventory.types';
 
 import { getAgentsMonitoringStatus } from './Services.utils';
+import Clusters from './Services/Clusters';
 import ServicesTable from './Services/ServicesTable';
 import { getStyles } from './Tabs.styles';
 
@@ -46,12 +48,14 @@ export const Services = () => {
       fetchedServices.map((value) => {
         return {
           type: value.type,
+          cluster: value.params.cluster || value.params.customLabels?.cluster,
           ...value.params,
           agentsStatus: getAgentsMonitoringStatus(value.params.agents ?? []),
         };
       }),
     [fetchedServices]
   );
+  const [showClusters, setShowClusters] = useLocalStorage('pmm-organize-by-clusters', false);
 
   const deletionMsg = useMemo(() => {
     const servicesToDelete = actionItem ? [actionItem] : selected;
@@ -130,9 +134,18 @@ export const Services = () => {
 
   return (
     <OldPage navModel={navModel}>
-      <OldPage.Contents>
+      <OldPage.Contents isLoading={isLoading}>
         <FeatureLoader>
           <HorizontalGroup height={40} justify="flex-end" align="flex-start">
+            <InlineSwitch
+              id="organize-by-clusters"
+              label={Messages.services.organizeByClusters}
+              className={styles.clustersSwitch}
+              value={showClusters}
+              onClick={() => setShowClusters(!showClusters)}
+              showLabel
+              transparent
+            />
             <Button
               size="md"
               disabled={selected.length === 0}
@@ -188,12 +201,16 @@ export const Services = () => {
               )}
             />
           </Modal>
-          <ServicesTable
-            flattenServices={flattenServices}
-            onSelectionChange={handleSelectionChange}
-            onDelete={handleDelete}
-            isLoading={isLoading}
-          />
+          {showClusters ? (
+            <Clusters services={flattenServices} onDelete={handleDelete} />
+          ) : (
+            <ServicesTable
+              flattenServices={flattenServices}
+              onSelectionChange={handleSelectionChange}
+              onDelete={handleDelete}
+              isLoading={isLoading}
+            />
+          )}
         </FeatureLoader>
       </OldPage.Contents>
     </OldPage>
