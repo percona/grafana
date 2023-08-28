@@ -41,11 +41,23 @@ const ServicesTable: FC<ServicesTableProps> = ({ isLoading, flattenServices, onS
         content: (
           <HorizontalGroup spacing="sm">
             <Icon name="trash-alt" />
-            <span className={styles.deleteItemTxtSpan}>{Messages.delete}</span>
+            <span className={styles.actionItemTxtSpan}>{Messages.delete}</span>
           </HorizontalGroup>
         ),
         action: () => {
           onDelete(row.original);
+        },
+      },
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="pen" />
+            <span className={styles.actionItemTxtSpan}>{Messages.edit}</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          const serviceId = row.original.serviceId.split('/').pop();
+          locationService.push(`/edit-instance/${serviceId}`);
         },
       },
       {
@@ -61,7 +73,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isLoading, flattenServices, onS
         },
       },
     ],
-    [styles.deleteItemTxtSpan, onDelete]
+    [styles.actionItemTxtSpan, onDelete]
   );
 
   const columns = useMemo(
