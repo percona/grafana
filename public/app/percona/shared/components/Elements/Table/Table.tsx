@@ -224,9 +224,7 @@ export const Table: FC<TableProps> = ({
                                         className: cx(
                                           cell.column.className,
                                           style.tableCell(!!cell.column.noHiddenOverflow),
-                                          cell.column && cell.column.Header && cell.column.Header === 'Summary'
-                                            ? style.summaryWrap
-                                            : undefined
+                                          cell.column?.Header === 'Summary' ? style.summaryWrap : undefined
                                         ),
                                         style: cell.column.style,
                                       },
