@@ -138,7 +138,7 @@ export const Services = () => {
             />
           )}
           {showClusters ? (
-            <Clusters services={flattenServices} onDelete={handleDelete} />
+            <Clusters services={flattenServices} onDelete={handleDelete} onSelectionChange={handleSelectionChange} />
           ) : (
             <ServicesTable
               flattenServices={flattenServices}

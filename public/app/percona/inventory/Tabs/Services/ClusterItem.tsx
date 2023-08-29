@@ -1,14 +1,24 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
+import { Row } from 'react-table';
 
 import { Collapse, HorizontalGroup, Icon, IconName } from '@grafana/ui';
 import { DATABASE_ICONS } from 'app/percona/shared/core';
 
+import { FlattenService } from '../../Inventory.types';
+
 import { ClusterItemProps } from './Clusters.type';
 import ServicesTable from './ServicesTable';
 
-const ClusterItem: FC<ClusterItemProps> = ({ cluster, onDelete }) => {
+const ClusterItem: FC<ClusterItemProps> = ({ cluster, onDelete, onSelectionChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const icon: IconName = cluster.type ? (DATABASE_ICONS[cluster.type] as IconName) : 'database';
+
+  const handleSelectionChange = useCallback(
+    (services: Array<Row<FlattenService>>) => {
+      onSelectionChange(cluster, services);
+    },
+    [cluster, onSelectionChange]
+  );
 
   return (
     <Collapse
@@ -26,7 +36,7 @@ const ClusterItem: FC<ClusterItemProps> = ({ cluster, onDelete }) => {
         flattenServices={cluster.services}
         isLoading={false}
         onDelete={onDelete}
-        onSelectionChange={console.log}
+        onSelectionChange={handleSelectionChange}
       />
     </Collapse>
   );
