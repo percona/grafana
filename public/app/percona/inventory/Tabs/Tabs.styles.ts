@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ spacing }: GrafanaTheme2) => ({
+export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
   detailsWrapper: css`
     display: flex;
     flex-direction: column;
@@ -36,12 +36,16 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
     align-items: center;
     background-color: transparent;
   `,
-  deleteItemTxtSpan: css`
+  actionItemTxtSpan: css`
     line-height: 15px;
   `,
   agentBreadcrumb: css`
     margin-top: ${spacing(4)};
     display: flex;
+
+    span {
+      white-space: pre;
+    }
 
     & > span:first-child {
       max-width: 70%;
@@ -52,5 +56,8 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
   `,
   goBack: css`
     vertical-align: middle;
+  `,
+  link: css`
+    color: ${colors.text.link};
   `,
 });
