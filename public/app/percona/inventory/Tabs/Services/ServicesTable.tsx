@@ -25,14 +25,25 @@ import {
 } from '../Services.utils';
 import { getStyles } from '../Tabs.styles';
 
+import { ServicesCluster } from './Clusters.type';
+
 interface ServicesTableProps {
   isLoading: boolean;
   flattenServices: FlattenService[];
   onSelectionChange: (rows: Array<Row<FlattenService>>) => void;
   onDelete: (service: FlattenService) => void;
+  showPagination?: boolean;
+  cluster?: ServicesCluster;
 }
 
-const ServicesTable: FC<ServicesTableProps> = ({ isLoading, flattenServices, onSelectionChange, onDelete }) => {
+const ServicesTable: FC<ServicesTableProps> = ({
+  isLoading,
+  flattenServices,
+  onSelectionChange,
+  onDelete,
+  cluster,
+  showPagination = true,
+}) => {
   const styles = useStyles2(getStyles);
 
   const getActions = useCallback(
@@ -211,7 +222,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isLoading, flattenServices, onS
       totalItems={flattenServices.length}
       rowSelection
       onRowSelection={onSelectionChange}
-      showPagination
+      showPagination={showPagination}
       pageSize={25}
       allRowsSelectionMode="page"
       emptyMessage={Messages.services.emptyTable}
@@ -221,6 +232,7 @@ const ServicesTable: FC<ServicesTableProps> = ({ isLoading, flattenServices, onS
       autoResetSelectedRows={false}
       getRowId={useCallback((row: FlattenService) => row.serviceId, [])}
       showFilter
+      tableKey={cluster?.name}
     />
   );
 };
