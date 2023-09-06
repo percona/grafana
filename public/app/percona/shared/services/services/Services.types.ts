@@ -82,7 +82,7 @@ export interface DbService {
   nodeName: string;
   environment?: string;
   status: ServiceStatus;
-  cluster?: string;
+  cluster: string;
   replicationSet?: string;
   customLabels?: Record<string, string>;
   agents?: DbAgent[];
