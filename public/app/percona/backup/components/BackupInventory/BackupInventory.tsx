@@ -24,7 +24,7 @@ import { useSelector } from 'app/types';
 
 import { NEW_BACKUP_URL, RESTORES_URL } from '../../Backup.constants';
 import { Messages } from '../../Backup.messages';
-import { formatBackupMode } from '../../Backup.utils';
+import { BackupModeMap, formatBackupMode } from '../../Backup.utils';
 import { useRecurringCall } from '../../hooks/recurringCall.hook';
 import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
@@ -59,45 +59,45 @@ export const BackupInventory: FC = () => {
   const columns = useMemo(
     (): Array<ExtendedColumn<Backup>> => [
       {
-        Header: Messages.backupInventory.table.columns.status,
+        Header: Messages.backupInventory.table.columns.status.name,
         accessor: 'status',
         type: FilterFieldTypes.DROPDOWN,
         width: '100px',
         options: [
           {
-            label: 'Success',
+            label: Messages.backupInventory.table.columns.status.options.success,
             value: BackupStatus.BACKUP_STATUS_SUCCESS,
           },
           {
-            label: 'Error',
+            label: Messages.backupInventory.table.columns.status.options.error,
             value: BackupStatus.BACKUP_STATUS_ERROR,
           },
           {
-            label: 'Pending',
+            label: Messages.backupInventory.table.columns.status.options.pending,
             value: BackupStatus.BACKUP_STATUS_PENDING,
           },
           {
-            label: 'Paused',
+            label: Messages.backupInventory.table.columns.status.options.paused,
             value: BackupStatus.BACKUP_STATUS_PAUSED,
           },
           {
-            label: 'Invalid',
+            label: Messages.backupInventory.table.columns.status.options.invalid,
             value: BackupStatus.BACKUP_STATUS_INVALID,
           },
           {
-            label: 'In Progress',
+            label: Messages.backupInventory.table.columns.status.options.inProgress,
             value: BackupStatus.BACKUP_STATUS_IN_PROGRESS,
           },
           {
-            label: 'Failed To Delete',
+            label: Messages.backupInventory.table.columns.status.options.failedToDelete,
             value: BackupStatus.BACKUP_STATUS_FAILED_TO_DELETE,
           },
           {
-            label: 'Failed Not Supported By Agent',
+            label: Messages.backupInventory.table.columns.status.options.failedNotSupportedByAgent,
             value: BackupStatus.BACKUP_STATUS_FAILED_NOT_SUPPORTED_BY_AGENT,
           },
           {
-            label: 'Deleting',
+            label: Messages.backupInventory.table.columns.status.options.deleting,
             value: BackupStatus.BACKUP_STATUS_DELETING,
           },
         ],
@@ -122,10 +122,15 @@ export const BackupInventory: FC = () => {
         options: serviceModes,
       },
       {
-        Header: Messages.backupInventory.table.columns.vendor,
-        accessor: ({ vendor }: Backup) => DATABASE_LABELS[vendor],
+        Header: Messages.scheduledBackups.table.columns.vendor,
+        accessor: 'vendor',
         width: '150px',
-        type: FilterFieldTypes.TEXT,
+        Cell: ({ value }) => DATABASE_LABELS[value],
+        type: FilterFieldTypes.DROPDOWN,
+        options: Object.values(DATABASE_LABELS).map((item: string) => ({
+          label: item,
+          value: item,
+        })),
       },
       {
         Header: Messages.backupInventory.table.columns.created,
@@ -137,8 +142,12 @@ export const BackupInventory: FC = () => {
       {
         Header: Messages.backupInventory.table.columns.type,
         accessor: 'mode',
-        type: FilterFieldTypes.TEXT,
+        type: FilterFieldTypes.DROPDOWN,
         Cell: ({ value }) => formatBackupMode(value),
+        options: Object.entries(BackupModeMap).map(([key, value]) => ({
+          label: value,
+          value: key,
+        })),
       },
       {
         Header: Messages.backupInventory.table.columns.location,

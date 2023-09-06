@@ -19,7 +19,7 @@ import { RemoveStorageLocationModal } from './RemoveStorageLocationModal';
 import { StorageLocationDetails } from './StorageLocationDetails';
 import { StorageLocationsService } from './StorageLocations.service';
 import { getStyles } from './StorageLocations.styles';
-import { StorageLocation } from './StorageLocations.types';
+import { LocationType, StorageLocation } from './StorageLocations.types';
 import { formatLocationList, formatToRawLocation } from './StorageLocations.utils';
 import { StorageLocationsActions } from './StorageLocationsActions';
 
@@ -46,7 +46,17 @@ export const StorageLocations: FC = () => {
         Header: Messages.storageLocations.table.columns.type,
         accessor: 'type',
         width: '150px',
-        type: FilterFieldTypes.TEXT,
+        type: FilterFieldTypes.DROPDOWN,
+        options: [
+          {
+            value: LocationType.S3,
+            label: LocationType.S3,
+          },
+          {
+            value: LocationType.CLIENT,
+            label: LocationType.CLIENT,
+          },
+        ],
       },
       {
         Header: Messages.storageLocations.table.columns.path,
