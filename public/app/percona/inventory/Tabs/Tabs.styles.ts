@@ -69,4 +69,8 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
       padding-left: ${spacing(1)};
     }
   `,
+  technicalPreview: css`
+    margin-left: -${spacing(1.5)};
+    color: ${colors.text.secondary};
+  `,
 });

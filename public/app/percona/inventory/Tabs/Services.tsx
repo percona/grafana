@@ -4,9 +4,10 @@ import { Row } from 'react-table';
 import { useLocalStorage } from 'react-use';
 
 import { locationService } from '@grafana/runtime';
-import { Button, HorizontalGroup, InlineSwitch, useStyles2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, InlineSwitch, Tooltip, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
+import { ReadMoreLink } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
@@ -41,8 +42,8 @@ export const Services = () => {
       fetchedServices.map((value) => {
         return {
           type: value.type,
-          cluster: value.params.cluster || value.params.customLabels?.cluster,
           ...value.params,
+          cluster: value.params.cluster || value.params.customLabels?.cluster || '',
           agentsStatus: getAgentsMonitoringStatus(value.params.agents ?? []),
         };
       }),
@@ -97,15 +98,25 @@ export const Services = () => {
       <OldPage.Contents isLoading={isLoading}>
         <FeatureLoader>
           <HorizontalGroup height={40} justify="flex-end" align="flex-start">
-            <InlineSwitch
-              id="organize-by-clusters"
-              label={Messages.services.organizeByClusters}
-              className={styles.clustersSwitch}
-              value={showClusters}
-              onClick={() => setShowClusters(!showClusters)}
-              showLabel
-              transparent
-            />
+            <HorizontalGroup align="center">
+              <InlineSwitch
+                id="organize-by-clusters"
+                label={Messages.services.organizeByClusters}
+                className={styles.clustersSwitch}
+                value={showClusters}
+                onClick={() => setShowClusters(!showClusters)}
+                showLabel
+                transparent
+              />
+              <Tooltip interactive placement="top" theme="info" content={<ReadMoreLink />}>
+                <div className={styles.technicalPreview}>
+                  <HorizontalGroup align="center" spacing="xs">
+                    <span>{Messages.services.technicalPreview}</span>
+                    <Icon name="info-circle" />
+                  </HorizontalGroup>
+                </div>
+              </Tooltip>
+            </HorizontalGroup>
             <Button
               size="md"
               disabled={selected.length === 0}
