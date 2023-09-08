@@ -6,6 +6,7 @@ import { useLocalStorage } from 'react-use';
 import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, InlineSwitch, Tooltip, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
+import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ReadMoreLink } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -50,6 +51,7 @@ export const Services = () => {
     [fetchedServices]
   );
   const [showClusters, setShowClusters] = useLocalStorage('pmm-organize-by-clusters', false);
+  const [params] = useQueryParams();
 
   const loadData = useCallback(async () => {
     try {
@@ -70,6 +72,10 @@ export const Services = () => {
 
   useEffect(() => {
     loadData();
+
+    // Reset when linking from nodes
+    setShowClusters(params['search-select'] !== 'serviceId');
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
