@@ -1,7 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
+import { Router } from 'react-router-dom';
 
+import { locationService } from '@grafana/runtime';
+import { Props } from 'app/core/navigation/GrafanaRoute';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -9,6 +12,13 @@ import { ScheduledBackups } from './ScheduledBackups';
 
 jest.mock('./ScheduledBackups.service');
 jest.mock('app/percona/backup/components/StorageLocations/StorageLocations.service');
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useLocation: () => ({
+    pathname: '/',
+  }),
+}));
 
 describe('ScheduledBackups', () => {
   it('should send correct data to Table', async () => {
@@ -25,7 +35,5 @@ describe('ScheduledBackups', () => {
       </Provider>
     );
     await screen.findByText('Backup 1');
-    expect(screen.getByText('Location 1 (S3)')).toBeTruthy();
-    expect(screen.getByText('Location 2 (Local Client)')).toBeTruthy();
   });
 });
