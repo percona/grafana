@@ -16,6 +16,25 @@ const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+require('dotenv').config({ path: './.env' });
+
+const { federationFactory } = require('./webpack.federation.js');
+const federation = federationFactory((module) => {
+  if (module === 'pmm_ui') {
+    let fd = process.env.fd_pmm;
+    let remote = '';
+    if (!fd) {
+      console.log('ENV fd_pmm is not set, falling back to compiled remote');
+      remote = `${module}@/graph/public/pmm-ui/remoteEntry.js`;
+    } else {
+      remote = `${module}@${fd}/remoteEntry.js`;
+    }
+    console.log(`using ${remote}`);
+    return remote;
+  }
+  throw new Error(`Module [${module}] is not supported.`);
+});
+
 module.exports = (env = {}) =>
   merge(common, {
     devtool: 'inline-source-map',
@@ -114,10 +133,14 @@ module.exports = (env = {}) =>
       }),
       new HTMLWebpackCSSChunks(),
       new DefinePlugin({
-        'process.env': {
-          NODE_ENV: JSON.stringify('development'),
-        },
+        'process.env': JSON.stringify({
+          ...process.env,
+          ...{
+            NODE_ENV: JSON.stringify('development'),
+          },
+        }),
       }),
+      federation,
 
       // @PERCONA
       new LiveReloadPlugin({

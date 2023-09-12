@@ -1,0 +1,57 @@
+import React, { FC, useState } from 'react';
+import { IconButton, useStyles2 } from '@grafana/ui';
+import { GrafanaTheme2 } from '@grafana/data';
+import { css } from '@emotion/css';
+import { ToolTip } from '../../../ToolTip';
+import { Feedback } from '../../../Feedback';
+import { Step } from "components/Feedback/Feedback";
+
+interface FeedbackTooltipProps {
+  visible: boolean;
+  pmmServerId?: string;
+  children?: any;
+  onClose?: () => void;
+}
+
+export const FeedbackTooltip: FC<FeedbackTooltipProps> = ({ visible, children, onClose, pmmServerId }) => {
+  const styles = useStyles2(getStyles);
+  const [step, setStep] = useState(Step.STEP1);
+
+  const feedbackClose = () => {
+    if (onClose) {
+      setStep(Step.STEP1);
+      onClose();
+    }
+  };
+
+  const tooltipContent = (
+    <>
+      {/* close button */}
+      <div className={styles.modalHeaderClose}>
+        <IconButton data-testid="modal-close-button" name="times" size="xl" onClick={feedbackClose} />
+      </div>
+
+      <div className={styles.feedbackContentForm}>
+        <Feedback pmmServerId={pmmServerId} step={step} />
+      </div>
+    </>
+  );
+
+  return (
+    <ToolTip content={tooltipContent} visible={visible}>
+      {children}
+    </ToolTip>
+  );
+};
+
+const getStyles = (theme: GrafanaTheme2) => ({
+  modalHeaderClose: css`
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: -8px;
+  `,
+  feedbackContentForm: css`
+    padding: 0 24px 24px 24px;
+  `,
+});

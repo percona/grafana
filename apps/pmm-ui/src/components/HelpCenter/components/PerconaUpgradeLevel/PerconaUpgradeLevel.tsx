@@ -1,0 +1,79 @@
+import React, { FC } from 'react';
+import { Button, useStyles2 } from '@grafana/ui';
+import { GrafanaTheme2 } from '@grafana/data';
+import { css } from '@emotion/css';
+import headerImg from '../../assets/percona-header.png';
+import { Messages } from './PerconaUpgradeLevel.messages';
+
+interface PerconaUpgradeLevelProps {}
+
+export const PerconaUpgradeLevel: FC<PerconaUpgradeLevelProps> = () => {
+  const styles = useStyles2(getStyles);
+
+  return (
+    <div className={styles.resourceContainer}>
+      <div>
+        <img alt="percona-logo" className={styles.headerImage} src={headerImg} />
+      </div>
+      <div className={styles.body}>
+        <div className={styles.text}>{Messages.body}</div>
+        <Button icon="external-link-alt" variant="secondary" size="md" type="button">
+          {Messages.btn}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const getStyles = (theme: GrafanaTheme2) => ({
+  resourceContainer: css`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+
+    width: 384px;
+    margin-top: 24px;
+    padding-bottom: 16px;
+
+    background: linear-gradient(0deg, #0e1a53, #0e1a53), #181b1f;
+    background-blend-mode: color, normal, normal;
+    border-radius: 8px;
+  `,
+  tipPointer: css`
+    cursor: pointer;
+  `,
+  tipContainerNoPadding: css`
+    padding-bottom: 0;
+  `,
+  headerImage: css`
+    height: 48px;
+    width: 100%;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  `,
+  title: css`
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    color: ${theme.colors.text.primary};
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  `,
+  body: css`
+    padding: 16px 16px 0;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.01071em;
+    linear-gradient(0deg, #0E1A53, #0E1A53),
+    width: 100%;
+    max-height: 15em;
+  `,
+  text: css`
+    margin-bottom: 16px;
+  `,
+});

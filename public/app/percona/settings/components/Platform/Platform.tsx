@@ -87,6 +87,8 @@ export const Platform: FC = () => {
     <OldPage navModel={navModel} vertical tabsDataTestId="settings-tabs">
       <OldPage.Contents dataTestId="settings-tab-content" className={settingsStyles.pageContent}>
         <FeatureLoader>
+          {/* TODO: to be replaced with: */}
+          {/* <PmmUi.PlatformConnectionSettings connected={result?.isConnectedToPortal} pmmServerId={pmmServerId}/> */}
           {result?.isConnectedToPortal ? (
             <Connected />
           ) : (

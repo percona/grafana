@@ -31,3 +31,5 @@ export const getAdvisors = (state: StoreState) => state.percona.advisors;
 export const getCategorizedAdvisors = createSelector([getAdvisors], (advisors) =>
   groupAdvisorsIntoCategories(advisors.result || [])
 );
+
+export const getHelpCenterState = (state: StoreState) => state.percona.helpCenter;

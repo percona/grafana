@@ -1,0 +1,139 @@
+import React from 'react';
+import React__default, { FC, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { IconButton, Tab, TabsBar, useStyles2 } from '@grafana/ui';
+import { GrafanaTheme2 } from '@grafana/data';
+import { css } from '@emotion/css';
+import { ResourcesContainer } from './components/ResourcesContainer';
+import { HelpCenterTipsContainer } from './components/HelpCenterTipsContainer/HelpCenterTipsContainer';
+import { fetchSystemAndUserTipsAction } from 'reducers/tips/tips';
+
+interface HelpCenterProps {
+  open: boolean;
+  onClose: () => void;
+
+  width: string;
+  isConnectedUser?: boolean;
+  userId: number;
+
+  openKeyboardShortcut: () => void;
+  onConnectToPlatformClick: () => void;
+}
+
+type TabName = 'tips' | 'resources' | 'wnatsnew';
+
+export const HelpCenter: FC<HelpCenterProps> = (props) => {
+  const [activeTab, setActiveTab] = useState<TabName>('tips');
+
+  const { open, onClose, width, isConnectedUser, userId, openKeyboardShortcut, onConnectToPlatformClick } = props;
+  const styles = useStyles2(getStyles);
+
+  const changeTab = (tab: TabName) => {
+    return (e?: React__default.MouseEvent<HTMLAnchorElement>) => {
+      e?.preventDefault();
+      setActiveTab(tab);
+    };
+  };
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchSystemAndUserTipsAction({ userId: props.userId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div
+      className={styles.drawer}
+      style={{
+        width: width,
+        transform: open ? `translateX(0)` : `translateX(${width})`,
+        transition: 'transform 225ms',
+      }}
+    >
+      <div className={styles.indentContainer} />
+      <div className={styles.container}>
+        <div className={styles.headerRow}>
+          <h3 className={styles.helpCenterHeader}>Help center</h3>
+          <div className="flex-grow-1" />
+          <IconButton aria-label="Close 'Add Panel' widget" name="times" size="xl" onClick={onClose} />
+        </div>
+        <TabsBar>
+          <TabsBar>
+            <Tab label="Tips" active={activeTab === 'tips'} onChangeTab={changeTab('tips')} />
+            <Tab label="Resources" active={activeTab === 'resources'} onChangeTab={changeTab('resources')} />
+          </TabsBar>
+        </TabsBar>
+        <div className={styles.containerContentTabs}>
+          {activeTab === 'tips' && (
+            <HelpCenterTipsContainer
+              userId={userId}
+              isConnectedUser={isConnectedUser}
+              onConnectToPlatformClick={onConnectToPlatformClick}
+            />
+          )}
+
+          {activeTab === 'resources' && <ResourcesContainer openKeyboardShortcut={openKeyboardShortcut} />}
+        </div>
+      </div>
+      <div className={styles.indentContainer} />
+    </div>
+  );
+};
+
+const getStyles = (theme: GrafanaTheme2) => ({
+  drawer: css`
+    left: auto;
+    right: 0;
+    flex: 1 0 auto;
+    height: calc(100% - 80px);
+    top: 57px;
+    position: fixed;
+    box-sizing: border-box;
+    overflow-y: hidden;
+    border-left: none;
+    background-color: ${theme.colors.background.canvas};
+    z-index: 1000;
+
+    @media (max-width: 1279px) {
+      height: 100%;
+      top: 0;
+      visibility: visible;
+      box-shadow: 0 8px 24px #010409;
+    }
+  `,
+  container: css`
+    padding-left: 16px;
+    padding-right: 16px;
+    border-left: solid;
+    border-width: 1px;
+    height: 100%;
+    border-left-color: ${theme.colors.background.secondary};
+    @media (max-width: 1279px) {
+      border-left: none;
+    }
+  `,
+  containerContentTabs: css`
+    overflow-y: auto;
+    height: calc(100% - 80px);
+  `,
+  indentContainer: css`
+    height: 16px;
+  `,
+  headerRow: css`
+    display: flex;
+    align-items: center;
+    height: 25px;
+    flex-shrink: 0;
+    width: 100%;
+    font-size: ${theme.typography.fontSize};
+    font-weight: ${theme.typography.fontWeightMedium};
+    padding-bottom: ${theme.spacing(1)};
+    transition: background-color 0.1s ease-in-out;
+  `,
+  helpCenterHeader: css`
+    margin: 0;
+    font-size: 21px;
+    line-height: 25px;
+    color: ${theme.colors.text.primary};
+  `,
+});

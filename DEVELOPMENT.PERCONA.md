@@ -51,3 +51,17 @@ cp ./bin/linux-amd64/grafana-server /usr/sbin/grafana-server
 cp ./bin/linux-amd64/grafana /usr/sbin/grafana
 supervisorctl restart grafana
 ```
+
+## Alternative flow with "Microfrontends" (MFE)
+
+This is an alternative and experimental flow intended to make developers more productive and isolate our changes from
+the upstream.
+
+With this approach you run 4 components:
+
+- devcontainer with PMM
+- grafana server on host
+- grafana ui rebuild/watch task on host
+- pmm-ui microfrontend on host
+
+Follow [this guide](./apps/DEVELOPMENT.md)

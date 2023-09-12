@@ -1,0 +1,8 @@
+# vim: ts=8:sw=8:ft=make:noai:noet
+SWAGGER_UI_VERSION?=latest
+
+.PHONY: default init release gen test clean all
+default: help
+
+_bash:
+	/bin/bash

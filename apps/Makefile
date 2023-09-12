@@ -1,0 +1,66 @@
+include Makefile.include
+
+clean:							## Cleans up project
+	rm -rf ./pmm-ui/build
+	rm -rf ./pmm-ui/node_modules
+
+init:								## Prepares local development environment.
+	cd ../ && make build-go
+	yarn install --immutable
+	cd ./pmm-ui && npm ci
+
+dev:								## Starts local development.
+	make env-down
+	make env-up
+	yarn start
+
+dev-local-gs:								## Starts local development with local grafana server.
+	make env-down-local-gs
+	make env-up-local-gs
+	find ./.config/grafana/plugins ! -name '.gitkeep' -type f -exec rm -f {} +
+	docker cp pmm-grafana-dev:/srv/grafana/plugins/. ./.config/grafana/plugins/
+	find ./.config/grafana/workdir/conf ! -name '.gitkeep' -type f -exec rm -f {} +
+	docker cp pmm-grafana-dev:/usr/share/grafana/conf/. ./.config/grafana/workdir/conf/
+	find ./.config/grafana/percona-dashboards ! -name '.gitkeep' -type f -exec rm -f {} +
+	docker cp pmm-grafana-dev:/usr/share/percona-dashboards/. ./.config/grafana/percona-dashboards/
+	cp -fr ./.config/grafana/provisioning/ ./.config/grafana/workdir/conf/provisioning
+	rm -f ./.config/grafana/workdir/data/grafana.db
+	yarn start
+
+env-up:								## Starts devcontainer.
+	docker compose -f docker-compose.dev.yaml build --no-cache; \
+	docker-compose -f docker-compose.dev.yaml up -d
+
+env-up-local-gs:								## Starts devcontainer with local grafana server.
+	docker-compose -f docker-compose.local-gs.dev.yaml build --no-cache; \
+	docker-compose -f docker-compose.local-gs.dev.yaml up -d
+
+ui-up:
+	cd pmm-ui && npm run dev:federation
+
+env-down:							## Stops devcontainer.
+	docker-compose -f docker-compose.dev.yaml down --remove-orphans
+
+env-down-local-gs:							## Stops devcontainer.
+	docker-compose -f docker-compose.local-gs.dev.yaml down --remove-orphans
+
+TARGET ?= _bash
+DEV_CONTAINER ?= pmm-grafana-dev
+DEV_WORKSPACE_LOCATION ?= /workspace
+DEV_PMM_WORKSPACE_LOCATION ?= /root/go/src/github.com/percona/pmm
+
+.PHONY: env
+env:								## Runs `make TARGET` in devcontainer (`make env TARGET=help`); TARGET defaults to bash.
+	docker exec -it --workdir=$(DEV_WORKSPACE_LOCATION) $(DEV_CONTAINER) make $(TARGET)
+
+.PHONY: env-pmm
+env-pmm:								## Runs `make TARGET` in devcontainer (`make env TARGET=help`); TARGET defaults to bash.
+	docker exec -it --workdir=$(DEV_PMM_WORKSPACE_LOCATION) $(DEV_CONTAINER) make $(TARGET)
+
+.PHONY: help
+default: help
+
+help:                           ## Displays help.
+	@echo "Please use \`make <target>\` where <target> is one of:"
+	@grep -h '^[a-zA-Z]' $(MAKEFILE_LIST) | \
+		awk -F ':.*?## ' 'NF==2 {printf "  %-26s%s\n", $$1, $$2}'
