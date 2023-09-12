@@ -1,10 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
 
-import { locationService } from '@grafana/runtime';
-import { Props } from 'app/core/navigation/GrafanaRoute';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
