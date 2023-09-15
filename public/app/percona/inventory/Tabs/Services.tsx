@@ -6,7 +6,6 @@ import { useLocalStorage } from 'react-use';
 import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, InlineSwitch, Tooltip, useStyles2 } from '@grafana/ui';
 import { OldPage } from 'app/core/components/Page/Page';
-import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ReadMoreLink } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
@@ -18,7 +17,7 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
-import { GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
+import { CLUSTERS_SWITCH_KEY, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { FlattenService } from '../Inventory.types';
 import DeleteServiceModal from '../components/DeleteServiceModal';
@@ -50,8 +49,7 @@ export const Services = () => {
       }),
     [fetchedServices]
   );
-  const [showClusters, setShowClusters] = useLocalStorage('pmm-organize-by-clusters', false);
-  const [params] = useQueryParams();
+  const [showClusters, setShowClusters] = useLocalStorage(CLUSTERS_SWITCH_KEY, false);
 
   const loadData = useCallback(async () => {
     try {
@@ -72,9 +70,6 @@ export const Services = () => {
 
   useEffect(() => {
     loadData();
-
-    // Reset when linking from nodes
-    setShowClusters(params['search-select'] !== 'serviceId');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
