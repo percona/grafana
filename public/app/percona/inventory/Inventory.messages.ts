@@ -10,6 +10,7 @@ export const Messages = {
       monitoring: 'Monitoring',
       address: 'Address',
       port: 'Port',
+      cluster: 'Cluster',
     },
     actions: {
       dashboard: 'Dashboard',

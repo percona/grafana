@@ -19,6 +19,9 @@ export const getStyles = ({ v1: { colors, spacing, typography } }: GrafanaTheme2
       justify-content: space-between;
       align-items: center;
     `,
+    filterWrapperGlobal: css`
+      justify-content: stretch;
+    `,
     filterLabel: css`
       font-size: ${typography.size.md};
     `,
