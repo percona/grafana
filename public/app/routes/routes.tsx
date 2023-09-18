@@ -820,6 +820,10 @@ export function getAppRoutes(): RouteDescriptor[] {
           import(/* webpackChunkName: "EnvironmentOverview" */ 'app/percona/environment-overview/EnvironmentOverview')
       ),
     },
+    {
+      path: '/pmm-dump',
+      component: SafeDynamicImport(() => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')),
+    },
     ...getBrowseStorageRoutes(),
     ...getDynamicDashboardRoutes(),
     ...getPluginCatalogRoutes(),
