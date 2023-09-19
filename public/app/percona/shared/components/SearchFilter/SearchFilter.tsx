@@ -48,7 +48,7 @@ const SearchFilter = <T extends object>({
   }, [queryParamsByKey, rawData]);
 
   const handleValuesChange = debounce(
-    (values: Record<string, any>) => setQueryParamsByKey(columns, values),
+    (values: QueryParamsValues) => setQueryParamsByKey(columns, values),
     DEBOUNCE_DELAY
   );
 
