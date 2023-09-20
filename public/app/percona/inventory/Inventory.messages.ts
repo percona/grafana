@@ -31,6 +31,10 @@ export const Messages = {
     organizeByClusters: 'Organize by Clusters',
     technicalPreview: '(Technical Preview) ',
   },
+  clusters: {
+    empty: 'No clusters available',
+    noMatch: 'No clusters found',
+  },
   agents: {
     goBackToServices: 'Go back to services',
     goBackToNodes: 'Go back to nodes',

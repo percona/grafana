@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 
@@ -27,10 +27,13 @@ export const useQueryParamsByKey = (tableKey?: string) => {
     return queryParams;
   }, [queryParams, tableKey]);
 
-  const setQueryParamsByKey = <T extends object>(columns: Array<ExtendedColumn<T>>, values: QueryParamsValues) => {
-    const params = buildParamsFromKey(tableKey, columns, values);
-    setQueryParams(params);
-  };
+  const setQueryParamsByKey = useCallback(
+    <T extends object>(columns: Array<ExtendedColumn<T>>, values: QueryParamsValues) => {
+      const params = buildParamsFromKey(tableKey, columns, values);
+      setQueryParams(params);
+    },
+    [setQueryParams, tableKey]
+  );
 
   return [queryParamsByKey, setQueryParamsByKey];
 };

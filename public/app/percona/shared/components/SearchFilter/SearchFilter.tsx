@@ -1,5 +1,6 @@
+import { FormState } from 'final-form';
 import { debounce } from 'lodash';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Form, FormSpy } from 'react-final-form';
 
 import { useStyles2 } from '@grafana/ui';
@@ -33,7 +34,10 @@ const SearchFilter = <T extends object>({
   const filterColumns = useMemo(() => getFilterColumns(columns), [columns]);
   const styles = useStyles2(getStyles);
   const [queryParamsByKey, setQueryParamsByKey] = useQueryParamsByKey(tableKey);
-  const initialValues = useMemo(() => getQueryParams(columns, queryParamsByKey), [columns, queryParamsByKey]);
+  const initialValues = useMemo<QueryParamsValues>(
+    () => getQueryParams(columns, queryParamsByKey),
+    [columns, queryParamsByKey]
+  );
 
   useEffect(() => {
     const queryParamsObj = getQueryParams(columns, queryParamsByKey);
@@ -47,14 +51,17 @@ const SearchFilter = <T extends object>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryParamsByKey, rawData]);
 
-  const handleValuesChange = debounce(
-    (values: QueryParamsValues) => setQueryParamsByKey(columns, values),
-    DEBOUNCE_DELAY
+  const onSubmit = useCallback(
+    (values: QueryParamsValues) => {
+      console.log(values);
+      setQueryParamsByKey(columns, values);
+    },
+    [columns, setQueryParamsByKey]
   );
 
-  const onSubmit = (values: QueryParamsValues) => {
-    setQueryParamsByKey(columns, values);
-  };
+  const handleFormValuesChange = debounce((state: FormState<QueryParamsValues>) => {
+    onSubmit(state.values);
+  }, DEBOUNCE_DELAY);
 
   return (
     <Form
@@ -83,7 +90,7 @@ const SearchFilter = <T extends object>({
               subscription={{
                 values: true,
               }}
-              onChange={(state) => handleValuesChange(state.values)}
+              onChange={handleFormValuesChange}
             />
           )}
         </div>

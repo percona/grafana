@@ -3,6 +3,7 @@ import { Row } from 'react-table';
 
 import { SearchFilter } from 'app/percona/shared/components/SearchFilter';
 
+import { Messages } from '../../Inventory.messages';
 import { FlattenService } from '../../Inventory.types';
 
 import ClusterItem from './ClusterItem';
@@ -42,15 +43,21 @@ const Clusters: FC<ClustersProps> = ({ services, onDelete, onSelectionChange }) 
         columns={CLUSTERS_COLUMNS}
         onFilteredDataChange={handleFiltering}
       />
-      {clusters.map((cluster) => (
-        <ClusterItem
-          key={cluster.name}
-          cluster={cluster}
-          onDelete={onDelete}
-          openByDefault={filterEnabled}
-          onSelectionChange={handleSelectionChange}
-        />
-      ))}
+      {clusters.length ? (
+        clusters.map((cluster) => (
+          <ClusterItem
+            key={cluster.name}
+            cluster={cluster}
+            onDelete={onDelete}
+            openByDefault={filterEnabled}
+            onSelectionChange={handleSelectionChange}
+          />
+        ))
+      ) : filterEnabled ? (
+        <div>{Messages.clusters.noMatch}</div>
+      ) : (
+        <div>{Messages.clusters.empty}</div>
+      )}
     </div>
   );
 };

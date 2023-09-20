@@ -104,12 +104,7 @@ export const TextInputField: FC<TextInputFieldProps> = React.memo(
                 />
                 {clearable && !!input.value && (
                   <div className={styles.clearContainer}>
-                    <Button
-                      fill="text"
-                      type="button"
-                      onClick={() => input.onChange('')}
-                      size='xs'
-                    >
+                    <Button fill="text" type="button" onClick={() => input.onChange('')} size="xs">
                       Clear
                     </Button>
                   </div>
