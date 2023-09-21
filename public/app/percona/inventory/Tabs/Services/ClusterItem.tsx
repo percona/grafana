@@ -14,8 +14,6 @@ const ClusterItem: FC<ClusterItemProps> = ({ cluster, onDelete, onSelectionChang
   const [isOpen, setIsOpen] = useState(shouldClusterBeExpanded(cluster.name) || openByDefault);
   const icon: IconName = cluster.type ? (DATABASE_ICONS[cluster.type] as IconName) : 'database';
 
-  console.log({ isOpen, openByDefault });
-
   const handleSelectionChange = useCallback(
     (services: Array<Row<FlattenService>>) => {
       onSelectionChange(cluster, services);

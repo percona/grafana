@@ -53,7 +53,6 @@ const SearchFilter = <T extends object>({
 
   const onSubmit = useCallback(
     (values: QueryParamsValues) => {
-      console.log(values);
       setQueryParamsByKey(columns, values);
     },
     [columns, setQueryParamsByKey]
