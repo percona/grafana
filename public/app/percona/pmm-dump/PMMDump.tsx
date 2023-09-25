@@ -1,8 +1,23 @@
-import { css } from '@emotion/css';
-import React from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
+import { Row } from 'react-table';
 
-import { GrafanaTheme2, NavModelItem } from '@grafana/data';
+import { NavModelItem, rangeUtil } from '@grafana/data';
+import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
+import { Action } from 'app/percona/dbaas/components/MultipleActions';
+import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
+import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
+import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
+import { fetchPmmDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
+import { getDumps } from 'app/percona/shared/core/selectors';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
+import { logger } from 'app/percona/shared/helpers/logger';
+import { useAppDispatch } from 'app/store/store';
+import { useSelector } from 'app/types';
+
+import { Messages } from './PMMDump.messages';
+import { getStyles } from './Tabs.styles';
 
 const pageNav: NavModelItem = {
   icon: 'brain',
@@ -13,65 +28,190 @@ const pageNav: NavModelItem = {
 };
 
 export const PMMDump = () => {
+  const styles = useStyles2(getStyles);
+  const dispatch = useAppDispatch();
+  const { isLoading, dumps } = useSelector(getDumps);
+  // const [setSelectedRows] = useState<Array<Row<Services>>>([]);
+
+  const loadData = useCallback(async () => {
+    try {
+      await dispatch(fetchPmmDumpAction);
+    } catch (e) {
+      if (isApiCancelError(e)) {
+        return;
+      }
+      logger.error(e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getActions = useCallback(
+    (row: Row<PMMDumpServices>): Action[] => [
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="trash-alt" />
+            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.delete}</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          /*          setActionItem(row.original);
+          setModalVisible(true);*/
+        },
+      },
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="download-alt" />
+            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.download}</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          // const serviceId = row.original.serviceId.split('/').pop();
+          // locationService.push(`/edit-instance/${serviceId}`);
+        },
+      },
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="arrow-right" />
+            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.sendToSupport}</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          //locationService.push(getDashboardLinkForService(row.original.type, row.original.serviceName));
+        },
+      },
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="eye" />
+            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.viewLogs}</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          // locationService.push(`/d/pmm-qan/pmm-query-analytics?var-service_name=${row.original.serviceName}`);
+        },
+      },
+    ],
+    [styles.actionItemTxtSpan]
+  );
+
+  const columns = useMemo(
+    (): Array<ExtendedColumn<PMMDumpServices>> => [
+      {
+        Header: Messages.services.columns.id,
+        id: 'dump_id',
+        accessor: 'dump_id',
+        hidden: true,
+        type: FilterFieldTypes.TEXT,
+      },
+      {
+        Header: Messages.services.columns.status,
+        accessor: 'status',
+        Cell: ({ value }: { value: DumpStatus }) => {
+          return <Badge text={DumpStatusText[value]} color={DumpStatusColor[value as DumpStatus] as BadgeColor} />;
+        },
+        type: FilterFieldTypes.DROPDOWN,
+        options: [
+          {
+            label: DumpStatusText[DumpStatus.BACKUP_STATUS_IN_PROGRESS],
+            value: DumpStatus.BACKUP_STATUS_IN_PROGRESS,
+          },
+          {
+            label: DumpStatusText[DumpStatus.BACKUP_STATUS_INVALID],
+            value: DumpStatus.BACKUP_STATUS_INVALID,
+          },
+          {
+            label: DumpStatusText[DumpStatus.BACKUP_STATUS_ERROR],
+            value: DumpStatus.BACKUP_STATUS_ERROR,
+          },
+          {
+            label: DumpStatusText[DumpStatus.BACKUP_STATUS_SUCCESS],
+            value: DumpStatus.BACKUP_STATUS_SUCCESS,
+          },
+        ],
+      },
+      {
+        Header: Messages.services.columns.created,
+        accessor: 'created',
+        type: FilterFieldTypes.TEXT,
+      },
+      {
+        Header: Messages.services.columns.startDate,
+        accessor: 'start_time',
+        type: FilterFieldTypes.TEXT,
+      },
+      {
+        Header: Messages.services.columns.endDate,
+        accessor: 'end_time',
+        type: FilterFieldTypes.TEXT,
+      },
+      {
+        Header: Messages.services.columns.timeRange,
+        accessor: 'timeRange',
+        type: FilterFieldTypes.TEXT,
+        Cell: ({ value, row }: { row: Row<PMMDumpServices>; value: string }) => {
+          let range = {
+            to: row.original.start_time,
+            from: row.original.end_time,
+          };
+          const date = new Date();
+          const offset = date.getTimezoneOffset();
+          return rangeUtil.describeTimeRange(range, offset);
+        },
+      },
+      getExpandAndActionsCol(getActions),
+    ],
+    [getActions]
+  );
+
+  const handleSelectionChange = useCallback((rows: Array<Row<PMMDumpServices>>) => {
+    // setSelectedRows(rows);
+  }, []);
+
+  const renderSelectedSubRow = React.useCallback((row: Row<PMMDumpServices>) => {
+    const nodes = row.original.node_ids || [];
+
+    return (
+      <DetailsRow>
+        {!!nodes.length && (
+          <DetailsRow.Contents title={Messages.services.columns.nodes}>
+            <span>{row.original.node_ids}</span>
+          </DetailsRow.Contents>
+        )}
+      </DetailsRow>
+    );
+  }, []);
+
   return (
     <Page navId="pmmdump" pageNav={pageNav}>
-      <Page.Contents>Content</Page.Contents>
+      <Page.Contents>
+        <Table
+          columns={columns}
+          data={dumps}
+          totalItems={dumps.length}
+          rowSelection
+          onRowSelection={handleSelectionChange}
+          showPagination
+          pageSize={25}
+          allRowsSelectionMode="page"
+          emptyMessage={Messages.services.emptyTable}
+          pendingRequest={isLoading}
+          overlayClassName={styles.overlay}
+          renderExpandedRow={renderSelectedSubRow}
+          autoResetSelectedRows={false}
+          getRowId={useCallback((row: PMMDumpServices) => row.dump_id, [])}
+          showFilter
+        />
+      </Page.Contents>
     </Page>
   );
-};
-
-export const getStyles = (theme: GrafanaTheme2) => {
-  return {
-    table: css`
-      margin-top: ${theme.spacing(3)};
-    `,
-    filter: css`
-      margin: 0 ${theme.spacing(1)};
-    `,
-    row: css`
-      display: flex;
-      align-items: center;
-      height: 100% !important;
-
-      a {
-        padding: ${theme.spacing(0.5)} 0 !important;
-      }
-    `,
-    unitTooltip: css`
-      display: flex;
-      flex-direction: column;
-    `,
-    unitItem: css`
-      cursor: pointer;
-      padding: ${theme.spacing(0.5)} 0;
-      margin-right: ${theme.spacing(1)};
-    `,
-    disabled: css`
-      color: ${theme.colors.text.disabled};
-    `,
-    link: css`
-      color: inherit;
-      cursor: pointer;
-      text-decoration: underline;
-    `,
-    pageHeader: css`
-      display: flex;
-      margin-bottom: ${theme.spacing(2)};
-    `,
-    apiKeyInfoLabel: css`
-      margin-left: ${theme.spacing(1)};
-      line-height: 2.2;
-      flex-grow: 1;
-      color: ${theme.colors.text.secondary};
-
-      span {
-        padding: ${theme.spacing(0.5)};
-      }
-    `,
-    filterDelimiter: css`
-      flex-grow: 1;
-    `,
-  };
 };
 
 export default PMMDump;
