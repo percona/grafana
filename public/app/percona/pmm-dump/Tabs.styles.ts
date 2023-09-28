@@ -67,4 +67,8 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
     align-items: center;
     margin-bottom: 24px;
   `,
+  actionButton: css`
+    background: none;
+    margin-right: 7px;
+  `,
 });

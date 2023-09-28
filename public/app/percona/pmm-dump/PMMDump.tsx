@@ -1,8 +1,8 @@
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { Row } from 'react-table';
 
 import { NavModelItem } from '@grafana/data';
-import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton } from '@grafana/ui';
+import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
@@ -32,7 +32,7 @@ export const PMMDump = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { isLoading, dumps } = useSelector(getDumps);
-  // const [setSelectedRows] = useState<Array<Row<Services>>>([]);
+  const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
 
   const loadData = useCallback(async () => {
     try {
@@ -167,7 +167,7 @@ export const PMMDump = () => {
   );
 
   const handleSelectionChange = useCallback((rows: Array<Row<PMMDumpServices>>) => {
-    // setSelectedRows(rows);
+    setSelectedRows(rows);
   }, []);
 
   const renderSelectedSubRow = React.useCallback((row: Row<PMMDumpServices>) => {
@@ -188,7 +188,42 @@ export const PMMDump = () => {
     <Page navId="pmmdump" pageNav={pageNav}>
       <Page.Contents>
         <div className={styles.createDatasetArea}>
-          <div>Select services to bulk edit them.</div>
+          {selected.length > 0 ? (
+            <div>
+              <Button
+                size="md"
+                variant="secondary"
+                className={styles.actionButton}
+                fill="outline"
+                data-testid="dump-sendToSupport"
+                icon="arrow-right"
+              >
+                {Messages.services.actions.sendToSupport}
+              </Button>
+              <Button
+                size="md"
+                variant="secondary"
+                className={styles.actionButton}
+                fill="outline"
+                data-testid="dump-download"
+                icon="download-alt"
+              >
+                {Messages.services.actions.download} {selected.length} items
+              </Button>
+              <Button
+                size="md"
+                variant="secondary"
+                className={styles.actionButton}
+                fill="outline"
+                data-testid="dump-primary"
+                icon="trash-alt"
+              >
+                {Messages.services.actions.delete} {selected.length} items
+              </Button>
+            </div>
+          ) : (
+            <div>Select services to bulk edit them.</div>
+          )}
           <LinkButton href="/" size="md" variant="primary" data-testid="create-dataset" icon="plus">
             {Messages.services.createDataset}
           </LinkButton>
