@@ -18,5 +18,6 @@ export const Messages = {
       viewLogs: 'View logs',
     },
     emptyTable: 'No dumps available',
+    createDataset: 'Create Dataset',
   },
 };

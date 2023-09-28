@@ -60,4 +60,11 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
   link: css`
     color: ${colors.text.link};
   `,
+  createDatasetArea: css`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  `,
 });

@@ -15,7 +15,7 @@ export const DumpStatusText = {
 export interface PMMDumpServices {
   dump_id: string;
   status: DumpStatus;
-  created: number;
+  created_at: string;
   start_time: string;
   end_time: string;
   node_ids: string[];

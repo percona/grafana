@@ -8,6 +8,7 @@ export interface PmmDump {
   node_ids: string[];
   start_time: string;
   end_time: string;
+  created_at: string;
 }
 
 export interface DeleteDump {

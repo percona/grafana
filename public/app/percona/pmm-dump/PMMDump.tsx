@@ -1,8 +1,8 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { Row } from 'react-table';
 
-import { NavModelItem, rangeUtil } from '@grafana/data';
-import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor } from '@grafana/ui';
+import { NavModelItem } from '@grafana/data';
+import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
@@ -13,6 +13,7 @@ import { getDumps } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
+import { dateDifferenceInWords } from 'app/percona/shared/helpers/utils/timeRange';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -35,7 +36,7 @@ export const PMMDump = () => {
 
   const loadData = useCallback(async () => {
     try {
-      await dispatch(fetchPmmDumpAction);
+      await dispatch(fetchPmmDumpAction());
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -139,8 +140,16 @@ export const PMMDump = () => {
       },
       {
         Header: Messages.services.columns.created,
-        accessor: 'created',
+        accessor: 'created_at',
         type: FilterFieldTypes.TEXT,
+      },
+      {
+        Header: Messages.services.columns.timeRange,
+        accessor: 'timeRange',
+        type: FilterFieldTypes.TEXT,
+        Cell: ({ value, row }: { row: Row<PMMDumpServices>; value: string }) => {
+          return dateDifferenceInWords(row.original.end_time, row.original.start_time);
+        },
       },
       {
         Header: Messages.services.columns.startDate,
@@ -151,20 +160,6 @@ export const PMMDump = () => {
         Header: Messages.services.columns.endDate,
         accessor: 'end_time',
         type: FilterFieldTypes.TEXT,
-      },
-      {
-        Header: Messages.services.columns.timeRange,
-        accessor: 'timeRange',
-        type: FilterFieldTypes.TEXT,
-        Cell: ({ value, row }: { row: Row<PMMDumpServices>; value: string }) => {
-          let range = {
-            to: row.original.start_time,
-            from: row.original.end_time,
-          };
-          const date = new Date();
-          const offset = date.getTimezoneOffset();
-          return rangeUtil.describeTimeRange(range, offset);
-        },
       },
       getExpandAndActionsCol(getActions),
     ],
@@ -192,6 +187,12 @@ export const PMMDump = () => {
   return (
     <Page navId="pmmdump" pageNav={pageNav}>
       <Page.Contents>
+        <div className={styles.createDatasetArea}>
+          <div>Select services to bulk edit them.</div>
+          <LinkButton href="/" size="md" variant="primary" data-testid="create-dataset" icon="plus">
+            {Messages.services.createDataset}
+          </LinkButton>
+        </div>
         <Table
           columns={columns}
           data={dumps}
@@ -207,7 +208,6 @@ export const PMMDump = () => {
           renderExpandedRow={renderSelectedSubRow}
           autoResetSelectedRows={false}
           getRowId={useCallback((row: PMMDumpServices) => row.dump_id, [])}
-          showFilter
         />
       </Page.Contents>
     </Page>
