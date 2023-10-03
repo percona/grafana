@@ -67,20 +67,7 @@ export const PMMDump = () => {
           </HorizontalGroup>
         ),
         action: () => {
-          /*          setActionItem(row.original);
-          setModalVisible(true);*/
-        },
-      },
-      {
-        content: (
-          <HorizontalGroup spacing="sm">
-            <Icon name="download-alt" />
-            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.download}</span>
-          </HorizontalGroup>
-        ),
-        action: () => {
-          // const serviceId = row.original.serviceId.split('/').pop();
-          // locationService.push(`/edit-instance/${serviceId}`);
+          onDelete(row.original);
         },
       },
       {
@@ -91,7 +78,7 @@ export const PMMDump = () => {
           </HorizontalGroup>
         ),
         action: () => {
-          //locationService.push(getDashboardLinkForService(row.original.type, row.original.serviceName));
+          setIsSendToSupportModalOpened(true);
         },
       },
       {
@@ -106,8 +93,29 @@ export const PMMDump = () => {
         },
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [styles.actionItemTxtSpan]
   );
+
+  const onDelete = (value?: PMMDumpServices) => {
+    if (value) {
+      console.log('onDelete value', value);
+    } else if (selected.length > 0) {
+      console.log('selected', selected);
+    }
+    // appEvents.publish(
+    //   new ShowConfirmModalEvent({
+    //     title: 'Delete',
+    //     text: 'Are you sure you want to delete the selected dumps?',
+    //     yesText: 'Delete',
+    //     icon: 'trash-alt',
+    //     onConfirm: () => {
+    //       deleteDumps();
+    //       dispatch(notifyApp(createSuccessNotification('Dumps deleted')));
+    //     },
+    //   })
+    // );
+  };
 
   const columns = useMemo(
     (): Array<ExtendedColumn<PMMDumpServices>> => [
@@ -212,18 +220,9 @@ export const PMMDump = () => {
                 variant="secondary"
                 className={styles.actionButton}
                 fill="outline"
-                data-testid="dump-download"
-                icon="download-alt"
-              >
-                {Messages.services.actions.download} {selected.length} items
-              </Button>
-              <Button
-                size="md"
-                variant="secondary"
-                className={styles.actionButton}
-                fill="outline"
                 data-testid="dump-primary"
                 icon="trash-alt"
+                onClick={() => onDelete()}
               >
                 {Messages.services.actions.delete} {selected.length} items
               </Button>
