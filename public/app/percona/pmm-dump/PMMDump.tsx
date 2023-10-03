@@ -18,6 +18,7 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Messages } from './PMMDump.messages';
+import { SendToSupportModal } from './SendToSupportModal';
 import { getStyles } from './Tabs.styles';
 
 const pageNav: NavModelItem = {
@@ -33,6 +34,7 @@ export const PMMDump = () => {
   const dispatch = useAppDispatch();
   const { isLoading, dumps } = useSelector(getDumps);
   const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
+  const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -50,6 +52,10 @@ export const PMMDump = () => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const closeEditModal = (saved = false) => {
+    setIsSendToSupportModalOpened(false);
+  };
 
   const getActions = useCallback(
     (row: Row<PMMDumpServices>): Action[] => [
@@ -197,6 +203,7 @@ export const PMMDump = () => {
                 fill="outline"
                 data-testid="dump-sendToSupport"
                 icon="arrow-right"
+                onClick={() => setIsSendToSupportModalOpened(true)}
               >
                 {Messages.services.actions.sendToSupport}
               </Button>
@@ -228,6 +235,7 @@ export const PMMDump = () => {
             {Messages.services.createDataset}
           </LinkButton>
         </div>
+        {isSendToSupportModalOpened && <SendToSupportModal onClose={() => closeEditModal()} />}
         <Table
           columns={columns}
           data={dumps}

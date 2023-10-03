@@ -28,3 +28,9 @@ export const DumpStatusColor = {
   [DumpStatus.BACKUP_STATUS_SUCCESS]: 'green',
   [DumpStatus.BACKUP_STATUS_ERROR]: 'red',
 };
+
+export interface SendToSupportForm {
+  name: string;
+  address: string;
+  password: string;
+}
