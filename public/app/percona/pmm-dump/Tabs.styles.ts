@@ -60,17 +60,15 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
   link: css`
     color: ${colors.text.link};
   `,
-  clustersSwitch: css`
+  createDatasetArea: css`
     display: flex;
-    flex-direction: row-reverse;
-
-    & > label {
-      padding: 0;
-      padding-left: ${spacing(1)};
-    }
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
   `,
-  technicalPreview: css`
-    margin-left: -${spacing(1.5)};
-    color: ${colors.text.secondary};
+  actionButton: css`
+    background: none;
+    margin-right: 7px;
   `,
 });

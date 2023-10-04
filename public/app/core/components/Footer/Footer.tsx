@@ -19,7 +19,7 @@ export let getFooterLinks = (): FooterLink[] => {
       text: 'PMM Dump',
       icon: 'brain',
       url: '/graph/pmm-dump',
-      target: '_blank',
+      target: '_self',
     },
     {
       id: 'pmm-logs',
