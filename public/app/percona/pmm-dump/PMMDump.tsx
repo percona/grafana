@@ -20,6 +20,7 @@ import { useSelector } from 'app/types';
 import { Messages } from './PMMDump.messages';
 import { SendToSupportModal } from './SendToSupportModal';
 import { getStyles } from './Tabs.styles';
+export const NEW_BACKUP_URL = '/pmm-dump/new';
 
 const pageNav: NavModelItem = {
   icon: 'brain',
@@ -27,6 +28,7 @@ const pageNav: NavModelItem = {
   text: 'PMM Export',
   subTitle:
     'Simplify troubleshooting and accelerate issue resolution by securely sharing relevant data, ensuring a smoother support experience.',
+  breadcrumbs: [{ title: 'Export new dataset', url: 'graph/export' }],
 };
 
 export const PMMDump = () => {
@@ -230,7 +232,7 @@ export const PMMDump = () => {
           ) : (
             <div>Select services to bulk edit them.</div>
           )}
-          <LinkButton href="/" size="md" variant="primary" data-testid="create-dataset" icon="plus">
+          <LinkButton href={NEW_BACKUP_URL} size="md" variant="primary" data-testid="create-dataset" icon="plus">
             {Messages.services.createDataset}
           </LinkButton>
         </div>
