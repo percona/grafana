@@ -30,7 +30,7 @@ export const getStyles = ({ breakpoints, colors, shape, spacing, v1: { spacing: 
     flex-direction: column;
     padding-top: ${spacingV1.xs};
     margin-bottom: 17px;
-    width: 70%;
+    width: 55%;
   `,
   selectField: css`
     padding-top: 7px;
@@ -62,7 +62,6 @@ export const getStyles = ({ breakpoints, colors, shape, spacing, v1: { spacing: 
     border: 1px solid ${colors.border.weak};
     border-radius: ${shape.borderRadius()};
     margin: ${spacing(0, 2, 2)};
-    overflow: hidden;
     flex: 1;
   `,
   form: css`
@@ -92,14 +91,14 @@ export const getStyles = ({ breakpoints, colors, shape, spacing, v1: { spacing: 
     justify-content: center;
   `,
   datePicker: css`
-    width: 70%;
+    width: 55%;
     display: flex;
     justify-content: space-between;
     margin-bottom: ${spacing(2)};
   `,
   switch: css`
     margin-bottom: ${spacing(2)};
-    width: 70%;
+    width: 55%;
     display: flex;
     & > div {
       margin-right: ${spacing(3)};
