@@ -87,7 +87,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     history.push(DUMP_URL);
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmit = (data: ExportDatasetProps) => {
     console.log(data);
   };
 
