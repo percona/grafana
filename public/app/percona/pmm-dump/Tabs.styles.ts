@@ -71,4 +71,7 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
     background: none;
     margin-right: 7px;
   `,
+  nodes: css`
+    color: ${colors.text.disabled};
+  `,
 });
