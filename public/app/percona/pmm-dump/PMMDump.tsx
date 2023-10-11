@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { Row } from 'react-table';
+import { style } from 'test/mocks/style';
 
 import { NavModelItem } from '@grafana/data';
 import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
@@ -18,8 +19,11 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Messages } from './PMMDump.messages';
+import { PMMDumpService } from './PMMDump.service';
 import { SendToSupportModal } from './SendToSupportModal';
 import { getStyles } from './Tabs.styles';
+import { PmmDumpLogsModal } from './components/PmmDumpLogsModal/PmmDumpLogsModal';
+export const NEW_BACKUP_URL = '/pmm-dump/new';
 
 const pageNav: NavModelItem = {
   icon: 'brain',
@@ -35,6 +39,7 @@ export const PMMDump = () => {
   const { isLoading, dumps } = useSelector(getDumps);
   const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
   const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
+  const [logsModalVisible, setLogsModalVisible] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -46,6 +51,10 @@ export const PMMDump = () => {
       logger.error(e);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getLogs = useCallback(async () => {
+    return PMMDumpService.getLogs2('1', 2, 2);
   }, []);
 
   useEffect(() => {
@@ -130,7 +139,14 @@ export const PMMDump = () => {
         Header: Messages.services.columns.status,
         accessor: 'status',
         Cell: ({ value }: { value: DumpStatus }) => {
-          return <Badge text={DumpStatusText[value]} color={DumpStatusColor[value as DumpStatus] as BadgeColor} />;
+          return (
+            <div>
+              <Badge text={DumpStatusText[value]} color={DumpStatusColor[value as DumpStatus] as BadgeColor} />
+              <span role="button" className={styles.logs} onClick={onLogClick}>
+                Logs
+              </span>
+            </div>
+          );
         },
         type: FilterFieldTypes.DROPDOWN,
         options: [
@@ -177,8 +193,16 @@ export const PMMDump = () => {
       },
       getExpandAndActionsCol(getActions),
     ],
-    [getActions]
+    [getActions, styles.logs]
   );
+
+  const onLogClick = () => {
+    setLogsModalVisible(true);
+  };
+
+  const handleLogsClose = () => {
+    setLogsModalVisible(false);
+  };
 
   const handleSelectionChange = useCallback((rows: Array<Row<PMMDumpServices>>) => {
     setSelectedRows(rows);
@@ -258,6 +282,9 @@ export const PMMDump = () => {
           autoResetSelectedRows={false}
           getRowId={useCallback((row: PMMDumpServices) => row.dump_id, [])}
         />
+        {logsModalVisible && (
+          <PmmDumpLogsModal title="test" isVisible onClose={handleLogsClose} getLogChunks={getLogs} />
+        )}
       </Page.Contents>
     </Page>
   );

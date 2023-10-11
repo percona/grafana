@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
+export const getStyles = ({ v1: { palette }, colors, spacing }: GrafanaTheme2) => ({
   detailsWrapper: css`
     display: flex;
     flex-direction: column;
@@ -73,5 +73,10 @@ export const getStyles = ({ colors, spacing }: GrafanaTheme2) => ({
   `,
   nodes: css`
     color: ${colors.text.disabled};
+  `,
+  logs: css`
+    color: ${palette.blue77};
+    text-decoration: underline;
+    cursor: pointer;
   `,
 });
