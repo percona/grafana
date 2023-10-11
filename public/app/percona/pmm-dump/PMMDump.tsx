@@ -186,26 +186,19 @@ export const PMMDump = () => {
     setSelectedRows(rows);
   }, []);
 
-  const renderSelectedSubRow = React.useCallback(
-    (row: Row<PMMDumpServices>) => {
-      const nodes = row.original.node_ids || [];
+  const renderSelectedSubRow = React.useCallback((row: Row<PMMDumpServices>) => {
+    const nodes = row.original.node_ids || [];
 
-      return (
-        <DetailsRow>
-          {!!nodes.length && (
-            <DetailsRow.Contents title={Messages.services.columns.nodes}>
-              {row.original.node_ids.map((node: string, index: number) => (
-                <div className={styles.nodes} key={index}>
-                  {node}
-                </div>
-              ))}
-            </DetailsRow.Contents>
-          )}
-        </DetailsRow>
-      );
-    },
-    [styles]
-  );
+    return (
+      <DetailsRow>
+        {!!nodes.length && (
+          <DetailsRow.Contents title={Messages.services.columns.nodes}>
+            <span>{row.original.node_ids}</span>
+          </DetailsRow.Contents>
+        )}
+      </DetailsRow>
+    );
+  }, []);
 
   return (
     <Page navId="pmmdump" pageNav={pageNav}>

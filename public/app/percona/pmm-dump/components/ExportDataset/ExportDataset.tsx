@@ -4,7 +4,7 @@ import React, { FC, useState, useEffect, useCallback } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useHistory } from 'react-router-dom';
 
-import { SelectableValue, DateTime, dateTime } from '@grafana/data';
+import { SelectableValue, DateTime, dateTime, TimeRange } from '@grafana/data';
 import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
@@ -22,7 +22,7 @@ import { SwitchRow } from '../../../settings/components/Advanced/SwitchRow';
 import { GET_NODES_CANCEL_TOKEN, DUMP_URL } from './ExportDataset.constants';
 import { Messages } from './ExportDataset.messages';
 import { getStyles } from './ExportDataset.styles';
-import { ExportDatasetProps, Timeranges } from './ExportDataset.types';
+import { ExportDatasetProps } from './ExportDataset.types';
 
 const { Form } = withTypes<ExportDatasetProps>();
 
@@ -30,7 +30,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
 
-  const [selectedTimerange, setSelectedTimerange] = useState<Timeranges>();
+  const [selectedTimerange, setSelectedTimerange] = useState<TimeRange>();
 
   const { nodes = [], isLoading } = useSelector(getNodes);
 
@@ -65,18 +65,31 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   useEffect(() => {
     loadData();
     setSelectedTimerange({
-      startTimestamp: '2023-10-03T04:35:46.795Z',
-      endTimestamp: '2023-10-03T10:35:46.795Z',
+      from: dateTime(new Date('2023-10-03T04:35:46.795Z')),
+      to: dateTime(new Date('2023-10-03T10:35:46.795Z')),
+      raw: {
+        from: 'now-6h',
+        to: 'now',
+      },
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // const onDatechange = (data: any) => {
+  //   setSelectedTimerange(data)
+  //   setDate(data.from)
+  //   console.log(data)
+  // }
 
   const history = useHistory();
   const handleGoBack = () => {
     history.push(DUMP_URL);
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    console.log(data);
+  };
 
   return (
     <Overlay>
@@ -110,6 +123,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       )}
                     </Field>
                   </span>
+
                   <div className={styles.datePicker}>
                     <div>
                       {Messages.selectStart}
@@ -146,6 +160,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       )}
                     </div>
                   </div>
+
                   <div className={styles.switch}>
                     <Field
                       name="QAN"
