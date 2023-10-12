@@ -18,6 +18,7 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { SwitchRow } from '../../../settings/components/Advanced/SwitchRow';
+import { PMMDumpService } from '../../PMMDump.service';
 
 import { GET_NODES_CANCEL_TOKEN, DUMP_URL } from './ExportDataset.constants';
 import { Messages } from './ExportDataset.messages';
@@ -88,7 +89,19 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   };
 
   const handleSubmit = (data: ExportDatasetProps) => {
+    let nodeids;
     console.log(data);
+    if (data.service) {
+      nodeids = [data.service.value];
+      console.log(data.service.value);
+    } else {
+      console.log(nodes);
+      nodeids = nodes?.map(({ nodeId }): string => nodeId);
+    }
+    console.log(endDate.toISOString());
+    console.log(date.toISOString());
+
+    PMMDumpService.triggerBackup(nodeids, date.toISOString(), endDate.toISOString(), data.QAN, data.load);
   };
 
   return (
