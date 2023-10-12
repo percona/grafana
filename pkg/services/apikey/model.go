@@ -10,7 +10,7 @@ import (
 
 var (
 	ErrNotFound          = errors.New("API key not found")
-	ErrInvalid           = errors.New("invalid API key")
+	ErrInvalid           = errors.New("invalid Service Token/API key")
 	ErrInvalidExpiration = errors.New("negative value for SecondsToLive")
 	ErrDuplicate         = errors.New("API key, organization ID and name must be unique")
 )

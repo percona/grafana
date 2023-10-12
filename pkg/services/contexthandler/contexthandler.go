@@ -36,7 +36,7 @@ import (
 const (
 	InvalidUsernamePassword = "invalid username or password"
 	/* #nosec */
-	InvalidAPIKey = "invalid API key"
+	InvalidAPIKey = "invalid Service Token/API key"
 )
 
 const ServiceName = "ContextHandler"
