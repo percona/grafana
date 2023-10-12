@@ -95,7 +95,9 @@ export const PMMDump = () => {
         content: (
           <HorizontalGroup spacing="sm">
             <Icon name="eye" />
-            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.viewLogs}</span>
+            <span className={styles.actionItemTxtSpan} onClick={onLogClick}>
+              {Messages.services.actions.viewLogs}
+            </span>
           </HorizontalGroup>
         ),
         action: () => {
@@ -140,14 +142,7 @@ export const PMMDump = () => {
         Header: Messages.services.columns.status,
         accessor: 'status',
         Cell: ({ value }: { value: DumpStatus }) => {
-          return (
-            <div>
-              <Badge text={DumpStatusText[value]} color={DumpStatusColor[value as DumpStatus] as BadgeColor} />
-              <span role="button" className={styles.logs} onClick={onLogClick}>
-                Logs
-              </span>
-            </div>
-          );
+          return <Badge text={DumpStatusText[value]} color={DumpStatusColor[value as DumpStatus] as BadgeColor} />;
         },
         type: FilterFieldTypes.DROPDOWN,
         options: [
@@ -194,7 +189,7 @@ export const PMMDump = () => {
       },
       getExpandAndActionsCol(getActions),
     ],
-    [getActions, styles.logs]
+    [getActions]
   );
 
   const onLogClick = () => {
