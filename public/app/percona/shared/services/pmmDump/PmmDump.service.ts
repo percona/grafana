@@ -9,8 +9,8 @@ const PmmDumpService = {
     const response = await api.post<PmmDumpResponse, void>(`${BASE_URL}/Dumps/List`, undefined);
     return response.dumps || [];
   },
-  async delete(dumpId: string) {
-    await api.post<void, DeleteDump>(`${BASE_URL}/Dumps/Delete`, { dump_id: dumpId });
+  async delete(dumpIds: string[]) {
+    await api.post<void, DeleteDump>(`${BASE_URL}/Dumps/Delete`, { dump_ids: dumpIds });
   },
   async sendToSupport(body: SendToSupportForm) {
     // await api.post<void, DeleteDump>(`${BASE_URL}/SendToSupport`, body);

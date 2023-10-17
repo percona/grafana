@@ -36,10 +36,10 @@ export const fetchPmmDumpAction = createAsyncThunk<PmmDump[]>('percona/fetchDump
 
 export const deletePmmDumpAction = createAsyncThunk(
   'percona/deletePmmDump',
-  async (dumpId: string): Promise<void> =>
+  async (dumpIds: string[]): Promise<void> =>
     withSerializedError(
       (async () => {
-        await PmmDumpService.delete(dumpId);
+        await PmmDumpService.delete(dumpIds);
       })()
     )
 );

@@ -4,12 +4,13 @@ import { Row } from 'react-table';
 
 import { NavModelItem } from '@grafana/data';
 import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
+import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
-import { fetchPmmDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
+import { deletePmmDumpAction, fetchPmmDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
 import { getDumps } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
@@ -17,6 +18,7 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { dateDifferenceInWords } from 'app/percona/shared/helpers/utils/timeRange';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
+import { ShowConfirmModalEvent } from 'app/types/events';
 
 import { Messages } from './PMMDump.messages';
 import { PMMDumpService } from './PMMDump.service';
@@ -115,22 +117,21 @@ export const PMMDump = () => {
 
   const onDelete = (value?: PMMDumpServices) => {
     if (value) {
-      console.log('onDelete value', value);
+      dispatch(deletePmmDumpAction([value.dump_id]));
     } else if (selected.length > 0) {
-      console.log('selected', selected);
+      appEvents.publish(
+        new ShowConfirmModalEvent({
+          title: 'Delete',
+          text: 'Are you sure you want to delete the selected dumps?',
+          yesText: 'Delete',
+          icon: 'trash-alt',
+          onConfirm: () => {
+            const dump_ids = selected.map((item) => item.original.dump_id);
+            dispatch(deletePmmDumpAction(dump_ids));
+          },
+        })
+      );
     }
-    // appEvents.publish(
-    //   new ShowConfirmModalEvent({
-    //     title: 'Delete',
-    //     text: 'Are you sure you want to delete the selected dumps?',
-    //     yesText: 'Delete',
-    //     icon: 'trash-alt',
-    //     onConfirm: () => {
-    //       deleteDumps();
-    //       dispatch(notifyApp(createSuccessNotification('Dumps deleted')));
-    //     },
-    //   })
-    // );
   };
 
   const columns = useMemo(

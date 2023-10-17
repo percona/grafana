@@ -12,7 +12,7 @@ export interface PmmDump {
 }
 
 export interface DeleteDump {
-  dump_id: string;
+  dump_ids: string[];
 }
 
 export interface Node {
