@@ -2,13 +2,13 @@ import { CancelToken } from 'axios';
 
 import { api } from 'app/percona/shared/helpers/api';
 
-import { BackupLogs, BackupLogResponse } from './PmmDump.types';
+import { DumpLogs, DumpLogResponse } from './PmmDump.types';
 // import { Service } from './components/ExportDataset/ExportDataset.types';
 
-const BASE_URL = '/v1/management/dump/Dump';
+const BASE_URL = '/v1/management/dump/Dumps';
 
 export const PMMDumpService = {
-  async triggerBackup(
+  async triggerDump(
     services: object | undefined,
     startTime: string,
     endTime: string,
@@ -30,19 +30,12 @@ export const PMMDumpService = {
     );
   },
 
-  async getLogs(): Promise<BackupLogs> {
-    let times = new Date();
-    return {
-      logs: [{ id: 1, data: 'logs', time: times.toString() }],
-      end: true,
-    };
-  },
-
-  async getLogs2(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<BackupLogs> {
-    const { logs = [], end } = await api.post<BackupLogResponse, Object>(
+  async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<DumpLogs> {
+    const { logs = [], end } = await api.post<DumpLogResponse, Object>(
       `${BASE_URL}/GetDumpLogs`,
+
       {
-        artifact_id: artifactId,
+        dump_id: artifactId,
         offset,
         limit,
       },

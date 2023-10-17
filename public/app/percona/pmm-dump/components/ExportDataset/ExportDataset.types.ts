@@ -1,8 +1,8 @@
 export interface ExportDatasetProps {
   id: string;
-  service?: Service;
-  load?: boolean;
-  QAN?: boolean;
+  service: Service;
+  load: boolean;
+  QAN: boolean;
 }
 
 export interface Timeranges {

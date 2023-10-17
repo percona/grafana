@@ -1,3 +1,4 @@
+import { CancelToken } from 'axios';
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { Row } from 'react-table';
 
@@ -18,8 +19,10 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Messages } from './PMMDump.messages';
+import { PMMDumpService } from './PMMDump.service';
 import { SendToSupportModal } from './SendToSupportModal';
 import { getStyles } from './Tabs.styles';
+import { PmmDumpLogsModal } from './components/PmmDumpLogsModal/PmmDumpLogsModal';
 export const NEW_BACKUP_URL = '/pmm-dump/new';
 
 const pageNav: NavModelItem = {
@@ -36,7 +39,9 @@ export const PMMDump = () => {
   const dispatch = useAppDispatch();
   const { isLoading, dumps } = useSelector(getDumps);
   const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
+  const [selectedDump, setSelectedDump] = useState<PMMDumpServices | null>(null);
   const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
+  const [logsModalVisible, setLogsModalVisible] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -49,6 +54,13 @@ export const PMMDump = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getLogs = useCallback(
+    async (startingChunk: number, offset: number, token?: CancelToken) => {
+      return PMMDumpService.getLogs(selectedDump!.dump_id, startingChunk, offset, token);
+    },
+    [selectedDump]
+  );
 
   useEffect(() => {
     loadData();
@@ -87,7 +99,9 @@ export const PMMDump = () => {
         content: (
           <HorizontalGroup spacing="sm">
             <Icon name="eye" />
-            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.viewLogs}</span>
+            <span className={styles.actionItemTxtSpan} onClick={() => onLogClick(row.original)}>
+              {Messages.services.actions.viewLogs}
+            </span>
           </HorizontalGroup>
         ),
         action: () => {
@@ -182,6 +196,15 @@ export const PMMDump = () => {
     [getActions]
   );
 
+  const onLogClick = (row: PMMDumpServices) => {
+    setSelectedDump(row);
+    setLogsModalVisible(true);
+  };
+
+  const handleLogsClose = () => {
+    setLogsModalVisible(false);
+  };
+
   const handleSelectionChange = useCallback((rows: Array<Row<PMMDumpServices>>) => {
     setSelectedRows(rows);
   }, []);
@@ -253,6 +276,9 @@ export const PMMDump = () => {
           autoResetSelectedRows={false}
           getRowId={useCallback((row: PMMDumpServices) => row.dump_id, [])}
         />
+        {logsModalVisible && (
+          <PmmDumpLogsModal title="test" isVisible onClose={handleLogsClose} getLogChunks={getLogs} />
+        )}
       </Page.Contents>
     </Page>
   );

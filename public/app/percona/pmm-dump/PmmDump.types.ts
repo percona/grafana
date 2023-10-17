@@ -34,3 +34,23 @@ export interface SendToSupportForm {
   address: string;
   password: string;
 }
+
+export interface RawDumpLog {
+  chunk_id: number;
+  data: string;
+  time: string;
+}
+
+export interface DumpLogResponse {
+  logs: RawDumpLog[];
+  end: boolean;
+}
+
+export interface DumpLogChunk extends Omit<RawDumpLog, 'chunk_id'> {
+  id: number;
+}
+
+export interface DumpLogs {
+  logs: DumpLogChunk[];
+  end: boolean;
+}

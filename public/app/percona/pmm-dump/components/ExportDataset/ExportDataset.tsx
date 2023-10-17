@@ -43,7 +43,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
           value: nodeId,
         })
       );
-  console.log(nodeOptions);
   // const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [generateToken] = useCancelToken();
   const [endDate, setEndDate] = useState<DateTime>(dateTime(new Date().setSeconds(0, 0)));
@@ -77,31 +76,28 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const onDatechange = (data: any) => {
-  //   setSelectedTimerange(data)
-  //   setDate(data.from)
-  //   console.log(data)
-  // }
-
   const history = useHistory();
   const handleGoBack = () => {
     history.push(DUMP_URL);
   };
 
-  const handleSubmit = (data: ExportDatasetProps) => {
+  const handleSubmit = async (data: ExportDatasetProps) => {
     let nodeids;
-    console.log(data);
-    if (data.service) {
+    if (data?.service) {
       nodeids = [data.service.value];
-      console.log(data.service.value);
     } else {
-      console.log(nodes);
       nodeids = nodes?.map(({ nodeId }): string => nodeId);
     }
-    console.log(endDate.toISOString());
-    console.log(date.toISOString());
 
-    PMMDumpService.triggerBackup(nodeids, date.toISOString(), endDate.toISOString(), data.QAN, data.load);
+    await PMMDumpService.triggerDump(
+      nodeids,
+      date.toISOString(),
+      endDate.toISOString(),
+      data.QAN ? true : false,
+      data.load ? true : false
+    );
+
+    history.push(DUMP_URL);
   };
 
   return (
