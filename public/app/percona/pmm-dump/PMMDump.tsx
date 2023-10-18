@@ -30,10 +30,9 @@ export const NEW_BACKUP_URL = '/pmm-dump/new';
 const pageNav: NavModelItem = {
   icon: 'brain',
   id: 'user-new',
-  text: 'PMM Export',
+  text: 'PMM Dump',
   subTitle:
     'Simplify troubleshooting and accelerate issue resolution by securely sharing relevant data, ensuring a smoother support experience.',
-  breadcrumbs: [{ title: 'Export new dataset', url: 'graph/export' }],
 };
 
 export const PMMDump = () => {
