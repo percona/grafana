@@ -1,6 +1,6 @@
 export interface ExportDatasetProps {
   id: string;
-  service: Service;
+  service: Service[];
   load: boolean;
   QAN: boolean;
 }
@@ -13,8 +13,4 @@ export interface Timeranges {
 export interface Service {
   label: string;
   value: string;
-}
-
-export interface ServiceList {
-  service: Service[];
 }

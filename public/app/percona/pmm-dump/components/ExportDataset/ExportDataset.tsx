@@ -9,7 +9,8 @@ import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
-import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+// import { SelectField } from 'app/percona/shared/components/Form/SelectField';
+import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getNodes } from 'app/percona/shared/core/selectors';
@@ -24,6 +25,7 @@ import { GET_NODES_CANCEL_TOKEN, DUMP_URL } from './ExportDataset.constants';
 import { Messages } from './ExportDataset.messages';
 import { getStyles } from './ExportDataset.styles';
 import { ExportDatasetProps } from './ExportDataset.types';
+// import { Service } from 'app/percona/shared/services/services/Services.types';
 
 const { Form } = withTypes<ExportDatasetProps>();
 
@@ -34,7 +36,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const [selectedTimerange, setSelectedTimerange] = useState<TimeRange>();
 
   const { nodes = [], isLoading } = useSelector(getNodes);
-
   const nodeOptions = isLoading
     ? []
     : nodes?.map(
@@ -43,6 +44,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
           value: nodeId,
         })
       );
+  // nodeOptions.unshift(ALL_NODES)
   // const [backupErrors, setBackupErrors] = useState<ApiVerboseError[]>([]);
   const [generateToken] = useCancelToken();
   const [endDate, setEndDate] = useState<DateTime>(dateTime(new Date().setSeconds(0, 0)));
@@ -82,13 +84,21 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   };
 
   const handleSubmit = async (data: ExportDatasetProps) => {
+    console.log(data.service);
     let nodeids;
-    if (data?.service) {
-      nodeids = [data.service.value];
-    } else {
+
+    if (date > endDate) {
+      console.log('date');
+      return;
+    }
+    if (!data?.service) {
       nodeids = nodes?.map(({ nodeId }): string => nodeId);
+    } else {
+      console.log(data.service);
+      nodeids = data?.service?.map(({ value }): string => value);
     }
 
+    console.log(nodeids);
     await PMMDumpService.triggerDump(
       nodeids,
       date.toISOString(),
@@ -118,12 +128,29 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                   <div>{Messages.summary}</div>
                   <h3 className={styles.heading3Style}>{Messages.title}</h3>
                   <span className={styles.SelectFieldWrap}>
-                    <Field name="service">
+                    {/* <Field name="service">
                       {({ input }) => (
                         <SelectField
+                          defaultValue={ALL_NODES}
                           label={Messages.selectNodes}
                           options={nodeOptions}
-                          placeholder={Messages.allNodes}
+                          {...input}
+                          isLoading={isLoading}
+                          className={styles.selectField}
+                          data-testid="service-select-input"
+                        />
+                      )}
+                    </Field> */}
+
+                    <Field name="service">
+                      {({ input }) => (
+                        <MultiSelectField
+                          {...input}
+                          placeholder="All nodes"
+                          closeMenuOnSelect={false}
+                          isClearable
+                          label={Messages.selectNodes}
+                          options={nodeOptions}
                           {...input}
                           isLoading={isLoading}
                           className={styles.selectField}
@@ -143,6 +170,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                             label="Date"
                             date={date}
                             onChange={setDate}
+                            maxDate={new Date()}
                             timepickerProps={{
                               showSecond: false,
                               hideDisabledOptions: true,
@@ -159,6 +187,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                           <DateTimePicker
                             label="Date"
                             date={endDate}
+                            maxDate={new Date()}
                             onChange={setEndDate}
                             timepickerProps={{
                               showSecond: false,
@@ -200,8 +229,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       {Messages.createDataset}
                     </LoaderButton>
                   </div>
-
-                  {isLoading ? undefined : console.log(nodes.length && !isLoading ? nodes.map((m) => m) : [])}
                 </div>
               </div>
             </div>
