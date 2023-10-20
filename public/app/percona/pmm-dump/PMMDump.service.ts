@@ -19,7 +19,7 @@ export const PMMDumpService = {
     return api.post(
       `${BASE_URL}/Start`,
       {
-        node_ids: services,
+        service_names: services,
         start_time: startTime,
         end_time: endTime,
         export_qan: qan,
@@ -42,8 +42,6 @@ export const PMMDumpService = {
       false,
       token
     );
-
-    console.log(logs);
     return {
       logs: logs.map(({ chunk_id = 0, data, time }) => ({ id: chunk_id, data, time })),
       end,
