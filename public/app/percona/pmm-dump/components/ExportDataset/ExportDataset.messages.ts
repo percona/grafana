@@ -3,7 +3,7 @@ export const Messages = {
   summary:
     'Simplify troubleshooting and accelerate issue resolution by securely sharing relevant data, ensuring a smoother support experience.',
   title: 'Select data to export',
-  selectNodes: 'Select nodes',
+  selectServiceNames: 'Select service names',
   allNodes: 'All nodes',
   selectStart: 'Select start time',
   selectEnd: 'Select end time',

@@ -9,7 +9,7 @@ export const Messages = {
       timeRange: 'Time Range',
       startTime: 'Start Time',
       endTime: 'End Time',
-      nodes: 'Nodes',
+      serviceNames: 'Service Names',
     },
     actions: {
       download: 'Download',

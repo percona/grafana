@@ -25,8 +25,8 @@ import { ShowConfirmModalEvent } from 'app/types/events';
 
 import { Messages } from './PMMDump.messages';
 import { PMMDumpService } from './PMMDump.service';
+import { getStyles } from './PmmDump.styles';
 import { SendToSupportModal } from './SendToSupportModal';
-import { getStyles } from './Tabs.styles';
 import { PmmDumpLogsModal } from './components/PmmDumpLogsModal/PmmDumpLogsModal';
 export const NEW_BACKUP_URL = '/pmm-dump/new';
 
@@ -41,7 +41,7 @@ const pageNav: NavModelItem = {
 export const PMMDump = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
-  const { isLoading, dumps } = useSelector(getDumps);
+  const { dumps } = useSelector(getDumps);
   const [triggerTimeout] = useRecurringCall();
   const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
   const [selectedDump, setSelectedDump] = useState<PMMDumpServices | null>(null);
@@ -227,19 +227,25 @@ export const PMMDump = () => {
     setSelectedRows(rows);
   }, []);
 
-  const renderSelectedSubRow = React.useCallback((row: Row<PMMDumpServices>) => {
-    const nodes = row.original.node_ids || [];
+  const renderSelectedSubRow = React.useCallback(
+    (row: Row<PMMDumpServices>) => {
+      const serviceNames = row.original.service_names || [];
 
-    return (
-      <DetailsRow>
-        {!!nodes.length && (
-          <DetailsRow.Contents title={Messages.services.columns.nodes}>
-            <span>{row.original.node_ids}</span>
-          </DetailsRow.Contents>
-        )}
-      </DetailsRow>
-    );
-  }, []);
+      return (
+        <DetailsRow>
+          {!!serviceNames.length && (
+            <div>
+              <span className={styles.serviceNamesTitle}>{Messages.services.columns.serviceNames}</span>
+              {serviceNames.map((service) => {
+                return <div key={service}>{service}</div>;
+              })}
+            </div>
+          )}
+        </DetailsRow>
+      );
+    },
+    [styles]
+  );
 
   return (
     <Page navId="pmmdump" pageNav={pageNav}>
@@ -288,9 +294,9 @@ export const PMMDump = () => {
           pageSize={25}
           allRowsSelectionMode="page"
           emptyMessage={Messages.services.emptyTable}
-          pendingRequest={isLoading}
           overlayClassName={styles.overlay}
           renderExpandedRow={renderSelectedSubRow}
+          autoResetExpanded={false}
           autoResetSelectedRows={false}
           getRowId={useCallback((row: PMMDumpServices) => row.dump_id, [])}
         />
