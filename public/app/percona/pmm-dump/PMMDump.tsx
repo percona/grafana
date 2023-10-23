@@ -6,6 +6,9 @@ import { NavModelItem } from '@grafana/data';
 import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
+import { DATA_INTERVAL } from 'app/percona/backup/components/BackupInventory/BackupInventory.constants';
+import { DetailedDate } from 'app/percona/backup/components/DetailedDate';
+import { useRecurringCall } from 'app/percona/backup/hooks/recurringCall.hook';
 import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
@@ -39,6 +42,7 @@ export const PMMDump = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { isLoading, dumps } = useSelector(getDumps);
+  const [triggerTimeout] = useRecurringCall();
   const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
   const [selectedDump, setSelectedDump] = useState<PMMDumpServices | null>(null);
   const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
@@ -64,9 +68,9 @@ export const PMMDump = () => {
   );
 
   useEffect(() => {
-    loadData();
+    loadData().then(() => triggerTimeout(loadData, DATA_INTERVAL));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadData]);
 
   const closeEditModal = (saved = false) => {
     setIsSendToSupportModalOpened(false);
@@ -116,7 +120,17 @@ export const PMMDump = () => {
 
   const onDelete = (value?: PMMDumpServices) => {
     if (value) {
-      dispatch(deletePmmDumpAction([value.dump_id]));
+      appEvents.publish(
+        new ShowConfirmModalEvent({
+          title: 'Delete',
+          text: 'Are you sure you want to delete this PMM dump?',
+          yesText: 'Delete',
+          icon: 'trash-alt',
+          onConfirm: () => {
+            dispatch(deletePmmDumpAction([value.dump_id]));
+          },
+        })
+      );
     } else if (selected.length > 0) {
       appEvents.publish(
         new ShowConfirmModalEvent({
@@ -131,6 +145,7 @@ export const PMMDump = () => {
         })
       );
     }
+    loadData();
   };
 
   const columns = useMemo(
@@ -172,6 +187,7 @@ export const PMMDump = () => {
         Header: Messages.services.columns.created,
         accessor: 'created_at',
         type: FilterFieldTypes.TEXT,
+        Cell: ({ value }) => <DetailedDate date={new Date(value).getTime()} />,
       },
       {
         Header: Messages.services.columns.timeRange,
@@ -185,11 +201,13 @@ export const PMMDump = () => {
         Header: Messages.services.columns.startDate,
         accessor: 'start_time',
         type: FilterFieldTypes.TEXT,
+        Cell: ({ value }) => <DetailedDate date={new Date(value).getTime()} />,
       },
       {
         Header: Messages.services.columns.endDate,
         accessor: 'end_time',
         type: FilterFieldTypes.TEXT,
+        Cell: ({ value }) => <DetailedDate date={new Date(value).getTime()} />,
       },
       getExpandAndActionsCol(getActions),
     ],

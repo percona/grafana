@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { withSerializedError } from 'app/features/alerting/unified/utils/redux';
+import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { SendToSupportForm } from 'app/percona/pmm-dump/PmmDump.types';
 import { PmmDumpState } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
 import PmmDumpService from 'app/percona/shared/services/pmmDump/PmmDump.service';
@@ -37,10 +37,14 @@ export const fetchPmmDumpAction = createAsyncThunk<PmmDump[]>('percona/fetchDump
 export const deletePmmDumpAction = createAsyncThunk(
   'percona/deletePmmDump',
   async (dumpIds: string[]): Promise<void> =>
-    withSerializedError(
+    withAppEvents(
       (async () => {
         await PmmDumpService.delete(dumpIds);
-      })()
+      })(),
+      {
+        successMessage: 'Deleted successfully',
+        errorMessage: 'Failed to delete ',
+      }
     )
 );
 
