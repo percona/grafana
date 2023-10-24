@@ -38,7 +38,6 @@ import { KubernetesClusterStatus as K8SStatus } from './KubernetesClusterStatus/
 import { ManageComponentsVersionsModal } from './ManageComponentsVersionsModal/ManageComponentsVersionsModal';
 import { UpdateOperatorModal } from './OperatorStatusItem/KubernetesOperatorStatus/UpdateOperatorModal/UpdateOperatorModal';
 import { OperatorStatusRow } from './OperatorStatusRow/OperatorStatusRow';
-import { PortalK8sFreeClusterPromotingMessage } from './PortalK8sFreeClusterPromotingMessage/PortalK8sFreeClusterPromotingMessage';
 import { ViewClusterConfigModal } from './ViewClusterConfigModal/ViewClusterConfigModal';
 
 interface KubernetesInventoryProps {
@@ -233,7 +232,6 @@ export const KubernetesInventory: FC<KubernetesInventoryProps> = ({ setMode }) =
             />
           </div>
         </FeatureLoader>
-        {kubernetes && kubernetes.length === 0 && <PortalK8sFreeClusterPromotingMessage />}
       </OldPage.Contents>
     </OldPage>
   );
