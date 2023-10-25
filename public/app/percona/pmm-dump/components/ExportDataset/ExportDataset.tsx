@@ -36,7 +36,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const flattenServices = useMemo(
     () =>
       fetchedServices.map((data: { params: { serviceName: string } }): SelectableValue<string> => {
-        console.log(data);
         return {
           label: data.params.serviceName,
           value: data.params.serviceName,
@@ -134,7 +133,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                           placeholder="All Services"
                           closeMenuOnSelect={false}
                           isClearable
-                          label={Messages.selectNodes}
+                          label={Messages.selectServiceNames}
                           options={flattenServices}
                           {...input}
                           isLoading={isLoading}

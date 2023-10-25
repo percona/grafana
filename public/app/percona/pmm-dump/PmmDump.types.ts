@@ -18,7 +18,7 @@ export interface PMMDumpServices {
   created_at: string;
   start_time: string;
   end_time: string;
-  node_ids: string[];
+  service_names: string[];
   timeRange?: string;
 }
 
