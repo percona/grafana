@@ -9,31 +9,36 @@ import { useDispatch, useSelector } from 'app/types';
 
 interface ModalProps {
   onClose: (saved?: boolean) => void;
+  dump_ids: string[];
 }
 
 export function SendToSupportModal(props: ModalProps): React.ReactElement {
-  const { onClose } = props;
+  const { onClose, dump_ids } = props;
   const styles = useStyles2(getStyles);
   const dispatch = useDispatch();
   const { isLoading } = useSelector(getDumps);
   const defaultValues: SendToSupportForm = {
-    name: '',
+    user: '',
     address: '',
     password: '',
+    dump_ids: [] as string[],
   } as const;
 
   const onSubmit = (values: SendToSupportForm) => {
     dispatch(
       sendToSupportAction({
-        name: values.name,
-        address: values.address,
-        password: values.password,
+        ftp_parameters: {
+          user: values.user,
+          address: values.address,
+          password: values.password,
+        },
+        dump_ids,
       })
     );
   };
 
   return (
-    <Modal className={styles.modal} isOpen={true} title="Send to suport" onDismiss={onClose} onClickBackdrop={onClose}>
+    <Modal className={styles.modal} isOpen={true} title="Send to Support" onDismiss={onClose} onClickBackdrop={onClose}>
       <Form defaultValues={defaultValues} onSubmit={onSubmit} key={JSON.stringify(defaultValues)}>
         {({ register, errors, formState: { isDirty } }) => (
           <>
@@ -46,10 +51,10 @@ export function SendToSupportModal(props: ModalProps): React.ReactElement {
                 })}
               />
             </Field>
-            <Field label="Name" invalid={!!errors.name} error={errors.name?.message}>
+            <Field label="Name" invalid={!!errors.user} error={errors.user?.message}>
               <Input
                 id="name"
-                {...register('name', {
+                {...register('user', {
                   required: 'Name is required.',
                 })}
               />

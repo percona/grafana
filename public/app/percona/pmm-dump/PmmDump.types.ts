@@ -29,10 +29,20 @@ export const DumpStatusColor = {
   [DumpStatus.BACKUP_STATUS_ERROR]: 'red',
 };
 
+export interface SendToSupportRequestBody {
+  ftp_parameters: {
+    user: string;
+    address: string;
+    password: string;
+  };
+  dump_ids: string[];
+}
+
 export interface SendToSupportForm {
-  name: string;
+  user: string;
   address: string;
   password: string;
+  dump_ids: string[];
 }
 
 export interface RawDumpLog {
