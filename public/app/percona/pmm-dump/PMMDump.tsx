@@ -44,6 +44,7 @@ export const PMMDump = () => {
   const { dumps } = useSelector(getDumps);
   const [triggerTimeout] = useRecurringCall();
   const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
+  const [selectedDumpIds, setSelectedDumpIds] = useState<string[]>([]);
   const [selectedDump, setSelectedDump] = useState<PMMDumpServices | null>(null);
   const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
@@ -74,6 +75,7 @@ export const PMMDump = () => {
 
   const closeEditModal = (saved = false) => {
     setIsSendToSupportModalOpened(false);
+    setSelectedDump(null);
   };
 
   const getActions = useCallback(
@@ -97,6 +99,7 @@ export const PMMDump = () => {
           </HorizontalGroup>
         ),
         action: () => {
+          setSelectedDumpIds([row.original.dump_id]);
           setIsSendToSupportModalOpened(true);
         },
       },
@@ -224,9 +227,15 @@ export const PMMDump = () => {
     setLogsModalVisible(false);
   };
 
-  const handleSelectionChange = useCallback((rows: Array<Row<PMMDumpServices>>) => {
-    setSelectedRows(rows);
-  }, []);
+  const handleSelectionChange = useCallback(
+    (rows: Array<Row<PMMDumpServices>>) => {
+      setSelectedRows(rows);
+      if (!isSendToSupportModalOpened) {
+        setSelectedDumpIds(rows.map((item: Row<PMMDumpServices>) => item.values.dump_id));
+      }
+    },
+    [isSendToSupportModalOpened]
+  );
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<PMMDumpServices>) => {
@@ -284,7 +293,9 @@ export const PMMDump = () => {
             {Messages.services.createDataset}
           </LinkButton>
         </div>
-        {isSendToSupportModalOpened && <SendToSupportModal onClose={() => closeEditModal()} />}
+        {isSendToSupportModalOpened && (
+          <SendToSupportModal onClose={() => closeEditModal()} dump_ids={selectedDumpIds} />
+        )}
         <Table
           columns={columns}
           data={dumps}

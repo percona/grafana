@@ -13,12 +13,12 @@ export const Messages = {
     },
     actions: {
       download: 'Download',
-      sendToSupport: 'Send to support',
+      sendToSupport: 'Send to Support',
       delete: 'Delete',
       viewLogs: 'View logs',
     },
     emptyTable: 'No dumps available',
-    createDataset: 'Create Dataset',
+    createDataset: 'Create dataset',
   },
   dumpLogs: {
     getLogsTitle: (name: string) => `Logs for ${name}`,
