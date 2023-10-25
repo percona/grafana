@@ -20,4 +20,7 @@ export const Messages = {
     emptyTable: 'No dumps available',
     createDataset: 'Create Dataset',
   },
+  dumpLogs: {
+    getLogsTitle: (name: string) => `Logs for ${name}`,
+  },
 };

@@ -58,7 +58,7 @@ export const PMMDump = () => {
 
   const getLogs = useCallback(
     async (startingChunk: number, offset: number, token?: CancelToken) => {
-      return PMMDumpService.getLogs(selectedDump!.dump_id, startingChunk, offset, token);
+      return PMMDumpService.getLogs(selectedDump?.dump_id || '', startingChunk, offset, token);
     },
     [selectedDump]
   );
@@ -198,6 +198,7 @@ export const PMMDump = () => {
 
   const onLogClick = (row: PMMDumpServices) => {
     setSelectedDump(row);
+    console.log(row);
     setLogsModalVisible(true);
   };
 
@@ -277,7 +278,12 @@ export const PMMDump = () => {
           getRowId={useCallback((row: PMMDumpServices) => row.dump_id, [])}
         />
         {logsModalVisible && (
-          <PmmDumpLogsModal title="test" isVisible onClose={handleLogsClose} getLogChunks={getLogs} />
+          <PmmDumpLogsModal
+            title={Messages.dumpLogs.getLogsTitle(selectedDump?.dump_id || '')}
+            isVisible
+            onClose={handleLogsClose}
+            getLogChunks={getLogs}
+          />
         )}
       </Page.Contents>
     </Page>

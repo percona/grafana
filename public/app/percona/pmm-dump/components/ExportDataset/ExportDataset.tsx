@@ -3,8 +3,9 @@ import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useHistory } from 'react-router-dom';
 
-import { SelectableValue, DateTime, dateTime, TimeRange } from '@grafana/data';
+import { SelectableValue, DateTime, dateTime, TimeRange, AppEvents } from '@grafana/data';
 import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui';
+import appEvents from 'app/core/app_events';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
@@ -87,6 +88,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     let serviceList;
 
     if (date > endDate) {
+      appEvents.emit(AppEvents.alertError, ['Please select a valid time range']);
       return;
     }
     if (!data?.service) {
@@ -129,7 +131,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       {({ input }) => (
                         <MultiSelectField
                           {...input}
-                          placeholder="All nodes"
+                          placeholder="All Services"
                           closeMenuOnSelect={false}
                           isClearable
                           label={Messages.selectNodes}
@@ -195,7 +197,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       type="checkbox"
                       label="Ignore Load"
                       dataTestId="advanced-backup"
-                      tooltip="Test"
+                      tooltip="Ignore load to force dump."
                       component={SwitchRow}
                     />
                   </div>
