@@ -25,7 +25,7 @@ export const getStyles = ({ breakpoints, colors, shape, spacing, v1: { spacing: 
   wideField: css`
     grid-column: span 2;
   `,
-  SelectFieldWrap: css`
+  selectFieldWrap: css`
     display: flex;
     flex-direction: column;
     padding-top: ${spacingV1.xs};

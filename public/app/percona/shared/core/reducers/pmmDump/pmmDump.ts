@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
-import { SendToSupportRequestBody } from 'app/percona/pmm-dump/PmmDump.types';
+import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
+import { PMMDumpServices, SendToSupportRequestBody } from 'app/percona/pmm-dump/PmmDump.types';
 import { PmmDumpState } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
-import PmmDumpService from 'app/percona/shared/services/pmmDump/PmmDump.service';
-import { PmmDump } from 'app/percona/shared/services/pmmDump/pmmDump.types';
+import { mapDumps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
 import { createAsyncThunk } from 'app/types';
 
 const initialState: PmmDumpState = {
@@ -30,8 +30,8 @@ export const pmmDumpSlice = createSlice({
   },
 });
 
-export const fetchPmmDumpAction = createAsyncThunk<PmmDump[]>('percona/fetchDumps', () => {
-  return withSerializedError(PmmDumpService.list());
+export const fetchPmmDumpAction = createAsyncThunk<PMMDumpServices[]>('percona/fetchDumps', async () => {
+  return mapDumps(await PMMDumpService.list());
 });
 
 export const deletePmmDumpAction = createAsyncThunk(
@@ -39,7 +39,7 @@ export const deletePmmDumpAction = createAsyncThunk(
   async (dumpIds: string[]): Promise<void> =>
     withAppEvents(
       (async () => {
-        await PmmDumpService.delete(dumpIds);
+        await PMMDumpService.delete(dumpIds);
       })(),
       {
         successMessage: 'Deleted successfully',
@@ -53,7 +53,7 @@ export const sendToSupportAction = createAsyncThunk(
   async (body: SendToSupportRequestBody): Promise<void> =>
     withSerializedError(
       (async () => {
-        await PmmDumpService.sendToSupport(body);
+        await PMMDumpService.sendToSupport(body);
       })()
     )
 );

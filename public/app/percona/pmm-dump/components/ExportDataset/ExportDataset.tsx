@@ -93,7 +93,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     if (!data?.service) {
       serviceList = flattenServices?.map(({ value }): string | undefined => value);
     } else {
-      console.log(data.service);
       serviceList = data?.service?.map(({ value }): string => value);
     }
 
@@ -125,7 +124,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                   <h1 className={styles.headingStyle}>{Messages.introduction}</h1>
                   <div>{Messages.summary}</div>
                   <h3 className={styles.heading3Style}>{Messages.title}</h3>
-                  <span className={styles.SelectFieldWrap}>
+                  <span className={styles.selectFieldWrap}>
                     <Field name="service">
                       {({ input }) => (
                         <MultiSelectField
@@ -148,7 +147,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                     <div>
                       {Messages.selectStart}
                       {selectedTimerange && (
-                        <div className={styles.SelectFieldWrap}>
+                        <div className={styles.selectFieldWrap}>
                           {/* <Label label="Timestamp" /> */}
                           <DateTimePicker
                             label="Date"
@@ -166,7 +165,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                     <div>
                       {Messages.selectEnd}
                       {selectedTimerange && (
-                        <div className={styles.SelectFieldWrap}>
+                        <div className={styles.selectFieldWrap}>
                           <DateTimePicker
                             label="Date"
                             date={endDate}

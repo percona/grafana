@@ -1,9 +1,9 @@
 import { CancelToken } from 'axios';
 
+import { PmmDump } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
 import { api } from 'app/percona/shared/helpers/api';
 
-import { DumpLogs, DumpLogResponse } from './PmmDump.types';
-// import { Service } from './components/ExportDataset/ExportDataset.types';
+import { DumpLogs, DumpLogResponse, SendToSupportRequestBody, DeleteDump, PmmDumpResponse } from './PmmDump.types';
 
 const BASE_URL = '/v1/management/dump/Dumps';
 
@@ -46,5 +46,15 @@ export const PMMDumpService = {
       logs: logs.map(({ chunk_id = 0, data, time }) => ({ id: chunk_id, data, time })),
       end,
     };
+  },
+  async list(): Promise<PmmDump[]> {
+    const response = await api.post<PmmDumpResponse, void>(`${BASE_URL}/List`, undefined);
+    return response.dumps || [];
+  },
+  async delete(dumpIds: string[]) {
+    await api.post<void, DeleteDump>(`${BASE_URL}/Delete`, { dump_ids: dumpIds });
+  },
+  async sendToSupport(body: SendToSupportRequestBody) {
+    await api.post<void, DeleteDump>(`${BASE_URL}/Upload`, body);
   },
 };

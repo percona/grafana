@@ -63,7 +63,7 @@ export const PMMDump = () => {
 
   const getLogs = useCallback(
     async (startingChunk: number, offset: number, token?: CancelToken) => {
-      return PMMDumpService.getLogs(selectedDump?.dump_id || '', startingChunk, offset, token);
+      return PMMDumpService.getLogs(selectedDump?.dumpId || '', startingChunk, offset, token);
     },
     [selectedDump]
   );
@@ -84,7 +84,7 @@ export const PMMDump = () => {
         content: (
           <HorizontalGroup spacing="sm">
             <Icon name="trash-alt" />
-            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.delete}</span>
+            <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.delete}</span>
           </HorizontalGroup>
         ),
         action: () => {
@@ -95,11 +95,11 @@ export const PMMDump = () => {
         content: (
           <HorizontalGroup spacing="sm">
             <Icon name="arrow-right" />
-            <span className={styles.actionItemTxtSpan}>{Messages.services.actions.sendToSupport}</span>
+            <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.sendToSupport}</span>
           </HorizontalGroup>
         ),
         action: () => {
-          setSelectedDumpIds([row.original.dump_id]);
+          setSelectedDumpIds([row.original.dumpId]);
           setIsSendToSupportModalOpened(true);
         },
       },
@@ -107,13 +107,11 @@ export const PMMDump = () => {
         content: (
           <HorizontalGroup spacing="sm">
             <Icon name="eye" />
-            <span className={styles.actionItemTxtSpan} onClick={() => onLogClick(row.original)}>
-              {Messages.services.actions.viewLogs}
-            </span>
+            <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.viewLogs}</span>
           </HorizontalGroup>
         ),
         action: () => {
-          // locationService.push(`/d/pmm-qan/pmm-query-analytics?var-service_name=${row.original.serviceName}`);
+          onLogClick(row.original);
         },
       },
     ],
@@ -125,25 +123,25 @@ export const PMMDump = () => {
     if (value) {
       appEvents.publish(
         new ShowConfirmModalEvent({
-          title: 'Delete',
-          text: 'Are you sure you want to delete this PMM dump?',
-          yesText: 'Delete',
+          title: Messages.dumps.actions.delete,
+          text: Messages.dumps.actions.deleteDumpMessage,
+          yesText: Messages.dumps.actions.delete,
           icon: 'trash-alt',
           onConfirm: () => {
-            dispatch(deletePmmDumpAction([value.dump_id]));
+            dispatch(deletePmmDumpAction([value.dumpId]));
           },
         })
       );
     } else if (selected.length > 0) {
       appEvents.publish(
         new ShowConfirmModalEvent({
-          title: 'Delete',
-          text: 'Are you sure you want to delete the selected dumps?',
-          yesText: 'Delete',
+          title: Messages.dumps.actions.delete,
+          text: Messages.dumps.actions.deleteMultipleDumpsMessage,
+          yesText: Messages.dumps.actions.delete,
           icon: 'trash-alt',
           onConfirm: () => {
-            const dump_ids = selected.map((item) => item.original.dump_id);
-            dispatch(deletePmmDumpAction(dump_ids));
+            const dumpIds = selected.map((item) => item.original.dumpId);
+            dispatch(deletePmmDumpAction(dumpIds));
           },
         })
       );
@@ -154,61 +152,60 @@ export const PMMDump = () => {
   const columns = useMemo(
     (): Array<ExtendedColumn<PMMDumpServices>> => [
       {
-        Header: Messages.services.columns.id,
-        id: 'dump_id',
-        accessor: 'dump_id',
+        Header: Messages.dumps.columns.id,
+        id: 'dumpId',
+        accessor: 'dumpId',
         hidden: true,
         type: FilterFieldTypes.TEXT,
       },
       {
-        Header: Messages.services.columns.status,
+        Header: Messages.dumps.columns.status,
         accessor: 'status',
-        Cell: ({ value }: { value: DumpStatus }) => {
-          return <Badge text={DumpStatusText[value]} color={DumpStatusColor[value as DumpStatus] as BadgeColor} />;
-        },
+        Cell: ({ value }: { value: DumpStatus }) => (
+          <Badge text={DumpStatusText[value]} color={DumpStatusColor[value as DumpStatus] as BadgeColor} />
+        ),
         type: FilterFieldTypes.DROPDOWN,
         options: [
           {
-            label: DumpStatusText[DumpStatus.BACKUP_STATUS_IN_PROGRESS],
-            value: DumpStatus.BACKUP_STATUS_IN_PROGRESS,
+            label: DumpStatusText[DumpStatus.DUMP_STATUS_IN_PROGRESS],
+            value: DumpStatus.DUMP_STATUS_IN_PROGRESS,
           },
           {
-            label: DumpStatusText[DumpStatus.BACKUP_STATUS_INVALID],
-            value: DumpStatus.BACKUP_STATUS_INVALID,
+            label: DumpStatusText[DumpStatus.DUMP_STATUS_INVALID],
+            value: DumpStatus.DUMP_STATUS_INVALID,
           },
           {
-            label: DumpStatusText[DumpStatus.BACKUP_STATUS_ERROR],
-            value: DumpStatus.BACKUP_STATUS_ERROR,
+            label: DumpStatusText[DumpStatus.DUMP_STATUS_ERROR],
+            value: DumpStatus.DUMP_STATUS_ERROR,
           },
           {
-            label: DumpStatusText[DumpStatus.BACKUP_STATUS_SUCCESS],
-            value: DumpStatus.BACKUP_STATUS_SUCCESS,
+            label: DumpStatusText[DumpStatus.DUMP_STATUS_SUCCESS],
+            value: DumpStatus.DUMP_STATUS_SUCCESS,
           },
         ],
       },
       {
-        Header: Messages.services.columns.created,
-        accessor: 'created_at',
+        Header: Messages.dumps.columns.created,
+        accessor: 'createdAt',
         type: FilterFieldTypes.TEXT,
         Cell: ({ value }) => <DetailedDate date={new Date(value).getTime()} />,
       },
       {
-        Header: Messages.services.columns.timeRange,
+        Header: Messages.dumps.columns.timeRange,
         accessor: 'timeRange',
         type: FilterFieldTypes.TEXT,
-        Cell: ({ value, row }: { row: Row<PMMDumpServices>; value: string }) => {
-          return dateDifferenceInWords(row.original.end_time, row.original.start_time);
-        },
+        Cell: ({ value, row }: { row: Row<PMMDumpServices>; value: string }) =>
+          dateDifferenceInWords(row.original.endTime, row.original.startTime),
       },
       {
-        Header: Messages.services.columns.startDate,
-        accessor: 'start_time',
+        Header: Messages.dumps.columns.startDate,
+        accessor: 'startTime',
         type: FilterFieldTypes.TEXT,
         Cell: ({ value }) => <DetailedDate date={new Date(value).getTime()} />,
       },
       {
-        Header: Messages.services.columns.endDate,
-        accessor: 'end_time',
+        Header: Messages.dumps.columns.endDate,
+        accessor: 'endTime',
         type: FilterFieldTypes.TEXT,
         Cell: ({ value }) => <DetailedDate date={new Date(value).getTime()} />,
       },
@@ -219,7 +216,6 @@ export const PMMDump = () => {
 
   const onLogClick = (row: PMMDumpServices) => {
     setSelectedDump(row);
-    console.log(row);
     setLogsModalVisible(true);
   };
 
@@ -231,7 +227,7 @@ export const PMMDump = () => {
     (rows: Array<Row<PMMDumpServices>>) => {
       setSelectedRows(rows);
       if (!isSendToSupportModalOpened) {
-        setSelectedDumpIds(rows.map((item: Row<PMMDumpServices>) => item.values.dump_id));
+        setSelectedDumpIds(rows.map((item: Row<PMMDumpServices>) => item.values.dumpTd));
       }
     },
     [isSendToSupportModalOpened]
@@ -239,13 +235,13 @@ export const PMMDump = () => {
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<PMMDumpServices>) => {
-      const serviceNames = row.original.service_names || [];
+      const serviceNames = row.original.serviceNames || [];
 
       return (
         <DetailsRow>
           {!!serviceNames.length && (
             <div>
-              <span className={styles.serviceNamesTitle}>{Messages.services.columns.serviceNames}</span>
+              <span className={styles.serviceNamesTitle}>{Messages.dumps.columns.serviceNames}</span>
               {serviceNames.map((service) => {
                 return <div key={service}>{service}</div>;
               })}
@@ -272,7 +268,7 @@ export const PMMDump = () => {
                 icon="arrow-right"
                 onClick={() => setIsSendToSupportModalOpened(true)}
               >
-                {Messages.services.actions.sendToSupport}
+                {Messages.dumps.actions.sendToSupport}
               </Button>
               <Button
                 size="md"
@@ -283,18 +279,18 @@ export const PMMDump = () => {
                 icon="trash-alt"
                 onClick={() => onDelete()}
               >
-                {Messages.services.actions.delete} {selected.length} items
+                {Messages.dumps.actions.delete} {selected.length} items
               </Button>
             </div>
           ) : (
-            <div>Select services to bulk edit them.</div>
+            <div>{Messages.dumps.actions.selectServices}</div>
           )}
           <LinkButton href={NEW_BACKUP_URL} size="md" variant="primary" data-testid="create-dataset" icon="plus">
-            {Messages.services.createDataset}
+            {Messages.dumps.createDataset}
           </LinkButton>
         </div>
         {isSendToSupportModalOpened && (
-          <SendToSupportModal onClose={() => closeEditModal()} dump_ids={selectedDumpIds} />
+          <SendToSupportModal onClose={() => closeEditModal()} dumpIds={selectedDumpIds} />
         )}
         <Table
           columns={columns}
@@ -305,16 +301,16 @@ export const PMMDump = () => {
           showPagination
           pageSize={25}
           allRowsSelectionMode="page"
-          emptyMessage={Messages.services.emptyTable}
+          emptyMessage={Messages.dumps.emptyTable}
           overlayClassName={styles.overlay}
           renderExpandedRow={renderSelectedSubRow}
           autoResetExpanded={false}
           autoResetSelectedRows={false}
-          getRowId={useCallback((row: PMMDumpServices) => row.dump_id, [])}
+          getRowId={useCallback((row: PMMDumpServices) => row.dumpId, [])}
         />
         {logsModalVisible && (
           <PmmDumpLogsModal
-            title={Messages.dumpLogs.getLogsTitle(selectedDump?.dump_id || '')}
+            title={Messages.dumpLogs.getLogsTitle(selectedDump?.dumpId || '')}
             isVisible
             onClose={handleLogsClose}
             getLogChunks={getLogs}

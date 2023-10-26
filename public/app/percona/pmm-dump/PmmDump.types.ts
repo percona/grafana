@@ -1,32 +1,34 @@
+import { PmmDump } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
+
 export enum DumpStatus {
-  BACKUP_STATUS_INVALID = 'BACKUP_STATUS_INVALID',
-  BACKUP_STATUS_IN_PROGRESS = 'BACKUP_STATUS_IN_PROGRESS',
-  BACKUP_STATUS_SUCCESS = 'BACKUP_STATUS_SUCCESS',
-  BACKUP_STATUS_ERROR = 'BACKUP_STATUS_ERROR',
+  DUMP_STATUS_INVALID = 'BACKUP_STATUS_INVALID',
+  DUMP_STATUS_IN_PROGRESS = 'BACKUP_STATUS_IN_PROGRESS',
+  DUMP_STATUS_SUCCESS = 'BACKUP_STATUS_SUCCESS',
+  DUMP_STATUS_ERROR = 'BACKUP_STATUS_ERROR',
 }
 
 export const DumpStatusText = {
-  [DumpStatus.BACKUP_STATUS_INVALID]: 'Invalid',
-  [DumpStatus.BACKUP_STATUS_IN_PROGRESS]: 'Pending',
-  [DumpStatus.BACKUP_STATUS_SUCCESS]: 'Success',
-  [DumpStatus.BACKUP_STATUS_ERROR]: 'Error',
+  [DumpStatus.DUMP_STATUS_INVALID]: 'Invalid',
+  [DumpStatus.DUMP_STATUS_IN_PROGRESS]: 'Pending',
+  [DumpStatus.DUMP_STATUS_SUCCESS]: 'Success',
+  [DumpStatus.DUMP_STATUS_ERROR]: 'Error',
 };
 
 export interface PMMDumpServices {
-  dump_id: string;
+  dumpId: string;
   status: DumpStatus;
-  created_at: string;
-  start_time: string;
-  end_time: string;
-  service_names: string[];
+  createdAt: string;
+  startTime: string;
+  endTime: string;
+  serviceNames: string[];
   timeRange?: string;
 }
 
 export const DumpStatusColor = {
-  [DumpStatus.BACKUP_STATUS_INVALID]: 'red',
-  [DumpStatus.BACKUP_STATUS_IN_PROGRESS]: 'orange',
-  [DumpStatus.BACKUP_STATUS_SUCCESS]: 'green',
-  [DumpStatus.BACKUP_STATUS_ERROR]: 'red',
+  [DumpStatus.DUMP_STATUS_INVALID]: 'red',
+  [DumpStatus.DUMP_STATUS_IN_PROGRESS]: 'orange',
+  [DumpStatus.DUMP_STATUS_SUCCESS]: 'green',
+  [DumpStatus.DUMP_STATUS_ERROR]: 'red',
 };
 
 export interface SendToSupportRequestBody {
@@ -42,7 +44,7 @@ export interface SendToSupportForm {
   user: string;
   address: string;
   password: string;
-  dump_ids: string[];
+  dumpIds: string[];
 }
 
 export interface RawDumpLog {
@@ -63,4 +65,36 @@ export interface DumpLogChunk extends Omit<RawDumpLog, 'chunk_id'> {
 export interface DumpLogs {
   logs: DumpLogChunk[];
   end: boolean;
+}
+
+export interface PmmDumpResponse {
+  dumps: PmmDump[];
+}
+
+export interface DeleteDump {
+  dump_ids: string[];
+}
+
+export interface Node {
+  node_id: string;
+  node_name: string;
+  address: string;
+  machine_id?: string;
+  distro?: string;
+  node_model: string;
+  region: string;
+  az: string;
+  custom_labels: {
+    additionalProp1: string;
+    additionalProp2: string;
+    additionalProp3: string;
+  };
+}
+
+export interface NodeTypes {
+  generic: Node;
+  container: Node;
+  remote: Node;
+  remote_rds: Node;
+  remote_azure_database: Node;
 }

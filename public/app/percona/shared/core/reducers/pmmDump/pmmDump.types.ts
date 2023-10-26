@@ -1,6 +1,15 @@
-import { PmmDump } from 'app/percona/shared/services/pmmDump/pmmDump.types';
+import { DumpStatus, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
 
 export interface PmmDumpState {
   isLoading: boolean;
-  dumps: PmmDump[];
+  dumps: PMMDumpServices[];
+}
+
+export interface PmmDump {
+  dump_id: string;
+  status: DumpStatus;
+  service_names: string[];
+  start_time: string;
+  end_time: string;
+  created_at: string;
 }

@@ -1,5 +1,5 @@
 export const Messages = {
-  services: {
+  dumps: {
     columns: {
       id: 'Id',
       status: 'Status',
@@ -16,6 +16,15 @@ export const Messages = {
       sendToSupport: 'Send to Support',
       delete: 'Delete',
       viewLogs: 'View logs',
+      deleteDumpMessage: 'Are you sure you want to delete this PMM dump?',
+      deleteMultipleDumpsMessage: 'Are you sure you want to delete these PMM dumps?',
+      selectServices: 'Select services to bulk edit them.',
+      addressRequired: 'Address is required.',
+      nameRequired: 'Name is required.',
+      passwordRequired: 'Password is required.',
+      addressPlaceholder: 'sftp.percona.com',
+      savingButton: 'Saving...',
+      sendButton: 'Send',
     },
     emptyTable: 'No dumps available',
     createDataset: 'Create dataset',
