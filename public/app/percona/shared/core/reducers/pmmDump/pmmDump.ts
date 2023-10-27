@@ -2,9 +2,9 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
-import { PMMDumpServices, SendToSupportRequestBody } from 'app/percona/pmm-dump/PmmDump.types';
+import { PMMDumpServices, SendToSupportRequestBody, ExportDatasetService } from 'app/percona/pmm-dump/PmmDump.types';
 import { PmmDumpState } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
-import { mapDumps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
+import { mapDumps, mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
 import { createAsyncThunk } from 'app/types';
 
 const initialState: PmmDumpState = {
@@ -54,6 +54,16 @@ export const sendToSupportAction = createAsyncThunk(
     withSerializedError(
       (async () => {
         await PMMDumpService.sendToSupport(body);
+      })()
+    )
+);
+
+export const triggerDumpAction = createAsyncThunk(
+  'percona/triggerDump',
+  async (body: ExportDatasetService): Promise<void> =>
+    withSerializedError(
+      (async () => {
+        await PMMDumpService.trigger(mapExportData(body));
       })()
     )
 );

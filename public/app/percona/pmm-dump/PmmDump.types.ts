@@ -98,3 +98,15 @@ export interface NodeTypes {
   remote_rds: Node;
   remote_azure_database: Node;
 }
+
+export interface ExportResponse {
+  dump_id: string;
+}
+
+export interface ExportDatasetService {
+  serviceNames: Array<string | undefined>;
+  startTime: string;
+  endTime: string;
+  ignoreLoad: boolean;
+  exportQan: boolean;
+}

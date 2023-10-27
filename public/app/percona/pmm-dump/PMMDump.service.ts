@@ -1,39 +1,23 @@
 import { CancelToken } from 'axios';
 
-import { PmmDump } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
+import { PmmDump, ExportDatasetProps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
 import { api } from 'app/percona/shared/helpers/api';
 
-import { DumpLogs, DumpLogResponse, SendToSupportRequestBody, DeleteDump, PmmDumpResponse } from './PmmDump.types';
+import {
+  DumpLogs,
+  DumpLogResponse,
+  SendToSupportRequestBody,
+  DeleteDump,
+  PmmDumpResponse,
+  ExportResponse,
+} from './PmmDump.types';
 
 const BASE_URL = '/v1/management/dump/Dumps';
 
 export const PMMDumpService = {
-  async triggerDump(
-    services: object | undefined,
-    startTime: string,
-    endTime: string,
-    qan: boolean | undefined,
-    load: boolean | undefined,
-    token?: CancelToken
-  ) {
-    return api.post(
-      `${BASE_URL}/Start`,
-      {
-        service_names: services,
-        start_time: startTime,
-        end_time: endTime,
-        export_qan: qan,
-        ignore_load: load,
-      },
-      false,
-      token
-    );
-  },
-
   async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<DumpLogs> {
     const { logs = [], end } = await api.post<DumpLogResponse, Object>(
       `${BASE_URL}/GetDumpLogs`,
-
       {
         dump_id: artifactId,
         offset,
@@ -56,5 +40,9 @@ export const PMMDumpService = {
   },
   async sendToSupport(body: SendToSupportRequestBody) {
     await api.post<void, DeleteDump>(`${BASE_URL}/Upload`, body);
+  },
+  async trigger(body: ExportDatasetProps, token?: CancelToken): Promise<string> {
+    const res = await api.post<ExportResponse, ExportDatasetProps>(`${BASE_URL}/Start`, body, false, token);
+    return res.dump_id;
   },
 };

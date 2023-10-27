@@ -9,4 +9,5 @@ export const Messages = {
   selectEnd: 'Select end time',
   backupName: 'Backup name',
   createDataset: 'Create Dataset',
+  timeRangeValidation: 'Please select a valid time range',
 };

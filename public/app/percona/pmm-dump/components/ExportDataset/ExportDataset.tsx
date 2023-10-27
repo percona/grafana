@@ -3,24 +3,23 @@ import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useHistory } from 'react-router-dom';
 
-import { SelectableValue, DateTime, dateTime, TimeRange, AppEvents } from '@grafana/data';
+import { SelectableValue, DateTime, dateTime, AppEvents } from '@grafana/data';
 import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
+import { SwitchRow } from 'app/percona/settings/components/Advanced/SwitchRow';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { triggerDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
-import { SwitchRow } from '../../../settings/components/Advanced/SwitchRow';
-import { PMMDumpService } from '../../PMMDump.service';
-
-import { GET_SERVICES_CANCEL_TOKEN, DUMP_URL } from './ExportDataset.constants';
+import { GET_SERVICES_CANCEL_TOKEN, DUMP_URL, SIX_HOURS } from './ExportDataset.constants';
 import { Messages } from './ExportDataset.messages';
 import { getStyles } from './ExportDataset.styles';
 import { ExportDatasetProps } from './ExportDataset.types';
@@ -30,50 +29,41 @@ const { Form } = withTypes<ExportDatasetProps>();
 const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
-  const [selectedTimerange, setSelectedTimerange] = useState<TimeRange>();
   const { isLoading, services: fetchedServices } = useSelector(getServices);
 
-  const flattenServices = useMemo(
+  const serviceNames = useMemo(
     () =>
-      fetchedServices.map((data: { params: { serviceName: string } }): SelectableValue<string> => {
-        return {
-          label: data.params.serviceName,
-          value: data.params.serviceName,
-        };
-      }),
+      fetchedServices.map<SelectableValue<string>>((data) => ({
+        label: data.params.serviceName,
+        value: data.params.serviceName,
+      })),
     [fetchedServices]
   );
 
   const [generateToken] = useCancelToken();
   const [endDate, setEndDate] = useState<DateTime>(dateTime(new Date().setSeconds(0, 0)));
-  let defaultEndDate = new Date();
-  defaultEndDate.setSeconds(0, 0);
-  const [date, setDate] = useState<DateTime>(dateTime(new Date(defaultEndDate.getTime() - 6 * 1000 * 60 * 60)));
+  const [startDate, setStartDate] = useState<DateTime>(
+    dateTime(new Date(new Date(new Date().setSeconds(0, 0)).getTime() - SIX_HOURS))
+  );
+  const [dateError, setDateError] = useState<boolean>(false);
 
   const loadData = useCallback(async () => {
     try {
-      await dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
-      await dispatch(fetchActiveServiceTypesAction());
+      await Promise.all([
+        dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) })),
+        dispatch(fetchActiveServiceTypesAction()),
+      ]);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
       }
-      console.log(e);
+      console.error(e);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     loadData();
-    setSelectedTimerange({
-      from: dateTime(new Date('2023-10-03T04:35:46.795Z')),
-      to: dateTime(new Date('2023-10-03T10:35:46.795Z')),
-      raw: {
-        from: 'now-6h',
-        to: 'now',
-      },
-    });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -82,28 +72,34 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
     history.push(DUMP_URL);
   };
 
-  const handleSubmit = async (data: ExportDatasetProps) => {
-    console.log(data.service);
-    let serviceList;
-
-    if (date > endDate) {
-      appEvents.emit(AppEvents.alertError, ['Please select a valid time range']);
-      return;
-    }
-    if (!data?.service) {
-      serviceList = flattenServices?.map(({ value }): string | undefined => value);
+  const handleStartDate = (date: DateTime) => {
+    if (dateTime(date) >= dateTime(endDate)) {
+      appEvents.emit(AppEvents.alertError, [Messages.timeRangeValidation]);
+      setDateError(true);
     } else {
-      serviceList = data?.service?.map(({ value }): string => value);
+      setDateError(false);
     }
 
-    await PMMDumpService.triggerDump(
-      serviceList,
-      date.toISOString(),
-      endDate.toISOString(),
-      data.QAN ? true : false,
-      data.load ? true : false
-    );
+    setStartDate(date);
+  };
 
+  const handleSubmit = async (data: ExportDatasetProps) => {
+    let serviceList;
+    if (data && data.service) {
+      serviceList = data.service.map(({ value }): string => value);
+    } else {
+      serviceList = serviceNames.map(({ value }): string | undefined => value);
+    }
+
+    dispatch(
+      triggerDumpAction({
+        serviceNames: serviceList,
+        startTime: startDate.toISOString(),
+        endTime: endDate.toISOString(),
+        exportQan: !!data.QAN,
+        ignoreLoad: !!data.load,
+      })
+    );
     history.push(DUMP_URL);
   };
 
@@ -129,11 +125,11 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       {({ input }) => (
                         <MultiSelectField
                           {...input}
-                          placeholder="All Services"
+                          placeholder={!!serviceNames.length ? 'All Services' : 'No Services available'}
                           closeMenuOnSelect={false}
                           isClearable
                           label={Messages.selectServiceNames}
-                          options={flattenServices}
+                          options={serviceNames}
                           {...input}
                           isLoading={isLoading}
                           className={styles.selectField}
@@ -146,38 +142,34 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                   <div className={styles.datePicker}>
                     <div>
                       {Messages.selectStart}
-                      {selectedTimerange && (
-                        <div className={styles.selectFieldWrap}>
-                          {/* <Label label="Timestamp" /> */}
-                          <DateTimePicker
-                            label="Date"
-                            date={date}
-                            onChange={setDate}
-                            maxDate={new Date()}
-                            timepickerProps={{
-                              showSecond: false,
-                              hideDisabledOptions: true,
-                            }}
-                          />
-                        </div>
-                      )}
+                      <div className={styles.selectFieldWrap}>
+                        {/* <Label label="Timestamp" /> */}
+                        <DateTimePicker
+                          label="Date"
+                          date={startDate}
+                          onChange={(e) => handleStartDate(e)}
+                          maxDate={new Date()}
+                          timepickerProps={{
+                            showSecond: false,
+                            hideDisabledOptions: true,
+                          }}
+                        />
+                      </div>
                     </div>
                     <div>
                       {Messages.selectEnd}
-                      {selectedTimerange && (
-                        <div className={styles.selectFieldWrap}>
-                          <DateTimePicker
-                            label="Date"
-                            date={endDate}
-                            maxDate={new Date()}
-                            onChange={setEndDate}
-                            timepickerProps={{
-                              showSecond: false,
-                              hideDisabledOptions: true,
-                            }}
-                          />
-                        </div>
-                      )}
+                      <div className={styles.selectFieldWrap}>
+                        <DateTimePicker
+                          label="Date"
+                          date={endDate}
+                          maxDate={new Date()}
+                          onChange={setEndDate}
+                          timepickerProps={{
+                            showSecond: false,
+                            hideDisabledOptions: true,
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -205,7 +197,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       size="md"
                       type="submit"
                       variant="primary"
-                      disabled={false}
+                      disabled={!serviceNames.length || dateError}
                       loading={false}
                     >
                       {Messages.createDataset}
