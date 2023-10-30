@@ -2,8 +2,13 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
-import { PMMDumpServices, SendToSupportRequestBody, ExportDatasetService } from 'app/percona/pmm-dump/PmmDump.types';
-import { PmmDumpState } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
+import {
+  PMMDumpServices,
+  SendToSupportRequestBody,
+  ExportDatasetService,
+  DumpLogs,
+} from 'app/percona/pmm-dump/PmmDump.types';
+import { PmmDumpState, LogsActionProps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
 import { mapDumps, mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
 import { createAsyncThunk } from 'app/types';
 
@@ -64,6 +69,17 @@ export const triggerDumpAction = createAsyncThunk(
     withSerializedError(
       (async () => {
         await PMMDumpService.trigger(mapExportData(body));
+      })()
+    )
+);
+
+export const getDumpLogsAction = createAsyncThunk(
+  'percona/getDumpLogs',
+  async (body: LogsActionProps): Promise<DumpLogs> =>
+    withSerializedError(
+      (async () => {
+        let logs = await PMMDumpService.getLogs(body.artifactId, body.startingChunk, body.offset, body.token);
+        return logs;
       })()
     )
 );

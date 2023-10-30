@@ -1,3 +1,5 @@
+import { CancelToken } from 'axios';
+
 import { DumpStatus, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
 
 export interface PmmDumpState {
@@ -24,4 +26,11 @@ export interface ExportDatasetProps {
 
 export interface ExportResponse {
   dump_id: string;
+}
+
+export interface LogsActionProps {
+  artifactId: string;
+  startingChunk: number;
+  offset: number;
+  token: CancelToken | undefined;
 }

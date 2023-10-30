@@ -13,7 +13,11 @@ import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
-import { deletePmmDumpAction, fetchPmmDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
+import {
+  deletePmmDumpAction,
+  fetchPmmDumpAction,
+  getDumpLogsAction,
+} from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
 import { getDumps } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
@@ -24,7 +28,6 @@ import { useSelector } from 'app/types';
 import { ShowConfirmModalEvent } from 'app/types/events';
 
 import { Messages } from './PMMDump.messages';
-import { PMMDumpService } from './PMMDump.service';
 import { getStyles } from './PmmDump.styles';
 import { SendToSupportModal } from './SendToSupportModal';
 import { PmmDumpLogsModal } from './components/PmmDumpLogsModal/PmmDumpLogsModal';
@@ -62,10 +65,14 @@ export const PMMDump = () => {
   }, []);
 
   const getLogs = useCallback(
-    async (startingChunk: number, offset: number, token?: CancelToken) => {
-      return PMMDumpService.getLogs(selectedDump?.dumpId || '', startingChunk, offset, token);
+    async (startingChunk: number, offset: number, token?: CancelToken | undefined) => {
+      const logs = await dispatch(
+        getDumpLogsAction({ artifactId: selectedDump?.dumpId || '', startingChunk, offset, token })
+      ).unwrap();
+      console.log(logs);
+      return logs;
     },
-    [selectedDump]
+    [selectedDump, dispatch]
   );
 
   useEffect(() => {
