@@ -39,7 +39,7 @@ export const PMMDumpService = {
     await api.post<void, DeleteDump>(`${BASE_URL}/Delete`, { dump_ids: dumpIds });
   },
   async sendToSupport(body: SendToSupportRequestBody) {
-    await api.post<void, DeleteDump>(`${BASE_URL}/Upload`, body);
+    await api.post<void, DeleteDump>(`${BASE_URL}/Upload`, body, true);
   },
   async trigger(body: ExportDatasetProps, token?: CancelToken): Promise<string> {
     const res = await api.post<ExportResponse, ExportDatasetProps>(`${BASE_URL}/Start`, body, false, token);
