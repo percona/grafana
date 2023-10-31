@@ -1,5 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import {
+  deleteNamespace,
+  deleteRulerRulesGroup,
+  fetchRulerRules,
+  setRulerRuleGroup,
+} from 'app/features/alerting/unified/api/ruler';
+import { fetchRulerRulesAction } from 'app/features/alerting/unified/state/actions';
 import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
 import {
@@ -24,13 +31,23 @@ export const pmmDumpSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchPmmDumpAction.pending, (state) => ({
       ...state,
-      isLoading: true,
     }));
 
     builder.addCase(fetchPmmDumpAction.fulfilled, (state, action) => ({
       ...state,
-      isLoading: false,
       dumps: action.payload,
+    }));
+    builder.addCase(sendToSupportAction.pending, (state, action) => ({
+      ...state,
+      isLoading: true,
+    }));
+    builder.addCase(sendToSupportAction.fulfilled, (state, action) => ({
+      ...state,
+      isLoading: false,
+    }));
+    builder.addCase(sendToSupportAction.rejected, (state) => ({
+      ...state,
+      isLoading: false,
     }));
   },
 });
@@ -56,10 +73,16 @@ export const deletePmmDumpAction = createAsyncThunk(
 export const sendToSupportAction = createAsyncThunk(
   'percona/sendToSupport',
   async (body: SendToSupportRequestBody): Promise<void> =>
-    withSerializedError(
-      (async () => {
-        await PMMDumpService.sendToSupport(body);
-      })()
+    withAppEvents(
+      withSerializedError(
+        (async () => {
+          await PMMDumpService.sendToSupport(body);
+        })()
+      ),
+      {
+        errorMessage: 'Failed to send the message',
+        successMessage: 'The message was send successfully!',
+      }
     )
 );
 
