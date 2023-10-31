@@ -2,7 +2,6 @@ import { CancelToken } from 'axios';
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { Row } from 'react-table';
 
-import { NavModelItem } from '@grafana/data';
 import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
@@ -13,6 +12,7 @@ import { Action } from 'app/percona/dbaas/components/MultipleActions';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
+import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
   deletePmmDumpAction,
   fetchPmmDumpAction,
@@ -33,14 +33,6 @@ import { SendToSupportModal } from './SendToSupportModal';
 import { PmmDumpLogsModal } from './components/PmmDumpLogsModal/PmmDumpLogsModal';
 export const NEW_BACKUP_URL = '/pmm-dump/new';
 
-const pageNav: NavModelItem = {
-  icon: 'brain',
-  id: 'user-new',
-  text: 'PMM Dump',
-  subTitle:
-    'Simplify troubleshooting and accelerate issue resolution by securely sharing relevant data, ensuring a smoother support experience.',
-};
-
 export const PMMDump = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
@@ -51,6 +43,7 @@ export const PMMDump = () => {
   const [selectedDump, setSelectedDump] = useState<PMMDumpServices | null>(null);
   const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
+  const navModel = usePerconaNavModel('pmm-dump');
 
   const loadData = useCallback(async () => {
     try {
@@ -261,7 +254,7 @@ export const PMMDump = () => {
   );
 
   return (
-    <Page navId="pmmdump" pageNav={pageNav}>
+    <Page navId="pmmdump" navModel={navModel}>
       <Page.Contents>
         <div className={styles.createDatasetArea}>
           {selected.length > 0 ? (
