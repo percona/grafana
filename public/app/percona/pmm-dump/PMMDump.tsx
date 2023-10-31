@@ -62,7 +62,6 @@ export const PMMDump = () => {
       const logs = await dispatch(
         getDumpLogsAction({ artifactId: selectedDump?.dumpId || '', startingChunk, offset, token })
       ).unwrap();
-      console.log(logs);
       return logs;
     },
     [selectedDump, dispatch]

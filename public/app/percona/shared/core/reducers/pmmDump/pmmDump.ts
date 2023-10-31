@@ -1,12 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import {
-  deleteNamespace,
-  deleteRulerRulesGroup,
-  fetchRulerRules,
-  setRulerRuleGroup,
-} from 'app/features/alerting/unified/api/ruler';
-import { fetchRulerRulesAction } from 'app/features/alerting/unified/state/actions';
 import { withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
 import {
@@ -74,13 +67,10 @@ export const sendToSupportAction = createAsyncThunk(
   'percona/sendToSupport',
   async (body: SendToSupportRequestBody): Promise<void> =>
     withAppEvents(
-      withSerializedError(
-        (async () => {
-          await PMMDumpService.sendToSupport(body);
-        })()
-      ),
+      (async () => {
+        await PMMDumpService.sendToSupport(body);
+      })(),
       {
-        errorMessage: 'Failed to send the message',
         successMessage: 'The message was send successfully!',
       }
     )
