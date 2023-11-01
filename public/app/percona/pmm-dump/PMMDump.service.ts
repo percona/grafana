@@ -17,7 +17,7 @@ const BASE_URL = '/v1/management/dump/Dumps';
 export const PMMDumpService = {
   async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<DumpLogs> {
     const { logs = [], end } = await api.post<DumpLogResponse, Object>(
-      `${BASE_URL}/GetDumpLogs`,
+      `${BASE_URL}/GetLogs`,
       {
         dump_id: artifactId,
         offset,
