@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
@@ -7,6 +7,7 @@ import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { Databases } from 'app/percona/shared/core';
+import validators from 'app/percona/shared/helpers/validators';
 import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
@@ -14,8 +15,8 @@ import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { AdditionalOptionsFormPartProps, PostgreSQLAdditionalOptionsProps } from '../FormParts.types';
 
-import { tablestatOptions } from './AdditionalOptions.constants';
-import { TablestatOptionsInterface } from './AdditionalOptions.types';
+import { autoDiscoveryOptions, tablestatOptions } from './AdditionalOptions.constants';
+import { AutoDiscoveryOptionsInterface, TablestatOptionsInterface } from './AdditionalOptions.types';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
@@ -41,16 +42,58 @@ export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   );
 };
 
-export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ isRDS, isAzure }) => (
-  <>
-    <h4>{Messages.form.labels.trackingOptions}</h4>
-    <RadioButtonGroupField
-      name="tracking"
-      data-testid="tracking-options-radio-button-group"
-      options={isRDS || isAzure ? rdsTrackingOptions : trackingOptions}
-    />
-  </>
-);
+export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ form, isRDS, isAzure }) => {
+  const selectedOption = form.getState().values && form.getState().values.autoDiscoveryOptions;
+  const [selectedValue, setSelectedValue] = useState<string>(selectedOption || AutoDiscoveryOptionsInterface.disabled);
+  const autoDiscoveryValidators = useMemo(() => [validators.min(0)], []);
+  const styles = useStyles2(getStyles);
+
+  const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) => {
+    switch (type) {
+      case AutoDiscoveryOptionsInterface.disabled:
+        return 0;
+      default:
+        return 1000;
+    }
+  };
+
+  useEffect(() => {
+    setSelectedValue(selectedOption);
+    form.change('autoDiscoveryLimit', getAutoDiscoveryLimitValue(selectedOption));
+  }, [selectedOption, form]);
+
+  return (
+    <>
+      <h4>{Messages.form.labels.trackingOptions}</h4>
+      <RadioButtonGroupField
+        name="tracking"
+        data-testid="tracking-options-radio-button-group"
+        options={isRDS || isAzure ? rdsTrackingOptions : trackingOptions}
+      />
+      <h4>{Messages.form.labels.postgresqlDetails.autoDiscovery}</h4>
+      <div className={styles.group}>
+        <RadioButtonGroupField
+          name="autoDiscoveryOptions"
+          data-testid="auto-discovery-options-radio-button-group"
+          defaultValue={selectedValue}
+          options={autoDiscoveryOptions}
+          className={styles.radioField}
+          label={Messages.form.labels.postgresqlDetails.autoDiscoveryLimitOptions}
+          fullWidth
+        />
+        <NumberInputField
+          key="autoDiscoveryLimit"
+          name="autoDiscoveryLimit"
+          defaultValue={0}
+          disabled={selectedValue !== AutoDiscoveryOptionsInterface.custom}
+          validators={autoDiscoveryValidators}
+          label={Messages.form.labels.postgresqlDetails.autoDiscoveryLimit}
+          tooltipText={Messages.form.tooltips.postgresqlDetails.autoDiscoveryLimit}
+        />
+      </div>
+    </>
+  );
+};
 
 const getTablestatValues = (type: TablestatOptionsInterface) => {
   switch (type) {
@@ -115,6 +158,7 @@ export const getAdditionalOptions = (
             />
           </>
           <PostgreSQLAdditionalOptions
+            form={form}
             isRDS={remoteInstanceCredentials.isRDS}
             isAzure={remoteInstanceCredentials.isAzure}
           />

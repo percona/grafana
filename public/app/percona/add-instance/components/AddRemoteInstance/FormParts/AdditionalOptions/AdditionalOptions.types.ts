@@ -3,3 +3,8 @@ export enum TablestatOptionsInterface {
   default = 'default',
   custom = 'custom',
 }
+
+export enum AutoDiscoveryOptionsInterface {
+  disabled = 'disabled',
+  custom = 'custom',
+}
