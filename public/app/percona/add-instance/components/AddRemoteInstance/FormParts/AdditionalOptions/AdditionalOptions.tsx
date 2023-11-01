@@ -60,7 +60,8 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
   useEffect(() => {
     setSelectedValue(selectedOption);
     form.change('autoDiscoveryLimit', getAutoDiscoveryLimitValue(selectedOption));
-  }, [selectedOption, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOption]);
 
   return (
     <>
