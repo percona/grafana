@@ -27,7 +27,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
   const onSubmit = (values: SendToSupportForm) => {
     dispatch(
       sendToSupportAction({
-        ftp_parameters: {
+        sftp_parameters: {
           user: values.user,
           address: values.address,
           password: values.password,

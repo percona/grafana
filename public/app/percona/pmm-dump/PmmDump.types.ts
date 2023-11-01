@@ -32,7 +32,7 @@ export const DumpStatusColor = {
 };
 
 export interface SendToSupportRequestBody {
-  ftp_parameters: {
+  sftp_parameters: {
     user: string;
     address: string;
     password: string;
