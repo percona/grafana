@@ -91,8 +91,7 @@ export const getDumpLogsAction = createAsyncThunk(
   async (body: LogsActionProps): Promise<DumpLogs> =>
     withSerializedError(
       (async () => {
-        let logs = await PMMDumpService.getLogs(body.artifactId, body.startingChunk, body.offset, body.token);
-        return logs;
+        return await PMMDumpService.getLogs(body.artifactId, body.startingChunk, body.offset, body.token);
       })()
     )
 );

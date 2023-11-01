@@ -91,7 +91,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       serviceList = serviceNames.map(({ value }): string | undefined => value);
     }
 
-    dispatch(
+    await dispatch(
       triggerDumpAction({
         serviceNames: serviceList,
         startTime: startDate.toISOString(),
@@ -109,9 +109,9 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
         onSubmit={handleSubmit}
         render={({ handleSubmit, form }) => (
           <form onSubmit={handleSubmit} className={styles.form}>
-            <PageToolbar title="PMM Export / Export new dataset" onGoBack={handleGoBack}>
+            <PageToolbar title={Messages.breadCrumbTitle} onGoBack={handleGoBack}>
               <LinkButton href={DUMP_URL} data-testid="cancel-button" variant="secondary" fill="outline">
-                Cancel
+                {Messages.cancel}
               </LinkButton>
             </PageToolbar>
             <div className={styles.contentOuter}>
@@ -125,7 +125,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       {({ input }) => (
                         <MultiSelectField
                           {...input}
-                          placeholder={!!serviceNames.length ? 'All Services' : 'No Services available'}
+                          placeholder={!!serviceNames.length ? Messages.allServices : Messages.noService}
                           closeMenuOnSelect={false}
                           isClearable
                           label={Messages.selectServiceNames}
@@ -143,9 +143,8 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                     <div>
                       {Messages.selectStart}
                       <div className={styles.selectFieldWrap}>
-                        {/* <Label label="Timestamp" /> */}
                         <DateTimePicker
-                          label="Date"
+                          label={Messages.date}
                           date={startDate}
                           onChange={(e) => handleStartDate(e)}
                           maxDate={new Date()}
@@ -160,7 +159,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       {Messages.selectEnd}
                       <div className={styles.selectFieldWrap}>
                         <DateTimePicker
-                          label="Date"
+                          label={Messages.date}
                           date={endDate}
                           maxDate={new Date()}
                           onChange={setEndDate}
@@ -177,23 +176,23 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                     <Field
                       name="QAN"
                       type="checkbox"
-                      label="Export QAN"
-                      dataTestId="advanced-backup"
+                      label={Messages.qan}
+                      dataTestId="pmm-dump"
                       component={SwitchRow}
                     />
 
                     <Field
                       name="load"
                       type="checkbox"
-                      label="Ignore Load"
-                      dataTestId="advanced-backup"
-                      tooltip="Ignore load to force dump."
+                      label={Messages.ignoreLoad}
+                      dataTestId="pmm-dump"
+                      tooltip={Messages.ignoreLoadTooltip}
                       component={SwitchRow}
                     />
                   </div>
                   <div className={styles.submitButton}>
                     <LoaderButton
-                      data-testid="backup-add-button"
+                      data-testid="create-dataset-submit-button"
                       size="md"
                       type="submit"
                       variant="primary"

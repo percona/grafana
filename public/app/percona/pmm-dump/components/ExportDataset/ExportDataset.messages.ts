@@ -2,6 +2,7 @@ export const Messages = {
   introduction: 'Introduction',
   summary:
     'Simplify troubleshooting and accelerate issue resolution by securely sharing relevant data, ensuring a smoother support experience.',
+  breadCrumbTitle: 'PMM Export / Export new dataset',
   title: 'Select data to export',
   selectServiceNames: 'Select service names',
   allNodes: 'All nodes',
@@ -10,4 +11,11 @@ export const Messages = {
   backupName: 'Backup name',
   createDataset: 'Create Dataset',
   timeRangeValidation: 'Please select a valid time range',
+  date: 'Date',
+  ignoreLoad: 'Ignore load',
+  qan: 'Export QAN',
+  ignoreLoadTooltip: 'Ignore load to force dump.',
+  allServices: 'All Services',
+  noService: 'No Services available',
+  cancel: 'Cancel',
 };
