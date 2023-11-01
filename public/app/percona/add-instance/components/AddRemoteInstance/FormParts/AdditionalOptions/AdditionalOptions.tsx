@@ -69,6 +69,8 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
         name="tracking"
         data-testid="tracking-options-radio-button-group"
         options={isRDS || isAzure ? rdsTrackingOptions : trackingOptions}
+        className={styles.radioField}
+        fullWidth
       />
       <h4>{Messages.form.labels.postgresqlDetails.autoDiscovery}</h4>
       <div className={styles.group}>
