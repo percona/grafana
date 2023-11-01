@@ -22,6 +22,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
     address: '',
     password: '',
     dumpIds: [] as string[],
+    directory: '',
   };
 
   const onSubmit = (values: SendToSupportForm) => {
@@ -31,6 +32,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
           user: values.user,
           address: values.address,
           password: values.password,
+          directory: values.directory,
         },
         dump_ids: dumpIds,
       })
@@ -70,6 +72,14 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
                 id="password"
                 {...register('password', {
                   required: Messages.dumps.actions.passwordRequired,
+                })}
+              />
+            </Field>
+            <Field label="Directory" invalid={!!errors.directory} error={errors.directory?.message}>
+              <Input
+                id="directory"
+                {...register('directory', {
+                  required: Messages.dumps.actions.directoryRequired,
                 })}
               />
             </Field>
