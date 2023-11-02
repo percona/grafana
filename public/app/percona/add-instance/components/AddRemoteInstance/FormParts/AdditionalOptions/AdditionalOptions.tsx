@@ -91,7 +91,6 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
           disabled={selectedValue !== AutoDiscoveryOptionsInterface.custom}
           validators={autoDiscoveryValidators}
           label={Messages.form.labels.postgresqlDetails.autoDiscoveryLimit}
-          tooltipText={Messages.form.tooltips.postgresqlDetails.autoDiscoveryLimit}
         />
       </div>
     </>

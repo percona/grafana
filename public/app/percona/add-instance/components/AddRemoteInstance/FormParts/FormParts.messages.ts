@@ -130,7 +130,6 @@ export const Messages = {
       postgresqlDetails: {
         database: 'Database name',
         maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
-        autoDiscoveryLimit: 'TODO',
       },
       mysqlDetails: {
         maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
