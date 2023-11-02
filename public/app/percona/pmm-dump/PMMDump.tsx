@@ -15,6 +15,7 @@ import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/comp
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
   deletePmmDumpAction,
+  downloadPmmDumpAction,
   fetchPmmDumpAction,
   getDumpLogsAction,
 } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
@@ -82,12 +83,12 @@ export const PMMDump = () => {
       {
         content: (
           <HorizontalGroup spacing="sm">
-            <Icon name="trash-alt" />
-            <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.delete}</span>
+            <Icon name="download-alt" />
+            <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.download}</span>
           </HorizontalGroup>
         ),
         action: () => {
-          onDelete(row.original);
+          onDownload(row.original);
         },
       },
       {
@@ -111,6 +112,17 @@ export const PMMDump = () => {
         ),
         action: () => {
           onLogClick(row.original);
+        },
+      },
+      {
+        content: (
+          <HorizontalGroup spacing="sm">
+            <Icon name="trash-alt" />
+            <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.delete}</span>
+          </HorizontalGroup>
+        ),
+        action: () => {
+          onDelete(row.original);
         },
       },
     ],
@@ -146,6 +158,15 @@ export const PMMDump = () => {
       );
     }
     loadData();
+  };
+
+  const onDownload = (value?: PMMDumpServices) => {
+    if (value) {
+      dispatch(downloadPmmDumpAction([value.dumpId]));
+    } else if (selected.length > 0) {
+      const dumpIds = selected.map((item) => item.original.dumpId);
+      dispatch(downloadPmmDumpAction(dumpIds));
+    }
   };
 
   const columns = useMemo(
@@ -268,6 +289,17 @@ export const PMMDump = () => {
                 onClick={() => setIsSendToSupportModalOpened(true)}
               >
                 {Messages.dumps.actions.sendToSupport}
+              </Button>
+              <Button
+                size="md"
+                variant="secondary"
+                className={styles.actionButton}
+                fill="outline"
+                data-testid="dump-primary"
+                icon="download-alt"
+                onClick={() => onDownload()}
+              >
+                {Messages.dumps.actions.download} {selected.length} items
               </Button>
               <Button
                 size="md"

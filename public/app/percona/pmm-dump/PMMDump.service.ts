@@ -1,4 +1,4 @@
-import { CancelToken } from 'axios';
+import { CancelToken, AxiosResponse } from 'axios';
 
 import { PmmDump, ExportDatasetProps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
 import { api } from 'app/percona/shared/helpers/api';
@@ -37,6 +37,24 @@ export const PMMDumpService = {
   },
   async delete(dumpIds: string[]) {
     await api.post<void, DeleteDump>(`${BASE_URL}/Delete`, { dump_ids: dumpIds });
+  },
+  async dowload(dumpIds: string[]) {
+    for (const dumpId of dumpIds) {
+      api.get<AxiosResponse<Blob>, DeleteDump>(`/dump/${dumpId}.tar.gz`).then((response: AxiosResponse<Blob>) => {
+        const blob = new Blob([response.data], { type: 'application/gzip' });
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `${dumpId}.tar.gz`;
+
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      });
+    }
   },
   async sendToSupport(body: SendToSupportRequestBody) {
     await api.post<void, DeleteDump>(`${BASE_URL}/Upload`, body, true);

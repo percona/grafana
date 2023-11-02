@@ -59,6 +59,20 @@ export const deletePmmDumpAction = createAsyncThunk(
     )
 );
 
+export const downloadPmmDumpAction = createAsyncThunk(
+  'percona/downloadPmmDump',
+  async (dumpIds: string[]): Promise<void> =>
+    withAppEvents(
+      (async () => {
+        await PMMDumpService.dowload(dumpIds);
+      })(),
+      {
+        successMessage: 'Download successfully',
+        errorMessage: 'Failed to download ',
+      }
+    )
+);
+
 export const sendToSupportAction = createAsyncThunk(
   'percona/sendToSupport',
   async (body: SendToSupportRequestBody): Promise<void> =>
