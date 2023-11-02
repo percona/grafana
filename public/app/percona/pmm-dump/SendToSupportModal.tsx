@@ -8,6 +8,8 @@ import { sendToSupportAction } from 'app/percona/shared/core/reducers/pmmDump/pm
 import { getDumps } from 'app/percona/shared/core/selectors';
 import { useDispatch, useSelector } from 'app/types';
 
+import { PasswordField } from '../../core/components/PasswordField/PasswordField';
+
 interface ModalProps {
   onClose: (saved?: boolean) => void;
   dumpIds: string[];
@@ -68,7 +70,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
               />
             </Field>
             <Field label="Password" invalid={!!errors.password} error={errors.password?.message}>
-              <Input
+              <PasswordField
                 id="password"
                 {...register('password', {
                   required: Messages.dumps.actions.passwordRequired,
@@ -95,7 +97,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
                 onClick={() => onClose(false)}
                 fill="outline"
               >
-                Cancel
+                {Messages.dumps.actions.cancelButton}
               </Button>
             </Modal.ButtonRow>
           </>

@@ -26,6 +26,7 @@ export const Messages = {
       addressPlaceholder: 'sftp.percona.com',
       savingButton: 'Saving...',
       sendButton: 'Send',
+      cancelButton: 'Cancel',
     },
     emptyTable: 'No dumps available',
     createDataset: 'Create dataset',

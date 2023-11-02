@@ -22,10 +22,6 @@ export const pmmDumpSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchPmmDumpAction.pending, (state) => ({
-      ...state,
-    }));
-
     builder.addCase(fetchPmmDumpAction.fulfilled, (state, action) => ({
       ...state,
       dumps: action.payload,
