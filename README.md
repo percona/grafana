@@ -1,6 +1,6 @@
 ![Grafana](docs/logo-horizontal.png)
 
-The open-source platform for monitoring and observability
+The open-source platform for monitoring and observability test
 
 [![License](https://img.shields.io/github/license/grafana/grafana)](LICENSE)
 [![Drone](https://drone.grafana.net/api/badges/grafana/grafana/status.svg)](https://drone.grafana.net/grafana/grafana)
