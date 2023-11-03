@@ -39,7 +39,7 @@ export const PMMDump = () => {
   const dispatch = useAppDispatch();
   const { dumps } = useSelector(getDumps);
   const [triggerTimeout] = useRecurringCall();
-  const [selected, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
+  const [selectedRows, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
   const [selectedDumpIds, setSelectedDumpIds] = useState<string[]>([]);
   const [selectedDump, setSelectedDump] = useState<PMMDumpServices | null>(null);
   const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
@@ -90,6 +90,7 @@ export const PMMDump = () => {
         action: () => {
           onDownload(row.original);
         },
+        disabled: row.original.status !== DumpStatus.DUMP_STATUS_SUCCESS,
       },
       {
         content: (
@@ -143,7 +144,7 @@ export const PMMDump = () => {
           },
         })
       );
-    } else if (selected.length > 0) {
+    } else if (selectedRows.length > 0) {
       appEvents.publish(
         new ShowConfirmModalEvent({
           title: Messages.dumps.actions.delete,
@@ -151,7 +152,7 @@ export const PMMDump = () => {
           yesText: Messages.dumps.actions.delete,
           icon: 'trash-alt',
           onConfirm: () => {
-            const dumpIds = selected.map((item) => item.original.dumpId);
+            const dumpIds = selectedRows.map((item) => item.original.dumpId);
             dispatch(deletePmmDumpAction(dumpIds));
           },
         })
@@ -163,8 +164,8 @@ export const PMMDump = () => {
   const onDownload = (value?: PMMDumpServices) => {
     if (value) {
       dispatch(downloadPmmDumpAction([value.dumpId]));
-    } else if (selected.length > 0) {
-      const dumpIds = selected.map((item) => item.original.dumpId);
+    } else if (selectedRows.length > 0) {
+      const dumpIds = selectedRows.map((item) => item.original.dumpId);
       dispatch(downloadPmmDumpAction(dumpIds));
     }
   };
@@ -277,7 +278,7 @@ export const PMMDump = () => {
     <Page navId="pmmdump" navModel={navModel}>
       <Page.Contents>
         <div className={styles.createDatasetArea}>
-          {selected.length > 0 ? (
+          {selectedRows.length > 0 ? (
             <div>
               <Button
                 size="md"
@@ -297,9 +298,12 @@ export const PMMDump = () => {
                 fill="outline"
                 data-testid="dump-primary"
                 icon="download-alt"
+                disabled={
+                  selectedRows.filter((item) => item.original.status !== DumpStatus.DUMP_STATUS_SUCCESS).length > 0
+                }
                 onClick={() => onDownload()}
               >
-                {Messages.dumps.actions.download} {selected.length} items
+                {Messages.dumps.actions.download} {selectedRows.length} items
               </Button>
               <Button
                 size="md"
@@ -310,7 +314,7 @@ export const PMMDump = () => {
                 icon="trash-alt"
                 onClick={() => onDelete()}
               >
-                {Messages.dumps.actions.delete} {selected.length} items
+                {Messages.dumps.actions.delete} {selectedRows.length} items
               </Button>
             </div>
           ) : (
