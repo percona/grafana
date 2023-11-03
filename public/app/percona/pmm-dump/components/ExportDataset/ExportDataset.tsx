@@ -19,7 +19,7 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
-import { GET_SERVICES_CANCEL_TOKEN, DUMP_URL, SIX_HOURS } from './ExportDataset.constants';
+import { GET_SERVICES_CANCEL_TOKEN, DUMP_URL, TWELVE_HOURS } from './ExportDataset.constants';
 import { Messages } from './ExportDataset.messages';
 import { getStyles } from './ExportDataset.styles';
 import { ExportDatasetProps } from './ExportDataset.types';
@@ -43,7 +43,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const [generateToken] = useCancelToken();
   const [endDate, setEndDate] = useState<DateTime>(dateTime(new Date().setSeconds(0, 0)));
   const [startDate, setStartDate] = useState<DateTime>(
-    dateTime(new Date(new Date(new Date().setSeconds(0, 0)).getTime() - SIX_HOURS))
+    dateTime(new Date(new Date(new Date().setSeconds(0, 0)).getTime() - TWELVE_HOURS))
   );
   const [dateError, setDateError] = useState<boolean>(false);
 
@@ -138,7 +138,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                       )}
                     </Field>
                   </span>
-
                   <div className={styles.datePicker}>
                     <div>
                       {Messages.selectStart}
