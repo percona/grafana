@@ -248,7 +248,7 @@ export const PMMDump = () => {
     (rows: Array<Row<PMMDumpServices>>) => {
       setSelectedRows(rows);
       if (!isSendToSupportModalOpened) {
-        setSelectedDumpIds(rows.map((item: Row<PMMDumpServices>) => item.values.dumpTd));
+        setSelectedDumpIds(rows.map((item: Row<PMMDumpServices>) => item.values.dumpId));
       }
     },
     [isSendToSupportModalOpened]
