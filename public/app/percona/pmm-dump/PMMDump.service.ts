@@ -13,6 +13,7 @@ import {
 } from './PmmDump.types';
 
 const BASE_URL = '/v1/management/dump/Dumps';
+const link = document.createElement('a');
 
 export const PMMDumpService = {
   async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<DumpLogs> {
@@ -41,7 +42,6 @@ export const PMMDumpService = {
   dowload(dumpIds: string[], index = 0) {
     if (index < dumpIds.length) {
       const dumpId = dumpIds[index];
-      const link = document.createElement('a');
       link.setAttribute('href', `${window.location.origin}/dump/${dumpId}.tar.gz`);
       link.setAttribute('download', `${dumpId}.tar.gz`);
       document.body.appendChild(link);
