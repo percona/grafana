@@ -6,7 +6,7 @@ export const Messages = {
       custom: 'Custom',
     },
     autoDiscoveryOptions: {
-      disabled: 'Disabled',
+      enabled: 'Enabled',
       custom: 'Custom',
     },
   },

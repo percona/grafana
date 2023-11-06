@@ -44,12 +44,12 @@ export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
 
 export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ form, isRDS, isAzure }) => {
   const selectedOption = form.getState()?.values?.autoDiscoveryOptions;
-  const [selectedValue, setSelectedValue] = useState<string>(selectedOption || AutoDiscoveryOptionsInterface.disabled);
+  const [selectedValue, setSelectedValue] = useState<string>(selectedOption || AutoDiscoveryOptionsInterface.enabled);
   const autoDiscoveryValidators = useMemo(() => [validators.min(0)], []);
   const styles = useStyles2(getStyles);
 
   const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) =>
-    type === AutoDiscoveryOptionsInterface.disabled ? 0 : 1000;
+    type === AutoDiscoveryOptionsInterface.enabled ? 0 : 1000;
 
   useEffect(() => {
     setSelectedValue(selectedOption);
@@ -85,6 +85,7 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
           disabled={selectedValue !== AutoDiscoveryOptionsInterface.custom}
           validators={autoDiscoveryValidators}
           label={Messages.form.labels.postgresqlDetails.autoDiscoveryLimit}
+          tooltipText={Messages.form.tooltips.postgresqlDetails.autoDiscoveryLimit}
         />
       </div>
     </>

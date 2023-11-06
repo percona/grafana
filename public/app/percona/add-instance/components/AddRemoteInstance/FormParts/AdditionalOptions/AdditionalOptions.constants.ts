@@ -18,8 +18,8 @@ export const tablestatOptions = [
 
 export const autoDiscoveryOptions = [
   {
-    value: AutoDiscoveryOptionsInterface.disabled,
-    label: Messages.form.autoDiscoveryOptions.disabled,
+    value: AutoDiscoveryOptionsInterface.enabled,
+    label: Messages.form.autoDiscoveryOptions.enabled,
   },
   {
     value: AutoDiscoveryOptionsInterface.custom,

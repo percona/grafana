@@ -5,6 +5,6 @@ export enum TablestatOptionsInterface {
 }
 
 export enum AutoDiscoveryOptionsInterface {
-  disabled = 'disabled',
+  enabled = 'enabled',
   custom = 'custom',
 }
