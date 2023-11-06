@@ -43,19 +43,13 @@ export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
 };
 
 export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ form, isRDS, isAzure }) => {
-  const selectedOption = form.getState().values && form.getState().values.autoDiscoveryOptions;
+  const selectedOption = form.getState()?.values?.autoDiscoveryOptions;
   const [selectedValue, setSelectedValue] = useState<string>(selectedOption || AutoDiscoveryOptionsInterface.disabled);
   const autoDiscoveryValidators = useMemo(() => [validators.min(0)], []);
   const styles = useStyles2(getStyles);
 
-  const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) => {
-    switch (type) {
-      case AutoDiscoveryOptionsInterface.disabled:
-        return 0;
-      default:
-        return 1000;
-    }
-  };
+  const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) =>
+    type === AutoDiscoveryOptionsInterface.disabled ? 0 : 1000;
 
   useEffect(() => {
     setSelectedValue(selectedOption);
