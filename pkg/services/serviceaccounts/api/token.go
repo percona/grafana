@@ -115,7 +115,7 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *models.ReqContext) response.Respo
 // @PERCONA
 // swagger:route GET /auth/serviceaccount serviceaccounts retrieveServiceAccount
 //
-// # CurrentServiceAcount get current service account info
+// # CurrentServiceAccount get current service account info
 //
 // Requires service account token authentication and that the authenticated user is at least reader.
 //
@@ -125,7 +125,7 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *models.ReqContext) response.Respo
 // 401: unauthorisedError
 // 403: forbiddenError
 // 500: internalServerError
-func (api *ServiceAccountsAPI) CurrentServiceAcount(ctx *models.ReqContext) response.Response {
+func (api *ServiceAccountsAPI) CurrentServiceAccount(ctx *models.ReqContext) response.Response {
 	if !ctx.IsServiceAccount {
 		err := api.store.MigrateApiKeysToServiceAccounts(ctx.Req.Context(), ctx.OrgID)
 		if err != nil {
