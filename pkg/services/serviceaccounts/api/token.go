@@ -41,11 +41,6 @@ type TokenDTO struct {
 	IsRevoked *bool `json:"isRevoked"`
 }
 
-type currentServiceAccount struct {
-	ServiceAccount         *serviceaccounts.ServiceAccountProfileDTO
-	JustMigratedFromAPIKey bool
-}
-
 func hasExpired(expiration *int64) bool {
 	if expiration == nil {
 		return false
@@ -118,26 +113,24 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *models.ReqContext) response.Respo
 }
 
 // @PERCONA
-// swagger:route GET /auth/serviceaccount serviceaccounts currentServiceAccount
+// swagger:route GET /auth/serviceaccount serviceaccounts retrieveServiceAccount
 //
 // # CurrentServiceAcount get current service account info
 //
 // Requires service account token authentication and that the authenticated user is at least reader.
 //
 // Responses:
-// 200: currentServiceAccountResponse
+// 200: retrieveServiceAccountResponse
 // 400: badRequestError
 // 401: unauthorisedError
 // 403: forbiddenError
 // 500: internalServerError
 func (api *ServiceAccountsAPI) CurrentServiceAcount(ctx *models.ReqContext) response.Response {
-	apiKey := false
 	if !ctx.IsServiceAccount {
 		err := api.store.MigrateApiKeysToServiceAccounts(ctx.Req.Context(), ctx.OrgID)
 		if err != nil {
 			return response.Error(http.StatusBadRequest, "Auth method is not service token type", errors.New("failed to migrate API key to service account"))
 		}
-		apiKey = true
 	}
 
 	serviceAccount, err := api.store.RetrieveServiceAccount(ctx.Req.Context(), ctx.OrgID, ctx.UserID)
@@ -150,14 +143,7 @@ func (api *ServiceAccountsAPI) CurrentServiceAcount(ctx *models.ReqContext) resp
 		}
 	}
 
-	currentServiceAccount := currentServiceAccount{
-		ServiceAccount: serviceAccount,
-	}
-	if apiKey {
-		currentServiceAccount.JustMigratedFromAPIKey = true
-	}
-
-	return response.JSON(http.StatusOK, currentServiceAccount)
+	return response.JSON(http.StatusOK, serviceAccount)
 }
 
 // swagger:route POST /serviceaccounts/{serviceAccountId}/tokens service_accounts createToken
