@@ -82,6 +82,12 @@ func (api *ServiceAccountsAPI) RegisterAPIEndpoints() {
 		serviceAccountsRoute.Post("/:serviceAccountId/revert/:keyId", auth(middleware.ReqOrgAdmin,
 			accesscontrol.EvalPermission(serviceaccounts.ActionDelete, serviceaccounts.ScopeID)), routing.Wrap(api.RevertApiKey))
 	})
+
+	// @PERCONA
+	// current service account (works only with service account token auth). If you use API key then key will be automatically migrated into service account.
+	api.RouterRegister.Group("/api/auth/serviceaccount", func(serviceAccountsRoute routing.RouteRegister) {
+		serviceAccountsRoute.Get("/", routing.Wrap(api.CurrentServiceAcount))
+	})
 }
 
 // swagger:route POST /serviceaccounts service_accounts createServiceAccount

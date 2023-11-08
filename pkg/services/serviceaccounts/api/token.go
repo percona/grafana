@@ -41,6 +41,11 @@ type TokenDTO struct {
 	IsRevoked *bool `json:"isRevoked"`
 }
 
+type currentServiceAccount struct {
+	ServiceAccount         *serviceaccounts.ServiceAccountProfileDTO
+	JustMigratedFromAPIKey bool
+}
+
 func hasExpired(expiration *int64) bool {
 	if expiration == nil {
 		return false
@@ -110,6 +115,49 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *models.ReqContext) response.Respo
 	}
 
 	return response.JSON(http.StatusOK, result)
+}
+
+// @PERCONA
+// swagger:route GET /auth/serviceaccount serviceaccounts currentServiceAccount
+//
+// # CurrentServiceAcount get current service account info
+//
+// Requires service account token authentication and that the authenticated user is at least reader.
+//
+// Responses:
+// 200: currentServiceAccountResponse
+// 400: badRequestError
+// 401: unauthorisedError
+// 403: forbiddenError
+// 500: internalServerError
+func (api *ServiceAccountsAPI) CurrentServiceAcount(ctx *models.ReqContext) response.Response {
+	apiKey := false
+	if !ctx.IsServiceAccount {
+		err := api.store.MigrateApiKeysToServiceAccounts(ctx.Req.Context(), ctx.OrgID)
+		if err != nil {
+			return response.Error(http.StatusBadRequest, "Auth method is not service token type", errors.New("failed to migrate API key to service account"))
+		}
+		apiKey = true
+	}
+
+	serviceAccount, err := api.store.RetrieveServiceAccount(ctx.Req.Context(), ctx.OrgID, ctx.UserID)
+	if err != nil {
+		switch {
+		case errors.Is(err, serviceaccounts.ErrServiceAccountNotFound):
+			return response.Error(http.StatusNotFound, "Failed to retrieve service account", err)
+		default:
+			return response.Error(http.StatusInternalServerError, "Failed to retrieve service account", err)
+		}
+	}
+
+	currentServiceAccount := currentServiceAccount{
+		ServiceAccount: serviceAccount,
+	}
+	if apiKey {
+		currentServiceAccount.JustMigratedFromAPIKey = true
+	}
+
+	return response.JSON(http.StatusOK, currentServiceAccount)
 }
 
 // swagger:route POST /serviceaccounts/{serviceAccountId}/tokens service_accounts createToken
