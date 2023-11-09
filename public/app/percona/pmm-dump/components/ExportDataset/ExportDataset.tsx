@@ -117,7 +117,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
             <div className={styles.contentOuter}>
               <div className={styles.contentInner}>
                 <div className={styles.pageWrapper}>
-                  <h1 className={styles.headingStyle}>{Messages.introduction}</h1>
                   <div>{Messages.summary}</div>
                   <h3 className={styles.heading3Style}>{Messages.title}</h3>
                   <span className={styles.selectFieldWrap}>
@@ -175,6 +174,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
                     <Field
                       name="QAN"
                       type="checkbox"
+                      tooltip={Messages.qanTootltip}
                       label={Messages.qan}
                       dataTestId="pmm-dump"
                       component={SwitchRow}

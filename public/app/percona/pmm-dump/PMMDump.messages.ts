@@ -18,7 +18,7 @@ export const Messages = {
       viewLogs: 'View logs',
       deleteDumpMessage: 'Are you sure you want to delete this PMM dump?',
       deleteMultipleDumpsMessage: 'Are you sure you want to delete these PMM dumps?',
-      selectServices: 'Select services to bulk edit them.',
+      selectServices: 'Select multiple datasets to bulk edit them.',
       addressRequired: 'Address is required.',
       nameRequired: 'Name is required.',
       passwordRequired: 'Password is required.',
