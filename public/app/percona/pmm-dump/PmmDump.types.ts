@@ -36,7 +36,7 @@ export interface SendToSupportRequestBody {
     user: string;
     address: string;
     password: string;
-    directory: string;
+    directory?: string;
   };
   dump_ids: string[];
 }
@@ -46,7 +46,7 @@ export interface SendToSupportForm {
   address: string;
   password: string;
   dumpIds: string[];
-  directory: string;
+  directory?: string;
 }
 
 export interface RawDumpLog {

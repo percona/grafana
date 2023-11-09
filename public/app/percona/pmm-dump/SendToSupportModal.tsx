@@ -34,7 +34,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
           user: values.user,
           address: values.address,
           password: values.password,
-          directory: values.directory,
+          directory: values.directory || undefined,
         },
         dump_ids: dumpIds,
       })
@@ -52,7 +52,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
       <Form defaultValues={defaultValues} onSubmit={onSubmit} key={JSON.stringify(defaultValues)}>
         {({ register, errors, formState: { isDirty } }) => (
           <>
-            <Field label="Address" invalid={!!errors.address} error={errors.address?.message}>
+            <Field label="Address *" invalid={!!errors.address} error={errors.address?.message}>
               <Input
                 placeholder={Messages.dumps.actions.addressPlaceholder}
                 id="address"
@@ -61,7 +61,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
                 })}
               />
             </Field>
-            <Field label="Name" invalid={!!errors.user} error={errors.user?.message}>
+            <Field label="Name *" invalid={!!errors.user} error={errors.user?.message}>
               <Input
                 id="name"
                 {...register('user', {
@@ -69,7 +69,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
                 })}
               />
             </Field>
-            <Field label="Password" invalid={!!errors.password} error={errors.password?.message}>
+            <Field label="Password *" invalid={!!errors.password} error={errors.password?.message}>
               <PasswordField
                 id="password"
                 {...register('password', {
@@ -78,12 +78,7 @@ export const SendToSupportModal: FC<ModalProps> = ({ onClose, dumpIds }) => {
               />
             </Field>
             <Field label="Directory" invalid={!!errors.directory} error={errors.directory?.message}>
-              <Input
-                id="directory"
-                {...register('directory', {
-                  required: Messages.dumps.actions.directoryRequired,
-                })}
-              />
+              <Input id="directory" {...register('directory')} />
             </Field>
 
             <Modal.ButtonRow>
