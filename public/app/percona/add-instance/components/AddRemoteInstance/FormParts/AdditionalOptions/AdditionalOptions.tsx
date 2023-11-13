@@ -47,7 +47,7 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
   const styles = useStyles2(getStyles);
 
   const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) =>
-    type === AutoDiscoveryOptionsInterface.enabled ? 0 : 1000;
+    type === AutoDiscoveryOptionsInterface.enabled ? 0 : 10;
 
   useEffect(() => {
     setSelectedValue(selectedOption);
