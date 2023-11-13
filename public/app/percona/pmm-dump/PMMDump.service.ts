@@ -15,6 +15,10 @@ import {
 const BASE_URL = '/v1/management/dump/Dumps';
 const link = document.createElement('a');
 
+const delay = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 export const PMMDumpService = {
   async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<DumpLogs> {
     const { logs = [], end } = await api.post<DumpLogResponse, Object>(
@@ -39,20 +43,23 @@ export const PMMDumpService = {
   async delete(dumpIds: string[]) {
     await api.post<void, DeleteDump>(`${BASE_URL}/Delete`, { dump_ids: dumpIds });
   },
-  dowload(dumpIds: string[], index = 0) {
-    if (index < dumpIds.length) {
+  async downloadAll(dumpIds: string[], index = 0): Promise<void> {
+    for (let i = index; i < dumpIds.length; i++) {
+      await this.download(dumpIds, i);
+    }
+  },
+  async download(dumpIds: string[], index: number): Promise<void> {
+    return new Promise<void>(async (resolve) => {
       const dumpId = dumpIds[index];
+
       link.setAttribute('href', `${window.location.origin}/dump/${dumpId}.tar.gz`);
       link.setAttribute('download', `${dumpId}.tar.gz`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Add a delay (1000ms) before the next download
-      setTimeout(() => {
-        PMMDumpService.dowload(dumpIds, index + 1);
-      }, 1000);
-    }
+      await delay(100);
+      resolve();
+    });
   },
   async sendToSupport(body: SendToSupportRequestBody) {
     await api.post<void, DeleteDump>(`${BASE_URL}/Upload`, body, true);

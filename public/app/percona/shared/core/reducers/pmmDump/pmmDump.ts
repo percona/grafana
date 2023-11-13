@@ -14,6 +14,7 @@ import { createAsyncThunk } from 'app/types';
 
 const initialState: PmmDumpState = {
   isLoading: false,
+  isDownloading: false,
   dumps: [],
 };
 
@@ -37,6 +38,18 @@ export const pmmDumpSlice = createSlice({
     builder.addCase(sendToSupportAction.rejected, (state) => ({
       ...state,
       isLoading: false,
+    }));
+    builder.addCase(downloadPmmDumpAction.pending, (state, action) => ({
+      ...state,
+      isDownloading: true,
+    }));
+    builder.addCase(downloadPmmDumpAction.fulfilled, (state, action) => ({
+      ...state,
+      isDownloading: false,
+    }));
+    builder.addCase(downloadPmmDumpAction.rejected, (state) => ({
+      ...state,
+      isDownloading: false,
     }));
   },
 });
@@ -64,7 +77,7 @@ export const downloadPmmDumpAction = createAsyncThunk(
   async (dumpIds: string[]): Promise<void> =>
     withAppEvents(
       (async () => {
-        await PMMDumpService.dowload(dumpIds);
+        await PMMDumpService.downloadAll(dumpIds);
       })(),
       {
         successMessage: 'Download successfully',

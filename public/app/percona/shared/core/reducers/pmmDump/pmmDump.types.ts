@@ -4,6 +4,7 @@ import { DumpStatus, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types'
 
 export interface PmmDumpState {
   isLoading: boolean;
+  isDownloading: boolean;
   dumps: PMMDumpServices[];
 }
 

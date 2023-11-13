@@ -37,7 +37,7 @@ export const NEW_BACKUP_URL = '/pmm-dump/new';
 export const PMMDump = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
-  const { dumps } = useSelector(getDumps);
+  const { dumps, isDownloading } = useSelector(getDumps);
   const [triggerTimeout] = useRecurringCall();
   const [selectedRows, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
   const [selectedDumpIds, setSelectedDumpIds] = useState<string[]>([]);
@@ -114,6 +114,7 @@ export const PMMDump = () => {
         action: () => {
           onLogClick(row.original);
         },
+        disabled: isDownloading,
       },
       {
         content: (
@@ -312,6 +313,7 @@ export const PMMDump = () => {
                 fill="outline"
                 data-testid="dump-primary"
                 icon="trash-alt"
+                disabled={isDownloading}
                 onClick={() => onDelete()}
               >
                 {Messages.dumps.actions.delete} {selectedRows.length} items
