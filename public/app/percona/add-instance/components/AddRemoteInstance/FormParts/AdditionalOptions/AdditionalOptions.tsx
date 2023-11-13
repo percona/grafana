@@ -1,5 +1,5 @@
 import { FormApi } from 'final-form';
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
@@ -7,7 +7,6 @@ import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { Databases } from 'app/percona/shared/core';
-import validators from 'app/percona/shared/helpers/validators';
 import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
@@ -45,7 +44,6 @@ export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
 export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ form, isRDS, isAzure }) => {
   const selectedOption = form.getState()?.values?.autoDiscoveryOptions;
   const [selectedValue, setSelectedValue] = useState<string>(selectedOption || AutoDiscoveryOptionsInterface.enabled);
-  const autoDiscoveryValidators = useMemo(() => [validators.min(0)], []);
   const styles = useStyles2(getStyles);
 
   const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) =>
@@ -83,7 +81,7 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
           name="autoDiscoveryLimit"
           defaultValue={0}
           disabled={selectedValue !== AutoDiscoveryOptionsInterface.custom}
-          validators={autoDiscoveryValidators}
+          validate={platformCoreValidators.containsNumber}
           label={Messages.form.labels.postgresqlDetails.autoDiscoveryLimit}
           tooltipText={Messages.form.tooltips.postgresqlDetails.autoDiscoveryLimit}
         />
@@ -109,7 +107,8 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
   useEffect(() => {
     setSelectedValue(selectedOption);
     form.change('tablestats_group_table_limit', getTablestatValues(selectedOption));
-  }, [selectedOption, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOption]);
 
   return (
     <>
