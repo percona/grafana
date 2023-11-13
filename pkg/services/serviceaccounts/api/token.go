@@ -127,10 +127,12 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *models.ReqContext) response.Respo
 // 500: internalServerError
 func (api *ServiceAccountsAPI) CurrentServiceAccount(ctx *models.ReqContext) response.Response {
 	if !ctx.IsServiceAccount {
-		err := api.store.MigrateApiKeysToServiceAccounts(ctx.Req.Context(), ctx.OrgID)
+		serviceAccountID, err := api.store.MigrateApiKey(ctx.Req.Context(), ctx.OrgID, ctx.ApiKeyID)
 		if err != nil {
-			return response.Error(http.StatusBadRequest, "Auth method is not service token type", errors.New("failed to migrate API key to service account"))
+			return response.Error(http.StatusBadRequest, "Auth method is not API key type", errors.New("failed to migrate API key to service account"))
 		}
+
+		ctx.UserID = serviceAccountID
 	}
 
 	serviceAccount, err := api.store.RetrieveServiceAccount(ctx.Req.Context(), ctx.OrgID, ctx.UserID)

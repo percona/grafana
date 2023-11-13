@@ -415,7 +415,7 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 	}
 	if len(basicKeys) > 0 {
 		for _, key := range basicKeys {
-			err := s.CreateServiceAccountFromApikey(ctx, key)
+			_, err := s.CreateServiceAccountFromApikey(ctx, key)
 			if err != nil {
 				s.log.Error("migating to service accounts failed with error", err)
 				return err
@@ -429,27 +429,29 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 	return nil
 }
 
-func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int64, keyId int64) error {
+func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int64, keyId int64) (int64, error) {
 	basicKeys, err := s.apiKeyService.GetAllAPIKeys(ctx, orgId)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if len(basicKeys) == 0 {
-		return fmt.Errorf("no API keys to convert found")
+		return 0, fmt.Errorf("no API keys to convert found")
 	}
 	for _, key := range basicKeys {
 		if keyId == key.Id {
-			err := s.CreateServiceAccountFromApikey(ctx, key)
+			serviceAccountID, err := s.CreateServiceAccountFromApikey(ctx, key)
 			if err != nil {
 				s.log.Error("converting to service account failed with error", "keyId", keyId, "error", err)
-				return err
+				return 0, err
 			}
+
+			return serviceAccountID, nil
 		}
 	}
-	return nil
+	return 0, fmt.Errorf("provided API key to convert not found")
 }
 
-func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) error {
+func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) (int64, error) {
 	prefix := "sa-autogen"
 	cmd := user.CreateUserCommand{
 		Login:            fmt.Sprintf("%v-%v-%v", prefix, key.OrgId, key.Name),
@@ -459,7 +461,8 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Co
 		IsServiceAccount: true,
 	}
 
-	return s.sqlStore.WithTransactionalDbSession(ctx, func(sess *sqlstore.DBSession) error {
+	var serviceAccountID int64
+	err := s.sqlStore.WithTransactionalDbSession(ctx, func(sess *sqlstore.DBSession) error {
 		newSA, errCreateSA := s.sqlStore.CreateUser(ctx, cmd)
 		if errCreateSA != nil {
 			return fmt.Errorf("failed to create service account: %w", errCreateSA)
@@ -472,8 +475,12 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Co
 			return fmt.Errorf("failed to migrate API key to service account token: %w", err)
 		}
 
+		serviceAccountID = newSA.ID
+
 		return nil
 	})
+
+	return serviceAccountID, err
 }
 
 // RevertApiKey converts service account token to old API key

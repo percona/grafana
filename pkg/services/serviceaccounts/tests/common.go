@@ -174,9 +174,9 @@ func (s *ServiceAccountsStoreMock) MigrateApiKeysToServiceAccounts(ctx context.C
 	return nil
 }
 
-func (s *ServiceAccountsStoreMock) MigrateApiKey(ctx context.Context, orgID int64, keyId int64) error {
+func (s *ServiceAccountsStoreMock) MigrateApiKey(ctx context.Context, orgID int64, keyId int64) (int64, error) {
 	s.Calls.MigrateApiKey = append(s.Calls.MigrateApiKey, []interface{}{ctx})
-	return nil
+	return 0, nil
 }
 
 func (s *ServiceAccountsStoreMock) RevertApiKey(ctx context.Context, saId int64, keyId int64) error {
