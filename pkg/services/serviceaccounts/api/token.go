@@ -117,7 +117,7 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *models.ReqContext) response.Respo
 //
 // # CurrentServiceAccount get current service account info
 //
-// Requires service account token authentication and that the authenticated user is at least reader.
+// Requires service account token authentication.
 //
 // Responses:
 // 200: retrieveServiceAccountResponse
