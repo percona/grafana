@@ -22,6 +22,10 @@ export const autoDiscoveryOptions = [
     label: Messages.form.autoDiscoveryOptions.enabled,
   },
   {
+    value: AutoDiscoveryOptionsInterface.disabled,
+    label: Messages.form.autoDiscoveryOptions.disabled,
+  },
+  {
     value: AutoDiscoveryOptionsInterface.custom,
     label: Messages.form.autoDiscoveryOptions.custom,
   },
