@@ -15,6 +15,7 @@ import { createAsyncThunk } from 'app/types';
 const initialState: PmmDumpState = {
   isLoading: false,
   isDownloading: false,
+  isDeleting: false,
   dumps: [],
 };
 
@@ -26,6 +27,7 @@ export const pmmDumpSlice = createSlice({
     builder.addCase(fetchPmmDumpAction.fulfilled, (state, action) => ({
       ...state,
       dumps: action.payload,
+      isDeleting: false,
     }));
     builder.addCase(sendToSupportAction.pending, (state, action) => ({
       ...state,
@@ -50,6 +52,10 @@ export const pmmDumpSlice = createSlice({
     builder.addCase(downloadPmmDumpAction.rejected, (state) => ({
       ...state,
       isDownloading: false,
+    }));
+    builder.addCase(deletePmmDumpAction.pending, (state, action) => ({
+      ...state,
+      isDeleting: true,
     }));
   },
 });

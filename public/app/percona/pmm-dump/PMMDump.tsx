@@ -37,7 +37,7 @@ export const NEW_BACKUP_URL = '/pmm-dump/new';
 export const PMMDump = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
-  const { dumps, isDownloading } = useSelector(getDumps);
+  const { dumps, isDownloading, isDeleting } = useSelector(getDumps);
   const [triggerTimeout] = useRecurringCall();
   const [selectedRows, setSelectedRows] = useState<Array<Row<PMMDumpServices>>>([]);
   const [selectedDumpIds, setSelectedDumpIds] = useState<string[]>([]);
@@ -90,7 +90,7 @@ export const PMMDump = () => {
         action: () => {
           onDownload(row.original);
         },
-        disabled: row.original.status !== DumpStatus.DUMP_STATUS_SUCCESS,
+        disabled: row.original.status !== DumpStatus.DUMP_STATUS_SUCCESS || isDeleting,
       },
       {
         content: (
@@ -114,7 +114,6 @@ export const PMMDump = () => {
         action: () => {
           onLogClick(row.original);
         },
-        disabled: isDownloading,
       },
       {
         content: (
@@ -129,7 +128,7 @@ export const PMMDump = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [styles.actionItemTxtSpan]
+    [styles.actionItemTxtSpan, isDeleting]
   );
 
   const onDelete = (value?: PMMDumpServices) => {
@@ -300,7 +299,8 @@ export const PMMDump = () => {
                 data-testid="dump-primary"
                 icon="download-alt"
                 disabled={
-                  selectedRows.filter((item) => item.original.status !== DumpStatus.DUMP_STATUS_SUCCESS).length > 0
+                  selectedRows.filter((item) => item.original.status !== DumpStatus.DUMP_STATUS_SUCCESS).length > 0 ||
+                  isDeleting
                 }
                 onClick={() => onDownload()}
               >

@@ -57,7 +57,7 @@ export const PMMDumpService = {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      await delay(100);
+      await delay(900);
       resolve();
     });
   },
