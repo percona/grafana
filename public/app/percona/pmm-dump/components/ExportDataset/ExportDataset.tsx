@@ -84,13 +84,14 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   };
 
   const handleSubmit = async (data: ExportDatasetProps) => {
-    let serviceList;
+    let serviceList: string[];
     if (data && data.service) {
       serviceList = data.service.map(({ value }): string => value);
     } else {
-      serviceList = serviceNames.map(({ value }): string | undefined => value);
+      serviceList = [];
     }
 
+    console.log(data);
     await dispatch(
       triggerDumpAction({
         serviceNames: serviceList,
