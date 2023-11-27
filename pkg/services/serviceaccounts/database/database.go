@@ -41,7 +41,8 @@ func ProvideServiceAccountsStore(store *sqlstore.SQLStore, apiKeyService apikey.
 
 // CreateServiceAccount creates service account
 func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, orgId int64, saForm *serviceaccounts.CreateServiceAccountForm) (*serviceaccounts.ServiceAccountDTO, error) {
-	generatedLogin := "sa-" + strings.ToLower(saForm.Name)
+	name := strings.ToLower(saForm.Name)
+	generatedLogin := "sa-" + name
 	generatedLogin = strings.ReplaceAll(generatedLogin, " ", "-")
 	isDisabled := false
 	role := org.RoleViewer
@@ -51,6 +52,26 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 	if saForm.Role != nil {
 		role = *saForm.Role
 	}
+
+	serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
+	if err == nil && saForm.Force != nil && *saForm.Force {
+		fmt.Println("ecxisting")
+		existingAccount, err := s.RetrieveServiceAccount(ctx, orgId, serviceAccountID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &serviceaccounts.ServiceAccountDTO{
+			Id:         existingAccount.Id,
+			Name:       existingAccount.Name,
+			Login:      existingAccount.Login,
+			OrgId:      existingAccount.OrgId,
+			Tokens:     0,
+			Role:       string(role),
+			IsDisabled: isDisabled,
+		}, nil
+	}
+
 	var newSA *user.User
 	createErr := s.sqlStore.WithTransactionalDbSession(ctx, func(sess *sqlstore.DBSession) (err error) {
 		var errUser error
