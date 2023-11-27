@@ -31,6 +31,10 @@ export const getStyles = (theme: GrafanaTheme) => {
           tr {
             height: 48px;
 
+            /* Allow the actions dialog to be visible */
+            position: relative;
+            z-index: 0;
+
             th {
               position: sticky;
               top: 0;
@@ -80,6 +84,9 @@ export const getStyles = (theme: GrafanaTheme) => {
       overflow: ${noHiddenOverflow ? 'visible' : 'hidden'};
       text-overflow: ${noHiddenOverflow ? 'clip' : 'ellipsis'};
       white-space: ${noHiddenOverflow ? 'normal' : 'nowrap'};
+    `,
+    summaryWrap: css`
+      white-space: normal !important;
     `,
     infoIcon: css`
       margin-left: ${spacing.sm};
