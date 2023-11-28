@@ -55,7 +55,6 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 
 	serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
 	if err == nil && saForm.Force != nil && *saForm.Force {
-		fmt.Println("ecxisting")
 		existingAccount, err := s.RetrieveServiceAccount(ctx, orgId, serviceAccountID)
 		if err != nil {
 			return nil, err
@@ -68,7 +67,7 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 			OrgId:      existingAccount.OrgId,
 			Tokens:     0,
 			Role:       string(role),
-			IsDisabled: isDisabled,
+			IsDisabled: existingAccount.IsDisabled,
 		}, nil
 	}
 
