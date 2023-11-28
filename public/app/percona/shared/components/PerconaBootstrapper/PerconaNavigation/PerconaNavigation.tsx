@@ -19,7 +19,6 @@ import {
   PMM_ACCESS_ROLE_EDIT_PAGE,
   PMM_ADD_INSTANCE_PAGE,
   PMM_BACKUP_PAGE,
-  PMM_DBAAS_PAGE,
   PMM_EDIT_INSTANCE_PAGE,
   PMM_ENTITLEMENTS_PAGE,
   PMM_ENVIRONMENT_OVERVIEW_PAGE,
@@ -39,7 +38,7 @@ import {
 const PerconaNavigation: React.FC = () => {
   const [folders, setFolders] = useState<FolderDTO[]>([]);
   const { result } = useSelector(getPerconaSettings);
-  const { alertingEnabled, sttEnabled, dbaasEnabled, backupEnabled } = result!;
+  const { alertingEnabled, sttEnabled, backupEnabled } = result!;
   const { isPlatformUser, isAuthorized } = useSelector(getPerconaUser);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
@@ -48,7 +47,6 @@ const PerconaNavigation: React.FC = () => {
   const advisorsPage = buildAdvisorsNavItem(categorizedAdvisors);
 
   dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
-  dispatch(updateNavIndex(PMM_DBAAS_PAGE));
   dispatch(updateNavIndex(PMM_BACKUP_PAGE));
   dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
   dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
@@ -107,10 +105,6 @@ const PerconaNavigation: React.FC = () => {
 
       if (sttEnabled) {
         updatedNavTree.push(advisorsPage);
-      }
-
-      if (dbaasEnabled) {
-        updatedNavTree.push(PMM_DBAAS_PAGE);
       }
 
       if (backupEnabled) {

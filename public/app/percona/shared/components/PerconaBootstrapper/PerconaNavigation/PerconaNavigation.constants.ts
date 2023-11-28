@@ -2,35 +2,6 @@ import { NavModelItem, NavSection } from '@grafana/data';
 import config from 'app/core/config';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 
-export const PMM_DBAAS_PAGE: NavModelItem = {
-  id: 'dbaas',
-  text: 'DBaaS',
-  subTitle: 'Percona DBaaS',
-  icon: 'database',
-  section: NavSection.Core,
-  url: `${config.appSubUrl}/dbaas`,
-  breadcrumbs: [
-    {
-      title: 'DBaaS',
-      url: `${config.appSubUrl}/dbaas`,
-    },
-  ],
-  children: [
-    {
-      id: 'dbclusters',
-      text: 'DB Cluster',
-      url: `${config.appSubUrl}/dbaas/dbclusters`,
-      hideFromMenu: true,
-    },
-    {
-      id: 'kubernetes',
-      text: 'Kubernetes Cluster',
-      url: `${config.appSubUrl}/dbaas/kubernetes`,
-      hideFromMenu: true,
-    },
-  ],
-};
-
 export const PMM_BACKUP_PAGE: NavModelItem = {
   id: 'backup',
   icon: 'history',

@@ -3,7 +3,6 @@ import React, { FC } from 'react';
 import { Form, FormRenderProps } from 'react-final-form';
 
 import { Button, useStyles2 } from '@grafana/ui';
-import { PMMServerUrlWarning } from 'app/percona/dbaas/components/PMMServerURLWarning/PMMServerUrlWarning';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
@@ -65,7 +64,7 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
             </Button>
           </a>
         </div>
-        {showPMMAddressWarning && <PMMServerUrlWarning />}
+        {/* {showPMMAddressWarning && <PMMServerUrlWarning />} */}
         <LoaderButton
           data-testid="connect-button"
           type="submit"
