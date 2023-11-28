@@ -5762,30 +5762,6 @@ exports[`better eslint`] = {
       [0, 0, 0, "Unexpected any. Specify a different type.", "0"],
       [0, 0, 0, "Unexpected any. Specify a different type.", "1"]
     ],
-    "public/app/percona/dbaas/components/DBCluster/DBCluster.service.utils.ts:5381": [
-      [0, 0, 0, "Do not use any type assertions.", "0"],
-      [0, 0, 0, "Do not use any type assertions.", "1"]
-    ],
-    "public/app/percona/dbaas/components/DBCluster/DBClusterLogsModal/DBClusterLogsModal.utils.ts:5381": [
-      [0, 0, 0, "Do not use any type assertions.", "0"],
-      [0, 0, 0, "Do not use any type assertions.", "1"],
-      [0, 0, 0, "Do not use any type assertions.", "2"]
-    ],
-    "public/app/percona/dbaas/components/DBCluster/EditDBClusterPage/hooks/useEditDBClusterFormSubmit.ts:5381": [
-      [0, 0, 0, "Unexpected any. Specify a different type.", "0"],
-      [0, 0, 0, "Unexpected any. Specify a different type.", "1"]
-    ],
-    "public/app/percona/dbaas/components/DBCluster/ResourcesBar/ResourcesBar.utils.ts:5381": [
-      [0, 0, 0, "Do not use any type assertions.", "0"]
-    ],
-    "public/app/percona/dbaas/components/Kubernetes/ColumnRenderers/ColumnRenderers.tsx:5381": [
-      [0, 0, 0, "Unexpected any. Specify a different type.", "0"]
-    ],
-    "public/app/percona/dbaas/components/Kubernetes/ManageComponentsVersionsModal/ManageComponentsVersions.utils.tsx:5381": [
-      [0, 0, 0, "Do not use any type assertions.", "0"],
-      [0, 0, 0, "Do not use any type assertions.", "1"],
-      [0, 0, 0, "Do not use any type assertions.", "2"]
-    ],
     "public/app/percona/inventory/Tabs/Services/ClusterItem.tsx:5381": [
       [0, 0, 0, "Do not use any type assertions.", "0"]
     ],
@@ -5824,9 +5800,6 @@ exports[`better eslint`] = {
       [0, 0, 0, "Unexpected any. Specify a different type.", "0"]
     ],
     "public/app/percona/shared/components/Form/MultiCheckbox/MultiCheckboxField.types.ts:5381": [
-      [0, 0, 0, "Unexpected any. Specify a different type.", "0"]
-    ],
-    "public/app/percona/shared/core/reducers/dbaas/addDBCluster/addDBCluster.types.ts:5381": [
       [0, 0, 0, "Unexpected any. Specify a different type.", "0"]
     ],
     "public/app/percona/shared/helpers/cron/cron.ts:5381": [
