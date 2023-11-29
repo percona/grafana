@@ -55,19 +55,24 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 
 	serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
 	if err == nil && saForm.Force != nil && *saForm.Force {
-		existingAccount, err := s.RetrieveServiceAccount(ctx, orgId, serviceAccountID)
+		updateForm := &serviceaccounts.UpdateServiceAccountForm{
+			Role:       &role,
+			IsDisabled: &isDisabled,
+		}
+
+		updatedAccount, err := s.UpdateServiceAccount(ctx, orgId, serviceAccountID, updateForm)
 		if err != nil {
 			return nil, err
 		}
 
 		return &serviceaccounts.ServiceAccountDTO{
-			Id:         existingAccount.Id,
-			Name:       existingAccount.Name,
-			Login:      existingAccount.Login,
-			OrgId:      existingAccount.OrgId,
+			Id:         updatedAccount.Id,
+			Name:       updatedAccount.Name,
+			Login:      updatedAccount.Login,
+			OrgId:      updatedAccount.OrgId,
 			Tokens:     0,
 			Role:       string(role),
-			IsDisabled: existingAccount.IsDisabled,
+			IsDisabled: updatedAccount.IsDisabled,
 		}, nil
 	}
 
