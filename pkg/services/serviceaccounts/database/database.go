@@ -56,6 +56,7 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 	serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
 	if err == nil && saForm.Force != nil && *saForm.Force {
 		updateForm := &serviceaccounts.UpdateServiceAccountForm{
+			Name:       &name,
 			Role:       &role,
 			IsDisabled: &isDisabled,
 		}
@@ -70,8 +71,8 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 			Name:       updatedAccount.Name,
 			Login:      updatedAccount.Login,
 			OrgId:      updatedAccount.OrgId,
-			Tokens:     0,
-			Role:       string(role),
+			Tokens:     updatedAccount.Tokens,
+			Role:       updatedAccount.Role,
 			IsDisabled: updatedAccount.IsDisabled,
 		}, nil
 	}
