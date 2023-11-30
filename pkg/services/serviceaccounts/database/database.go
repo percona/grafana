@@ -44,17 +44,25 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 	name := strings.ToLower(saForm.Name)
 	generatedLogin := "sa-" + name
 	generatedLogin = strings.ReplaceAll(generatedLogin, " ", "-")
+
 	isDisabled := false
-	role := org.RoleViewer
 	if saForm.IsDisabled != nil {
 		isDisabled = *saForm.IsDisabled
 	}
+
+	role := org.RoleViewer
 	if saForm.Role != nil {
 		role = *saForm.Role
 	}
 
+	force := false
+	if saForm.Force != nil {
+		force = *saForm.Force
+	}
+
 	serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
-	if err == nil && saForm.Force != nil && *saForm.Force {
+	fmt.Printf("\n\n\n\n id:%d, error:%s, force:%t \n\n\n\n", serviceAccountID, err, force)
+	if err == nil && force {
 		updateForm := &serviceaccounts.UpdateServiceAccountForm{
 			Name:       &name,
 			Role:       &role,
