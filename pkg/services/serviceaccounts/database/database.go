@@ -41,8 +41,8 @@ func ProvideServiceAccountsStore(store *sqlstore.SQLStore, apiKeyService apikey.
 
 // CreateServiceAccount creates service account
 func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, orgId int64, saForm *serviceaccounts.CreateServiceAccountForm) (*serviceaccounts.ServiceAccountDTO, error) {
-	name := strings.ToLower(saForm.Name)
-	generatedLogin := "sa-" + name
+	name := saForm.Name
+	generatedLogin := "sa-" + strings.ToLower(name)
 	generatedLogin = strings.ReplaceAll(generatedLogin, " ", "-")
 
 	isDisabled := false
