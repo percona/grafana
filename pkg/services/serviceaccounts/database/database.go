@@ -66,7 +66,7 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 		newSA, errUser = s.sqlStore.CreateUser(ctx, user.CreateUserCommand{
 			Login:            generatedLogin,
 			OrgID:            orgId,
-			Name:             saForm.Name,
+			Name:             name,
 			IsDisabled:       isDisabled,
 			IsServiceAccount: true,
 			SkipOrgSetup:     true,
