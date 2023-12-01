@@ -60,31 +60,6 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 		force = *saForm.Force
 	}
 
-	serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
-	fmt.Printf("\n\n\n\n id:%d, error:%s, force:%t \n\n\n\n", serviceAccountID, err, force)
-	if err == nil && force {
-		updateForm := &serviceaccounts.UpdateServiceAccountForm{
-			Name:       &name,
-			Role:       &role,
-			IsDisabled: &isDisabled,
-		}
-
-		updatedAccount, err := s.UpdateServiceAccount(ctx, orgId, serviceAccountID, updateForm)
-		if err != nil {
-			return nil, err
-		}
-
-		return &serviceaccounts.ServiceAccountDTO{
-			Id:         updatedAccount.Id,
-			Name:       updatedAccount.Name,
-			Login:      updatedAccount.Login,
-			OrgId:      updatedAccount.OrgId,
-			Tokens:     updatedAccount.Tokens,
-			Role:       updatedAccount.Role,
-			IsDisabled: updatedAccount.IsDisabled,
-		}, nil
-	}
-
 	var newSA *user.User
 	createErr := s.sqlStore.WithTransactionalDbSession(ctx, func(sess *sqlstore.DBSession) (err error) {
 		var errUser error
@@ -115,7 +90,31 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 
 	if createErr != nil {
 		if errors.Is(createErr, user.ErrUserAlreadyExists) {
-			return nil, ErrServiceAccountAlreadyExists
+			if !force {
+				return nil, ErrServiceAccountAlreadyExists
+			}
+
+			serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
+			fmt.Printf("\n\n\n\n id:%d, error:%s, name:%s, force:%t \n\n\n\n", serviceAccountID, err, name, force)
+			updateForm := &serviceaccounts.UpdateServiceAccountForm{
+				Name:       &name,
+				Role:       &role,
+				IsDisabled: &isDisabled,
+			}
+			updatedAccount, err := s.UpdateServiceAccount(ctx, orgId, serviceAccountID, updateForm)
+			if err != nil {
+				return nil, err
+			}
+
+			return &serviceaccounts.ServiceAccountDTO{
+				Id:         updatedAccount.Id,
+				Name:       updatedAccount.Name,
+				Login:      updatedAccount.Login,
+				OrgId:      updatedAccount.OrgId,
+				Tokens:     updatedAccount.Tokens,
+				Role:       updatedAccount.Role,
+				IsDisabled: updatedAccount.IsDisabled,
+			}, nil
 		}
 
 		return nil, fmt.Errorf("failed to create service account: %w", createErr)
