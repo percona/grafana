@@ -95,7 +95,10 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 			}
 
 			serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
-			fmt.Printf("\n\n\n\n id:%d, error:%s, name:%s, force:%t \n\n\n\n", serviceAccountID, err, name, force)
+			if err != nil {
+				return nil, err
+			}
+
 			updateForm := &serviceaccounts.UpdateServiceAccountForm{
 				Name:       &name,
 				Role:       &role,
@@ -280,7 +283,7 @@ func (s *ServiceAccountsStoreImpl) RetrieveServiceAccountIdByName(ctx context.Co
 		sess := dbSession.Table("user")
 
 		whereConditions := []string{
-			fmt.Sprintf("%s.name = ?",
+			fmt.Sprintf("LOWER(%s.name) = LOWER(?)",
 				s.sqlStore.Dialect.Quote("user")),
 			fmt.Sprintf("%s.org_id = ?",
 				s.sqlStore.Dialect.Quote("user")),
