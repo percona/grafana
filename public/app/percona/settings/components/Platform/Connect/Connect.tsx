@@ -15,6 +15,7 @@ import { ConnectRenderProps } from '../types';
 
 import { getStyles } from './Connect.styles';
 import { ConnectProps } from './Connect.types';
+import { PMMServerUrlWarning } from './PMMServerURLWarning/PMMServerUrlWarning';
 
 export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues }) => {
   const styles = useStyles2(getStyles);
@@ -64,7 +65,7 @@ export const Connect: FC<ConnectProps> = ({ onConnect, connecting, initialValues
             </Button>
           </a>
         </div>
-        {/* {showPMMAddressWarning && <PMMServerUrlWarning />} */}
+        {showPMMAddressWarning && <PMMServerUrlWarning />}
         <LoaderButton
           data-testid="connect-button"
           type="submit"
