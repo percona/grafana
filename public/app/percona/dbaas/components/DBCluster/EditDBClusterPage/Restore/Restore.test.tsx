@@ -58,7 +58,7 @@ describe('DBaaS DBCluster creation Restore section ::', () => {
     expect(screen.getByTestId('toggle-scheduled-restore')).toBeInTheDocument();
     const checkbox = screen.getByTestId('toggle-scheduled-restore');
     await waitFor(() => fireEvent.click(checkbox));
-    expect(screen.getByTestId('backupArtifact-field-container')).toBeInTheDocument();
+    expect(screen.getByTestId('backup-select-wrapper')).toBeInTheDocument();
   });
   it('shows secrets field if kubernetesCluster name exists in form', async () => {
     await waitFor(() =>
