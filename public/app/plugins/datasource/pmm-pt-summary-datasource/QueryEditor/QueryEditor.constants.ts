@@ -2,7 +2,6 @@ import { DatasourceType } from '../PTSummary.types';
 
 import { Messages } from './QueryEditor.messages';
 
-
 export const DATASOURCES = [
   {
     value: DatasourceType.node,
