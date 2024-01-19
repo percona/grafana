@@ -214,7 +214,7 @@ func TestStore_MigrateApiKeys(t *testing.T) {
 			_, err := store.orgService.CreateWithMember(context.Background(), &org.CreateOrgCommand{Name: "main"})
 			require.NoError(t, err)
 			key := tests.SetupApiKey(t, db, c.key)
-			err = store.MigrateApiKey(context.Background(), key.OrgID, key.ID)
+			_, err = store.MigrateApiKey(context.Background(), key.OrgID, key.ID)
 			if c.expectedErr != nil {
 				require.ErrorIs(t, err, c.expectedErr)
 			} else {

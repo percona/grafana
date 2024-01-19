@@ -31,7 +31,7 @@ type Service interface {
 	ListTokens(ctx context.Context, query *GetSATokensQuery) ([]apikey.APIKey, error)
 
 	// API specific functions
-	MigrateApiKey(ctx context.Context, orgID int64, keyId int64) error
+	MigrateApiKey(ctx context.Context, orgID int64, keyId int64) (int64, error)
 	MigrateApiKeysToServiceAccounts(ctx context.Context, orgID int64) (*MigrationResult, error)
 }
 

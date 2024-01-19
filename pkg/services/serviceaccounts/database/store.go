@@ -3,6 +3,7 @@ package database
 //nolint:goimports
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -44,6 +45,7 @@ func ProvideServiceAccountsStore(cfg *setting.Cfg, store db.DB, apiKeyService ap
 
 // CreateServiceAccount creates service account
 func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, orgId int64, saForm *serviceaccounts.CreateServiceAccountForm) (*serviceaccounts.ServiceAccountDTO, error) {
+	name := saForm.Name
 	generatedLogin := serviceaccounts.ServiceAccountPrefix + strings.ToLower(saForm.Name)
 	generatedLogin = strings.ReplaceAll(generatedLogin, " ", "-")
 	isDisabled := false
@@ -55,16 +57,51 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 		role = *saForm.Role
 	}
 
+	force := false
+	if saForm.Force != nil {
+		force = *saForm.Force
+	}
+
 	newSA, err := s.userService.CreateServiceAccount(ctx, &user.CreateUserCommand{
 		Login:            generatedLogin,
 		OrgID:            orgId,
-		Name:             saForm.Name,
+		Name:             name,
 		IsDisabled:       isDisabled,
 		IsServiceAccount: true,
 		DefaultOrgRole:   string(role),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create service account: %w", err)
+		if errors.Is(err, serviceaccounts.ErrServiceAccountAlreadyExists) {
+			if !force {
+				return nil, serviceaccounts.ErrServiceAccountAlreadyExists
+			}
+
+			serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
+			if err != nil {
+				return nil, err
+			}
+
+			updateForm := &serviceaccounts.UpdateServiceAccountForm{
+				Name:       &name,
+				Role:       &role,
+				IsDisabled: &isDisabled,
+			}
+			updatedAccount, err := s.UpdateServiceAccount(ctx, orgId, serviceAccountID, updateForm)
+			if err != nil {
+				return nil, err
+			}
+
+			return &serviceaccounts.ServiceAccountDTO{
+				Id:         updatedAccount.Id,
+				Name:       updatedAccount.Name,
+				Login:      updatedAccount.Login,
+				OrgId:      updatedAccount.OrgId,
+				Tokens:     updatedAccount.Tokens,
+				Role:       updatedAccount.Role,
+				IsDisabled: updatedAccount.IsDisabled,
+			}, nil
+			//return nil, fmt.Errorf("failed to create service account: %w", err)
+		}
 	}
 
 	return &serviceaccounts.ServiceAccountDTO{
@@ -238,7 +275,7 @@ func (s *ServiceAccountsStoreImpl) RetrieveServiceAccountIdByName(ctx context.Co
 		sess := dbSession.Table("user")
 
 		whereConditions := []string{
-			fmt.Sprintf("%s.name = ?",
+			fmt.Sprintf("LOWER(%s.name) = LOWER(?)",
 				s.sqlStore.GetDialect().Quote("user")),
 			fmt.Sprintf("%s.org_id = ?",
 				s.sqlStore.GetDialect().Quote("user")),
@@ -397,7 +434,7 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 
 	if len(basicKeys) > 0 {
 		for _, key := range basicKeys {
-			err := s.CreateServiceAccountFromApikey(ctx, key)
+			_, err := s.CreateServiceAccountFromApikey(ctx, key)
 			if err != nil {
 				s.log.Error("Migating to service accounts failed with error", err.Error())
 				migrationResult.Failed++
@@ -412,27 +449,28 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 	return migrationResult, nil
 }
 
-func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int64, keyId int64) error {
+func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int64, keyId int64) (int64, error) {
 	basicKeys, err := s.apiKeyService.GetAllAPIKeys(ctx, orgId)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if len(basicKeys) == 0 {
-		return fmt.Errorf("no API keys to convert found")
+		return 0, fmt.Errorf("no API keys to convert found")
 	}
 	for _, key := range basicKeys {
 		if keyId == key.ID {
-			err := s.CreateServiceAccountFromApikey(ctx, key)
+			serviceAccountID, err := s.CreateServiceAccountFromApikey(ctx, key)
 			if err != nil {
 				s.log.Error("Converting to service account failed with error", "keyId", keyId, "error", err)
-				return err
+				return 0, err
 			}
+			return serviceAccountID, nil
 		}
 	}
-	return nil
+	return 0, fmt.Errorf("no API keys to convert found")
 }
 
-func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) error {
+func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) (int64, error) {
 	prefix := "sa-autogen"
 	cmd := user.CreateUserCommand{
 		Login:            fmt.Sprintf("%v-%v-%v", prefix, key.OrgID, key.Name),
@@ -442,13 +480,18 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Co
 		IsServiceAccount: true,
 	}
 
-	return s.sqlStore.InTransaction(ctx, func(tctx context.Context) error {
+	var serviceAccountID int64
+	err := s.sqlStore.InTransaction(ctx, func(tctx context.Context) error {
 		newSA, errCreateSA := s.userService.CreateServiceAccount(tctx, &cmd)
 		if errCreateSA != nil {
 			return fmt.Errorf("failed to create service account: %w", errCreateSA)
 		}
+		serviceAccountID = newSA.ID
+
 		return s.assignApiKeyToServiceAccount(tctx, key.ID, newSA.ID)
 	})
+
+	return serviceAccountID, err
 }
 
 func serviceAccountDeletions(dialect migrator.Dialect) []string {

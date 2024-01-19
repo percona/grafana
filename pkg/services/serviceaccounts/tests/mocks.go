@@ -138,7 +138,7 @@ func (_m *MockServiceAccountService) ListTokens(ctx context.Context, query *serv
 }
 
 // MigrateApiKey provides a mock function with given fields: ctx, orgID, keyId
-func (_m *MockServiceAccountService) MigrateApiKey(ctx context.Context, orgID int64, keyId int64) error {
+func (_m *MockServiceAccountService) MigrateApiKey(ctx context.Context, orgID int64, keyId int64) (int64, error) {
 	ret := _m.Called(ctx, orgID, keyId)
 
 	var r0 error
@@ -148,7 +148,7 @@ func (_m *MockServiceAccountService) MigrateApiKey(ctx context.Context, orgID in
 		r0 = ret.Error(0)
 	}
 
-	return r0
+	return 0, r0
 }
 
 // MigrateApiKeysToServiceAccounts provides a mock function with given fields: ctx, orgID
