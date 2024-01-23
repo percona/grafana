@@ -219,7 +219,7 @@ export const PMMDump = () => {
           if (value === undefined) {
             return "N/A";
           } else {
-            dateDifferenceInWords(row.original.endTime, row.original.startTime)
+            return dateDifferenceInWords(row.original.endTime, row.original.startTime)
           }
         }
       },
