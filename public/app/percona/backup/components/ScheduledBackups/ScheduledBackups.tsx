@@ -7,12 +7,11 @@ import { AppEvents, urlUtil } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { LinkButton, useStyles } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
-import { OldPage } from 'app/core/components/Page/Page';
+import { Page } from 'app/core/components/Page/Page';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -40,7 +39,6 @@ export const ScheduledBackups: FC = () => {
   const [deletePending, setDeletePending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const navModel = usePerconaNavModel('scheduled-backups');
   const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
   const styles = useStyles(getStyles);
@@ -142,30 +140,22 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.vendor,
         accessor: 'vendor',
-        Cell: ({ value }) => DATABASE_LABELS[value],
-        type: FilterFieldTypes.DROPDOWN,
-        options: Object.values(DATABASE_LABELS).map((item: string) => ({
-          label: item,
-          value: item,
-        })),
+        Cell: ({ value }) => <>{DATABASE_LABELS[value]}</>,
       },
       {
         Header: Messages.scheduledBackups.table.columns.frequency,
         accessor: 'cronExpression',
-        Cell: ({ value }) => cronstrue.toString(value, { use24HourTimeFormat: true }),
-        type: FilterFieldTypes.TEXT,
+        Cell: ({ value }) => <>{cronstrue.toString(value, { use24HourTimeFormat: true })}</>,
       },
       {
         Header: Messages.scheduledBackups.table.columns.retention,
         accessor: 'retention',
-        Cell: ({ value }) => retentionValue(value),
-        type: FilterFieldTypes.TEXT,
+        Cell: ({ value }) => <>{retentionValue(value)}</>,
       },
       {
         Header: Messages.scheduledBackups.table.columns.type,
         accessor: 'mode',
-        Cell: ({ value }) => formatBackupMode(value),
-        type: FilterFieldTypes.TEXT,
+        Cell: ({ value }) => <>{formatBackupMode(value)}</>,
       },
       {
         Header: Messages.scheduledBackups.table.columns.location,
@@ -184,7 +174,7 @@ export const ScheduledBackups: FC = () => {
       {
         Header: Messages.scheduledBackups.table.columns.lastBackup,
         accessor: 'lastBackup',
-        Cell: ({ value }) => (value ? <DetailedDate date={value} /> : ''),
+        Cell: ({ value }) => <>{value ? <DetailedDate date={value} /> : ''}</>,
         width: '200px',
         type: FilterFieldTypes.TEXT,
       },
@@ -263,8 +253,8 @@ export const ScheduledBackups: FC = () => {
   }, []);
 
   return (
-    <OldPage navModel={navModel}>
-      <OldPage.Contents>
+    <Page navId="scheduled-backups">
+      <Page.Contents>
         <FeatureLoader featureName={Messages.backupManagement} featureSelector={featureSelector}>
           <div className={styles.addWrapper}>
             <LinkButton
@@ -298,8 +288,8 @@ export const ScheduledBackups: FC = () => {
             message={Messages.scheduledBackups.getDeleteMessage(selectedBackup?.name!)}
           />
         </FeatureLoader>
-      </OldPage.Contents>
-    </OldPage>
+      </Page.Contents>
+    </Page>
   );
 };
 

@@ -3,6 +3,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 
 import * as reducers from 'app/percona/shared/core/reducers';
+import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -35,7 +36,7 @@ describe('Advanced::', () => {
           },
         } as StoreState)}
       >
-        <Advanced />
+        {wrapWithGrafanaContextMock(<Advanced />)}
       </Provider>
     );
 
@@ -68,7 +69,7 @@ describe('Advanced::', () => {
           },
         } as StoreState)}
       >
-        <Advanced />
+        {wrapWithGrafanaContextMock(<Advanced />)}
       </Provider>
     );
     fireEvent.change(screen.getByTestId('retention-number-input'), { target: { value: 70 } });
@@ -112,7 +113,7 @@ describe('Advanced::', () => {
           },
         } as StoreState)}
       >
-        <Advanced />
+        {wrapWithGrafanaContextMock(<Advanced />)}
       </Provider>
     );
 
@@ -146,7 +147,7 @@ describe('Advanced::', () => {
           },
         } as StoreState)}
       >
-        <Advanced />
+        {wrapWithGrafanaContextMock(<Advanced />)}
       </Provider>
     );
 
@@ -187,7 +188,7 @@ describe('Advanced::', () => {
           navIndex: {},
         } as StoreState)}
       >
-        <Advanced />
+        {wrapWithGrafanaContextMock(<Advanced />)}
       </Provider>
     );
 
@@ -199,5 +200,54 @@ describe('Advanced::', () => {
     expect(spy).toHaveBeenLastCalledWith(
       expect.objectContaining({ body: expect.objectContaining({ stt_check_intervals: expect.anything() }) })
     );
+  });
+  it('Sets correct URL when DBaaS switched to checked mode', async () => {
+    const location = {
+      ...window.location,
+      host: 'pmmtest.percona.com',
+    };
+
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: location,
+    });
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: true },
+            settings: {
+              loading: false,
+              result: {
+                sttCheckIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
+                dataRetention: '2592000s',
+                telemetryEnabled: true,
+                telemetrySummaries: ['summary1', 'summary2'],
+                updatesDisabled: true,
+                backupEnabled: false,
+                sttEnabled: true,
+                dbaasEnabled: false,
+                azureDiscoverEnabled: true,
+                publicAddress: '',
+                alertingEnabled: true,
+              },
+            },
+          },
+        } as StoreState)}
+      >
+        {wrapWithGrafanaContextMock(<Advanced />)}
+      </Provider>
+    );
+
+    const input = screen.getByTestId('advanced-dbaas').querySelector('input');
+
+    expect(input).not.toBeChecked();
+    expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('');
+    if (input) {
+      fireEvent.click(input);
+    }
+    expect(input).toBeChecked();
+    expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('pmmtest.percona.com');
   });
 });

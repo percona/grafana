@@ -15,6 +15,7 @@ import { ServerInfo } from '../types';
 
 import advisorsReducers from './advisors/advisors';
 import perconaBackupLocations from './backups/backupLocations';
+import navigationReducer from './navigation';
 import nodesReducer from './nodes';
 import pmmDumpsReducers from './pmmDump/pmmDump';
 import rolesReducers from './roles/roles';
@@ -198,6 +199,8 @@ const updateSettingsReducer = createAsyncSlice('updateSettings', updateSettingsA
 const templatesReducer = createAsyncSlice('templates', fetchTemplatesAction).reducer;
 
 export default {
+  // Extend grafana navBarTree
+  navBarTree: navigationReducer,
   percona: combineReducers({
     settings: settingsReducer,
     updateSettings: updateSettingsReducer,

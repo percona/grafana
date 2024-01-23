@@ -227,7 +227,7 @@ export interface ErrorResponse {
     {
       type_url: string;
       value: string;
-    }
+    },
   ];
 }
 

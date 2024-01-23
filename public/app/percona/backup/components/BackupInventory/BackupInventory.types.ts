@@ -1,6 +1,8 @@
 import { Databases } from 'app/percona/shared/core';
 
 import { DataModel, BackupStatus, BackupMode } from '../../Backup.types';
+import { StorageLocation } from '../StorageLocations/StorageLocations.types';
+
 export interface Backup {
   id: string;
   name: string;
@@ -15,6 +17,10 @@ export interface Backup {
   mode: BackupMode;
   folder: string;
   type?: Databases | 'external';
+}
+
+export interface BackupRow extends Backup {
+  location?: StorageLocation;
 }
 
 export interface RawBackup {
