@@ -811,7 +811,6 @@ export function getAppRoutes(): RouteDescriptor[] {
           )
       ),
     },
-    ...getBrowseStorageRoutes(),
     ...getDynamicDashboardRoutes(),
     ...getPluginCatalogRoutes(),
     ...getSupportBundleRoutes(),
