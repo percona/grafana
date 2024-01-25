@@ -5,7 +5,7 @@ import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
 import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
-import { OldPage } from 'app/core/components/Page/Page';
+import { Page } from 'app/core/components/Page/Page';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -299,8 +299,8 @@ export const NodesTab = () => {
   }, []);
 
   return (
-    <OldPage navModel={navModel}>
-      <OldPage.Contents>
+    <Page navModel={navModel}>
+      <Page.Contents>
         <FeatureLoader>
           <div className={styles.actionPanel}>
             <Button
@@ -366,8 +366,8 @@ export const NodesTab = () => {
             showFilter
           />
         </FeatureLoader>
-      </OldPage.Contents>
-    </OldPage>
+      </Page.Contents>
+    </Page>
   );
 };
 
