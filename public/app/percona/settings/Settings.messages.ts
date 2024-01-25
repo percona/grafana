@@ -43,7 +43,6 @@ export const Messages = {
       'These are technical preview features, not recommended to be used in production environments. Read more\n' +
       '                  about feature status',
     technicalPreviewLinkText: 'here',
-    deprecatedFeatures: 'Deprecated features',
   },
   diagnostics: {
     action: 'Download server diagnostics',
