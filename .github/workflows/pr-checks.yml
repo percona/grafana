@@ -27,7 +27,8 @@ permissions:
 jobs:
   main:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
+    # @PERCONA - disable workflow
+    if: false
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
