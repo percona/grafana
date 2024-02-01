@@ -27,8 +27,8 @@ permissions:
 jobs:
   main:
     runs-on: ubuntu-latest
-    # @PERCONA - disable workflow
-    if: false
+    # @PERCONA - add repo check
+    if: github.event.pull_request.draft == false && github.repository == 'grafana/grafana'
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
