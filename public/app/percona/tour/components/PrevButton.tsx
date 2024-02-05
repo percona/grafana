@@ -18,7 +18,7 @@ const PrevButton: FC<BtnFnProps> = () => {
       chrome.setMegaMenu('open');
     }
     previousStep();
-  }
+  };
 
   return (
     <IconButton onClick={handleClick} aria-label="Previous step" name="arrow-left" size="lg" disabled={isFirstStep} />

@@ -17,7 +17,7 @@ const NextButton: FC<BtnFnProps> = () => {
       chrome.setMegaMenu('open');
     }
     nextStep();
-  }
+  };
 
   return isLastStep ? (
     <Button onClick={() => tour && endTour(tour)}>Done</Button>
