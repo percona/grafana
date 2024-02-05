@@ -11,10 +11,10 @@ const NextButton: FC<BtnFnProps> = () => {
   const { tour, endTour, nextStep, isLastStep } = usePerconaTour();
   const { chrome } = useGrafana();
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (tour === 'product') {
-      chrome.setMegaMenu('closed');
-      chrome.setMegaMenu('open');
+      await chrome.setMegaMenu('closed');
+      await chrome.setMegaMenu('open');
     }
     nextStep();
   };
