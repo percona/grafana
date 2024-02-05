@@ -4,13 +4,24 @@ import { BtnFnProps } from '@reactour/tour/dist/types';
 import React, { FC } from 'react';
 
 import { IconButton } from '@grafana/ui';
+import { useGrafana } from 'app/core/context/GrafanaContext';
 import usePerconaTour from 'app/percona/shared/core/hooks/tour';
 
 const PrevButton: FC<BtnFnProps> = () => {
-  const { previousStep, isFirstStep } = usePerconaTour();
+  const { tour, previousStep, isFirstStep } = usePerconaTour();
+
+  const { chrome } = useGrafana();
+
+  const handleClick = () => {
+    if (tour === 'product') {
+      chrome.setMegaMenu('closed');
+      chrome.setMegaMenu('open');
+    }
+    previousStep();
+  }
 
   return (
-    <IconButton onClick={previousStep} aria-label="Previous step" name="arrow-left" size="lg" disabled={isFirstStep} />
+    <IconButton onClick={handleClick} aria-label="Previous step" name="arrow-left" size="lg" disabled={isFirstStep} />
   );
 };
 

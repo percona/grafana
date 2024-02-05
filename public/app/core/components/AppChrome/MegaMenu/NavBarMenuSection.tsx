@@ -32,7 +32,8 @@ export function NavBarMenuSection({
 
   return (
     <>
-      <div className={cx(styles.collapsibleSectionWrapper, className)}>
+      {/* @Percona add aria-label for product tour to work*/}
+      <div className={cx(styles.collapsibleSectionWrapper, className)} aria-label={link.text}>
         <NavBarMenuItem
           isActive={link === activeItem}
           onClick={() => {

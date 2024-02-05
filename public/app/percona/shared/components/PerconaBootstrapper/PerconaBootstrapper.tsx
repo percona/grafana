@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { config } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, Modal, useStyles2, useTheme2 } from '@grafana/ui';
+import { useGrafana } from 'app/core/context/GrafanaContext';
 import {
   fetchServerInfoAction,
   fetchServerSaasHostAction,
@@ -36,6 +37,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const { user } = config.bootData;
   const { isSignedIn } = user;
   const theme = useTheme2();
+  const { chrome } = useGrafana();
 
   const dismissModal = () => {
     setModalIsOpen(false);
@@ -49,6 +51,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
   const startTour = () => {
     setModalIsOpen(false);
+    chrome.setMegaMenu('open');
     startPerconaTour(TourType.Product);
   };
 
