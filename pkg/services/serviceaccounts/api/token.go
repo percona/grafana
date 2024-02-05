@@ -125,20 +125,11 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *contextmodel.ReqContext) response
 // 403: forbiddenError
 // 500: internalServerError
 func (api *ServiceAccountsAPI) CurrentServiceAccount(ctx *contextmodel.ReqContext) response.Response {
-	if !ctx.IsServiceAccount {
-		serviceAccountID, err := api.service.MigrateApiKey(ctx.Req.Context(), ctx.OrgID, ctx.ApiKeyID)
-		if err != nil {
-			return response.Error(http.StatusBadRequest, "Auth method is not API key type", errors.New("failed to migrate API key to service account"))
-		}
-
-		ctx.UserID = serviceAccountID
-	}
-
 	serviceAccount, err := api.service.RetrieveServiceAccount(ctx.Req.Context(), ctx.OrgID, ctx.UserID)
 	if err != nil {
 		switch {
 		case errors.Is(err, serviceaccounts.ErrServiceAccountNotFound):
-			return response.Error(http.StatusNotFound, "Failed to retrieve service account", err)
+			return response.Error(http.StatusNotFound, "Failed to found service account", err)
 		default:
 			return response.Error(http.StatusInternalServerError, "Failed to retrieve service account", err)
 		}

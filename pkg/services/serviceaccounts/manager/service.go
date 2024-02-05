@@ -229,12 +229,12 @@ func (sa *ServiceAccountsService) DeleteServiceAccountToken(ctx context.Context,
 	return sa.store.DeleteServiceAccountToken(ctx, orgID, serviceAccountID, tokenID)
 }
 
-func (sa *ServiceAccountsService) MigrateApiKey(ctx context.Context, orgID, keyID int64) (int64, error) {
+func (sa *ServiceAccountsService) MigrateApiKey(ctx context.Context, orgID, keyID int64) error {
 	if err := validOrgID(orgID); err != nil {
-		return 0, err
+		return err
 	}
 	if err := validAPIKeyID(keyID); err != nil {
-		return 0, err
+		return err
 	}
 	return sa.store.MigrateApiKey(ctx, orgID, keyID)
 }

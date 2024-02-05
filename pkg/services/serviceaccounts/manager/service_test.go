@@ -73,8 +73,8 @@ func (f *FakeServiceAccountStore) MigrateApiKeysToServiceAccounts(ctx context.Co
 }
 
 // MigrateApiKey is a fake migrating an api key to a service account.
-func (f *FakeServiceAccountStore) MigrateApiKey(ctx context.Context, orgID int64, keyId int64) (int64, error) {
-	return 0, f.ExpectedError
+func (f *FakeServiceAccountStore) MigrateApiKey(ctx context.Context, orgID int64, keyId int64) error {
+	return f.ExpectedError
 }
 
 // RevertApiKey is a fake reverting an api key to a service account.

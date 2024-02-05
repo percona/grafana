@@ -434,7 +434,7 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 
 	if len(basicKeys) > 0 {
 		for _, key := range basicKeys {
-			_, err := s.CreateServiceAccountFromApikey(ctx, key)
+			err := s.CreateServiceAccountFromApikey(ctx, key)
 			if err != nil {
 				s.log.Error("Migrating to service accounts failed with error", err.Error())
 				migrationResult.Failed++
@@ -449,28 +449,28 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 	return migrationResult, nil
 }
 
-func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int64, keyId int64) (int64, error) {
+func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int64, keyId int64) error {
 	basicKeys, err := s.apiKeyService.GetAllAPIKeys(ctx, orgId)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	if len(basicKeys) == 0 {
-		return 0, fmt.Errorf("no API keys to convert found")
+		return fmt.Errorf("no API keys to convert found")
 	}
 	for _, key := range basicKeys {
 		if keyId == key.ID {
-			serviceAccountID, err := s.CreateServiceAccountFromApikey(ctx, key)
+			err := s.CreateServiceAccountFromApikey(ctx, key)
 			if err != nil {
 				s.log.Error("Converting to service account failed with error", "keyId", keyId, "error", err)
-				return 0, err
+				return err
 			}
-			return serviceAccountID, nil
+			return nil
 		}
 	}
-	return 0, fmt.Errorf("no API keys to convert found")
+	return fmt.Errorf("no API keys to convert found")
 }
 
-func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) (int64, error) {
+func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) error {
 	prefix := "sa-autogen"
 	cmd := user.CreateUserCommand{
 		Login:            fmt.Sprintf("%v-%v-%v", prefix, key.OrgID, key.Name),
@@ -480,18 +480,14 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Co
 		IsServiceAccount: true,
 	}
 
-	var serviceAccountID int64
-	err := s.sqlStore.InTransaction(ctx, func(tctx context.Context) error {
+	return s.sqlStore.InTransaction(ctx, func(tctx context.Context) error {
 		newSA, errCreateSA := s.userService.CreateServiceAccount(tctx, &cmd)
 		if errCreateSA != nil {
 			return fmt.Errorf("failed to create service account: %w", errCreateSA)
 		}
-		serviceAccountID = newSA.ID
 
 		return s.assignApiKeyToServiceAccount(tctx, key.ID, newSA.ID)
 	})
-
-	return serviceAccountID, err
 }
 
 func serviceAccountDeletions(dialect migrator.Dialect) []string {
