@@ -125,6 +125,10 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *contextmodel.ReqContext) response
 // 403: forbiddenError
 // 500: internalServerError
 func (api *ServiceAccountsAPI) CurrentServiceAccount(ctx *contextmodel.ReqContext) response.Response {
+	if !ctx.IsServiceAccount {
+		return response.Error(http.StatusBadRequest, "Auth method is not service account token", errors.New("failed to get service account info"))
+	}
+
 	serviceAccount, err := api.service.RetrieveServiceAccount(ctx.Req.Context(), ctx.OrgID, ctx.UserID)
 	if err != nil {
 		switch {
