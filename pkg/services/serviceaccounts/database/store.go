@@ -461,10 +461,9 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int6
 				s.log.Error("Converting to service account failed with error", "keyId", keyId, "error", err)
 				return err
 			}
-			return nil
 		}
 	}
-	return fmt.Errorf("no API keys to convert found")
+	return nil
 }
 
 func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) error {
