@@ -481,7 +481,6 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Co
 		if errCreateSA != nil {
 			return fmt.Errorf("failed to create service account: %w", errCreateSA)
 		}
-
 		return s.assignApiKeyToServiceAccount(tctx, key.ID, newSA.ID)
 	})
 }
