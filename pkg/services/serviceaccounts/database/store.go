@@ -71,11 +71,7 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 		DefaultOrgRole:   string(role),
 	})
 	if err != nil {
-		if errors.Is(err, serviceaccounts.ErrServiceAccountAlreadyExists) {
-			if !force {
-				return nil, serviceaccounts.ErrServiceAccountAlreadyExists
-			}
-
+		if errors.Is(err, serviceaccounts.ErrServiceAccountAlreadyExists) && !force {
 			serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
 			if err != nil {
 				return nil, err
@@ -100,7 +96,8 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 				Role:       updatedAccount.Role,
 				IsDisabled: updatedAccount.IsDisabled,
 			}, nil
-			//return nil, fmt.Errorf("failed to create service account: %w", err)
+		} else {
+			return nil, fmt.Errorf("failed to create service account: %w", err)
 		}
 	}
 
