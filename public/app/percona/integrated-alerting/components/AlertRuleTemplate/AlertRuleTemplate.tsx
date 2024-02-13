@@ -71,7 +71,6 @@ export const AlertRuleTemplate: FC = () => {
       {
         Header: nameColumn,
         accessor: 'summary',
-        width: '60%',
       },
       {
         Header: sourceColumn,
@@ -125,13 +124,7 @@ export const AlertRuleTemplate: FC = () => {
     <Page
       navModel={navModel}
       actions={
-        <Button
-          size="md"
-          icon="plus-square"
-          fill="text"
-          onClick={handleAddButton}
-          data-testid="alert-rule-template-add-modal-button"
-        >
+        <Button size="md" fill="text" onClick={handleAddButton} data-testid="alert-rule-template-add-modal-button">
           {Messages.alertRuleTemplate.addAction}
         </Button>
       }

@@ -1,4 +1,4 @@
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data/src/themes';
@@ -15,7 +15,17 @@ export const NoRulesSplash = () => {
     return (
       <div>
         <p>{"You haven't created any alert rules yet"}</p>
-        <Stack gap={1}>
+        <Stack gap={1} wrap='wrap'>
+          <div className={cx(styles.newRuleCard, styles.fullWidth)}>
+            <EmptyListCTA
+              title=""
+              buttonIcon="plus"
+              buttonLink={'alerting/new/alerting'}
+              buttonTitle="New alert rule from template"
+              onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
+            />
+          </div>
+
           <div className={styles.newRuleCard}>
             <EmptyListCTA
               title=""
@@ -54,4 +64,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
       height: 100%;
     }
   `,
+  fullWidth: css`
+    width: 100%;
+  `
 });
