@@ -22,13 +22,6 @@ import {
   PMM_ADD_INSTANCE_CREATE_PAGE,
 } from './PerconaNavigation.constants';
 
-const DIVIDER: NavModelItem = {
-  id: 'divider',
-  text: 'Divider',
-  hideFromTabs: true,
-  isDivider: true,
-};
-
 export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavModelItem | undefined => {
   const alertingItem = mainLinks.find(({ id }) => id === 'alerting');
 
@@ -71,11 +64,6 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     text: 'Organization',
     isSection: true,
   };
-  const pmmLink: NavModelItem = {
-    id: 'settings-pmm',
-    text: 'PMM',
-    isSection: true,
-  };
   const settingsLink: NavModelItem = {
     id: 'settings',
     icon: 'percona-setting',
@@ -83,21 +71,36 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     url: `${config.appSubUrl}/settings`,
   };
   const configNode = mainLinks.find((link) => link.id === 'cfg');
+  const pmmConfigNode = mainLinks.find((link) => link.id === 'pmmcfg')
+
+  if (!pmmConfigNode) {
+    const pmmcfgNode: NavModelItem = {
+      id: 'pmmcfg',
+      text: 'PMM Configuration',
+      icon: 'percona-nav-logo',
+      url: `${config.appSubUrl}/inventory`,
+      subTitle: 'Configuration',
+      children: [PMM_ADD_INSTANCE_PAGE, PMM_ADD_INSTANCE_CREATE_PAGE, inventoryLink, settingsLink],
+      sortWeight: -800
+    };
+    mainLinks.push(pmmcfgNode);
+  }
 
   if (!configNode) {
     const cfgNode: NavModelItem = {
       id: 'cfg',
       text: 'Configuration',
       icon: 'cog',
-      url: `${config.appSubUrl}/inventory`,
+      url: `${config.appSubUrl}/admin`,
       subTitle: 'Configuration',
-      children: [inventoryLink, settingsLink, DIVIDER, PMM_ADD_INSTANCE_PAGE],
+      children: [],
     };
     if (settings?.enableAccessControl) {
       addAccessRolesLink(cfgNode);
     }
     mainLinks.push(cfgNode);
   } else {
+    configNode.text = 'Configuration';
     if (!configNode.children) {
       configNode.children = [];
     }
@@ -105,15 +108,8 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
       orgLink.text = configNode.subTitle || '';
       configNode.subTitle = '';
     }
-    configNode.url = `${config.appSubUrl}/inventory`;
+    configNode.url = `${config.appSubUrl}/admin`;
     configNode.children = [
-      pmmLink,
-      PMM_ADD_INSTANCE_PAGE,
-      PMM_ADD_INSTANCE_CREATE_PAGE,
-      inventoryLink,
-      settingsLink,
-      DIVIDER,
-      orgLink,
       ...configNode.children,
     ];
     if (settings?.enableAccessControl) {
@@ -127,7 +123,6 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
 export const addAccessRolesLink = (configNode: NavModelItem) => {
   if (configNode.children) {
     const accessNode = configNode.children.find((item) => item.id === 'cfg/access');
-
     if (accessNode && accessNode.children) {
       const usersIdx = accessNode.children.findIndex((item) => item.id === 'global-users');
       PMM_ACCESS_ROLES_PAGE.parentItem = accessNode;
