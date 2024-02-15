@@ -133,7 +133,7 @@ func (api *ServiceAccountsAPI) CurrentServiceAccount(ctx *contextmodel.ReqContex
 	if err != nil {
 		switch {
 		case errors.Is(err, serviceaccounts.ErrServiceAccountNotFound):
-			return response.Error(http.StatusNotFound, "Failed to found service account", err)
+			return response.Error(http.StatusNotFound, "Failed to find service account", err)
 		default:
 			return response.Error(http.StatusInternalServerError, "Failed to retrieve service account", err)
 		}
