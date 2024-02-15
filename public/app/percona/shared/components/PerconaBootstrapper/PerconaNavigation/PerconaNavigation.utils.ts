@@ -127,6 +127,7 @@ export const addAccessRolesLink = (configNode: NavModelItem) => {
       accessNode.parentItem = configNode;
       const usersIdx = accessNode.children.findIndex((item) => item.id === 'global-users');
       PMM_ACCESS_ROLES_PAGE.parentItem = accessNode;
+      PMM_ACCESS_ROLE_CREATE_PAGE.parentItem = accessNode;
       accessNode.children = [
         ...accessNode.children.slice(0, usersIdx + 1),
         PMM_ACCESS_ROLES_PAGE,
