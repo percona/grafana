@@ -52,6 +52,12 @@ export const PMM_ALERTING_PERCONA_ALERTS: NavModelItem[] = [
     icon: 'brackets-curly',
     url: `${config.appSubUrl}/alerting/alert-rule-templates`,
   },
+  {
+    id: 'integrated-alerting-new-from-template',
+    text: 'Alert rule from template',
+    icon: 'brackets-curly',
+    url: `${config.appSubUrl}/alerting/new-from-template`,
+  },
 ];
 
 export const PMM_SERVICES_PAGE: NavModelItem = {

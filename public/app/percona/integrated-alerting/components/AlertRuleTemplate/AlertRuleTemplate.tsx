@@ -136,25 +136,27 @@ export const AlertRuleTemplate: FC = () => {
             setVisible={setAddModalVisible}
             getAlertRuleTemplates={getAlertRuleTemplates}
           />
-          <Table
-            showPagination
-            totalItems={totalItems}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            pageIndex={pageIndex}
-            onPaginationChanged={handlePaginationChanged}
-            data={data}
-            columns={columns}
-            pendingRequest={pendingRequest}
-            emptyMessage={
-              <EmptyListCTA
-                title={Messages.alertRuleTemplate.table.noCreated}
-                buttonIcon="bell"
-                buttonTitle={Messages.alertRuleTemplate.table.newAlertRuleTemplate}
-                onClick={handleAddButton}
-              />
-            }
-          />
+          <div className={styles.tableWrapper}>
+            <Table
+              showPagination
+              totalItems={totalItems}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              pageIndex={pageIndex}
+              onPaginationChanged={handlePaginationChanged}
+              data={data}
+              columns={columns}
+              pendingRequest={pendingRequest}
+              emptyMessage={
+                <EmptyListCTA
+                  title={Messages.alertRuleTemplate.table.noCreated}
+                  buttonIcon="bell"
+                  buttonTitle={Messages.alertRuleTemplate.table.newAlertRuleTemplate}
+                  onClick={handleAddButton}
+                />
+              }
+            />
+          </div>
         </FeatureLoader>
       </Page.Contents>
     </Page>

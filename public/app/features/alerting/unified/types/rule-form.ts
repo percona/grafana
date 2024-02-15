@@ -1,9 +1,9 @@
 import { Template } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
+import { FiltersForm } from 'app/percona/integrated-alerting/components/TemplateStep/TemplateStep.types';
 import { Severity } from 'app/percona/shared/core';
 import { AlertQuery, GrafanaAlertStateDecision } from 'app/types/unified-alerting-dto';
 
 import { Folder } from '../components/rule-editor/RuleFolderPicker';
-import { FiltersForm } from '../components/rule-editor/TemplateStep/TemplateStep.types';
 
 export enum RuleFormType {
   grafana = 'grafana',

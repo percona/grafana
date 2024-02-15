@@ -2,6 +2,7 @@ import { AsyncThunk, createAsyncThunk } from '@reduxjs/toolkit';
 import { isEmpty } from 'lodash';
 
 import { locationService } from '@grafana/runtime';
+import { formatCreateAPIPayload } from 'app/percona/integrated-alerting/components/TemplateStep/TemplateStep.utils';
 import { AlertRulesService } from 'app/percona/shared/services/AlertRules/AlertRules.service';
 import {
   AlertmanagerAlert,
@@ -66,7 +67,6 @@ import {
   FetchRulerRulesFilter,
   setRulerRuleGroup,
 } from '../api/ruler';
-import { formatCreateAPIPayload } from '../components/rule-editor/TemplateStep/TemplateStep.utils';
 import { RuleFormType, RuleFormValues } from '../types/rule-form';
 import { addDefaultsToAlertmanagerConfig, removeMuteTimingFromRoute } from '../utils/alertmanager';
 import {
