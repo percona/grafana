@@ -100,7 +100,6 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     }
     mainLinks.push(cfgNode);
   } else {
-    configNode.text = 'Configuration';
     if (!configNode.children) {
       configNode.children = [];
     }
