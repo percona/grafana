@@ -104,7 +104,7 @@ export const getProductTourSteps = (
   ...(isPmmAdmin
     ? [
         {
-          selector: '[aria-label="Configuration"]',
+          selector: '[aria-label="PMM Configuration"]',
           content: (
             <SidebarStep title={Messages.configPanel.title}>
               <p>{Messages.configPanel.services}</p>
