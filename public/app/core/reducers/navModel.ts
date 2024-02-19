@@ -95,7 +95,7 @@ export const navIndexReducer = (state: NavIndex = initialState, action: AnyActio
       if (node.children) {
         for (const child of node.children) {
           // @PERCONA update the navIndex of deep child
-          if(child.children){
+          if (child.children) {
             for (const child1 of child.children) {
               newPages[child1.id!] = {
                 ...child1,

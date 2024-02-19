@@ -71,7 +71,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     url: `${config.appSubUrl}/settings`,
   };
   const configNode = mainLinks.find((link) => link.id === 'cfg');
-  const pmmConfigNode = mainLinks.find((link) => link.id === 'pmmcfg')
+  const pmmConfigNode = mainLinks.find((link) => link.id === 'pmmcfg');
 
   if (!pmmConfigNode) {
     const pmmcfgNode: NavModelItem = {
@@ -81,7 +81,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
       url: `${config.appSubUrl}/inventory`,
       subTitle: 'Configuration',
       children: [PMM_ADD_INSTANCE_PAGE, PMM_ADD_INSTANCE_CREATE_PAGE, inventoryLink, settingsLink],
-      sortWeight: -800
+      sortWeight: -800,
     };
     mainLinks.push(pmmcfgNode);
   }
@@ -121,7 +121,6 @@ export const addAccessRolesLink = (configNode: NavModelItem) => {
     const accessNode = configNode.children.find((item) => item.id === 'cfg/access');
     const general = configNode.children.find((item) => item.id === 'cfg/general');
     const plugins = configNode.children.find((item) => item.id === 'cfg/plugins');
-
 
     if (accessNode && accessNode.children) {
       accessNode.parentItem = configNode;
