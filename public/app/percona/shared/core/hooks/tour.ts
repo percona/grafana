@@ -1,6 +1,7 @@
 import { useTour } from '@reactour/tour';
 import { useCallback, useEffect, useMemo } from 'react';
 
+import { useGrafana } from 'app/core/context/GrafanaContext';
 import * as TourActions from 'app/percona/shared/core/reducers/tour';
 import { TourStep, TourType } from 'app/percona/shared/core/reducers/tour';
 import { useAppDispatch } from 'app/store/store';
@@ -14,6 +15,7 @@ const usePerconaTour = () => {
   const { steps, tour } = useSelector(getTour);
   const reactTour = useTour();
   const tourSteps = useMemo(() => (tour ? steps[tour] : []), [tour, steps]);
+  const { chrome } = useGrafana();
 
   useEffect(() => {
     if (reactTour.setSteps) {
@@ -55,13 +57,21 @@ const usePerconaTour = () => {
     [dispatch]
   );
 
-  const nextStep = useCallback(() => {
+  const nextStep = useCallback(async () => {
+    if (tour === 'product') {
+      await chrome.setMegaMenu('closed');
+      await chrome.setMegaMenu('open');
+    }
     reactTour.setCurrentStep((step: number) => (step === reactTour.steps.length - 1 ? step : step + 1));
-  }, [reactTour]);
+  }, [reactTour, chrome, tour]);
 
-  const previousStep = useCallback(() => {
+  const previousStep = useCallback(async () => {
+    if (tour === 'product') {
+      await chrome.setMegaMenu('closed');
+      await chrome.setMegaMenu('open');
+    }
     reactTour.setCurrentStep((step: number) => (step === 0 ? 0 : step - 1));
-  }, [reactTour]);
+  }, [reactTour, chrome, tour]);
 
   return {
     tour,
