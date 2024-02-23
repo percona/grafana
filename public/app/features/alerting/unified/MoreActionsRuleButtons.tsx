@@ -50,7 +50,7 @@ export function MoreActionsRuleButtons({}: Props) {
         <>
         {/* @PERCONA */}
         <LinkButton
-            href={urlUtil.renderUrl('alerting/new/alerting', { returnTo: location.pathname + location.search })}
+            href={urlUtil.renderUrl('alerting/new-from-template', { returnTo: location.pathname + location.search })}
             icon="plus"
             onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
           >

@@ -20,7 +20,7 @@ export const NoRulesSplash = () => {
             <EmptyListCTA
               title=""
               buttonIcon="plus"
-              buttonLink={'alerting/new/alerting'}
+              buttonLink="alerting/new-from-template"
               buttonTitle="New alert rule from template"
               onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
             />

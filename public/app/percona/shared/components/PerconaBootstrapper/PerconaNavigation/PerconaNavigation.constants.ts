@@ -39,6 +39,15 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
   ],
 };
 
+export const PMM_ALERTING_CREATE_ALERT_TEMPLATE: NavModelItem = {
+  id: 'integrated-alerting-new-from-template',
+  text: 'Alert rule from template',
+  icon: 'brackets-curly',
+  url: `${config.appSubUrl}/alerting/new-from-template`,
+  hideFromTabs: true,
+  isCreateAction: true,
+};
+
 export const PMM_ALERTING_PERCONA_ALERTS: NavModelItem[] = [
   {
     id: 'integrated-alerting-alerts',
@@ -52,12 +61,7 @@ export const PMM_ALERTING_PERCONA_ALERTS: NavModelItem[] = [
     icon: 'brackets-curly',
     url: `${config.appSubUrl}/alerting/alert-rule-templates`,
   },
-  {
-    id: 'integrated-alerting-new-from-template',
-    text: 'Alert rule from template',
-    icon: 'brackets-curly',
-    url: `${config.appSubUrl}/alerting/new-from-template`,
-  },
+  PMM_ALERTING_CREATE_ALERT_TEMPLATE,
 ];
 
 export const PMM_SERVICES_PAGE: NavModelItem = {

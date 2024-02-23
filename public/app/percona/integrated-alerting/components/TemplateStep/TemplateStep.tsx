@@ -5,7 +5,6 @@ import { Field, Input, Select } from '@grafana/ui';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { FolderAndGroup } from 'app/features/alerting/unified/components/rule-editor/FolderAndGroup';
 import { fetchExternalAlertmanagersConfigAction } from 'app/features/alerting/unified/state/actions';
-import { RuleFormValues } from 'app/features/alerting/unified/types/rule-form';
 import { initialAsyncRequestState } from 'app/features/alerting/unified/utils/redux';
 import { durationValidationPattern, parseDurationToMilliseconds } from 'app/features/alerting/unified/utils/time';
 import {
@@ -15,6 +14,8 @@ import {
 import { fetchTemplatesAction } from 'app/percona/shared/core/reducers';
 import { getTemplates } from 'app/percona/shared/core/selectors';
 import { useDispatch, useSelector } from 'app/types';
+
+import { TemplatedAlertFormValues } from '../../types';
 
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import TemplateFiltersField from './TemplateFiltersField';
@@ -28,7 +29,7 @@ export const TemplateStep: FC = () => {
     setValue,
     getValues,
     formState: { errors },
-  } = useFormContext<RuleFormValues>();
+  } = useFormContext<TemplatedAlertFormValues>();
   const dispatch = useDispatch();
   const templates = useRef<Template[]>([]);
   const [currentTemplate, setCurrentTemplate] = useState<Template>();
@@ -85,9 +86,7 @@ export const TemplateStep: FC = () => {
 
   useEffect(() => {
     const getData = async () => {
-      // @PERCONA_TODO check if it's fetching the correct one
-      dispatch(fetchExternalAlertmanagersConfigAction());
-      // dispatch(fetchExternalAlertmanagersConfigAction('grafana'));
+      await dispatch(fetchExternalAlertmanagersConfigAction());
       const { templates } = await dispatch(fetchTemplatesAction()).unwrap();
 
       if (selectedTemplate) {
@@ -106,7 +105,6 @@ export const TemplateStep: FC = () => {
   }, [dispatch, handleTemplateChange, selectedTemplate, setRuleNameAfterTemplate, setValue]);
 
   return (
-    // <RuleEditorSection stepNo={2} title="Template details">
     <>
       <Field
         label={Messages.templateField}
@@ -134,8 +132,8 @@ export const TemplateStep: FC = () => {
       <Field
         label={Messages.nameField}
         description={Messages.tooltips.name}
-        error={errors.name?.message}
-        invalid={!!errors.name?.message}
+        error={errors.ruleName?.message}
+        invalid={!!errors.ruleName?.message}
       >
         <Input id="ruleName" {...register('ruleName', { required: { value: true, message: Messages.errors.name } })} />
       </Field>
@@ -218,78 +216,13 @@ export const TemplateStep: FC = () => {
         />
       </Field>
 
-      {/* TODO */}
-      <FolderAndGroup enableProvisionedGroups={true} />
-
-      {/* <div className={styles.folderAndGroupSelect}>
-        <Field
-          label={
-            <Label htmlFor="folder" description={'Select a folder to store your rule.'}>
-              <Stack gap={0.5}>
-                Folder
-                <Tooltip
-                  placement="top"
-                  content={
-                    <div>
-                      Each folder has unique folder permission. When you store multiple rules in a folder, the folder
-                      access permissions get assigned to the rules.
-                    </div>
-                  }
-                >
-                  <Icon name="info-circle" size="xs" />
-                </Tooltip>
-              </Stack>
-            </Label>
-          }
-          className={styles.folderAndGroupInput}
-          error={errors.folder?.message}
-          invalid={!!errors.folder?.message}
-          data-testid="folder-picker"
-        >
-          <InputControl
-            render={({ field: { ref, ...field } }) => (
-              <RuleFolderPicker
-                inputId="folder"
-                {...field}
-                enableCreateNew={contextSrv.hasPermission(AccessControlAction.FoldersCreate)}
-                enableReset={true}
-                filter={folderFilter}
-                // @PERCONA_TODO
-                // dissalowSlashes={true}
-              />
-            )}
-            name="folder"
-            rules={{
-              required: { value: true, message: 'Please select a folder' },
-              validate: {
-                pathSeparator: (folder: Folder) => checkForPathSeparator(folder.title),
-              },
-            }}
-          />
-        </Field>
-        <Field
-          label="Group"
-          data-testid="group-picker"
-          description="Rules within the same group are evaluated after the same time interval."
-          className={styles.folderAndGroupInput}
-          error={errors.group?.message}
-          invalid={!!errors.group?.message}
-        >
-          <Input
-            id="group"
-            {...register('group', {
-              required: { value: true, message: 'Must enter a group name' },
-            })}
-          />
-        </Field>
-      </div> */}
+      <FolderAndGroup enableProvisionedGroups />
 
       <TemplateFiltersField />
 
       {currentTemplate && (
         <AdvancedRuleSection expression={currentTemplate.expr} summary={currentTemplate.annotations?.summary} />
       )}
-      {/* </RuleEditorSection> */}
     </>
   );
 };

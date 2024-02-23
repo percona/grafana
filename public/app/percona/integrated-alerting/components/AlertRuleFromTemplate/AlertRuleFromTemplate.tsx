@@ -1,66 +1,66 @@
-import React, { FC, useMemo } from 'react';
+import { AxiosError } from 'axios';
+import React, { FC, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
+import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Spinner, useStyles2 } from '@grafana/ui';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
 import { Page } from 'app/core/components/Page/Page';
 import { useAppNotification } from 'app/core/copy/appNotification';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { useUnifiedAlertingSelector } from 'app/features/alerting/unified/hooks/useUnifiedAlertingSelector';
-import { saveRuleFormAction } from 'app/features/alerting/unified/state/actions';
-import { RuleFormType, RuleFormValues } from 'app/features/alerting/unified/types/rule-form';
-import { initialAsyncRequestState } from 'app/features/alerting/unified/utils/redux';
-import { getDefaultFormValues, getDefaultQueries, MINUTE } from 'app/features/alerting/unified/utils/rule-form';
-import { useDispatch } from 'app/types';
+import { PMM_ALERTING_CREATE_ALERT_TEMPLATE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { ApiErrorResponse } from 'app/percona/shared/core';
+import { logger } from 'app/percona/shared/helpers/logger';
+import { AlertRulesService } from 'app/percona/shared/services/AlertRules/AlertRules.service';
 
+import { TemplatedAlertFormValues } from '../../types';
 import { TemplateStep } from '../TemplateStep/TemplateStep';
+import { formatCreateAPIPayload } from '../TemplateStep/TemplateStep.utils';
 
 import { getStyles } from './AlertRuleFromTemplate.styles';
 
 export const AlertRuleFromTemplate: FC = () => {
-  const dispatch = useDispatch();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const notifyApp = useAppNotification();
   const [queryParams] = useQueryParams();
-  const evaluateEvery = MINUTE;
   const returnTo = !queryParams['returnTo'] ? '/alerting/list' : String(queryParams['returnTo']);
-  const defaultValues: RuleFormValues = useMemo(() => {
-    return {
-      ...getDefaultFormValues(),
-      condition: 'C',
-      queries: getDefaultQueries(),
-      evaluateEvery: evaluateEvery,
-      type: RuleFormType.templated,
-    };
-  }, [evaluateEvery]);
+  const defaultValues: TemplatedAlertFormValues = useMemo(
+    () => ({
+      duration: '1m',
+      // TODO: group interval - isn't handled on BE currently
+      evaluateFor: '1m',
+      filters: [],
+      ruleName: '',
+      severity: null,
+      template: null,
+      folder: null,
+      group: '',
+    }),
+    []
+  );
   const methods = useForm({
     mode: 'onSubmit',
     defaultValues,
     shouldFocusError: true,
   });
   const styles = useStyles2(getStyles);
-  const submitState = useUnifiedAlertingSelector((state) => state.ruleForm.saveRule) || initialAsyncRequestState;
 
-  const submit = (values: RuleFormValues) => {
-    dispatch(
-      saveRuleFormAction({
-        values: {
-          ...defaultValues,
-          ...values,
-          annotations:
-            values.annotations
-              ?.map(({ key, value }) => ({ key: key.trim(), value: value.trim() }))
-              .filter(({ key, value }) => !!key && !!value) ?? [],
-          labels:
-            values.labels
-              ?.map(({ key, value }) => ({ key: key.trim(), value: value.trim() }))
-              .filter(({ key }) => !!key) ?? [],
-        },
-        redirectOnSave: returnTo,
-        initialAlertRuleName: defaultValues.name,
-        evaluateEvery: evaluateEvery,
-      })
-    );
+  const submit = async (values: TemplatedAlertFormValues) => {
+    setIsSubmitting(true);
+
+    try {
+      await AlertRulesService.create(formatCreateAPIPayload(values), undefined, true);
+      notifyApp.success(`Rule "${values.ruleName}" saved.`);
+
+      locationService.push(returnTo);
+    } catch (error) {
+      logger.error(error);
+      const message = (error as AxiosError<ApiErrorResponse>)?.response?.data?.message;
+      notifyApp.error(message || 'Failed to save rule');
+    }
+
+    setIsSubmitting(false);
   };
 
   const onInvalid = () => {
@@ -74,13 +74,13 @@ export const AlertRuleFromTemplate: FC = () => {
         type="button"
         size="sm"
         onClick={methods.handleSubmit((values) => submit(values), onInvalid)}
-        disabled={submitState.loading}
+        disabled={isSubmitting}
       >
-        {submitState.loading && <Spinner className={styles.buttonSpinner} inline={true} />}
+        {isSubmitting && <Spinner className={styles.buttonSpinner} inline={true} />}
         Save rule and exit
       </Button>
       <Link to={returnTo}>
-        <Button variant="secondary" disabled={submitState.loading} type="button" size="sm">
+        <Button variant="secondary" disabled={isSubmitting} type="button" size="sm">
           Cancel
         </Button>
       </Link>
@@ -90,7 +90,7 @@ export const AlertRuleFromTemplate: FC = () => {
   return (
     <FormProvider {...methods}>
       <AppChromeUpdate actions={actionButtons} />
-      <Page navId="integrated-alerting-new-from-template">
+      <Page navId="alert-list" pageNav={PMM_ALERTING_CREATE_ALERT_TEMPLATE}>
         <TemplateStep />
       </Page>
     </FormProvider>

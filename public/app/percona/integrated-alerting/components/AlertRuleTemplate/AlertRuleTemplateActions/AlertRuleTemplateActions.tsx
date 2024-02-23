@@ -25,7 +25,7 @@ export const AlertRuleTemplateActions: FC<AlertRuleTemplateActionsProps> = ({ te
         <LinkButton
           icon="plus"
           fill="text"
-          href={`/alerting/new?returnTo=%2Falerting%2Falert-rule-templates&template=${template.name}`}
+          href={`/alerting/new-from-template?returnTo=%2Falerting%2Falert-rule-templates&template=${template.name}`}
           data-testid="create-from-template-button"
         >
           Create alert rule

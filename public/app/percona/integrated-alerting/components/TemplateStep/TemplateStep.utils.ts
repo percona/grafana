@@ -1,8 +1,8 @@
 import { durationToMilliseconds, parseDuration, SelectableValue } from '@grafana/data';
-import { RuleFormValues } from 'app/features/alerting/unified/types/rule-form';
 import { Template } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
 import { AlertRuleCreatePayload, AlertRulesListResponseChannel, Severity } from 'app/percona/shared/core';
 
+import { TemplatedAlertFormValues } from '../../types';
 
 export const formatChannelsOptions = (channels: string[]): Array<SelectableValue<string>> =>
   channels
@@ -20,7 +20,7 @@ export const formatTemplateOptions = (templates: Template[]): Array<SelectableVa
       }))
     : [];
 
-export const formatCreateAPIPayload = (data: RuleFormValues): AlertRuleCreatePayload => {
+export const formatCreateAPIPayload = (data: TemplatedAlertFormValues): AlertRuleCreatePayload => {
   const { duration, filters, ruleName, severity, template, folder, group } = data;
   const durationObj = parseDuration(duration);
   const durationSeconds = durationToMilliseconds(durationObj) / 1000;

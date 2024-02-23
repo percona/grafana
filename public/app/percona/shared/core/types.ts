@@ -27,6 +27,12 @@ export interface ApiVerboseError {
   link?: string;
 }
 
+export interface ApiErrorResponse {
+  code: number;
+  message: string;
+  error: string;
+}
+
 export interface PaginatedPayload {
   page_totals: {
     total_items: number;

@@ -2,8 +2,6 @@ import { AsyncThunk, createAsyncThunk } from '@reduxjs/toolkit';
 import { isEmpty } from 'lodash';
 
 import { locationService } from '@grafana/runtime';
-import { formatCreateAPIPayload } from 'app/percona/integrated-alerting/components/TemplateStep/TemplateStep.utils';
-import { AlertRulesService } from 'app/percona/shared/services/AlertRules/AlertRules.service';
 import {
   AlertmanagerAlert,
   AlertManagerCortexConfig,
@@ -459,11 +457,6 @@ export const saveRuleFormAction = createAsyncThunk(
             const rulerClient = getRulerClient(rulerConfig);
             identifier = await rulerClient.saveGrafanaRule(values, evaluateEvery, existing);
             await thunkAPI.dispatch(fetchRulerRulesAction({ rulesSourceName: GRAFANA_RULES_SOURCE_NAME }));
-            // @PERCONA
-            // Added our type case
-          } else if (type === RuleFormType.templated) {
-            await AlertRulesService.create(formatCreateAPIPayload(values), undefined, true);
-            identifier = { uid: '', ruleSourceName: 'grafana' };
           } else {
             throw new Error('Unexpected rule form type');
           }
