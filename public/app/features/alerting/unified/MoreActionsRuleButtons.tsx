@@ -48,8 +48,8 @@ export function MoreActionsRuleButtons({}: Props) {
     <>
       {(canCreateGrafanaRules || canCreateCloudRules) && (
         <>
-        {/* @PERCONA */}
-        <LinkButton
+          {/* @PERCONA */}
+          <LinkButton
             href={urlUtil.renderUrl('alerting/new-from-template', { returnTo: location.pathname + location.search })}
             icon="plus"
             onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
@@ -57,7 +57,7 @@ export function MoreActionsRuleButtons({}: Props) {
             New alert rule from template
           </LinkButton>
           <LinkButton
-            variant='secondary'
+            variant="secondary"
             href={urlUtil.renderUrl('alerting/new/alerting', { returnTo: location.pathname + location.search })}
             icon="plus"
             onClick={() => logInfo(LogMessages.alertRuleFromScratch)}

@@ -15,7 +15,7 @@ export const NoRulesSplash = () => {
     return (
       <div>
         <p>{"You haven't created any alert rules yet"}</p>
-        <Stack gap={1} wrap='wrap'>
+        <Stack gap={1} wrap="wrap">
           <div className={cx(styles.newRuleCard, styles.fullWidth)}>
             <EmptyListCTA
               title=""
@@ -66,5 +66,5 @@ const getStyles = (theme: GrafanaTheme2) => ({
   `,
   fullWidth: css`
     width: 100%;
-  `
+  `,
 });

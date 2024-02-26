@@ -6,7 +6,7 @@ export const getStyles = ({ spacing }: GrafanaTheme2) => ({
   actionsWrapper: css`
     display: flex;
     align-items: center;
-    gap: 10px
+    gap: 10px;
   `,
   button: css`
     margin-right: 0;
