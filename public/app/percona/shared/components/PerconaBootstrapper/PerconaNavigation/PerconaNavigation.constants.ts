@@ -41,7 +41,7 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
 
 export const PMM_ALERTING_CREATE_ALERT_TEMPLATE: NavModelItem = {
   id: 'integrated-alerting-new-from-template',
-  text: 'Alert rule from template',
+  text: 'Create alert rule from template',
   icon: 'brackets-curly',
   url: `${config.appSubUrl}/alerting/new-from-template`,
   hideFromTabs: true,
