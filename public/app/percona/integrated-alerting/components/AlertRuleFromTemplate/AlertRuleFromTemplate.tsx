@@ -15,8 +15,8 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { AlertRulesService } from 'app/percona/shared/services/AlertRules/AlertRules.service';
 
 import { TemplatedAlertFormValues } from '../../types';
-import { TemplateStep } from '../TemplateStep/TemplateStep';
-import { formatCreateAPIPayload } from '../TemplateStep/TemplateStep.utils';
+import { TemplateForm } from '../TemplateForm/TemplateForm';
+import { formatCreateAPIPayload } from '../TemplateForm/TemplateForm.utils';
 
 import { getStyles } from './AlertRuleFromTemplate.styles';
 
@@ -91,7 +91,7 @@ export const AlertRuleFromTemplate: FC = () => {
     <FormProvider {...methods}>
       <AppChromeUpdate actions={actionButtons} />
       <Page navId="alert-list" pageNav={PMM_ALERTING_CREATE_ALERT_TEMPLATE}>
-        <TemplateStep />
+        <TemplateForm />
       </Page>
     </FormProvider>
   );

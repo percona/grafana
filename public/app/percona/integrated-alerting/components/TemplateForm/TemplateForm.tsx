@@ -19,11 +19,11 @@ import { TemplatedAlertFormValues } from '../../types';
 
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
 import TemplateFiltersField from './TemplateFiltersField';
-import { SEVERITY_OPTIONS } from './TemplateStep.constants';
-import { Messages } from './TemplateStep.messages';
-import { formatTemplateOptions } from './TemplateStep.utils';
+import { SEVERITY_OPTIONS } from './TemplateForm.constants';
+import { Messages } from './TemplateForm.messages';
+import { formatTemplateOptions } from './TemplateForm.utils';
 
-export const TemplateStep: FC = () => {
+export const TemplateForm: FC = () => {
   const {
     register,
     setValue,
