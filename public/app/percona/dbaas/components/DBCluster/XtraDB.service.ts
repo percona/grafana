@@ -159,6 +159,7 @@ export class XtraDBService extends DBClusterService {
       availableImage: dbCluster.available_image,
       template: dbCluster.template,
       sourceRanges: dbCluster.source_ranges,
+      configuration: dbCluster.params.pxc?.configuration,
     };
   }
 }
