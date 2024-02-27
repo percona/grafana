@@ -9,7 +9,7 @@ import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioB
 import { Databases } from 'app/percona/shared/core';
 import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
 
-import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
+import { trackingOptions } from '../FormParts.constants';
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { AdditionalOptionsFormPartProps, PostgreSQLAdditionalOptionsProps } from '../FormParts.types';
@@ -41,7 +41,7 @@ export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   );
 };
 
-export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ form, isRDS, isAzure }) => {
+export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> = ({ form }) => {
   const selectedOption = form.getState()?.values?.autoDiscoveryOptions;
   const [selectedValue, setSelectedValue] = useState<string>(selectedOption || AutoDiscoveryOptionsInterface.enabled);
   const styles = useStyles2(getStyles);
@@ -62,7 +62,7 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
       <RadioButtonGroupField
         name="tracking"
         data-testid="tracking-options-radio-button-group"
-        options={isRDS || isAzure ? rdsTrackingOptions : trackingOptions}
+        options={trackingOptions}
         className={styles.radioField}
         fullWidth
       />
