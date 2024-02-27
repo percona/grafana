@@ -198,6 +198,6 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
     expect(trakingFields.length).toBe(trackingOptions.length);
-    expect(fields.length).toBe(13);
+    expect(fields.length).toBe(14);
   });
 });
