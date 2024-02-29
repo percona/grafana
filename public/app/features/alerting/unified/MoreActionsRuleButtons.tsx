@@ -5,6 +5,7 @@ import { useToggle } from 'react-use';
 
 import { urlUtil } from '@grafana/data';
 import { Button, Dropdown, Icon, LinkButton, Menu, MenuItem } from '@grafana/ui';
+import { usePerconaAlertingEnabled } from 'app/percona/integrated-alerting/hooks';
 
 import { logInfo, LogMessages } from './Analytics';
 import { GrafanaRulesExporter } from './components/export/GrafanaRulesExporter';
@@ -18,6 +19,8 @@ export function MoreActionsRuleButtons({}: Props) {
   const [exportRulesSupported, exportRulesAllowed] = useAlertingAbility(AlertingAction.ExportGrafanaManagedRules);
 
   const location = useLocation();
+  // @PERCONA
+  const perconaAlertingEnabled = usePerconaAlertingEnabled();
   const [showExportDrawer, toggleShowExportDrawer] = useToggle(false);
 
   const canCreateGrafanaRules = createRuleSupported && createRuleAllowed;
@@ -49,15 +52,17 @@ export function MoreActionsRuleButtons({}: Props) {
       {(canCreateGrafanaRules || canCreateCloudRules) && (
         <>
           {/* @PERCONA */}
+          {perconaAlertingEnabled && (
+            <LinkButton
+              href={urlUtil.renderUrl('alerting/new-from-template', { returnTo: location.pathname + location.search })}
+              icon="plus"
+              onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
+            >
+              New alert rule from template
+            </LinkButton>
+          )}
           <LinkButton
-            href={urlUtil.renderUrl('alerting/new-from-template', { returnTo: location.pathname + location.search })}
-            icon="plus"
-            onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
-          >
-            New alert rule from template
-          </LinkButton>
-          <LinkButton
-            variant="secondary"
+            variant={perconaAlertingEnabled ? 'secondary' : 'primary'}
             href={urlUtil.renderUrl('alerting/new/alerting', { returnTo: location.pathname + location.search })}
             icon="plus"
             onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
