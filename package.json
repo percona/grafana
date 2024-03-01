@@ -266,7 +266,7 @@
     "@grafana/experimental": "1.0.1",
     "@grafana/google-sdk": "0.0.3",
     "@grafana/lezer-logql": "0.1.0",
-    "@grafana/runtime": "workspace:*",
+    "@grafana/runtime": "6.3.2",
     "@grafana/schema": "workspace:*",
     "@grafana/ui": "workspace:*",
     "@jaegertracing/jaeger-ui-components": "workspace:*",
