@@ -7,7 +7,7 @@ import { Databases } from 'app/percona/shared/core';
 
 import { AdditionalOptionsFormPart, getAdditionalOptions } from './AdditionalOptions/AdditionalOptions';
 import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
-import { trackingOptions } from './FormParts.constants';
+import { trackingOptions, rdsTrackingOptions } from './FormParts.constants';
 import { LabelsFormPart } from './Labels/Labels';
 import { MainDetailsFormPart } from './MainDetails/MainDetails';
 
@@ -197,7 +197,7 @@ describe('getAdditionalOptions ::', () => {
     );
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
-    expect(trakingFields.length).toBe(trackingOptions.length);
-    expect(fields.length).toBe(14);
+    expect(trakingFields.length).toBe(rdsTrackingOptions.length);
+    expect(fields.length).toBe(13);
   });
 });
