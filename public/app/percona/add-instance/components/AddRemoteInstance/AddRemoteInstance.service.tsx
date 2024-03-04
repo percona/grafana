@@ -128,9 +128,11 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
   }
 
   if (!values.isAzure) {
-    if (data.tracking === TrackingOptions.pgStatements) {
+    if (data.isRDS && data.tracking === TrackingOptions.pgStatements) {
+      data.qan_postgresql_pgstatements = true;
+    } else if (!data.isRDS && data.tracking === TrackingOptions.pgStatements) {
       data.qan_postgresql_pgstatements_agent = true;
-    } else if (data.tracking === TrackingOptions.pgMonitor) {
+    } else if (!data.isRDS && data.tracking === TrackingOptions.pgMonitor) {
       data.qan_postgresql_pgstatmonitor_agent = true;
     }
   }
@@ -168,11 +170,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
 
   if (values.isAzure) {
     data.node_name = data.service_name;
-    if (
-      data.tracking === TrackingOptions.pgStatements ||
-      data.tracking === TrackingOptions.pgMonitor ||
-      data.qan_mysql_perfschema
-    ) {
+    if (data.tracking === TrackingOptions.pgStatements || data.qan_mysql_perfschema) {
       data.qan = true;
     }
   }

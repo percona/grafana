@@ -5,6 +5,11 @@ import { TrackingOptions } from '../AddRemoteInstance.types';
 
 import { MetricsParameters, Schema } from './FormParts.types';
 
+export const rdsTrackingOptions = [
+  { value: TrackingOptions.none, label: Messages.form.trackingOptions.none },
+  { value: TrackingOptions.pgStatements, label: Messages.form.trackingOptions.pgStatements },
+];
+
 export const trackingOptions = [
   { value: TrackingOptions.none, label: Messages.form.trackingOptions.none },
   { value: TrackingOptions.pgStatements, label: Messages.form.trackingOptions.pgStatements },
