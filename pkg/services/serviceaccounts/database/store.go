@@ -71,7 +71,7 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 		DefaultOrgRole:   string(role),
 	})
 	if err != nil {
-		if errors.Is(err, serviceaccounts.ErrServiceAccountAlreadyExists.Errorf("service account with login %s already exists", generatedLogin)) && force {
+		if errors.Is(err, serviceaccounts.ErrServiceAccountAlreadyExists) && force {
 			serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
 			if err != nil {
 				return nil, err
