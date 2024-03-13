@@ -60,7 +60,7 @@ export const ScheduledBackupsActions: FC<ScheduledBackupsActionsProps> = ({
       ) : (
         <>
           <span>
-            <Switch value={backup.enabled} onClick={handleToggle} data-testid="toggle-scheduled-backpup" />
+            <Switch value={!backup.enabled} onClick={handleToggle} data-testid="toggle-scheduled-backpup" />
           </span>
           <Tooltip content={Messages.details} placement="top">
             <span>
