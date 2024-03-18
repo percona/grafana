@@ -49,7 +49,11 @@ export function NavBarMenuSection({
             })}
           >
             <FeatureHighlightWrapper>
-              <NavBarItemIcon link={link} />
+              <>
+                <NavBarItemIcon link={link} />
+                {/* @PERCONA */}
+                {!!link.showDot && <div className={styles.highlightBadge} />}
+              </>
             </FeatureHighlightWrapper>
             {link.text}
           </div>
@@ -113,5 +117,15 @@ const getStyles = (theme: GrafanaTheme2) => ({
   }),
   hasActiveChild: css({
     color: theme.colors.text.primary,
+  }),
+  // @PERCONA
+  highlightBadge: css({
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    left: 37,
+    top: 3,
+    borderRadius: theme.shape.radius.circle,
+    backgroundColor: theme.colors.error.main,
   }),
 });

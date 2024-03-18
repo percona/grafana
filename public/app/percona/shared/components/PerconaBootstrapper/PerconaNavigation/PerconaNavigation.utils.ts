@@ -66,6 +66,14 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     url: `${config.appSubUrl}/inventory`,
     hideFromTabs: true,
   };
+  const updatesLink: NavModelItem = {
+    id: 'pmm-updates',
+    text: 'Updates',
+    url: '/pmm/updates',
+    hideFromTabs: true,
+    target: '_self',
+    badgeText: 'New',
+  };
   const orgLink: NavModelItem = {
     id: 'main-organization',
     text: 'Organization',
@@ -91,13 +99,15 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
       icon: 'cog',
       url: `${config.appSubUrl}/inventory`,
       subTitle: 'Configuration',
-      children: [inventoryLink, settingsLink, DIVIDER, PMM_ADD_INSTANCE_PAGE],
+      showDot: true,
+      children: [inventoryLink, settingsLink, updatesLink, DIVIDER, PMM_ADD_INSTANCE_PAGE],
     };
     if (settings?.enableAccessControl) {
       addAccessRolesLink(cfgNode);
     }
     mainLinks.push(cfgNode);
   } else {
+    configNode.showDot = true;
     if (!configNode.children) {
       configNode.children = [];
     }
@@ -112,6 +122,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
       PMM_ADD_INSTANCE_CREATE_PAGE,
       inventoryLink,
       settingsLink,
+      updatesLink,
       DIVIDER,
       orgLink,
       ...configNode.children,

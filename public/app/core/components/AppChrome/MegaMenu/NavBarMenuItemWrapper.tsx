@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 import React from 'react';
 
 import { GrafanaTheme2, NavModelItem } from '@grafana/data';
-import { useStyles2 } from '@grafana/ui';
+import { Badge, useStyles2 } from '@grafana/ui';
 import { MegaMenuItem } from 'app/percona/shared/components/MegaMenuItem';
 
 import { NavBarMenuItem } from './NavBarMenuItem';
@@ -55,6 +55,8 @@ export function NavBarMenuItemWrapper({
                   item={childLink}
                 >
                   {childLink.text}
+                  {/* @PERCONA */}
+                  {childLink.badgeText && <Badge text={childLink.badgeText} color="orange" className={styles.badge} />}
                 </NavBarMenuItem>
               )
             );
@@ -104,6 +106,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
     color: theme.colors.text.secondary,
     fontStyle: 'italic',
     padding: theme.spacing(1, 1.5, 1, 7),
+  }),
+  // @PERCONA
+  badge: css({
+    marginLeft: theme.spacing(1),
   }),
 });
 
