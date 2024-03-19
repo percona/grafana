@@ -116,6 +116,7 @@ export const ScheduledBackups: FC = () => {
 
   const handleToggle = useCallback(
     async ({ id, enabled }: ScheduledBackup) => {
+      console.log('id: ', id, ' enabled: ', enabled);
       setActionPending(true);
       try {
         await ScheduledBackupsService.toggle(id, !enabled);
