@@ -345,7 +345,7 @@ export const PMM_NAV_MYSQL: NavModelItem = {
       icon: 'percona-cluster',
       hideFromTabs: true,
       showChildren: true,
-
+      url: `${config.appSubUrl}/d/mysql-group-replicaset-summary`,
       children: [
         {
           id: 'mysql-group-replication-summary',
@@ -458,7 +458,7 @@ export const PMM_NAV_MONGO: NavModelItem = {
       icon: 'percona-cluster',
       hideFromTabs: true,
       showChildren: true,
-
+      url: `${config.appSubUrl}/d/mongodb-cluster-summary`,
       children: [
         {
           id: 'mongo-cluster-summary',
