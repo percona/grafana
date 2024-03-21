@@ -4,7 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 import { locationService } from '@grafana/runtime';
-import { Button, HorizontalGroup, Spinner, useStyles2 } from '@grafana/ui';
+import { Button, Stack, Spinner, useStyles2 } from '@grafana/ui';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
 import { Page } from 'app/core/components/Page/Page';
 import { useAppNotification } from 'app/core/copy/appNotification';
@@ -67,7 +67,7 @@ export const AlertRuleFromTemplate: FC = () => {
   };
 
   const actionButtons = (
-    <HorizontalGroup height="auto" justify="flex-end">
+    <Stack>
       <Button
         variant="primary"
         type="button"
@@ -83,7 +83,7 @@ export const AlertRuleFromTemplate: FC = () => {
           Cancel
         </Button>
       </Link>
-    </HorizontalGroup>
+    </Stack>
   );
 
   return (
