@@ -177,15 +177,15 @@ export function CreateAlertButton() {
   if (canCreateGrafanaRules || canCreateCloudRules) {
     return (
       <Stack>
-        {!perconaAlertingEnabled &&
-          (<LinkButton
+        {perconaAlertingEnabled && (
+          <LinkButton
             href={urlUtil.renderUrl('alerting/new-from-template', { returnTo: location.pathname + location.search })}
             icon="plus"
             onClick={() => logInfo(LogMessages.alertRuleFromScratch)}
           >
             New alert rule from template
           </LinkButton>
-          )}
+        )}
         <LinkButton
           variant={perconaAlertingEnabled ? 'secondary' : 'primary'}
           href={urlUtil.renderUrl('alerting/new/alerting', { returnTo: location.pathname + location.search })}

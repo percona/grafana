@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'app/types';
 import { TemplatedAlertFormValues } from '../../types';
 
 import { AdvancedRuleSection } from './AdvancedRuleSection/AdvancedRuleSection';
+import { EvaluateEvery } from './EvaluateEvery/EvaluateEvery';
 import TemplateFiltersField from './TemplateFiltersField';
 import { SEVERITY_OPTIONS } from './TemplateForm.constants';
 import { Messages } from './TemplateForm.messages';
@@ -217,6 +218,8 @@ export const TemplateForm: FC = () => {
       </Field>
 
       <FolderAndGroup enableProvisionedGroups />
+
+      <EvaluateEvery />
 
       <TemplateFiltersField />
 
