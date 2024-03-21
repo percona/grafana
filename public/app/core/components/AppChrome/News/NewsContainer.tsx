@@ -4,7 +4,7 @@ import { useToggle } from 'react-use';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { Button, Drawer, ToolbarButton, useStyles2, Text } from '@grafana/ui';
+import { IconButton, Drawer, ToolbarButton, useStyles2, Text } from '@grafana/ui';
 import { t } from 'app/core/internationalization';
 
 import { NewsWrapper } from './NewsWrapper';
@@ -36,12 +36,12 @@ export function NewsContainer({ className }: NewsContainerProps) {
                 <img src="public/img/percona-logo.svg" alt="Percona logo" />
               </a>
               <div className={styles.actions}>
-                <Button
-                  icon="times"
+                <IconButton
+                  name="times"
                   variant="secondary"
-                  fill="text"
                   onClick={onToggleShowNewsDrawer}
-                  aria-label={selectors.components.Drawer.General.close}
+                  data-testid={selectors.components.Drawer.General.close}
+                  tooltip={t(`news.drawer.close`, 'Close Drawer')}
                 />
               </div>
             </div>
