@@ -17,9 +17,7 @@ export interface TemplatedAlertFormValues {
   template: Template | null;
   folder: Folder | null;
   group: string;
-
-  // TODO: group interval - isn't handled on BE yet.
-  evaluateFor?: string;
+  evaluateEvery: string;
 }
 
 declare module 'react-table' {

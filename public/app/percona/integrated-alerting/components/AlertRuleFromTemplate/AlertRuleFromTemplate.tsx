@@ -28,8 +28,7 @@ export const AlertRuleFromTemplate: FC = () => {
   const defaultValues: TemplatedAlertFormValues = useMemo(
     () => ({
       duration: '1m',
-      // TODO: group interval - isn't handled on BE currently
-      evaluateFor: '1m',
+      evaluateEvery: '1m',
       filters: [],
       ruleName: '',
       severity: null,

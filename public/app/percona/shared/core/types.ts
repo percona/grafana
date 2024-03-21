@@ -171,6 +171,7 @@ export interface AlertRuleCreatePayload {
   custom_labels?: { [K: string]: string };
   filters: AlertRulesListPayloadFilter[];
   for: string;
+  interval?: string;
   params?: AlertRulesListResponseParam[];
   severity: keyof typeof Severity;
   name: string;

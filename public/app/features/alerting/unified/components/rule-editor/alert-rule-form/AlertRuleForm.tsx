@@ -73,12 +73,6 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
       return formValuesFromQueryParams(queryParams['defaults'], ruleType);
     }
 
-    const type = ruleType
-      ? ruleType
-      : result && !!result.alertingEnabled
-        ? RuleFormType.templated
-        : RuleFormType.grafana;
-
     return {
       ...getDefaultFormValues(),
       condition: 'C',
