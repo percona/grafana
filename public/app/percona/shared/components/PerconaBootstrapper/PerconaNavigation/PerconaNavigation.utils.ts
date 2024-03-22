@@ -20,6 +20,8 @@ import {
   WEIGHTS,
   PMM_ACCESS_ROLE_CREATE_PAGE,
   PMM_ADD_INSTANCE_CREATE_PAGE,
+  getPmmSettingsPage,
+  PMM_INVENTORY_PAGE,
 } from './PerconaNavigation.constants';
 
 export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavModelItem | undefined => {
@@ -52,24 +54,13 @@ export const removeAlertingMenuItem = (mainLinks: NavModelItem[]) => {
 };
 
 export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: Settings): NavModelItem[] => {
-  const inventoryLink: NavModelItem = {
-    id: 'inventory',
-    icon: 'server-network',
-    text: 'Inventory',
-    url: `${config.appSubUrl}/inventory`,
-    hideFromTabs: true,
-  };
+  const inventoryLink: NavModelItem = PMM_INVENTORY_PAGE;
   const orgLink: NavModelItem = {
     id: 'main-organization',
     text: 'Organization',
     isSection: true,
   };
-  const settingsLink: NavModelItem = {
-    id: 'settings',
-    icon: 'percona-setting',
-    text: 'Settings',
-    url: `${config.appSubUrl}/settings`,
-  };
+  const settingsLink: NavModelItem = getPmmSettingsPage();
   const configNode = mainLinks.find((link) => link.id === 'cfg');
   const pmmConfigNode = mainLinks.find((link) => link.id === 'pmmcfg');
 
