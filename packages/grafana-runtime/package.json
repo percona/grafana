@@ -36,9 +36,9 @@
   },
   "dependencies": {
     "@grafana/agent-web": "^0.4.0",
-    "@grafana/data": "9.2.20",
+    "@grafana/data": "6.3.2",
     "@grafana/e2e-selectors": "9.2.20",
-    "@grafana/ui": "9.2.20",
+    "@grafana/ui": "6.3.2",
     "@sentry/browser": "6.19.7",
     "history": "4.10.1",
     "lodash": "4.17.21",
