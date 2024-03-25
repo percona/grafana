@@ -7,27 +7,27 @@ export const PTSummaryService = {
   async getPTSummary(variableName: string) {
     const body: PTSummaryRequest = { node_id: getTemplateSrv().replace(`$${variableName || 'node_id'}`) };
 
-    return apiManagement.post<PTSummaryResponse, any>('/Actions/StartPTSummary', body, true);
+    return apiManagement.post<PTSummaryResponse, any>('/actions:startNodeAction', body, true);
   },
   async getMysqlPTSummary(variableName: string) {
     const body: DatabaseSummaryRequest = {
       service_id: getTemplateSrv().replace(`$${variableName || 'service_name'}`),
     };
 
-    return apiManagement.post<PTSummaryResponse, any>('/Actions/StartPTMySQLSummary', body, true);
+    return apiManagement.post<PTSummaryResponse, any>('/actions:startServiceAction', body, true);
   },
   async getPostgresqlPTSummary(variableName: string) {
     const body: DatabaseSummaryRequest = {
       service_id: getTemplateSrv().replace(`$${variableName || 'service_name'}`),
     };
 
-    return apiManagement.post<PTSummaryResponse, any>('/Actions/StartPTPgSummary', body, true);
+    return apiManagement.post<PTSummaryResponse, any>('/actions:startServiceAction', body, true);
   },
   async getMongodbPTSummary(variableName: string) {
     const body: DatabaseSummaryRequest = {
       service_id: getTemplateSrv().replace(`$${variableName || 'service-name'}`),
     };
 
-    return apiManagement.post<PTSummaryResponse, any>('/Actions/StartPTMongoDBSummary', body, true);
+    return apiManagement.post<PTSummaryResponse, any>('/actions/:startServiceAction', body, true);
   },
 };

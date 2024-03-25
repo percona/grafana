@@ -92,8 +92,7 @@ export interface Agent {
 }
 
 export interface RemoveAgentBody {
-  agent_id: string;
-  force: boolean;
+  id: string;
 }
 export interface RemoveNodeBody {
   node_id: string;

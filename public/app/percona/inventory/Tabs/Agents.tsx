@@ -164,12 +164,12 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   }, [generateToken, loadData, service, nodeId, serviceId, node]);
 
   const removeAgents = useCallback(
-    async (agents: Array<SelectedTableRows<FlattenAgent>>, forceMode: boolean) => {
+    async (agents: Array<SelectedTableRows<FlattenAgent>>) => {
       try {
         setLoading(true);
         // eslint-disable-next-line max-len
         const requests = agents.map((agent) =>
-          InventoryService.removeAgent({ agent_id: agent.original.agentId, force: forceMode })
+          InventoryService.removeAgent({ id: agent.original.agentId })
         );
         const results = await processPromiseResults(requests);
 
@@ -259,7 +259,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
                       <Button
                         size="md"
                         onClick={() => {
-                          removeAgents(selected, form.getState().values.force);
+                          removeAgents(selected);
                           setModalVisible(false);
                         }}
                         variant="destructive"
