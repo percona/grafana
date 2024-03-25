@@ -115,7 +115,7 @@ require (
 	gonum.org/v1/gonum v0.11.0
 	google.golang.org/api v0.74.0
 	google.golang.org/grpc v1.45.0
-	google.golang.org/protobuf v1.28.1
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.66.2
 	gopkg.in/ldap.v3 v3.1.0
