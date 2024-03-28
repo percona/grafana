@@ -89,7 +89,7 @@ export const removeServicesAction = createAsyncThunk(
   'percona/removeServices',
   async (params: RemoveServicesParams): Promise<number> => {
     const bodies = params.services.map(toRemoveServiceBody);
-    const requests = bodies.map((body) => ServicesService.removeService(body, params.cancelToken));
+    const requests = bodies.map((body) => ServicesService.removeService(body));
     const results = await processPromiseResults(requests);
     return results.filter(filterFulfilled).length;
   }
