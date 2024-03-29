@@ -55,12 +55,12 @@ jobs:
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
-      - name: Checkout UI tests in main branch
+      - name: Checkout UI tests in v3 branch
         uses: percona-platform/checkout@v2
         if: ${{ steps.branch_checkout.outcome != 'success' }}
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
-          ref: main
+          ref: v3
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
