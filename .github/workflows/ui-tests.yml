@@ -60,7 +60,7 @@ jobs:
         if: ${{ steps.branch_checkout.outcome != 'success' }}
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
-          ref: v3
+          ref: PMM-12847-product-tour-automation
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
