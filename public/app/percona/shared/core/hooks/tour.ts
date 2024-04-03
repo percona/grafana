@@ -55,11 +55,11 @@ const usePerconaTour = () => {
     [dispatch]
   );
 
-  const nextStep = useCallback(async () => {
+  const nextStep = useCallback(() => {
     reactTour.setCurrentStep((step: number) => (step === reactTour.steps.length - 1 ? step : step + 1));
   }, [reactTour]);
 
-  const previousStep = useCallback(async () => {
+  const previousStep = useCallback(() => {
     reactTour.setCurrentStep((step: number) => (step === 0 ? 0 : step - 1));
   }, [reactTour]);
 
