@@ -66,6 +66,12 @@ func (api *ServiceAccountsAPI) RegisterAPIEndpoints() {
 		serviceAccountsRoute.Post("/migrate", auth(accesscontrol.EvalPermission(serviceaccounts.ActionCreate)), routing.Wrap(api.MigrateApiKeysToServiceAccounts))
 		serviceAccountsRoute.Post("/migrate/:keyId", auth(accesscontrol.EvalPermission(serviceaccounts.ActionCreate)), routing.Wrap(api.ConvertToServiceAccount))
 	}, requestmeta.SetOwner(requestmeta.TeamAuth))
+
+	// @PERCONA
+	// current service account (works only with service account token auth). If you use API key then key will be automatically migrated into service account.
+	api.RouterRegister.Group("/api/auth/serviceaccount", func(serviceAccountsRoute routing.RouteRegister) {
+		serviceAccountsRoute.Get("/", routing.Wrap(api.CurrentServiceAccount))
+	})
 }
 
 // swagger:route POST /serviceaccounts service_accounts createServiceAccount
@@ -147,7 +153,7 @@ func (api *ServiceAccountsAPI) RetrieveServiceAccount(ctx *contextmodel.ReqConte
 
 	saIDString := strconv.FormatInt(serviceAccount.Id, 10)
 	metadata := api.getAccessControlMetadata(ctx, map[string]bool{saIDString: true})
-	serviceAccount.AvatarUrl = dtos.GetGravatarUrlWithDefault("", serviceAccount.Name)
+	serviceAccount.AvatarUrl = dtos.GetGravatarUrlWithDefault(api.cfg, "", serviceAccount.Name)
 	serviceAccount.AccessControl = metadata[saIDString]
 
 	tokens, err := api.service.ListTokens(ctx.Req.Context(), &serviceaccounts.GetSATokensQuery{
@@ -198,7 +204,7 @@ func (api *ServiceAccountsAPI) UpdateServiceAccount(c *contextmodel.ReqContext) 
 
 	saIDString := strconv.FormatInt(resp.Id, 10)
 	metadata := api.getAccessControlMetadata(c, map[string]bool{saIDString: true})
-	resp.AvatarUrl = dtos.GetGravatarUrlWithDefault("", resp.Name)
+	resp.AvatarUrl = dtos.GetGravatarUrlWithDefault(api.cfg, "", resp.Name)
 	resp.AccessControl = metadata[saIDString]
 
 	return response.JSON(http.StatusOK, util.DynMap{
@@ -296,7 +302,7 @@ func (api *ServiceAccountsAPI) SearchOrgServiceAccountsWithPaging(c *contextmode
 	saIDs := map[string]bool{}
 	for i := range serviceAccountSearch.ServiceAccounts {
 		sa := serviceAccountSearch.ServiceAccounts[i]
-		sa.AvatarUrl = dtos.GetGravatarUrlWithDefault("", sa.Name)
+		sa.AvatarUrl = dtos.GetGravatarUrlWithDefault(api.cfg, "", sa.Name)
 
 		saIDString := strconv.FormatInt(sa.Id, 10)
 		saIDs[saIDString] = true
