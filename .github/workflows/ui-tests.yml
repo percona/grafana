@@ -70,7 +70,7 @@ jobs:
 
       - name: Run UI tests
         working-directory: ./pmm-ui-tests
-        run: npm run e2e:grafana-pr
+        run: npx codeceptjs run --config "pr.codecept.js" --grep "@pmm-tour"
 
       - name: Attaching artifacts
         if: ${{ always() }}
