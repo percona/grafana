@@ -5,8 +5,7 @@ import { Router, Redirect, Switch, RouteComponentProps } from 'react-router-dom'
 import { CompatRouter, CompatRoute } from 'react-router-dom-v5-compat';
 
 import { config, locationService, navigationLogger, reportInteraction } from '@grafana/runtime';
-import { ErrorBoundaryAlert, GlobalStyles, ModalRoot, ModalsProvider, PortalContainer } from '@grafana/ui';
-import { PerconaBootstrapper } from 'app/percona/shared/components/PerconaBootstrapper';
+import { ErrorBoundaryAlert, GlobalStyles, ModalRoot, PortalContainer } from '@grafana/ui';
 import { getAppRoutes } from 'app/routes/routes';
 import { store } from 'app/store/store';
 
@@ -16,11 +15,13 @@ import { GrafanaApp } from './app';
 import { AppChrome } from './core/components/AppChrome/AppChrome';
 import { AppNotificationList } from './core/components/AppNotifications/AppNotificationList';
 import { GrafanaContext } from './core/context/GrafanaContext';
+import { ModalsContextProvider } from './core/context/ModalsContextProvider';
 import { GrafanaRoute } from './core/navigation/GrafanaRoute';
 import { RouteDescriptor } from './core/navigation/types';
 import { contextSrv } from './core/services/context_srv';
 import { ThemeProvider } from './core/utils/ConfigProvider';
 import { LiveConnectionWarning } from './features/live/LiveConnectionWarning';
+import { PerconaBootstrapper } from './percona/shared/components/PerconaBootstrapper';
 import PerconaTourProvider from './percona/tour/TourProvider';
 
 interface AppWrapperProps {
@@ -107,32 +108,32 @@ export class AppWrapper extends React.Component<AppWrapperProps, AppWrapperState
                 actions={[]}
                 options={{ enableHistory: true, callbacks: { onSelectAction: commandPaletteActionSelected } }}
               >
-                <ModalsProvider>
-                  <GlobalStyles />
-                  <div className="grafana-app">
-                    <Router history={locationService.getHistory()}>
-                      <CompatRouter>
-                        <PerconaTourProvider>
+                <Router history={locationService.getHistory()}>
+                  <CompatRouter>
+                    <PerconaTourProvider>
+                      <ModalsContextProvider>
+                        <GlobalStyles />
+                        <div className="grafana-app">
                           <AppChrome>
-                            {ready && <PerconaBootstrapper onReady={this.perconaReadyCallback} />}
                             {pageBanners.map((Banner, index) => (
                               <Banner key={index.toString()} />
                             ))}
                             <AngularRoot />
                             <AppNotificationList />
+                            {ready && <PerconaBootstrapper onReady={this.perconaReadyCallback} />}
                             {ready && perconaReady && this.renderRoutes()}
                             {bodyRenderHooks.map((Hook, index) => (
                               <Hook key={index.toString()} />
                             ))}
                           </AppChrome>
-                        </PerconaTourProvider>
-                      </CompatRouter>
-                    </Router>
-                  </div>
-                  <LiveConnectionWarning />
-                  <ModalRoot />
-                  <PortalContainer />
-                </ModalsProvider>
+                        </div>
+                        <LiveConnectionWarning />
+                        <ModalRoot />
+                        <PortalContainer />
+                      </ModalsContextProvider>
+                    </PerconaTourProvider>
+                  </CompatRouter>
+                </Router>
               </KBarProvider>
             </ThemeProvider>
           </GrafanaContext.Provider>

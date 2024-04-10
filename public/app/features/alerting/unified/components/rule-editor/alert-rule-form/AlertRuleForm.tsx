@@ -15,7 +15,13 @@ import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { useDispatch, useSelector } from 'app/types';
 import { RuleWithLocation } from 'app/types/unified-alerting';
 
-import { LogMessages, logInfo, trackNewAlerRuleFormError } from '../../../Analytics';
+import {
+  LogMessages,
+  logInfo,
+  trackAlertRuleFormError,
+  trackAlertRuleFormCancelled,
+  trackAlertRuleFormSaved,
+} from '../../../Analytics';
 import { useUnifiedAlertingSelector } from '../../../hooks/useUnifiedAlertingSelector';
 import { deleteRuleAction, saveRuleFormAction } from '../../../state/actions';
 import { RuleFormType, RuleFormValues } from '../../../types/rule-form';
@@ -123,6 +129,9 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
       notifyApp.error(conditionErrorMsg);
       return;
     }
+
+    trackAlertRuleFormSaved({ formAction: existing ? 'update' : 'create', ruleType: values.type });
+
     // when creating a new rule, we save the manual routing setting in local storage
     if (!existing) {
       if (values.manualRouting) {
@@ -168,20 +177,21 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
   };
 
   const onInvalid: SubmitErrorHandler<RuleFormValues> = (errors): void => {
-    if (!existing) {
-      trackNewAlerRuleFormError({
-        grafana_version: config.buildInfo.version,
-        org_id: contextSrv.user.orgId,
-        user_id: contextSrv.user.id,
-        error: Object.keys(errors).toString(),
-      });
-    }
+    trackAlertRuleFormError({
+      grafana_version: config.buildInfo.version,
+      org_id: contextSrv.user.orgId,
+      user_id: contextSrv.user.id,
+      error: Object.keys(errors).toString(),
+      formAction: existing ? 'update' : 'create',
+    });
     notifyApp.error('There are errors in the form. Please correct them and try again!');
   };
 
   const cancelRuleCreation = () => {
     logInfo(LogMessages.cancelSavingAlertRule);
+    trackAlertRuleFormCancelled({ formAction: existing ? 'update' : 'create' });
   };
+
   const evaluateEveryInForm = watch('evaluateEvery');
   useEffect(() => setEvaluateEvery(evaluateEveryInForm), [evaluateEveryInForm]);
 
