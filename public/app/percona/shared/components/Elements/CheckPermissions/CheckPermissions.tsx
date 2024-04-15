@@ -22,7 +22,7 @@ export const CheckPermissions: FC<CheckPermissionsProps> = ({
     const getSettings = async () => {
       setLoadingSettings(true);
       try {
-        const settings = await SettingsService.getSettings(undefined, true);
+        const settings = await SettingsService.getSettings();
         onSettingsLoadSuccess && onSettingsLoadSuccess(settings);
       } catch (e) {
         // @ts-ignore

@@ -9,18 +9,16 @@ export type LoadingCallback = (value: boolean) => void;
 export type SettingsCallback = (settings: Settings) => void;
 
 export const SettingsService = {
-  async getSettings(token?: CancelToken, disableNotifications = false): Promise<Settings> {
-    const { settings }: SettingsAPIResponse = await api.post('/v1/Settings/Get', {}, disableNotifications, token);
+  async getSettings(): Promise<Settings> {
+    const { settings }: SettingsAPIResponse = await api.get('/v1/server/settings');
     return toModel(settings);
   },
-  async setSettings(body: Partial<SettingsAPIChangePayload>, token?: CancelToken): Promise<Settings | undefined> {
+  async setSettings(body: Partial<SettingsAPIChangePayload>): Promise<Settings | undefined> {
     let response;
     try {
-      const { settings } = await api.post<SettingsAPIResponse, Partial<SettingsAPIChangePayload>>(
-        '/v1/Settings/Change',
-        body,
-        false,
-        token
+      const { settings } = await api.put<SettingsAPIResponse, Partial<SettingsAPIChangePayload>>(
+        '/v1/server/settings',
+        body
       );
       response = toModel(settings);
     } catch (e) {

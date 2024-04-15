@@ -25,10 +25,10 @@ export const ServicesService = {
   updateService(body: UpdateServiceBody, token?: CancelToken) {
     return api.put<{}, UpdateServiceBody>(`/v1/inventory/services/${body.service_id}`, body);
   },
-  addCustomLabels(body: AddCustomLabelsBody, token?: CancelToken) {
-    return api.post<{}, UpdateServiceBody>(`/v1/inventory/services/${body.service_id}/custom_labels`, body, false, token);
+  addCustomLabels(body: AddCustomLabelsBody) {
+    return api.put<{}, UpdateServiceBody>(`/v1/inventory/services/${body.service_id}`, body);
   },
-  removeCustomLabels(body: RemoveCustomLabelsBody, token?: CancelToken) {
-    return api.delete<{}>(`/v1/inventory/services/${body.service_id}/custom_labels`);
+  removeCustomLabels(body: RemoveCustomLabelsBody) {
+    return api.put<{}>(`/v1/inventory/services/${body.service_id}`, {});
   },
 };

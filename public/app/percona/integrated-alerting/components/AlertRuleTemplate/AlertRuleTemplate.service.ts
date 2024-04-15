@@ -11,14 +11,14 @@ import {
   TemplatesListAPI,
 } from './AlertRuleTemplate.types';
 
-const BASE_URL = `/v1/management/alerting/Templates`;
+const BASE_URL = `/v1/alerting/templates`;
 
 export const AlertRuleTemplateService = {
   async upload(payload: UploadAlertRuleTemplatePayload, token?: CancelToken): Promise<void> {
-    return api.post(`${BASE_URL}/Create`, payload, false, token);
+    return api.post(`${BASE_URL}`, payload, false, token);
   },
   async list(payload: AlertRuleTemplateGetPayload, token?: CancelToken): Promise<TemplatesList> {
-    return api.post<TemplatesListAPI, Object>(`${BASE_URL}/List`, { ...payload, reload: true }, true, token).then(
+    return api.get<TemplatesListAPI>(`${BASE_URL}`).then(
       ({ totals, templates = [] }): TemplatesList => ({
         totals,
         templates: templates.map((template) => ({
@@ -40,10 +40,10 @@ export const AlertRuleTemplateService = {
       })
     );
   },
-  async update(payload: UpdateAlertRuleTemplatePayload, token?: CancelToken): Promise<void> {
-    return api.post(`${BASE_URL}/Update`, payload, false, token);
+  async update(payload: UpdateAlertRuleTemplatePayload): Promise<void> {
+    return api.put(`${BASE_URL}/${payload.name}`, { yaml: payload.yaml });
   },
   async delete(payload: DeleteAlertRuleTemplatePayload, token?: CancelToken): Promise<void> {
-    return api.post(`${BASE_URL}/Delete`, payload, false, token);
+    return api.delete(`${BASE_URL}/${payload.name}`);
   },
 };

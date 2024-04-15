@@ -92,7 +92,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       if (scheduleMode) {
         backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
       } else {
-        backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
+        backups = await BackupInventoryService.list();
       }
       for (const value of backups) {
         if (value.id === `/${match.params.type}/${match.params.id}`) {

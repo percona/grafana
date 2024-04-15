@@ -78,7 +78,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       if (isPmmAdmin(user)) {
         await getSettings();
         await dispatch(fetchUserStatusAction());
-        await dispatch(fetchAdvisors({ disableNotifications: true }));
+        await dispatch(fetchAdvisors());
       }
 
       await getUserDetails();

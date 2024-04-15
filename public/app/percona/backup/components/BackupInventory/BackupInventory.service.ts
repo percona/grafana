@@ -9,11 +9,11 @@ import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
 import { Backup, BackupResponse, Timeranges, TimerangesResponse } from './BackupInventory.types';
 import { formatDate } from './BackupInventory.utils';
 
-const BASE_URL = '/v1/management/backup';
+const BASE_URL = '/v1/backup';
 
 export const BackupInventoryService = {
-  async list(token?: CancelToken): Promise<Backup[]> {
-    const { artifacts = [] } = await api.post<BackupResponse, Object>(`${BASE_URL}/Artifacts/List`, {}, false, token);
+  async list(): Promise<Backup[]> {
+    const { artifacts = [] } = await api.get<BackupResponse, Object>(`${BASE_URL}/artifacts`);
     return artifacts.map(
       ({
         artifact_id,
@@ -45,9 +45,7 @@ export const BackupInventoryService = {
     );
   },
   async listPitrTimeranges(artifactId: string): Promise<Array<SelectableValue<Timeranges>>> {
-    const { timeranges = [] } = await api.post<TimerangesResponse, Object>(`${BASE_URL}/Artifacts/ListPITRTimeranges`, {
-      artifact_id: artifactId,
-    });
+    const { timeranges = [] } = await api.get<TimerangesResponse>(`${BASE_URL}/artifacts/${artifactId}/pitr-timeranges`);
     return timeranges.map((value) => ({
       label: `${formatDate(value.start_timestamp)} / ${formatDate(value.end_timestamp)}`,
       value: { startTimestamp: value.start_timestamp, endTimestamp: value.end_timestamp },
@@ -91,7 +89,7 @@ export const BackupInventoryService = {
     );
   },
   async delete(artifactId: string, removeFiles: boolean) {
-    return api.post(`${BASE_URL}/Artifacts/Delete`, { artifact_id: artifactId, remove_files: removeFiles });
+    return api.delete(`${BASE_URL}/artifacts/${artifactId}?remove_files=${removeFiles}`);
   },
   async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<BackupLogs> {
     const { logs = [], end } = await api.post<BackupLogResponse, Object>(

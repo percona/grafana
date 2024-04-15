@@ -7,10 +7,10 @@ import { Advisor } from 'app/percona/shared/services/advisors/Advisors.types';
 
 export const fetchAdvisors = createAsyncThunk(
   'percona/fetchAdvisors',
-  (args?: { token?: CancelToken; disableNotifications?: boolean }): Promise<Advisor[]> =>
+  (): Promise<Advisor[]> =>
     withSerializedError(
       (async () => {
-        const { advisors } = await AdvisorsService.list(args?.token, args?.disableNotifications);
+        const { advisors } = await AdvisorsService.list();
         return advisors;
       })()
     )

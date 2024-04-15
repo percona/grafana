@@ -26,11 +26,7 @@ export const useVersionDetails = (initialForceUpdate = false): CurrentOrNextVers
   });
   const [lastCheckDate, setLastCheckDate] = useState('');
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
-  const [data, errorMessage, isLoading, getVersionDetails] = useApiCall<GetUpdatesResponse | void, GetUpdatesBody>(
-    getCurrentVersion,
-    { force: initialForceUpdate },
-    { force: initialForceUpdate, onlyInstalledVersion: true }
-  );
+  const [data, errorMessage, isLoading, getVersionDetails] = useApiCall<GetUpdatesResponse | void, GetUpdatesBody>(getCurrentVersion);
 
   useEffect(() => {
     if (!data) {
