@@ -90,7 +90,7 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       let backups: Backup[] | ScheduledBackup[];
       let backup: Backup | ScheduledBackup | null = null;
       if (scheduleMode) {
-        backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
+        backups = await ScheduledBackupsService.list();
       } else {
         backups = await BackupInventoryService.list();
       }

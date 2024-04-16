@@ -74,7 +74,7 @@ export const BackupInventoryService = {
     token?: CancelToken
   ) {
     return api.post(
-      `${BASE_URL}/Backups/Start`,
+      `${BASE_URL}:start`,
       {
         service_id: serviceId,
         location_id: locationId,
@@ -91,16 +91,10 @@ export const BackupInventoryService = {
   async delete(artifactId: string, removeFiles: boolean) {
     return api.delete(`${BASE_URL}/artifacts/${artifactId}?remove_files=${removeFiles}`);
   },
-  async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<BackupLogs> {
-    const { logs = [], end } = await api.post<BackupLogResponse, Object>(
-      `${BASE_URL}/Backups/GetLogs`,
-      {
-        artifact_id: artifactId,
-        offset,
-        limit,
-      },
+  async getLogs(artifactId: string): Promise<BackupLogs> {
+    const { logs = [], end } = await api.get<BackupLogResponse>(
+      `${BASE_URL}/${artifactId}/logs`,
       false,
-      token
     );
 
     return {
@@ -109,11 +103,8 @@ export const BackupInventoryService = {
     };
   },
   async listCompatibleServices(artifactId: string): Promise<DBServiceList> {
-    const { mysql = [], mongodb = [] } = await api.post<CompatibleServiceListPayload, Object>(
-      `${BASE_URL}/Backups/ListArtifactCompatibleServices`,
-      {
-        artifact_id: artifactId,
-      }
+    const { mysql = [], mongodb = [] } = await api.get<CompatibleServiceListPayload>(
+      `${BASE_URL}/${artifactId}/compatible-services`
     );
 
     const result: DBServiceList = {

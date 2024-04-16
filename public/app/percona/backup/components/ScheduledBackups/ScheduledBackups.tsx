@@ -60,7 +60,7 @@ export const ScheduledBackups: FC = () => {
     setPending(true);
     await dispatch(fetchStorageLocations());
     try {
-      const backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
+      const backups = await ScheduledBackupsService.list();
       setData(backups);
     } catch (e) {
       if (isApiCancelError(e)) {
