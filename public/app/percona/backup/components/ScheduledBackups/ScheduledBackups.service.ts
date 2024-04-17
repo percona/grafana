@@ -1,5 +1,3 @@
-import { CancelToken } from 'axios';
-
 import { api } from 'app/percona/shared/helpers/api';
 
 import { BackupMode, DataModel } from '../../Backup.types';
