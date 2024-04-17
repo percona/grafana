@@ -11,7 +11,6 @@ import { useSelector } from 'app/types';
 import { useCancelToken } from '../../../shared/components/hooks/cancelToken.hook';
 import { WidgetWrapper } from '../WidgetWrapper/WidgetWrapper';
 
-import { CONTACT_CANCEL_TOKEN } from './Contact.constants';
 import { Messages } from './Contact.messages';
 import { ContactService } from './Contact.service';
 import { getStyles } from './Contact.styles';
@@ -27,7 +26,7 @@ const Contact = () => {
   const getData = useCallback(async () => {
     setPendingRequest(true);
     try {
-      const contact = await ContactService.getContact(generateToken(CONTACT_CANCEL_TOKEN));
+      const contact = await ContactService.getContact();
       setData(contact);
     } catch (e) {
       if (isApiCancelError(e)) {
