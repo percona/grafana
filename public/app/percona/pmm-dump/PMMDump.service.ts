@@ -12,7 +12,7 @@ import {
   ExportResponse,
 } from './PmmDump.types';
 
-const BASE_URL = '/v1/management/dump/Dumps';
+const BASE_URL = '/v1/dumps';
 const link = document.createElement('a');
 
 const delay = (ms: number): Promise<void> => {
@@ -21,15 +21,8 @@ const delay = (ms: number): Promise<void> => {
 
 export const PMMDumpService = {
   async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<DumpLogs> {
-    const { logs = [], end } = await api.post<DumpLogResponse, Object>(
-      `${BASE_URL}/GetLogs`,
-      {
-        dump_id: artifactId,
-        offset,
-        limit,
-      },
-      false,
-      token
+    const { logs = [], end } = await api.get<DumpLogResponse>(
+      `${BASE_URL}/${artifactId}/logs?offset=${offset}&limit=${limit}`
     );
     return {
       logs: logs.map(({ chunk_id = 0, data, time }) => ({ id: chunk_id, data, time })),
@@ -37,11 +30,11 @@ export const PMMDumpService = {
     };
   },
   async list(): Promise<PmmDump[]> {
-    const response = await api.post<PmmDumpResponse, void>(`${BASE_URL}/List`, undefined);
+    const response = await api.get<PmmDumpResponse, void>(`${BASE_URL}`);
     return response.dumps || [];
   },
   async delete(dumpIds: string[]) {
-    await api.post<void, DeleteDump>(`${BASE_URL}/Delete`, { dump_ids: dumpIds });
+    await api.post<void, DeleteDump>(`${BASE_URL}:batchDelete`, { dump_ids: dumpIds });
   },
   async downloadAll(dumpIds: string[], index = 0): Promise<void> {
     for (let i = index; i < dumpIds.length; i++) {
@@ -62,10 +55,10 @@ export const PMMDumpService = {
     });
   },
   async sendToSupport(body: SendToSupportRequestBody) {
-    await api.post<void, DeleteDump>(`${BASE_URL}/Upload`, body, true);
+    await api.post<void, DeleteDump>(`${BASE_URL}:upload`, body, true);
   },
   async trigger(body: ExportDatasetProps, token?: CancelToken): Promise<string> {
-    const res = await api.post<ExportResponse, ExportDatasetProps>(`${BASE_URL}/Start`, body, false, token);
+    const res = await api.post<ExportResponse, ExportDatasetProps>(`${BASE_URL}:start`, body, false, token);
     return res.dump_id;
   },
 };

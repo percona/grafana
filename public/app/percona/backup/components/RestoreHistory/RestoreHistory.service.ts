@@ -6,11 +6,11 @@ import { BackupLogResponse, BackupLogs } from '../../Backup.types';
 
 import { Restore, RestoreResponse } from './RestoreHistory.types';
 
-const BASE_URL = '/v1/management/backup';
+const BASE_URL = '/v1/backups';
 
 export const RestoreHistoryService = {
-  async list(token?: CancelToken): Promise<Restore[]> {
-    const { items = [] } = await api.post<RestoreResponse, object>(`${BASE_URL}/RestoreHistory/List`, {}, false, token);
+  async list(): Promise<Restore[]> {
+    const { items = [] } = await api.get<RestoreResponse, object>(`${BASE_URL}/restores`);
     return items.map(
       ({
         restore_id,

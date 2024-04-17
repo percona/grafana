@@ -213,7 +213,7 @@ export const RestoreHistory: FC = () => {
       await dispatch(fetchStorageLocations());
 
       try {
-        const restores = await RestoreHistoryService.list(generateToken(LIST_RESTORES_CANCEL_TOKEN));
+        const restores = await RestoreHistoryService.list();
         setData(restores);
       } catch (e) {
         if (isApiCancelError(e)) {

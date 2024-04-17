@@ -53,7 +53,7 @@ export const BackupInventoryService = {
   },
   async restore(serviceId: string, artifactId: string, pitrTimestamp?: string, token?: CancelToken) {
     return api.post(
-      `${BASE_URL}/Backups/Restore`,
+      `${BASE_URL}/restore:start`,
       {
         service_id: serviceId,
         artifact_id: artifactId,
