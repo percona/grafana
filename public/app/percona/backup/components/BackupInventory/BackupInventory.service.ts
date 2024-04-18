@@ -9,7 +9,7 @@ import { BackupLogResponse, BackupLogs, DataModel } from '../../Backup.types';
 import { Backup, BackupResponse, Timeranges, TimerangesResponse } from './BackupInventory.types';
 import { formatDate } from './BackupInventory.utils';
 
-const BASE_URL = '/v1/backup';
+const BASE_URL = '/v1/backups';
 
 export const BackupInventoryService = {
   async list(): Promise<Backup[]> {

@@ -24,18 +24,15 @@ const order = {
   [Severity.SEVERITY_INFO]: 7,
   [Severity.SEVERITY_DEBUG]: 8,
 };
-const BASE_URL = '/v1/management/SecurityChecks';
+const BASE_URL = '/v1/advisors';
 
 /**
  * A service-like object to store the API methods
  */
 export const CheckService = {
-  async getAllFailedChecks(token?: CancelToken, disableNotifications?: boolean): Promise<FailedCheckSummary[]> {
-    const { result = [] } = await api.post<CheckResultSummaryPayload, Object>(
-      `${BASE_URL}/ListFailedServices`,
-      {},
-      disableNotifications,
-      token
+  async getAllFailedChecks(): Promise<FailedCheckSummary[]> {
+    const { result = [] } = await api.get<CheckResultSummaryPayload>(
+      `${BASE_URL}/failedServices`
     );
 
     return result
@@ -77,11 +74,8 @@ export const CheckService = {
     const {
       results = [],
       page_totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
-    } = await api.post<CheckResultForServicePayload, Object>(
-      `${BASE_URL}/FailedChecks`,
-      { service_id: serviceId, page_params: { page_size: pageSize, index: pageIndex } },
-      false,
-      token
+    } = await api.get<CheckResultForServicePayload>(
+      `${BASE_URL}/checks/failed?service_id=${serviceId}&page_size=${pageSize}&page_index=${pageIndex}`
     );
 
     return {
@@ -118,7 +112,7 @@ export const CheckService = {
   },
   runDbChecks(checkNames: string[], token?: CancelToken): Promise<void | {}> {
     return api.post<{}, {}>(
-      '/v1/management/SecurityChecks/Start',
+      `${BASE_URL}/checks:start`,
       {
         names: checkNames,
       },
@@ -128,7 +122,7 @@ export const CheckService = {
   },
   runIndividualDbCheck(checkName: string, token?: CancelToken): Promise<void | {}> {
     return api.post<{}, {}>(
-      '/v1/management/SecurityChecks/Start',
+      `${BASE_URL}/checks:start`,
       {
         names: [checkName],
       },
@@ -137,6 +131,6 @@ export const CheckService = {
     );
   },
   changeCheck(body: ChangeCheckBody, token?: CancelToken): Promise<void | {}> {
-    return api.post<{}, ChangeCheckBody>('/v1/management/SecurityChecks/Change', body, false, token);
+    return api.post<{}, ChangeCheckBody>(`${BASE_URL}/checks:batchChange`, body, false, token);
   },
 };

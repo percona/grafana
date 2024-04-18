@@ -28,7 +28,7 @@ export const Failed: FC = () => {
 
   const fetchAlerts = useCallback(async (): Promise<void> => {
     try {
-      const checks = await CheckService.getAllFailedChecks(undefined, true);
+      const checks = await CheckService.getAllFailedChecks();
       setFailedChecks(checks);
     } catch (e) {
       logger.error(e);

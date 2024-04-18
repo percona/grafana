@@ -17,12 +17,9 @@ import {
 const BASE_URL = `/v1/inventory`;
 
 export const InventoryService = {
-  getAgents(serviceId: string | undefined, nodeId: string | undefined, token?: CancelToken) {
-    return api.post<ServiceAgentListPayload, object>(
-      '/v1/management/Agent/List',
-      { service_id: serviceId, node_id: nodeId },
-      false,
-      token
+  getAgents(serviceId: string | undefined, nodeId: string | undefined) {
+    return api.get<ServiceAgentListPayload, object>(
+      `/v1/management/agents?service_id=${serviceId}&node_id=${nodeId}`,
     );
   },
   removeAgent(body: RemoveAgentBody) {
@@ -31,7 +28,7 @@ export const InventoryService = {
   // TODO unify typings and this function with getServices()
   async getDbServices(): Promise<DBServiceList> {
     const response = await api.get<CompatibleServiceListPayload, object>(
-      `${BASE_URL}/Services/List`
+      `${BASE_URL}/services`
     );
     const result: DBServiceList = {};
 
@@ -50,13 +47,13 @@ export const InventoryService = {
 
     return result;
   },
-  getNodes(body = {}, token?: CancelToken) {
-    return api.post<NodeListDBPayload, object>(`/v1/management/Node/List`, body, false, token);
+  getNodes(body = {}) {
+    return api.get<NodeListDBPayload, object>(`/v1/management/nodes`);
   },
   removeNode(body: RemoveNodeBody) {
     return api.delete<void>(`${BASE_URL}/nodes/${body.node_id}`);
   },
-  getService(serviceId: string, token?: CancelToken) {
-    return api.post<any, any>(`${BASE_URL}/Services/Get`, { service_id: serviceId }, false, token);
+  getService(serviceId: string) {
+    return api.get<any, any>(`${BASE_URL}/services/${serviceId}`);
   },
 };

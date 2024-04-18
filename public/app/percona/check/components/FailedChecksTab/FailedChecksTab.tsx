@@ -9,7 +9,6 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { FailedCheckSummary } from 'app/percona/check/types';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ExtendedTableCellProps, ExtendedTableRowProps, Table } from 'app/percona/shared/components/Elements/Table';
-import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
@@ -17,7 +16,6 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 import { ChecksInfoAlert } from '../CheckInfoAlert/CheckInfoAlert';
 
-import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 import { Messages } from './FailedChecksTab.messages';
 import { getStyles } from './FailedChecksTab.styles';
 import { stripServiceId } from './FailedChecksTab.utils';
@@ -27,7 +25,6 @@ export const FailedChecksTab: FC = () => {
   const [fetchAlertsPending, setFetchAlertsPending] = useState(true);
   const [data, setData] = useState<FailedCheckSummary[]>([]);
   const styles = useStyles2(getStyles);
-  const [generateToken] = useCancelToken();
 
   const columns = useMemo(
     (): Array<Column<FailedCheckSummary>> => [
@@ -49,7 +46,7 @@ export const FailedChecksTab: FC = () => {
     setFetchAlertsPending(true);
 
     try {
-      const checks = await CheckService.getAllFailedChecks(generateToken(GET_ACTIVE_ALERTS_CANCEL_TOKEN));
+      const checks = await CheckService.getAllFailedChecks();
       setData(checks);
     } catch (e) {
       if (isApiCancelError(e)) {

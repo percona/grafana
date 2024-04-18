@@ -29,7 +29,7 @@ import { dispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { GET_AGENTS_CANCEL_TOKEN, GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
+import { GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
@@ -115,8 +115,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
     try {
       const { agents = [] } = await InventoryService.getAgents(
         serviceId,
-        nodeId,
-        generateToken(GET_AGENTS_CANCEL_TOKEN)
+        nodeId
       );
       setData(toAgentModel(agents));
     } catch (e) {
