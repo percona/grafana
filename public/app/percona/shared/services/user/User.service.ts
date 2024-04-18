@@ -4,16 +4,11 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { UserStatusResponse, UserDetailsResponse, UserDetailsPutPayload, UserListResponse } from './User.types';
 
-const BASE_URL = '/v1/Platform';
+const BASE_URL = '/v1/platform';
 
 export const UserService = {
-  async getUserStatus(cancelToken?: CancelToken, disableNotifications = false): Promise<boolean> {
-    const { is_platform_user }: UserStatusResponse = await api.post(
-      `${BASE_URL}/UserStatus`,
-      {},
-      disableNotifications,
-      cancelToken
-    );
+  async getUserStatus(): Promise<boolean> {
+    const { is_platform_user }: UserStatusResponse = await api.get(`${BASE_URL}/user`);
     return is_platform_user;
   },
   getUserDetails: async (): Promise<UserDetailsResponse> => await api.get('/v1/users/me', true),
