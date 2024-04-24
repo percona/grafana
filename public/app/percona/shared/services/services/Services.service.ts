@@ -16,8 +16,8 @@ export const ServicesService = {
   getActive(token?: CancelToken, disableNotifications?: boolean) {
     return api.post<ListTypesPayload, {}>('/v1/inventory/services:getTypes', {}, disableNotifications, token);
   },
-  getServices(body: Partial<ListServicesBody> = {}, token?: CancelToken) {
-    return api.post<ServiceListPayload, Partial<ListServicesBody>>('/v1/management/Service/List', body, false, token);
+  getServices(body: Partial<ListServicesBody> = {}) {
+    return api.get<ServiceListPayload, Partial<ListServicesBody>>(`/v1/management/services?node_id=${body.node_id}&service_type=${body.service_type}&external_group=${body.external_group}`);
   },
   removeService(body: RemoveServiceBody) {
     return api.delete<{}>(`/v1/inventory/services/${body.service_id}`);

@@ -79,7 +79,7 @@ export const fetchServicesAction = createAsyncThunk<Service[], Partial<ListServi
   'percona/fetchServices',
   async (params = {}) => {
     const body = toListServicesBody(params);
-    const payload = await ServicesService.getServices(body, params.token);
+    const payload = await ServicesService.getServices(body);
     const mappedServices = toDbServicesModel(payload);
     return mappedServices.sort((a, b) => a.params.serviceName.localeCompare(b.params.serviceName));
   }

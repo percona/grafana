@@ -29,7 +29,7 @@ import {
 class AddRemoteInstanceService {
   static async addMysql(body: MySQLPayload, token?: CancelToken) {
     return apiManagement.post<MySQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
-      '/MySQL/Add',
+      '/v1/management/services',
       body,
       false,
       token
@@ -38,7 +38,7 @@ class AddRemoteInstanceService {
 
   static async addPostgresql(body: PostgreSQLPayload, token?: CancelToken) {
     return apiManagement.post<PostgreSQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
-      '/PostgreSQL/Add',
+      '/v1/management/services',
       body,
       false,
       token
@@ -47,7 +47,7 @@ class AddRemoteInstanceService {
 
   static async addProxysql(body: ProxySQLPayload, token?: CancelToken) {
     return apiManagement.post<ProxySQLInstanceResponse | ErrorResponse, RemoteInstancePayload>(
-      '/ProxySQL/Add',
+      '/v1/management/services',
       body,
       false,
       token
@@ -56,7 +56,7 @@ class AddRemoteInstanceService {
 
   static async addHaproxy(body: HaProxyPayload, token?: CancelToken) {
     return apiManagement.post<AddHaProxyResponse | ErrorResponse, RemoteInstancePayload>(
-      '/HAProxy/Add',
+      '/v1/management/services',
       body,
       false,
       token
@@ -65,7 +65,7 @@ class AddRemoteInstanceService {
 
   static async addMongodb(body: MongoDBPayload, token?: CancelToken) {
     return apiManagement.post<AddMongoDbResponse | ErrorResponse, RemoteInstancePayload>(
-      '/MongoDB/Add',
+      '/v1/management/services',
       body,
       false,
       token
@@ -73,12 +73,12 @@ class AddRemoteInstanceService {
   }
 
   static async addRDS(body: RDSPayload, token?: CancelToken) {
-    return apiManagement.post<AddRDSResponse | ErrorResponse, RemoteInstancePayload>('/RDS/Add', body, false, token);
+    return apiManagement.post<AddRDSResponse | ErrorResponse, RemoteInstancePayload>('/v1/management/services', body, false, token);
   }
 
   static async addAzure(body: MSAzurePayload, token?: CancelToken) {
     return apiManagement.post<{} | ErrorResponse, RemoteInstancePayload>(
-      '/azure/AzureDatabase/Add',
+      '/v1/management/services/azure',
       body,
       false,
       token
@@ -86,7 +86,7 @@ class AddRemoteInstanceService {
   }
 
   static async addExternal(body: ExternalPayload, token?: CancelToken) {
-    return apiManagement.post<AddExternalResponse, ExternalPayload>('/External/Add', body, false, token);
+    return apiManagement.post<AddExternalResponse, ExternalPayload>('/v1/management/services', body, false, token);
   }
 
   static addRemote(type: InstanceAvailableType, data: RemoteInstancePayload, token?: CancelToken) {
