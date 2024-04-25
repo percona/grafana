@@ -21,7 +21,7 @@ const delay = (ms: number): Promise<void> => {
 
 export const PMMDumpService = {
   async getLogs(artifactId: string, offset: number, limit: number, token?: CancelToken): Promise<DumpLogs> {
-    const { logs = [], end } = await api.get<DumpLogResponse>(
+    const { logs = [], end } = await api.get<DumpLogResponse, void>(
       `${BASE_URL}/${artifactId}/logs?offset=${offset}&limit=${limit}`
     );
     return {

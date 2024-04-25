@@ -1,5 +1,3 @@
-import { CancelToken } from 'axios';
-
 import { api } from '../../helpers/api';
 
 import { Advisor } from './Advisors.types';

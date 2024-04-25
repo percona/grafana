@@ -8,7 +8,6 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { useSelector } from 'app/types';
 
-import { useCancelToken } from '../../../shared/components/hooks/cancelToken.hook';
 import { WidgetWrapper } from '../WidgetWrapper/WidgetWrapper';
 
 import { Messages } from './Contact.messages';
@@ -20,7 +19,6 @@ const Contact = () => {
   const [pendingRequest, setPendingRequest] = useState(true);
   const [data, setData] = useState<CustomerSuccess>();
   const { isPlatformUser } = useSelector(getPerconaUser);
-  const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
   const getData = useCallback(async () => {

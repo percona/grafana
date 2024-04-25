@@ -1,5 +1,3 @@
-import { CancelToken } from 'axios';
-
 import { api } from 'app/percona/shared/helpers/api';
 
 import { BackupLogResponse, BackupLogs } from '../../Backup.types';
@@ -43,16 +41,9 @@ export const RestoreHistoryService = {
       })
     );
   },
-  async getLogs(restoreId: string, offset: number, limit: number, token?: CancelToken): Promise<BackupLogs> {
-    const { logs = [], end } = await api.post<BackupLogResponse, Object>(
-      `${BASE_URL}/Backups/GetLogs`,
-      {
-        restore_id: restoreId,
-        offset,
-        limit,
-      },
-      false,
-      token
+  async getLogs(restoreId: string, offset: number, limit: number): Promise<BackupLogs> {
+    const { logs = [], end } = await api.get<BackupLogResponse, Object>(
+      `${BASE_URL}/${restoreId}/logs?offset=${offset}&limit=${limit}`
     );
 
     return {

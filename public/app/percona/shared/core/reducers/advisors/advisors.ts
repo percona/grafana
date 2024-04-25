@@ -1,5 +1,4 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { CancelToken } from 'axios';
 
 import { createAsyncSlice, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { AdvisorsService } from 'app/percona/shared/services/advisors/Advisors.service';

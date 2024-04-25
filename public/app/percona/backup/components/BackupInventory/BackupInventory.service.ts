@@ -45,7 +45,7 @@ export const BackupInventoryService = {
     );
   },
   async listPitrTimeranges(artifactId: string): Promise<Array<SelectableValue<Timeranges>>> {
-    const { timeranges = [] } = await api.get<TimerangesResponse>(`${BASE_URL}/artifacts/${artifactId}/pitr-timeranges`);
+    const { timeranges = [] } = await api.get<TimerangesResponse, void>(`${BASE_URL}/artifacts/${artifactId}/pitr-timeranges`);
     return timeranges.map((value) => ({
       label: `${formatDate(value.start_timestamp)} / ${formatDate(value.end_timestamp)}`,
       value: { startTimestamp: value.start_timestamp, endTimestamp: value.end_timestamp },
@@ -91,9 +91,9 @@ export const BackupInventoryService = {
   async delete(artifactId: string, removeFiles: boolean) {
     return api.delete(`${BASE_URL}/artifacts/${artifactId}?remove_files=${removeFiles}`);
   },
-  async getLogs(artifactId: string): Promise<BackupLogs> {
-    const { logs = [], end } = await api.get<BackupLogResponse>(
-      `${BASE_URL}/${artifactId}/logs`,
+  async getLogs(artifactId: string, offset: number, limit: number): Promise<BackupLogs> {
+    const { logs = [], end } = await api.get<BackupLogResponse, void>(
+      `${BASE_URL}/${artifactId}/logs?offset=${offset}&limit=${limit}`,
       false,
     );
 
@@ -103,7 +103,7 @@ export const BackupInventoryService = {
     };
   },
   async listCompatibleServices(artifactId: string): Promise<DBServiceList> {
-    const { mysql = [], mongodb = [] } = await api.get<CompatibleServiceListPayload>(
+    const { mysql = [], mongodb = [] } = await api.get<CompatibleServiceListPayload, void>(
       `${BASE_URL}/${artifactId}/compatible-services`
     );
 

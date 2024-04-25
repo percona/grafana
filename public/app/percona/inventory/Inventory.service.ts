@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 
-import { CancelToken } from 'axios';
-
 import { api } from 'app/percona/shared/helpers/api';
 
 import {

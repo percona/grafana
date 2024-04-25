@@ -10,7 +10,6 @@ import { Chip } from 'app/percona/shared/components/Elements/Chip';
 import { ExpandableCell } from 'app/percona/shared/components/Elements/ExpandableCell';
 import { ExtendedColumn, Table } from 'app/percona/shared/components/Elements/Table';
 import { useStoredTablePageSize } from 'app/percona/shared/components/Elements/Table/Pagination';
-import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
@@ -19,7 +18,7 @@ import { CheckService } from '../../Check.service';
 import { ServiceFailedCheck } from '../../types';
 import { formatServiceId } from '../FailedChecksTab/FailedChecksTab.utils';
 
-import { SERVICE_CHECKS_CANCEL_TOKEN, SERVICE_CHECKS_TABLE_ID } from './ServiceChecks.constants';
+import { SERVICE_CHECKS_TABLE_ID } from './ServiceChecks.constants';
 import { Messages } from './ServiceChecks.messages';
 import { getStyles } from './ServiceChecks.styles';
 
@@ -32,7 +31,6 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
   const [data, setData] = useState<ServiceFailedCheck[]>([]);
   const [pending, setPending] = useState(false);
   const [serviceName, setServiceName] = useState('');
-  const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const navModel = usePerconaNavModel('advisors-insights');
 
@@ -45,8 +43,7 @@ export const ServiceChecks: FC<GrafanaRouteComponentProps<{ service: string }>> 
       } = await CheckService.getFailedCheckForService(
         serviceId,
         pageSize,
-        pageIndex,
-        generateToken(SERVICE_CHECKS_CANCEL_TOKEN)
+        pageIndex
       );
       setData(data);
       setServiceName(data[0].serviceName);

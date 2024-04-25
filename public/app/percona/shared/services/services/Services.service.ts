@@ -29,6 +29,6 @@ export const ServicesService = {
     return api.put<{}, UpdateServiceBody>(`/v1/inventory/services/${body.service_id}`, body);
   },
   removeCustomLabels(body: RemoveCustomLabelsBody) {
-    return api.put<{}>(`/v1/inventory/services/${body.service_id}`, {});
+    return api.put<{}, unknown>(`/v1/inventory/services/${body.service_id}`, {});
   },
 };

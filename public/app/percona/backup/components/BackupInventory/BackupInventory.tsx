@@ -29,7 +29,7 @@ import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
 import { LocationType } from '../StorageLocations/StorageLocations.types';
 
-import { DATA_INTERVAL, LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN } from './BackupInventory.constants';
+import { DATA_INTERVAL, RESTORE_CANCEL_TOKEN } from './BackupInventory.constants';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
 import { BackupRow } from './BackupInventory.types';
@@ -222,7 +222,7 @@ export const BackupInventory: FC = () => {
       showLoading && setPending(true);
 
       try {
-        const backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
+        const backups = await BackupInventoryService.list();
         const backupsWithLocation = backups.map<BackupRow>((backup) => ({
           ...backup,
           location: locations.find((location) => location.locationID === backup.locationId),
@@ -268,7 +268,7 @@ export const BackupInventory: FC = () => {
 
   const getLogs = useCallback(
     async (startingChunk: number, offset: number, token?: CancelToken) => {
-      return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset, token);
+      return BackupInventoryService.getLogs(selectedBackup!.id, startingChunk, offset);
     },
     [selectedBackup]
   );

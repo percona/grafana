@@ -16,7 +16,7 @@ import { updateServiceAction } from '../shared/core/reducers/services';
 import { logger } from '../shared/helpers/logger';
 import { DbServicePayload } from '../shared/services/services/Services.types';
 
-import { EDIT_INSTANCE_DOCS_LINK, FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
+import { EDIT_INSTANCE_DOCS_LINK } from './EditInstance.constants';
 import { Messages } from './EditInstance.messages';
 import { getStyles } from './EditInstance.styles';
 import { EditInstanceFormValues, EditInstanceRouteParams } from './EditInstance.types';

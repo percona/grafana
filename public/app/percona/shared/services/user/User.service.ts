@@ -1,5 +1,3 @@
-import { CancelToken } from 'axios';
-
 import { api } from 'app/percona/shared/helpers/api';
 
 import { UserStatusResponse, UserDetailsResponse, UserDetailsPutPayload, UserListResponse } from './User.types';

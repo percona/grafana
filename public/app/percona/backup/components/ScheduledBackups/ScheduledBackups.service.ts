@@ -8,7 +8,7 @@ const BASE_URL = '/v1/backups';
 
 export const ScheduledBackupsService = {
   async list(): Promise<ScheduledBackup[]> {
-    const { scheduled_backups = [] } = await api.get<ScheduledBackupResponse>(
+    const { scheduled_backups = [] } = await api.get<ScheduledBackupResponse, void>(
       `${BASE_URL}/scheduled`
     );
 

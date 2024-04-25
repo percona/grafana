@@ -18,7 +18,7 @@ export const AlertRuleTemplateService = {
     return api.post(`${BASE_URL}`, payload, false, token);
   },
   async list(payload: AlertRuleTemplateGetPayload, token?: CancelToken): Promise<TemplatesList> {
-    return api.get<TemplatesListAPI>(`${BASE_URL}`).then(
+    return api.get<TemplatesListAPI, void>(`${BASE_URL}`).then(
       ({ totals, templates = [] }): TemplatesList => ({
         totals,
         templates: templates.map((template) => ({
