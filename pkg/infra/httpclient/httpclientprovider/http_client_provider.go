@@ -23,7 +23,6 @@ func New(cfg *setting.Cfg, validator validations.PluginRequestValidator, tracer 
 	middlewares := []sdkhttpclient.Middleware{
 		TracingMiddleware(logger, tracer),
 		DataSourceMetricsMiddleware(),
-		ForwardedProxyFilterMiddleware(),
 		sdkhttpclient.ContextualMiddleware(),
 		SetUserAgentMiddleware(cfg.DataProxyUserAgent),
 		sdkhttpclient.BasicAuthenticationMiddleware(),

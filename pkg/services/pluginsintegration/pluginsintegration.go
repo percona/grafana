@@ -189,6 +189,8 @@ func CreateMiddlewares(cfg *setting.Cfg, oAuthTokenService oauthtoken.OAuthToken
 
 	middlewares = append(middlewares, clientmiddleware.NewHTTPClientMiddleware())
 
+	middlewares = append(middlewares, clientmiddleware.NewPerconaForwarderHTTPClientMiddleware())
+
 	if features.IsEnabledGlobally(featuremgmt.FlagPluginsInstrumentationStatusSource) {
 		// StatusSourceMiddleware should be at the very bottom, or any middlewares below it won't see the
 		// correct status source in their context.Context
