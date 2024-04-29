@@ -8,8 +8,9 @@ import (
 
 const ForwardedProxyFilterMiddlewareName = "forwarded-x-proxy-filter"
 
-func ForwardedProxyFilterMiddleware(token string) sdkhttpclient.Middleware {
+func ForwardedProxyFilterMiddleware() sdkhttpclient.Middleware {
 	return sdkhttpclient.NamedMiddlewareFunc(ForwardedProxyFilterMiddlewareName, func(opts sdkhttpclient.Options, next http.RoundTripper) http.RoundTripper {
+		token := opts.Header.Get("X-Proxy-Filter")
 		if token == "" {
 			return next
 		}
