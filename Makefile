@@ -339,8 +339,6 @@ help: ## Display this help.
 
 rebuild-pmm:
 		make build-go
-		rm -f /usr/sbin/grafana-server
 		rm -f /usr/sbin/grafana
-		cp ./bin/linux-amd64/grafana-server /usr/sbin/grafana-server
 		cp ./bin/linux-amd64/grafana /usr/sbin/grafana
 		supervisorctl restart grafana

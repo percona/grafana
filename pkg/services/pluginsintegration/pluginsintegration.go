@@ -189,6 +189,7 @@ func CreateMiddlewares(cfg *setting.Cfg, oAuthTokenService oauthtoken.OAuthToken
 
 	middlewares = append(middlewares, clientmiddleware.NewHTTPClientMiddleware())
 
+	// @PERCONA
 	middlewares = append(middlewares, clientmiddleware.NewPerconaForwarderHTTPClientMiddleware())
 
 	if features.IsEnabledGlobally(featuremgmt.FlagPluginsInstrumentationStatusSource) {

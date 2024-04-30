@@ -11,6 +11,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/contexthandler"
 )
 
+// @PERCONA
 const forwardedProxyFilterMiddlewareName = "forwarded-x-proxy-filter"
 
 // NewPerconaForwarderHTTPClientMiddleware creates a new plugins.ClientMiddleware
@@ -36,8 +37,6 @@ func (m *PerconaForwarderHTTPClientMiddleware) applyHeaders(ctx context.Context,
 		return httpclient.RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
 			reqCtx := contexthandler.FromContext(ctx)
 
-			// @PERCONA
-			// @PERCONA_TODO
 			xProxyFilter := reqCtx.Req.Header.Get("X-Proxy-Filter")
 			if xProxyFilter != "" {
 				req.Header.Set("X-Proxy-Filter", xProxyFilter)
