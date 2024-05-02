@@ -18,7 +18,7 @@ export class ApiRequest {
   async get<T, B>(
     path: string,
     disableNotifications = false,
-    query?: { params: B; cancelToken?: CancelToken }
+    query?: { params?: B; cancelToken?: CancelToken }
   ): Promise<T> {
     return this.axiosInstance
       .get<T>(path, query)
@@ -44,32 +44,38 @@ export class ApiRequest {
       });
   }
 
-  async delete<T>(path: string): Promise<T> {
+  async delete<T>(path: string, disableNotifications = false, cancelToken?: CancelToken): Promise<T> {
     return this.axiosInstance
-      .delete<T>(path)
+      .delete<T>(path, { cancelToken })
       .then((response): T => response.data)
       .catch((e) => {
-        // Notify.error(e.message);
+        if (!disableNotifications) {
+          appEvents.emit(AppEvents.alertError, [e.message]);
+        }
         throw e;
       });
   }
 
-  async patch<T, B>(path: string, body: B): Promise<T> {
+  async patch<T, B>(path: string, body: B, disableNotifications = false, cancelToken?: CancelToken): Promise<T> {
     return this.axiosInstance
-      .patch<T>(path, body)
+      .patch<T>(path, body, { cancelToken })
       .then((response): T => response.data)
       .catch((e) => {
-        // Notify.error(e.message);
+        if (!disableNotifications) {
+          appEvents.emit(AppEvents.alertError, [e.message]);
+        }
         throw e;
       });
   }
 
-  async put<T, B>(path: string, body: B): Promise<T> {
+  async put<T, B>(path: string, body: B, disableNotifications = false, cancelToken?: CancelToken): Promise<T> {
     return this.axiosInstance
-      .put<T>(path, body)
+      .put<T>(path, body, { cancelToken })
       .then((response): T => response.data)
       .catch((e) => {
-        // Notify.error(e.message);
+        if (!disableNotifications) {
+          appEvents.emit(AppEvents.alertError, [e.message]);
+        }
         throw e;
       });
   }
