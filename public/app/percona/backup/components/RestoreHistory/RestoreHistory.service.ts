@@ -1,3 +1,5 @@
+import { CancelToken } from 'axios';
+
 import { api } from 'app/percona/shared/helpers/api';
 
 import { BackupLogResponse, BackupLogs } from '../../Backup.types';
@@ -7,8 +9,8 @@ import { Restore, RestoreResponse } from './RestoreHistory.types';
 const BASE_URL = '/v1/backups';
 
 export const RestoreHistoryService = {
-  async list(): Promise<Restore[]> {
-    const { items = [] } = await api.get<RestoreResponse, object>(`${BASE_URL}/restores`);
+  async list(cancelToken?: CancelToken): Promise<Restore[]> {
+    const { items = [] } = await api.get<RestoreResponse, object>(`${BASE_URL}/restores`, false, { cancelToken });
     return items.map(
       ({
         restore_id,
@@ -41,9 +43,11 @@ export const RestoreHistoryService = {
       })
     );
   },
-  async getLogs(restoreId: string, offset: number, limit: number): Promise<BackupLogs> {
+  async getLogs(restoreId: string, offset: number, limit: number, cancelToken?: CancelToken): Promise<BackupLogs> {
     const { logs = [], end } = await api.get<BackupLogResponse, Object>(
-      `${BASE_URL}/${restoreId}/logs?offset=${offset}&limit=${limit}`
+      `${BASE_URL}/${restoreId}/logs?offset=${offset}&limit=${limit}`,
+      false,
+      { cancelToken }
     );
 
     return {

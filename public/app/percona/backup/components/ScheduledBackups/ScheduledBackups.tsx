@@ -11,6 +11,7 @@ import { Page } from 'app/core/components/Page/Page';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { DATABASE_LABELS } from 'app/percona/shared/core';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -24,6 +25,7 @@ import { BackupService } from '../../Backup.service';
 import { formatBackupMode, formatLocationsToMap } from '../../Backup.utils';
 import { DetailedDate } from '../DetailedDate';
 
+import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from './ScheduledBackups.constants';
 import { ScheduledBackupsService } from './ScheduledBackups.service';
 import { getStyles } from './ScheduledBackups.styles';
 import { ScheduledBackup } from './ScheduledBackups.types';
@@ -37,6 +39,7 @@ export const ScheduledBackups: FC = () => {
   const [deletePending, setDeletePending] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<ScheduledBackup | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
   const styles = useStyles(getStyles);
   const { result: locations = [] } = useSelector(getBackupLocations);
@@ -57,7 +60,7 @@ export const ScheduledBackups: FC = () => {
     setPending(true);
     await dispatch(fetchStorageLocations());
     try {
-      const backups = await ScheduledBackupsService.list();
+      const backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
       setData(backups);
     } catch (e) {
       if (isApiCancelError(e)) {

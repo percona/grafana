@@ -23,11 +23,11 @@ const RolesService = {
     return toAccessRole(response);
   },
   async list(): Promise<AccessRole[]> {
-    const response = await api.get<ListRolesResponse, void>(`${BASE_URL}`);
+    const response = await api.get<ListRolesResponse, void>(BASE_URL);
     return response.roles.map((role) => toAccessRole(role));
   },
   async create(role: CreateAccessRole): Promise<void> {
-    await api.post<void, CreateAccessRolePayload>(`${BASE_URL}`, toCreateBody(role));
+    await api.post<void, CreateAccessRolePayload>(BASE_URL, toCreateBody(role));
   },
   async update(role: UpdateAccessRole): Promise<void> {
     await api.put<void, UpdateAccessRolePayload>(`${BASE_URL}/${role.roleId}`, toUpdateBody(role));

@@ -69,7 +69,7 @@ export const fetchSettingsAction = createAsyncThunk(
   ): Promise<Settings> =>
     withSerializedError(
       (async () => {
-        const settings = await SettingsService.getSettings();
+        const settings = await SettingsService.getSettings(undefined, true);
         const modifiedSettings: Settings = {
           ...settings,
           alertingSettings: {
@@ -105,7 +105,7 @@ export const updateSettingsAction = createAsyncThunk(
               args.body.email_alerting_settings!.test_email = undefined;
             }
           }
-          const settings = await SettingsService.setSettings(args.body);
+          const settings = await SettingsService.setSettings(args.body, args.token);
           await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
           return settings;
         })()

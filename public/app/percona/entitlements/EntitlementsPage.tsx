@@ -9,8 +9,10 @@ import { StoreState, useSelector } from 'app/types';
 
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { PMM_ENTITLEMENTS_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation';
+import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { isApiCancelError } from '../shared/helpers/api';
 
+import { LIST_ENTITLEMENTS_CANCEL_TOKEN } from './Entitlements.contants';
 import { Messages } from './Entitlements.messages';
 import EntitlementsService from './Entitlements.service';
 import { getStyles } from './Entitlements.styles';
@@ -23,13 +25,14 @@ const EntitlementsPage: FC = () => {
   const [pendingRequest, setPendingRequest] = useState(true);
   const [data, setData] = useState<Entitlement[]>([]);
   const isConnectedToPortal = useSelector((state: StoreState) => !!state.percona.user.isPlatformUser);
+  const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
 
   const getData = useCallback(async (showLoading = false) => {
     showLoading && setPendingRequest(true);
 
     try {
-      const entitlements = await EntitlementsService.list();
+      const entitlements = await EntitlementsService.list(generateToken(LIST_ENTITLEMENTS_CANCEL_TOKEN));
       setData(entitlements);
     } catch (e) {
       if (isApiCancelError(e)) {

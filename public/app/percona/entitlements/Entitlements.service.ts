@@ -1,3 +1,5 @@
+import { CancelToken } from 'axios';
+
 import { api } from 'app/percona/shared/helpers/api';
 
 import { EntitlementsResponse, Entitlement } from './Entitlements.types';
@@ -5,8 +7,12 @@ import { EntitlementsResponse, Entitlement } from './Entitlements.types';
 const BASE_URL = '/v1/platform';
 
 const EntitlementsService = {
-  async list(): Promise<Entitlement[]> {
-    const { entitlements = [] } = await api.get<EntitlementsResponse, {}>(`${BASE_URL}/organization/entitlements`);
+  async list(token?: CancelToken): Promise<Entitlement[]> {
+    const { entitlements = [] } = await api.get<EntitlementsResponse, {}>(
+      `${BASE_URL}/organization/entitlements`,
+      false,
+      { cancelToken: token }
+    );
     return entitlements.map(
       ({
         number,

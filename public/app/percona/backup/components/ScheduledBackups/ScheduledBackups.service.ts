@@ -1,3 +1,5 @@
+import { CancelToken } from 'axios';
+
 import { api } from 'app/percona/shared/helpers/api';
 
 import { BackupMode, DataModel } from '../../Backup.types';
@@ -7,10 +9,10 @@ import { ScheduledBackup, ScheduledBackupResponse } from './ScheduledBackups.typ
 const BASE_URL = '/v1/backups';
 
 export const ScheduledBackupsService = {
-  async list(): Promise<ScheduledBackup[]> {
-    const { scheduled_backups = [] } = await api.get<ScheduledBackupResponse, void>(
-      `${BASE_URL}/scheduled`
-    );
+  async list(cancelToken?: CancelToken): Promise<ScheduledBackup[]> {
+    const { scheduled_backups = [] } = await api.get<ScheduledBackupResponse, void>(`${BASE_URL}/scheduled`, false, {
+      cancelToken,
+    });
 
     return scheduled_backups.map(
       ({

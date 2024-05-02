@@ -1,4 +1,5 @@
 /* eslint-disable react/display-name */
+import { CancelToken } from 'axios';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Row } from 'react-table';
 
@@ -6,6 +7,7 @@ import { Page } from 'app/core/components/Page/Page';
 import { BackupStatus } from 'app/percona/backup/Backup.types';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { fetchStorageLocations } from 'app/percona/shared/core/reducers/backups/backupLocations';
 import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
@@ -20,7 +22,7 @@ import { useRecurringCall } from '../../hooks/recurringCall.hook';
 import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
 
-import { DATA_INTERVAL } from './RestoreHistory.constants';
+import { DATA_INTERVAL, LIST_RESTORES_CANCEL_TOKEN } from './RestoreHistory.constants';
 import { RestoreHistoryService } from './RestoreHistory.service';
 import { Restore } from './RestoreHistory.types';
 import { RestoreHistoryActions } from './RestoreHistoryActions';
@@ -32,6 +34,7 @@ export const RestoreHistory: FC = () => {
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<Restore[]>([]);
   const [selectedRestore, setSelectedRestore] = useState<Restore | null>(null);
+  const [generateToken] = useCancelToken();
   const [triggerTimeout] = useRecurringCall();
   const dispatch = useAppDispatch();
   const { result: locations = [] } = useSelector(getBackupLocations);
@@ -196,8 +199,8 @@ export const RestoreHistory: FC = () => {
   };
 
   const getLogs = useCallback(
-    async (startingChunk: number, offset: number) =>
-      RestoreHistoryService.getLogs(selectedRestore!.id, startingChunk, offset),
+    async (startingChunk: number, offset: number, token?: CancelToken) =>
+      RestoreHistoryService.getLogs(selectedRestore!.id, startingChunk, offset, token),
     [selectedRestore]
   );
 
@@ -210,7 +213,7 @@ export const RestoreHistory: FC = () => {
       await dispatch(fetchStorageLocations());
 
       try {
-        const restores = await RestoreHistoryService.list();
+        const restores = await RestoreHistoryService.list(generateToken(LIST_RESTORES_CANCEL_TOKEN));
         setData(restores);
       } catch (e) {
         if (isApiCancelError(e)) {

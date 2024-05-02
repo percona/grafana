@@ -79,7 +79,7 @@ export const fetchServicesAction = createAsyncThunk<Service[], Partial<ListServi
   'percona/fetchServices',
   async (params = {}) => {
     const body = toListServicesBody(params);
-    const payload = await ServicesService.getServices(body);
+    const payload = await ServicesService.getServices(body, params.token);
     const mappedServices = toDbServicesModel(payload);
     return mappedServices.sort((a, b) => a.params.serviceName.localeCompare(b.params.serviceName));
   }
@@ -89,7 +89,7 @@ export const removeServicesAction = createAsyncThunk(
   'percona/removeServices',
   async (params: RemoveServicesParams): Promise<number> => {
     const bodies = params.services.map(toRemoveServiceBody);
-    const requests = bodies.map((body) => ServicesService.removeService(body));
+    const requests = bodies.map((body) => ServicesService.removeService(body, params.cancelToken));
     const results = await processPromiseResults(requests);
     return results.filter(filterFulfilled).length;
   }

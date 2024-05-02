@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 
+import { CancelToken } from 'axios';
+
 import { api } from 'app/percona/shared/helpers/api';
 
 import {
   CompatibleServiceListPayload,
   DBServiceList,
   NodeListDBPayload,
-  RemoveAgentBody,
   RemoveNodeBody,
   ServiceAgentListPayload,
 } from './Inventory.types';
@@ -15,19 +16,22 @@ import {
 const BASE_URL = `/v1/inventory`;
 
 export const InventoryService = {
-  getAgents(serviceId: string | undefined, nodeId: string | undefined) {
+  getAgents(serviceId: string | undefined, nodeId: string | undefined, token?: CancelToken) {
     return api.get<ServiceAgentListPayload, object>(
       `/v1/management/agents?service_id=${serviceId}&node_id=${nodeId}`,
+      false,
+      { cancelToken: token }
     );
   },
-  removeAgent(body: RemoveAgentBody) {
-    return api.delete<void>(`${BASE_URL}/agents/${body.id}`);
+  removeAgent(agentId: string, forceMode = false, token?: CancelToken) {
+    // todo: address forceMode
+    return api.delete<void>(`${BASE_URL}/agents/${agentId}`, false, token);
   },
   // TODO unify typings and this function with getServices()
-  async getDbServices(): Promise<DBServiceList> {
-    const response = await api.get<CompatibleServiceListPayload, object>(
-      `${BASE_URL}/services`
-    );
+  async getDbServices(token?: CancelToken): Promise<DBServiceList> {
+    const response = await api.get<CompatibleServiceListPayload, object>(`${BASE_URL}/services`, false, {
+      cancelToken: token,
+    });
     const result: DBServiceList = {};
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -45,13 +49,14 @@ export const InventoryService = {
 
     return result;
   },
-  getNodes(body = {}) {
-    return api.get<NodeListDBPayload, object>(`/v1/management/nodes`);
+  getNodes(body = {}, token?: CancelToken) {
+    // todo: address body
+    return api.get<NodeListDBPayload, object>(`/v1/management/nodes`, false, { cancelToken: token });
   },
-  removeNode(body: RemoveNodeBody) {
-    return api.delete<void>(`${BASE_URL}/nodes/${body.node_id}`);
+  removeNode(body: RemoveNodeBody, token?: CancelToken) {
+    return api.delete<void>(`${BASE_URL}/nodes/${body.node_id}`, false, token);
   },
-  getService(serviceId: string) {
-    return api.get<any, any>(`${BASE_URL}/services/${serviceId}`);
+  getService(serviceId: string, cancelToken?: CancelToken) {
+    return api.get<any, any>(`${BASE_URL}/services/${serviceId}`, false, { cancelToken });
   },
 };

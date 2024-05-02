@@ -12,11 +12,12 @@ import { useAppDispatch } from 'app/store/store';
 
 import { Labels } from '../add-instance/components/AddRemoteInstance/FormParts';
 import { PMM_EDIT_INSTANCE_PAGE, PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation';
+import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { updateServiceAction } from '../shared/core/reducers/services';
 import { logger } from '../shared/helpers/logger';
 import { DbServicePayload } from '../shared/services/services/Services.types';
 
-import { EDIT_INSTANCE_DOCS_LINK } from './EditInstance.constants';
+import { EDIT_INSTANCE_DOCS_LINK, FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
 import { Messages } from './EditInstance.messages';
 import { getStyles } from './EditInstance.styles';
 import { EditInstanceFormValues, EditInstanceRouteParams } from './EditInstance.types';
@@ -28,6 +29,7 @@ const EditInstancePage: FC = () => {
   const { serviceId } = useParams<EditInstanceRouteParams>();
   const [isLoading, setIsLoading] = useState(true);
   const [service, setService] = useState<DbServicePayload>();
+  const [generateToken] = useCancelToken();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const styles = useStyles2(getStyles);
 
@@ -38,7 +40,7 @@ const EditInstancePage: FC = () => {
 
   const fetchService = async (serviceId: string) => {
     setIsLoading(true);
-    const result = await InventoryService.getService(serviceId);
+    const result = await InventoryService.getService(serviceId, generateToken(FETCH_SERVICE_CANCEL_TOKEN));
     const service = getService(result);
 
     setService(service);

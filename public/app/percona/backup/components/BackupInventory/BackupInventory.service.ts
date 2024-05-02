@@ -12,8 +12,8 @@ import { formatDate } from './BackupInventory.utils';
 const BASE_URL = '/v1/backups';
 
 export const BackupInventoryService = {
-  async list(): Promise<Backup[]> {
-    const { artifacts = [] } = await api.get<BackupResponse, Object>(`${BASE_URL}/artifacts`);
+  async list(cancelToken?: CancelToken): Promise<Backup[]> {
+    const { artifacts = [] } = await api.get<BackupResponse, Object>(`${BASE_URL}/artifacts`, false, { cancelToken });
     return artifacts.map(
       ({
         artifact_id,
@@ -45,7 +45,9 @@ export const BackupInventoryService = {
     );
   },
   async listPitrTimeranges(artifactId: string): Promise<Array<SelectableValue<Timeranges>>> {
-    const { timeranges = [] } = await api.get<TimerangesResponse, void>(`${BASE_URL}/artifacts/${artifactId}/pitr-timeranges`);
+    const { timeranges = [] } = await api.get<TimerangesResponse, void>(
+      `${BASE_URL}/artifacts/${artifactId}/pitr-timeranges`
+    );
     return timeranges.map((value) => ({
       label: `${formatDate(value.start_timestamp)} / ${formatDate(value.end_timestamp)}`,
       value: { startTimestamp: value.start_timestamp, endTimestamp: value.end_timestamp },
@@ -91,10 +93,11 @@ export const BackupInventoryService = {
   async delete(artifactId: string, removeFiles: boolean) {
     return api.delete(`${BASE_URL}/artifacts/${artifactId}?remove_files=${removeFiles}`);
   },
-  async getLogs(artifactId: string, offset: number, limit: number): Promise<BackupLogs> {
+  async getLogs(artifactId: string, offset: number, limit: number, cancelToken?: CancelToken): Promise<BackupLogs> {
     const { logs = [], end } = await api.get<BackupLogResponse, void>(
       `${BASE_URL}/${artifactId}/logs?offset=${offset}&limit=${limit}`,
       false,
+      { cancelToken }
     );
 
     return {

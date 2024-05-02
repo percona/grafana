@@ -33,9 +33,10 @@ import { Messages as MessagesBackup } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
 import { BackupMode, BackupType, DataModel } from '../../Backup.types';
 import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
-import { BACKUP_CANCEL_TOKEN } from '../BackupInventory/BackupInventory.constants';
+import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN } from '../BackupInventory/BackupInventory.constants';
 import { BackupInventoryService } from '../BackupInventory/BackupInventory.service';
 import { Backup } from '../BackupInventory/BackupInventory.types';
+import { LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN } from '../ScheduledBackups/ScheduledBackups.constants';
 import { ScheduledBackupsService } from '../ScheduledBackups/ScheduledBackups.service';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { LocationType } from '../StorageLocations/StorageLocations.types';
@@ -89,9 +90,9 @@ const AddBackupPage: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       let backups: Backup[] | ScheduledBackup[];
       let backup: Backup | ScheduledBackup | null = null;
       if (scheduleMode) {
-        backups = await ScheduledBackupsService.list();
+        backups = await ScheduledBackupsService.list(generateToken(LIST_SCHEDULED_BACKUPS_CANCEL_TOKEN));
       } else {
-        backups = await BackupInventoryService.list();
+        backups = await BackupInventoryService.list(generateToken(LIST_ARTIFACTS_CANCEL_TOKEN));
       }
       for (const value of backups) {
         if (value.id === `/${match.params.type}/${match.params.id}`) {

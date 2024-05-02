@@ -39,7 +39,7 @@ export const fetchUserStatusAction = createAsyncThunk(
   (_, thunkAPI): Promise<void> =>
     withSerializedError(
       (async () => {
-        const isPlatformUser = await UserService.getUserStatus();
+        const isPlatformUser = await UserService.getUserStatus(undefined, true);
         thunkAPI.dispatch(setIsPlatformUser(isPlatformUser));
       })()
     )

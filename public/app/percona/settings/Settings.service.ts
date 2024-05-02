@@ -1,3 +1,5 @@
+import { CancelToken } from 'axios';
+
 import { api } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
 
@@ -7,16 +9,20 @@ export type LoadingCallback = (value: boolean) => void;
 export type SettingsCallback = (settings: Settings) => void;
 
 export const SettingsService = {
-  async getSettings(): Promise<Settings> {
-    const { settings }: SettingsAPIResponse = await api.get('/v1/server/settings');
+  async getSettings(token?: CancelToken, disableNotifications = false): Promise<Settings> {
+    const { settings }: SettingsAPIResponse = await api.get('/v1/server/settings', disableNotifications, {
+      cancelToken: token,
+    });
     return toModel(settings);
   },
-  async setSettings(body: Partial<SettingsAPIChangePayload>): Promise<Settings | undefined> {
+  async setSettings(body: Partial<SettingsAPIChangePayload>, token?: CancelToken): Promise<Settings | undefined> {
     let response;
     try {
       const { settings } = await api.put<SettingsAPIResponse, Partial<SettingsAPIChangePayload>>(
         '/v1/server/settings',
-        body
+        body,
+        false,
+        token
       );
       response = toModel(settings);
     } catch (e) {

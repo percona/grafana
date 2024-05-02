@@ -29,7 +29,7 @@ import { dispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
+import { GET_AGENTS_CANCEL_TOKEN, GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
@@ -115,7 +115,8 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
     try {
       const { agents = [] } = await InventoryService.getAgents(
         serviceId,
-        nodeId
+        nodeId,
+        generateToken(GET_AGENTS_CANCEL_TOKEN)
       );
       setData(toAgentModel(agents));
     } catch (e) {
@@ -163,13 +164,11 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   }, [generateToken, loadData, service, nodeId, serviceId, node]);
 
   const removeAgents = useCallback(
-    async (agents: Array<SelectedTableRows<FlattenAgent>>) => {
+    async (agents: Array<SelectedTableRows<FlattenAgent>>, forceMode: boolean) => {
       try {
         setLoading(true);
         // eslint-disable-next-line max-len
-        const requests = agents.map((agent) =>
-          InventoryService.removeAgent({ id: agent.original.agentId })
-        );
+        const requests = agents.map((agent) => InventoryService.removeAgent(agent.original.agentId, forceMode));
         const results = await processPromiseResults(requests);
 
         const successfullyDeleted = results.filter(filterFulfilled).length;
@@ -258,7 +257,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
                       <Button
                         size="md"
                         onClick={() => {
-                          removeAgents(selected);
+                          removeAgents(selected, form.getState().values.force);
                           setModalVisible(false);
                         }}
                         variant="destructive"
