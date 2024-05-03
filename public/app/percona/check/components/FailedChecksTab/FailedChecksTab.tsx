@@ -78,7 +78,7 @@ export const FailedChecksTab: FC = () => {
   }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const featureSelector = useCallback(getPerconaSettingFlag('sttEnabled'), []);
+  const featureSelector = useCallback(getPerconaSettingFlag('advisorEnabled'), []);
 
   return (
     <Page navId="advisors-insights" data-testid="db-check-panel">
