@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import axios, { CancelToken, AxiosInstance } from 'axios';
+import axios, { CancelToken, AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { AppEvents } from '@grafana/data';
 import { appEvents } from 'app/core/app_events';
@@ -31,9 +31,15 @@ export class ApiRequest {
       });
   }
 
-  async post<T, B>(path: string, body: B, disableNotifications = false, cancelToken?: CancelToken): Promise<T> {
+  async post<T, B = any>(
+    path: string,
+    body: B,
+    disableNotifications = false,
+    cancelToken?: CancelToken,
+    params?: AxiosRequestConfig<B>['params']
+  ): Promise<T> {
     return this.axiosInstance
-      .post<T>(path, body, { cancelToken })
+      .post<T>(path, body, { cancelToken, params })
       .then((response): T => response.data)
       .catch((e) => {
         if (!disableNotifications && !axios.isCancel(e)) {
@@ -44,9 +50,14 @@ export class ApiRequest {
       });
   }
 
-  async delete<T>(path: string, disableNotifications = false, cancelToken?: CancelToken): Promise<T> {
+  async delete<T, B = any>(
+    path: string,
+    disableNotifications = false,
+    cancelToken?: CancelToken,
+    params?: AxiosRequestConfig<B>['params']
+  ): Promise<T> {
     return this.axiosInstance
-      .delete<T>(path, { cancelToken })
+      .delete<T>(path, { cancelToken, params })
       .then((response): T => response.data)
       .catch((e) => {
         if (!disableNotifications) {
