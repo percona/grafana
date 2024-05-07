@@ -22,4 +22,26 @@ describe('PostgreSQL connection details:: ', () => {
 
     expect(screen.getByTestId('maxQueryLength-text-input')).toHaveValue('1000');
   });
+
+  it('should have max connection field for pg and rds pg', () => {
+    render(
+      <Form
+        onSubmit={jest.fn()}
+        render={() => <PostgreSQLConnectionDetails remoteInstanceCredentials={{ isAzure: false }} />}
+      />
+    );
+    const connectionlimitInput = screen.queryByTestId('maxExporterConnections-text-input');
+    expect(connectionlimitInput).toBeInTheDocument();
+  });
+
+  it('should not have max connection field for Azure', () => {
+    render(
+      <Form
+        onSubmit={jest.fn()}
+        render={() => <PostgreSQLConnectionDetails remoteInstanceCredentials={{ isAzure: true }} />}
+      />
+    );
+    const connectionlimitInput = screen.queryByTestId('maxExporterConnections-text-input');
+    expect(connectionlimitInput).not.toBeInTheDocument();
+  });
 });
