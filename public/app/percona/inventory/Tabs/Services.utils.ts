@@ -39,7 +39,7 @@ export const getBadgeTextForServiceStatus = (status: ServiceStatus): string => {
     return 'N/A';
   }
 
-  return capitalizeText(status);
+  return capitalizeText(status.split('_')[1] || '');
 };
 
 export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
@@ -65,3 +65,6 @@ export const getNodeLink = (service: FlattenService) => {
   const nodeId = service.nodeId === 'pmm-server' ? 'pmm-server' : stripNodeId(service.nodeId);
   return `/inventory/nodes?search-text-input=${nodeId}&search-select=nodeId`;
 };
+
+export const getTagsFromLabels = (labelKeys: string[], labels: Record<string, string>) =>
+  labelKeys.filter((label) => labels[label] !== '').map((label) => `${label}=${labels![label]}`);

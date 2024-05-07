@@ -17,11 +17,13 @@ const BASE_URL = `/v1/inventory`;
 
 export const InventoryService = {
   getAgents(serviceId: string | undefined, nodeId: string | undefined, token?: CancelToken) {
-    return api.get<ServiceAgentListPayload, object>(
-      `/v1/management/agents?service_id=${serviceId}&node_id=${nodeId}`,
-      false,
-      { cancelToken: token }
-    );
+    return api.get<ServiceAgentListPayload, object>('/v1/management/agents', false, {
+      cancelToken: token,
+      params: {
+        service_id: serviceId,
+        node_id: nodeId,
+      },
+    });
   },
   removeAgent(agentId: string, forceMode = false, token?: CancelToken) {
     // todo: address forceMode

@@ -16,12 +16,11 @@ export const ServicesService = {
   getActive(token?: CancelToken, disableNotifications?: boolean) {
     return api.post<ListTypesPayload, {}>('/v1/inventory/services:getTypes', {}, disableNotifications, token);
   },
-  getServices(body: Partial<ListServicesBody> = {}, token?: CancelToken) {
-    return api.get<ServiceListPayload, Partial<ListServicesBody>>(
-      `/v1/management/services?node_id=${body.node_id}&service_type=${body.service_type}&external_group=${body.external_group}`,
-      false,
-      { cancelToken: token }
-    );
+  getServices(params: Partial<ListServicesBody> = {}, token?: CancelToken) {
+    return api.get<ServiceListPayload, Partial<ListServicesBody>>('/v1/management/services', false, {
+      cancelToken: token,
+      params,
+    });
   },
   removeService(body: RemoveServiceBody, token?: CancelToken) {
     return api.delete<{}>(`/v1/inventory/services/${body.service_id}`, false, token);

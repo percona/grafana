@@ -22,6 +22,7 @@ import {
   getBadgeIconForServiceStatus,
   getNodeLink,
   stripServiceId,
+  getTagsFromLabels,
 } from '../Services.utils';
 import { getStyles } from '../Tabs.styles';
 
@@ -200,11 +201,7 @@ const ServicesTable: FC<ServicesTableProps> = ({
           </DetailsRow.Contents>
           {!!labelKeys.length && (
             <DetailsRow.Contents title={Messages.services.details.labels} fullRow>
-              <TagList
-                colorIndex={9}
-                className={styles.tagList}
-                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
-              />
+              <TagList colorIndex={9} className={styles.tagList} tags={getTagsFromLabels(labelKeys, labels)} />
             </DetailsRow.Contents>
           )}
         </DetailsRow>

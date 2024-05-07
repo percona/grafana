@@ -1,3 +1,4 @@
+import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 import {
   AddCustomLabelsBody,
@@ -148,3 +149,5 @@ export const toDbServicesModel = (serviceList: ServiceListPayload): Service[] =>
 
   return result;
 };
+
+export const getServiceStatusText = (status: ServiceStatus): string => capitalizeText(status.split('_')[1] || '');

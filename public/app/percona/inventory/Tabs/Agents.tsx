@@ -21,7 +21,6 @@ import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getNodes, getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
@@ -33,8 +32,9 @@ import { GET_AGENTS_CANCEL_TOKEN, GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TO
 import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
-import { beautifyAgentType, getAgentStatusColor, toAgentModel } from './Agents.utils';
+import { beautifyAgentType, getAgentStatusColor, getAgentStatusText, toAgentModel } from './Agents.utils';
 import { formatNodeId } from './Nodes.utils';
+import { getTagsFromLabels } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: string }>> = ({ match }) => {
@@ -64,7 +64,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
         Header: Messages.agents.columns.status,
         accessor: 'status',
         Cell: ({ value }: { value: ServiceAgentStatus }) => (
-          <Badge text={capitalizeText(value)} color={getAgentStatusColor(value)} />
+          <Badge text={getAgentStatusText(value)} color={getAgentStatusColor(value)} />
         ),
         type: FilterFieldTypes.DROPDOWN,
         options: [
@@ -138,11 +138,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
         <DetailsRow>
           {!!labelKeys.length && (
             <DetailsRow.Contents title={Messages.agents.details.properties} fullRow>
-              <TagList
-                colorIndex={9}
-                className={styles.tagList}
-                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
-              />
+              <TagList colorIndex={9} className={styles.tagList} tags={getTagsFromLabels(labelKeys, labels)} />
             </DetailsRow.Contents>
           )}
         </DetailsRow>

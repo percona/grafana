@@ -18,7 +18,7 @@ class DiscoveryService {
   ) {
     return apiManagement
       .post<RDSInstances, RDSCredentialsForm>(
-        '/v1/management/services:discoverRDS',
+        '/services:discoverRDS',
         {
           aws_access_key,
           aws_secret_key,

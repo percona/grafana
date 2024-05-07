@@ -11,7 +11,7 @@ class DiscoveryService {
     token?: CancelToken
   ) {
     return apiManagement.post<AzureDatabaseInstances, AzureCredentialsForm>(
-      '/v1/management/services:discoverAzure',
+      '/services:discoverAzure',
       {
         azure_client_id,
         azure_client_secret,

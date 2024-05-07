@@ -18,7 +18,6 @@ import { RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { NodeType } from 'app/percona/shared/services/nodes/Nodes.types';
@@ -34,7 +33,12 @@ import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
 import { getServiceLink, stripNodeId } from './Nodes.utils';
-import { getBadgeColorForServiceStatus, getBadgeIconForServiceStatus } from './Services.utils';
+import {
+  getBadgeColorForServiceStatus,
+  getBadgeIconForServiceStatus,
+  getBadgeTextForServiceStatus,
+  getTagsFromLabels,
+} from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
 export const NodesTab = () => {
@@ -84,7 +88,7 @@ export const NodesTab = () => {
         accessor: 'status',
         Cell: ({ value }: { value: ServiceStatus }) => (
           <Badge
-            text={capitalizeText(value)}
+            text={getBadgeTextForServiceStatus(value)}
             color={getBadgeColorForServiceStatus(value)}
             icon={getBadgeIconForServiceStatus(value)}
           />
@@ -220,11 +224,7 @@ export const NodesTab = () => {
           )}
           {!!labelKeys.length && (
             <DetailsRow.Contents title={Messages.services.details.labels} fullRow>
-              <TagList
-                colorIndex={9}
-                className={styles.tagList}
-                tags={labelKeys.map((label) => `${label}=${labels![label]}`)}
-              />
+              <TagList colorIndex={9} className={styles.tagList} tags={getTagsFromLabels(labelKeys, labels)} />
             </DetailsRow.Contents>
           )}
           {!!extraPropertiesKeys.length && (
@@ -232,7 +232,7 @@ export const NodesTab = () => {
               <TagList
                 colorIndex={9}
                 className={styles.tagList}
-                tags={extraPropertiesKeys.map((prop) => `${prop}=${extraProperties![prop]}`)}
+                tags={getTagsFromLabels(extraPropertiesKeys, extraProperties)}
               />
             </DetailsRow.Contents>
           )}

@@ -13,9 +13,9 @@ export enum ServiceType {
 }
 
 export enum ServiceStatus {
-  UP = 'UP',
-  DOWN = 'DOWN',
-  UNKNOWN = 'UNKNOWN',
+  UP = 'STATUS_UP',
+  DOWN = 'STATUS_DOWN',
+  UNKNOWN = 'STATUS_UNKNOWN',
   NA = 'N/A',
 }
 
