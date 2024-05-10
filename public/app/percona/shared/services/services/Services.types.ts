@@ -109,13 +109,3 @@ export interface UpdateServiceBody {
   replication_set?: string;
   external_group?: string;
 }
-
-export interface AddCustomLabelsBody {
-  service_id: string;
-  custom_labels: Record<string, string>;
-}
-
-export interface RemoveCustomLabelsBody {
-  service_id: string;
-  custom_label_keys: string[];
-}

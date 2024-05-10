@@ -3,10 +3,8 @@ import { CancelToken } from 'axios';
 import { api } from 'app/percona/shared/helpers/api';
 
 import {
-  AddCustomLabelsBody,
   ListServicesBody,
   ListTypesPayload,
-  RemoveCustomLabelsBody,
   RemoveServiceBody,
   ServiceListPayload,
   UpdateServiceBody,
@@ -26,13 +24,7 @@ export const ServicesService = {
     return api.delete<{}>(`/v1/inventory/services/${body.service_id}`, false, token);
   },
   updateService(body: UpdateServiceBody, token?: CancelToken) {
-    return api.put<{}, UpdateServiceBody>(`/v1/inventory/services/${body.service_id}`, body, false, token);
-  },
-  // todo: check custom labels functionality
-  addCustomLabels(body: AddCustomLabelsBody, token?: CancelToken) {
-    return api.put<{}, UpdateServiceBody>(`/v1/inventory/services/${body.service_id}`, body, false, token);
-  },
-  removeCustomLabels(body: RemoveCustomLabelsBody, token?: CancelToken) {
-    return api.put<{}, unknown>(`/v1/inventory/services/${body.service_id}`, {}, false, token);
+    const serviceId = body.service_id.replace('/service_id/', '');
+    return api.put<{}, UpdateServiceBody>(`/v1/inventory/services/${serviceId}`, body, false, token);
   },
 };
