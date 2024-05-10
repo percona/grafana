@@ -31,9 +31,13 @@ const BASE_URL = '/v1/advisors';
  */
 export const CheckService = {
   async getAllFailedChecks(token?: CancelToken, disableNotifications?: boolean): Promise<FailedCheckSummary[]> {
-    const { result = [] } = await api.get<CheckResultSummaryPayload, void>(`${BASE_URL}/failedServices`, false, {
-      cancelToken: token,
-    });
+    const { result = [] } = await api.get<CheckResultSummaryPayload, void>(
+      `${BASE_URL}/failedServices`,
+      disableNotifications,
+      {
+        cancelToken: token,
+      }
+    );
 
     return result
       .map(
@@ -74,11 +78,17 @@ export const CheckService = {
     const {
       results = [],
       page_totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
-    } = await api.get<CheckResultForServicePayload, void>(
-      `${BASE_URL}/checks/failed?service_id=${serviceId}&page_size=${pageSize}&page_index=${pageIndex}`,
-      false,
-      { cancelToken: token }
-    );
+    } = await api.get<
+      CheckResultForServicePayload,
+      {
+        service_id: string;
+        page_size: number;
+        page_index: number;
+      }
+    >(`${BASE_URL}/checks/failed`, false, {
+      cancelToken: token,
+      params: { service_id: serviceId, page_size: pageSize, page_index: pageIndex },
+    });
 
     return {
       totals: {

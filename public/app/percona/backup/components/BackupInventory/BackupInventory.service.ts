@@ -91,13 +91,18 @@ export const BackupInventoryService = {
     );
   },
   async delete(artifactId: string, removeFiles: boolean) {
-    return api.delete(`${BASE_URL}/artifacts/${artifactId}?remove_files=${removeFiles}`);
+    return api.delete(`${BASE_URL}/artifacts/${artifactId}`, false, undefined, {
+      params: { remove_files: removeFiles },
+    });
   },
   async getLogs(artifactId: string, offset: number, limit: number, cancelToken?: CancelToken): Promise<BackupLogs> {
-    const { logs = [], end } = await api.get<BackupLogResponse, void>(
-      `${BASE_URL}/${artifactId}/logs?offset=${offset}&limit=${limit}`,
+    const { logs = [], end } = await api.get<BackupLogResponse, { offset: number; limit: number }>(
+      `${BASE_URL}/${artifactId}/logs`,
       false,
-      { cancelToken }
+      {
+        cancelToken,
+        params: { offset, limit },
+      }
     );
 
     return {
