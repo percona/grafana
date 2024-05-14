@@ -45,6 +45,7 @@ labels:
     - enterprise
     - oss
 title: Transform data
+description: Use transformations to rename fields, join series data, apply mathematical operations, and more
 weight: 100
 ---
 
@@ -86,7 +87,7 @@ The following steps guide you in adding a transformation to data. This documenta
    For information about available calculations, refer to [Calculation types][].
 1. To apply another transformation, click **Add transformation**.
    This transformation acts on the result set returned by the previous transformation.
-   {{< figure src="/static/img/docs/transformations/transformations-7-0.png" class="docs-image--no-shadow" max-width= "1100px" >}}
+   {{< figure src="/static/img/docs/transformations/transformations-7-0.png" class="docs-image--no-shadow" max-width= "1100px" alt="Transform tab in the panel editor" >}}
 
 ## Debug a transformation
 
@@ -94,19 +95,21 @@ To see the input and the output result sets of the transformation, click the bug
 
 The input and output results sets can help you debug a transformation.
 
-{{< figure src="/static/img/docs/transformations/debug-transformations-7-0.png" class="docs-image--no-shadow" max-width= "1100px" >}}
+{{< figure src="/static/img/docs/transformations/debug-transformations-7-0.png" class="docs-image--no-shadow" max-width= "1100px" alt="The debug transformation screen with the debug icon highlighted" >}}
 
 ## Disable a transformation
 
 You can disable or hide one or more transformations by clicking on the eye icon on the top right side of the transformation row. This disables the applied actions of that specific transformation and can help to identify issues when you change several transformations one after another.
 
-{{< figure src="/static/img/docs/transformations/screenshot-example-disable-transformation.png" class="docs-image--no-shadow" max-width= "1100px" >}}
+{{< figure src="/static/img/docs/transformations/screenshot-example-disable-transformation.png" class="docs-image--no-shadow" max-width= "1100px" alt="A transformation row with the disable transformation icon highlighted" >}}
 
 ## Filter a transformation
 
 If your panel uses more than one query, you can filter these and apply the selected transformation to only one of the queries. To do this, click the filter icon on the top right of the transformation row. This opens a drop-down with a list of queries used on the panel. From here, you can select the query you want to transform.
 
-Note that the filter icon is always displayed if your panel has more than one query, but it may not work if previous transformations for merging the queries' outputs are applied. This is because one transformation takes the output of the previous one.
+You can also filter by annotations (which includes exemplars) to apply transformations to them. When you do so, the list of fields changes to reflect those in the annotation or exemplar tooltip.
+
+The filter icon is always displayed if your panel has more than one query or source of data (that is, panel or annotation data) but it may not work if previous transformations for merging the queries’ outputs are applied. This is because one transformation takes the output of the previous one.
 
 ## Delete a transformation
 
@@ -122,7 +125,7 @@ We recommend that you remove transformations that you don't need. When you delet
 1. Click the **Transform** tab.
 1. Click the trash icon next to the transformation you want to delete.
 
-{{< figure src="/static/img/docs/transformations/screenshot-example-remove-transformation.png" class="docs-image--no-shadow" max-width= "1100px" >}}
+{{< figure src="/static/img/docs/transformations/screenshot-example-remove-transformation.png" class="docs-image--no-shadow" max-width= "1100px" alt="A transformation row with the remove transformation icon highlighted" >}}
 
 ## Transformation functions
 

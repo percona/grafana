@@ -1,31 +1,31 @@
 import { css } from '@emotion/css';
 import React, { useEffect, useMemo, useState } from 'react';
-import { DeepMap, FieldError, FormProvider, useForm, UseFormWatch } from 'react-hook-form';
+import { FormProvider, SubmitErrorHandler, UseFormWatch, useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { config } from '@grafana/runtime';
-import { Button, ConfirmModal, CustomScrollbar, HorizontalGroup, Spinner, useStyles2, Stack } from '@grafana/ui';
+import { Button, ConfirmModal, CustomScrollbar, HorizontalGroup, Spinner, Stack, useStyles2 } from '@grafana/ui';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
 import { useAppNotification } from 'app/core/copy/appNotification';
 import { contextSrv } from 'app/core/core';
 import { useCleanup } from 'app/core/hooks/useCleanup';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
-import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { useDispatch, useSelector } from 'app/types';
+import { useDispatch } from 'app/types';
 import { RuleWithLocation } from 'app/types/unified-alerting';
 
-import { logInfo, LogMessages, trackNewAlerRuleFormError } from '../../../Analytics';
+import { LogMessages, logInfo, trackNewAlerRuleFormError } from '../../../Analytics';
 import { useUnifiedAlertingSelector } from '../../../hooks/useUnifiedAlertingSelector';
 import { deleteRuleAction, saveRuleFormAction } from '../../../state/actions';
 import { RuleFormType, RuleFormValues } from '../../../types/rule-form';
 import { initialAsyncRequestState } from '../../../utils/redux';
 import {
+  MANUAL_ROUTING_KEY,
+  MINUTE,
   formValuesFromExistingRule,
   getDefaultFormValues,
   getDefaultQueries,
   ignoreHiddenQueries,
-  MINUTE,
   normalizeDefaultAnnotations,
 } from '../../../utils/rule-form';
 import * as ruleId from '../../../utils/rule-id';
@@ -37,7 +37,6 @@ import { GrafanaEvaluationBehavior } from '../GrafanaEvaluationBehavior';
 import { NotificationsStep } from '../NotificationsStep';
 import { RecordingRulesNameSpaceAndGroupStep } from '../RecordingRulesNameSpaceAndGroupStep';
 import { RuleInspector } from '../RuleInspector';
-import { TemplateStep } from '../TemplateStep/TemplateStep';
 import { QueryAndExpressionsStep } from '../query-and-alert-condition/QueryAndExpressionsStep';
 import { translateRouteParamToRuleType } from '../util';
 
@@ -53,7 +52,6 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
   const [queryParams] = useQueryParams();
   const [showEditYaml, setShowEditYaml] = useState(false);
   const [evaluateEvery, setEvaluateEvery] = useState(existing?.group.interval ?? MINUTE);
-  const { result } = useSelector(getPerconaSettings);
 
   const routeParams = useParams<{ type: string; id: string }>();
   const ruleType = translateRouteParamToRuleType(routeParams.type);
@@ -75,23 +73,14 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
       return formValuesFromQueryParams(queryParams['defaults'], ruleType);
     }
 
-    const type = ruleType
-      ? ruleType
-      : result && !!result.alertingEnabled
-      ? RuleFormType.templated
-      : RuleFormType.grafana;
-
     return {
       ...getDefaultFormValues(),
       condition: 'C',
       queries: getDefaultQueries(),
+      type: ruleType || RuleFormType.grafana,
       evaluateEvery: evaluateEvery,
-      // @PERCONA
-      // Set templated as default
-      type,
-      group: result && !!result.alertingEnabled ? 'default-alert-group' : '',
     };
-  }, [existing, prefill, queryParams, evaluateEvery, ruleType, result]);
+  }, [existing, prefill, queryParams, evaluateEvery, ruleType]);
 
   const formAPI = useForm<RuleFormValues>({
     mode: 'onSubmit',
@@ -105,8 +94,6 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
   const dataSourceName = watch('dataSourceName');
 
   const showDataSourceDependantStep = Boolean(type && (type === RuleFormType.grafana || !!dataSourceName));
-  // @PERCONA
-  const showTemplateStep = type === RuleFormType.templated;
 
   const submitState = useUnifiedAlertingSelector((state) => state.ruleForm.saveRule) || initialAsyncRequestState;
   useCleanup((state) => (state.unifiedAlerting.ruleForm.saveRule = initialAsyncRequestState));
@@ -121,6 +108,14 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
     if (conditionErrorMsg !== '') {
       notifyApp.error(conditionErrorMsg);
       return;
+    }
+    // when creating a new rule, we save the manual routing setting in local storage
+    if (!existing) {
+      if (values.manualRouting) {
+        localStorage.setItem(MANUAL_ROUTING_KEY, 'true');
+      } else {
+        localStorage.setItem(MANUAL_ROUTING_KEY, 'false');
+      }
     }
 
     dispatch(
@@ -158,7 +153,7 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
     }
   };
 
-  const onInvalid = (errors: DeepMap<RuleFormValues, FieldError>): void => {
+  const onInvalid: SubmitErrorHandler<RuleFormValues> = (errors): void => {
     if (!existing) {
       trackNewAlerRuleFormError({
         grafana_version: config.buildInfo.version,
@@ -236,8 +231,6 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
               <AlertRuleNameInput />
               {/* Step 2 */}
               <QueryAndExpressionsStep editingExistingRule={!!existing} onDataChange={checkAlertCondition} />
-              {/* @PERCONA */}
-              {showTemplateStep && <TemplateStep />}
               {/* Step 3-4-5 */}
               {showDataSourceDependantStep && (
                 <>
@@ -256,10 +249,10 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
                   {type === RuleFormType.cloudRecording && <RecordingRulesNameSpaceAndGroupStep />}
 
                   {/* Step 4 & 5 */}
-                  {/* Annotations only for cloud and Grafana */}
-                  {type !== RuleFormType.cloudRecording && <AnnotationsStep />}
                   {/* Notifications step*/}
                   <NotificationsStep alertUid={uidFromParams} />
+                  {/* Annotations only for cloud and Grafana */}
+                  {type !== RuleFormType.cloudRecording && <AnnotationsStep />}
                 </>
               )}
             </Stack>

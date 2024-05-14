@@ -11,7 +11,7 @@
 
 import * as ui from '@grafana/schema';
 
-export const pluginVersion = "10.2.3";
+export const pluginVersion = "10.4.2";
 
 export enum HorizontalConstraint {
   Center = 'center',
@@ -106,9 +106,17 @@ export const defaultCanvasElementOptions: Partial<CanvasElementOptions> = {
 
 export interface Options {
   /**
+   * Enable infinite pan
+   */
+  infinitePan: boolean;
+  /**
    * Enable inline editing
    */
   inlineEditing: boolean;
+  /**
+   * Enable pan and zoom
+   */
+  panZoom: boolean;
   /**
    * The root element of canvas (frame), where all canvas elements are nested
    * TODO: Figure out how to define a default value for this
@@ -134,6 +142,8 @@ export interface Options {
 }
 
 export const defaultOptions: Partial<Options> = {
+  infinitePan: true,
   inlineEditing: true,
+  panZoom: true,
   showAdvancedTypes: true,
 };

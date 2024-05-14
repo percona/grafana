@@ -1,4 +1,4 @@
-import { IconName, IconSize } from '../../types/icon';
+import { IconName, IconSize, IconType } from '../../types/icon';
 
 const alwaysMonoIcons: IconName[] = [
   'grafana',
@@ -31,6 +31,7 @@ const alwaysMonoIcons: IconName[] = [
   'percona-system',
   'percona-nav-overview',
   'percona-nav-summary',
+  'percona-nav-logo',
   'percona-database-mysql',
   'percona-database-postgresql',
   'percona-database-mongodb',
@@ -41,7 +42,7 @@ const alwaysMonoIcons: IconName[] = [
   'qan-logo',
 ];
 
-export function getIconSubDir(name: IconName, type: string): string {
+export function getIconSubDir(name: IconName, type: IconType): string {
   if (name?.startsWith('gf-')) {
     return 'custom';
   } else if (alwaysMonoIcons.includes(name)) {

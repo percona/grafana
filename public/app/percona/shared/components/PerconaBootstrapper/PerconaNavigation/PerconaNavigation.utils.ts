@@ -20,14 +20,10 @@ import {
   WEIGHTS,
   PMM_ACCESS_ROLE_CREATE_PAGE,
   PMM_ADD_INSTANCE_CREATE_PAGE,
+  getPmmSettingsPage,
+  PMM_INVENTORY_PAGE,
+  PMM_UPDATES_LINK,
 } from './PerconaNavigation.constants';
-
-const DIVIDER: NavModelItem = {
-  id: 'divider',
-  text: 'Divider',
-  hideFromTabs: true,
-  isDivider: true,
-};
 
 export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavModelItem | undefined => {
   const alertingItem = mainLinks.find(({ id }) => id === 'alerting');
@@ -59,48 +55,38 @@ export const removeAlertingMenuItem = (mainLinks: NavModelItem[]) => {
 };
 
 export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: Settings): NavModelItem[] => {
-  const inventoryLink: NavModelItem = {
-    id: 'inventory',
-    icon: 'server-network',
-    text: 'Inventory',
-    url: `${config.appSubUrl}/inventory`,
-    hideFromTabs: true,
-  };
-  const updatesLink: NavModelItem = {
-    id: 'pmm-updates',
-    text: 'Updates',
-    url: '/pmm/updates',
-    hideFromTabs: true,
-    target: '_self',
-    badgeText: 'New',
-  };
+  const inventoryLink: NavModelItem = PMM_INVENTORY_PAGE;
   const orgLink: NavModelItem = {
     id: 'main-organization',
     text: 'Organization',
     isSection: true,
   };
-  const pmmLink: NavModelItem = {
-    id: 'settings-pmm',
-    text: 'PMM',
-    isSection: true,
-  };
-  const settingsLink: NavModelItem = {
-    id: 'settings',
-    icon: 'percona-setting',
-    text: 'Settings',
-    url: `${config.appSubUrl}/settings`,
-  };
+  const settingsLink: NavModelItem = getPmmSettingsPage();
   const configNode = mainLinks.find((link) => link.id === 'cfg');
+  const pmmConfigNode = mainLinks.find((link) => link.id === 'pmmcfg');
+
+  if (!pmmConfigNode) {
+    const pmmcfgNode: NavModelItem = {
+      id: 'pmmcfg',
+      text: 'PMM Configuration',
+      icon: 'percona-nav-logo',
+      url: `${config.appSubUrl}/inventory`,
+      subTitle: 'Configuration',
+      children: [PMM_ADD_INSTANCE_PAGE, PMM_ADD_INSTANCE_CREATE_PAGE, inventoryLink, settingsLink, PMM_UPDATES_LINK],
+      sortWeight: -800,
+    };
+    mainLinks.push(pmmcfgNode);
+  }
 
   if (!configNode) {
     const cfgNode: NavModelItem = {
       id: 'cfg',
       text: 'Configuration',
       icon: 'cog',
-      url: `${config.appSubUrl}/inventory`,
+      url: `${config.appSubUrl}/admin`,
       subTitle: 'Configuration',
       showDot: true,
-      children: [inventoryLink, settingsLink, updatesLink, DIVIDER, PMM_ADD_INSTANCE_PAGE],
+      children: [],
     };
     if (settings?.enableAccessControl) {
       addAccessRolesLink(cfgNode);
@@ -115,18 +101,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
       orgLink.text = configNode.subTitle || '';
       configNode.subTitle = '';
     }
-    configNode.url = `${config.appSubUrl}/inventory`;
-    configNode.children = [
-      pmmLink,
-      PMM_ADD_INSTANCE_PAGE,
-      PMM_ADD_INSTANCE_CREATE_PAGE,
-      inventoryLink,
-      settingsLink,
-      updatesLink,
-      DIVIDER,
-      orgLink,
-      ...configNode.children,
-    ];
+    configNode.url = `${config.appSubUrl}/admin`;
     if (settings?.enableAccessControl) {
       addAccessRolesLink(configNode);
     }
@@ -138,8 +113,11 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
 export const addAccessRolesLink = (configNode: NavModelItem) => {
   if (configNode.children) {
     const accessNode = configNode.children.find((item) => item.id === 'cfg/access');
+    const general = configNode.children.find((item) => item.id === 'cfg/general');
+    const plugins = configNode.children.find((item) => item.id === 'cfg/plugins');
 
     if (accessNode && accessNode.children) {
+      accessNode.parentItem = configNode;
       const usersIdx = accessNode.children.findIndex((item) => item.id === 'global-users');
       PMM_ACCESS_ROLES_PAGE.parentItem = accessNode;
       accessNode.children = [
@@ -149,6 +127,12 @@ export const addAccessRolesLink = (configNode: NavModelItem) => {
         PMM_ACCESS_ROLE_CREATE_PAGE,
         ...accessNode.children.slice(usersIdx + 1),
       ];
+    }
+    if (general && general.children) {
+      general.parentItem = configNode;
+    }
+    if (plugins && plugins.children) {
+      plugins.parentItem = configNode;
     }
   }
 };

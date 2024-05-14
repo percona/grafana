@@ -39,6 +39,15 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
   ],
 };
 
+export const PMM_ALERTING_CREATE_ALERT_TEMPLATE: NavModelItem = {
+  id: 'integrated-alerting-new-from-template',
+  text: 'Create alert rule from template',
+  icon: 'brackets-curly',
+  url: `${config.appSubUrl}/alerting/new-from-template`,
+  hideFromTabs: true,
+  isCreateAction: true,
+};
+
 export const PMM_ALERTING_PERCONA_ALERTS: NavModelItem[] = [
   {
     id: 'integrated-alerting-alerts',
@@ -52,6 +61,7 @@ export const PMM_ALERTING_PERCONA_ALERTS: NavModelItem[] = [
     icon: 'brackets-curly',
     url: `${config.appSubUrl}/alerting/alert-rule-templates`,
   },
+  PMM_ALERTING_CREATE_ALERT_TEMPLATE,
 ];
 
 export const PMM_SERVICES_PAGE: NavModelItem = {
@@ -73,6 +83,15 @@ export const PMM_INVENTORY_PAGE: NavModelItem = {
   url: `${config.appSubUrl}/inventory`,
   subTitle: 'Percona PMM Inventory',
   children: [PMM_SERVICES_PAGE, PMM_NODES_PAGE],
+};
+
+export const PMM_UPDATES_LINK: NavModelItem = {
+  id: 'pmm-updates',
+  text: 'Updates',
+  url: '/pmm/updates',
+  hideFromTabs: true,
+  target: '_self',
+  badgeText: 'New',
 };
 
 export const PMM_HEADING_LINK: NavModelItem = {
@@ -335,7 +354,7 @@ export const PMM_NAV_MYSQL: NavModelItem = {
       icon: 'percona-cluster',
       hideFromTabs: true,
       showChildren: true,
-
+      url: `${config.appSubUrl}/d/mysql-group-replicaset-summary`,
       children: [
         {
           id: 'mysql-group-replication-summary',
@@ -448,7 +467,7 @@ export const PMM_NAV_MONGO: NavModelItem = {
       icon: 'percona-cluster',
       hideFromTabs: true,
       showChildren: true,
-
+      url: `${config.appSubUrl}/d/mongodb-cluster-summary`,
       children: [
         {
           id: 'mongo-cluster-summary',

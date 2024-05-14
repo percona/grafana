@@ -4,9 +4,8 @@ import { useToggle } from 'react-use';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { Button, Drawer, ToolbarButton, useStyles2, Text } from '@grafana/ui';
+import { IconButton, Drawer, ToolbarButton, useStyles2, Text } from '@grafana/ui';
 import { t } from 'app/core/internationalization';
-import { DEFAULT_FEED_URL } from 'app/plugins/panel/news/constants';
 
 import { NewsWrapper } from './NewsWrapper';
 
@@ -26,22 +25,23 @@ export function NewsContainer({ className }: NewsContainerProps) {
           title={
             <div className={styles.title}>
               <Text element="h3">{t('news.title', 'Latest from the blog')}</Text>
+              {/* @PERCONA - point to percona blog */}
               <a
-                href="https://grafana.com/blog/"
+                href="https://www.percona.com/blog/"
                 target="_blank"
                 rel="noreferrer"
-                title="Go to Grafana labs blog"
+                title="Go to Percona blog"
                 className={styles.grot}
               >
-                <img src="public/img/grot-news.svg" alt="Grot reading news" />
+                <img src="public/img/percona-logo.svg" alt="Percona logo" />
               </a>
               <div className={styles.actions}>
-                <Button
-                  icon="times"
+                <IconButton
+                  name="times"
                   variant="secondary"
-                  fill="text"
                   onClick={onToggleShowNewsDrawer}
-                  aria-label={selectors.components.Drawer.General.close}
+                  data-testid={selectors.components.Drawer.General.close}
+                  tooltip={t(`news.drawer.close`, 'Close Drawer')}
                 />
               </div>
             </div>
@@ -49,7 +49,8 @@ export function NewsContainer({ className }: NewsContainerProps) {
           onClose={onToggleShowNewsDrawer}
           size="md"
         >
-          <NewsWrapper feedUrl={DEFAULT_FEED_URL} />
+          {/* @PERCONA */}
+          <NewsWrapper feedUrl="/percona-blog/feed" />
         </Drawer>
       )}
     </>
