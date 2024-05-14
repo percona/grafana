@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 
 import { GrafanaTheme2, NavModelItem, toIconName } from '@grafana/data';
-import { useStyles2, Text, IconButton, Icon } from '@grafana/ui';
+import { useStyles2, Text, IconButton, Icon, Badge } from '@grafana/ui';
 import { useGrafana } from 'app/core/context/GrafanaContext';
 
 import { Indent } from '../../Indent/Indent';
@@ -100,16 +100,22 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick }: Props) {
               {/* @PERCONA - show icons for inner items */}
               {level <= 1 && link.icon && (
                 <FeatureHighlightWrapper>
-                  <Icon
-                    className={styles.icon}
-                    name={toIconName(link.icon) ?? 'link'}
-                    size={level === 0 ? 'lg' : 'md'}
-                  />
+                  <>
+                    <Icon
+                      className={styles.icon}
+                      name={toIconName(link.icon) ?? 'link'}
+                      size={level === 0 ? 'lg' : 'md'}
+                    />
+                    {/* @PERCONA */}
+                    {!!link.showDot && <div className={styles.highlightBadge} />}
+                  </>
                 </FeatureHighlightWrapper>
               )}
               <Text truncate>{link.text}</Text>
             </div>
           </MegaMenuItemText>
+          {/* @PERCONA */}
+          {!!link.badgeText && <Badge text={link.badgeText} color="orange" className={styles.badge} />}
         </div>
       </div>
       {showExpandButton && sectionExpanded && (
@@ -207,6 +213,20 @@ const getStyles = (theme: GrafanaTheme2) => ({
     color: theme.colors.text.secondary,
     fontStyle: 'italic',
     padding: theme.spacing(1, 1.5, 1, 7),
+  }),
+  // @PERCONA
+  badge: css({
+    position: 'absolute',
+    marginLeft: theme.spacing(9),
+  }),
+  highlightBadge: css({
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    left: 25,
+    top: 2,
+    borderRadius: theme.shape.radius.circle,
+    backgroundColor: theme.colors.error.main,
   }),
 });
 

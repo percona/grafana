@@ -74,6 +74,7 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
       subTitle: 'Configuration',
       children: [PMM_ADD_INSTANCE_PAGE, PMM_ADD_INSTANCE_CREATE_PAGE, inventoryLink, settingsLink, PMM_UPDATES_LINK],
       sortWeight: -800,
+      showDot: true,
     };
     mainLinks.push(pmmcfgNode);
   }
@@ -85,7 +86,6 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
       icon: 'cog',
       url: `${config.appSubUrl}/admin`,
       subTitle: 'Configuration',
-      showDot: true,
       children: [],
     };
     if (settings?.enableAccessControl) {
@@ -93,7 +93,6 @@ export const buildInventoryAndSettings = (mainLinks: NavModelItem[], settings?: 
     }
     mainLinks.push(cfgNode);
   } else {
-    configNode.showDot = true;
     if (!configNode.children) {
       configNode.children = [];
     }
