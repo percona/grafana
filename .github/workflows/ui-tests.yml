@@ -55,12 +55,12 @@ jobs:
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
-      - name: Checkout UI tests in main branch
+      - name: Checkout UI tests in v3 branch
         uses: percona-platform/checkout@v2
         if: ${{ steps.branch_checkout.outcome != 'success' }}
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
-          ref: main
+          ref: PMM-12847-product-tour-automation
           repository: percona/pmm-ui-tests
           path: ./pmm-ui-tests
 
@@ -70,7 +70,7 @@ jobs:
 
       - name: Run UI tests
         working-directory: ./pmm-ui-tests
-        run: npm run e2e:grafana-pr
+        run: npx codeceptjs run --config "pr.codecept.js" --grep "@pmm-tour"
 
       - name: Attaching artifacts
         if: ${{ always() }}
