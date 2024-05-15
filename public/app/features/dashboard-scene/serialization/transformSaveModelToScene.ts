@@ -1,3 +1,5 @@
+import { uniqueId } from 'lodash';
+
 import { DataFrameDTO, DataFrameJSON, TypedVariableModel } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import {
@@ -26,13 +28,10 @@ import {
   UserActionEvent,
   GroupByVariable,
   AdHocFiltersVariable,
-  SceneFlexLayout,
 } from '@grafana/scenes';
 import { DashboardModel, PanelModel } from 'app/features/dashboard/state';
-import { trackDashboardLoaded } from 'app/features/dashboard/utils/tracking';
 import { DashboardDTO } from 'app/types';
 
-import { AddLibraryPanelWidget } from '../scene/AddLibraryPanelWidget';
 import { AlertStatesDataLayer } from '../scene/AlertStatesDataLayer';
 import { DashboardAnnotationsDataLayer } from '../scene/DashboardAnnotationsDataLayer';
 import { DashboardControls } from '../scene/DashboardControls';
@@ -46,12 +45,14 @@ import { panelLinksBehavior, panelMenuBehavior } from '../scene/PanelMenuBehavio
 import { PanelNotices } from '../scene/PanelNotices';
 import { PanelTimeRange } from '../scene/PanelTimeRange';
 import { RowRepeaterBehavior } from '../scene/RowRepeaterBehavior';
+import { hoverHeaderOffsetBehavior } from '../scene/hoverHeaderOffsetBehavior';
 import { RowActions } from '../scene/row-actions/RowActions';
 import { setDashboardPanelContext } from '../scene/setDashboardPanelContext';
 import { createPanelDataProvider } from '../utils/createPanelDataProvider';
 import { DashboardInteractions } from '../utils/interactions';
 import {
   getCurrentValueForOldIntervalModel,
+  getDashboardSceneFor,
   getIntervalsFromQueryString,
   getVizPanelKeyForPanelId,
 } from '../utils/utils';
@@ -109,18 +110,6 @@ export function createSceneObjectsForPanels(oldPanels: PanelModel[]): SceneGridI
           currentRowPanels = [];
         }
       }
-    } else if (panel.type === 'add-library-panel') {
-      const gridItem = buildGridItemForLibraryPanelWidget(panel);
-
-      if (!gridItem) {
-        continue;
-      }
-
-      if (currentRow) {
-        currentRowPanels.push(gridItem);
-      } else {
-        panels.push(gridItem);
-      }
     } else if (panel.libraryPanel?.uid && !('model' in panel.libraryPanel)) {
       const gridItem = buildGridItemForLibPanel(panel);
 
@@ -167,15 +156,7 @@ function createRowFromPanelModel(row: PanelModel, content: SceneGridItemLike[]):
           saveModel = new PanelModel(saveModel);
         }
 
-        if (saveModel.type === 'add-library-panel') {
-          const gridItem = buildGridItemForLibraryPanelWidget(saveModel);
-
-          if (!gridItem) {
-            throw new Error('Failed to build grid item for library panel widget');
-          }
-
-          return gridItem;
-        } else if (saveModel.libraryPanel?.uid && !('model' in saveModel.libraryPanel)) {
+        if (saveModel.libraryPanel?.uid && !('model' in saveModel.libraryPanel)) {
           const gridItem = buildGridItemForLibPanel(saveModel);
 
           if (!gridItem) {
@@ -248,7 +229,7 @@ export function createDashboardSceneFromDashboardModel(oldModel: DashboardModel)
     annotationLayers = oldModel.annotations?.list.map((a) => {
       // Each annotation query is an individual data layer
       return new DashboardAnnotationsDataLayer({
-        key: `annotations-${a.name}`,
+        key: uniqueId('annotations-'),
         query: a,
         name: a.name,
         isEnabled: Boolean(a.enable),
@@ -285,6 +266,7 @@ export function createDashboardSceneFromDashboardModel(oldModel: DashboardModel)
     body: new SceneGridLayout({
       isLazy: true,
       children: createSceneObjectsForPanels(oldModel.panels),
+      $behaviors: [trackIfEmpty],
     }),
     $timeRange: new SceneTimeRange({
       from: oldModel.time.from,
@@ -301,10 +283,8 @@ export function createDashboardSceneFromDashboardModel(oldModel: DashboardModel)
       }),
       new behaviors.SceneQueryController(),
       registerDashboardMacro,
-      registerDashboardSceneTracking(oldModel),
       registerPanelInteractionsReporter,
-      trackIfIsEmpty,
-      new behaviors.LiveNowTimer(oldModel.liveNow),
+      new behaviors.LiveNowTimer({ enabled: oldModel.liveNow }),
     ],
     $data: new DashboardDataLayerSet({ annotationLayers, alertStatesLayer }),
     controls: new DashboardControls({
@@ -410,9 +390,20 @@ export function createSceneVariableFromVariableModel(variable: TypedVariableMode
       hide: variable.hide,
     });
   } else if (variable.type === 'textbox') {
+    let val;
+    if (!variable?.current?.value) {
+      val = variable.query;
+    } else {
+      if (typeof variable.current.value === 'string') {
+        val = variable.current.value;
+      } else {
+        val = variable.current.value[0];
+      }
+    }
+
     return new TextBoxVariable({
       ...commonProperties,
-      value: variable?.current?.value?.[0] ?? variable.query,
+      value: val,
       skipUrlSync: variable.skipUrlSync,
       hide: variable.hide,
     });
@@ -430,24 +421,6 @@ export function createSceneVariableFromVariableModel(variable: TypedVariableMode
   } else {
     throw new Error(`Scenes: Unsupported variable type ${variable.type}`);
   }
-}
-
-export function buildGridItemForLibraryPanelWidget(panel: PanelModel) {
-  if (panel.type !== 'add-library-panel') {
-    return null;
-  }
-
-  const body = new AddLibraryPanelWidget({
-    key: getVizPanelKeyForPanelId(panel.id),
-  });
-
-  return new DashboardGridItem({
-    body,
-    y: panel.gridPos.y,
-    x: panel.gridPos.x,
-    width: panel.gridPos.w,
-    height: panel.gridPos.h,
-  });
 }
 
 export function buildGridItemForLibPanel(panel: PanelModel) {
@@ -504,6 +477,7 @@ export function buildGridItemForPanel(panel: PanelModel): DashboardGridItem {
     displayMode: panel.transparent ? 'transparent' : undefined,
     // To be replaced with it's own option persited option instead derived
     hoverHeader: !panel.title && !panel.timeFrom && !panel.timeShift,
+    hoverHeaderOffset: (panel.gridPos?.y ?? 0) === 0 ? 0 : undefined,
     $data: createPanelDataProvider(panel),
     titleItems,
 
@@ -537,19 +511,8 @@ export function buildGridItemForPanel(panel: PanelModel): DashboardGridItem {
     body,
     maxPerRow: panel.maxPerRow,
     ...repeatOptions,
+    $behaviors: [hoverHeaderOffsetBehavior],
   });
-}
-
-function registerDashboardSceneTracking(model: DashboardModel) {
-  return () => {
-    const unsetDashboardInteractionsScenesContext = DashboardInteractions.setScenesContext();
-
-    trackDashboardLoaded(model, model.version);
-
-    return () => {
-      unsetDashboardInteractionsScenesContext();
-    };
-  };
 }
 
 function registerPanelInteractionsReporter(scene: DashboardScene) {
@@ -568,21 +531,6 @@ function registerPanelInteractionsReporter(scene: DashboardScene) {
         break;
     }
   });
-}
-
-export function trackIfIsEmpty(parent: DashboardScene) {
-  updateIsEmpty(parent);
-
-  parent.state.body.subscribeToState(() => {
-    updateIsEmpty(parent);
-  });
-}
-
-function updateIsEmpty(parent: DashboardScene) {
-  const { body } = parent.state;
-  if (body instanceof SceneFlexLayout || body instanceof SceneGridLayout) {
-    parent.setState({ isEmpty: body.state.children.length === 0 });
-  }
 }
 
 const convertSnapshotData = (snapshotData: DataFrameDTO[]): DataFrameJSON[] => {
@@ -619,3 +567,17 @@ export const convertOldSnapshotToScenesSnapshot = (panel: PanelModel) => {
     panel.snapshotData = [];
   }
 };
+
+function trackIfEmpty(grid: SceneGridLayout) {
+  getDashboardSceneFor(grid).setState({ isEmpty: grid.state.children.length === 0 });
+
+  const sub = grid.subscribeToState((n, p) => {
+    if (n.children.length !== p.children.length || n.children !== p.children) {
+      getDashboardSceneFor(grid).setState({ isEmpty: n.children.length === 0 });
+    }
+  });
+
+  return () => {
+    sub.unsubscribe();
+  };
+}

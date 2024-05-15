@@ -254,7 +254,7 @@ export default class InfluxDatasource extends DataSourceWithBackend<InfluxQuery,
         return selects.map((select) => {
           return {
             ...select,
-            params: select.params?.map((param) => this.templateSrv.replace(param.toString(), undefined)),
+            params: select.params?.map((param) => this.templateSrv.replace(param.toString(), scopedVars)),
           };
         });
       });
@@ -297,7 +297,12 @@ export default class InfluxDatasource extends DataSourceWithBackend<InfluxQuery,
       ), // The raw sql query text
       alias: this.templateSrv.replace(query.alias ?? '', scopedVars),
       limit: this.templateSrv.replace(query.limit?.toString() ?? '', scopedVars),
-      measurement: this.templateSrv.replace(query.measurement ?? '', scopedVars),
+      measurement: this.templateSrv.replace(
+        query.measurement ?? '',
+        scopedVars,
+        (value: string | string[] = [], variable: QueryVariableModel) =>
+          this.interpolateQueryExpr(value, variable, query.measurement)
+      ),
       policy: this.templateSrv.replace(query.policy ?? '', scopedVars),
       slimit: this.templateSrv.replace(query.slimit?.toString() ?? '', scopedVars),
       tz: this.templateSrv.replace(query.tz ?? '', scopedVars),
@@ -308,6 +313,13 @@ export default class InfluxDatasource extends DataSourceWithBackend<InfluxQuery,
     // If there is no query just return the value directly
     if (!query) {
       return value;
+    }
+
+    if (typeof value === 'string') {
+      // Check the value is a number. If not run to escape special characters
+      if (!isNaN(parseFloat(value))) {
+        return value;
+      }
     }
 
     // If template variable is a multi-value variable

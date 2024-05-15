@@ -101,7 +101,7 @@ const maybeZoomAction = (e?: MouseEvent | null) => e != null && !e.ctrlKey && !e
 /**
  * @alpha
  */
-export const TooltipPlugin2 = ({
+export const TooltipPlugin2: React.FC<TooltipPlugin2Props> = ({
   config,
   hoverMode,
   render,
@@ -574,7 +574,7 @@ const getStyles = (theme: GrafanaTheme2, maxWidth?: number, maxHeight?: number) 
   tooltipWrapper: css({
     top: 0,
     left: 0,
-    zIndex: theme.zIndex.tooltip,
+    zIndex: theme.zIndex.portal,
     whiteSpace: 'pre',
     borderRadius: theme.shape.radius.default,
     position: 'fixed',

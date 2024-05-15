@@ -1,4 +1,5 @@
 import { interpolateRgbBasis } from 'd3-interpolate';
+// @ts-ignore
 import stringHash from 'string-hash';
 import tinycolor from 'tinycolor2';
 

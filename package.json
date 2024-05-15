@@ -3,7 +3,7 @@
   "license": "AGPL-3.0-only",
   "private": true,
   "name": "grafana",
-  "version": "11.0.0-preview",
+  "version": "11.0.0",
   "repository": "github:grafana/grafana",
   "scripts": {
     "build": "NODE_ENV=production nx exec --verbose -- webpack --config scripts/webpack/webpack.prod.js",
@@ -11,6 +11,7 @@
     "build-max-memory": "NODE_OPTIONS='--max-old-space-size=5120' GENERATE_SOURCEMAP=false && yarn build",
     "dev": "NODE_ENV=dev nx exec -- webpack --config scripts/webpack/webpack.dev.js",
     "e2e": "./e2e/start-and-run-suite",
+    "e2e:scenes": "./e2e/start-and-run-suite scenes",
     "e2e:debug": "./e2e/start-and-run-suite debug",
     "e2e:dev": "./e2e/start-and-run-suite dev",
     "e2e:benchmark:live": "./e2e/start-and-run-suite benchmark live",
@@ -259,7 +260,7 @@
     "@grafana/prometheus": "workspace:*",
     "@grafana/runtime": "workspace:*",
     "@grafana/saga-icons": "workspace:*",
-    "@grafana/scenes": "4.0.4",
+    "@grafana/scenes": "^4.14.0",
     "@grafana/schema": "workspace:*",
     "@grafana/sql": "workspace:*",
     "@grafana/ui": "workspace:*",
@@ -430,7 +431,7 @@
     "uuid": "9.0.1",
     "visjs-network": "4.25.0",
     "whatwg-fetch": "3.6.20",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.1/xlsx-0.19.1.tgz",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.2/xlsx-0.20.2.tgz",
     "yaml": "^2.1.1"
   },
   "resolutions": {
