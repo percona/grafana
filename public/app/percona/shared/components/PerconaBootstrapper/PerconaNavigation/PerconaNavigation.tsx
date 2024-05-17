@@ -28,7 +28,6 @@ import {
   PMM_TICKETS_PAGE,
   PMM_DUMP_PAGE,
 } from './PerconaNavigation.constants';
-import { useTemplatingVariables } from './PerconaNavigation.hooks';
 import {
   addAccessRolesLink,
   addDashboardsLinks,
@@ -51,7 +50,6 @@ const PerconaNavigation: FC = () => {
   const dispatch = useAppDispatch();
   const { activeTypes } = useSelector(getServices);
   const advisorsPage = buildAdvisorsNavItem(categorizedAdvisors);
-  const variables = useTemplatingVariables();
 
   dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
   dispatch(updateNavIndex(PMM_DUMP_PAGE));
@@ -142,7 +140,7 @@ const PerconaNavigation: FC = () => {
 
     dispatch(updateNavTree(filterByServices(updatedNavTree, activeTypes)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, folders, activeTypes, isAuthorized, isPlatformUser, advisorsPage, variables]);
+  }, [result, folders, activeTypes, isAuthorized, isPlatformUser, advisorsPage]);
 
   return null;
 };

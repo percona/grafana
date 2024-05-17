@@ -1,8 +1,5 @@
-import { cloneDeep } from 'lodash';
-
 import { NavModelItem } from '@grafana/data';
 import { config } from 'app/core/config';
-import { getLinkSrv } from 'app/features/panel/panellinks/link_srv';
 import { Settings } from 'app/percona/settings/Settings.types';
 import { CategorizedAdvisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
@@ -197,36 +194,14 @@ export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) =>
 };
 
 export const addDashboardsLinks = (items: NavModelItem[]) => {
-  items.push(addVariablesToUrls(PMM_NAV_OS));
-  items.push(addVariablesToUrls(PMM_NAV_MYSQL));
-  items.push(addVariablesToUrls(PMM_NAV_MONGO));
-  items.push(addVariablesToUrls(PMM_NAV_POSTGRE));
-  items.push(addVariablesToUrls(PMM_NAV_PROXYSQL));
-  items.push(addVariablesToUrls(PMM_NAV_HAPROXY));
+  items.push(PMM_NAV_OS);
+  items.push(PMM_NAV_MYSQL);
+  items.push(PMM_NAV_MONGO);
+  items.push(PMM_NAV_POSTGRE);
+  items.push(PMM_NAV_PROXYSQL);
+  items.push(PMM_NAV_HAPROXY);
 };
 
 export const sortNavigation = (items: NavModelItem[]) => {
   items.sort((a, b) => (a.sortWeight || 0) - (b.sortWeight || 0));
-};
-
-export const addVariablesToUrls = (item: NavModelItem): NavModelItem => {
-  const linkSrv = getLinkSrv();
-
-  const traverse = (item: NavModelItem): NavModelItem => {
-    if (item.children) {
-      item.children = item.children.map(traverse);
-    }
-
-    if (item.url) {
-      item.url = linkSrv.getLinkUrl({
-        url: item.url,
-        keepTime: true,
-        includeVars: true,
-      });
-    }
-
-    return item;
-  };
-
-  return traverse(cloneDeep(item));
 };
