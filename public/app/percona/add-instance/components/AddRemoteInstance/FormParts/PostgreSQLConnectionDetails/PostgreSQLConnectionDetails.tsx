@@ -83,16 +83,6 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
           tooltipText={Messages.form.tooltips.postgresqlDetails.maxQueryLength}
         />
       </div>
-      {!remoteInstanceCredentials.isAzure && (
-        <div className={styles.group}>
-          <TextInputField
-            name="maxExporterConnections"
-            placeholder={Messages.form.placeholders.postgresqlDetails.maxConnectionLimit}
-            label={Messages.form.labels.postgresqlDetails.maxConnectionLimit}
-            tooltipText={Messages.form.tooltips.postgresqlDetails.maxConnectionLimit}
-          />
-        </div>
-      )}
     </div>
   );
 };

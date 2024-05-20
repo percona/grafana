@@ -32,7 +32,9 @@ export const Messages = {
         autoDiscovery: 'Auto-discovery',
         autoDiscoveryLimit: 'Auto-discovery limit',
         autoDiscoveryLimitOptions: 'State',
-        maxConnectionLimit: 'Maximum connection limit',
+        maxConnection: 'Maximum connection limit',
+        maxConnectionLimit: 'Maximum connection limit per PostgreSQL instance',
+        maxConnectionLimitOptions: 'State',
       },
       mysqlDetails: {
         maxQueryLength: 'Max query length',
@@ -92,7 +94,7 @@ export const Messages = {
         database: 'Database (default: postgres)',
         maxQueryLength: 'Max query length',
         autoDiscoveryLimit: 'Auto-discovery limit',
-        maxConnectionLimit: 'Maximum connection limit',
+        maxConnectionLimit: 'Maximum connection limit per PostgreSQL instance',
       },
       mysqlDetails: {
         maxQueryLength: 'Max query length',
@@ -133,7 +135,8 @@ export const Messages = {
         database: 'Database name',
         maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
         autoDiscoveryLimit: 'Turn off auto-discovery when the total count of databases exceeds the limit.',
-        maxConnectionLimit: 'Maximum number of connections to PostgreSQL instance that exporter can use',
+        maxConnectionLimit:
+          'The maximum connections the Exporter can open to each PostgreSQL instance for monitoring. Higher values might be needed for larger or busier instances, but avoid setting it too high as it can impact performance. Adjust based on your instance size and monitoring needs.',
       },
       mysqlDetails: {
         maxQueryLength: 'Full Example (Fingerprint) storage is not allowed by default to have the best performance',
