@@ -58,7 +58,8 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
   const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) =>
     type === AutoDiscoveryOptionsInterface.disabled ? -1 : 10;
 
-  const getMaxConnectionLimitValue = (type: MaxConnectionLimitOptionsInterface) => 5;
+  const getMaxConnectionLimitValue = (type: MaxConnectionLimitOptionsInterface) =>
+    type === MaxConnectionLimitOptionsInterface.disabled ? null : 5;
 
   useEffect(() => {
     setSelectedValue(selectedOption);
@@ -120,8 +121,8 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
               key="maxExporterConnections"
               name="maxExporterConnections"
               defaultValue={5}
+              placeholder={'5'}
               disabled={maxConnSelectedValue !== MaxConnectionLimitOptionsInterface.enabled}
-              validators={validators}
               label={Messages.form.labels.postgresqlDetails.maxConnectionLimit}
               tooltipText={Messages.form.tooltips.postgresqlDetails.maxConnectionLimit}
             />

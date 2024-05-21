@@ -13,5 +13,4 @@ export enum AutoDiscoveryOptionsInterface {
 export enum MaxConnectionLimitOptionsInterface {
   enabled = 'enabled',
   disabled = 'disabled',
-  custom = 'custom',
 }
