@@ -71,7 +71,10 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
 
   useEffect(() => {
     setMaxConnSelectedValue(maxConnSelectedOption);
-    form.change('maxExporterConnections', getMaxConnectionLimitValue(maxConnSelectedOption));
+    form.change(
+      isRDS ? 'maxPostgresqlExporterConnections' : 'maxExporterConnections',
+      getMaxConnectionLimitValue(maxConnSelectedOption)
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [maxConnSelectedOption]);
 
@@ -120,8 +123,8 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
               fullWidth
             />
             <NumberInputField
-              key={isRDS ? 'MaxPostgresqlExporterConnections' : 'maxExporterConnections'}
-              name={isRDS ? 'MaxPostgresqlExporterConnections' : 'maxExporterConnections'}
+              key={isRDS ? 'maxPostgresqlExporterConnections' : 'maxExporterConnections'}
+              name={isRDS ? 'maxPostgresqlExporterConnections' : 'maxExporterConnections'}
               defaultValue={5}
               placeholder={'5'}
               validators={
