@@ -7,6 +7,7 @@ import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
 import { Databases } from 'app/percona/shared/core';
+import Validators from 'app/percona/shared/helpers/validators';
 import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
 
 import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
@@ -53,7 +54,8 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
     maxConnSelectedOption || MaxConnectionLimitOptionsInterface.disabled
   );
   const styles = useStyles2(getStyles);
-  const validators = [platformCoreValidators.containsNumber, ...platformCoreValidators.int32];
+  const validators = [platformCoreValidators.containsNumber, platformCoreValidators.int32];
+  const maxConnValidators = [Validators.min(0), platformCoreValidators.int32];
 
   const getAutoDiscoveryLimitValue = (type: AutoDiscoveryOptionsInterface) =>
     type === AutoDiscoveryOptionsInterface.disabled ? -1 : 10;
@@ -118,10 +120,13 @@ export const PostgreSQLAdditionalOptions: FC<PostgreSQLAdditionalOptionsProps> =
               fullWidth
             />
             <NumberInputField
-              key="maxExporterConnections"
-              name="maxExporterConnections"
+              key={isRDS ? 'MaxPostgresqlExporterConnections' : 'maxExporterConnections'}
+              name={isRDS ? 'MaxPostgresqlExporterConnections' : 'maxExporterConnections'}
               defaultValue={5}
               placeholder={'5'}
+              validators={
+                maxConnSelectedValue === MaxConnectionLimitOptionsInterface.enabled ? maxConnValidators : undefined
+              }
               disabled={maxConnSelectedValue !== MaxConnectionLimitOptionsInterface.enabled}
               label={Messages.form.labels.postgresqlDetails.maxConnectionLimit}
               tooltipText={Messages.form.tooltips.postgresqlDetails.maxConnectionLimit}

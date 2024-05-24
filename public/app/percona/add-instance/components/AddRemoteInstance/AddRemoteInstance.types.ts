@@ -197,7 +197,7 @@ export interface RDSPayload extends CommonRDSAzurePayload {
   metrics_mode: string;
   qan_postgresql_pgstatements: boolean;
   agent_password: string;
-  max_exporter_connections: number;
+  max_postgresql_exporter_connections: number;
 }
 
 export interface MSAzurePayload extends CommonRDSAzurePayload {
