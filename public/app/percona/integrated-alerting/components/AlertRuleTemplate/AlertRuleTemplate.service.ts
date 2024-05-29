@@ -18,7 +18,6 @@ export const AlertRuleTemplateService = {
     return api.post(BASE_URL, payload, false, token);
   },
   async list(payload: AlertRuleTemplateGetPayload, token?: CancelToken): Promise<TemplatesList> {
-    // todo: address payload
     return api
       .get<TemplatesListAPI, void>(BASE_URL, false, {
         cancelToken: token,
