@@ -163,7 +163,7 @@ describe('Advanced::', () => {
           },
         } as StoreState)}
       >
-        {wrapWithGrafanaContextMock(<Advanced />)}
+        {wrapWithGrafanaContextMock(<Advanced/>)}
       </Provider>
     );
 
@@ -173,8 +173,17 @@ describe('Advanced::', () => {
 
     // expect(spy.calls.mostRecent().args[0].body.stt_check_intervals).toBeUndefined();
     expect(spy).toHaveBeenLastCalledWith(
-      expect.objectContaining({ body: expect.objectContaining({ stt_check_intervals: undefined }) })
-    );
+      expect.objectContaining({
+        body: expect.objectContaining({
+          advisor_run_intervals: undefined,
+          data_retention: "6048000s",
+          enable_access_control: undefined,
+          enable_advisor: false,
+          enable_alerting: true,
+          enable_azurediscover: true,
+          enable_backup_management: false,
+        })
+      }));
   });
 
   it('Includes STT check intervals in the change request if STT checks are enabled', async () => {
@@ -218,7 +227,25 @@ describe('Advanced::', () => {
 
     // expect(spy.calls.mostRecent().args[0].body.stt_check_intervals).toBeDefined();
     expect(spy).toHaveBeenLastCalledWith(
-      expect.objectContaining({ body: expect.objectContaining({ stt_check_intervals: expect.anything() }) })
-    );
+      expect.objectContaining({
+        body: expect.objectContaining({
+            advisor_run_intervals: {
+              frequent_interval: "14400s",
+              rare_interval: "280800s",
+              standard_interval: "86400s",
+            },
+            data_retention: "6048000s",
+            enable_access_control: undefined,
+            enable_advisor: true,
+            enable_alerting: true,
+            enable_azurediscover: true,
+            enable_backup_management: false,
+            enable_telemetry: true,
+            enable_updates: false,
+            pmm_public_address: "localhost",
+          })
+        })
+      );
+
   });
 });
