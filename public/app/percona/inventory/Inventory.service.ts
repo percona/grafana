@@ -55,7 +55,7 @@ export const InventoryService = {
     return api.get<NodeListDBPayload, object>(`/v1/management/nodes`, false, { cancelToken: token });
   },
   removeNode(body: RemoveNodeBody, token?: CancelToken) {
-    return api.delete<void>(`${BASE_URL}/nodes/${body.node_id}`, false, token, true );
+    return api.delete<void>(`${BASE_URL}/nodes/${body.node_id}`, false, token, true);
   },
   getService(serviceId: string, cancelToken?: CancelToken) {
     return api.get<any, any>(`${BASE_URL}/services/${serviceId}`, false, { cancelToken });
