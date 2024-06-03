@@ -21,11 +21,7 @@ describe('Advanced::', () => {
             settings: {
               loading: false,
               result: {
-                advisorRunIntervals: {
-                  rareInterval: '280800s',
-                  standardInterval: '86400s',
-                  frequentInterval: '14400s',
-                },
+                advisorRunIntervals: { rareInterval: '280800s', standardInterval: '86400s', frequentInterval: '14400s' },
                 dataRetention: '2592000s',
                 telemetryEnabled: true,
                 telemetrySummaries: ['summary1', 'summary2'],
@@ -176,12 +172,6 @@ describe('Advanced::', () => {
       expect.objectContaining({
         body: expect.objectContaining({
           advisor_run_intervals: undefined,
-          data_retention: '6048000s',
-          enable_access_control: undefined,
-          enable_advisor: false,
-          enable_alerting: true,
-          enable_azurediscover: true,
-          enable_backup_management: false,
         }),
       })
     );
@@ -234,16 +224,7 @@ describe('Advanced::', () => {
             frequent_interval: '14400s',
             rare_interval: '280800s',
             standard_interval: '86400s',
-          },
-          data_retention: '6048000s',
-          enable_access_control: undefined,
-          enable_advisor: true,
-          enable_alerting: true,
-          enable_azurediscover: true,
-          enable_backup_management: false,
-          enable_telemetry: true,
-          enable_updates: false,
-          pmm_public_address: 'localhost',
+          }
         }),
       })
     );

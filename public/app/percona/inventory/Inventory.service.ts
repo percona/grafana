@@ -27,7 +27,7 @@ export const InventoryService = {
   },
   removeAgent(agentId: string, forceMode = false, token?: CancelToken) {
     // todo: address forceMode
-    return api.delete<void>(`${BASE_URL}/agents/${agentId}`, false, token);
+    return api.delete<void>(`${BASE_URL}/agents/${agentId}`, false, token, { force: forceMode });
   },
   // TODO unify typings and this function with getServices()
   async getDbServices(token?: CancelToken): Promise<DBServiceList> {
