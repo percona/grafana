@@ -77,7 +77,8 @@ export const CheckService = {
   ): Promise<PaginatedFomattedResponse<ServiceFailedCheck[]>> {
     const {
       results = [],
-      page_totals: { total_items: totalItems = 0, total_pages: totalPages = 1 },
+      total_items: totalItems = 0,
+      total_pages: totalPages = 1
     } = await api.get<
       CheckResultForServicePayload,
       {

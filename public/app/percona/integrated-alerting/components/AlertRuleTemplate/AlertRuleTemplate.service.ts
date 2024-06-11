@@ -19,9 +19,9 @@ export const AlertRuleTemplateService = {
   },
   async list(payload: AlertRuleTemplateGetPayload, token?: CancelToken): Promise<TemplatesList> {
     return api
-      .get<TemplatesListAPI, void>(BASE_URL, false, {
+      .get<TemplatesListAPI, AlertRuleTemplateGetPayload>(BASE_URL, false, {
         cancelToken: token,
-        ...payload,
+        params: { ...payload },
       })
       .then(
         ({ totals, templates = [] }): TemplatesList => ({
