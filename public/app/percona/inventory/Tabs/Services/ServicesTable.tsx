@@ -188,11 +188,7 @@ const ServicesTable: FC<ServicesTableProps> = ({
         <DetailsRow>
           {!!agents.length && (
             <DetailsRow.Contents title={Messages.services.details.agents}>
-              <StatusBadge
-                strippedId={row.original.serviceId}
-                type={'services'}
-                agents={row.original.agents || []}
-              />
+              <StatusBadge strippedId={row.original.serviceId} type={'services'} agents={row.original.agents || []} />
             </DetailsRow.Contents>
           )}
           <DetailsRow.Contents title={Messages.services.details.serviceId}>
