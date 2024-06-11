@@ -20,7 +20,6 @@ import { ChecksInfoAlert } from '../CheckInfoAlert/CheckInfoAlert';
 import { GET_ACTIVE_ALERTS_CANCEL_TOKEN } from './FailedChecksTab.constants';
 import { Messages } from './FailedChecksTab.messages';
 import { getStyles } from './FailedChecksTab.styles';
-import { stripServiceId } from './FailedChecksTab.utils';
 import { Failures } from './Failures/Failures';
 
 export const FailedChecksTab: FC = () => {
@@ -64,7 +63,7 @@ export const FailedChecksTab: FC = () => {
   const getRowProps = (row: Row<FailedCheckSummary>): ExtendedTableRowProps => ({
     key: row.original.serviceId,
     className: styles.row,
-    onClick: () => locationService.push(`/advisors/insights/${stripServiceId(row.original.serviceId)}`),
+    onClick: () => locationService.push(`/advisors/insights/${row.original.serviceId}`),
   });
 
   const getCellProps = (cellInfo: Cell<FailedCheckSummary>): ExtendedTableCellProps => ({

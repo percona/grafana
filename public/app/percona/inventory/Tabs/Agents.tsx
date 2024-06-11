@@ -7,7 +7,6 @@ import { AppEvents } from '@grafana/data';
 import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-import { formatServiceId } from 'app/percona/check/components/FailedChecksTab/FailedChecksTab.utils';
 import { Agent, FlattenAgent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/AnotherTableInstance/Table.types';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
@@ -33,7 +32,6 @@ import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
 import { beautifyAgentType, getAgentStatusColor, getAgentStatusText, toAgentModel } from './Agents.utils';
-import { formatNodeId } from './Nodes.utils';
 import { getTagsFromLabels } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
@@ -42,11 +40,11 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<Agent[]>([]);
   const [selected, setSelectedRows] = useState<any[]>([]);
-  const serviceId = match.params.serviceId ? formatServiceId(match.params.serviceId) : undefined;
+  const serviceId = match.params.serviceId ? match.params.serviceId : undefined;
   const nodeId = match.params.nodeId
     ? match.params.nodeId === 'pmm-server'
       ? 'pmm-server'
-      : formatNodeId(match.params.nodeId)
+      : match.params.nodeId
     : undefined;
   const navModel = usePerconaNavModel(serviceId ? 'inventory-services' : 'inventory-nodes');
   const [generateToken] = useCancelToken();

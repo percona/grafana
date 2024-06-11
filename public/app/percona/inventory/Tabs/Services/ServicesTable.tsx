@@ -21,7 +21,6 @@ import {
   getBadgeTextForServiceStatus,
   getBadgeIconForServiceStatus,
   getNodeLink,
-  stripServiceId,
   getTagsFromLabels,
 } from '../Services.utils';
 import { getStyles } from '../Tabs.styles';
@@ -149,7 +148,7 @@ const ServicesTable: FC<ServicesTableProps> = ({
         accessor: 'agentsStatus',
         width: '70px',
         Cell: ({ value, row }) => (
-          <StatusLink type="services" strippedId={stripServiceId(row.original.serviceId)} agentsStatus={value} />
+          <StatusLink type="services" strippedId={row.original.serviceId} agentsStatus={value} />
         ),
         type: FilterFieldTypes.RADIO_BUTTON,
         options: [
@@ -190,7 +189,7 @@ const ServicesTable: FC<ServicesTableProps> = ({
           {!!agents.length && (
             <DetailsRow.Contents title={Messages.services.details.agents}>
               <StatusBadge
-                strippedId={stripServiceId(row.original.serviceId)}
+                strippedId={row.original.serviceId}
                 type={'services'}
                 agents={row.original.agents || []}
               />

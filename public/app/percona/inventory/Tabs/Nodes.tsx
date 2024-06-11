@@ -32,7 +32,7 @@ import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
-import { getServiceLink, stripNodeId } from './Nodes.utils';
+import { getServiceLink } from './Nodes.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
@@ -133,7 +133,7 @@ export const NodesTab = () => {
         Cell: ({ value, row }) => (
           <StatusLink
             type="nodes"
-            strippedId={row.original.nodeId === 'pmm-server' ? 'pmm-server' : stripNodeId(row.original.nodeId)}
+            strippedId={row.original.nodeId === 'pmm-server' ? 'pmm-server' : row.original.nodeId}
             agentsStatus={value}
           />
         ),
@@ -203,7 +203,7 @@ export const NodesTab = () => {
             <DetailsRow.Contents title={Messages.services.details.agents}>
               <StatusBadge
                 type="nodes"
-                strippedId={row.original.nodeId === 'pmm-server' ? 'pmm-server' : stripNodeId(row.original.nodeId)}
+                strippedId={row.original.nodeId === 'pmm-server' ? 'pmm-server' : row.original.nodeId}
                 agents={row.original.agents || []}
               />
             </DetailsRow.Contents>
