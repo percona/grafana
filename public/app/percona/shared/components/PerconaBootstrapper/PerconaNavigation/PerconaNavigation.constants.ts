@@ -91,7 +91,7 @@ export const PMM_UPDATES_LINK: NavModelItem = {
   url: '/pmm-ui/updates',
   hideFromTabs: true,
   target: '_self',
-  badgeText: 'New',
+  showDot: true,
 };
 
 export const PMM_HEADING_LINK: NavModelItem = {

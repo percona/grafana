@@ -45,7 +45,6 @@ export interface NavModelItem extends NavLinkDTO {
   isHeading?: boolean;
   showChildren?: boolean;
   showDot?: boolean;
-  badgeText?: string;
 }
 
 /**
