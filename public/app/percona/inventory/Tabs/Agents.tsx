@@ -40,19 +40,18 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState<Agent[]>([]);
   const [selected, setSelectedRows] = useState<any[]>([]);
-  const serviceId = match.params.serviceId ? match.params.serviceId : undefined;
   const nodeId = match.params.nodeId
     ? match.params.nodeId === 'pmm-server'
       ? 'pmm-server'
       : match.params.nodeId
     : undefined;
-  const navModel = usePerconaNavModel(serviceId ? 'inventory-services' : 'inventory-nodes');
+  const navModel = usePerconaNavModel(match.params.serviceId ? 'inventory-services' : 'inventory-nodes');
   const [generateToken] = useCancelToken();
   const { isLoading: servicesLoading, services } = useSelector(getServices);
   const { isLoading: nodesLoading, nodes } = useSelector(getNodes);
   const styles = useStyles2(getStyles);
 
-  const service = services.find((s) => s.params.serviceId === serviceId);
+  const service = services.find((s) => s.params.serviceId === match.params.serviceId);
   const node = nodes.find((s) => s.nodeId === nodeId);
   const flattenAgents = useMemo(() => data.map((value) => ({ type: value.type, ...value.params })), [data]);
 
@@ -112,7 +111,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
     setLoading(true);
     try {
       const { agents = [] } = await InventoryService.getAgents(
-        serviceId,
+        match.params.serviceId,
         nodeId,
         generateToken(GET_AGENTS_CANCEL_TOKEN)
       );
@@ -148,14 +147,14 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const deletionMsg = useMemo(() => Messages.agents.deleteConfirmation(selected.length), [selected]);
 
   useEffect(() => {
-    if (!service && serviceId) {
+    if (!service && match.params.serviceId) {
       dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
     } else if (!node && nodeId) {
       dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) }));
     } else {
       loadData();
     }
-  }, [generateToken, loadData, service, nodeId, serviceId, node]);
+  }, [generateToken, loadData, service, nodeId, match.params.serviceId, node]);
 
   const removeAgents = useCallback(
     async (agents: Array<SelectedTableRows<FlattenAgent>>, forceMode: boolean) => {

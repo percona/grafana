@@ -78,7 +78,7 @@ export const CheckService = {
     const {
       results = [],
       total_items: totalItems = 0,
-      total_pages: totalPages = 1
+      total_pages: totalPages = 1,
     } = await api.get<
       CheckResultForServicePayload,
       {
