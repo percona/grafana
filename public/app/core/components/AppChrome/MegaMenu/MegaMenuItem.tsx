@@ -6,6 +6,7 @@ import { useLocalStorage } from 'react-use';
 import { GrafanaTheme2, NavModelItem, toIconName } from '@grafana/data';
 import { useStyles2, Text, IconButton, Icon } from '@grafana/ui';
 import { useGrafana } from 'app/core/context/GrafanaContext';
+import { Dot } from 'app/percona/shared/components/Elements/Dot';
 
 import { Indent } from '../../Indent/Indent';
 
@@ -107,7 +108,7 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick }: Props) {
                       size={level === 0 ? 'lg' : 'md'}
                     />
                     {/* @PERCONA */}
-                    {!!link.showDot && <div className={styles.dot} />}
+                    {!!link.showDot && <Dot left={23} top={0} />}
                   </>
                 </FeatureHighlightWrapper>
               )}
@@ -116,7 +117,7 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick }: Props) {
                   {link.text}
                   {/* @PERCONA */}
                 </Text>
-                {!!link.showDot && !link.icon && <div className={styles.dotInner} />}
+                {!!link.showDot && !link.icon && <Dot right={-8} top={2} />}
               </div>
             </div>
           </MegaMenuItemText>
@@ -221,24 +222,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
   // @PERCONA
   relativeText: css({
     position: 'relative',
-  }),
-  dot: css({
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    left: 25,
-    top: 2,
-    borderRadius: theme.shape.radius.circle,
-    backgroundColor: theme.colors.error.main,
-  }),
-  dotInner: css({
-    position: 'absolute',
-    right: -10,
-    top: 0,
-    width: 8,
-    height: 8,
-    borderRadius: theme.shape.radius.circle,
-    backgroundColor: theme.colors.error.main,
   }),
 });
 
