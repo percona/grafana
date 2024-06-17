@@ -112,11 +112,10 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick }: Props) {
                   </>
                 </FeatureHighlightWrapper>
               )}
+              {/* @PERCONA */}
               <div className={styles.relativeText}>
-                <Text truncate>
-                  {link.text}
-                  {/* @PERCONA */}
-                </Text>
+                <Text truncate>{link.text}</Text>
+                {/* @PERCONA */}
                 {!!link.showDot && !link.icon && <Dot right={-8} top={2} />}
               </div>
             </div>
