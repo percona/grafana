@@ -92,7 +92,7 @@ export const BackupInventoryService = {
   },
   async delete(artifactId: string, removeFiles: boolean) {
     return api.delete(`${BASE_URL}/artifacts/${artifactId}`, false, undefined, {
-      remove_files: removeFiles
+      remove_files: removeFiles,
     });
   },
   async getLogs(artifactId: string, offset: number, limit: number, cancelToken?: CancelToken): Promise<BackupLogs> {
