@@ -21,7 +21,7 @@ export const ServicesService = {
     });
   },
   removeService(body: RemoveServiceBody, token?: CancelToken) {
-    return api.delete<{}>(`/v1/inventory/services/${body.service_id}`, false, token, { force: true });
+    return api.delete<{}>(`/v1/inventory/services/${body.service_id}`, false, token, { force: body.force });
   },
   updateService(body: UpdateServiceBody, token?: CancelToken) {
     const serviceId = body.service_id.replace('/service_id/', '');
