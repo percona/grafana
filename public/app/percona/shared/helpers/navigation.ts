@@ -13,7 +13,7 @@ export const useLinkWithVariables = (url?: string) => {
   }
 };
 
-const isDashboardUrl = (url?: string) => url?.match('/d/');
+const isDashboardUrl = (url?: string) => url?.includes('/d/');
 
 const checkDbType = (url: string): boolean => {
   const currentDB = window.location.pathname?.split('/')[3]?.split('-')[0];
