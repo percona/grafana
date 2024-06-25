@@ -96,17 +96,16 @@ export const alertmanagerApi = alertingApi.injectEndpoints({
     }),
 
     getExternalAlertmanagerConfig: build.query<ExternalAlertmanagerConfig, void>({
-      query: () => ({ url: '/api/v1/ngalert/admin_config' }),
+      query: () => ({ url: '/api/v1/provisioning/alert-rules' }),
       providesTags: ['AlertmanagerChoice'],
     }),
-
     getExternalAlertmanagers: build.query<ExternalAlertmanagers, void>({
       query: () => ({ url: '/api/v1/ngalert/alertmanagers' }),
       transformResponse: (response: ExternalAlertmanagersResponse) => response.data,
     }),
 
     saveExternalAlertmanagersConfig: build.mutation<{ message: string }, ExternalAlertmanagerConfig>({
-      query: (config) => ({ url: '/api/v1/ngalert/admin_config', method: 'POST', data: config }),
+      query: (config) => ({ url: '/api/v1/provisioning/alert-rules', method: 'PUT', data: config }),
       invalidatesTags: ['AlertmanagerChoice'],
     }),
 
