@@ -61,7 +61,7 @@ export class ApiRequest {
       .then((response): T => response.data)
       .catch((e) => {
         if (!disableNotifications) {
-          appEvents.emit(AppEvents.alertError, [e.response.data?.message ?? 'Unknown error']);
+          appEvents.emit(AppEvents.alertError, [e.message]);
         }
         throw e;
       });
@@ -73,7 +73,7 @@ export class ApiRequest {
       .then((response): T => response.data)
       .catch((e) => {
         if (!disableNotifications) {
-          appEvents.emit(AppEvents.alertError, [e.response.data?.message ?? 'Unknown error']);
+          appEvents.emit(AppEvents.alertError, [e.message]);
         }
         throw e;
       });
@@ -85,7 +85,7 @@ export class ApiRequest {
       .then((response): T => response.data)
       .catch((e) => {
         if (!disableNotifications) {
-          appEvents.emit(AppEvents.alertError, [e.response.data?.message ?? 'Unknown error']);
+          appEvents.emit(AppEvents.alertError, [e.message]);
         }
         throw e;
       });
