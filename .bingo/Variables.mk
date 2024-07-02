@@ -44,7 +44,7 @@ $(JB): $(BINGO_DIR)/jb.mod
 SWAGGER := $(GOBIN)/swagger-v0.30.6
 $(SWAGGER): $(BINGO_DIR)/swagger.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/swagger-v0.30.2"
+	@echo "(re)installing $(GOBIN)/swagger-v0.30.6"
 	@cd $(BINGO_DIR) && $(GO) build -mod=mod -modfile=swagger.mod -o=$(GOBIN)/swagger-v0.30.6 "github.com/go-swagger/go-swagger/cmd/swagger"
 
 WIRE := $(GOBIN)/wire-v0.6.0
