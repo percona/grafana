@@ -24,7 +24,7 @@ export class ApiRequest {
       .get<T>(path, query)
       .then((response): T => response.data)
       .catch((e) => {
-        if (!disableNotifications) {
+        if (!disableNotifications && !axios.isCancel(e)) {
           appEvents.emit(AppEvents.alertError, [e.message]);
         }
         throw e;
