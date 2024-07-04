@@ -13,7 +13,7 @@ export const responseToPayload = (response: CheckUpdatesResponse): CheckUpdatesP
   latest: response.latest
     ? {
         version: response.latest.version,
-        fullVersion: response.latest.full_version,
+        tag: response.latest.tag,
         timestamp: response.latest.timestamp,
       }
     : undefined,
