@@ -26,7 +26,7 @@ import perconaUserReducers from './user/user';
 import usersReducers from './users/users';
 
 const initialSettingsState: Settings = {
-  updatesDisabled: true,
+  updatesEnabled: false,
   telemetryEnabled: false,
   backupEnabled: false,
   metricsResolutions: {
@@ -40,7 +40,7 @@ const initialSettingsState: Settings = {
   awsPartitions: [],
   alertManagerUrl: '',
   alertManagerRules: '',
-  sttEnabled: false,
+  advisorEnabled: false,
   alertingEnabled: false,
   alertingSettings: {
     email: {
@@ -53,7 +53,7 @@ const initialSettingsState: Settings = {
       url: '',
     },
   },
-  sttCheckIntervals: {
+  advisorRunIntervals: {
     rareInterval: '10s',
     standardInterval: '10s',
     frequentInterval: '10s',
