@@ -3,11 +3,11 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
-import { Node, RemoveNodeBody } from 'app/percona/inventory/Inventory.types';
+import { Node, NodesOptions, RemoveNodeBody } from 'app/percona/inventory/Inventory.types';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 
 import { NodesState, RemoveNodesParams } from './nodes.types';
-import { nodeFromDbMapper } from './nodes.utils';
+import { nodeFromDbMapper, nodesOptionsMapper } from './nodes.utils';
 
 const initialState: NodesState = {
   nodes: [],
@@ -41,6 +41,15 @@ export const fetchNodesAction = createAsyncThunk<Node[], { token?: CancelToken }
     const { nodes } = await InventoryService.getNodes(params.token);
     const mappedNodes = nodeFromDbMapper(nodes);
     return mappedNodes.sort((a, b) => a.nodeName.localeCompare(b.nodeName));
+  }
+);
+
+export const fetchNodesOptionsAction = createAsyncThunk<NodesOptions[], { token?: CancelToken }>(
+  'percona/fetchNodesOptions',
+  async (params = {}) => {
+    const { nodes } = await InventoryService.getNodes(params.token);
+
+    return nodesOptionsMapper(nodes);
   }
 );
 

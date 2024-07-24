@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
-import { Node, NodeDB } from 'app/percona/inventory/Inventory.types';
+import { AgentsOptions, AgentType, Node, NodeDB, NodesOptions } from 'app/percona/inventory/Inventory.types';
 import { getAgentsMonitoringStatus } from 'app/percona/inventory/Tabs/Services.utils';
 import { DbAgent } from 'app/percona/shared/services/services/Services.types';
 
@@ -54,3 +54,25 @@ export const nodeFromDbMapper = (nodeFromDb: NodeDB[]) => {
     } as Node;
   });
 };
+
+export const nodesOptionsMapper = (nodeFromDb: NodeDB[]) => {
+  return  nodeFromDb.map((node) => {
+
+    const agents = node.agents?.map(
+      (agent) => {
+        if (agent.agent_type === AgentType.pmmAgent) {
+          return {
+            value: agent.agent_id,
+            label: agent.agent_type
+          } as AgentsOptions;
+        } else { return null; }
+      }
+    ).filter(agent => agent !== null) as AgentsOptions[];
+
+    return {
+      value: node.node_id,
+      label: node.node_name,
+      agents: agents,
+    } as NodesOptions;
+  });
+}

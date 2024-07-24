@@ -53,6 +53,8 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
   if (type === Databases.mysql) {
     initialValues.qan_mysql_perfschema = true;
     initialValues.disable_comments_parsing = true;
+    initialValues.node = "";
+    initialValues.agent = "";
   }
 
   if (type === Databases.postgresql) {
@@ -65,6 +67,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
 
   const onSubmit = useCallback(
     async (values: FormValues) => {
+      console.log('----Submit---', values);
       try {
         setLoading(true);
         if (values.isRDS) {

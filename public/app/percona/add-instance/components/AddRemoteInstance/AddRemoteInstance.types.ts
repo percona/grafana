@@ -127,6 +127,8 @@ export interface MySQLPayload extends RemoteCommonPayload, TLSCommon {
   tls_key: string;
   tls_ca: string;
   max_query_length: number;
+  node?: string;
+  agent?: string;
 }
 
 export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {

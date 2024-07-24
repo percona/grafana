@@ -33,6 +33,8 @@ export interface RemoteInstanceCredentials {
   skip_connection_check?: boolean;
   tls?: boolean;
   tls_skip_verify?: boolean;
+  node?: string;
+  agent?: string;
 }
 
 export enum InstanceTypesExtra {
