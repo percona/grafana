@@ -241,7 +241,7 @@ export const ScheduledBackups: FC = () => {
   };
 
   const onEditClick = (backup: ScheduledBackup) => {
-    locationService.push(`/backup/${backup.id}/edit`);
+    locationService.push(`/backup/${backup.type}/${backup.id}/edit`);
   };
 
   const getCellProps = useCallback(
