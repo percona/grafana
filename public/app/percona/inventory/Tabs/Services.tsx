@@ -95,8 +95,8 @@ export const Services = () => {
   }, [onModalClose, loadData]);
 
   return (
-    <TabbedPage navModel={navModel}>
-      <TabbedPageContents isLoading={isLoading}>
+    <TabbedPage navModel={navModel} isLoading={isLoading}>
+      <TabbedPageContents>
         <FeatureLoader>
           <HorizontalGroup height={40} justify="flex-end" align="flex-start">
             <HorizontalGroup align="center">

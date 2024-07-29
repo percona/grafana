@@ -9,26 +9,28 @@ import { getStyles } from './TabbedPage.styles';
 import { TabbedPageProps } from './TabbedPage.types';
 import { TabbedPageSelect } from './TabbedPageSelect';
 
-export const TabbedPage: FC<TabbedPageProps> = ({ children, vertical, ...props }) => {
+export const TabbedPage: FC<TabbedPageProps> = ({ children, isLoading, vertical, ...props }) => {
   const tabs = useTabs(props.navId, props.navModel);
   const styles = useStyles2(getStyles, vertical);
 
   return (
     <Page {...props} className={cx(styles.Page, props.className)}>
-      <TabsBar className={styles.TabsBar} hideBorder={vertical}>
-        {tabs.map((child, index) => (
-          <Tab
-            label={child.text}
-            active={child.active}
-            key={`${child.url}-${index}`}
-            icon={child.icon}
-            href={child.url}
-            suffix={child.tabSuffix}
-          />
-        ))}
-      </TabsBar>
-      <TabbedPageSelect tabs={tabs} className={styles.TabSelect} />
-      <div className={styles.PageBody}>{children}</div>
+      <Page.Contents isLoading={isLoading}>
+        <TabsBar className={styles.TabsBar} hideBorder={vertical}>
+          {tabs.map((child, index) => (
+            <Tab
+              label={child.text}
+              active={child.active}
+              key={`${child.url}-${index}`}
+              icon={child.icon}
+              href={child.url}
+              suffix={child.tabSuffix}
+            />
+          ))}
+        </TabsBar>
+        <TabbedPageSelect tabs={tabs} className={styles.TabSelect} />
+        <div className={styles.PageBody}>{children}</div>
+      </Page.Contents>
     </Page>
   );
 };

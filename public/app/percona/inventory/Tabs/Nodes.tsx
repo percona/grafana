@@ -299,7 +299,7 @@ export const NodesTab = () => {
   }, []);
 
   return (
-    <TabbedPage navModel={navModel}>
+    <TabbedPage navModel={navModel} isLoading={isLoading}>
       <TabbedPageContents>
         <FeatureLoader>
           <div className={styles.actionPanel}>
