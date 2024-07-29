@@ -62,8 +62,8 @@ export const nodesOptionsMapper = (nodeFromDb: NodeDB[]) => {
       (agent) => {
         if (agent.agent_type === AgentType.pmmAgent) {
           return {
-            value: agent.agent_id,
-            label: agent.agent_type
+            value: agent.agent_type,
+            label: agent.agent_id
           } as AgentsOptions;
         } else { return null; }
       }

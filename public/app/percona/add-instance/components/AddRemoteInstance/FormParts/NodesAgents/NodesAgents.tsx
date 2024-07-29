@@ -39,12 +39,12 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const setNodeAndAgent = (value: NodesOptions) => {
     setSelectedNode(value);
     if (value.agents && value.agents.length > 1) {
-      form?.change('agent', value.agents[1]);
+      form?.change('pmm_agent_id', value.agents[1]);
     } else if (value.agents && value.agents.length === 1) {
-      form?.change('agent', value.agents[0]);
+      form?.change('pmm_agent_id', value.agents[0]);
     }
 
-    if(selectedAgent && selectedAgent.value !== "pmm-server") {
+    if(selectedAgent && selectedAgent.label !== "pmm-server") {
       form?.change('address', 'localhost');
     }
   }
@@ -77,7 +77,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           isSearchable={false}
           disabled={!selectedNode || !selectedNode.agents || selectedNode.agents.length === 1}
           options={selectedNode?.agents || []}
-          name="agent"
+          name="pmm_agent_id"
           data-testid="nodes-label"
           onChange={ (event) => { setSelectedAgent(event as AgentsOptions); }}
           className={styles.selectField}

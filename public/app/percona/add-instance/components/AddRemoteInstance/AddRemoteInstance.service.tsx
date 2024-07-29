@@ -30,64 +30,6 @@ import {
 const BASE_URL = '/services';
 
 class AddRemoteInstanceService {
-  /*
-* {
-  "node_id": "string",
-  "node_name": "string",
-  "add_node": {
-    "node_type": "NODE_TYPE_INVALID",
-    "node_name": "string",
-    "machine_id": "string",
-    "distro": "string",
-    "container_id": "string",
-    "container_name": "string",
-    "node_model": "string",
-    "region": "string",
-    "az": "string",
-    "custom_labels": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    }
-  },
-  "service_name": "string",
-  "address": "string",
-  "port": 0,
-  "socket": "string",
-  "pmm_agent_id": "string",
-  "environment": "string",
-  "cluster": "string",
-  "replication_set": "string",
-  "username": "string",
-  "password": "string",
-  "qan_mysql_perfschema": true,
-  "qan_mysql_slowlog": true,
-  "custom_labels": {
-    "additionalProp1": "string",
-    "additionalProp2": "string",
-    "additionalProp3": "string"
-  },
-  "skip_connection_check": true,
-  "disable_comments_parsing": true,
-  "max_query_length": 0,
-  "disable_query_examples": true,
-  "max_slowlog_file_size": "string",
-  "tls": true,
-  "tls_skip_verify": true,
-  "tls_ca": "string",
-  "tls_cert": "string",
-  "tls_key": "string",
-  "tablestats_group_table_limit": 0,
-  "metrics_mode": "AUTO",
-  "disable_collectors": [
-    "string"
-  ],
-  "agent_password": "string",
-  "log_level": "auto",
-  "expose_exporter": true
-}
-*
-* */
   static async addMysql(body: MySQLPayload, token?: CancelToken) {
     return apiManagement.post<MySQLInstanceResponse | ErrorResponse, AddServicePayload>(
       BASE_URL,
@@ -237,8 +179,11 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
     }
   }
 
+  data.pmm_agent_id = values.pmm_agent_id.label;
+
   data.metrics_mode = 1;
   delete data.tracking;
+  delete data.node;
 
   return data;
 };
