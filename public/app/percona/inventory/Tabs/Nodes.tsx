@@ -41,7 +41,6 @@ import {
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
-
 export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
   const [modalVisible, setModalVisible] = useState(false);

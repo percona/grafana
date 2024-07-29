@@ -34,8 +34,6 @@ export const MegaMenu = React.memo(
 
     const activeItem = getActiveItem(navItems, location.pathname);
 
-    console.log({ activeItem });
-
     const handleDockedMenu = () => {
       chrome.setMegaMenuDocked(!state.megaMenuDocked);
       if (state.megaMenuDocked) {

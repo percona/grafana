@@ -1,13 +1,10 @@
 import React, { FC, useMemo } from 'react';
 
-import { NavModelItem, SelectableValue } from '@grafana/data';
+import { SelectableValue } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Select } from '@grafana/ui';
 
-interface TabbedPageSelectProps {
-  tabs: NavModelItem[];
-  className?: string;
-}
+import { TabbedPageSelectProps } from './TabbedPageSelect.types';
 
 export const TabbedPageSelect: FC<TabbedPageSelectProps> = ({ tabs, className }) => {
   const options = useMemo<SelectableValue[]>(
