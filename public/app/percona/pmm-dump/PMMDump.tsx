@@ -15,7 +15,6 @@ import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/comp
 import {
   PMM_DUMP_PAGE,
 } from "app/percona/shared/components/PerconaBootstrapper/PerconaNavigation";
-import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
   deletePmmDumpAction,
   downloadPmmDumpAction,
