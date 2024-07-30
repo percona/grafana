@@ -12,6 +12,9 @@ import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'ap
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { Action } from 'app/percona/shared/components/Elements/MultipleActions';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
+import {
+  PMM_DUMP_PAGE,
+} from "app/percona/shared/components/PerconaBootstrapper/PerconaNavigation";
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import {
   deletePmmDumpAction,
@@ -44,7 +47,6 @@ export const PMMDump = () => {
   const [selectedDump, setSelectedDump] = useState<PMMDumpServices | null>(null);
   const [isSendToSupportModalOpened, setIsSendToSupportModalOpened] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
-  const navModel = usePerconaNavModel('pmm-dump');
 
   const loadData = useCallback(async () => {
     try {
@@ -280,7 +282,10 @@ export const PMMDump = () => {
   );
 
   return (
-    <Page navId="pmmdump" navModel={navModel}>
+    <Page navModel={{
+      main: PMM_DUMP_PAGE,
+      node: PMM_DUMP_PAGE,
+    }}>
       <Page.Contents>
         <div className={styles.createDatasetArea}>
           {selectedRows.length > 0 ? (

@@ -91,7 +91,6 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
       serviceList = [];
     }
 
-    console.log(data);
     await dispatch(
       triggerDumpAction({
         serviceNames: serviceList,
