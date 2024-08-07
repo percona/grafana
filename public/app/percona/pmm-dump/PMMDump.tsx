@@ -12,9 +12,7 @@ import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'ap
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { Action } from 'app/percona/shared/components/Elements/MultipleActions';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
-import {
-  PMM_DUMP_PAGE,
-} from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
 import {
   deletePmmDumpAction,
   downloadPmmDumpAction,
@@ -281,10 +279,12 @@ export const PMMDump = () => {
   );
 
   return (
-    <Page navModel={{
-      main: PMM_DUMP_PAGE,
-      node: PMM_DUMP_PAGE,
-    }}>
+    <Page
+      navModel={{
+        main: PMM_DUMP_PAGE,
+        node: PMM_DUMP_PAGE,
+      }}
+    >
       <Page.Contents>
         <div className={styles.createDatasetArea}>
           {selectedRows.length > 0 ? (
