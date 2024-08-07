@@ -14,7 +14,7 @@ import { Action } from 'app/percona/shared/components/Elements/MultipleActions';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
 import {
   PMM_DUMP_PAGE,
-} from "app/percona/shared/components/PerconaBootstrapper/PerconaNavigation";
+} from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
 import {
   deletePmmDumpAction,
   downloadPmmDumpAction,
