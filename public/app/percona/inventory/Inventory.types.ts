@@ -177,13 +177,13 @@ export type FlattenNode = DbNode & {
   type: NodeType;
 };
 
-export interface NodesOptions {
+export interface NodesOption {
   value: string;
   label: string;
-  agents?: AgentsOptions[];
+  agents?: AgentsOption[];
 }
 
-export interface AgentsOptions {
+export interface AgentsOption {
   value: string;
   label: string;
 }

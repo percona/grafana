@@ -49,7 +49,6 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [generateToken] = useCancelToken();
   const initialValues: FormValues = { ...remoteInstanceCredentials };
-  initialValues.pmm_agent_id = "";
 
   if (type === Databases.mysql) {
     initialValues.qan_mysql_perfschema = true;

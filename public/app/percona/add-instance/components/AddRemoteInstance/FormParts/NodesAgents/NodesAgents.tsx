@@ -1,32 +1,41 @@
-import { FormApi } from "final-form";
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
-import { getStyles } from "app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles";
-import { GET_NODES_CANCEL_TOKEN } from "app/percona/inventory/Inventory.constants";
-import { AgentsOptions, NodesOptions } from "app/percona/inventory/Inventory.types";
-import { SelectField } from "app/percona/shared/components/Form/SelectFieldCore";
-import { useCancelToken } from "app/percona/shared/components/hooks/cancelToken.hook";
-import { fetchNodesOptionsAction } from "app/percona/shared/core/reducers/nodes/nodes";
-import { isApiCancelError } from "app/percona/shared/helpers/api";
-import { logger } from "app/percona/shared/helpers/logger";
-import { useAppDispatch } from "app/store/store";
-
-export interface NodesAgentsProps {
-  form?: FormApi;
-}
+import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
+import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
+import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
+import { AgentsOption, NodesOption } from 'app/percona/inventory/Inventory.types';
+import { SelectField } from 'app/percona/shared/components/Form/SelectFieldCore';
+import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
+import { nodesOptionsMapper } from 'app/percona/shared/core/reducers/nodes';
+import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
+import { getNodes } from 'app/percona/shared/core/selectors';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { logger } from 'app/percona/shared/helpers/logger';
+import { useAppDispatch } from 'app/store/store';
+import { useSelector } from 'app/types';
 
 export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
-  const [selectedNode, setSelectedNode] = useState<NodesOptions| undefined>(undefined);
-  const [selectedAgent, setSelectedAgent] = useState<AgentsOptions | undefined>(undefined);
-  const [nodes, setNodes] = useState<NodesOptions[]>([]);
+  const [selectedNode, setSelectedNode] = useState<NodesOption>();
+  const [selectedAgent, setSelectedAgent] = useState<AgentsOption>();
+  const [nodesOptions, setNodesOptions] = useState<NodesOption[]>([]);
+  const { nodes } = useSelector(getNodes);
+
+  useMemo(() => {
+      if(nodes.length > 0) {
+        setNodesOptions(nodesOptionsMapper(nodes));
+      }
+    },
+    [nodes]
+  );
+
 
   const loadData = useCallback(async () => {
     try {
-      setNodes(await dispatch(fetchNodesOptionsAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap());
+      await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap();
     } catch (e) {
       if (isApiCancelError(e)) {
         return;
@@ -36,7 +45,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const setNodeAndAgent = (value: NodesOptions) => {
+  const setNodeAndAgent = (value: NodesOption) => {
     setSelectedNode(value);
     if (value.agents && value.agents.length > 1) {
       form?.change('pmm_agent_id', value.agents[1]);
@@ -50,11 +59,11 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   }
 
   useEffect(() => {
-    if(nodes.length === 0) {
+    if(nodesOptions.length === 0) {
       loadData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes]);
+  }, [nodesOptions]);
 
   return (
     <div className={styles.group}>
@@ -62,11 +71,10 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
         <SelectField
           label="Nodes"
           isSearchable={false}
-          disabled={false}
-          options={nodes}
+          options={nodesOptions}
           name="node"
-          data-testid="nodes-label"
-          onChange={ (event) => { setNodeAndAgent(event as NodesOptions) }}
+          data-testid="nodes-selectbox"
+          onChange={ (event) => setNodeAndAgent(event as NodesOption)}
           className={styles.selectField}
           value={selectedNode}
         />
@@ -78,8 +86,8 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           disabled={!selectedNode || !selectedNode.agents || selectedNode.agents.length === 1}
           options={selectedNode?.agents || []}
           name="pmm_agent_id"
-          data-testid="nodes-label"
-          onChange={ (event) => { setSelectedAgent(event as AgentsOptions); }}
+          data-testid="agents-selectbox"
+          onChange={ (event) => setSelectedAgent(event as AgentsOption)}
           className={styles.selectField}
         />
       </div>
