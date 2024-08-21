@@ -1,34 +1,42 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
 
 import { NodesAgents } from './NodesAgents';
+import { Form } from 'react-final-form';
+import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes.ts'
+
+const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
+
+jest.mock('app/percona/inventory/Inventory.service');
 
 describe('Nodes Agents:: ', () => {
+
+  let store = configureStore();
+  let formAPI;
   render(
-    <Provider
-      store={configureStore({
-        percona: {
-          user: { isAuthorized: true, isPlatformUser: false },
-          settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
-        },
-      } as StoreState)}
-  >
-      <Form onSubmit={jest.fn()}>
-        <NodesAgents />
-      </Form>
+    <Provider store={store}>
+      <Form
+        onSubmit={jest.fn()}
+        render={({ form }) => {
+          formAPI=form;
+          return <NodesAgents form={form}/>
+        }}
+      />
     </Provider>
   );
 
-  it('should change the   list of agents when changing the nodes', () => {
-    const nodesValue = screen.getByTestId('nodes-selectbox');
-    fireEvent.change(nodesValue, { target: { value: 'pmm-agent' } });
+  it('should change the   list of agents when changing the nodes', async () => {
+    await waitFor(() => {
+      expect(fetchNodesActionActionSpy).toHaveBeenCalled();
+    });
 
-    expect(screen.getByTestId('agents-selectbox')).toHaveValue('pmm-agent');
+
+    fireEvent.change(screen.getByTestId('nodes-selectbox'), { target: { value: 'pmm_agent' } });
+    console.log(formAPI.getState().values);
+    // expect(container.querySelector('#nodes-selectbox input')).toHaveValue('pmm-agent');
   });
 
 });

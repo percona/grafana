@@ -25,7 +25,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const { nodes } = useSelector(getNodes);
 
   useMemo(() => {
-      if(nodes.length > 0) {
+      if(nodes && nodes.length > 0) {
         setNodesOptions(nodesOptionsMapper(nodes));
       }
     },
@@ -59,6 +59,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   }
 
   useEffect(() => {
+    console.log('nodesOptions', nodesOptions);
     if(nodesOptions.length === 0) {
       loadData();
     }
@@ -73,6 +74,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           isSearchable={false}
           options={nodesOptions}
           name="node"
+          id="nodes-selectbox"
           data-testid="nodes-selectbox"
           onChange={ (event) => setNodeAndAgent(event as NodesOption)}
           className={styles.selectField}
