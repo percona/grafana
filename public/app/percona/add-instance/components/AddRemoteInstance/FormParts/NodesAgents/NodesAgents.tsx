@@ -59,7 +59,6 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   }
 
   useEffect(() => {
-    console.log('nodesOptions', nodesOptions);
     if(nodesOptions.length === 0) {
       loadData();
     }
@@ -79,6 +78,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           onChange={ (event) => setNodeAndAgent(event as NodesOption)}
           className={styles.selectField}
           value={selectedNode}
+          aria-label="Nodes"
         />
       </div>
       <div className={styles.selectFieldWrapper}>
@@ -91,6 +91,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           data-testid="agents-selectbox"
           onChange={ (event) => setSelectedAgent(event as AgentsOption)}
           className={styles.selectField}
+          aria-label="Agents"
         />
       </div>
     </div>

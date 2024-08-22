@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 
@@ -7,6 +7,7 @@ import { configureStore } from 'app/store/configureStore';
 import { NodesAgents } from './NodesAgents';
 import { Form } from 'react-final-form';
 import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes.ts'
+import selectEvent from "react-select-event";
 
 const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
 
@@ -32,11 +33,13 @@ describe('Nodes Agents:: ', () => {
     await waitFor(() => {
       expect(fetchNodesActionActionSpy).toHaveBeenCalled();
     });
+    const nodesSelect = screen.getByLabelText('Nodes');
+    await selectEvent.select(nodesSelect, ['pmm-server'], { container: document.body });
 
-
-    fireEvent.change(screen.getByTestId('nodes-selectbox'), { target: { value: 'pmm_agent' } });
-    console.log(formAPI.getState().values);
-    // expect(container.querySelector('#nodes-selectbox input')).toHaveValue('pmm-agent');
+    const agentsSelect = screen.getByLabelText('Agents');
+    const formValues = formAPI.getState().values;
+    expect(formValues.pmm_agent_id.value).toBe('pmm-agent');
+    expect(formValues.node.value).toBe('pmm-server');
   });
 
 });
