@@ -103,7 +103,7 @@ func AddPerconaRoutes() []*navtree.NavLink {
 
 	mongodbChildNavs := []*navtree.NavLink{
 		{Text: "Overview", Id: "mongo-overview", Url: setting.AppSubUrl + "/d/mongodb-instance-overview/mongodb-instances-overview", Icon: "percona-nav-overview", HideFromTabs: true, ShowIconInNavbar: true},
-		{Text: "Summary", Id: "mongo-summary", Url: setting.AppSubUrl + "/d/mongodb-replicaset-summary/mongodb-replset-summary", Icon: "percona-nav-summary", HideFromTabs: true, ShowIconInNavbar: true},
+		{Text: "Summary", Id: "mongo-summary", Url: setting.AppSubUrl + "/d/mongodb-instance-summary/mongodb-instance-summary", Icon: "percona-nav-summary", HideFromTabs: true, ShowIconInNavbar: true},
 		{Text: "High availability", Id: "mongo-ha", Icon: "percona-cluster", HideFromTabs: true, Children: mongodbHAChildNavs, ShowIconInNavbar: true},
 		{Text: "InMemory", Id: "mongo-memory-details", Url: setting.AppSubUrl + "/d/mongodb-inmemory/mongodb-inmemory-details", Icon: "sitemap", HideFromTabs: true},
 		{Text: "WiredTiger", Id: "mongo-wiredtiger-details", Url: setting.AppSubUrl + "/d/mongodb-wiredtiger/mongodb-wiredtiger-details", Icon: "sitemap", HideFromTabs: true},
