@@ -4,10 +4,10 @@ import { useStyles2 } from '@grafana/ui';
 import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
 import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
 import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
-import { AgentsOption, NodesOption } from 'app/percona/inventory/Inventory.types';
+import { AgentsOption, Node, NodesOption } from 'app/percona/inventory/Inventory.types';
 import { SelectField } from 'app/percona/shared/components/Form/SelectFieldCore';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { nodesOptionsMapper } from 'app/percona/shared/core/reducers/nodes';
+import { nodeFromDbMapper, nodesOptionsMapper } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -21,14 +21,10 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const [generateToken] = useCancelToken();
   const [selectedNode, setSelectedNode] = useState<NodesOption>();
   const [selectedAgent, setSelectedAgent] = useState<AgentsOption>();
-  const [nodesOptions, setNodesOptions] = useState<NodesOption[]>([]);
   const { nodes } = useSelector(getNodes);
 
-  useMemo(() => {
-      if(nodes && nodes.length > 0) {
-        setNodesOptions(nodesOptionsMapper(nodes));
-      }
-    },
+  const nodesOptions  = useMemo(
+    (): NodesOption[] => nodesOptionsMapper(nodes),
     [nodes]
   );
 

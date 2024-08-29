@@ -53,12 +53,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const styles = useStyles2(getStyles);
 
   const mappedNodes: Node[] = useMemo(
-    (): Node[] => {
-      if(nodes.length > 0) {
-        return nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName));
-      }
-      return [];
-    },
+    (): Node[] => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
     [nodes]
   );
 

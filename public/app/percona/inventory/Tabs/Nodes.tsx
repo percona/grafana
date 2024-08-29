@@ -52,12 +52,7 @@ export const NodesTab = () => {
   const dispatch = useAppDispatch();
 
   const mappedNodes: Node[]  = useMemo(
-    (): Node[] => {
-      if(nodes.length > 0) {
-        return nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName));
-      }
-      return [];
-    },
+    (): Node[] => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
     [nodes]
   );
 
