@@ -97,7 +97,7 @@ func AddPerconaRoutes() []*navtree.NavLink {
 	}
 
 	mongodbHAChildNavs := []*navtree.NavLink{
-		{Text: "Cluster summary", Id: "mongo-cluster-summary", Url: setting.AppSubUrl + "/d/mongodb-cluster-summary/mongodb-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "Cluster summary", Id: "mongo-cluster-summary", Url: setting.AppSubUrl + "/d/mongodb-cluster-summary/mongodb-sharded-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
 		{Text: "ReplSet summary", Id: "mongo-rplset-summary", Url: setting.AppSubUrl + "/d/mongodb-replicaset-summary/mongodb-replset-summary", Icon: "percona-cluster", HideFromTabs: true},
 	}
 
@@ -106,8 +106,9 @@ func AddPerconaRoutes() []*navtree.NavLink {
 		{Text: "Summary", Id: "mongo-summary", Url: setting.AppSubUrl + "/d/mongodb-instance-summary/mongodb-instance-summary", Icon: "percona-nav-summary", HideFromTabs: true, ShowIconInNavbar: true},
 		{Text: "High availability", Id: "mongo-ha", Icon: "percona-cluster", HideFromTabs: true, Children: mongodbHAChildNavs, ShowIconInNavbar: true},
 		{Text: "InMemory", Id: "mongo-memory-details", Url: setting.AppSubUrl + "/d/mongodb-inmemory/mongodb-inmemory-details", Icon: "sitemap", HideFromTabs: true},
-		{Text: "MMAPv1", Id: "mongo-mmap-details", Url: setting.AppSubUrl + "/d/mongodb-mmapv1/mongodb-mmapv1-details", Icon: "sitemap", HideFromTabs: true},
-		{Text: "WiredTiger", Id: "mondo-wiredtiger-details", Url: setting.AppSubUrl + "/d/mongodb-wiredtiger/mongodb-wiredtiger-details", Icon: "sitemap", HideFromTabs: true},
+		{Text: "WiredTiger", Id: "mongo-wiredtiger-details", Url: setting.AppSubUrl + "/d/mongodb-wiredtiger/mongodb-wiredtiger-details", Icon: "sitemap", HideFromTabs: true},
+		{Text: "Collections", Id: "mongo-collections-overview", Url: setting.AppSubUrl + "/d/mongodb-collections-overview/mongodb-collections-overview", Icon: "sitemap", HideFromTabs: true},
+		{Text: "Oplog", Id: "mongo-oplog-details", Url: setting.AppSubUrl + "/d/mongodb-oplog-details/mongodb-oplog-details", Icon: "sitemap", HideFromTabs: true},
 	}
 
 	postgresqlChildNavs := []*navtree.NavLink{
