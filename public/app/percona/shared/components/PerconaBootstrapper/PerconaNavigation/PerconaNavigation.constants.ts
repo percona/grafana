@@ -85,6 +85,15 @@ export const PMM_INVENTORY_PAGE: NavModelItem = {
   children: [PMM_SERVICES_PAGE, PMM_NODES_PAGE],
 };
 
+export const PMM_UPDATES_LINK: NavModelItem = {
+  id: 'pmm-updates',
+  text: 'Updates',
+  url: '/pmm-ui/updates',
+  hideFromTabs: true,
+  target: '_self',
+  showDot: false,
+};
+
 export const PMM_HEADING_LINK: NavModelItem = {
   id: 'settings-pmm',
   text: 'PMM',
@@ -464,7 +473,7 @@ export const PMM_NAV_MONGO: NavModelItem = {
           id: 'mongo-cluster-summary',
           text: 'Cluster summary',
           icon: 'percona-cluster',
-          url: `${config.appSubUrl}/d/mongodb-cluster-summary/mongodb-cluster-summary`,
+          url: `${config.appSubUrl}/d/mongodb-cluster-summary/mongodb-sharded-cluster-summary`,
           hideFromTabs: true,
         },
         {
@@ -472,6 +481,13 @@ export const PMM_NAV_MONGO: NavModelItem = {
           text: 'ReplSet summary',
           icon: 'percona-cluster',
           url: `${config.appSubUrl}/d/mongodb-replicaset-summary/mongodb-replset-summary`,
+          hideFromTabs: true,
+        },
+        {
+          id: 'mongo-router-summary',
+          text: 'Router summary',
+          icon: 'percona-cluster',
+          url: `${config.appSubUrl}/d/mongodb-router-summary/mongodb-router-summary`,
           hideFromTabs: true,
         },
       ],
@@ -484,17 +500,24 @@ export const PMM_NAV_MONGO: NavModelItem = {
       hideFromTabs: true,
     },
     {
-      id: 'mongo-mmap-details',
-      text: 'MMAPv1',
-      icon: 'sitemap',
-      url: `${config.appSubUrl}/d/mongodb-mmapv1/mongodb-mmapv1-details`,
-      hideFromTabs: true,
-    },
-    {
       id: 'mondo-wiredtiger-details',
       text: 'WiredTiger',
       icon: 'sitemap',
       url: `${config.appSubUrl}/d/mongodb-wiredtiger/mongodb-wiredtiger-details`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'mongo-collections-overview',
+      text: 'Collections',
+      icon: 'sitemap',
+      url: `${config.appSubUrl}/d/mongodb-collections-overview/mongodb-collections-overview`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'mongo-oplog-details',
+      text: 'Oplog',
+      icon: 'sitemap',
+      url: `${config.appSubUrl}/d/mongodb-oplog-details/mongodb-oplog-details`,
       hideFromTabs: true,
     },
   ],

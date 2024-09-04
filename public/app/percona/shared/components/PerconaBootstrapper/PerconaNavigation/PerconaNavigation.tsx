@@ -10,7 +10,13 @@ import { fetchActiveServiceTypesAction } from 'app/percona/shared/core/reducers/
 import { useAppDispatch } from 'app/store/store';
 import { FolderDTO, useSelector } from 'app/types';
 
-import { getCategorizedAdvisors, getPerconaSettings, getPerconaUser, getServices } from '../../../core/selectors';
+import {
+  getCategorizedAdvisors,
+  getPerconaSettings,
+  getPerconaUser,
+  getServices,
+  getUpdatesInfo,
+} from '../../../core/selectors';
 
 import {
   ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS,
@@ -43,13 +49,14 @@ import {
 const PerconaNavigation: FC = () => {
   const [folders, setFolders] = useState<FolderDTO[]>([]);
   const { result } = useSelector(getPerconaSettings);
-  const { alertingEnabled, sttEnabled, backupEnabled } = result || {};
+  const { alertingEnabled, advisorEnabled, backupEnabled } = result || {};
   const { isPlatformUser, isAuthorized } = useSelector(getPerconaUser);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
   const dispatch = useAppDispatch();
   const { activeTypes } = useSelector(getServices);
   const advisorsPage = buildAdvisorsNavItem(categorizedAdvisors);
+  const { updateAvailable } = useSelector(getUpdatesInfo);
 
   dispatch(updateNavIndex(getPmmSettingsPage(alertingEnabled)));
   dispatch(updateNavIndex(PMM_DUMP_PAGE));
@@ -113,7 +120,7 @@ const PerconaNavigation: FC = () => {
         }
       }
 
-      buildInventoryAndSettings(updatedNavTree, result);
+      buildInventoryAndSettings(updatedNavTree, result, updateAvailable);
 
       const iaMenuItem = alertingEnabled
         ? buildIntegratedAlertingMenuItem(updatedNavTree)
@@ -123,7 +130,7 @@ const PerconaNavigation: FC = () => {
         dispatch(updateNavIndex(iaMenuItem));
       }
 
-      if (sttEnabled) {
+      if (advisorEnabled) {
         updatedNavTree.push(advisorsPage);
       }
 
@@ -140,7 +147,7 @@ const PerconaNavigation: FC = () => {
 
     dispatch(updateNavTree(filterByServices(updatedNavTree, activeTypes)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, folders, activeTypes, isAuthorized, isPlatformUser, advisorsPage]);
+  }, [result, folders, activeTypes, isAuthorized, isPlatformUser, advisorsPage, updateAvailable]);
 
   return null;
 };
