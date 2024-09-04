@@ -99,6 +99,7 @@ func AddPerconaRoutes() []*navtree.NavLink {
 	mongodbHAChildNavs := []*navtree.NavLink{
 		{Text: "Cluster summary", Id: "mongo-cluster-summary", Url: setting.AppSubUrl + "/d/mongodb-cluster-summary/mongodb-sharded-cluster-summary", Icon: "percona-cluster", HideFromTabs: true},
 		{Text: "ReplSet summary", Id: "mongo-rplset-summary", Url: setting.AppSubUrl + "/d/mongodb-replicaset-summary/mongodb-replset-summary", Icon: "percona-cluster", HideFromTabs: true},
+		{Text: "Router summary", Id: "mongo-router-summary", Url: setting.AppSubUrl + "/d/mongodb-router-summary/mongodb-router-summary", Icon: "percona-cluster", HideFromTabs: true},
 	}
 
 	mongodbChildNavs := []*navtree.NavLink{
