@@ -1,3 +1,5 @@
+import { DefaultDatabaseConfiguration } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Configurations/Configuration.constants';
+import { ConfigurationFields } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Configurations/Configurations.types';
 import { logger } from 'app/percona/shared/helpers/logger';
 
 import { DATABASE_LABELS } from '../../../../shared/core';
@@ -37,8 +39,12 @@ export const getAddInitialValues = (
       initialValues[BasicOptionsFields.kubernetesCluster] = initialCluster;
       if (activeOperators.length > 0) {
         const databaseDefaultOperator = getDatabaseOptionFromOperator(activeOperators[0]);
+        const defaultConfiguration = databaseDefaultOperator?.value
+          ? DefaultDatabaseConfiguration[databaseDefaultOperator?.value]
+          : '';
         initialValues[BasicOptionsFields.databaseType] = databaseDefaultOperator;
         initialValues[BasicOptionsFields.name] = `${databaseDefaultOperator?.value}-${generateUID()}`;
+        initialValues[ConfigurationFields.configuration] = defaultConfiguration;
       }
     }
   }
@@ -80,7 +86,10 @@ export const getEditInitialValues = (
     cpu,
     disk,
     memory,
-    configuration: configuration?.params?.pxc?.configuration || configuration?.params?.replicaset?.configuration,
+    configuration:
+      selectedDBCluster?.configuration ||
+      configuration?.params?.pxc?.configuration ||
+      configuration?.params?.replicaset?.configuration,
     expose: configuration?.exposed,
     internetFacing: configuration?.internet_facing,
     sourceRanges: sourceRangesArray,

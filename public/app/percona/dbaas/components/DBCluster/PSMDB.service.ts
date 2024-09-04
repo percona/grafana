@@ -150,6 +150,7 @@ export class PSMDBService extends DBClusterService {
       availableImage: dbCluster.available_image,
       template: dbCluster.template,
       sourceRanges: dbCluster.source_ranges,
+      configuration: dbCluster.params.replicaset?.configuration,
     };
   }
 }
@@ -169,6 +170,7 @@ const toAPI = (dbCluster: DBCluster): DBClusterPayload => ({
       },
       storage_class: dbCluster.storageClass,
       disk_size: dbCluster.disk * BILLION,
+      configuration: dbCluster.configuration,
     },
     image: dbCluster.databaseImage,
     ...(dbCluster.backup && {
