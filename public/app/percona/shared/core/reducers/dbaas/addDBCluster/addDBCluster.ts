@@ -124,12 +124,13 @@ export const addDbClusterAction = createAsyncThunk(
               secretsName: secretsName?.value || '',
             },
           }),
-        ...(template && {
-          template: {
-            name: template.label,
-            kind: template.value,
-          },
-        }),
+        ...(template &&
+          template.value && {
+            template: {
+              name: template.label,
+              kind: template.value,
+            },
+          }),
       }),
       {
         successMessage: 'Cluster was successfully added',

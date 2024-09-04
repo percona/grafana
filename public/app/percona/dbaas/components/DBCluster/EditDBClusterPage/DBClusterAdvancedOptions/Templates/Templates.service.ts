@@ -1,18 +1,15 @@
-import { SelectableValue } from '@grafana/data';
+import { apiManagement } from 'app/percona/shared/helpers/api';
 
-import { Databases } from '../../../../../../shared/core';
-import { DBClusterService } from '../../../DBCluster.service';
-import { DatabaseToDBClusterTypeMapping } from '../../../DBCluster.types';
+import { DBClusterType } from '../../../DBCluster.types';
+
+import { DBClusterTemplatesRequest, DBClusterTemplatesResponse } from './Templates.types';
 
 export const TemplatesService = {
-  async loadTemplatesOptions(k8sClusterName: string, databaseType: Databases): Promise<Array<SelectableValue<string>>> {
-    const dbClusterType = DatabaseToDBClusterTypeMapping[databaseType];
-    const templatesResponse =
-      dbClusterType && (await DBClusterService.getDBClusterTemplates(k8sClusterName, dbClusterType));
-    const templates = templatesResponse?.templates || [];
-    return templates.map((template) => ({
-      label: template.name,
-      value: template.kind,
-    }));
+  getDBaaSTemplates(kubernetesClusterName: string, k8sClusterType: DBClusterType): Promise<DBClusterTemplatesResponse> {
+    return apiManagement.post<DBClusterTemplatesResponse, DBClusterTemplatesRequest>(
+      '/DBaaS/Templates/List',
+      { kubernetes_cluster_name: kubernetesClusterName, cluster_type: k8sClusterType },
+      true
+    );
   },
 };

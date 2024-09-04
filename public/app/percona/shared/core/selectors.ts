@@ -10,6 +10,7 @@ export const getPerconaSettingFlag = (setting: keyof Settings) => (state: StoreS
   !!state.percona.settings.result?.[setting];
 export const getPerconaUser = (state: StoreState) => state.percona.user;
 export const getDBaaS = (state: StoreState) => state.percona.dbaas;
+export const getDbaaSTemplates = (state: StoreState) => state.percona.dbaasTemplates;
 export const getKubernetes = (state: StoreState) => state.percona.kubernetes;
 export const getDeleteKubernetes = (state: StoreState) => state.percona.deleteKubernetes;
 export const getAddKubernetes = (state: StoreState) => state.percona.addKubernetes;
