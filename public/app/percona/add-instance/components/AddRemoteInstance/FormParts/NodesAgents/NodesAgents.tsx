@@ -2,6 +2,7 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
+import { agentTypes } from "app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants";
 import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
 import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
 import { AgentsOption, Node, NodesOption } from 'app/percona/inventory/Inventory.types';
@@ -44,12 +45,15 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const setNodeAndAgent = (value: NodesOption) => {
     setSelectedNode(value);
     if (value.agents && value.agents.length > 1) {
-      form?.change('pmm_agent_id', value.agents[1]);
+      const pmmServerAgent = value.agents.find(item => item.key === agentTypes.pmmServer)
+      if(pmmServerAgent) {
+        form?.change('pmm_agent_id', pmmServerAgent);
+      }
     } else if (value.agents && value.agents.length === 1) {
       form?.change('pmm_agent_id', value.agents[0]);
     }
 
-    if(selectedAgent && selectedAgent.label !== "pmm-server") {
+    if(selectedAgent && selectedAgent.label !== agentTypes.pmmServer) {
       form?.change('address', 'localhost');
     }
   }

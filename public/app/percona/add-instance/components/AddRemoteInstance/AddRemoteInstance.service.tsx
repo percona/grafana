@@ -179,7 +179,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
     }
   }
 
-  data.pmm_agent_id = values.pmm_agent_id.label;
+  data.pmm_agent_id = values.pmm_agent_id.value;
 
   data.metrics_mode = 1;
   delete data.tracking;

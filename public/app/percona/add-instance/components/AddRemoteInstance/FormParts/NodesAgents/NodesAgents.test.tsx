@@ -1,30 +1,30 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
+import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
+import selectEvent from 'react-select-event';
 
+import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes.ts';
 import { configureStore } from 'app/store/configureStore';
 
 import { NodesAgents } from './NodesAgents';
-import { Form } from 'react-final-form';
-import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes.ts'
-import selectEvent from "react-select-event";
 
 const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
 
 jest.mock('app/percona/inventory/Inventory.service');
 
-describe('Nodes Agents:: ', () => {
+const submitMock = jest.fn();
 
-  let store = configureStore();
-  let formAPI;
+describe('Nodes Agents:: ', () => {
   render(
-    <Provider store={store}>
+    <Provider store={configureStore()}>
       <Form
-        onSubmit={jest.fn()}
-        render={({ form }) => {
-          formAPI=form;
-          return <NodesAgents form={form}/>
-        }}
+        onSubmit={submitMock}
+        render={({ handleSubmit, form }) => (
+          <form data-testid="node-agents-form" onSubmit={handleSubmit}>
+            <NodesAgents form={form} />
+          </form>
+        )}
       />
     </Provider>
   );
@@ -33,13 +33,25 @@ describe('Nodes Agents:: ', () => {
     await waitFor(() => {
       expect(fetchNodesActionActionSpy).toHaveBeenCalled();
     });
+
+    const form = screen.getByTestId('node-agents-form');
+
     const nodesSelect = screen.getByLabelText('Nodes');
-    await selectEvent.select(nodesSelect, ['pmm-server'], { container: document.body });
+    await selectEvent.select(nodesSelect, 'pmm-server', { container: document.body });
 
-    const agentsSelect = screen.getByLabelText('Agents');
-    const formValues = formAPI.getState().values;
-    expect(formValues.pmm_agent_id.value).toBe('pmm-agent');
-    expect(formValues.node.value).toBe('pmm-server');
+    fireEvent.submit(form);
+
+    expect(submitMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        node: expect.objectContaining({
+          value: 'pmm-server',
+        }),
+        pmm_agent_id: expect.objectContaining({
+          value: 'pmm-agent',
+        }),
+      }),
+      expect.anything(),
+      expect.anything()
+    );
   });
-
 });

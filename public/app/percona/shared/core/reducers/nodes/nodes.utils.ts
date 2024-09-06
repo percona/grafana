@@ -59,7 +59,7 @@ export const nodesOptionsMapper = (nodeFromDb: NodeDB[]): NodesOption[] =>
   nodeFromDb.map((node) => {
     const agents = (node.agents || [])
       .filter(agent => agent.agent_type === AgentType.pmmAgent)
-      .map<AgentsOption>(agent => ({ value: agent.agent_type, label: agent.agent_id }))
+      .map<AgentsOption>(agent => ({ value: agent.agent_id, label: agent.agent_id, key: agent.agent_type }))
 
     return {
       value: node.node_id,
