@@ -9,7 +9,7 @@ import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
-import { NodesAgents } from "../NodesAgents/NodesAgents";
+import { NodesAgents } from '../NodesAgents/NodesAgents';
 
 export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
   const styles = useStyles2(getStyles);

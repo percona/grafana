@@ -29,46 +29,46 @@ export const stubs: DBServiceList = {
   ],
 };
 
-const nodesMock =[
-    {
-      node_id: 'pmm-server',
-      node_type: 'generic',
-      node_name: 'pmm-server',
-      machine_id: '',
-      distro: '',
-      node_model: '',
-      container_id: '',
-      container_name: '',
-      address: '127.0.0.1',
-      region: '',
-      az: '',
-      custom_labels: {},
-      created_at: '2024-08-20T08:05:31.079300Z',
-      updated_at: '2024-08-20T08:05:31.079300Z',
-      status: 'STATUS_UP',
-      agents: [
-        {
-          agent_id: '05af4544-8fd0-4788-b841-89ed6caa9ac1',
-          agent_type: 'node_exporter',
-          status: 'AGENT_STATUS_RUNNING',
-          is_connected: false
-        },
-        {
-          agent_id: 'pmm-server',
-          agent_type: 'pmm-agent',
-          status: '',
-          is_connected: true
-        }
-      ],
-      services: [
-        {
-          service_id: '291afb9b-2ae0-41d1-a173-f1a138cf1725',
-          service_type: 'postgresql',
-          service_name: 'pmm-server-postgresql'
-        }
-      ]
-    }
-  ];
+const nodesMock = [
+  {
+    node_id: 'pmm-server',
+    node_type: 'generic',
+    node_name: 'pmm-server',
+    machine_id: '',
+    distro: '',
+    node_model: '',
+    container_id: '',
+    container_name: '',
+    address: '127.0.0.1',
+    region: '',
+    az: '',
+    custom_labels: {},
+    created_at: '2024-08-20T08:05:31.079300Z',
+    updated_at: '2024-08-20T08:05:31.079300Z',
+    status: 'STATUS_UP',
+    agents: [
+      {
+        agent_id: '05af4544-8fd0-4788-b841-89ed6caa9ac1',
+        agent_type: 'node_exporter',
+        status: 'AGENT_STATUS_RUNNING',
+        is_connected: false,
+      },
+      {
+        agent_id: 'pmm-server',
+        agent_type: 'pmm-agent',
+        status: '',
+        is_connected: true,
+      },
+    ],
+    services: [
+      {
+        service_id: '291afb9b-2ae0-41d1-a173-f1a138cf1725',
+        service_type: 'postgresql',
+        service_name: 'pmm-server-postgresql',
+      },
+    ],
+  },
+];
 
 export const InventoryService = jest.genMockFromModule<typeof service>(
   'app/percona/inventory/Inventory.service'

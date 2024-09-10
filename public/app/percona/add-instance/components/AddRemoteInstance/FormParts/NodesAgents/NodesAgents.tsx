@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
 import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
-import { agentTypes } from "app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants";
+import { agentTypes } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
 import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
 import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
 import { AgentsOption, Node, NodesOption } from 'app/percona/inventory/Inventory.types';
@@ -24,11 +24,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const [selectedAgent, setSelectedAgent] = useState<AgentsOption>();
   const { nodes } = useSelector(getNodes);
 
-  const nodesOptions  = useMemo(
-    (): NodesOption[] => nodesOptionsMapper(nodes),
-    [nodes]
-  );
-
+  const nodesOptions = useMemo((): NodesOption[] => nodesOptionsMapper(nodes), [nodes]);
 
   const loadData = useCallback(async () => {
     try {
@@ -45,21 +41,21 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const setNodeAndAgent = (value: NodesOption) => {
     setSelectedNode(value);
     if (value.agents && value.agents.length > 1) {
-      const pmmServerAgent = value.agents.find(item => item.key === agentTypes.pmmServer)
-      if(pmmServerAgent) {
+      const pmmServerAgent = value.agents.find((item) => item.key === agentTypes.pmmServer);
+      if (pmmServerAgent) {
         form?.change('pmm_agent_id', pmmServerAgent);
       }
     } else if (value.agents && value.agents.length === 1) {
       form?.change('pmm_agent_id', value.agents[0]);
     }
 
-    if(selectedAgent && selectedAgent.label !== agentTypes.pmmServer) {
+    if (selectedAgent && selectedAgent.label !== agentTypes.pmmServer) {
       form?.change('address', 'localhost');
     }
-  }
+  };
 
   useEffect(() => {
-    if(nodesOptions.length === 0) {
+    if (nodesOptions.length === 0) {
       loadData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,7 +71,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           name="node"
           id="nodes-selectbox"
           data-testid="nodes-selectbox"
-          onChange={ (event) => setNodeAndAgent(event as NodesOption)}
+          onChange={(event) => setNodeAndAgent(event as NodesOption)}
           className={styles.selectField}
           value={selectedNode}
           aria-label="Nodes"
@@ -89,12 +85,11 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           options={selectedNode?.agents || []}
           name="pmm_agent_id"
           data-testid="agents-selectbox"
-          onChange={ (event) => setSelectedAgent(event as AgentsOption)}
+          onChange={(event) => setSelectedAgent(event as AgentsOption)}
           className={styles.selectField}
           aria-label="Agents"
         />
       </div>
     </div>
   );
-
-}
+};

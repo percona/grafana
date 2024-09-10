@@ -1,7 +1,7 @@
 import React, { FC, useMemo } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
-import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput'
+import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import Validators from 'app/percona/shared/helpers/validators';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';

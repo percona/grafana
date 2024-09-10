@@ -61,8 +61,6 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const node = mappedNodes.find((s) => s.nodeId === nodeId);
   const flattenAgents = useMemo(() => data.map((value) => ({ type: value.type, ...value.params })), [data]);
 
-
-
   const columns = useMemo(
     (): Array<ExtendedColumn<FlattenAgent>> => [
       {

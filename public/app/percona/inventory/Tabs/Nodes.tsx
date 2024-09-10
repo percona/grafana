@@ -51,7 +51,7 @@ export const NodesTab = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
 
-  const mappedNodes: Node[]  = useMemo(
+  const mappedNodes: Node[] = useMemo(
     (): Node[] => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
     [nodes]
   );
