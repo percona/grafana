@@ -5,10 +5,10 @@ import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance
 import { agentTypes } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
 import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
 import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
-import { AgentsOption, Node, NodesOption } from 'app/percona/inventory/Inventory.types';
+import { AgentsOption, NodesOption } from 'app/percona/inventory/Inventory.types';
 import { SelectField } from 'app/percona/shared/components/Form/SelectFieldCore';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { nodeFromDbMapper, nodesOptionsMapper } from 'app/percona/shared/core/reducers/nodes';
+import { nodesOptionsMapper } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';

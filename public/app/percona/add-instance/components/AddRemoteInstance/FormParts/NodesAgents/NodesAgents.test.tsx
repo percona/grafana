@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
 import selectEvent from 'react-select-event';
 
-import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes.ts';
+import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes';
 import { configureStore } from 'app/store/configureStore';
 
 import { NodesAgents } from './NodesAgents';

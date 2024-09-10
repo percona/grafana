@@ -1,5 +1,6 @@
 import * as service from 'app/percona/inventory/Inventory.service';
-import { DBServiceList } from 'app/percona/inventory/Inventory.types';
+import { AgentType, DBServiceList, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
+import { ServiceStatus, ServiceType } from 'app/percona/shared/services/services/Services.types';
 
 export const stubWithLabels = {
   service_id: 'service_id',
@@ -45,25 +46,25 @@ const nodesMock = [
     custom_labels: {},
     created_at: '2024-08-20T08:05:31.079300Z',
     updated_at: '2024-08-20T08:05:31.079300Z',
-    status: 'STATUS_UP',
+    status: ServiceStatus.UP,
     agents: [
       {
         agent_id: '05af4544-8fd0-4788-b841-89ed6caa9ac1',
-        agent_type: 'node_exporter',
-        status: 'AGENT_STATUS_RUNNING',
+        agent_type: AgentType.nodeExporter,
+        status: ServiceAgentStatus.RUNNING,
         is_connected: false,
       },
       {
         agent_id: 'pmm-server',
-        agent_type: 'pmm-agent',
-        status: '',
+        agent_type: AgentType.pmmAgent,
+        status: ServiceAgentStatus.RUNNING,
         is_connected: true,
       },
     ],
     services: [
       {
         service_id: '291afb9b-2ae0-41d1-a173-f1a138cf1725',
-        service_type: 'postgresql',
+        service_type: ServiceType.posgresql,
         service_name: 'pmm-server-postgresql',
       },
     ],
