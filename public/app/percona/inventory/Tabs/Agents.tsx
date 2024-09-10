@@ -33,7 +33,7 @@ import { GET_AGENTS_CANCEL_TOKEN, GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TO
 import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
-import { beautifyAgentType, getAgentStatusColor, toAgentModel } from './Agents.utils';
+import { beautifyAgentType, getAgentStatusColor, getBadgeTextForAgentStatus, toAgentModel } from './Agents.utils';
 import { formatNodeId } from './Nodes.utils';
 import { getStyles } from './Tabs.styles';
 
@@ -64,7 +64,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
         Header: Messages.agents.columns.status,
         accessor: 'status',
         Cell: ({ value }: { value: ServiceAgentStatus }) => (
-          <Badge text={capitalizeText(value)} color={getAgentStatusColor(value)} />
+          <Badge text={getBadgeTextForAgentStatus(value)} color={getAgentStatusColor(value)} />
         ),
         type: FilterFieldTypes.DROPDOWN,
         options: [
