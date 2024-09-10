@@ -45,7 +45,7 @@ export const getBadgeTextForServiceStatus = (status: ServiceStatus): string => {
 export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
   const allAgentsOk = agents?.every(
     (agent) =>
-      agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected
+      agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected || agent.status === ServiceAgentStatus.UNKNOWN
   );
   return allAgentsOk ? MonitoringStatus.OK : MonitoringStatus.FAILED;
 };

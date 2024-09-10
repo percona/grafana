@@ -16,7 +16,7 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, type, strippedId }) 
 
   const link = `/inventory/${type}/${strippedId}/agents`;
   const totalAgents = agents.length;
-  const [good, bad] = agents.reduce(
+  const [good, bad, unknown] = agents.reduce(
     (acc, agent) => {
       if (
         agent.status === ServiceAgentStatus.RUNNING ||
@@ -24,6 +24,8 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, type, strippedId }) 
         !!agent.isConnected
       ) {
         acc[0]++;
+      } else if (agent.status === ServiceAgentStatus.UNKNOWN) {
+        acc[2]++;
       } else {
         acc[1]++;
       }
@@ -32,7 +34,7 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, type, strippedId }) 
     [0, 0]
   );
   const percentageNotRunning = bad / totalAgents;
-  const badgeColor: BadgeColor = percentageNotRunning === 1 ? 'red' : percentageNotRunning === 0 ? 'green' : 'orange';
+  const badgeColor: BadgeColor = percentageNotRunning === 1 ? 'red' : percentageNotRunning === 0 ? 'green' : unknown === 0 ? 'orange' : 'gray';
   const textToShow = `${percentageNotRunning === 1 ? bad : good}/${totalAgents}`;
   const textToAppend = `${percentageNotRunning === 1 ? ' not running' : ' running'}`;
 

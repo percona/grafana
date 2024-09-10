@@ -92,6 +92,10 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
             label: 'Waiting',
             value: ServiceAgentStatus.WAITING,
           },
+          {
+            label: "Initialization error",
+            value: ServiceAgentStatus.INITIALIZATION_ERROR,
+          }
         ],
       },
       {
