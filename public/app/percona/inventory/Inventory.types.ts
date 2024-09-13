@@ -64,7 +64,7 @@ export enum ServiceAgentStatus {
 export enum MonitoringStatus {
   OK = 'OK',
   FAILED = 'Failed',
-  UNKNOWN = 'Unknown',
+  NA = 'N/A',
 }
 
 export interface ServiceAgentPayload {

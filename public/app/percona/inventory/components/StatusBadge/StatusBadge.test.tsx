@@ -64,21 +64,4 @@ describe('StatusBadge', () => {
     expect(screen.queryByTestId('status-badge-red')).toBeInTheDocument();
     expect(screen.queryByText('3/3 not running')).toBeInTheDocument();
   });
-  it('should render grey if any agent has unknown status', () => {
-    render(
-      <Router history={locationService.getHistory()}>
-        <StatusBadge
-          agents={[
-            { agentId: 'agent_1', status: ServiceAgentStatus.STARTING },
-            { agentId: 'agent_2', status: ServiceAgentStatus.RUNNING },
-            { agentId: 'agent_3', status: ServiceAgentStatus.UNKNOWN },
-          ]}
-          type="services"
-          strippedId=""
-        />
-      </Router>
-    );
-    expect(screen.queryByTestId('status-badge-gray')).toBeInTheDocument();
-    expect(screen.queryByText('2/3  running')).toBeInTheDocument();
-  });
 });

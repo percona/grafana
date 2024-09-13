@@ -55,7 +55,7 @@ export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
 
   console.log('hasUnknownAgents', hasUnknownAgents);
   console.log('agents', agents);
-  return allAgentsOk ? MonitoringStatus.OK : hasUnknownAgents ? MonitoringStatus.UNKNOWN : MonitoringStatus.FAILED;
+  return allAgentsOk ? MonitoringStatus.OK : hasUnknownAgents ? MonitoringStatus.NA : MonitoringStatus.FAILED;
 };
 
 export const stripServiceId = (serviceId: string) => {

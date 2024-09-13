@@ -161,8 +161,8 @@ const ServicesTable: FC<ServicesTableProps> = ({
             value: MonitoringStatus.FAILED,
           },
           {
-            label: MonitoringStatus.UNKNOWN,
-            value: MonitoringStatus.UNKNOWN,
+            label: MonitoringStatus.NA,
+            value: MonitoringStatus.NA,
           },
         ],
       },

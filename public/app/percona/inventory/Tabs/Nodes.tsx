@@ -144,8 +144,8 @@ export const NodesTab = () => {
             value: MonitoringStatus.FAILED,
           },
           {
-            label: MonitoringStatus.UNKNOWN,
-            value: MonitoringStatus.UNKNOWN,
+            label: MonitoringStatus.NA,
+            value: MonitoringStatus.NA,
           },
         ],
       },
