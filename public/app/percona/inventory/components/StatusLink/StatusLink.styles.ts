@@ -1,10 +1,11 @@
 import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { MonitoringStatus } from "app/percona/inventory/Inventory.types";
 
-export const getStyles = ({ visualization }: GrafanaTheme2, allAgentsOk: boolean) => ({
+export const getStyles = ({ visualization }: GrafanaTheme2, status: string | undefined) => ({
   link: css`
     text-decoration: underline;
-    color: ${allAgentsOk ? visualization.getColorByName('green') : visualization.getColorByName('red')};
+    color: ${status === MonitoringStatus.OK ? visualization.getColorByName('green') : status === MonitoringStatus.FAILED ? visualization.getColorByName('red') : visualization.getColorByName('gray')};
   `,
 });

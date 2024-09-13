@@ -45,9 +45,17 @@ export const getBadgeTextForServiceStatus = (status: ServiceStatus): string => {
 export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
   const allAgentsOk = agents?.every(
     (agent) =>
-      agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected || agent.status === ServiceAgentStatus.UNKNOWN
+      agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected
   );
-  return allAgentsOk ? MonitoringStatus.OK : MonitoringStatus.FAILED;
+  console.log('allAgentsOk', allAgentsOk);
+  const hasUnknownAgents = agents?.some(
+    (agent) =>
+      agent.agentType !== "pmm-agent" && (agent.status === ServiceAgentStatus.UNKNOWN || agent.status === ServiceAgentStatus.INVALID || agent.status === undefined)
+  );
+
+  console.log('hasUnknownAgents', hasUnknownAgents);
+  console.log('agents', agents);
+  return allAgentsOk ? MonitoringStatus.OK : hasUnknownAgents ? MonitoringStatus.UNKNOWN : MonitoringStatus.FAILED;
 };
 
 export const stripServiceId = (serviceId: string) => {

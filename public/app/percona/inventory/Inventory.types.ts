@@ -58,11 +58,13 @@ export enum ServiceAgentStatus {
   STOPPING = 'STOPPING',
   DONE = 'DONE',
   UNKNOWN = 'UNKNOWN',
+  INVALID = '',
 }
 
 export enum MonitoringStatus {
   OK = 'OK',
   FAILED = 'Failed',
+  UNKNOWN = 'Unknown',
 }
 
 export interface ServiceAgentPayload {

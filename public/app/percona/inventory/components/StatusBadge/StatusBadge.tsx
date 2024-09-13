@@ -24,14 +24,14 @@ export const StatusBadge: FC<StatusBadgeProps> = ({ agents, type, strippedId }) 
         !!agent.isConnected
       ) {
         acc[0]++;
-      } else if (agent.status === ServiceAgentStatus.UNKNOWN) {
+      } else if (agent.status === ServiceAgentStatus.UNKNOWN || agent.status === ServiceAgentStatus.INVALID) {
         acc[2]++;
       } else {
         acc[1]++;
       }
       return acc;
     },
-    [0, 0]
+    [0, 0, 0]
   );
   const percentageNotRunning = bad / totalAgents;
   const badgeColor: BadgeColor = percentageNotRunning === 1 ? 'red' : percentageNotRunning === 0 ? 'green' : unknown === 0 ? 'orange' : 'gray';
