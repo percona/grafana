@@ -1,5 +1,5 @@
 import { BadgeColor } from '@grafana/ui';
-import { capitalizeText } from "app/percona/shared/helpers/capitalizeText";
+import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCase';
 
 import { Agent, AgentType, ServiceAgentPayload, ServiceAgentStatus } from '../Inventory.types';
@@ -54,7 +54,11 @@ export const beautifyAgentType = (type: AgentType): string =>
   type.replace(/^\w/, (c) => c.toUpperCase()).replace(/[_-]/g, ' ');
 
 export const getAgentStatusColor = (status: ServiceAgentStatus): BadgeColor =>
-  status === ServiceAgentStatus.STARTING || status === ServiceAgentStatus.RUNNING ? 'green' : status === ServiceAgentStatus.UNKNOWN ? 'gray' : 'red';
+  status === ServiceAgentStatus.STARTING || status === ServiceAgentStatus.RUNNING
+    ? 'green'
+    : status === ServiceAgentStatus.UNKNOWN
+    ? 'gray'
+    : 'red';
 
 export const getBadgeTextForAgentStatus = (status: ServiceAgentStatus): string => {
   return capitalizeText(status.replace('_', ' '));

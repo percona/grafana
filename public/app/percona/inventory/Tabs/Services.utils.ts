@@ -50,7 +50,10 @@ export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
   console.log('allAgentsOk', allAgentsOk);
   const hasUnknownAgents = agents?.some(
     (agent) =>
-      agent.agentType !== "pmm-agent" && (agent.status === ServiceAgentStatus.UNKNOWN || agent.status === ServiceAgentStatus.INVALID || agent.status === undefined)
+      agent.agentType !== 'pmm-agent' &&
+      (agent.status === ServiceAgentStatus.UNKNOWN ||
+        agent.status === ServiceAgentStatus.INVALID ||
+        agent.status === undefined)
   );
 
   console.log('hasUnknownAgents', hasUnknownAgents);
