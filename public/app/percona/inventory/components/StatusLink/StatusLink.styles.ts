@@ -3,7 +3,7 @@ import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { MonitoringStatus } from 'app/percona/inventory/Inventory.types';
 
-export const getStyles = ({ visualization }: GrafanaTheme2, status: string | undefined) => ({
+export const getStyles = ({ visualization }: GrafanaTheme2, status?: string) => ({
   link: css`
     text-decoration: underline;
     color: ${status === MonitoringStatus.OK

@@ -34,7 +34,7 @@ export enum AgentType {
   mysql = 'mysql',
   mysqldExporter = 'mysqldExporter',
   nodeExporter = 'nodeExporter',
-  pmmAgent = 'pmm_agent',
+  pmmAgent = 'pmm-agent',
   postgresExporter = 'postgresExporter',
   postgresql = 'postgresql',
   proxysql = 'proxysql',

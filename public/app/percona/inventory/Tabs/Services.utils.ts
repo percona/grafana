@@ -2,7 +2,7 @@ import { BadgeColor, IconName } from '@grafana/ui';
 import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { DbAgent, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 
-import { FlattenService, MonitoringStatus, ServiceAgentStatus } from '../Inventory.types';
+import { AgentType, FlattenService, MonitoringStatus, ServiceAgentStatus } from '../Inventory.types';
 
 import { stripNodeId } from './Nodes.utils';
 
@@ -43,23 +43,18 @@ export const getBadgeTextForServiceStatus = (status: ServiceStatus): string => {
 };
 
 export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
-  const allAgentsOk = agents?.every(
-    (agent) =>
-      agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected
-  );
-  console.log('allAgentsOk', allAgentsOk);
-  const hasUnknownAgents = agents?.some(
-    (agent) =>
-      agent.agentType !== 'pmm-agent' &&
-      (agent.status === ServiceAgentStatus.UNKNOWN ||
-        agent.status === ServiceAgentStatus.INVALID ||
-        agent.status === undefined)
-  );
+  const allAgentsOk = agents?.every(isAgentOk);
+  const hasUnknownAgents = agents?.some(isAgentUnknown);
 
-  console.log('hasUnknownAgents', hasUnknownAgents);
-  console.log('agents', agents);
   return allAgentsOk ? MonitoringStatus.OK : hasUnknownAgents ? MonitoringStatus.NA : MonitoringStatus.FAILED;
 };
+
+const isAgentOk = (agent: DbAgent) =>
+  agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected;
+
+const isAgentUnknown = ({ status, agentType }: DbAgent) =>
+  agentType !== AgentType.pmmAgent &&
+  (status === ServiceAgentStatus.INVALID || status === ServiceAgentStatus.UNKNOWN || !status);
 
 export const stripServiceId = (serviceId: string) => {
   const regex = /\/service_id\/(.*)/gm;
