@@ -53,7 +53,7 @@ const isAgentOk = (agent: DbAgent) =>
   agent.status === ServiceAgentStatus.RUNNING || agent.status === ServiceAgentStatus.STARTING || !!agent.isConnected;
 
 const isAgentUnknown = ({ status, agentType }: DbAgent) =>
-  agentType !== AgentType.pmmAgent &&
+  agentType === AgentType.externalExporter &&
   (status === ServiceAgentStatus.INVALID || status === ServiceAgentStatus.UNKNOWN || !status);
 
 export const stripServiceId = (serviceId: string) => {

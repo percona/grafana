@@ -77,7 +77,6 @@ describe('StatusLink', () => {
       {
         agentId: 'agent3',
         agentType: AgentType.externalExporter,
-        isConnected: false,
       },
     ];
     const agentsStatus = getAgentsMonitoringStatus(agents);
@@ -101,6 +100,10 @@ describe('StatusLink', () => {
         agentId: 'agent2',
         status: ServiceAgentStatus.STOPPING,
       },
+      {
+        agentId: 'agent3',
+        agentType: AgentType.mongodbExporter,
+      }
     ];
     const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
@@ -121,6 +124,7 @@ describe('StatusLink', () => {
       },
       {
         agentId: 'agent2',
+        agentType: AgentType.externalExporter,
         status: ServiceAgentStatus.UNKNOWN,
       },
     ];
@@ -135,7 +139,7 @@ describe('StatusLink', () => {
     expect(screen.getByText('N/A')).toBeInTheDocument();
   });
 
-  it('should show "N/A" if there are invalid agents', () => {
+  it('should show "Failed" if there are invalid agents', () => {
     const agents: DbAgent[] = [
       {
         agentId: 'agent1',
@@ -143,7 +147,53 @@ describe('StatusLink', () => {
       },
       {
         agentId: 'agent2',
+        agentType: AgentType.mysqldExporter,
         status: ServiceAgentStatus.INVALID,
+      },
+    ];
+    const agentsStatus = getAgentsMonitoringStatus(agents);
+    render(
+      <Router history={locationService.getHistory()}>
+        <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
+      </Router>
+    );
+    expect(screen.queryByText('OK')).not.toBeInTheDocument();
+    expect(screen.queryByText('Failed')).toBeInTheDocument();
+    expect(screen.queryByText('N/A')).not.toBeInTheDocument();
+  });
+
+  it('should show "N/A" if there are invalid external agents', () => {
+    const agents: DbAgent[] = [
+      {
+        agentId: 'agent1',
+        status: ServiceAgentStatus.RUNNING,
+      },
+      {
+        agentId: 'agent2',
+        agentType: AgentType.externalExporter,
+        status: ServiceAgentStatus.INVALID,
+      },
+    ];
+    const agentsStatus = getAgentsMonitoringStatus(agents);
+    render(
+      <Router history={locationService.getHistory()}>
+        <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
+      </Router>
+    );
+    expect(screen.queryByText('OK')).not.toBeInTheDocument();
+    expect(screen.queryByText('Failed')).not.toBeInTheDocument();
+    expect(screen.getByText('N/A')).toBeInTheDocument();
+  });
+
+  it('should show "N/A" if there are external agents with no status', () => {
+    const agents: DbAgent[] = [
+      {
+        agentId: 'agent1',
+        status: ServiceAgentStatus.RUNNING,
+      },
+      {
+        agentId: 'agent2',
+        agentType: AgentType.externalExporter,
       },
     ];
     const agentsStatus = getAgentsMonitoringStatus(agents);
