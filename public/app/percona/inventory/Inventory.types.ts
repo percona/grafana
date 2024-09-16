@@ -34,7 +34,7 @@ export enum AgentType {
   mysql = 'mysql',
   mysqldExporter = 'mysqldExporter',
   nodeExporter = 'nodeExporter',
-  pmmAgent = 'pmm_agent',
+  pmmAgent = 'pmm-agent',
   postgresExporter = 'postgresExporter',
   postgresql = 'postgresql',
   proxysql = 'proxysql',
@@ -54,14 +54,17 @@ export enum ServiceAgentStatus {
   STARTING = 'STARTING',
   RUNNING = 'RUNNING',
   WAITING = 'WAITING',
+  INITIALIZATION_ERROR = 'INITIALIZATION_ERROR',
   STOPPING = 'STOPPING',
   DONE = 'DONE',
   UNKNOWN = 'UNKNOWN',
+  INVALID = '',
 }
 
 export enum MonitoringStatus {
   OK = 'OK',
   FAILED = 'Failed',
+  NA = 'N/A',
 }
 
 export interface ServiceAgentPayload {

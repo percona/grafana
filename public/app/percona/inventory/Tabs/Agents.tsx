@@ -21,7 +21,6 @@ import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getNodes, getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
-import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
@@ -33,7 +32,7 @@ import { GET_AGENTS_CANCEL_TOKEN, GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TO
 import { Messages } from '../Inventory.messages';
 import { InventoryService } from '../Inventory.service';
 
-import { beautifyAgentType, getAgentStatusColor, toAgentModel } from './Agents.utils';
+import { beautifyAgentType, getAgentStatusColor, getBadgeTextForAgentStatus, toAgentModel } from './Agents.utils';
 import { formatNodeId } from './Nodes.utils';
 import { getStyles } from './Tabs.styles';
 
@@ -64,7 +63,7 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
         Header: Messages.agents.columns.status,
         accessor: 'status',
         Cell: ({ value }: { value: ServiceAgentStatus }) => (
-          <Badge text={capitalizeText(value)} color={getAgentStatusColor(value)} />
+          <Badge text={getBadgeTextForAgentStatus(value)} color={getAgentStatusColor(value)} />
         ),
         type: FilterFieldTypes.DROPDOWN,
         options: [
@@ -91,6 +90,10 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
           {
             label: 'Waiting',
             value: ServiceAgentStatus.WAITING,
+          },
+          {
+            label: 'Initialization error',
+            value: ServiceAgentStatus.INITIALIZATION_ERROR,
           },
         ],
       },
