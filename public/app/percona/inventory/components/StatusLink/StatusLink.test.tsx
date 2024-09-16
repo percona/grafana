@@ -103,7 +103,7 @@ describe('StatusLink', () => {
       {
         agentId: 'agent3',
         agentType: AgentType.mongodbExporter,
-      }
+      },
     ];
     const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
