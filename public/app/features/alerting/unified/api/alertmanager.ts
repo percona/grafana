@@ -237,9 +237,9 @@ function getReceiverResultError(receiversResult: TestReceiversResult) {
 export async function addAlertManagers(alertManagerConfig: ExternalAlertmanagerConfig): Promise<void> {
   await lastValueFrom(
     getBackendSrv().fetch({
-      method: 'POST',
+      method: 'PUT',
       data: alertManagerConfig,
-      url: '/api/v1/ngalert/admin_config',
+      url: '/api/v1/provisioning/alert-rules',
       showErrorAlert: false,
       showSuccessAlert: false,
     })
@@ -263,7 +263,7 @@ export async function fetchExternalAlertmanagerConfig(): Promise<ExternalAlertma
   const result = await lastValueFrom(
     getBackendSrv().fetch<ExternalAlertmanagerConfig>({
       method: 'GET',
-      url: '/api/v1/ngalert/admin_config',
+      url: '/api/v1/provisioning/alert-rules',
       showErrorAlert: false,
     })
   );
