@@ -186,5 +186,4 @@ export interface NodesOption {
 export interface AgentsOption {
   value: string;
   label: string;
-  key: string;
 }

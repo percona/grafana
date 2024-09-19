@@ -1,3 +1,3 @@
-export const agentTypes = {
+export const agentId = {
   pmmServer: 'pmm-server',
 };

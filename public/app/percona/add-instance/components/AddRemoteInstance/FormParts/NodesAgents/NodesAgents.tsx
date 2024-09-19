@@ -1,8 +1,9 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
+import { Messages } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.messages';
 import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
-import { agentTypes } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
+import { agentId } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
 import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
 import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
 import { AgentsOption, NodesOption } from 'app/percona/inventory/Inventory.types';
@@ -24,7 +25,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const [selectedAgent, setSelectedAgent] = useState<AgentsOption>();
   const { nodes } = useSelector(getNodes);
 
-  const nodesOptions = useMemo((): NodesOption[] => nodesOptionsMapper(nodes), [nodes]);
+  const nodesOptions = useMemo<NodesOption[]>(() => nodesOptionsMapper(nodes), [nodes]);
 
   const loadData = useCallback(async () => {
     try {
@@ -40,8 +41,9 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
 
   const setNodeAndAgent = (value: NodesOption) => {
     setSelectedNode(value);
+
     if (value.agents && value.agents.length > 1) {
-      const pmmServerAgent = value.agents.find((item) => item.key === agentTypes.pmmServer);
+      const pmmServerAgent = value.agents.find((item) => item.value === agentId.pmmServer);
       if (pmmServerAgent) {
         form?.change('pmm_agent_id', pmmServerAgent);
       }
@@ -49,7 +51,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
       form?.change('pmm_agent_id', value.agents[0]);
     }
 
-    if (selectedAgent && selectedAgent.label !== agentTypes.pmmServer) {
+    if (selectedAgent && selectedAgent.label !== agentId.pmmServer) {
       form?.change('address', 'localhost');
     }
   };
@@ -65,7 +67,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
     <div className={styles.group}>
       <div className={styles.selectFieldWrapper}>
         <SelectField
-          label="Nodes"
+          label={Messages.form.labels.nodesAgents.nodes}
           isSearchable={false}
           options={nodesOptions}
           name="node"
@@ -74,12 +76,12 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           onChange={(event) => setNodeAndAgent(event as NodesOption)}
           className={styles.selectField}
           value={selectedNode}
-          aria-label="Nodes"
+          aria-label={Messages.form.labels.nodesAgents.nodes}
         />
       </div>
       <div className={styles.selectFieldWrapper}>
         <SelectField
-          label="Agents"
+          label={Messages.form.labels.nodesAgents.agents}
           isSearchable={false}
           disabled={!selectedNode || !selectedNode.agents || selectedNode.agents.length === 1}
           options={selectedNode?.agents || []}
@@ -87,7 +89,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           data-testid="agents-selectbox"
           onChange={(event) => setSelectedAgent(event as AgentsOption)}
           className={styles.selectField}
-          aria-label="Agents"
+          aria-label={Messages.form.labels.nodesAgents.agents}
         />
       </div>
     </div>

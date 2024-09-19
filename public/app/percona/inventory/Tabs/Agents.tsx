@@ -7,7 +7,7 @@ import { AppEvents } from '@grafana/data';
 import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-import { Agent, FlattenAgent, Node, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
+import { Agent, FlattenAgent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/AnotherTableInstance/Table.types';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
@@ -52,8 +52,8 @@ export const Agents: FC<GrafanaRouteComponentProps<{ serviceId: string; nodeId: 
   const { isLoading: nodesLoading, nodes } = useSelector(getNodes);
   const styles = useStyles2(getStyles);
 
-  const mappedNodes: Node[] = useMemo(
-    (): Node[] => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
+  const mappedNodes = useMemo(
+    () => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
     [nodes]
   );
 
