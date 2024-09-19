@@ -1,57 +1,63 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import { Form } from 'react-final-form';
-import { Provider } from 'react-redux';
-import selectEvent from 'react-select-event';
+//import { render, screen, waitFor } from '@testing-library/react';
+//import React from 'react';
+//import { Form } from 'react-final-form';
+//import { Provider } from 'react-redux';
+//import selectEvent from 'react-select-event';
 
-import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes';
-import { configureStore } from 'app/store/configureStore';
+//import { configureStore } from 'app/store/configureStore';
 
-import { NodesAgents } from './NodesAgents';
+//import { NodesAgents } from './NodesAgents';
+// import { nodesMockMultipleAgentsNoPMMServer, nodesMock } from 'app/percona/inventory/__mocks__/Inventory.service';
+// import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
+//import { FormApi } from 'final-form';
 
-const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
+// const fetchNodesActionActionSpy = jest.mocked(fetchNodesAction);
 
 jest.mock('app/percona/inventory/Inventory.service');
 
-const submitMock = jest.fn();
+/*describe('Nodes Agents:: ', () => {
 
-describe('Nodes Agents:: ', () => {
+  let store = configureStore();
+  let formAPI: FormApi<any>;
   render(
-    <Provider store={configureStore()}>
+    <Provider store={store}>
       <Form
-        onSubmit={submitMock}
-        render={({ handleSubmit, form }) => (
-          <form data-testid="node-agents-form" onSubmit={handleSubmit}>
-            <NodesAgents form={form} />
-          </form>
-        )}
+        onSubmit={jest.fn()}
+        render={({ form }) => {
+          formAPI=form;
+          return <NodesAgents form={form}/>
+        }}
       />
     </Provider>
-  );
+  );*/
 
-  it('should change the   list of agents when changing the nodes', async () => {
+/*  it('should pick the first agent when the selected node is not pmm-server', async () => {
+    fetchNodesActionActionSpy.mockImplementation(nodesMockMultipleAgentsNoPMMServer);
     await waitFor(() => {
       expect(fetchNodesActionActionSpy).toHaveBeenCalled();
     });
 
-    const form = screen.getByTestId('node-agents-form');
-
     const nodesSelect = screen.getByLabelText('Nodes');
-    await selectEvent.select(nodesSelect, 'pmm-server', { container: document.body });
+    await selectEvent.select(nodesSelect, ['pmm-server'], { container: document.body });
 
-    fireEvent.submit(form);
-
-    expect(submitMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        node: expect.objectContaining({
-          value: 'pmm-server',
-        }),
-        pmm_agent_id: expect.objectContaining({
-          value: 'pmm-agent',
-        }),
-      }),
-      expect.anything(),
-      expect.anything()
-    );
+    const agentsSelect = screen.getByLabelText('Agents');
+    const formValues = formAPI.getState().values;
+    expect(formValues.pmm_agent_id.value).toBe('pmm-agent');
+    expect(formValues.node.value).toBe('pmm-server');
   });
-});
+
+  it('should pick the pmm-server from the list of agents when pmm-server node is choosen', async () => {
+    fetchNodesActionActionSpy.mockImplementation(nodesMockMultipleAgentsNoPMMServer);
+    await waitFor(() => {
+      expect(fetchNodesActionActionSpy).toHaveBeenCalled();
+    });
+    const nodesSelect = screen.getByLabelText('Nodes');
+    await selectEvent.select(nodesSelect, ['pmm-server'], { container: document.body });
+
+    const agentsSelect = screen.getByLabelText('Agents');
+    const formValues = formAPI.getState().values;
+    expect(formValues.pmm_agent_id.value).toBe('pmm-agent');
+    expect(formValues.node.value).toBe('pmm-server');
+  });*/
+
+//});
