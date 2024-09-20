@@ -66,8 +66,8 @@ describe('AddRemoteInstanceService:: ', () => {
       cluster: 'test',
       custom_labels: 'test:test',
       pmm_agent_id: {
-        value: 'pmm-server'
-      }
+        value: 'pmm-server',
+      },
     };
 
     const payload = {
