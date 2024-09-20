@@ -39,6 +39,14 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const changeAgentValue = (value: AgentsOption) => {
+    setSelectedAgent(value);
+
+    if (value.label !== agentId.pmmServer) {
+      form?.change('address', 'localhost');
+    }
+  };
+
   const setNodeAndAgent = (value: NodesOption) => {
     setSelectedNode(value);
 
@@ -87,7 +95,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
           options={selectedNode?.agents || []}
           name="pmm_agent_id"
           data-testid="agents-selectbox"
-          onChange={(event) => setSelectedAgent(event as AgentsOption)}
+          onChange={(event) => changeAgentValue(event as AgentsOption)}
           className={styles.selectField}
           aria-label={Messages.form.labels.nodesAgents.agents}
         />

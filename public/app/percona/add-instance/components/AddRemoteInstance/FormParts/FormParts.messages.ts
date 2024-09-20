@@ -20,8 +20,8 @@ export const Messages = {
         password: 'Password',
       },
       nodesAgents: {
-        nodes: "Nodes",
-        agents: "Agents"
+        nodes: 'Nodes',
+        agents: 'Agents',
       },
       mainDetails: {
         address: 'Hostname',

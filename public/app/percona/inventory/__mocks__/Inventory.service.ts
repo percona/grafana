@@ -90,13 +90,13 @@ export const nodesMockMultipleAgentsNoPMMServer = [
     agents: [
       {
         agent_id: '05af4544-8fd0-4788-b841-89ed6caa9ac1',
-        agent_type: AgentType.nodeExporter,
+        agent_type: AgentType.pmmAgent,
         status: ServiceAgentStatus.RUNNING,
         is_connected: false,
       },
       {
         agent_id: '12132132',
-        agent_type: AgentType.amazonRdsMysql,
+        agent_type: AgentType.pmmAgent,
         status: ServiceAgentStatus.RUNNING,
         is_connected: true,
       },
