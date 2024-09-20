@@ -74,6 +74,7 @@ export const nodesMock = [
 export const nodesMockMultipleAgentsNoPMMServer = [
   {
     node_id: '324234234',
+    node_type: 'generic',
     node_name: 'node1',
     custom_labels: {},
     machine_id: '',

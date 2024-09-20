@@ -7,7 +7,6 @@ import selectEvent from 'react-select-event';
 
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { nodesMockMultipleAgentsNoPMMServer, nodesMock } from 'app/percona/inventory/__mocks__/Inventory.service';
-import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes';
 import { configureStore } from 'app/store/configureStore';
 
@@ -68,7 +67,6 @@ describe('Nodes Agents:: ', () => {
     const nodesSelect = screen.getByLabelText('Nodes');
     await selectEvent.select(nodesSelect, ['pmm-server'], { container: document.body });
 
-    const agentsSelect = screen.getByLabelText('Agents');
     const formValues = formAPI.getState().values;
     expect(formValues.pmm_agent_id.value).toBe('pmm-server');
     expect(formValues.node.value).toBe('pmm-server');
