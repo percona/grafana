@@ -65,6 +65,9 @@ describe('AddRemoteInstanceService:: ', () => {
       replication_set: 'test',
       cluster: 'test',
       custom_labels: 'test:test',
+      pmm_agent_id: {
+        value: 'pmm-server'
+      }
     };
 
     const payload = {
@@ -93,7 +96,7 @@ describe('AddRemoteInstanceService:: ', () => {
       qan_postgresql_pgstatements_agent: true,
       metrics_mode: 1,
     };
-
-    expect(toPayload(data)).toStrictEqual(payload);
+    const expected = toPayload(data);
+    expect(expected).toStrictEqual(payload);
   });
 });
