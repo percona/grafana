@@ -1,21 +1,21 @@
-//import { render, screen, waitFor } from '@testing-library/react';
-//import React from 'react';
-//import { Form } from 'react-final-form';
-//import { Provider } from 'react-redux';
-//import selectEvent from 'react-select-event';
+import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { Form } from 'react-final-form';
+import { Provider } from 'react-redux';
+import selectEvent from 'react-select-event';
 
-//import { configureStore } from 'app/store/configureStore';
+import { configureStore } from 'app/store/configureStore';
 
-//import { NodesAgents } from './NodesAgents';
-// import { nodesMockMultipleAgentsNoPMMServer, nodesMock } from 'app/percona/inventory/__mocks__/Inventory.service';
-// import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
-//import { FormApi } from 'final-form';
+import { NodesAgents } from './NodesAgents';
+import { nodesMockMultipleAgentsNoPMMServer, nodesMock } from 'app/percona/inventory/__mocks__/Inventory.service';
+import { fetchNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
+import { FormApi } from 'final-form';
 
-// const fetchNodesActionActionSpy = jest.mocked(fetchNodesAction);
+const fetchNodesActionActionSpy = jest.mocked(fetchNodesAction);
 
 jest.mock('app/percona/inventory/Inventory.service');
 
-/*describe('Nodes Agents:: ', () => {
+describe('Nodes Agents:: ', () => {
 
   let store = configureStore();
   let formAPI: FormApi<any>;
@@ -29,9 +29,9 @@ jest.mock('app/percona/inventory/Inventory.service');
         }}
       />
     </Provider>
-  );*/
+  );
 
-/*  it('should pick the first agent when the selected node is not pmm-server', async () => {
+  it('should pick the first agent when the selected node is not pmm-server', async () => {
     fetchNodesActionActionSpy.mockImplementation(nodesMockMultipleAgentsNoPMMServer);
     await waitFor(() => {
       expect(fetchNodesActionActionSpy).toHaveBeenCalled();
@@ -58,6 +58,6 @@ jest.mock('app/percona/inventory/Inventory.service');
     const formValues = formAPI.getState().values;
     expect(formValues.pmm_agent_id.value).toBe('pmm-agent');
     expect(formValues.node.value).toBe('pmm-server');
-  });*/
+  });
 
-//});
+});

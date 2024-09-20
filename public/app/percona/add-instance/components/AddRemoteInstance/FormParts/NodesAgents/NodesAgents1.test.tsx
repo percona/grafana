@@ -1,15 +1,15 @@
-// import { fireEvent, render, screen, waitFor } from '@testing-library/react';
- import { render } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
-// import selectEvent from 'react-select-event';
+import selectEvent from 'react-select-event';
 
+import * as NodesReducer from 'app/percona/shared/core/reducers/nodes/nodes.ts';
 import { configureStore } from 'app/store/configureStore';
 
 import { NodesAgents } from './NodesAgents';
 
-// const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
+const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
 
 jest.mock('app/percona/inventory/Inventory.service');
 
@@ -29,7 +29,7 @@ describe('Nodes Agents:: ', () => {
     </Provider>
   );
 
-  /*it('should change the list of agents when changing the nodes', async () => {
+  it('should change the   list of agents when changing the nodes', async () => {
     await waitFor(() => {
       expect(fetchNodesActionActionSpy).toHaveBeenCalled();
     });
@@ -53,5 +53,5 @@ describe('Nodes Agents:: ', () => {
       expect.anything(),
       expect.anything()
     );
-  });*/
+  });
 });
