@@ -13,7 +13,6 @@ import { configureStore } from 'app/store/configureStore';
 import { NodesAgents } from './NodesAgents';
 
 const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
-jest.spyOn(console, 'error').mockImplementation(() => {});
 
 describe('Nodes Agents:: ', () => {
   let formAPI: FormApi<any>;
@@ -38,6 +37,8 @@ describe('Nodes Agents:: ', () => {
   }
 
   it('should not pick any agent when the selected node is not pmm-server', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
     jest
       .spyOn(InventoryService, 'getNodes')
       .mockReturnValue(Promise.resolve({ nodes: nodesMockMultipleAgentsNoPMMServer }));
@@ -54,6 +55,9 @@ describe('Nodes Agents:: ', () => {
     const formValues = formAPI.getState().values;
     expect(formValues.pmm_agent_id).toBe(undefined);
     expect(formValues.node.value).toBe(nodesMockMultipleAgentsNoPMMServer[0].node_id);
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should pick the pmm-server from the list of agents when pmm-server node is chosen', async () => {
