@@ -61,6 +61,8 @@ describe('Nodes Agents:: ', () => {
   });
 
   it('should pick the pmm-server from the list of agents when pmm-server node is chosen', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
     InventoryService.getNodes = () =>
       Promise.resolve({
         nodes: nodesMock,
@@ -75,9 +77,14 @@ describe('Nodes Agents:: ', () => {
     const formValues = formAPI.getState().values;
     expect(formValues.pmm_agent_id.value).toBe('pmm-server');
     expect(formValues.node.value).toBe('pmm-server');
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should change the address to localhost when the agent id is not pmmServer', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
     InventoryService.getNodes = () =>
       Promise.resolve({
         nodes: nodesMockMultipleAgentsNoPMMServer,
@@ -97,9 +104,14 @@ describe('Nodes Agents:: ', () => {
 
     const formValues = formAPI.getState().values;
     expect(formValues.address).toBe('localhost');
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should have the node/agent selected values when submit', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
     InventoryService.getNodes = () =>
       Promise.resolve({
         nodes: nodesMock,
@@ -128,5 +140,8 @@ describe('Nodes Agents:: ', () => {
       expect.anything(),
       expect.anything()
     );
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
   });
 });
