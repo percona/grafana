@@ -13,6 +13,7 @@ import { configureStore } from 'app/store/configureStore';
 import { NodesAgents } from './NodesAgents';
 
 const fetchNodesActionActionSpy = jest.spyOn(NodesReducer, 'fetchNodesAction');
+jest.spyOn(console, 'error').mockImplementation(() => {});
 
 describe('Nodes Agents:: ', () => {
   let formAPI: FormApi<any>;
