@@ -49,7 +49,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const setNodeAndAgent = (value: NodesOption) => {
     setSelectedNode(value);
 
-    let selectedAgent: AgentsOption;
+    let selectedAgent: AgentsOption | undefined;
     if (value.agents && value.agents?.length > 1) {
       selectedAgent = value.agents.find((item) => item.value === PMM_SERVER_NODE_AGENT_ID);
     } else if (value.agents && value.agents?.length === 1) {

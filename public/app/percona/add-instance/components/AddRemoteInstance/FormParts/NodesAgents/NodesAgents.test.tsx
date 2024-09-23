@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { FormApi } from 'final-form';
 import React from 'react';
 import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
@@ -84,7 +83,6 @@ describe('Nodes Agents:: ', () => {
       expect(fetchNodesActionActionSpy).toHaveBeenCalled();
     });
     const nodesSelect = screen.getByLabelText('Nodes');
-    const agentsSelect = screen.getByLabelText('Agents');
 
     await waitFor(() =>
       selectEvent.select(nodesSelect, [nodesMockOneAgentNoPMMServer[0].node_name], {
