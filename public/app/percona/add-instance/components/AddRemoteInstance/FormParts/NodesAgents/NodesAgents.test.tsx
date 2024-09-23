@@ -113,7 +113,11 @@ describe('Nodes Agents:: ', () => {
     const form = screen.getByTestId('node-agents-form');
 
     const nodesSelect = screen.getByLabelText('Nodes');
-    await selectEvent.select(nodesSelect, 'pmm-server', { container: document.body });
+    await waitFor(() =>
+      selectEvent.select(nodesSelect, 'pmm-server', {
+        container: document.body,
+      })
+    );
 
     fireEvent.submit(form);
 
