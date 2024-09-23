@@ -38,6 +38,10 @@ describe('Nodes Agents:: ', () => {
     );
   }
 
+  beforeEach(() => {
+    submitMock.mockClear();
+  });
+
   it('should not pick any agent when the selected node is not pmm-server', async () => {
     jest
       .spyOn(InventoryService, 'getNodes')
