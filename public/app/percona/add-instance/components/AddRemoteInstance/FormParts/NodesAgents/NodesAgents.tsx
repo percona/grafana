@@ -22,7 +22,6 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const dispatch = useAppDispatch();
   const [generateToken] = useCancelToken();
   const [selectedNode, setSelectedNode] = useState<NodesOption>();
-  const [selectedAgent, setSelectedAgent] = useState<AgentsOption>();
   const { nodes } = useSelector(getNodes);
 
   const nodesOptions = useMemo<NodesOption[]>(() => nodesOptionsMapper(nodes), [nodes]);
@@ -40,10 +39,10 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   }, []);
 
   const changeAgentValue = (value: AgentsOption) => {
-    setSelectedAgent(value);
-
-    if (value.label !== agentId.pmmServer) {
+    if (value.label !== PMM_SERVER_NODE_AGENT_ID) {
       form?.change('address', 'localhost');
+    } else {
+      form?.change('address', '');
     }
   };
 
@@ -51,9 +50,9 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
     setSelectedNode(value);
 
     let selectedAgent: AgentsOption;
-    if (value.agents?.length > 1) {
-      selectedAgent = value.agents.find((item) => item.value === agentId.pmmServer);
-    } else if (value.agents?.length === 1) {
+    if (value.agents && value.agents?.length > 1) {
+      selectedAgent = value.agents.find((item) => item.value === PMM_SERVER_NODE_AGENT_ID);
+    } else if (value.agents && value.agents?.length === 1) {
       selectedAgent = value.agents[0];
     }
     if (selectedAgent) {
@@ -62,6 +61,9 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
       if (selectedAgent.value !== PMM_SERVER_NODE_AGENT_ID) {
         form?.change('address', 'localhost');
       }
+    } else {
+      form?.change('pmm_agent_id', undefined);
+      form?.change('address', '');
     }
   };
 

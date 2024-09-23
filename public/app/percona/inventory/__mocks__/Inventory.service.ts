@@ -118,6 +118,47 @@ export const nodesMockMultipleAgentsNoPMMServer = [
   },
 ];
 
+export const nodesMockOneAgentNoPMMServer = [
+  {
+    node_id: '324234234',
+    node_type: 'generic',
+    node_name: 'node2',
+    custom_labels: {},
+    machine_id: '',
+    distro: '',
+    node_model: '',
+    container_id: '',
+    container_name: '',
+    address: '127.0.0.1',
+    region: '',
+    az: '',
+    created_at: '2024-08-20T08:05:31.079300Z',
+    updated_at: '2024-08-20T08:05:31.079300Z',
+    status: ServiceStatus.UP,
+    agents: [
+      {
+        agent_id: '12132132',
+        agent_type: AgentType.pmmAgent,
+        status: ServiceAgentStatus.RUNNING,
+        is_connected: true,
+      },
+      {
+        agent_id: '4534534534534',
+        agent_type: AgentType.externalExporter,
+        status: ServiceAgentStatus.RUNNING,
+        is_connected: true,
+      },
+    ],
+    services: [
+      {
+        service_id: '291afb9b-2ae0-41d1-a173-f1a138cf1725',
+        service_type: ServiceType.posgresql,
+        service_name: 'pmm-server-postgresql',
+      },
+    ],
+  },
+];
+
 export const InventoryService = jest.genMockFromModule<typeof service>(
   'app/percona/inventory/Inventory.service'
 ).InventoryService;
