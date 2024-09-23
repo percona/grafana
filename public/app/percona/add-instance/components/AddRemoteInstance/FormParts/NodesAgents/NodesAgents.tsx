@@ -3,7 +3,7 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useStyles2 } from '@grafana/ui';
 import { Messages } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.messages';
 import { getStyles } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/FormParts.styles';
-import { agentId } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
+import { PMM_SERVER_NODE_AGENT_ID } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.constants';
 import { NodesAgentsProps } from 'app/percona/add-instance/components/AddRemoteInstance/FormParts/NodesAgents/NodesAgents.types';
 import { GET_NODES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
 import { AgentsOption, NodesOption } from 'app/percona/inventory/Inventory.types';
@@ -50,17 +50,18 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const setNodeAndAgent = (value: NodesOption) => {
     setSelectedNode(value);
 
-    if (value.agents && value.agents.length > 1) {
-      const pmmServerAgent = value.agents.find((item) => item.value === agentId.pmmServer);
-      if (pmmServerAgent) {
-        form?.change('pmm_agent_id', pmmServerAgent);
-      }
-    } else if (value.agents && value.agents.length === 1) {
-      form?.change('pmm_agent_id', value.agents[0]);
+    let selectedAgent: AgentsOption;
+    if (value.agents?.length > 1) {
+      selectedAgent = value.agents.find((item) => item.value === agentId.pmmServer);
+    } else if (value.agents?.length === 1) {
+      selectedAgent = value.agents[0];
     }
+    if (selectedAgent) {
+      form?.change('pmm_agent_id', selectedAgent);
 
-    if (selectedAgent && selectedAgent.label !== agentId.pmmServer) {
-      form?.change('address', 'localhost');
+      if (selectedAgent.value !== PMM_SERVER_NODE_AGENT_ID) {
+        form?.change('address', 'localhost');
+      }
     }
   };
 

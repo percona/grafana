@@ -96,7 +96,6 @@ describe('AddRemoteInstanceService:: ', () => {
       qan_postgresql_pgstatements_agent: true,
       metrics_mode: 1,
     };
-    const expected = toPayload(data);
-    expect(expected).toStrictEqual(payload);
+    expect(toPayload(data)).toStrictEqual(payload);
   });
 });

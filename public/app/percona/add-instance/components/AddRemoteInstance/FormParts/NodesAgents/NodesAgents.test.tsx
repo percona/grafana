@@ -63,10 +63,7 @@ describe('Nodes Agents:: ', () => {
   it('should pick the pmm-server from the list of agents when pmm-server node is chosen', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    InventoryService.getNodes = () =>
-      Promise.resolve({
-        nodes: nodesMock,
-      });
+    jest.spyOn(InventoryService, 'getNodes').mockReturnValue(Promise.resolve({ nodes: nodesMock }));
     setup();
     await waitFor(() => {
       expect(fetchNodesActionActionSpy).toHaveBeenCalled();
@@ -109,7 +106,7 @@ describe('Nodes Agents:: ', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('should have the node/agent selected values when submit', async () => {
+  it('should have the node/agent selected values when submitted', async () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     InventoryService.getNodes = () =>
