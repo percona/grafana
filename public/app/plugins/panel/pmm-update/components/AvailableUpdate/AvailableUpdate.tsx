@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { Icon, LinkButton, Tooltip, useStyles2 } from '@grafana/ui';
 
+import { formatDateWithYear } from '../../UpdatePanel.utils';
 import { useToggleOnAltClick } from '../../hooks';
 
 import { Messages } from './AvailableUpdate.messages';
@@ -26,7 +27,7 @@ export const AvailableUpdate: FC<AvailableUpdateProps> = ({ nextVersion, newsLin
           {showFullVersion ? nextVersion?.tag : nextVersion?.version}
         </span>
         <span data-testid="update-latest-release-date" className={styles.releaseDate}>
-          ({nextVersion?.timestamp})
+          {!!nextVersion?.timestamp && `(${formatDateWithYear(nextVersion?.timestamp)})`}
           <Tooltip content={Messages.tooltip} data-testid="update-published-date-info">
             <Icon name="info-circle" className={styles.infoIcon} />
           </Tooltip>
