@@ -104,7 +104,7 @@ describe('PerconaUpdateVersion', () => {
 
     const store = configureStore(state);
 
-    const { container } = setup(store);
+    setup(store);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
     });
