@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { MockStore } from 'redux-mock-store';
 import { waitFor } from 'test/test-utils';
 
 import * as GrafanaUpdates from 'app/percona/shared/core/reducers/updates/updates';
@@ -9,10 +8,12 @@ import { UpdatesService } from 'app/percona/shared/services/updates';
 import { configureStore } from 'app/store/configureStore';
 
 import PerconaUpdateVersion from './PerconaUpdateVersion';
+import { StoreState } from 'app/types';
+import { EnhancedStore } from '@reduxjs/toolkit';
 
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
 describe('PerconaUpdateVersion', () => {
-  function setup(store: MockStore) {
+  function setup(store: EnhancedStore) {
     return render(
       <Provider store={store}>
         <PerconaUpdateVersion />
@@ -56,7 +57,7 @@ describe('PerconaUpdateVersion', () => {
         ...defaultState.percona,
         ...state,
       },
-    });
+    } as StoreState);
     setup(store);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
@@ -104,7 +105,7 @@ describe('PerconaUpdateVersion', () => {
         ...defaultState.percona,
         ...state,
       },
-    });
+    } as StoreState);
 
     setup(store);
     await waitFor(() => {
