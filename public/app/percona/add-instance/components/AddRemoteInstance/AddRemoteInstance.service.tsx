@@ -145,7 +145,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
 
   if (data.address === '127.0.0.1' || data.address === 'localhost') {
     data.node_id = data.node.value;
-  } else  if (!values.isAzure && data.add_node === undefined) {
+  } else if (!values.isAzure && data.add_node === undefined) {
     data.add_node = {
       node_name: data.service_name,
       node_type: 'NODE_TYPE_REMOTE_NODE',
