@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
+import { MockStore } from 'redux-mock-store';
 import { waitFor } from 'test/test-utils';
 
 import * as GrafanaUpdates from 'app/percona/shared/core/reducers/updates/updates';
@@ -11,7 +12,7 @@ import PerconaUpdateVersion from './PerconaUpdateVersion';
 
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
 describe('PerconaUpdateVersion', () => {
-  function setup(store) {
+  function setup(store: MockStore) {
     return render(
       <Provider store={store}>
         <PerconaUpdateVersion />
