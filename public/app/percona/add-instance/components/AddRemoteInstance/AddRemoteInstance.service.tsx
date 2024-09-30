@@ -143,18 +143,13 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
     data.service_name = data.address;
   }
 
-  if (
-    (!values.isAzure && data.add_node === undefined) ||
-    (data.address !== '127.0.0.1' && data.address !== 'localhost')
-  ) {
+  if (data.address === '127.0.0.1' || data.address === 'localhost') {
+    data.node_id = data.node.value;
+  } else  if (!values.isAzure && data.add_node === undefined) {
     data.add_node = {
       node_name: data.service_name,
       node_type: 'NODE_TYPE_REMOTE_NODE',
     };
-  }
-
-  if (data.address === '127.0.0.1' || data.address === 'localhost') {
-    data.node_id = data.node.value;
   }
 
   if (values.isRDS && discoverName) {
@@ -190,9 +185,9 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
   data.pmm_agent_id = values.pmm_agent_id.value;
 
   if (data.pmm_agent_id === PMM_SERVER_NODE_AGENT_ID) {
-    data.metrics_mode = 2;
-  } else {
     data.metrics_mode = 1;
+  } else {
+    data.metrics_mode = 2;
   }
   delete data.tracking;
   delete data.node;
