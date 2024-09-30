@@ -25,38 +25,38 @@ describe('PerconaUpdateVersion', () => {
 
   it('should render modal with one update', async () => {
     const state = {
-      percona: {
-        updates: {
-          updateAvailable: true,
-          latest: { version: '3.0.1' },
-          lastChecked: '',
-          snoozeCurrentVersion: {
-            user_id: 0,
-            productTourCompleted: true,
-            alertingTourCompleted: true,
-            snoozedPmmVersion: '',
-          },
-          changeLogs: {
-            updates: [
-              {
-                version: 'PMM 3.0.1',
-                tag: 'string',
-                timestamp: '2024-09-24T09:12:31.488Z',
-                releaseNotesUrl: 'http://localhost:3000',
-                releaseNotesText: 'text1',
-              },
-            ],
-          },
+      updates: {
+        isLoading: false,
+        updateAvailable: true,
+        latest: { version: '3.0.1' },
+        lastChecked: '',
+        changeLogs: {
+          lastCheck: '',
+          updates: [
+            {
+              version: 'PMM 3.0.1',
+              tag: 'string',
+              timestamp: '2024-09-24T09:12:31.488Z',
+              releaseNotesUrl: 'http://localhost:3000',
+              releaseNotesText: 'text1',
+            },
+          ],
         },
       },
     };
     jest
       .spyOn(UpdatesService, 'getUpdatesChangelogs')
-      .mockReturnValue(Promise.resolve({ ...state.percona.updates.changeLogs }));
+      .mockReturnValue(Promise.resolve({ ...state.updates.changeLogs }));
 
-    const store = configureStore(state);
-
-    const { container } = setup(store);
+    const defaultState = configureStore().getState();
+    const store = configureStore({
+      ...defaultState,
+      percona: {
+        ...defaultState.percona,
+        ...state,
+      },
+    });
+    setup(store);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
     });
@@ -66,43 +66,44 @@ describe('PerconaUpdateVersion', () => {
 
   it('should render modal with multiple updates', async () => {
     const state = {
-      percona: {
-        updates: {
-          updateAvailable: true,
-          latest: { version: '3.0.1' },
-          lastChecked: '',
-          snoozeCurrentVersion: {
-            user_id: 0,
-            productTourCompleted: true,
-            alertingTourCompleted: true,
-            snoozedPmmVersion: '',
-          },
-          changeLogs: {
-            updates: [
-              {
-                version: 'PMM 3.0.1',
-                tag: 'string',
-                timestamp: '2024-09-24T09:12:31.488Z',
-                releaseNotesUrl: 'http://localhost:3000',
-                releaseNotesText: 'text1',
-              },
-              {
-                version: 'PMM 3.0.2',
-                tag: 'string',
-                timestamp: '2024-09-24T09:12:31.488Z',
-                releaseNotesUrl: 'http://localhost:3000',
-                releaseNotesText: 'text2',
-              },
-            ],
-          },
+      updates: {
+        isLoading: false,
+        updateAvailable: true,
+        latest: { version: '3.0.1' },
+        lastChecked: '',
+        changeLogs: {
+          lastCheck: '',
+          updates: [
+            {
+              version: 'PMM 3.0.1',
+              tag: 'string',
+              timestamp: '2024-09-24T09:12:31.488Z',
+              releaseNotesUrl: 'http://localhost:3000',
+              releaseNotesText: 'text1',
+            },
+            {
+              version: 'PMM 3.0.2',
+              tag: 'string',
+              timestamp: '2024-09-24T09:12:31.488Z',
+              releaseNotesUrl: 'http://localhost:3000',
+              releaseNotesText: 'text2',
+            },
+          ],
         },
       },
     };
     jest
       .spyOn(UpdatesService, 'getUpdatesChangelogs')
-      .mockReturnValue(Promise.resolve({ ...state.percona.updates.changeLogs }));
+      .mockReturnValue(Promise.resolve({ ...state.updates.changeLogs }));
 
-    const store = configureStore(state);
+    const defaultState = configureStore().getState();
+    const store = configureStore({
+      ...defaultState,
+      percona: {
+        ...defaultState.percona,
+        ...state,
+      },
+    });
 
     setup(store);
     await waitFor(() => {
