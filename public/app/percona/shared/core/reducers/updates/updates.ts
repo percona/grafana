@@ -22,6 +22,7 @@ export const updatesSlice = createSlice({
     builder.addCase(checkUpdatesAction.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
+      isLoading: false,
     }));
     builder.addCase(checkUpdatesAction.rejected, (state) => ({
       ...state,

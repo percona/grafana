@@ -14,6 +14,7 @@ import { useSelector } from 'app/types';
 
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
+import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
 
 const PerconaUpdateVersion: FC = () => {
   const { updateAvailable, installed, latest, changeLogs, lastChecked, snoozeCurrentVersion } =
@@ -24,25 +25,14 @@ const PerconaUpdateVersion: FC = () => {
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
-    const differenceInDays = () => {
-      if (lastChecked) {
-        const lastCheckDate = new Date(lastChecked);
-        const currentDate = new Date();
-        const differenceInMilliseconds = currentDate.getTime() - lastCheckDate.getTime();
-        return Math.trunc(differenceInMilliseconds / (1000 * 60 * 60 * 24));
-      } else {
-        return 7;
-      }
-    };
 
     const prepareModal = async () => {
       if (!snoozeCurrentVersion) {
         await dispatch(getSnoozeCurrentVersion());
       }
-      const days = differenceInDays();
+
       if (
         (installed?.version !== latest?.version &&
-          days > 6 &&
           snoozeCurrentVersion?.snoozedPmmVersion !== latest?.version) ||
         !lastChecked
       ) {
@@ -72,6 +62,12 @@ const PerconaUpdateVersion: FC = () => {
     setShowUpdate(false);
   };
 
+  const onUpdateClick = () => {
+    setShowUpdate(false);
+    const baseUrl = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
+    window.location.href = baseUrl + PMM_UPDATES_LINK.url;
+  }
+
   return (
     <>
       <Modal
@@ -92,7 +88,7 @@ const PerconaUpdateVersion: FC = () => {
               {Messages.snooze}
             </Button>
             <Button type="button" variant="primary">
-              <a href="/pmm-ui/updates">{Messages.goToUpdatesPage}</a>
+              <a onClick={onUpdateClick}>{Messages.goToUpdatesPage}</a>
             </Button>
           </div>
         </div>
@@ -121,7 +117,7 @@ const PerconaUpdateVersion: FC = () => {
               {Messages.snooze}
             </Button>
             <Button type="button" variant="primary">
-              <a href="/pmm-ui/updates">{Messages.goToUpdatesPage}</a>
+              <a onClick={onUpdateClick}>{Messages.goToUpdatesPage}</a>
             </Button>
           </div>
         </div>
