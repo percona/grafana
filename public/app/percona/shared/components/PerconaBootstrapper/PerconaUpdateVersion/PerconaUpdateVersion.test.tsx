@@ -13,13 +13,12 @@ import { EnhancedStore } from '@reduxjs/toolkit';
 
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
 describe('PerconaUpdateVersion', () => {
-  function setup(store: EnhancedStore) {
-    return render(
+  const setup = (store: EnhancedStore) =>
+    render(
       <Provider store={store}>
         <PerconaUpdateVersion />
       </Provider>
     );
-  }
 
   beforeEach(() => {
     jest.clearAllMocks();

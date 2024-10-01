@@ -2,38 +2,31 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { dateTimeFormat } from '@grafana/data';
 import { Modal, useStyles2, Button } from '@grafana/ui';
-import {
-  checkUpdatesChangeLogs,
-  getSnoozeCurrentVersion,
-  setSnoozeCurrentUpdate,
-  UpdatesChangelogs,
-} from 'app/percona/shared/core/reducers/updates';
-import { getUpdatesInfo } from 'app/percona/shared/core/selectors';
+import { checkUpdatesChangeLogs, UpdatesChangelogs } from 'app/percona/shared/core/reducers/updates';
+import { getTour, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
 import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
 
 const PerconaUpdateVersion: FC = () => {
-  const { updateAvailable, installed, latest, changeLogs, lastChecked, snoozeCurrentVersion } =
-    useSelector(getUpdatesInfo);
-
+  const { updateAvailable, installed, latest, changeLogs, lastChecked } = useSelector(getUpdatesInfo);
+  const { snoozeCurrentVersion } = useSelector(getTour);
   const [showUpdate, setShowUpdate] = useState(false);
   const dispatch = useAppDispatch();
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
-
     const prepareModal = async () => {
       if (!snoozeCurrentVersion) {
-        await dispatch(getSnoozeCurrentVersion());
+        await dispatch(fetchUserDetailsAction());
       }
 
       if (
-        (installed?.version !== latest?.version &&
-          snoozeCurrentVersion?.snoozedPmmVersion !== latest?.version) ||
+        (installed?.version !== latest?.version && snoozeCurrentVersion?.snoozedPmmVersion !== latest?.version) ||
         !lastChecked
       ) {
         setShowUpdate(true);
@@ -49,11 +42,9 @@ const PerconaUpdateVersion: FC = () => {
   const snoozeUpdate = async () => {
     if (latest && latest.version) {
       const payload = {
-        productTourCompleted: snoozeCurrentVersion?.productTourCompleted || true,
-        alertingTourCompleted: snoozeCurrentVersion?.alertingTourCompleted || true,
-        snoozedPmmVersion: latest.version,
+        version: latest.version.toString(),
       };
-      await dispatch(setSnoozeCurrentUpdate(payload));
+      await dispatch(setSnoozedVersion(payload));
     }
     setShowUpdate(false);
   };
@@ -66,7 +57,7 @@ const PerconaUpdateVersion: FC = () => {
     setShowUpdate(false);
     const baseUrl = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
     window.location.href = baseUrl + PMM_UPDATES_LINK.url;
-  }
+  };
 
   return (
     <>
@@ -79,10 +70,12 @@ const PerconaUpdateVersion: FC = () => {
         <div data-testid="one-update-modal">
           <h5 className={styles.version}>{changeLogs?.updates[0]?.version || ''}</h5>
           <p className={styles.releaseNotesText}>
-            <a href={changeLogs?.updates[0]?.releaseNotesUrl || ''}>{Messages.fullReleaseNotes}</a>
+            <a target="_blank" rel="noopener noreferrer" href={changeLogs?.updates[0]?.releaseNotesUrl || ''}>
+              {Messages.fullReleaseNotes}
+            </a>
           </p>
-          <h5 className={styles.howToUpdateTitle}>{Messages.howToUpdate}</h5>
-          <p className={styles.howToUpdateDescription}>{Messages.howToUpdateDescription}</p>
+          <h5>{Messages.howToUpdate}</h5>
+          <p>{Messages.howToUpdateDescription}</p>
           <div className={styles.updateButtons}>
             <Button type="button" variant="secondary" onClick={snoozeUpdate} className={styles.snoozeButton}>
               {Messages.snooze}
@@ -104,7 +97,7 @@ const PerconaUpdateVersion: FC = () => {
           <ul className={styles.listOfReleaseNotes}>
             {changeLogs?.updates.map((update: UpdatesChangelogs) => (
               <li key={update.toString()}>
-                <a href={update.releaseNotesUrl}>
+                <a target="_blank" rel="noopener noreferrer" href={update.releaseNotesUrl}>
                   {update.version}, {dateTimeFormat(update.timestamp, { format: 'MMM DD, YYYY' })}
                 </a>
               </li>

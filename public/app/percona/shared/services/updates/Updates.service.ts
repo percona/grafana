@@ -1,8 +1,4 @@
-import {
-  CheckUpdatesChangeLogsResponse,
-  SnoozePayloadBody,
-  SnoozePayloadResponse,
-} from 'app/percona/shared/core/reducers/updates';
+import { CheckUpdatesChangeLogsResponse } from 'app/percona/shared/core/reducers/updates';
 
 import { api } from '../../helpers/api';
 
@@ -13,9 +9,4 @@ export const UpdatesService = {
     api.get<CheckUpdatesResponse, CheckUpdatesParams>('/v1/server/updates', true, { params: body }),
 
   getUpdatesChangelogs: () => api.get<CheckUpdatesChangeLogsResponse, void>('/v1/server/updates/changelogs', false),
-
-  setSnoozeCurrentVersion: (body: SnoozePayloadBody) =>
-    api.put<SnoozePayloadResponse, SnoozePayloadBody>('/v1/users/me', body, true),
-
-  getSnoozeCurrentVersion: () => api.get<SnoozePayloadResponse, void>('/v1/users/me', false),
 };

@@ -17,8 +17,6 @@ export const getStyles = ({ v1: { spacing, colors } }: GrafanaTheme2) => ({
       color: ${colors.textBlue};
     }
   `,
-  howToUpdateTitle: css``,
-  howToUpdateDescription: css``,
   newVersionsTitle: css`
     font-weight: 500;
     font-size: 16px;
