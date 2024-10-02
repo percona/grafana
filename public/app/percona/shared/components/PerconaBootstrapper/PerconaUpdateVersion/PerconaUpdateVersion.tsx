@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import { dateTimeFormat } from '@grafana/data';
 import { Modal, useStyles2, Button } from '@grafana/ui';
-import { checkUpdatesChangeLogs, UpdatesChangelogs } from 'app/percona/shared/core/reducers/updates';
+import { checkUpdatesChangeLogs, UpdatesChangeLogs } from 'app/percona/shared/core/reducers/updates';
 import { getPerconaUser, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -89,7 +89,7 @@ const PerconaUpdateVersion: FC = () => {
         <div data-testid="multiple-updates-modal">
           <h5 className={styles.newVersionsTitle}>{Messages.newVersions}</h5>
           <ul className={styles.listOfReleaseNotes}>
-            {changeLogs?.updates.map((update: UpdatesChangelogs) => (
+            {changeLogs?.updates.map((update: UpdatesChangeLogs) => (
               <li key={update.toString()}>
                 <a target="_blank" rel="noopener noreferrer" href={update.releaseNotesUrl}>
                   {update.version}, {dateTimeFormat(update.timestamp, { format: 'MMM DD, YYYY' })}

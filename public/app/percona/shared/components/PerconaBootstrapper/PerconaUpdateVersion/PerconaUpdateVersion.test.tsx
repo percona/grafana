@@ -28,6 +28,18 @@ describe('PerconaUpdateVersion', () => {
   });
 
   it('should render modal with one update', async () => {
+    const changeLogsAPIResponse = {
+      last_check: '',
+      updates: [
+        {
+          version: 'PMM 3.0.1',
+          tag: 'string',
+          timestamp: '2024-09-24T09:12:31.488Z',
+          release_notes_url: 'http://localhost:3000',
+          release_notes_text: 'text1',
+        },
+      ],
+    };
     const state = {
       updates: {
         isLoading: false,
@@ -48,9 +60,7 @@ describe('PerconaUpdateVersion', () => {
         },
       },
     };
-    jest
-      .spyOn(UpdatesService, 'getUpdatesChangelogs')
-      .mockReturnValue(Promise.resolve({ ...state.updates.changeLogs }));
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ changeLogsAPIResponse }));
 
     const defaultState = configureStore().getState();
     const store = configureStore({
@@ -70,6 +80,25 @@ describe('PerconaUpdateVersion', () => {
   });
 
   it('should render modal with multiple updates', async () => {
+    const changeLogsAPIResponse = {
+      last_check: '',
+      updates: [
+        {
+          version: 'PMM 3.0.1',
+          tag: 'string',
+          timestamp: '2024-09-24T09:12:31.488Z',
+          release_notes_url: 'http://localhost:3000',
+          release_notes_text: 'text1',
+        },
+        {
+          version: 'PMM 3.0.2',
+          tag: 'string',
+          timestamp: '2024-09-24T09:12:31.488Z',
+          release_notes_url: 'http://localhost:3000',
+          release_notes_text: 'text2',
+        },
+      ],
+    };
     const state = {
       updates: {
         isLoading: false,
@@ -97,9 +126,7 @@ describe('PerconaUpdateVersion', () => {
         },
       },
     };
-    jest
-      .spyOn(UpdatesService, 'getUpdatesChangelogs')
-      .mockReturnValue(Promise.resolve({ ...state.updates.changeLogs }));
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ changeLogsAPIResponse }));
 
     const defaultState = configureStore().getState();
     const store = configureStore({

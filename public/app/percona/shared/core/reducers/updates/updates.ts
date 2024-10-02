@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { UpdatesService } from 'app/percona/shared/services/updates';
 
 import { CheckUpdatesPayload, UpdatesState } from './updates.types';
-import { responseToPayload } from './updates.utils';
+import { mapUpdatesChangeLogs, responseToPayload } from './updates.utils';
 
 const initialState: UpdatesState = {
   isLoading: false,
@@ -54,7 +54,7 @@ export const checkUpdatesAction = createAsyncThunk('percona/checkUpdates', async
 });
 
 export const checkUpdatesChangeLogs = createAsyncThunk('percona/checkUpdatesChangelogs', async () => {
-  return await UpdatesService.getUpdatesChangelogs();
+  return mapUpdatesChangeLogs(await UpdatesService.getUpdatesChangelogs());
 });
 
 export default updatesSlice.reducer;
