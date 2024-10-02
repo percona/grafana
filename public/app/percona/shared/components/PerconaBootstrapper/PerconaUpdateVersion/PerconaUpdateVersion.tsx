@@ -10,7 +10,7 @@ import { useSelector } from 'app/types';
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
 import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
-import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
+import { fetchUserDetailsAction, setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
 
 const PerconaUpdateVersion: FC = () => {
   const { updateAvailable, installed, latest, changeLogs, lastChecked } = useSelector(getUpdatesInfo);

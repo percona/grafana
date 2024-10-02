@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { waitFor } from 'test/test-utils';
 
 import * as GrafanaUpdates from 'app/percona/shared/core/reducers/updates/updates';
+import * as UserTourReducer from 'app/percona/shared/core/reducers/user/user';
 import { UpdatesService } from 'app/percona/shared/services/updates';
 import { configureStore } from 'app/store/configureStore';
 
@@ -12,6 +13,8 @@ import { StoreState } from 'app/types';
 import { EnhancedStore } from '@reduxjs/toolkit';
 
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
+const fetchUserDetailsActionSpy = jest.spyOn(UserTourReducer, 'fetchUserDetailsAction');
+
 describe('PerconaUpdateVersion', () => {
   const setup = (store: EnhancedStore) =>
     render(
@@ -60,6 +63,7 @@ describe('PerconaUpdateVersion', () => {
     setup(store);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
+      expect(fetchUserDetailsActionSpy).toHaveBeenCalled();
     });
 
     expect(screen.getByTestId('one-update-modal')).toBeInTheDocument();
@@ -109,6 +113,7 @@ describe('PerconaUpdateVersion', () => {
     setup(store);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
+      expect(fetchUserDetailsActionSpy).toHaveBeenCalled();
     });
 
     expect(screen.getByTestId('multiple-updates-modal')).toBeInTheDocument();
