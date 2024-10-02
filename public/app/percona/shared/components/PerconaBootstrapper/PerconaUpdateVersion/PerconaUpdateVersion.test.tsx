@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import { waitFor } from 'test/test-utils';
 
 import * as GrafanaUpdates from 'app/percona/shared/core/reducers/updates/updates';
-import * as UserTourReducer from 'app/percona/shared/core/reducers/user/user';
 import { UpdatesService } from 'app/percona/shared/services/updates';
 import { configureStore } from 'app/store/configureStore';
 
@@ -13,7 +12,6 @@ import { StoreState } from 'app/types';
 import { EnhancedStore } from '@reduxjs/toolkit';
 
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
-const fetchUserDetailsActionSpy = jest.spyOn(UserTourReducer, 'fetchUserDetailsAction');
 
 describe('PerconaUpdateVersion', () => {
   const setup = (store: EnhancedStore) =>
@@ -60,7 +58,7 @@ describe('PerconaUpdateVersion', () => {
         },
       },
     };
-    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ changeLogsAPIResponse }));
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
 
     const defaultState = configureStore().getState();
     const store = configureStore({
@@ -73,10 +71,10 @@ describe('PerconaUpdateVersion', () => {
     setup(store);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
-      expect(fetchUserDetailsActionSpy).toHaveBeenCalled();
     });
 
-    expect(screen.getByTestId('one-update-modal')).toBeInTheDocument();
+    expect(screen.queryByTestId('one-update-modal')).toBeInTheDocument();
+    expect(screen.queryByTestId('multiple-updates-modal')).not.toBeInTheDocument();
   });
 
   it('should render modal with multiple updates', async () => {
@@ -126,7 +124,7 @@ describe('PerconaUpdateVersion', () => {
         },
       },
     };
-    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ changeLogsAPIResponse }));
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
 
     const defaultState = configureStore().getState();
     const store = configureStore({
@@ -140,9 +138,9 @@ describe('PerconaUpdateVersion', () => {
     setup(store);
     await waitFor(() => {
       expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
-      expect(fetchUserDetailsActionSpy).toHaveBeenCalled();
     });
 
-    expect(screen.getByTestId('multiple-updates-modal')).toBeInTheDocument();
+    expect(screen.queryByTestId('one-update-modal')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('multiple-updates-modal')).toBeInTheDocument();
   });
 });

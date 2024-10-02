@@ -23,7 +23,7 @@ export const responseToPayload = (response: CheckUpdatesResponse): CheckUpdatesP
 });
 
 export const mapUpdatesChangeLogs = (response: CheckUpdatesChangeLogsResponse): CheckUpdatesChangeLogs => {
-  let responseMapping = response.updates.map((item) => ({
+  const responseMapping = response.updates.map((item) => ({
     version: item.version,
     tag: item.tag,
     timestamp: item.timestamp,

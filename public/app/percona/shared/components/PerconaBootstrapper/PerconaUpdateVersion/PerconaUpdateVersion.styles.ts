@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
 
-export const getStyles = ({ v1: { spacing, colors } }: GrafanaTheme2) => ({
+export const getStyles = ({ v1: { spacing, colors, typography } }: GrafanaTheme2) => ({
   updateVersionModal: css`
     display: flex;
     flex-direction: column;
@@ -18,13 +18,13 @@ export const getStyles = ({ v1: { spacing, colors } }: GrafanaTheme2) => ({
     }
   `,
   newVersionsTitle: css`
-    font-weight: 500;
-    font-size: 16px;
+    font-weight: ${typography.weight.semibold};
+    font-size: ${typography.heading.h5};
     margin-bottom: 8px;
   `,
   notesTitle: css`
-    font-weight: 500;
-    font-size: 16px;
+    font-weight: ${typography.weight.semibold};
+    font-size: ${typography.heading.h5};
     margin-top: 27px;
   `,
   updateButtons: css`

@@ -15,7 +15,7 @@ export const updatesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(checkUpdatesAction.pending, (state) => ({
-      ...state,
+      ...initialState,
       isLoading: true,
     }));
     builder.addCase(checkUpdatesAction.fulfilled, (state, { payload }) => ({
@@ -29,16 +29,13 @@ export const updatesSlice = createSlice({
     }));
     builder.addCase(checkUpdatesChangeLogs.pending, (state) => ({
       ...state,
-      isLoading: true,
     }));
     builder.addCase(checkUpdatesChangeLogs.fulfilled, (state, { payload }) => ({
       ...state,
-      isLoading: false,
       changeLogs: payload,
     }));
     builder.addCase(checkUpdatesChangeLogs.rejected, (state) => ({
       ...state,
-      isLoading: false,
     }));
   },
 });

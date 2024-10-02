@@ -10,10 +10,10 @@ import { useSelector } from 'app/types';
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
 import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
-import { fetchUserDetailsAction, setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
+import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
 
 const PerconaUpdateVersion: FC = () => {
-  const { updateAvailable, installed, latest, changeLogs, lastChecked } = useSelector(getUpdatesInfo);
+  const { updateAvailable, installed, latest, changeLogs } = useSelector(getUpdatesInfo);
   const { snoozedPmmVersion } = useSelector(getPerconaUser);
   const [showUpdate, setShowUpdate] = useState(false);
   const dispatch = useAppDispatch();
@@ -21,11 +21,7 @@ const PerconaUpdateVersion: FC = () => {
 
   useEffect(() => {
     const prepareModal = async () => {
-      if (!snoozedPmmVersion) {
-        await dispatch(fetchUserDetailsAction());
-      }
-
-      if ((installed?.version !== latest?.version && snoozedPmmVersion !== latest?.version) || !lastChecked) {
+      if (installed?.version !== latest?.version && snoozedPmmVersion !== latest?.version) {
         setShowUpdate(true);
         await dispatch(checkUpdatesChangeLogs());
       }
@@ -34,7 +30,7 @@ const PerconaUpdateVersion: FC = () => {
     if (updateAvailable) {
       prepareModal();
     }
-  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion, lastChecked]);
+  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion]);
 
   const snoozeUpdate = async () => {
     if (latest && latest.version) {
@@ -49,8 +45,7 @@ const PerconaUpdateVersion: FC = () => {
 
   const onUpdateClick = () => {
     setShowUpdate(false);
-    const baseUrl = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
-    window.location.href = baseUrl + PMM_UPDATES_LINK.url;
+    window.location.assign(PMM_UPDATES_LINK.url!);
   };
 
   return (
@@ -62,7 +57,7 @@ const PerconaUpdateVersion: FC = () => {
         className={styles.updateVersionModal}
       >
         <div data-testid="one-update-modal">
-          <h5 className={styles.version}>{changeLogs?.updates[0]?.version || ''}</h5>
+          <h5 className={styles.version}>{latest?.version || ''}</h5>
           <p className={styles.releaseNotesText}>
             <a target="_blank" rel="noopener noreferrer" href={changeLogs?.updates[0]?.releaseNotesUrl || ''}>
               {Messages.fullReleaseNotes}
@@ -97,8 +92,8 @@ const PerconaUpdateVersion: FC = () => {
               </li>
             ))}
           </ul>
-          <h5 className={styles.notesTitle}>{Messages.notes}</h5>
-          <p>{Messages.notesDescription}</p>
+          <h5>{Messages.howToUpdate}</h5>
+          <p>{Messages.howToUpdateDescription}</p>
           <div className={styles.updateButtons}>
             <Button type="button" variant="secondary" onClick={snoozeUpdate} className={styles.snoozeButton}>
               {Messages.snooze}
