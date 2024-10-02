@@ -32,7 +32,7 @@ describe('PerconaUpdateVersion', () => {
         {
           version: 'PMM 3.0.1',
           tag: 'string',
-          timestamp: '2024-09-24T09:12:31.488Z',
+          timestamp: '2024-09-23T09:12:31.488Z',
           release_notes_url: 'http://localhost:3000',
           release_notes_text: 'text1',
         },
@@ -44,18 +44,6 @@ describe('PerconaUpdateVersion', () => {
         updateAvailable: true,
         latest: { version: '3.0.1' },
         lastChecked: '',
-        changeLogs: {
-          lastCheck: '',
-          updates: [
-            {
-              version: 'PMM 3.0.1',
-              tag: 'string',
-              timestamp: '2024-09-24T09:12:31.488Z',
-              releaseNotesUrl: 'http://localhost:3000',
-              releaseNotesText: 'text1',
-            },
-          ],
-        },
       },
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
@@ -84,14 +72,14 @@ describe('PerconaUpdateVersion', () => {
         {
           version: 'PMM 3.0.1',
           tag: 'string',
-          timestamp: '2024-09-24T09:12:31.488Z',
+          timestamp: '2024-09-27T09:12:31.488Z',
           release_notes_url: 'http://localhost:3000',
           release_notes_text: 'text1',
         },
         {
           version: 'PMM 3.0.2',
           tag: 'string',
-          timestamp: '2024-09-24T09:12:31.488Z',
+          timestamp: '2024-09-23T09:12:31.488Z',
           release_notes_url: 'http://localhost:3000',
           release_notes_text: 'text2',
         },
@@ -103,25 +91,6 @@ describe('PerconaUpdateVersion', () => {
         updateAvailable: true,
         latest: { version: '3.0.1' },
         lastChecked: '',
-        changeLogs: {
-          lastCheck: '',
-          updates: [
-            {
-              version: 'PMM 3.0.1',
-              tag: 'string',
-              timestamp: '2024-09-24T09:12:31.488Z',
-              releaseNotesUrl: 'http://localhost:3000',
-              releaseNotesText: 'text1',
-            },
-            {
-              version: 'PMM 3.0.2',
-              tag: 'string',
-              timestamp: '2024-09-24T09:12:31.488Z',
-              releaseNotesUrl: 'http://localhost:3000',
-              releaseNotesText: 'text2',
-            },
-          ],
-        },
       },
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
