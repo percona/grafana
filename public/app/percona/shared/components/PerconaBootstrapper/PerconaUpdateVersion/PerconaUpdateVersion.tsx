@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { dateTimeFormat } from '@grafana/data';
 import { Modal, useStyles2, Button } from '@grafana/ui';
 import { checkUpdatesChangeLogs, UpdatesChangelogs } from 'app/percona/shared/core/reducers/updates';
-import { getTour, getUpdatesInfo } from 'app/percona/shared/core/selectors';
+import { getPerconaUser, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -14,21 +14,18 @@ import { fetchUserDetailsAction, setSnoozedVersion } from 'app/percona/shared/co
 
 const PerconaUpdateVersion: FC = () => {
   const { updateAvailable, installed, latest, changeLogs, lastChecked } = useSelector(getUpdatesInfo);
-  const { snoozeCurrentVersion } = useSelector(getTour);
+  const { snoozedPmmVersion } = useSelector(getPerconaUser);
   const [showUpdate, setShowUpdate] = useState(false);
   const dispatch = useAppDispatch();
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
     const prepareModal = async () => {
-      if (!snoozeCurrentVersion) {
+      if (!snoozedPmmVersion) {
         await dispatch(fetchUserDetailsAction());
       }
 
-      if (
-        (installed?.version !== latest?.version && snoozeCurrentVersion?.snoozedPmmVersion !== latest?.version) ||
-        !lastChecked
-      ) {
+      if ((installed?.version !== latest?.version && snoozedPmmVersion !== latest?.version) || !lastChecked) {
         setShowUpdate(true);
         await dispatch(checkUpdatesChangeLogs());
       }
@@ -37,14 +34,11 @@ const PerconaUpdateVersion: FC = () => {
     if (updateAvailable) {
       prepareModal();
     }
-  }, [dispatch, updateAvailable, installed, latest, snoozeCurrentVersion, lastChecked]);
+  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion, lastChecked]);
 
   const snoozeUpdate = async () => {
     if (latest && latest.version) {
-      const payload = {
-        version: latest.version.toString(),
-      };
-      await dispatch(setSnoozedVersion(payload));
+      await dispatch(setSnoozedVersion(latest.version));
     }
     setShowUpdate(false);
   };

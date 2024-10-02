@@ -15,7 +15,7 @@ export const getServices = (state: StoreState) => state.percona.services;
 export const getNodes = (state: StoreState) => state.percona.nodes;
 export const getBackupLocations = (state: StoreState) => state.percona.backupLocations;
 export const getTour = (state: StoreState) => state.percona.tour;
-export const getAccesstourRoles = (state: StoreState) => state.percona.roles;
+export const getAccessRoles = (state: StoreState) => state.percona.roles;
 export const getUsers = (state: StoreState) => state.users;
 export const getUsersInfo = (state: StoreState) => state.percona.users;
 export const getDefaultRole = (state: StoreState) =>
