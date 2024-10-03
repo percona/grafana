@@ -1,26 +1,31 @@
+import { EnhancedStore } from '@reduxjs/toolkit';
 import { fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
+import React, { useState } from 'react';
 import { Provider } from 'react-redux';
 import { waitFor } from 'test/test-utils';
 
+import { Messages } from 'app/percona/shared/components/PerconaBootstrapper/PerconaUpdateVersion/PerconaUpdateVersion.constants';
 import * as GrafanaUpdates from 'app/percona/shared/core/reducers/updates/updates';
 import * as User from 'app/percona/shared/core/reducers/user/user';
 import { UpdatesService } from 'app/percona/shared/services/updates';
 import { configureStore } from 'app/store/configureStore';
+import { StoreState } from 'app/types';
 
 import PerconaUpdateVersion from './PerconaUpdateVersion';
-import { StoreState } from 'app/types';
-import { EnhancedStore } from '@reduxjs/toolkit';
-import { Messages } from 'app/percona/shared/components/PerconaBootstrapper/PerconaUpdateVersion/PerconaUpdateVersion.constants';
 
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
 const setSnoozedVersionSpy = jest.spyOn(User, 'setSnoozedVersion');
+
+const PerconaUpdateVersionWithProps = () => {
+  const [showUpdate, setShowUpdate] = useState(true);
+  return <PerconaUpdateVersion showUpdate={showUpdate} setShowUpdate={setShowUpdate} />;
+};
 
 describe('PerconaUpdateVersion', () => {
   const setup = (store: EnhancedStore) =>
     render(
       <Provider store={store}>
-        <PerconaUpdateVersion />
+        <PerconaUpdateVersionWithProps />
       </Provider>
     );
 

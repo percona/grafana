@@ -8,5 +8,5 @@ export const Messages = {
   readMore: 'Read more',
   fullReleaseNotes: 'Full release notes here',
   goToUpdatesPage: 'Go to updates page',
-  snooze: 'Snooze',
+  snooze: 'Dismiss',
 };

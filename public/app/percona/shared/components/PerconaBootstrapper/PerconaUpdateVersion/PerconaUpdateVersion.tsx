@@ -1,28 +1,29 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { dateTimeFormat } from '@grafana/data';
 import { Modal, useStyles2, Button } from '@grafana/ui';
+import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PerconaUpdateVersionProps } from 'app/percona/shared/components/PerconaBootstrapper/PerconaUpdateVersion/PerconaUpdateVersion.types';
 import { checkUpdatesChangeLogs, UpdatesChangeLogs } from 'app/percona/shared/core/reducers/updates';
+import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
 import { getPerconaUser, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
-import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
-import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
 
-const PerconaUpdateVersion: FC = () => {
+const PerconaUpdateVersion = ({ showUpdate, setShowUpdate }: PerconaUpdateVersionProps) => {
   const { updateAvailable, installed, latest, changeLogs } = useSelector(getUpdatesInfo);
   const { snoozedPmmVersion } = useSelector(getPerconaUser);
-  const [showUpdate, setShowUpdate] = useState(false);
   const dispatch = useAppDispatch();
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
     const prepareModal = async () => {
-      if (installed?.version !== latest?.version && snoozedPmmVersion !== latest?.version) {
-        setShowUpdate(true);
+      if (installed?.version === latest?.version || snoozedPmmVersion === latest?.version) {
+        setShowUpdate(false);
+      } else {
         await dispatch(checkUpdatesChangeLogs());
       }
     };
@@ -30,7 +31,7 @@ const PerconaUpdateVersion: FC = () => {
     if (updateAvailable) {
       prepareModal();
     }
-  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion]);
+  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion, setShowUpdate]);
 
   const snoozeUpdate = async () => {
     if (latest && latest.version) {
@@ -69,8 +70,8 @@ const PerconaUpdateVersion: FC = () => {
             <Button type="button" variant="secondary" onClick={snoozeUpdate} className={styles.snoozeButton}>
               {Messages.snooze}
             </Button>
-            <Button type="button" variant="primary">
-              <a onClick={onUpdateClick}>{Messages.goToUpdatesPage}</a>
+            <Button type="button" variant="primary" onClick={onUpdateClick}>
+              {Messages.goToUpdatesPage}
             </Button>
           </div>
         </div>
@@ -98,8 +99,8 @@ const PerconaUpdateVersion: FC = () => {
             <Button type="button" variant="secondary" onClick={snoozeUpdate} className={styles.snoozeButton}>
               {Messages.snooze}
             </Button>
-            <Button type="button" variant="primary">
-              <a onClick={onUpdateClick}>{Messages.goToUpdatesPage}</a>
+            <Button type="button" variant="primary" onClick={onUpdateClick}>
+              {Messages.goToUpdatesPage}
             </Button>
           </div>
         </div>
