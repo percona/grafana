@@ -30,7 +30,7 @@ export function AppChromeMenu({}: Props) {
 
   const isOpen = state.megaMenuOpen && !state.megaMenuDocked;
   const onClose = () => chrome.setMegaMenuOpen(false);
-  
+
   // @PERCONA
   const { isOpen: isTourOpen } = useTour();
 
