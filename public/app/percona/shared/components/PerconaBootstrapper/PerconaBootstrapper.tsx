@@ -35,8 +35,7 @@ import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const dispatch = useAppDispatch();
   const { setSteps, startTour: startPerconaTour, endTour } = usePerconaTour();
-  const [showUpdate, setShowUpdate] = useState(true);
-  const { updateAvailable } = useSelector(getUpdatesInfo);
+  const { updateAvailable, isLoading: isLoadingUpdates, showUpdateModal } = useSelector(getUpdatesInfo);
   const [modalIsOpen, setModalIsOpen] = useState(true);
   const [showTour, setShowTour] = useState(false);
   const styles = useStyles2(getStyles);
@@ -109,8 +108,8 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       {isSignedIn && <Telemetry />}
       <PerconaNavigation />
       <PerconaTourBootstrapper />
-      {updateAvailable && showUpdate ? (
-        <PerconaUpdateVersion showUpdate={showUpdate} setShowUpdate={setShowUpdate} />
+      {updateAvailable && showUpdateModal && !isLoadingUpdates ? (
+        <PerconaUpdateVersion />
       ) : (
         isSignedIn &&
         showTour && (

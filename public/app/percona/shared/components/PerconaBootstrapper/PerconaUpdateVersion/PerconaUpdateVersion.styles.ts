@@ -7,7 +7,6 @@ export const getStyles = ({ v1: { spacing, colors, typography } }: GrafanaTheme2
     display: flex;
     flex-direction: column;
     width: 480px;
-    height: 343px;
   `,
   version: css`
     margin-bottom: ${spacing.md};
@@ -22,7 +21,7 @@ export const getStyles = ({ v1: { spacing, colors, typography } }: GrafanaTheme2
     font-size: ${typography.heading.h5};
     margin-bottom: 8px;
   `,
-  notesTitle: css`
+  howToUpdate: css`
     font-weight: ${typography.weight.semibold};
     font-size: ${typography.heading.h5};
     margin-top: 27px;

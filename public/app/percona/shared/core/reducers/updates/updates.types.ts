@@ -18,6 +18,7 @@ export interface UpdatesState {
   latestNewsUrl?: string;
   lastChecked?: string;
   changeLogs?: CheckUpdatesChangeLogs;
+  showUpdateModal: boolean;
 }
 
 export interface CheckUpdatesPayload {

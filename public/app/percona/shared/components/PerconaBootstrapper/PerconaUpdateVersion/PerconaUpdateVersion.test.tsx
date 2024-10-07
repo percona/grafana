@@ -1,6 +1,6 @@
 import { EnhancedStore } from '@reduxjs/toolkit';
 import { fireEvent, render, screen } from '@testing-library/react';
-import React, { useState } from 'react';
+import React from 'react';
 import { Provider } from 'react-redux';
 import { waitFor } from 'test/test-utils';
 
@@ -16,16 +16,11 @@ import PerconaUpdateVersion from './PerconaUpdateVersion';
 const checkUpdatesChangeLogsSpy = jest.spyOn(GrafanaUpdates, 'checkUpdatesChangeLogs');
 const setSnoozedVersionSpy = jest.spyOn(User, 'setSnoozedVersion');
 
-const PerconaUpdateVersionWithProps = () => {
-  const [showUpdate, setShowUpdate] = useState(true);
-  return <PerconaUpdateVersion showUpdate={showUpdate} setShowUpdate={setShowUpdate} />;
-};
-
 describe('PerconaUpdateVersion', () => {
   const setup = (store: EnhancedStore) =>
     render(
       <Provider store={store}>
-        <PerconaUpdateVersionWithProps />
+        <PerconaUpdateVersion />
       </Provider>
     );
 
@@ -52,6 +47,7 @@ describe('PerconaUpdateVersion', () => {
         updateAvailable: true,
         latest: { version: '3.0.1' },
         lastChecked: '',
+        showUpdateModal: true,
       },
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
@@ -99,6 +95,7 @@ describe('PerconaUpdateVersion', () => {
         updateAvailable: true,
         latest: { version: '3.0.1' },
         lastChecked: '',
+        showUpdateModal: true,
       },
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
@@ -140,6 +137,7 @@ describe('PerconaUpdateVersion', () => {
         updateAvailable: true,
         latest: { version: '3.0.1' },
         lastChecked: '',
+        showUpdateModal: true,
       },
     };
     jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));

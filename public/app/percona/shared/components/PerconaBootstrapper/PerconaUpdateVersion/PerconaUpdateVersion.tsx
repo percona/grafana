@@ -3,8 +3,11 @@ import React, { useEffect } from 'react';
 import { dateTimeFormat } from '@grafana/data';
 import { Modal, useStyles2, Button } from '@grafana/ui';
 import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
-import { PerconaUpdateVersionProps } from 'app/percona/shared/components/PerconaBootstrapper/PerconaUpdateVersion/PerconaUpdateVersion.types';
-import { checkUpdatesChangeLogs, UpdatesChangeLogs } from 'app/percona/shared/core/reducers/updates';
+import {
+  checkUpdatesChangeLogs,
+  setShowUpdateModal,
+  UpdatesChangeLogs,
+} from 'app/percona/shared/core/reducers/updates';
 import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
 import { getPerconaUser, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
@@ -13,8 +16,8 @@ import { useSelector } from 'app/types';
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
 
-const PerconaUpdateVersion = ({ showUpdate, setShowUpdate }: PerconaUpdateVersionProps) => {
-  const { updateAvailable, installed, latest, changeLogs } = useSelector(getUpdatesInfo);
+const PerconaUpdateVersion = () => {
+  const { updateAvailable, installed, latest, changeLogs, showUpdateModal } = useSelector(getUpdatesInfo);
   const { snoozedPmmVersion } = useSelector(getPerconaUser);
   const dispatch = useAppDispatch();
   const styles = useStyles2(getStyles);
@@ -22,7 +25,7 @@ const PerconaUpdateVersion = ({ showUpdate, setShowUpdate }: PerconaUpdateVersio
   useEffect(() => {
     const prepareModal = async () => {
       if (installed?.version === latest?.version || snoozedPmmVersion === latest?.version) {
-        setShowUpdate(false);
+        dispatch(setShowUpdateModal(false));
       } else {
         await dispatch(checkUpdatesChangeLogs());
       }
@@ -31,21 +34,21 @@ const PerconaUpdateVersion = ({ showUpdate, setShowUpdate }: PerconaUpdateVersio
     if (updateAvailable) {
       prepareModal();
     }
-  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion, setShowUpdate]);
+  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion]);
 
   const snoozeUpdate = async () => {
     if (latest && latest.version) {
       await dispatch(setSnoozedVersion(latest.version));
     }
-    setShowUpdate(false);
+    dispatch(setShowUpdateModal(false));
   };
 
   const onDismiss = () => {
-    setShowUpdate(false);
+    dispatch(setShowUpdateModal(false));
   };
 
   const onUpdateClick = () => {
-    setShowUpdate(false);
+    dispatch(setShowUpdateModal(false));
     window.location.assign(PMM_UPDATES_LINK.url!);
   };
 
@@ -54,7 +57,7 @@ const PerconaUpdateVersion = ({ showUpdate, setShowUpdate }: PerconaUpdateVersio
       <Modal
         onDismiss={onDismiss}
         title={Messages.titleOneUpdate}
-        isOpen={showUpdate && changeLogs && changeLogs?.updates?.length === 1}
+        isOpen={showUpdateModal && changeLogs && changeLogs?.updates?.length === 1}
         className={styles.updateVersionModal}
       >
         <div data-testid="one-update-modal">
@@ -79,7 +82,7 @@ const PerconaUpdateVersion = ({ showUpdate, setShowUpdate }: PerconaUpdateVersio
       <Modal
         onDismiss={onDismiss}
         title={Messages.titleMultipleUpdates}
-        isOpen={showUpdate && changeLogs && changeLogs?.updates?.length > 1}
+        isOpen={showUpdateModal && changeLogs && changeLogs?.updates?.length > 1}
         className={styles.updateVersionModal}
       >
         <div data-testid="multiple-updates-modal">
@@ -93,7 +96,7 @@ const PerconaUpdateVersion = ({ showUpdate, setShowUpdate }: PerconaUpdateVersio
               </li>
             ))}
           </ul>
-          <h5>{Messages.howToUpdate}</h5>
+          <h5 className={styles.howToUpdate}>{Messages.howToUpdate}</h5>
           <p>{Messages.howToUpdateDescription}</p>
           <div className={styles.updateButtons}>
             <Button type="button" variant="secondary" onClick={snoozeUpdate} className={styles.snoozeButton}>

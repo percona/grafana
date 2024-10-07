@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { UpdatesService } from 'app/percona/shared/services/updates';
 
@@ -7,6 +7,7 @@ import { mapUpdatesChangeLogs, responseToPayload } from './updates.utils';
 
 const initialState: UpdatesState = {
   isLoading: false,
+  showUpdateModal: true,
 };
 
 export const updatesSlice = createSlice({
@@ -14,7 +15,7 @@ export const updatesSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(checkUpdatesAction.pending, (state) => ({
+    builder.addCase(checkUpdatesAction.pending, () => ({
       ...initialState,
       isLoading: true,
     }));
@@ -37,6 +38,10 @@ export const updatesSlice = createSlice({
     builder.addCase(checkUpdatesChangeLogs.rejected, (state) => ({
       ...state,
     }));
+    builder.addCase(setShowUpdateModal, (state, { payload }) => ({
+      ...state,
+      showUpdateModal: payload,
+    }));
   },
 });
 
@@ -53,5 +58,7 @@ export const checkUpdatesAction = createAsyncThunk('percona/checkUpdates', async
 export const checkUpdatesChangeLogs = createAsyncThunk('percona/checkUpdatesChangelogs', async () => {
   return mapUpdatesChangeLogs(await UpdatesService.getUpdatesChangelogs());
 });
+
+export const setShowUpdateModal = createAction<boolean>('percona/setShowUpdateModal');
 
 export default updatesSlice.reducer;
