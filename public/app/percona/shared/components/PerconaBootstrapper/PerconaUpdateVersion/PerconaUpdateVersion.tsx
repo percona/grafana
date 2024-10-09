@@ -91,7 +91,8 @@ const PerconaUpdateVersion = () => {
             {changeLogs?.updates.map((update: UpdatesChangeLogs) => (
               <li key={update.timestamp}>
                 <a target="_blank" rel="noopener noreferrer" href={update.releaseNotesUrl}>
-                  {update.version}, {dateTimeFormat(update.timestamp, { format: 'MMM DD, YYYY' })}
+                  {update.version},{' '}
+                  {update.timestamp ? dateTimeFormat(update.timestamp, { format: 'MMM DD, YYYY' }) : ''}
                 </a>
               </li>
             ))}
