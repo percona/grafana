@@ -30,7 +30,6 @@ import ServicesTable from './Services/ServicesTable';
 import { getAgentsMonitoringStatus } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
-
 export const Services = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<Array<Row<FlattenService>>>([]);
