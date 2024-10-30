@@ -5,6 +5,8 @@ import { useLocalStorage } from 'react-use';
 
 import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, InlineSwitch, Tooltip, useStyles2 } from '@grafana/ui';
+import { DATA_INTERVAL } from 'app/percona/backup/components/BackupInventory/BackupInventory.constants';
+import { useRecurringCall } from 'app/percona/backup/hooks/recurringCall.hook';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ReadMoreLink } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
@@ -28,10 +30,12 @@ import ServicesTable from './Services/ServicesTable';
 import { getAgentsMonitoringStatus } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
+
 export const Services = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<Array<Row<FlattenService>>>([]);
   const [actionItem, setActionItem] = useState<FlattenService | null>(null);
+  const [triggerTimeout] = useRecurringCall();
   const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
@@ -69,10 +73,9 @@ export const Services = () => {
   }, []);
 
   useEffect(() => {
-    loadData();
-
+    loadData().then(() => triggerTimeout(loadData, DATA_INTERVAL));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loadData]);
 
   const handleSelectionChange = useCallback((rows: Array<Row<FlattenService>>) => {
     setSelectedRows(rows);
