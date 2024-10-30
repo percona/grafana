@@ -183,7 +183,7 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
     },
     {
       id: 'settings-percona-platform',
-      text: 'Percona Platform',
+      text: 'Percona Portal',
       url: `${config.appSubUrl}/settings/percona-platform`,
     },
   ];
