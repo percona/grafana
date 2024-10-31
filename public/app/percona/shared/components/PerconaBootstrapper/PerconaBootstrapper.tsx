@@ -27,6 +27,7 @@ import { isPmmAdmin } from '../../helpers/permissions';
 import { Messages } from './PerconaBootstrapper.messages';
 import { getStyles } from './PerconaBootstrapper.styles';
 import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
+import { PerconaFrame } from './PerconaFrame/PerconaFrame';
 import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 import PerconaTourBootstrapper from './PerconaTour';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
@@ -107,6 +108,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     <>
       {isSignedIn && <Telemetry />}
       <PerconaNavigation />
+      <PerconaFrame />
       <PerconaTourBootstrapper />
       {updateAvailable && showUpdateModal && !isLoadingUpdates ? (
         <PerconaUpdateVersion />
