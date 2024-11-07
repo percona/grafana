@@ -194,13 +194,16 @@ export const RestoreHistory: FC = () => {
   };
 
   const onLogClick = (restore: Restore) => {
+    console.log('onLogClick', restore);
     setSelectedRestore(restore);
     setLogsModalVisible(true);
   };
 
   const getLogs = useCallback(
-    async (startingChunk: number, offset: number, token?: CancelToken) =>
-      RestoreHistoryService.getLogs(selectedRestore!.id, startingChunk, offset, token),
+    async (startingChunk: number, offset: number, token?: CancelToken) => {
+      console.log('selectedRestore!.id', selectedRestore!.id);
+      return RestoreHistoryService.getLogs(selectedRestore!.id, startingChunk, offset, token)
+    }
     [selectedRestore]
   );
 
