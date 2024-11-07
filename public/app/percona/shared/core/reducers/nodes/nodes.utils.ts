@@ -66,4 +66,4 @@ export const nodesOptionsMapper = (nodeFromDb: NodeDB[]): NodesOption[] =>
       label: node.node_name,
       agents: agents,
     };
-  });
+  }).filter((node) => node.agents.length > 0);
