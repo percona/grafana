@@ -39,8 +39,7 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   }, []);
 
   const changeAgentValue = (value: AgentsOption) => {
-    console.log(form?.getState().values?.address);
-    if (form?.getState().values?.address === undefined || form?.getState().values?.address === '' ) {
+    if (!form?.getState().values?.address) {
       if (value.label !== PMM_SERVER_NODE_AGENT_ID) {
         form?.change('address', 'localhost');
       } else {
