@@ -5,13 +5,13 @@ import { useLocalStorage } from 'react-use';
 
 import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, InlineSwitch, Tooltip, useStyles2 } from '@grafana/ui';
-import { DATA_INTERVAL } from 'app/percona/backup/components/BackupInventory/BackupInventory.constants';
-import { useRecurringCall } from 'app/percona/backup/hooks/recurringCall.hook';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ReadMoreLink } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { DATA_INTERVAL } from 'app/percona/shared/core';
+import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
