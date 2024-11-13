@@ -38,8 +38,9 @@ export const Services = () => {
   const navModel = usePerconaNavModel('inventory-services');
   const [generateToken] = useCancelToken();
   const dispatch = useAppDispatch();
-  const { isLoading, services: fetchedServices } = useSelector(getServices);
+  const { services: fetchedServices } = useSelector(getServices);
   const styles = useStyles2(getStyles);
+  const [isLoading, setIsLoading] = useState(false);
   const flattenServices = useMemo(
     () =>
       fetchedServices.map((value) => {
@@ -72,7 +73,10 @@ export const Services = () => {
   }, []);
 
   useEffect(() => {
-    loadData().then(() => triggerTimeout(loadData, DATA_INTERVAL));
+    if(!fetchedServices) {
+      setIsLoading(true);
+    }
+    loadData().then(() => { triggerTimeout(loadData, DATA_INTERVAL); setIsLoading(false) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadData]);
 
