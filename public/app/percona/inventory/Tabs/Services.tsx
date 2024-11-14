@@ -73,10 +73,13 @@ export const Services = () => {
   }, []);
 
   useEffect(() => {
-    if(!fetchedServices) {
+    if (!fetchedServices) {
       setIsLoading(true);
     }
-    loadData().then(() => { triggerTimeout(loadData, DATA_INTERVAL); setIsLoading(false) });
+    loadData().then(() => {
+      triggerTimeout(loadData, DATA_INTERVAL);
+      setIsLoading(false);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadData]);
 
