@@ -2,6 +2,9 @@ import { NavModelItem } from '@grafana/data';
 import config from 'app/core/config';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
 
+import messager from '../PerconaFrame/Messager';
+import { MessageType } from '../PerconaFrame/Messages.types';
+
 export const WEIGHTS = {
   dashboards: -1700,
   alerting: -1500,
@@ -92,6 +95,16 @@ export const PMM_UPDATES_LINK: NavModelItem = {
   hideFromTabs: true,
   target: '_self',
   showDot: false,
+  onClick: () => {
+    messager.sendMessage({
+      type: MessageType.LOCATION_CHANGE,
+      data: {
+        location: {
+          pathname: '/pmm-ui/updates',
+        },
+      },
+    });
+  },
 };
 
 export const PMM_HEADING_LINK: NavModelItem = {
