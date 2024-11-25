@@ -1,24 +1,39 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect } from 'react';
+import { useLocation } from 'react-router';
 
-import { locationService } from "@grafana/runtime";
+import { locationService } from '@grafana/runtime';
+
+import messager from './Messager';
+import { MessageType, NavigateToMessage } from './Messages.types';
 
 export const PerconaFrame: FC = () => {
-    const messageListener = (e: MessageEvent) => {
-        console.log('percona-frame', e);
+  const location = useLocation();
 
-        if (e.data && e.data?.type === 'NAVIGATE-TO') {
-            locationService.push(e.data?.to);
-        }
+  const onNavigate = (message: NavigateToMessage) => {
+    locationService.push(message.data.to);
+  };
 
-    }
+  useEffect(() => {
+    messager.register();
 
-    useEffect(() => {
-        window.addEventListener('message', messageListener);
+    messager.addListener({
+      type: MessageType.NAVIGATE_TO,
+      onMessage: onNavigate,
+    });
 
-        return () => {
-            window.removeEventListener('message', messageListener);
-        }
-    }, []);
+    return () => {
+      messager.unregister();
+    };
+  }, []);
 
-    return null;
+  useEffect(() => {
+    messager.sendMessage({
+      type: MessageType.LOCATION_CHANGE,
+      data: {
+        location,
+      },
+    });
+  }, [location]);
+
+  return null;
 };
