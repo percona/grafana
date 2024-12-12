@@ -57,6 +57,7 @@ jobs:
 
       - name: Checkout UI tests in ${{ github.base_ref }} branch
         uses: percona-platform/checkout@v2
+        if: ${{ steps.branch_checkout.outcome != 'success' }}
         continue-on-error: true
         id: target_branch_checkout
         with:
