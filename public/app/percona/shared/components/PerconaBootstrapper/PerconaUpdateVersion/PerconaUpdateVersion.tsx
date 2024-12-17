@@ -43,7 +43,7 @@ const PerconaUpdateVersion = () => {
     dispatch(setShowUpdateModal(false));
   };
 
-  const onDismiss = () => {
+  const onDismiss = async () => {
     await snoozeUpdate();
     dispatch(setShowUpdateModal(false));
   };
