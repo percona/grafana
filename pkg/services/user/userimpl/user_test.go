@@ -2,12 +2,12 @@ package userimpl
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/grafana/grafana/pkg/infra/localcache"
 	"github.com/grafana/grafana/pkg/infra/tracing"
@@ -16,6 +16,8 @@ import (
 	"github.com/grafana/grafana/pkg/services/team/teamtest"
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/setting"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUserService(t *testing.T) {
@@ -262,6 +264,28 @@ func TestMetrics(t *testing.T) {
 		assert.Equal(t, int64(1), stats["stats.user.role_none.count"])
 		assert.Equal(t, 1, stats["stats.password_policy.count"])
 	})
+}
+
+func generateRandomString(length int) (string, error) {
+	buffer := make([]byte, length)
+	_, err := rand.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(buffer)[:length], nil
+}
+
+func TestSanitizeSAName(t *testing.T) {
+	// max possible length without hashing
+	len180, err := generateRandomString(180)
+	require.NoError(t, err)
+	require.Equal(t, len180, SanitizeSAName(len180))
+
+	// too long length - postfix hashed
+	len200, err := generateRandomString(200)
+	require.NoError(t, err)
+	len200sanitized := SanitizeSAName(len200)
+	require.Equal(t, fmt.Sprintf("%s%s", len200[:148], len200sanitized[148:]), len200sanitized)
 }
 
 type FakeUserStore struct {

@@ -2,13 +2,11 @@ package userimpl
 
 import (
 	"context"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
-
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 
 	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/infra/localcache"
@@ -23,6 +21,8 @@ import (
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/util"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Service struct {
@@ -400,6 +400,23 @@ func (s *Service) GetProfile(ctx context.Context, query *user.GetUserProfileQuer
 	return s.store.GetProfile(ctx, query)
 }
 
+// SanitizeSAName is used for sanitize name and it's length for service accounts.
+// Max length of service account name is 190 chars (limit in Grafana Postgres DB).
+// However, prefix added by grafana is counted too. Prefix is sa-{orgID}-.
+// Bare minimum is 5 chars reserved (orgID is <10, like sa-1-) and could be more depends
+// on orgID number. Let's reserve 10 chars. It will cover almost one million orgIDs.
+// Sanitizing, ensure its length by hashing postfix when length is exceeded.
+// MD5 is used because it has fixed length 32 chars.
+//
+// Be aware that the same method is implemented in the PMM repo, and all changes should be reflected there as well!
+func SanitizeSAName(name string) string {
+	if len(name) <= 180 {
+		return name
+	}
+
+	return fmt.Sprintf("%s%x", name[:148], md5.Sum([]byte(name[148:]))) //nolint:gosec
+}
+
 // CreateServiceAccount creates a service account in the user table and adds service account to an organisation in the org_user table
 func (s *Service) CreateServiceAccount(ctx context.Context, cmd *user.CreateUserCommand) (*user.User, error) {
 	ctx, span := s.tracer.Start(ctx, "user.CreateServiceAccount", trace.WithAttributes(
@@ -416,7 +433,7 @@ func (s *Service) CreateServiceAccount(ctx context.Context, cmd *user.CreateUser
 	// create user
 	usr := &user.User{
 		Email:            cmd.Email,
-		Name:             cmd.Name,
+		Name:             SanitizeSAName(cmd.Name),
 		Login:            cmd.Login,
 		IsDisabled:       cmd.IsDisabled,
 		OrgID:            cmd.OrgID,
