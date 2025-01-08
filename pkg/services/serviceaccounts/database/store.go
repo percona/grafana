@@ -60,7 +60,7 @@ func generateLogin(prefix string, orgId int64, name string) string {
 // CreateServiceAccount creates service account
 func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, orgId int64, saForm *serviceaccounts.CreateServiceAccountForm) (*serviceaccounts.ServiceAccountDTO, error) {
 	name := nameutil.SanitizeSAName(saForm.Name)
-	login := generateLogin(serviceaccounts.ServiceAccountPrefix, orgId, saForm.Name)
+	login := nameutil.SanitizeSAName(generateLogin(serviceaccounts.ServiceAccountPrefix, orgId, saForm.Name))
 	isDisabled := false
 	role := org.RoleViewer
 	if saForm.IsDisabled != nil {
