@@ -69,16 +69,18 @@ export const buildInventoryAndSettings = (
   const configNode = mainLinks.find((link) => link.id === 'cfg');
   const pmmConfigNode = mainLinks.find((link) => link.id === 'pmmcfg');
 
-  PMM_UPDATES_LINK.showDot = updateAvailable;
-
   if (!pmmConfigNode) {
+    const updatesLink = {
+      ...PMM_UPDATES_LINK,
+      showDot: updateAvailable,
+    };
     const pmmcfgNode: NavModelItem = {
       id: 'pmmcfg',
       text: 'PMM Configuration',
       icon: 'percona-nav-logo',
       url: `${config.appSubUrl}/inventory`,
       subTitle: 'Configuration',
-      children: [PMM_ADD_INSTANCE_PAGE, PMM_ADD_INSTANCE_CREATE_PAGE, inventoryLink, settingsLink, PMM_UPDATES_LINK],
+      children: [PMM_ADD_INSTANCE_PAGE, PMM_ADD_INSTANCE_CREATE_PAGE, inventoryLink, settingsLink, updatesLink],
       sortWeight: -600,
       showDot: updateAvailable,
     };
