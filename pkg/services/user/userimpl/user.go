@@ -20,7 +20,6 @@ import (
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/util"
-	"github.com/grafana/grafana/pkg/util/nameutil"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -416,7 +415,7 @@ func (s *Service) CreateServiceAccount(ctx context.Context, cmd *user.CreateUser
 	// create user
 	usr := &user.User{
 		Email:            cmd.Email,
-		Name:             nameutil.SanitizeSAName(cmd.Name),
+		Name:             cmd.Name,
 		Login:            cmd.Login,
 		IsDisabled:       cmd.IsDisabled,
 		OrgID:            cmd.OrgID,
