@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
+import { AppEvents } from '@grafana/data';
+import { appEvents } from 'app/core/core';
 import { migrateAll } from 'app/features/api-keys/state/actions';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -22,6 +24,15 @@ export const useMigrator = () => {
 
     dispatch(migrateAll());
   }, [location.search, dispatch]);
+
+  useEffect(() => {
+    if (migrationResult && migrationResult.total > 0 && migrationResult.failed === 0) {
+      // give some time for the app to load
+      setTimeout(() => {
+        appEvents.emit(AppEvents.alertSuccess, ['All api keys successfully migrated']);
+      }, 1000);
+    }
+  }, [migrationResult]);
 
   const dismissSummary = () => {
     dispatch(snoozeApiKeyMigrationSummary(true));
