@@ -36,7 +36,7 @@ const PerconaUpdateVersion = () => {
     if (updateAvailable) {
       prepareModal();
     }
-  }, [dispatch, updateAvailable, installed, latest, snoozedPmmVersion]);
+  }, [dispatch, updatesEnabled, updateAvailable, installed, latest, snoozedPmmVersion]);
 
   const snoozeUpdate = async () => {
     if (latest && latest.version) {
