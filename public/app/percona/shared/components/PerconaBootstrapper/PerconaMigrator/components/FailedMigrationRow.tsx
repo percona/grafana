@@ -13,12 +13,14 @@ const FailedMigrationRow: FC<FailedMigrationRowProps> = ({ id, details }) => {
     <li>
       <strong>{Messages.id(id)}</strong>
       <ul>
-        <li>
-          <Text>
-            <strong>{Messages.name}</strong>
-            {name}
-          </Text>
-        </li>
+        {!!name && (
+          <li>
+            <Text>
+              <strong>{Messages.name}</strong>
+              {name}
+            </Text>
+          </li>
+        )}
         <li>
           <Text>
             <strong>{Messages.error}</strong>
