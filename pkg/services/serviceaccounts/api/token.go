@@ -114,7 +114,7 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *contextmodel.ReqContext) response
 // @PERCONA
 // swagger:route GET /auth/serviceaccount serviceaccounts retrieveServiceAccount
 //
-// # CurrentServiceAccount get current service account info, in case of nil it is not service account.
+// # CurrentServiceAccount get current service account info
 //
 // Requires service account token authentication.
 //
@@ -126,7 +126,7 @@ func (api *ServiceAccountsAPI) ListTokens(ctx *contextmodel.ReqContext) response
 // 500: internalServerError
 func (api *ServiceAccountsAPI) CurrentServiceAccount(ctx *contextmodel.ReqContext) response.Response {
 	if !ctx.IsServiceAccount {
-		return response.JSON(http.StatusOK, nil)
+		return response.Error(http.StatusBadRequest, "Auth method is not service account token", errors.New("failed to get service account info"))
 	}
 
 	serviceAccount, err := api.service.RetrieveServiceAccount(ctx.Req.Context(), ctx.OrgID, ctx.UserID)
