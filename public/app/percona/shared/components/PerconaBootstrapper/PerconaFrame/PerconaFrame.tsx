@@ -10,7 +10,8 @@ export const PerconaFrame: FC = () => {
   const location = useLocation();
 
   const onNavigate = (message: NavigateToMessage) => {
-    locationService.push(message.data.to);
+    console.log('onNavigate', message);
+    locationService.push(message.data.to.replace('/graph', ''));
   };
 
   useEffect(() => {

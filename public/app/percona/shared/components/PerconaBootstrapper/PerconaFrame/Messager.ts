@@ -1,4 +1,4 @@
-import { Message, MessageListener } from './Messages.types';
+import { Message, MessageListener, MessageType } from './Messages.types';
 
 class Messager {
   listeners: MessageListener[] = [];
@@ -9,7 +9,8 @@ class Messager {
   }
 
   onMessageReceived(e: MessageEvent) {
-    console.log(e);
+    console.log('MessageEvent', e);
+    console.log('MessageType', e.data?.type);
     console.log(this.listeners);
 
     this.listeners.forEach((listener) => {
@@ -25,6 +26,10 @@ class Messager {
 
   register() {
     window.addEventListener('message', (e) => this.onMessageReceived(e));
+    this.sendMessage({
+      type: MessageType.MESSENGER_READY,
+      data: {},
+    });
   }
 
   unregister() {

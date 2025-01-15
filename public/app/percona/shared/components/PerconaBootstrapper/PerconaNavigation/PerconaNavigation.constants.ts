@@ -351,7 +351,6 @@ export const PMM_NAV_MYSQL: NavModelItem = {
   url: `${config.appSubUrl}/d/mysql-instance-overview/mysql-instances-overview`,
   sortWeight: WEIGHTS.dashboards,
   hideFromTabs: true,
-
   children: [
     {
       id: 'mysql-overview',
@@ -456,6 +455,8 @@ export const PMM_NAV_MYSQL: NavModelItem = {
     },
   ],
 };
+
+console.log('PMM_NAV_MYSQL', PMM_NAV_MYSQL);
 
 export const PMM_NAV_MONGO: NavModelItem = {
   id: 'mongo',
