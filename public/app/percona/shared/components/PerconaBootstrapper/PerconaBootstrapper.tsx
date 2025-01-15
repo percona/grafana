@@ -19,6 +19,7 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Telemetry } from '../../../ui-events/components/Telemetry';
+import { useMigrator } from '../../core/hooks/migrator';
 import usePerconaTour from '../../core/hooks/tour';
 import { checkUpdatesAction } from '../../core/reducers/updates';
 import { logger } from '../../helpers/logger';
@@ -27,6 +28,7 @@ import { isPmmAdmin } from '../../helpers/permissions';
 import { Messages } from './PerconaBootstrapper.messages';
 import { getStyles } from './PerconaBootstrapper.styles';
 import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
+import PerconaMigrator from './PerconaMigrator';
 import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 import PerconaTourBootstrapper from './PerconaTour';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
@@ -42,6 +44,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const { user } = config.bootData;
   const { isSignedIn } = user;
   const theme = useTheme2();
+  const { migrationSummaryVisible } = useMigrator();
 
   const dismissModal = () => {
     setModalIsOpen(false);
@@ -61,8 +64,9 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   useEffect(() => {
     const getSettings = async () => {
       try {
-        await dispatch(fetchSettingsAction()).unwrap();
+        const settings = await dispatch(fetchSettingsAction()).unwrap();
         dispatch(setAuthorized(true));
+        return settings;
       } catch (e) {
         // @ts-ignore
         if (e.response?.status === 401) {
@@ -71,6 +75,8 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
           logger.error(e);
         }
       }
+
+      return null;
     };
 
     const getUserDetails = async () => {
@@ -84,10 +90,13 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
     const bootstrap = async () => {
       if (isPmmAdmin(user)) {
-        await getSettings();
+        const settings = await getSettings();
         await dispatch(fetchUserStatusAction());
         await dispatch(fetchAdvisors({ disableNotifications: true }));
-        await dispatch(checkUpdatesAction());
+
+        if (settings?.updatesEnabled) {
+          await dispatch(checkUpdatesAction());
+        }
       }
 
       await getUserDetails();
@@ -108,7 +117,9 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       {isSignedIn && <Telemetry />}
       <PerconaNavigation />
       <PerconaTourBootstrapper />
-      {updateAvailable && showUpdateModal && !isLoadingUpdates ? (
+      {isSignedIn && isPmmAdmin(user) && migrationSummaryVisible ? (
+        <PerconaMigrator />
+      ) : updateAvailable && showUpdateModal && !isLoadingUpdates ? (
         <PerconaUpdateVersion />
       ) : (
         isSignedIn &&
