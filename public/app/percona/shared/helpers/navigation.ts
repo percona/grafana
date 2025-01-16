@@ -13,6 +13,8 @@ export const useLinkWithVariables = (url?: string) => {
   }
 };
 
+export const getLinkWithVariables = useLinkWithVariables;
+
 const isDashboardUrl = (url?: string) => url?.includes('/d/');
 
 const checkDbType = (url: string): boolean => {
