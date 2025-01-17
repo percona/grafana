@@ -119,15 +119,8 @@ export class LoginCtrl extends PureComponent<Props, State> {
 
   toGrafana = () => {
     // @PERCONA
-    // trigger apikey migration on login
     const constructUrl = (url: string) => {
-      const forceApiKeyMigration = 'force-apikey-migration=true';
-
-      if (url.includes('?')) {
-        return url + '&' + forceApiKeyMigration;
-      } else {
-        return url + '?' + forceApiKeyMigration;
-      }
+      return '/pmm-ui';
     };
 
     // Use window.location.href to force page reload
