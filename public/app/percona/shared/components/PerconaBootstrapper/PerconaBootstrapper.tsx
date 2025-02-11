@@ -23,7 +23,7 @@ import { useMigrator } from '../../core/hooks/migrator';
 import usePerconaTour from '../../core/hooks/tour';
 import { checkUpdatesAction } from '../../core/reducers/updates';
 import { logger } from '../../helpers/logger';
-import { isPmmAdmin } from '../../helpers/permissions';
+import { isPmmAdmin, isViewer } from '../../helpers/permissions';
 
 import { Messages } from './PerconaBootstrapper.messages';
 import { getStyles } from './PerconaBootstrapper.styles';
@@ -89,10 +89,14 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     };
 
     const bootstrap = async () => {
-      if (isPmmAdmin(user)) {
-        const settings = await getSettings();
-        await dispatch(fetchUserStatusAction());
+      const settings = await getSettings();
+
+      if (!isViewer(user)) {
         await dispatch(fetchAdvisors({ disableNotifications: true }));
+      }
+
+      if (isPmmAdmin(user)) {
+        await dispatch(fetchUserStatusAction());
 
         if (settings?.updatesEnabled) {
           await dispatch(checkUpdatesAction());
