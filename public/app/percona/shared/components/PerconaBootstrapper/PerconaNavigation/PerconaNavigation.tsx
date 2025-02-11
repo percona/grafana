@@ -8,9 +8,9 @@ import { updateNavIndex } from 'app/core/reducers/navModel';
 import { fetchFolders } from 'app/features/manage-dashboards/state/actions';
 import { updateNavTree } from 'app/percona/shared/core/reducers/navigation';
 import { fetchActiveServiceTypesAction } from 'app/percona/shared/core/reducers/services';
-import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
+import { isPmmAdmin, isViewer } from 'app/percona/shared/helpers/permissions';
 import { useAppDispatch } from 'app/store/store';
-import { FolderDTO, OrgRole, useSelector } from 'app/types';
+import { FolderDTO, useSelector } from 'app/types';
 
 import {
   getCategorizedAdvisors,
@@ -139,7 +139,7 @@ const PerconaNavigation: FC = () => {
       ? buildIntegratedAlertingMenuItem(updatedNavTree)
       : removeAlertingMenuItem(updatedNavTree);
 
-    if (advisorEnabled && config.bootData.user.orgRole !== OrgRole.Viewer) {
+    if (advisorEnabled && !isViewer(config.bootData.user)) {
       updatedNavTree.push(advisorsPage);
     }
 
