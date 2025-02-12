@@ -137,7 +137,7 @@ export function getAppRoutes(): RouteDescriptor[] {
           ? import(/* webpackChunkName: "CorrelationsPage" */ 'app/features/correlations/CorrelationsPage')
           : import(
               /* webpackChunkName: "CorrelationsFeatureToggle" */ 'app/features/correlations/CorrelationsFeatureToggle'
-          )
+            )
       ),
     },
     {
@@ -295,9 +295,9 @@ export function getAppRoutes(): RouteDescriptor[] {
       component:
         config.licenseInfo.enabledFeatures?.saml || config.ldapEnabled || config.featureToggles.ssoSettingsApi
           ? SafeDynamicImport(
-            () =>
-              import(/* webpackChunkName: "AdminAuthentication" */ '../features/auth-config/AuthProvidersListPage')
-          )
+              () =>
+                import(/* webpackChunkName: "AdminAuthentication" */ '../features/auth-config/AuthProvidersListPage')
+            )
           : () => <Redirect to="/admin" />,
     },
     {
@@ -309,8 +309,8 @@ export function getAppRoutes(): RouteDescriptor[] {
       roles: () => contextSrv.evaluatePermission([AccessControlAction.SettingsWrite]),
       component: config.featureToggles.ssoSettingsApi
         ? SafeDynamicImport(
-          () => import(/* webpackChunkName: "AdminAuthentication" */ '../features/auth-config/ProviderConfigPage')
-        )
+            () => import(/* webpackChunkName: "AdminAuthentication" */ '../features/auth-config/ProviderConfigPage')
+          )
         : () => <Redirect to="/admin" />,
     },
     {
@@ -355,8 +355,8 @@ export function getAppRoutes(): RouteDescriptor[] {
       path: '/admin/featuretoggles',
       component: config.featureToggles.featureToggleAdminPage
         ? SafeDynamicImport(
-          () => import(/* webpackChunkName: "AdminFeatureTogglesPage" */ 'app/features/admin/AdminFeatureTogglesPage')
-        )
+            () => import(/* webpackChunkName: "AdminFeatureTogglesPage" */ 'app/features/admin/AdminFeatureTogglesPage')
+          )
         : () => <Redirect to="/admin" />,
     },
     {
@@ -398,8 +398,8 @@ export function getAppRoutes(): RouteDescriptor[] {
       component: !config.verifyEmailEnabled
         ? () => <Redirect to="/signup" />
         : SafeDynamicImport(
-          () => import(/* webpackChunkName "VerifyEmailPage"*/ 'app/core/components/Signup/VerifyEmailPage')
-        ),
+            () => import(/* webpackChunkName "VerifyEmailPage"*/ 'app/core/components/Signup/VerifyEmailPage')
+          ),
       pageClass: 'login-page',
       chromeless: true,
     },
@@ -790,22 +790,24 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     ...(isPmmAdmin(config.bootData.user) && config.bootData.user.isGrafanaAdmin
       ? [
-        {
-          path: '/pmm-dump',
-          roles: () => ['Admin'],
-          component: SafeDynamicImport(() => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')),
-        },
-        {
-          path: '/pmm-dump/new',
-          roles: () => ['Admin'],
-          component: SafeDynamicImport(
-            () =>
-              import(
-              /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/pmm-dump/components/ExportDataset/ExportDataset'
-              )
-          ),
-        },
-      ]
+          {
+            path: '/pmm-dump',
+            roles: () => ['Admin'],
+            component: SafeDynamicImport(
+              () => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')
+            ),
+          },
+          {
+            path: '/pmm-dump/new',
+            roles: () => ['Admin'],
+            component: SafeDynamicImport(
+              () =>
+                import(
+                  /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/pmm-dump/components/ExportDataset/ExportDataset'
+                )
+            ),
+          },
+        ]
       : []),
     ...getPluginCatalogRoutes(),
     ...getSupportBundleRoutes(),
