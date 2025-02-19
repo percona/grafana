@@ -89,13 +89,12 @@ export interface SettingsAPIResponse {
   settings: SettingsPayload;
 }
 
-export interface ReadonlySettingsPayload extends MetricsResolutionsPayload, AdvancedPayload {
+export interface ReadonlySettingsPayload {
   updates_enabled: boolean;
   telemetry_enabled: boolean;
   advisor_enabled: boolean;
   alerting_enabled: boolean;
   pmm_public_address: string;
-  advisor_run_intervals?: AdvisorRunIntervalsPayload;
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
   enable_access_control: boolean;
@@ -159,19 +158,19 @@ export type SettingsAPIChangePayload =
 
 export interface ReadonlySettings {
   advisorEnabled: boolean;
-  advisorRunIntervals: AdvisorRunIntervalsSettings;
   alertingEnabled: boolean;
   azureDiscoverEnabled?: boolean;
   backupEnabled: boolean;
-  dataRetention: string;
   enableAccessControl: boolean;
-  metricsResolutions: MetricsResolutions;
   publicAddress?: string;
   telemetryEnabled: boolean;
   updatesEnabled: boolean;
 }
 
 export interface Settings extends ReadonlySettings {
+  advisorRunIntervals: AdvisorRunIntervalsSettings;
+  metricsResolutions: MetricsResolutions;
+  dataRetention: string;
   sshKey: string;
   awsPartitions: string[];
   alertManagerUrl: string;
