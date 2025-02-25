@@ -1,6 +1,6 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 
-import { AppEvents, UrlQueryMap } from '@grafana/data';
+import { AppEvents, OrgRole, UrlQueryMap } from '@grafana/data';
 import { config, locationService } from '@grafana/runtime';
 import { useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
@@ -197,6 +197,7 @@ export const AllChecksTab: FC<GrafanaRouteComponentProps<{ category: string }>> 
           messagedataTestId="db-check-panel-settings-link"
           featureName={mainChecksMessages.advisors}
           featureSelector={featureSelector}
+          allowedRoles={[OrgRole.Admin, OrgRole.Editor]}
         >
           <ChecksInfoAlert />
           <div className={styles.wrapper}>

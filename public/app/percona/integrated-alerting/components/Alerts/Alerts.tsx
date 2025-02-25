@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import React, { FC, useCallback } from 'react';
 import { Cell, Column, Row } from 'react-table';
 
+import { OrgRole } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { Icon, LinkButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
@@ -157,7 +158,11 @@ export const Alerts: FC = () => {
   return (
     <Page navModel={navModel}>
       <Page.Contents>
-        <FeatureLoader featureName={Messages.alerting} featureSelector={featureSelector}>
+        <FeatureLoader
+          featureName={Messages.alerting}
+          featureSelector={featureSelector}
+          allowedRoles={[OrgRole.Admin, OrgRole.Editor, OrgRole.Viewer]}
+        >
           <Table
             totalItems={alertManagerAlerts.length}
             data={alertManagerAlerts || []}
