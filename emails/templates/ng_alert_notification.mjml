@@ -104,6 +104,11 @@
     </mj-wrapper>
     <mj-section padding="10px" />
 
+    <!-- @PERCONA -->
+    <mj-wrapper css-class="background" padding="0">
+      <mj-include path="./partials/alerting/contact_us.mjml" />
+    </mj-wrapper>
+
     <!-- end Resolved instances loop -->
     <mj-raw>
       {{ end }}
