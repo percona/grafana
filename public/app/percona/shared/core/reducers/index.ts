@@ -110,8 +110,7 @@ export const updateSettingsAction = createAsyncThunk(
           try {
             settings = await SettingsService.setSettings(args.body, args.token);
             await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
-          }
-          catch(e) {
+          } catch (e) {
             await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
             throw e;
           }
