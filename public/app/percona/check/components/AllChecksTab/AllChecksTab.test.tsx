@@ -201,6 +201,24 @@ describe('AllChecksTab::', () => {
 
     expect(runChecksButton).toBeNull();
   });
+
+  it('editors should be able to run checks', () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Editor;
+
+    render(<AllChecksTabTesting />);
+
+    expect(screen.queryByTestId('db-check-panel-actions')).not.toBeInTheDocument();
+  });
+
+  it("viewers shouldn't be able to to access advisors", async () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Editor;
+
+    render(<AllChecksTabTesting />);
+
+    expect(screen.queryByText('Insufficient access permissions.'));
+  });
 });
 
 const AllChecksTabTesting = () => {

@@ -78,4 +78,24 @@ describe('CheckInfoAlert', () => {
     );
     expect(screen.queryByText(Messages.title)).not.toBeInTheDocument();
   });
+
+  it("shouldn't show alert to viewers", async () => {
+    config.bootData.user.isGrafanaAdmin = false;
+    config.bootData.user.orgRole = OrgRole.Viewer;
+
+    render(
+      <Provider
+        store={configureStore({
+          percona: {
+            user: { isAuthorized: false },
+            settings: { loading: false, result: { isConnectedToPortal: true } },
+          },
+        } as StoreState)}
+      >
+        <ChecksInfoAlert />
+      </Provider>
+    );
+
+    expect(screen.queryByText(Messages.title)).not.toBeInTheDocument();
+  });
 });

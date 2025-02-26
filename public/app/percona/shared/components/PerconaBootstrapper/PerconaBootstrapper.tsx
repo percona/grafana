@@ -65,7 +65,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     const getSettings = async () => {
       try {
         const settings = await dispatch(fetchSettingsAction()).unwrap();
-        dispatch(setAuthorized(true));
+        dispatch(setAuthorized(isPmmAdmin(user)));
         return settings;
       } catch (e) {
         // @ts-ignore

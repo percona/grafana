@@ -110,6 +110,7 @@ export const Alerts: FC = () => {
             row={row}
             value={
               <LinkButton
+                data-testid={`silence-alert-row-${row.index}`}
                 disabled={isViewer(config.bootData.user)}
                 href={
                   row.original.status.state === AlertState.Suppressed
