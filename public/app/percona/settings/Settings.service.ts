@@ -21,14 +21,14 @@ export const SettingsService = {
       const { settings } = await api.put<SettingsAPIResponse, Partial<SettingsAPIChangePayload>>(
         '/v1/server/settings',
         body,
-        false,
+        true,
         token
       );
       response = toModel(settings);
     } catch (e) {
       logger.error(e);
+      throw e;
     }
-
     return response;
   },
 };

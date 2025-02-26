@@ -106,8 +106,15 @@ export const updateSettingsAction = createAsyncThunk(
               args.body.email_alerting_settings!.test_email = undefined;
             }
           }
-          const settings = await SettingsService.setSettings(args.body, args.token);
-          await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
+          let settings;
+          try {
+            settings = await SettingsService.setSettings(args.body, args.token);
+            await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
+          }
+          catch(e) {
+            await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
+            throw e;
+          }
           return settings;
         })()
       ),
