@@ -1,4 +1,4 @@
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 
@@ -104,7 +104,7 @@ describe('FailedChecksTab::', () => {
       </Provider>
     );
 
-    expect(screen.queryByTestId('unauthorized')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByTestId('unauthorized')).not.toBeInTheDocument());
   });
 
   it("viewers shouldn't be able to to access advisors", async () => {
@@ -124,6 +124,6 @@ describe('FailedChecksTab::', () => {
       </Provider>
     );
 
-    expect(screen.getByTestId('unauthorized')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('unauthorized')).toBeInTheDocument());
   });
 });
