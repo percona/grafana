@@ -87,7 +87,7 @@ describe('FailedChecksTab::', () => {
     expect(screen.queryByTestId('table-no-data')).toBeInTheDocument();
   });
 
-  it("editors should be able to to access advisors", async () => {
+  it('editors should be able to to access advisors', async () => {
     config.bootData.user.isGrafanaAdmin = false;
     config.bootData.user.orgRole = OrgRole.Editor;
 

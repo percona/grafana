@@ -112,7 +112,6 @@ describe('AlertsTable', () => {
     expect(screen.queryByTestId('silence-alert-row-1')).toHaveAttribute('aria-disabled', 'false');
   });
 
-
   it('should be accessible to viewer', () => {
     config.bootData.user.orgRole = OrgRole.Viewer;
 
