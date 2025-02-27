@@ -15,13 +15,17 @@ export const SettingsService = {
     });
     return toModel(settings);
   },
-  async setSettings(body: Partial<SettingsAPIChangePayload>, token?: CancelToken): Promise<Settings | undefined> {
+  async setSettings(
+    body: Partial<SettingsAPIChangePayload>,
+    token?: CancelToken,
+    disableNotifications = false
+  ): Promise<Settings | undefined> {
     let response;
     try {
       const { settings } = await api.put<SettingsAPIResponse, Partial<SettingsAPIChangePayload>>(
         '/v1/server/settings',
         body,
-        true,
+        disableNotifications,
         token
       );
       response = toModel(settings);
