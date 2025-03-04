@@ -28,7 +28,7 @@
         <mj-text>
           <ul style="margin:0;">
             <li><a href="https://per.co.na/pmm/about-PMM">Getting Started Guide</a> - Learn how to leverage PMM’s monitoring capabilities effectively.</li>
-            <li><a href="{{ .AppUrl }}/dashboards">Pre-built dashboards</a> - Explore dashboards tailored for MySQL, MongoDB, and PostgreSQL.</li>
+            <li><a href="{{ .AppUrl }}dashboards">Pre-built dashboards</a> - Explore dashboards tailored for MySQL, MongoDB, and PostgreSQL.</li>
           </ul>
         </mj-text>
         <mj-text>
