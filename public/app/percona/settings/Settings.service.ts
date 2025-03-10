@@ -28,7 +28,7 @@ export const SettingsService = {
     });
     return toReadonlyModel(settings);
   },
-   async setSettings(
+  async setSettings(
     body: Partial<SettingsAPIChangePayload>,
     token?: CancelToken,
     disableNotifications = false
