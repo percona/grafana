@@ -11,14 +11,17 @@ import { Failed } from './Failed';
 
 jest.mock('app/percona/check/Check.service');
 
+const spyGetAllFailedChecks = jest.spyOn(CheckService, 'getAllFailedChecks');
+
 describe('Failed::', () => {
   beforeEach(() => {
     config.bootData.user.isGrafanaAdmin = true;
     config.bootData.user.orgRole = OrgRole.Admin;
+    spyGetAllFailedChecks.mockClear();
   });
 
   it('should render a sum of total failed checks with severity details for admin user', async () => {
-    jest.spyOn(CheckService, 'getAllFailedChecks').mockImplementationOnce(async () => [
+    spyGetAllFailedChecks.mockImplementationOnce(async () => [
       {
         serviceName: '',
         serviceId: '',
@@ -73,7 +76,7 @@ describe('Failed::', () => {
   it('should render a sum of total failed checks with severity details for editor user', async () => {
     config.bootData.user.isGrafanaAdmin = false;
     config.bootData.user.orgRole = OrgRole.Editor;
-    jest.spyOn(CheckService, 'getAllFailedChecks').mockImplementationOnce(async () => [
+    spyGetAllFailedChecks.mockImplementationOnce(async () => [
       {
         serviceName: '',
         serviceId: '',
@@ -126,7 +129,7 @@ describe('Failed::', () => {
   });
 
   it('should render 0 when the sum of all checks is zero for admin user', async () => {
-    jest.spyOn(CheckService, 'getAllFailedChecks').mockImplementationOnce(async () => [
+    spyGetAllFailedChecks.mockImplementationOnce(async () => [
       {
         serviceName: '',
         serviceId: '',
@@ -176,7 +179,7 @@ describe('Failed::', () => {
   it('should render 0 when the sum of all checks is zero for editor user', async () => {
     config.bootData.user.isGrafanaAdmin = false;
     config.bootData.user.orgRole = OrgRole.Editor;
-    jest.spyOn(CheckService, 'getAllFailedChecks').mockImplementationOnce(async () => [
+    spyGetAllFailedChecks.mockImplementationOnce(async () => [
       {
         serviceName: '',
         serviceId: '',
@@ -223,9 +226,11 @@ describe('Failed::', () => {
     await waitFor(() => expect(screen.getByTestId('db-check-panel-zero-checks')).toBeInTheDocument());
   });
 
-  it('should render a message and no failed checks for viewer user', async () => {
+  it('should render unauthorised message and no failed checks for viewer user', async () => {
     config.bootData.user.isGrafanaAdmin = false;
     config.bootData.user.orgRole = OrgRole.Viewer;
+
+    expect(spyGetAllFailedChecks).not.toHaveBeenCalled();
     render(
       <Provider
         store={configureStore({
