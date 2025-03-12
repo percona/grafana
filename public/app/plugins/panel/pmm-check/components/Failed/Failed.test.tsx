@@ -230,7 +230,6 @@ describe('Failed::', () => {
     config.bootData.user.isGrafanaAdmin = false;
     config.bootData.user.orgRole = OrgRole.Viewer;
 
-    expect(spyGetAllFailedChecks).not.toHaveBeenCalled();
     render(
       <Provider
         store={configureStore({
@@ -245,5 +244,7 @@ describe('Failed::', () => {
     );
 
     await waitFor(() => expect(screen.getByTestId('unauthorized')).toBeInTheDocument());
+
+    expect(spyGetAllFailedChecks).not.toHaveBeenCalled();
   });
 });
