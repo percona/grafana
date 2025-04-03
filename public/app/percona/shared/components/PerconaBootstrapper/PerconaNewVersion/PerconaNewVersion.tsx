@@ -15,7 +15,7 @@ const PerconaNewVersion = ({ isOpen, onDismiss }: PerconaNewVersionProps) => {
       <div data-testid="new-version-modal">
         <span>
           {Messages.description}
-          <a className={styles.link} href={DOCUMENTATION_LINK_URL}>
+          <a className={styles.link} href={DOCUMENTATION_LINK_URL} target="_blank" rel="noreferrer">
             {Messages.seeWhatsNew}
           </a>
         </span>
@@ -23,7 +23,9 @@ const PerconaNewVersion = ({ isOpen, onDismiss }: PerconaNewVersionProps) => {
           <Button type="button" variant="secondary" onClick={onDismiss} className={styles.closeButton}>
             {Messages.close}
           </Button>
-          <LinkButton href={MIGRATION_LINK_URL}>{Messages.viewMigrationGuide}</LinkButton>
+          <LinkButton href={MIGRATION_LINK_URL} target="_blank">
+            {Messages.viewMigrationGuide}
+          </LinkButton>
         </div>
       </div>
     </Modal>
