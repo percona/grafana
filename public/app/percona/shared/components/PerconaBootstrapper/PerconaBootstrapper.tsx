@@ -15,9 +15,7 @@ import {
   fetchUserStatusAction,
   setAuthorized,
 } from 'app/percona/shared/core/reducers/user/user';
-import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
 
 import { Telemetry } from '../../../ui-events/components/Telemetry';
 import usePerconaTour from '../../core/hooks/tour';
@@ -40,9 +38,8 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const { user } = config.bootData;
   const { isSignedIn } = user;
   const theme = useTheme2();
-  const { userId } = useSelector(getPerconaUser);
 
-  const [modalNewVersionShown, setModalNewVersionShown] = useLocalStorage(`${userId}-grafana.pmm3.modalShown`, false);
+  const [modalNewVersionShown, setModalNewVersionShown] = useLocalStorage(`${user.id}-grafana.pmm3.modalShown`, false);
   const dismissModal = () => {
     setModalIsOpen(false);
   };
@@ -110,7 +107,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       <PerconaNavigation />
 
       <PerconaTourBootstrapper />
-      {isSignedIn && userId !== 0 && !modalNewVersionShown ? (
+      {isSignedIn && user.id !== 0 && !modalNewVersionShown ? (
         <PerconaNewVersion isOpen={!modalNewVersionShown} onDismiss={onDismissModalNewVersion} />
       ) : (
         isSignedIn &&
