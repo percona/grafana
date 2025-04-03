@@ -788,7 +788,7 @@ export function getAppRoutes(): RouteDescriptor[] {
         () => import(/* webpackChunkName: "DataTrailsPage"*/ 'app/features/trails/DataTrailsPage')
       ),
     },
-    ...(isPmmAdmin(config.bootData.user) && config.bootData.user.isGrafanaAdmin
+    ...(isPmmAdmin(config.bootData.user)
       ? [
           {
             path: '/pmm-dump',

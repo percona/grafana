@@ -18,7 +18,7 @@ export interface FooterLink {
 
 export let getFooterLinks = (): FooterLink[] => {
   // @PERCONA
-  if (isPmmAdmin(config.bootData.user) && config.bootData.user.isGrafanaAdmin) {
+  if (isPmmAdmin(config.bootData.user)) {
     return [
       {
         id: 'pmm-dump',
