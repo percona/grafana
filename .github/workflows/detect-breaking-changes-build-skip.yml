@@ -28,7 +28,7 @@ jobs:
 
       # Upload artifact (so it can be used in the more privileged "report" workflow)
       - name: Upload check output as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: levitate
           path: levitate/
