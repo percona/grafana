@@ -792,14 +792,12 @@ export function getAppRoutes(): RouteDescriptor[] {
       ? [
           {
             path: '/pmm-dump',
-            roles: () => ['Admin'],
             component: SafeDynamicImport(
               () => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')
             ),
           },
           {
             path: '/pmm-dump/new',
-            roles: () => ['Admin'],
             component: SafeDynamicImport(
               () =>
                 import(
