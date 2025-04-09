@@ -29,17 +29,17 @@ const columns: Array<ExtendedColumn<CheckDetails>> = [
   },
   {
     Header: Messages.disabled,
-    accessor: 'disabled',
+    accessor: 'enabled',
     type: FilterFieldTypes.RADIO_BUTTON,
     label: 'Test',
     options: [
       {
         label: 'Enabled',
-        value: false,
+        value: true,
       },
       {
         label: 'Disabled',
-        value: true,
+        value: false,
       },
     ],
   },
@@ -70,21 +70,21 @@ const data = [
     description: 'Test desctiption 1',
     summary: 'Test summary 1',
     interval: 'interval 1',
-    disabled: false,
+    enabled: true,
   },
   {
     name: 'test2',
     description: 'Test desctiption 2',
     summary: 'Test summary 2',
     interval: 'interval 2',
-    disabled: false,
+    enabled: true,
   },
   {
     name: 'test3',
     description: 'Test desctiption 3',
     summary: 'Test summary 3',
     interval: 'interval 3',
-    disabled: true,
+    enabled: false,
   },
 ];
 
@@ -130,7 +130,7 @@ describe('Filter', () => {
   });
 
   it('should correctly show init data in advance filter fields from url query', async () => {
-    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ disabled: 'true', interval: 'Rare' }));
+    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ enabled: 'false', interval: 'Rare' }));
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
 
     expect(screen.getByText('Rare')).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe('Filter', () => {
   });
 
   it('should show only advance filter fields when only advance filter fields are set', async () => {
-    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ disabled: 'true', interval: 'Rare' }));
+    jest.spyOn(filterUtils, 'getQueryParams').mockImplementation(() => ({ enabled: 'false', interval: 'Rare' }));
     render(<Filter columns={columns} rawData={data} setFilteredData={setFilteredData} hasBackendFiltering={false} />);
 
     expect(screen.queryByText('Name')).not.toBeInTheDocument();
