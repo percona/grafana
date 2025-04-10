@@ -43,7 +43,7 @@ export const Messages = {
     services:
       "Here you can check Services, Agents and Nodes in your PMM's Inventory, and add new instances for monitoring: PostgreSQL, MySQL, MongoDB, HAProxy, etc.",
     settings:
-      'PMM Settings also live here. From there, you can connect your PMM instance to Percona Platform and change more advanced settings, for example to activate PMM Alerting, etc.',
+      'PMM Settings also live here. From there, you can connect your PMM instance to Percona Portal and change more advanced settings, for example to activate PMM Alerting, etc.',
     settingsDocs: 'Documentation for PMM Settings ',
     settingsDocsLink: 'here',
   },
