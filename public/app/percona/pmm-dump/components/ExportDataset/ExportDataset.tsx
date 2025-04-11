@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
-import React, { FC, useState, useEffect, useCallback, useMemo } from 'react';
+import { FC, useState, useEffect, useCallback, useMemo } from 'react';
 import { Field, withTypes } from 'react-final-form';
 import { useHistory } from 'react-router-dom';
 
@@ -27,7 +27,7 @@ import { ExportDatasetProps } from './ExportDataset.types';
 
 const { Form } = withTypes<ExportDatasetProps>();
 
-const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = ({ match }) => {
+const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>> = () => {
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { isLoading, services: fetchedServices } = useSelector(getServices);

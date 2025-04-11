@@ -1,5 +1,4 @@
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
 
 import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
@@ -25,7 +24,7 @@ describe('ServiceChecks', () => {
         {wrapWithGrafanaContextMock(
           <ServiceChecks
             {...getRouteComponentProps({
-              match: { params: { service: '/service_1/' }, isExact: true, path: '', url: '' },
+              queryParams: { service: '/service_1/' },
             })}
           />
         )}
@@ -48,7 +47,7 @@ describe('ServiceChecks', () => {
         {wrapWithGrafanaContextMock(
           <ServiceChecks
             {...getRouteComponentProps({
-              match: { params: { service: '/service_1/' }, isExact: true, path: '', url: '' },
+              queryParams: { service: '/service_1/' },
             })}
           />
         )}
