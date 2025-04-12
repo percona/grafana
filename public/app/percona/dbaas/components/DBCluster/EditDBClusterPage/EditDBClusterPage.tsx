@@ -5,7 +5,9 @@ import { Form } from 'react-final-form';
 import { Redirect, useHistory } from 'react-router-dom';
 
 import { Spinner, useStyles2 } from '@grafana/ui/src';
+import { DefaultDatabaseConfiguration } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/Configurations/Configuration.constants';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
+import { Databases } from 'app/percona/shared/core';
 import { useSelector, useDispatch } from 'app/types';
 
 import { FeatureLoader } from '../../../../shared/components/Elements/FeatureLoader';
@@ -92,6 +94,11 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
             },
             trimConfiguration: ([configuration]: string[], state, { changeValue }) => {
               changeValue(state, ConfigurationFields.configuration, () => configuration.trim());
+            },
+            changeConfiguration: (databaseTypeValue: Databases, state, { changeValue }) => {
+              changeValue(state, ConfigurationFields.configuration, () =>
+                databaseTypeValue ? DefaultDatabaseConfiguration[databaseTypeValue] : ''
+              );
             },
             ...arrayMutators,
           }}
