@@ -4,7 +4,9 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { Redirect, useHistory } from 'react-router-dom';
 
+import { SelectableValue } from '@grafana/data';
 import { Spinner, useStyles2 } from '@grafana/ui/src';
+import { AdvancedOptionsFields } from 'app/percona/dbaas/components/DBCluster/EditDBClusterPage/DBClusterAdvancedOptions/DBClusterAdvancedOptions.types';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { useSelector, useDispatch } from 'app/types';
 
@@ -92,6 +94,9 @@ export const EditDBClusterPage: FC<EditDBClusterPageProps> = () => {
             },
             trimConfiguration: ([configuration]: string[], state, { changeValue }) => {
               changeValue(state, ConfigurationFields.configuration, () => configuration.trim());
+            },
+            resetTemplate: (templateValue: SelectableValue<string>, state, { changeValue }) => {
+              changeValue(state, AdvancedOptionsFields.template, () => templateValue);
             },
             ...arrayMutators,
           }}
