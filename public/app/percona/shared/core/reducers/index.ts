@@ -16,6 +16,7 @@ import { uiEventsReducer } from 'app/percona/ui-events/reducer';
 import { ServerInfo } from '../types';
 
 import advisorsReducers from './advisors/advisors';
+import perconaBackupArtifacts from './backups/backupArtifacts';
 import perconaBackupLocations from './backups/backupLocations';
 import perconaAddDBCluster from './dbaas/addDBCluster/addDBCluster';
 import perconaDBClustersReducer from './dbaas/dbClusters/dbClusters';
@@ -249,6 +250,7 @@ export default {
     templates: templatesReducer,
     services: servicesReducer,
     nodes: nodesReducer,
+    backupArtifacts: perconaBackupArtifacts,
     backupLocations: perconaBackupLocations,
     tour: tourReducer,
     telemetry: uiEventsReducer,
