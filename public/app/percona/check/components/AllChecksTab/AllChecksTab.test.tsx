@@ -8,6 +8,7 @@ import { config, locationService } from '@grafana/runtime';
 import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
+import { Advisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
@@ -138,7 +139,7 @@ describe('AllChecksTab::', () => {
     await waitFor(() => fireEvent.click(button));
 
     expect(runChecksSpy).toBeCalledTimes(1);
-    expect(runChecksSpy).toBeCalledWith({ params: [{ name: 'mongodb_cve_version', disable: true }] });
+    expect(runChecksSpy).toBeCalledWith({ params: [{ name: 'mongodb_cve_version', enable: false }] });
   });
 
   it('should log an error if the run checks API call fails', async () => {
@@ -263,7 +264,7 @@ const navIndex: NavIndex = {
   },
 };
 
-const advisorsArray = [
+const advisorsArray: Advisor[] = [
   {
     name: 'cve_security',
     description: 'Informing users about versions of DBs  affected by CVE.',
@@ -276,8 +277,10 @@ const advisorsArray = [
           'This check returns errors if MongoDB or Percona Server for MongoDB version is less than the latest one with CVE fixes.',
         summary: 'MongoDB CVE Version',
         interval: 'RARE',
+        enabled: true,
       },
     ],
+    comment: '',
   },
   {
     name: 'version_configuration',
@@ -288,7 +291,7 @@ const advisorsArray = [
     checks: [
       {
         name: 'mongodb_version',
-        disabled: true,
+        enabled: false,
         description:
           'This check returns warnings if MongoDB or Percona Server for MongoDB version is not the latest one.',
         summary: 'MongoDB Version',
@@ -296,7 +299,7 @@ const advisorsArray = [
       },
       {
         name: 'mysql_version',
-        disabled: true,
+        enabled: false,
         description:
           'This check returns warnings if MySQL, Percona Server for MySQL, or MariaDB version is not the latest one.',
         summary: 'MySQL Version',
@@ -308,7 +311,9 @@ const advisorsArray = [
           'This check returns warnings if PostgreSQL minor version is not the latest one.\nAdditionally notice is returned if PostgreSQL major version is not the latest one.\nError is returned if the major version of PostgreSQL is 9.4 or older.\n',
         summary: 'PostgreSQL Version',
         interval: 'STANDARD',
+        enabled: true,
       },
     ],
+    comment: '',
   },
 ];
