@@ -1,10 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React, { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
-import { Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom-v5-compat';
 
-import { locationService } from '@grafana/runtime';
-import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
@@ -45,7 +43,7 @@ const AddBackupPageWrapper: FC<PropsWithChildren> = ({ children }) =>
         },
       } as unknown as StoreState)}
     >
-      <Router history={locationService.getHistory()}>{children}</Router>
+      {children}
     </Provider>
   );
 
@@ -53,11 +51,9 @@ describe('AddBackupPage', () => {
   it('should render fields', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: '', id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
 
@@ -66,7 +62,7 @@ describe('AddBackupPage', () => {
     expect(screen.getAllByTestId('service-select-label')).toHaveLength(1);
     const textboxes = screen.getAllByRole('textbox');
     expect(textboxes.filter((textbox) => textbox.tagName === 'INPUT')).toHaveLength(2);
-    expect(screen.queryByTestId('advanced-backup-fields')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('advanced-backup-fields')).toBeNull();
 
     expect(screen.queryByText(Messages.advanceSettings)).toBeInTheDocument();
     expect(screen.queryAllByText('Incremental')).toHaveLength(0);
@@ -76,11 +72,9 @@ describe('AddBackupPage', () => {
   it('should render advanced fields when in schedule mode', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: BackupType.SCHEDULED, id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter initialEntries={[`?type=${BackupType.SCHEDULED}`]}>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
 
@@ -93,11 +87,9 @@ describe('AddBackupPage', () => {
   it('should render backup mode selector when in schedule mode', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: BackupType.SCHEDULED, id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter initialEntries={[`?type=${BackupType.SCHEDULED}`]}>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
     await waitFor(() => expect(screen.getAllByText('Choose')).toHaveLength(2));
@@ -108,11 +100,9 @@ describe('AddBackupPage', () => {
   it('should render demand page backup without params', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: '', id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
 
@@ -123,11 +113,9 @@ describe('AddBackupPage', () => {
   it('should render schedule page backup with schedule params', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: BackupType.SCHEDULED, id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter initialEntries={[`?type=${BackupType.SCHEDULED}`]}>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
 
@@ -138,11 +126,9 @@ describe('AddBackupPage', () => {
   it('should switch page to schedule backup page when click on schedule backup button', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: '', id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
 
@@ -156,11 +142,9 @@ describe('AddBackupPage', () => {
   it('should switch back to demand backup page when click on demand backup button', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: BackupType.SCHEDULED, id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter initialEntries={[`?type=${BackupType.SCHEDULED}`]}>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
 
