@@ -31,7 +31,7 @@ const ExportDataset: FC<GrafanaRouteComponentProps<{ type: string; id: string }>
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { isLoading, services: fetchedServices } = useSelector(getServices);
-  const initialValues = useMemo<Partial<ExportDatasetProps>>(() => ({ load: true, }), [])
+  const initialValues = useMemo<Partial<ExportDatasetProps>>(() => ({ load: true }), []);
 
   const serviceNames = useMemo(
     () =>
