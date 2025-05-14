@@ -54,7 +54,7 @@ describe('PerconaUpdateVersion', () => {
         showUpdateModal: true,
       },
     };
-    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve({ ...changeLogsAPIResponse }));
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve(changeLogsAPIResponse ));
 
     setup(state);
     await waitFor(() => {

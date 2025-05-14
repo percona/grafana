@@ -59,7 +59,7 @@ const PerconaUpdateVersion = () => {
       <Modal
         onDismiss={onDismiss}
         title={Messages.titleOneUpdate}
-        isOpen={showUpdateModal&&( !!!changeLogs|| (changeLogs && changeLogs?.updates?.length <= 1))}
+        isOpen={showUpdateModal&&((changeLogs?.updates?.length || 0) <= 1)}
         className={styles.updateVersionModal}
       >
         <div data-testid="one-update-modal">
