@@ -42,7 +42,7 @@ describe('PerconaUpdateVersion', () => {
   it('should render modal without changelogs', async () => {
     const changeLogsAPIResponse = {
       last_check: '',
-      updates: []
+      updates: [],
     };
     const state = {
       updates: {
@@ -53,7 +53,7 @@ describe('PerconaUpdateVersion', () => {
         showUpdateModal: true,
       },
     };
-    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve(changeLogsAPIResponse ));
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve(changeLogsAPIResponse));
 
     setup(state);
     await waitFor(() => {
