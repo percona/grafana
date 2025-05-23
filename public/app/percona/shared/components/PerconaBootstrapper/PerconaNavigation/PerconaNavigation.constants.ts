@@ -552,9 +552,9 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
     },
     {
       id: 'postgre-summary',
-      text: 'Summary',
+      text: 'Instances',
       icon: 'percona-nav-summary',
-      url: `${config.appSubUrl}/d/postgresql-instance-summary/postgresql-instance-summary`,
+      url: `${config.appSubUrl}/d/postgresql-instances/postgresql-instances`,
       hideFromTabs: true,
     },
   ],
