@@ -20,6 +20,11 @@ export const Messages = {
       pgStatements: 'PG Stat Statements',
       pgMonitor: 'PG Stat Monitor',
     },
+    mongoQuerySourceOptions: {
+      none: 'None',
+      profiler: 'Profiler',
+      mongolog: 'Mongolog',
+    },
     schemaOptions: {
       http: 'HTTP',
       https: 'HTTPS',

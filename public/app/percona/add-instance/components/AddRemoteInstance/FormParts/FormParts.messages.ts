@@ -7,6 +7,7 @@ export const Messages = {
     },
     labels: {
       trackingOptions: 'Stat tracking options',
+      mongoQuerySource: 'Query source',
       externalService: {
         url: 'External service endpoint',
         connectionParameters: 'External service connection parameters',

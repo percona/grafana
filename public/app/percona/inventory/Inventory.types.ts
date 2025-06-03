@@ -40,6 +40,7 @@ export enum AgentType {
   proxysql = 'proxysql',
   proxysqlExporter = 'proxysqlExporter',
   qanMongodb_profiler_agent = 'qan_mongodb_profiler_agent',
+  qanMongodb_mongolog_agent = 'qan_mongodb_mongolog_agent',
   qanMysql_perfschema_agent = 'qan_mysql_perfschema_agent',
   qanMysql_slowlog_agent = 'qan_mysql_slowlog_agent',
   qanPostgresql_pgstatements_agent = 'qan_postgresql_pgstatements_agent',

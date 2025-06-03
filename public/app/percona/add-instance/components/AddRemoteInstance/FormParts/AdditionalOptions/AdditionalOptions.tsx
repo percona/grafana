@@ -10,7 +10,7 @@ import { Databases } from 'app/percona/shared/core';
 import Validators from 'app/percona/shared/helpers/validators';
 import { validators as platformCoreValidators } from 'app/percona/shared/helpers/validatorsForm';
 
-import { rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
+import { mongoQuerySourceOptions, rdsTrackingOptions, trackingOptions } from '../FormParts.constants';
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { AdditionalOptionsFormPartProps, PostgreSQLAdditionalOptionsProps } from '../FormParts.types';
@@ -186,6 +186,23 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
   );
 };
 
+const MongoQuerySourceOptions = ({}: { form: FormApi }) => {
+  const styles = useStyles2(getStyles);
+
+  return (
+    <>
+      <h4>{Messages.form.labels.mongoQuerySource}</h4>
+      <RadioButtonGroupField
+        name="query_source"
+        data-testid="query-source-radio-button-group"
+        options={mongoQuerySourceOptions}
+        className={styles.radioField}
+        fullWidth
+      />
+    </>
+  );
+};
+
 export const getAdditionalOptions = (
   type: InstanceAvailableType,
   remoteInstanceCredentials: RemoteInstanceCredentials,
@@ -270,11 +287,7 @@ export const getAdditionalOptions = (
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
           <MongodbTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
-          <CheckboxField
-            name="qan_mongodb_profiler"
-            data-testid="qan-mongodb-profiler-checkbox"
-            label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
-          />
+          <MongoQuerySourceOptions form={form} />
         </>
       );
     case Databases.haproxy:

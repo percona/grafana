@@ -136,9 +136,9 @@ describe('getAdditionalOptions ::', () => {
 
     expect(screen.getByTestId('tls-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('tls_skip_verify-checkbox-input')).toBeInTheDocument();
-    expect(screen.getByTestId('qan_mongodb_profiler-checkbox-input')).toBeInTheDocument();
+    expect(screen.getByTestId('query_source-radio-state')).toBeInTheDocument();
 
-    expect(fields.length).toBe(3);
+    expect(fields.length).toBe(6);
   });
   it('should render correct for MySQL', async () => {
     const type = Databases.mysql;

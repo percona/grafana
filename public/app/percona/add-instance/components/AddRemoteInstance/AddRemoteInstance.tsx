@@ -24,6 +24,7 @@ import { getInstanceData, remoteToken } from './AddRemoteInstance.tools';
 import {
   AddRemoteInstanceProps,
   FormValues,
+  MongoQuerySourceOptions,
   MSAzurePayload,
   RDSPayload,
   TrackingOptions,
@@ -61,6 +62,10 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
         ? TrackingOptions.pgStatements
         : TrackingOptions.pgMonitor;
     initialValues.disable_comments_parsing = true;
+  }
+
+  if (type === Databases.mongodb) {
+    initialValues.query_source = MongoQuerySourceOptions.none;
   }
 
   const onSubmit = useCallback(

@@ -26,6 +26,7 @@ import {
   ProxySQLPayload,
   MongoDBPayload,
   AddServicePayload,
+  MongoQuerySourceOptions,
 } from './AddRemoteInstance.types';
 
 const BASE_URL = '/services';
@@ -179,6 +180,12 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
   if (type === Databases.mongodb) {
     if (values.tls) {
       data.authentication_mechanism = 'MONGODB-X509';
+    }
+
+    if (data.query_source === MongoQuerySourceOptions.profiler) {
+      data.qan_mongodb_profiler = true;
+    } else if (data.query_source === MongoQuerySourceOptions.mongolog) {
+      data.qan_mongodb_mongolog = true;
     }
   }
 

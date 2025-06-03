@@ -1,7 +1,7 @@
 import { SelectableValue } from '@grafana/data';
 
 import { Messages } from '../AddRemoteInstance.messages';
-import { TrackingOptions } from '../AddRemoteInstance.types';
+import { MongoQuerySourceOptions, TrackingOptions } from '../AddRemoteInstance.types';
 
 import { MetricsParameters, Schema } from './FormParts.types';
 
@@ -24,4 +24,10 @@ export const schemaOptions: SelectableValue[] = [
 export const metricsParametersOptions: SelectableValue[] = [
   { value: MetricsParameters.manually, label: Messages.form.metricsParametersOptions.manually },
   { value: MetricsParameters.parsed, label: Messages.form.metricsParametersOptions.parsed },
+];
+
+export const mongoQuerySourceOptions: SelectableValue[] = [
+  { value: MongoQuerySourceOptions.none, label: Messages.form.mongoQuerySourceOptions.none },
+  { value: MongoQuerySourceOptions.profiler, label: Messages.form.mongoQuerySourceOptions.profiler },
+  { value: MongoQuerySourceOptions.mongolog, label: Messages.form.mongoQuerySourceOptions.mongolog },
 ];

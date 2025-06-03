@@ -4,12 +4,19 @@ export interface FormValues extends RemoteInstanceCredentials {
   qan_mysql_perfschema?: boolean;
   disable_comments_parsing?: boolean;
   tracking?: TrackingOptions;
+  query_source?: MongoQuerySourceOptions;
 }
 
 export enum TrackingOptions {
   none = 'none',
   pgStatements = 'qan_postgresql_pgstatements_agent',
   pgMonitor = 'qan_postgresql_pgstatmonitor_agent',
+}
+
+export enum MongoQuerySourceOptions {
+  none = 'none',
+  profiler = 'qan_mongodb_profiler',
+  mongolog = 'qan_mongodb_mongolog',
 }
 
 export interface InstanceData {
@@ -138,6 +145,7 @@ export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {
   cluster: string;
   replication_set: string;
   qan_mongodb_profiler: boolean;
+  qan_mongodb_mongolog: boolean;
   tls_certificate_key: string;
   tls_certificate_key_file_password: string;
   tls_ca: string;
