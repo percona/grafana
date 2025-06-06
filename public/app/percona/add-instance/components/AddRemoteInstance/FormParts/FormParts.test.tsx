@@ -102,8 +102,12 @@ describe('MainDetailsFormPart ::', () => {
       const form = screen.getByTestId('service-form');
       fireEvent.submit(form);
 
-      await waitFor(() => expect(screen.getByTestId('username-field-error-message')).toHaveTextContent('Required field'));
-      await waitFor(() => expect(screen.getByTestId('password-field-error-message')).toHaveTextContent('Required field'));
+      await waitFor(() =>
+        expect(screen.getByTestId('username-field-error-message')).toHaveTextContent('Required field')
+      );
+      await waitFor(() =>
+        expect(screen.getByTestId('password-field-error-message')).toHaveTextContent('Required field')
+      );
     }
   );
 });
