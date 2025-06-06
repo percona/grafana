@@ -1,10 +1,11 @@
 import { FormApi } from 'final-form';
 
-import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
+import { InstanceAvailableType, InstanceTypes, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
 
 export interface MainDetailsFormPartProps {
   remoteInstanceCredentials: RemoteInstanceCredentials;
   form?: FormApi;
+  type?: '' | InstanceTypes;
 }
 
 export interface FormPartProps {

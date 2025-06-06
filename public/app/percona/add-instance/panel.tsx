@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name,@typescript-eslint/consistent-type-assertions,@typescript-eslint/no-explicit-any */
-import { MouseEventHandler, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom-v5-compat';
+import { MouseEventHandler, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom-v5-compat';
 
 import { PageLayoutType } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
@@ -38,6 +38,7 @@ const availableInstanceTypes: AvailableTypes[] = [
   Databases.mongodb,
   InstanceTypesExtra.external,
   Databases.haproxy,
+  Databases.valkey,
 ];
 
 const AddInstancePanel = () => {
@@ -50,6 +51,8 @@ const AddInstancePanel = () => {
   const [showSelection, setShowSelection] = useState(!instanceType);
   const [submitting, setSubmitting] = useState(false);
   const styles = useStyles2(getStyles);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (submitPromise: Promise<void>) => {
     setSubmitting(true);
@@ -110,6 +113,11 @@ const AddInstancePanel = () => {
     return `Configuring ${INSTANCE_TYPES_LABELS[databaseType]} service`;
   };
 
+  useEffect(() => {
+    // reset selection based on the url to fix browser back button
+    setShowSelection(location.pathname.endsWith('/add-instance'));
+  }, [location.pathname]);
+
   return (
     <Page
       navId={PMM_SERVICES_PAGE.id}
@@ -122,7 +130,7 @@ const AddInstancePanel = () => {
     >
       <PageToolbar
         title={showSelection ? Messages.pageTitleSelection : Messages.pageTitleConfiguration}
-        onGoBack={() => locationService.getHistory().goBack()}
+        onGoBack={() => navigate(-1)}
       >
         <ToolbarButton onClick={handleCancel} variant="canvas">
           {showSelection ? Messages.selectionStep.cancel : Messages.configurationStep.cancel}

@@ -26,6 +26,8 @@ import {
   ProxySQLPayload,
   MongoDBPayload,
   AddServicePayload,
+  ValkeyPayload,
+  AddValkeyResponse,
 } from './AddRemoteInstance.types';
 
 const BASE_URL = '/services';
@@ -76,6 +78,15 @@ class AddRemoteInstanceService {
     );
   }
 
+  static async addValkey(body: ValkeyPayload, token?: CancelToken) {
+    return apiManagement.post<AddValkeyResponse | ErrorResponse, AddServicePayload>(
+      BASE_URL,
+      { valkey: body },
+      false,
+      token
+    );
+  }
+
   static async addRDS(body: RDSPayload, token?: CancelToken) {
     return apiManagement.post<AddRDSResponse | ErrorResponse, AddServicePayload>(BASE_URL, { rds: body }, false, token);
   }
@@ -100,6 +111,8 @@ class AddRemoteInstanceService {
         return AddRemoteInstanceService.addProxysql(toPayload(data, '', type) as ProxySQLPayload, token);
       case Databases.haproxy:
         return AddRemoteInstanceService.addHaproxy(toExternalServicePayload(data), token);
+      case Databases.valkey:
+        return AddRemoteInstanceService.addValkey(toPayload(data, '', type) as ValkeyPayload, token);
       case InstanceTypesExtra.external:
         return AddRemoteInstanceService.addExternal(toExternalServicePayload(data), token);
       default:

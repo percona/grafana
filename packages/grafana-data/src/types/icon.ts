@@ -292,6 +292,7 @@ export const availableIconsIndex = {
   'percona-database-mongodb': true,
   'percona-database-proxysql': true,
   'percona-database-haproxy': true,
+  'percona-database-valkey': true,
   ticket: true,
   clouds: true,
   'percona-bell': true,
