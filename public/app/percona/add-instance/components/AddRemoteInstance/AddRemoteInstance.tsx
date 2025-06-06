@@ -111,7 +111,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
         case Databases.mysql:
           return <MySQLConnectionDetails form={form} remoteInstanceCredentials={remoteInstanceCredentials} />;
         default:
-          return <MainDetails form={form} remoteInstanceCredentials={remoteInstanceCredentials} />;
+          return <MainDetails form={form} type={type} remoteInstanceCredentials={remoteInstanceCredentials} />;
       }
     },
     [remoteInstanceCredentials]

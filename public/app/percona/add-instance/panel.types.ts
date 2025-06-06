@@ -53,6 +53,7 @@ export const INSTANCE_TYPES_LABELS = {
   [Databases.postgresql]: 'PostgreSQL',
   [Databases.proxysql]: 'ProxySQL',
   [Databases.haproxy]: 'HAProxy',
+  [Databases.valkey]: 'Valkey',
   [InstanceTypesExtra.azure]: '',
   [InstanceTypesExtra.rds]: '',
   [InstanceTypesExtra.external]: '',

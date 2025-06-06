@@ -10,14 +10,18 @@ import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { Messages } from '../FormParts.messages';
 import { getStyles } from '../FormParts.styles';
 import { MainDetailsFormPartProps } from '../FormParts.types';
+import { Databases } from 'app/percona/shared/core';
 
-export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, remoteInstanceCredentials }) => {
+export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, remoteInstanceCredentials }) => {
   const styles = useStyles2(getStyles);
   const formValues = form && form.getState().values;
   const tlsFlag = formValues && formValues['tls'];
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
-  const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
+  const userPassValidators = useMemo(
+    () => (tlsFlag || type === Databases.valkey ? [] : [validators.required]),
+    [tlsFlag, type]
+  );
 
   return (
     <div className={styles.groupWrapper}>

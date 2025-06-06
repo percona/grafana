@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FormApi, FormState } from 'final-form';
 import { Form } from 'react-final-form';
 import { Provider } from 'react-redux';
@@ -11,6 +11,7 @@ import { ExternalServiceConnectionDetails } from './ExternalServiceConnectionDet
 import { trackingOptions, rdsTrackingOptions } from './FormParts.constants';
 import { LabelsFormPart } from './Labels/Labels';
 import { MainDetailsFormPart } from './MainDetails/MainDetails';
+import { instanceList } from '../../AddInstance/AddInstance.constants';
 
 jest.mock('app/percona/inventory/Inventory.service');
 
@@ -60,6 +61,51 @@ describe('MainDetailsFormPart ::', () => {
     expect(screen.getByTestId('username-text-input')).not.toBeDisabled();
     expect(screen.getByTestId('password-password-input')).not.toBeDisabled();
   });
+
+  it('username and password should be optional for valkey', async () => {
+    render(
+      <Provider store={configureStore()}>
+        <Form
+          onSubmit={jest.fn()}
+          render={({ form, handleSubmit }) => (
+            <form data-testid="valkey-form" onSubmit={handleSubmit}>
+              <MainDetailsFormPart form={form} type={Databases.valkey} remoteInstanceCredentials={{}} />
+            </form>
+          )}
+        />
+      </Provider>
+    );
+
+    const form = screen.getByTestId('valkey-form');
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(screen.getByTestId('username-field-error-message')).toHaveTextContent(''));
+    await waitFor(() => expect(screen.getByTestId('password-field-error-message')).toHaveTextContent(''));
+  });
+
+  fit.each(instanceList.filter((i) => i.type !== Databases.valkey))(
+    'username and password field should be required for other service types',
+    async (service) => {
+      render(
+        <Provider store={configureStore()}>
+          <Form
+            onSubmit={jest.fn()}
+            render={({ form, handleSubmit }) => (
+              <form data-testid="service-form" onSubmit={handleSubmit}>
+                <MainDetailsFormPart form={form} type={service.type} remoteInstanceCredentials={{}} />
+              </form>
+            )}
+          />
+        </Provider>
+      );
+
+      const form = screen.getByTestId('service-form');
+      fireEvent.submit(form);
+
+      await waitFor(() => expect(screen.getByTestId('username-field-error-message')).toHaveTextContent('Required field'));
+      await waitFor(() => expect(screen.getByTestId('password-field-error-message')).toHaveTextContent('Required field'));
+    }
+  );
 });
 
 describe('ExternalServiceConnectionDetails ::', () => {

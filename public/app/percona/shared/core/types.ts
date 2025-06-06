@@ -5,6 +5,7 @@ export enum Databases {
   mariadb = 'mariadb',
   proxysql = 'proxysql',
   haproxy = 'haproxy',
+  valkey = 'valkey',
 }
 
 export enum ApiErrorCode {

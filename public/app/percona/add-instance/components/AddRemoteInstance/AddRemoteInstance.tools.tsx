@@ -142,6 +142,10 @@ export const getInstanceData = (instanceType: InstanceAvailableType, credentials
         instance.instanceType = INSTANCE_TYPES_LABELS[Databases.haproxy];
         instance.remoteInstanceCredentials.port = DEFAULT_PORTS[Databases.haproxy];
         break;
+      case Databases.valkey:
+        instance.instanceType = INSTANCE_TYPES_LABELS[Databases.valkey];
+        instance.remoteInstanceCredentials.port = DEFAULT_PORTS[Databases.valkey];
+        break;
       default:
         logger.error('Not implemented');
     }
