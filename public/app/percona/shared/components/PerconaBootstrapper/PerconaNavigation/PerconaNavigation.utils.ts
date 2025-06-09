@@ -25,6 +25,7 @@ import {
   PMM_UPDATES_LINK,
   PMM_ALERTING_FIRED_ALERTS,
   PMM_ALERTING_PERCONA_ALERTS,
+  PMM_NAV_VALKEY,
 } from './PerconaNavigation.constants';
 
 export const buildIntegratedAlertingMenuItem = (mainLinks: NavModelItem[]): NavModelItem | undefined => {
@@ -207,6 +208,7 @@ export const addDashboardsLinks = (items: NavModelItem[]) => {
   items.push(PMM_NAV_POSTGRE);
   items.push(PMM_NAV_PROXYSQL);
   items.push(PMM_NAV_HAPROXY);
+  items.push(PMM_NAV_VALKEY);
 };
 
 export const sortNavigation = (items: NavModelItem[]) => {
