@@ -608,6 +608,6 @@ export const PMM_NAV_VALKEY: NavModelItem = {
       text: 'Sentinel Cluster',
       url: `${config.appSubUrl}/d/valkey-sentinel/valkey-redis-sentinel-cluster`,
       hideFromTabs: true,
-    }
-  ]
+    },
+  ],
 };
