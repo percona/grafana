@@ -37,6 +37,7 @@ const alwaysMonoIcons: IconName[] = [
   'percona-database-mongodb',
   'percona-database-proxysql',
   'percona-database-haproxy',
+  'percona-database-valkey',
   'percona-asterisk',
   'pmm-logo',
   'qan-logo',

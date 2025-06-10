@@ -149,6 +149,16 @@ export interface MongoDBPayload extends RemoteCommonPayload, TLSCommon {
   max_query_length: number;
 }
 
+export interface ValkeyPayload extends RemoteCommonPayload, TLSCommon {
+  node_id: string;
+  add_node: AddNode;
+  port: number;
+  socket: string;
+  pmm_agent_id: string;
+  cluster: string;
+  replication_set: string;
+}
+
 export interface HaProxyPayload extends RemoteCommonPayload {
   node_id: string;
   add_node: AddNode;
@@ -219,6 +229,7 @@ export type RemoteInstancePayload =
   | ProxySQLPayload
   | PostgreSQLPayload
   | MongoDBPayload
+  | ValkeyPayload
   | ExternalPayload;
 
 export type AddServicePayload = {
@@ -229,6 +240,7 @@ export type AddServicePayload = {
   haproxy?: HaProxyPayload;
   external?: ExternalPayload;
   rds?: RDSPayload;
+  valkey?: ValkeyPayload;
 };
 
 export interface ErrorResponse {
@@ -324,6 +336,15 @@ interface MongoDbExporter extends BaseExporter {
   listen_port: number;
 }
 
+interface ValkeyExporter extends BaseExporter {
+  push_metrics_enabled: boolean;
+  disabled_collectors: string[];
+  listen_port: number;
+  process_exec_path: string;
+  expose_exporter: boolean;
+  metrics_resolutions: null;
+}
+
 export interface MySQLInstanceResponse {
   service: ExtendedService;
   mysqld_exporter: MySQLExporter;
@@ -364,6 +385,13 @@ export interface AddMongoDbResponse {
   service: ExtendedService;
   mongodb_exporter: MongoDbExporter;
   qan_mongodb_profiler: BaseExporter;
+}
+
+export interface AddValkeyResponse {
+  valkey: {
+    service: ExtendedService;
+  };
+  valkey_exporter: ValkeyExporter;
 }
 
 export interface AddRDSResponse {

@@ -248,6 +248,7 @@ export const NAV_FOLDER_MAP: Record<string, string> = {
   mysql: 'MySQL',
   mongo: 'MongoDB',
   postgre: 'PostgreSQL',
+  valkey: 'Valkey',
 };
 
 export const NAV_ID_TO_SERVICE: Record<string, ServiceType> = {
@@ -256,6 +257,7 @@ export const NAV_ID_TO_SERVICE: Record<string, ServiceType> = {
   postgre: ServiceType.posgresql,
   proxysql: ServiceType.proxysql,
   haproxy: ServiceType.haproxy,
+  valkey: ServiceType.valkey,
 };
 
 // 5 mins
@@ -585,4 +587,27 @@ export const PMM_NAV_QAN: NavModelItem = {
   url: `${config.appSubUrl}/d/pmm-qan/pmm-query-analytics`,
   sortWeight: WEIGHTS.dashboards,
   hideFromTabs: true,
+};
+
+export const PMM_NAV_VALKEY: NavModelItem = {
+  id: 'valkey',
+  text: 'Valkey',
+  icon: 'percona-database-valkey',
+  url: `${config.appSubUrl}/d/valkey-cluster/valkey-redis-cluster`,
+  sortWeight: WEIGHTS.dashboards,
+  hideFromTabs: true,
+  children: [
+    {
+      id: 'valkey-cluster',
+      text: 'Cluster',
+      url: `${config.appSubUrl}/d/valkey-cluster/valkey-redis-cluster`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-sentinel',
+      text: 'Sentinel Cluster',
+      url: `${config.appSubUrl}/d/valkey-sentinel/valkey-redis-sentinel-cluster`,
+      hideFromTabs: true,
+    },
+  ],
 };

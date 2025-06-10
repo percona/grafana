@@ -10,6 +10,7 @@ export enum ServiceType {
   proxysql = 'SERVICE_TYPE_PROXYSQL_SERVICE',
   haproxy = 'SERVICE_TYPE_HAPROXY_SERVICE',
   external = 'SERVICE_TYPE_EXTERNAL_SERVICE',
+  valkey = 'SERVICE_TYPE_VALKEY_SERVICE',
 }
 
 export enum ServiceStatus {
