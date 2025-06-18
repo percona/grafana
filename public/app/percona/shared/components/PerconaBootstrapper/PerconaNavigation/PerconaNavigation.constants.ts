@@ -571,7 +571,7 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
           url: `${config.appSubUrl}/d/postgresql-replication-overview/postgresql-replication-overview`,
           hideFromTabs: true,
         },
-        // todo: add in after top queries is merged
+        // todo: add in after patroni is merged
         // {
         //   id: 'postgre-patroni',
         //   text: 'Patroni',
