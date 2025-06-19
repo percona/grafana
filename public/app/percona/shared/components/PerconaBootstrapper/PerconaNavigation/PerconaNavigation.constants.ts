@@ -571,14 +571,13 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
           url: `${config.appSubUrl}/d/postgresql-replication-overview/postgresql-replication-overview`,
           hideFromTabs: true,
         },
-        // todo: add in after patroni is merged
-        // {
-        //   id: 'postgre-patroni',
-        //   text: 'Patroni',
-        //   icon: 'percona-cluster',
-        //   url: `${config.appSubUrl}/d/postgresql-patroni-details/postgresql-patroni-details`,
-        //   hideFromTabs: true,
-        // },
+        {
+          id: 'postgre-patroni',
+          text: 'Patroni',
+          icon: 'percona-cluster',
+          url: `${config.appSubUrl}/d/postgresql-patroni-details/postgresql-patroni-details`,
+          hideFromTabs: true,
+        },
       ],
     },
     {
