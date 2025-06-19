@@ -581,13 +581,12 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
         // },
       ],
     },
-    // todo: add in after top queries is merged
-    // {
-    //   id: 'postgre-top-queries',
-    //   text: 'Top queries',
-    //   url: `${config.appSubUrl}/d/postgresql-top-queries/postgresql-top-queries`,
-    //   hideFromTabs: true,
-    // },
+    {
+      id: 'postgre-top-queries',
+      text: 'Top queries',
+      url: `${config.appSubUrl}/d/postgresql-top-queries/postgresql-top-queries`,
+      hideFromTabs: true,
+    },
   ],
 };
 
