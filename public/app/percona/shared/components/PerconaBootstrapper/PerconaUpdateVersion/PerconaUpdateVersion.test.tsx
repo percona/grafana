@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
 import { Provider } from 'react-redux';
 import { waitFor } from 'test/test-utils';
 
@@ -38,6 +37,31 @@ describe('PerconaUpdateVersion', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('should render modal without changelogs', async () => {
+    const changeLogsAPIResponse = {
+      last_check: '',
+      updates: [],
+    };
+    const state = {
+      updates: {
+        isLoading: false,
+        updateAvailable: true,
+        latest: { version: '3.0.1' },
+        lastChecked: '',
+        showUpdateModal: true,
+      },
+    };
+    jest.spyOn(UpdatesService, 'getUpdatesChangelogs').mockReturnValue(Promise.resolve(changeLogsAPIResponse));
+
+    setup(state);
+    await waitFor(() => {
+      expect(checkUpdatesChangeLogsSpy).toHaveBeenCalled();
+    });
+
+    expect(screen.queryByTestId('one-update-modal')).toBeInTheDocument();
+    expect(screen.queryByTestId('multiple-updates-modal')).not.toBeInTheDocument();
   });
 
   it('should render modal with one update', async () => {

@@ -1,11 +1,16 @@
+import { Observable, of } from 'rxjs';
+
 import {
+  DataQuery,
+  DataQueryRequest,
+  DataQueryResponse,
   DataSourceApi,
   DataSourceInstanceSettings,
   DataSourcePlugin,
   DataSourcePluginMeta,
   ScopedVars,
 } from '@grafana/data';
-import { TemplateSrv } from '@grafana/runtime';
+import { RuntimeDataSource, TemplateSrv } from '@grafana/runtime';
 import { ExpressionDatasourceRef } from '@grafana/runtime/src/utils/DataSourceWithBackend';
 import { DatasourceSrv, getNameOrUid } from 'app/features/plugins/datasource_srv';
 
@@ -48,6 +53,12 @@ const templateSrv = {
 
 class TestDataSource {
   constructor(public instanceSettings: DataSourceInstanceSettings) {}
+}
+
+class TestRuntimeDataSource extends RuntimeDataSource {
+  query(request: DataQueryRequest<DataQuery>): Promise<DataQueryResponse> | Observable<DataQueryResponse> {
+    return of({ data: [] });
+  }
 }
 
 jest.mock('../plugin_loader', () => ({
@@ -135,9 +146,35 @@ describe('datasource_srv', () => {
       name: 'TestData',
       meta: { metrics: true, id: 'grafana-testdata-datasource', aliasIDs: ['testdata'] },
     },
+    Prometheus: {
+      type: 'prometheus',
+      name: 'Prometheus',
+      uid: 'uid-code-prometheus',
+      meta: { metrics: true, id: 'prometheus' },
+    },
+    AmazonPrometheus: {
+      type: 'grafana-amazonprometheus-datasource',
+      name: 'Amazon Prometheus',
+      uid: 'uid-code-amp',
+      meta: { metrics: true, id: 'grafana-amazonprometheus-datasource' },
+    },
+    AzurePrometheus: {
+      type: 'grafana-azureprometheus-datasource',
+      name: 'Azure Prometheus',
+      uid: 'uid-code-azp',
+      meta: { metrics: true, id: 'grafana-azureprometheus-datasource' },
+    },
   };
 
   describe('Given a list of data sources', () => {
+    const runtimeDataSource = new TestRuntimeDataSource('grafana-runtime-datasource', 'uuid-runtime-ds');
+
+    beforeAll(() => {
+      dataSourceSrv.registerRuntimeDataSource({
+        dataSource: runtimeDataSource,
+      });
+    });
+
     beforeEach(() => {
       dataSourceSrv.init(dataSourceInit as any, 'BBB');
     });
@@ -251,6 +288,16 @@ describe('datasource_srv', () => {
         expect(exprWithName?.uid).toBe(ExpressionDatasourceRef.uid);
         expect(exprWithName?.type).toBe(ExpressionDatasourceRef.type);
       });
+
+      it('should return settings for runtime datasource when called with uid', () => {
+        const settings = dataSourceSrv.getInstanceSettings(runtimeDataSource.uid);
+        expect(settings).toBe(runtimeDataSource.instanceSettings);
+      });
+
+      it('should not return settings for runtime datasource when called with name', () => {
+        const settings = dataSourceSrv.getInstanceSettings(runtimeDataSource.name);
+        expect(settings).toBe(undefined);
+      });
     });
 
     describe('when loading datasource', () => {
@@ -279,7 +326,7 @@ describe('datasource_srv', () => {
     describe('when getting external metric sources', () => {
       it('should return list of explore sources', () => {
         const externalSources = dataSourceSrv.getExternal();
-        expect(externalSources.length).toBe(8);
+        expect(externalSources.length).toBe(11);
       });
     });
 
@@ -297,6 +344,11 @@ describe('datasource_srv', () => {
       expect(list[2].name).toBe('${datasource}');
     });
 
+    it('Should filter out the -- Grafana -- datasource', () => {
+      const list = dataSourceSrv.getList({ filter: (x) => x.name !== '-- Grafana --' });
+      expect(list.find((x) => x.name === '-- Grafana --')).toBeUndefined();
+    });
+
     it('Can get list of data sources with tracing: true', () => {
       const list = dataSourceSrv.getList({ tracing: true });
       expect(list[0].name).toBe('Jaeger');
@@ -307,10 +359,39 @@ describe('datasource_srv', () => {
       expect(list[0].name).toBe('mmm');
     });
 
-    it('Can get get list and filter by pluginId', () => {
-      const list = dataSourceSrv.getList({ pluginId: 'jaeger' });
-      expect(list[0].name).toBe('Jaeger');
-      expect(list.length).toBe(1);
+    describe('get list filtered by plugin Id', () => {
+      it('should list all data sources for specified plugin id', () => {
+        const list = dataSourceSrv.getList({ pluginId: 'jaeger' });
+        expect(list.length).toBe(1);
+        expect(list[0].name).toBe('Jaeger');
+      });
+
+      it('should include Prometheus flavor data sources when pluginId is prometheus', () => {
+        const list = dataSourceSrv.getList({ pluginId: 'prometheus' });
+        expect(list.length).toBe(3);
+        expect(list[0].name).toBe('Amazon Prometheus');
+        expect(list[0].type).toBe('grafana-amazonprometheus-datasource');
+        expect(list[1].name).toBe('Azure Prometheus');
+        expect(list[1].type).toBe('grafana-azureprometheus-datasource');
+        expect(list[2].name).toBe('Prometheus');
+        expect(list[2].type).toBe('prometheus');
+      });
+
+      it('should include compatible Prometheus data sources when pluginId is a flavor of prometheus', () => {
+        const list = dataSourceSrv.getList({ pluginId: 'grafana-amazonprometheus-datasource' });
+        expect(list.length).toBe(3);
+        expect(list[0].name).toBe('Amazon Prometheus');
+        expect(list[0].type).toBe('grafana-amazonprometheus-datasource');
+        expect(list[1].name).toBe('Azure Prometheus');
+        expect(list[1].type).toBe('grafana-azureprometheus-datasource');
+        expect(list[2].name).toBe('Prometheus');
+        expect(list[2].type).toBe('prometheus');
+      });
+
+      it('should not include runtime datasources in list', () => {
+        const list = dataSourceSrv.getList({ pluginId: 'grafana-runtime-datasource' });
+        expect(list.length).toBe(0);
+      });
     });
 
     it('Can get get list and filter by an alias', () => {
@@ -329,6 +410,24 @@ describe('datasource_srv', () => {
             "name": "aaa",
             "type": "test-db",
             "uid": "uid-code-aaa",
+          },
+          {
+            "meta": {
+              "id": "grafana-amazonprometheus-datasource",
+              "metrics": true,
+            },
+            "name": "Amazon Prometheus",
+            "type": "grafana-amazonprometheus-datasource",
+            "uid": "uid-code-amp",
+          },
+          {
+            "meta": {
+              "id": "grafana-azureprometheus-datasource",
+              "metrics": true,
+            },
+            "name": "Azure Prometheus",
+            "type": "grafana-azureprometheus-datasource",
+            "uid": "uid-code-azp",
           },
           {
             "isDefault": true,
@@ -355,6 +454,15 @@ describe('datasource_srv', () => {
             "name": "mmm",
             "type": "test-db",
             "uid": "uid-code-mmm",
+          },
+          {
+            "meta": {
+              "id": "prometheus",
+              "metrics": true,
+            },
+            "name": "Prometheus",
+            "type": "prometheus",
+            "uid": "uid-code-prometheus",
           },
           {
             "meta": {
@@ -410,20 +518,58 @@ describe('datasource_srv', () => {
       `);
     });
 
-    it('Should reload the datasource', async () => {
-      // arrange
-      getBackendSrvGetMock.mockReturnValueOnce({
-        datasources: {
-          ...dataSourceInit,
-        },
-        defaultDatasource: 'aaa',
+    describe('when calling reload', () => {
+      it('should reload the datasource list', async () => {
+        // arrange
+        getBackendSrvGetMock.mockReturnValueOnce({
+          datasources: {
+            ...dataSourceInit,
+          },
+          defaultDatasource: 'aaa',
+        });
+        const initMock = jest.spyOn(dataSourceSrv, 'init').mockImplementation(() => {});
+        // act
+        await dataSourceSrv.reload();
+        // assert
+        expect(getBackendSrvGetMock).toHaveBeenCalledWith('/api/frontend/settings');
+        expect(initMock).toHaveBeenCalledWith(dataSourceInit, 'aaa');
       });
-      const initMock = jest.spyOn(dataSourceSrv, 'init').mockImplementation(() => {});
-      // act
-      await dataSourceSrv.reload();
-      // assert
-      expect(getBackendSrvGetMock).toHaveBeenCalledWith('/api/frontend/settings');
-      expect(initMock).toHaveBeenCalledWith(dataSourceInit, 'aaa');
+
+      it('should still be possible to get registered runtime data source', async () => {
+        getBackendSrvGetMock.mockReturnValueOnce({
+          datasources: {
+            ...dataSourceInit,
+          },
+          defaultDatasource: 'aaa',
+        });
+
+        await dataSourceSrv.reload();
+        const ds = await dataSourceSrv.get(runtimeDataSource.getRef());
+        expect(ds).toBe(runtimeDataSource);
+      });
+    });
+
+    describe('when registering runtime datasources', () => {
+      it('should have registered a runtime datasource', async () => {
+        const ds = await dataSourceSrv.get(runtimeDataSource.getRef());
+        expect(ds).toBe(runtimeDataSource);
+      });
+
+      it('should throw when trying to re-register a runtime datasource', () => {
+        expect(() =>
+          dataSourceSrv.registerRuntimeDataSource({
+            dataSource: runtimeDataSource,
+          })
+        ).toThrow();
+      });
+
+      it('should throw when trying to register a runtime datasource with the same uid as an "regular" datasource', async () => {
+        expect(() =>
+          dataSourceSrv.registerRuntimeDataSource({
+            dataSource: new TestRuntimeDataSource('grafana-runtime-datasource', 'uid-code-Jaeger'),
+          })
+        ).toThrow();
+      });
     });
   });
 

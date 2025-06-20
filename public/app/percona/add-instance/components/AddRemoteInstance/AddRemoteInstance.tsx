@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 /* eslint-disable @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any */
 import { FormApi } from 'final-form';
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Form as FormFinal } from 'react-final-form';
 
 import { AppEvents } from '@grafana/data';
@@ -122,14 +122,12 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
       <>
         <ConnectionDetails form={form} type={type} />
         <Labels />
-        {type !== InstanceTypesExtra.external && (
-          <AdditionalOptions
-            remoteInstanceCredentials={remoteInstanceCredentials}
-            loading={loading}
-            instanceType={type}
-            form={form}
-          />
-        )}
+        <AdditionalOptions
+          remoteInstanceCredentials={remoteInstanceCredentials}
+          loading={loading}
+          instanceType={type}
+          form={form}
+        />
       </>
     ),
     [ConnectionDetails, loading, remoteInstanceCredentials, type]

@@ -21,9 +21,9 @@ weight: 600
 refs:
   state-history:
     - pattern: /docs/grafana/
-      destination: /docs/grafana/<GRAFANA_VERSION>/alerting/manage-notifications/view-state-health/
+      destination: /docs/grafana/<GRAFANA_VERSION>/alerting/monitor-status/view-alert-state-history/
     - pattern: /docs/grafana-cloud/
-      destination: /docs/grafana-cloud/alerting-and-irm/alerting/manage-notifications/view-state-health/
+      destination: /docs/grafana-cloud/alerting-and-irm/alerting/monitor-status/view-alert-state-history/
   meta-monitoring:
     - pattern: /docs/grafana/
       destination: /docs/grafana/<GRAFANA_VERSION>/alerting/monitor/
@@ -96,12 +96,15 @@ For a demo, see this [example using Docker Compose](https://github.com/grafana/a
 
    ```yaml
    ports:
-     - containerPort: 3000
-       name: http-grafana
+     - name: grafana
+       containerPort: 3000
        protocol: TCP
-     - containerPort: 9094
-       name: grafana-alert
+     - name: gossip-tcp
+       containerPort: 9094
        protocol: TCP
+     - name: gossip-udp
+       containerPort: 9094
+       protocol: UDP
    ```
 
 1. Add the environment variables to the Grafana deployment:
@@ -145,6 +148,7 @@ For a demo, see this [example using Docker Compose](https://github.com/grafana/a
    ha_peers = "grafana-alerting.grafana:9094"
    ha_advertise_address = "${POD_IP}:9094"
    ha_peer_timeout = 15s
+   ha_reconnect_timeout = 2m
    ```
 
 ## Verify your high availability setup

@@ -51,6 +51,7 @@ export interface ThemeComponents {
   };
   table: {
     rowHoverBackground: string;
+    rowSelected: string;
   };
 }
 
@@ -79,10 +80,10 @@ export function createComponents(colors: ThemeColors, shadows: ThemeShadows): Th
     input,
     panel,
     dropdown: {
-      background: input.background,
+      background: colors.background.elevated,
     },
     tooltip: {
-      background: colors.background.secondary,
+      background: colors.background.elevated,
       text: colors.text.primary,
     },
     dashboard: {
@@ -90,13 +91,13 @@ export function createComponents(colors: ThemeColors, shadows: ThemeShadows): Th
       padding: 1,
     },
     overlay: {
-      background: colors.mode === 'dark' ? 'rgba(63, 62, 62, 0.45)' : 'rgba(208, 209, 211, 0.24)',
+      background: colors.mode === 'dark' ? 'rgba(63, 62, 62, 0.5)' : 'rgba(208, 209, 211, 0.5)',
     },
     sidemenu: {
       width: 57,
     },
     menuTabs: {
-      height: 42,
+      height: 5,
     },
     textHighlight: {
       text: colors.warning.contrastText,
@@ -106,7 +107,8 @@ export function createComponents(colors: ThemeColors, shadows: ThemeShadows): Th
       defaultHeight: 400,
     },
     table: {
-      rowHoverBackground: colors.emphasize(colors.background.primary, 0.03),
+      rowHoverBackground: colors.action.hover,
+      rowSelected: colors.action.selected,
     },
   };
 }
