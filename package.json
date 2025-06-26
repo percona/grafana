@@ -327,7 +327,7 @@
     "dangerously-set-html-content": "1.0.9",
     "date-fns": "2.29.1",
     "debounce-promise": "3.1.2",
-    "dompurify": "^2.4.1",
+    "dompurify": "^2.4.2",
     "emotion": "11.0.0",
     "eventemitter3": "4.0.7",
     "fast-deep-equal": "^3.1.3",
@@ -438,7 +438,8 @@
     "@storybook/react/webpack": "5.74.0",
     "ngtemplate-loader/loader-utils": "^2.0.0",
     "node-fetch": "2.6.7",
-    "slate-dev-environment@^0.2.2": "patch:slate-dev-environment@npm:0.2.5#.yarn/patches/slate-dev-environment-npm-0.2.5-9aeb7da7b5.patch"
+    "slate-dev-environment@^0.2.2": "patch:slate-dev-environment@npm:0.2.5#.yarn/patches/slate-dev-environment-npm-0.2.5-9aeb7da7b5.patch",
+    "protobufjs": ">=6.11.4"
   },
   "workspaces": {
     "packages": [
