@@ -615,3 +615,13 @@ export const PMM_NAV_QAN: NavModelItem = {
   sortWeight: WEIGHTS.dashboards,
   hideFromTabs: true,
 };
+
+export const AI_CHAT_DEMO_PAGE: NavModelItem = {
+  id: 'ai-chat-demo',
+  icon: 'ai',
+  text: 'AI Chat Demo',
+  url: '/pmm-ui/ai-chat',
+  subTitle: 'AI Chat Demo',
+  sortWeight: WEIGHTS.dashboards,
+  hideFromTabs: true,
+};

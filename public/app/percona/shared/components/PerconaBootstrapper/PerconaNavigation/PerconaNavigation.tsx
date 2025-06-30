@@ -36,6 +36,7 @@ import {
   PMM_TICKETS_PAGE,
   PMM_DUMP_PAGE,
   PMM_EXPORT_DUMP_PAGE,
+  AI_CHAT_DEMO_PAGE,
 } from './PerconaNavigation.constants';
 import {
   addAccessRolesLink,
@@ -97,6 +98,9 @@ const PerconaNavigation: FC = () => {
 
     // QAN
     updatedNavTree.push(PMM_NAV_QAN);
+
+    // Add AI Chat Demo after QAN
+    updatedNavTree.push(AI_CHAT_DEMO_PAGE);
 
     if (isPlatformUser) {
       updatedNavTree.push(PMM_ENTITLEMENTS_PAGE);
