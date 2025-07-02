@@ -33,12 +33,17 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const dispatch = useAppDispatch();
   const { setSteps, startTour: startPerconaTour, endTour } = usePerconaTour();
   const [modalIsOpen, setModalIsOpen] = useState(true);
-  const [showTour, setShowTour] = useState(false);
-  const styles = useStyles2(getStyles);
   const { user } = config.bootData;
+  const [showTour, setShowTour] = useState(false);
+  const [showTourFlag, setShowTourFlag] = useLocalStorage<boolean>(`${user.id}-percona.showTour`, !navigator.webdriver);
+  const styles = useStyles2(getStyles);
+
   const { isSignedIn } = user;
   const theme = useTheme2();
-  const [modalNewVersionShown, setModalNewVersionShown] = useLocalStorage(`${user.id}-grafana.pmm3.modalShown`, true);
+  const [modalNewVersionShown, setModalNewVersionShown] = useLocalStorage(
+    `${user.id}-grafana.pmm3.modalShown`,
+    !navigator.webdriver
+  );
 
   const dismissModal = () => {
     setModalIsOpen(false);
@@ -47,6 +52,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const finishTour = () => {
     setModalIsOpen(false);
     setShowTour(false);
+    setShowTourFlag(false);
     endTour(TourType.Product);
   };
 
@@ -74,6 +80,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
         setShowTour(!details.productTourCompleted);
       } catch (e) {
         setShowTour(false);
+        setShowTourFlag(false);
       }
     };
 
@@ -95,7 +102,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     } else {
       onReady();
     }
-  }, [dispatch, isSignedIn, setSteps, onReady, user]);
+  }, [dispatch, isSignedIn, setSteps, onReady, user, setShowTour, setShowTourFlag]);
 
   const onDismissModalNewVersion = () => {
     setModalNewVersionShown(false);
@@ -110,7 +117,8 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
         <PerconaNewVersion isOpen={modalNewVersionShown} onDismiss={onDismissModalNewVersion} />
       ) : (
         isSignedIn &&
-        showTour && (
+        showTour &&
+        showTourFlag && (
           <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title={Messages.title}>
             <div className={styles.iconContainer}>
               <Icon type="mono" name={theme.isLight ? 'pmm-logo-light' : 'pmm-logo'} className={styles.svg} />
