@@ -624,4 +624,5 @@ export const AI_CHAT_DEMO_PAGE: NavModelItem = {
   subTitle: 'AI Chat Demo',
   sortWeight: WEIGHTS.dashboards,
   hideFromTabs: true,
+  target: '_self',
 };
