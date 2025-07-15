@@ -32,7 +32,9 @@ describe('EditInstance::', () => {
     await waitFor(() => expect(screen.queryByLabelText('Cluster')).toHaveValue(stubWithLabels.cluster));
     await waitFor(() => expect(screen.queryByLabelText('Replication set')).toHaveValue(stubWithLabels.replication_set));
     await waitFor(() =>
-      expect(screen.queryByLabelText('Custom labels')).toHaveValue(CustomLabelsUtils.fromPayload(stubWithLabels.custom_labels))
+      expect(screen.queryByLabelText('Custom labels')).toHaveValue(
+        CustomLabelsUtils.fromPayload(stubWithLabels.custom_labels)
+      )
     );
   });
 });
