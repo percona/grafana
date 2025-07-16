@@ -129,6 +129,7 @@ describe('getExtraLabels', () => {
       mongo: 'value',
       mysql: 'value',
       postgresql: 'value',
+      valkey: 'value',
     });
   });
 });
