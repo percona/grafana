@@ -14,4 +14,5 @@ export const AGENT_LABELS_SKIP_KEYS: string[] = [
   'mongo_db_options',
   'mysql_options',
   'postgresql_options',
+  'valkey_options',
 ];
