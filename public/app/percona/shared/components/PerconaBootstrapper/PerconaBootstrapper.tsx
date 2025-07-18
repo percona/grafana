@@ -30,6 +30,7 @@ import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
 import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 import PerconaTourBootstrapper from './PerconaTour';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
+import { isPmmNavEnabled } from '../../helpers/plugin';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
@@ -117,10 +118,11 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     <>
       {isSignedIn && <Telemetry />}
       <PerconaNavigation />
-      <PerconaTourBootstrapper />
+      {!isPmmNavEnabled() && <PerconaTourBootstrapper />}
       {updateAvailable && showUpdateModal && !isLoadingUpdates ? (
         <PerconaUpdateVersion />
       ) : (
+        !isPmmNavEnabled() &&
         isSignedIn &&
         showTour && (
           <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title={Messages.title}>
