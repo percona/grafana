@@ -5,13 +5,11 @@ import { useAsync } from 'react-use';
 import { GrafanaTheme2, ScopedVars } from '@grafana/data';
 import { sanitize, sanitizeUrl } from '@grafana/data/src/text/sanitize';
 import { selectors } from '@grafana/e2e-selectors';
-import { config } from '@grafana/runtime';
 import { DashboardLink } from '@grafana/schema';
 import { Dropdown, Icon, Button, Menu, ScrollContainer, useStyles2 } from '@grafana/ui';
 import { ButtonLinkProps, LinkButton } from '@grafana/ui/src/components/Button';
 import { getBackendSrv } from 'app/core/services/backend_srv';
 import { DashboardSearchItem } from 'app/features/search/types';
-import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 
 import { getLinkSrv } from '../../../panel/panellinks/link_srv';
 
@@ -29,22 +27,7 @@ interface DashboardLinksMenuProps {
 
 function DashboardLinksMenu({ dashboardUID, link }: DashboardLinksMenuProps) {
   const styles = useStyles2(getStyles);
-  let resolvedLinks = useResolvedLinks({ dashboardUID, link });
-
-  // @PERCONA
-  // TODO: PMM-7736 remove it ASAP after migration transition period is finished
-  if (link.title === 'PMM') {
-    if (isPmmAdmin(config.bootData.user)) {
-      resolvedLinks = [
-        { uid: '1000', url: '/graph/add-instance', title: 'PMM Add Instance' },
-        { uid: '1001', url: '/graph/advisors/insights', title: 'PMM Advisors' },
-        { uid: '1002', url: '/graph/inventory', title: 'PMM Inventory' },
-        { uid: '1003', url: '/graph/settings', title: 'PMM Settings' },
-      ];
-    } else {
-      return <></>;
-    }
-  }
+  const resolvedLinks = useResolvedLinks({ dashboardUID, link });
 
   if (!resolvedLinks || resolveLinks.length === 0) {
     return null;
