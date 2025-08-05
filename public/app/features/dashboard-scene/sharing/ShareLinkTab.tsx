@@ -91,7 +91,7 @@ export class ShareLinkTab extends SceneObjectBase<ShareLinkTabState> implements 
       timeZone: getRenderTimeZone(timeRange.getTimeZone()),
     });
     const pImageUrl = window.location.origin + config.appSubUrl + imageUrl;
-    this.setState({ shareUrl, pImageUrl, isBuildUrlLoading: false });
+    this.setState({ shareUrl, imageUrl: pImageUrl, isBuildUrlLoading: false });
   };
 
   public getTabLabel() {
