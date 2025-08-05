@@ -80,8 +80,8 @@ export class ShareLinkTab extends SceneObjectBase<ShareLinkTabState> implements 
       // force solo route to use scenes
       imageQueryParams['__feature.dashboardSceneSolo'] = true;
     }
-// @PERCONA to support different ports
-    let imageUrl = getDashboardUrl({
+    // @PERCONA to support different ports
+    const imageUrl = getDashboardUrl({
       uid: dashboard.state.uid,
       currentQueryParams: location.search,
       updateQuery: { ...urlParamsUpdate, ...queryOptions, panelId: panel?.state.key },
@@ -90,8 +90,8 @@ export class ShareLinkTab extends SceneObjectBase<ShareLinkTabState> implements 
       render: true,
       timeZone: getRenderTimeZone(timeRange.getTimeZone()),
     });
-    imageUrl = window.location.origin + config.appSubUrl + imageUrl;
-    this.setState({ shareUrl, imageUrl, isBuildUrlLoading: false });
+    const pImageUrl = window.location.origin + config.appSubUrl + imageUrl;
+    this.setState({ shareUrl, pImageUrl, isBuildUrlLoading: false });
   };
 
   public getTabLabel() {
