@@ -1,4 +1,5 @@
 import { cx } from '@emotion/css';
+import { debounce } from 'lodash';
 import { FC, useCallback, useEffect, useState } from 'react';
 
 import { PanelProps } from '@grafana/data';
@@ -37,22 +38,25 @@ export const Failed: FC<PanelProps> = ({ eventBus }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedFetchAlerts = useCallback(debounce(fetchAlerts, 300), [fetchAlerts]);
+
   useEffect(() => {
     if (isPmmAdmin(config.bootData.user) || isEditor(config.bootData.user)) {
-      fetchAlerts();
+      debouncedFetchAlerts();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     const subscriber = eventBus.getStream(RefreshEvent).subscribe((event) => {
-      fetchAlerts();
+      debouncedFetchAlerts();
     });
 
     return () => {
       subscriber.unsubscribe();
     };
-  }, [eventBus, fetchAlerts]);
+  }, [eventBus, debouncedFetchAlerts]);
 
   if (settingsLoading) {
     return <Spinner />;
