@@ -1,5 +1,5 @@
 import { cx } from '@emotion/css';
-import {debounce} from 'lodash';
+import { debounce } from 'lodash';
 import { FC, useCallback, useEffect, useState } from 'react';
 
 import { PanelProps } from '@grafana/data';
@@ -19,9 +19,7 @@ import { Messages } from './Failed.messages';
 import { getStyles } from './Failed.styles';
 import { TooltipText } from './TooltipText';
 
-
-
-export const Failed: FC<PanelProps> = ({eventBus}) => {
+export const Failed: FC<PanelProps> = ({ eventBus }) => {
   const [failedChecks, setFailedChecks] = useState<FailedCheckSummary[]>([]);
   const { isAuthorized } = useSelector(getPerconaUser);
   const { result: settings, loading: settingsLoading } = useSelector(getPerconaSettings);
@@ -49,14 +47,14 @@ export const Failed: FC<PanelProps> = ({eventBus}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-    useEffect(() => {
-    const subscriber = eventBus.getStream(RefreshEvent).subscribe(event => {
+  useEffect(() => {
+    const subscriber = eventBus.getStream(RefreshEvent).subscribe((event) => {
       debouncedFetchAlerts();
-    })
+    });
 
     return () => {
       subscriber.unsubscribe();
-    }
+    };
   }, [eventBus, debouncedFetchAlerts]);
 
   if (settingsLoading) {

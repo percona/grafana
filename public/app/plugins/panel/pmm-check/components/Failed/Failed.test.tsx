@@ -26,7 +26,7 @@ const mockPanelProps: PanelProps<any> = {
       to: dateTime(new Date().toISOString()),
       raw: { from: 'now-6h', to: 'now' },
     },
-    state: LoadingState.NotStarted
+    state: LoadingState.NotStarted,
   },
   width: 800,
   height: 600,
@@ -53,7 +53,7 @@ const mockPanelProps: PanelProps<any> = {
   },
   timeZone: '',
   transparent: false,
-  title: ''
+  title: '',
 };
 
 describe('Failed::', () => {
@@ -104,7 +104,7 @@ describe('Failed::', () => {
           },
         } as StoreState)}
       >
-        <Failed {...mockPanelProps}/>
+        <Failed {...mockPanelProps} />
       </Provider>
     );
 
@@ -159,7 +159,7 @@ describe('Failed::', () => {
           },
         } as StoreState)}
       >
-        <Failed {...mockPanelProps}/>
+        <Failed {...mockPanelProps} />
       </Provider>
     );
 
@@ -212,7 +212,7 @@ describe('Failed::', () => {
           },
         } as StoreState)}
       >
-        <Failed {...mockPanelProps}/>
+        <Failed {...mockPanelProps} />
       </Provider>
     );
 
@@ -262,7 +262,7 @@ describe('Failed::', () => {
           },
         } as StoreState)}
       >
-        <Failed {...mockPanelProps}/>
+        <Failed {...mockPanelProps} />
       </Provider>
     );
 
@@ -282,7 +282,7 @@ describe('Failed::', () => {
           },
         } as StoreState)}
       >
-        <Failed {...mockPanelProps}/>
+        <Failed {...mockPanelProps} />
       </Provider>
     );
 
