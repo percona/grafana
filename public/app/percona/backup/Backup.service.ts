@@ -47,7 +47,7 @@ export const BackupService = {
         resultRetryTimes!,
         dataModel,
         folder,
-        compression,
+        compression.value!,
         token
       );
     } else {
@@ -69,7 +69,7 @@ export const BackupService = {
           strRetryInterval,
           resultRetryTimes!,
           retention!,
-          compression
+          compression.value!
         );
       } else {
         return this.scheduleBackup(
@@ -85,7 +85,7 @@ export const BackupService = {
           mode,
           dataModel,
           folder,
-          compression
+          compression.value!
         );
       }
     }

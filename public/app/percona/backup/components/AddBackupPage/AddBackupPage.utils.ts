@@ -10,6 +10,7 @@ import { Backup } from '../BackupInventory/BackupInventory.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { LocationType } from '../StorageLocations/StorageLocations.types';
 
+import { COMPRESSION_OPTIONS } from './AddBackupPage.constants';
 import { AddBackupFormProps } from './AddBackupPage.types';
 import {
   ScheduleSectionFields as ScheduleSectionFieldsEnum,
@@ -79,7 +80,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode: BackupMode.SNAPSHOT,
       type: scheduleMode ? BackupType.SCHEDULED : getBackupType(backup),
       folder: '',
-      compression: Compression.NONE,
+      compression: COMPRESSION_OPTIONS.find((option) => option.value === Compression.NONE)!,
     };
   }
 
@@ -131,7 +132,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode,
       type: BackupType.SCHEDULED,
       folder,
-      compression: backup.compression || Compression.NONE,
+      compression: COMPRESSION_OPTIONS.find((option) => option.value === backup.compression)!,
     };
   } else {
     return {
@@ -148,7 +149,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       retryInterval: 30,
       type: BackupType.DEMAND,
       folder,
-      compression: backup.compression || Compression.NONE,
+      compression: COMPRESSION_OPTIONS.find((option) => option.value === backup.compression)!,
     };
   }
 };
