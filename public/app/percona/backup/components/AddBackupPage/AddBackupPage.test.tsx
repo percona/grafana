@@ -154,4 +154,24 @@ describe('AddBackupPage', () => {
     await fireEvent.click(button);
     expect(screen.getByText('Create Backup on demand')).toBeInTheDocument();
   });
+
+  it('should render compression field in advanced settings', async () => {
+    render(
+      <AddBackupPageWrapper>
+        <AddBackupPage
+          {...getRouteComponentProps({
+            match: { params: { type: 'scheduled_task_id', id: '' }, isExact: true, path: '', url: '' },
+          })}
+        />
+      </AddBackupPageWrapper>
+    );
+
+    await waitFor(() => expect(screen.getAllByText('Choose')).toHaveLength(2));
+
+    const advancedSettingsButton = screen.getByTestId('add-backup-advanced-settings');
+    fireEvent.click(advancedSettingsButton);
+
+    expect(screen.getByTestId('compression-select-input')).toBeInTheDocument();
+    expect(screen.getByText(Messages.compression)).toBeInTheDocument();
+  });
 });

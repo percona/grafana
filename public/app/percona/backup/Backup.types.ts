@@ -40,6 +40,17 @@ export enum BackupType {
   SCHEDULED = 'SCHEDULED',
 }
 
+export enum Compression {
+  NONE = 'NONE',
+  QUICKLZ = 'QUICKLZ',
+  ZSTD = 'ZSTD',
+  LZ4 = 'LZ4',
+  S2 = 'S2',
+  GZIP = 'GZIP',
+  SNAPPY = 'SNAPPY',
+  PGZIP = 'PGZIP',
+}
+
 export interface RawBackupLog {
   chunk_id: number;
   data: string;

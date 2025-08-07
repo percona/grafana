@@ -32,6 +32,7 @@ export const BackupService = {
       type,
       dataModel,
       folder,
+      compression,
     } = values;
     const strRetryInterval = `${retryInterval}s`;
     const resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
@@ -46,6 +47,7 @@ export const BackupService = {
         resultRetryTimes!,
         dataModel,
         folder,
+        compression,
         token
       );
     } else {
@@ -66,7 +68,8 @@ export const BackupService = {
           description ?? '',
           strRetryInterval,
           resultRetryTimes!,
-          retention!
+          retention!,
+          compression
         );
       } else {
         return this.scheduleBackup(
@@ -81,7 +84,8 @@ export const BackupService = {
           active!,
           mode,
           dataModel,
-          folder
+          folder,
+          compression
         );
       }
     }
@@ -95,6 +99,7 @@ export const BackupService = {
     retryTimes: number,
     dataModel: DataModel,
     folder: string,
+    compression: string,
     token?: CancelToken
   ) {
     return api.post(
@@ -108,6 +113,7 @@ export const BackupService = {
         retries: retryTimes,
         data_model: dataModel,
         folder,
+        compression,
       },
       false,
       token
@@ -125,7 +131,8 @@ export const BackupService = {
     enabled: boolean,
     mode: BackupMode,
     dataModel: DataModel,
-    folder: string
+    folder: string,
+    compression: string
   ) {
     return api.post(`${BASE_URL}:schedule`, {
       service_id: serviceId,
@@ -140,6 +147,7 @@ export const BackupService = {
       mode,
       data_model: dataModel,
       folder,
+      compression,
     });
   },
   async changeScheduleBackup(
@@ -150,7 +158,8 @@ export const BackupService = {
     description: string,
     retryInterval: string,
     retryTimes: number,
-    retention: number
+    retention: number,
+    compression: string
   ) {
     return api.put(`${BASE_URL}:changeScheduled`, {
       scheduled_backup_id: id,
@@ -161,6 +170,7 @@ export const BackupService = {
       retry_interval: retryInterval,
       retries: retryTimes,
       retention,
+      compression,
     });
   },
 };

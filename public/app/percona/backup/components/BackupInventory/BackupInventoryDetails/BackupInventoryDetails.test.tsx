@@ -12,10 +12,12 @@ describe('BackupInventoryDetails', () => {
         status={BackupStatus.BACKUP_STATUS_PAUSED}
         dataModel={DataModel.LOGICAL}
         folder="folder1"
+        compression="NONE"
       />
     );
     expect(screen.getByTestId('backup-artifact-details-name')).toBeInTheDocument();
     expect(screen.getByTestId('backup-artifact-details-data-model')).toBeInTheDocument();
     expect(screen.getByTestId('backup-artifact-details-folder')).toBeInTheDocument();
+    expect(screen.getByTestId('backup-artifact-details-compression')).toBeInTheDocument();
   });
 });

@@ -17,6 +17,7 @@ export interface Backup {
   mode: BackupMode;
   folder: string;
   type?: Databases | 'external';
+  compression: string;
 }
 
 export interface BackupRow extends Backup {
@@ -36,6 +37,7 @@ export interface RawBackup {
   vendor: Databases;
   mode: BackupMode;
   folder: string;
+  compression: string;
 }
 
 export interface BackupResponse {

@@ -1,4 +1,4 @@
-import { DataModel, BackupStatus, BackupMode } from 'app/percona/backup/Backup.types';
+import { DataModel, BackupStatus, BackupMode, Compression } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 
 import * as service from '../BackupInventory.service';
@@ -18,6 +18,7 @@ export const stubs: Backup[] = [
     vendor: Databases.mysql,
     mode: BackupMode.SNAPSHOT,
     folder: 'folder1',
+    compression: Compression.NONE,
   },
   {
     id: 'backup_2',
@@ -32,6 +33,7 @@ export const stubs: Backup[] = [
     vendor: Databases.mysql,
     mode: BackupMode.SNAPSHOT,
     folder: 'folder1',
+    compression: Compression.NONE,
   },
 ];
 

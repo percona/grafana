@@ -39,4 +39,5 @@ export interface AddBackupFormProps extends ScheduledSectionFieldsValuesProps {
   mode: BackupMode;
   type: BackupType;
   folder: string;
+  compression: string;
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { SelectableValue } from '@grafana/data';
-import { BackupMode, BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, BackupType, DataModel, RetryMode, Compression } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
@@ -79,6 +79,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode: BackupMode.SNAPSHOT,
       type: scheduleMode ? BackupType.SCHEDULED : getBackupType(backup),
       folder: '',
+      compression: Compression.NONE,
     };
   }
 
@@ -130,6 +131,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode,
       type: BackupType.SCHEDULED,
       folder,
+      compression: backup.compression || Compression.NONE,
     };
   } else {
     return {
@@ -146,6 +148,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       retryInterval: 30,
       type: BackupType.DEMAND,
       folder,
+      compression: backup.compression || Compression.NONE,
     };
   }
 };

@@ -21,6 +21,7 @@ export interface RawScheduledBackup {
   retention: number;
   mode: BackupMode;
   folder: string;
+  compression: string;
 }
 
 export interface ScheduledBackupResponse {
@@ -46,4 +47,5 @@ export interface ScheduledBackup {
   mode: BackupMode;
   enabled: boolean;
   folder: string;
+  compression: string;
 }
