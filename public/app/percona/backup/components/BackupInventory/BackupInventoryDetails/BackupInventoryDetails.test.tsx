@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import { DataModel, BackupStatus } from 'app/percona/backup/Backup.types';
+import { Compression, DataModel, BackupStatus } from 'app/percona/backup/Backup.types';
 
 import { BackupInventoryDetails } from './BackupInventoryDetails';
 
@@ -12,7 +12,7 @@ describe('BackupInventoryDetails', () => {
         status={BackupStatus.BACKUP_STATUS_PAUSED}
         dataModel={DataModel.LOGICAL}
         folder="folder1"
-        compression="NONE"
+        compression={Compression.NONE}
       />
     );
     expect(screen.getByTestId('backup-artifact-details-name')).toBeInTheDocument();

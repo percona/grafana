@@ -32,7 +32,7 @@ import { PageSwitcherCard } from '../../../shared/components/Elements/PageSwitch
 import { BACKUP_INVENTORY_URL, BACKUP_SCHEDULED_URL } from '../../Backup.constants';
 import { Messages as MessagesBackup } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';
-import { BackupMode, BackupType, DataModel } from '../../Backup.types';
+import { BackupMode, BackupType, Compression, DataModel } from '../../Backup.types';
 import { BackupErrorSection } from '../BackupErrorSection/BackupErrorSection';
 import { BACKUP_CANCEL_TOKEN, LIST_ARTIFACTS_CANCEL_TOKEN } from '../BackupInventory/BackupInventory.constants';
 import { BackupInventoryService } from '../BackupInventory/BackupInventory.service';
@@ -42,13 +42,14 @@ import { ScheduledBackupsService } from '../ScheduledBackups/ScheduledBackups.se
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { LocationType } from '../StorageLocations/StorageLocations.types';
 
-import { COMPRESSION_OPTIONS, DATA_MODEL_OPTIONS, MAX_BACKUP_NAME } from './AddBackupPage.constants';
+import { DATA_MODEL_OPTIONS, MAX_BACKUP_NAME } from './AddBackupPage.constants';
 import { Messages } from './AddBackupPage.messages';
 import { AddBackupPageService } from './AddBackupPage.service';
 import { getStyles } from './AddBackupPage.styles';
 import { AddBackupFormProps, SelectableService } from './AddBackupPage.types';
 import {
   getBackupModeOptions,
+  getCompressionOptionFromValue,
   getDataModelFromVendor,
   getLabelForStorageOption,
   isDataModelDisabled,
@@ -111,6 +112,14 @@ const AddBackupPage: FC = () => {
     }
     setPending(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadCompressionOptions = useCallback(async (serviceId?: string) => {
+    if (!serviceId) {
+      return [getCompressionOptionFromValue(Compression.DEFAULT)];
+    }
+    const methods = await BackupInventoryService.listServiceCompressions(serviceId);
+    return methods.map((m) => getCompressionOptionFromValue(m));
   }, []);
 
   const handleBackup = async (values: AddBackupFormProps) => {
@@ -357,21 +366,22 @@ const AddBackupPage: FC = () => {
                           >
                             <RetryModeSelector retryMode={values.retryMode} />
                             <span className={cx(styles.wideField, styles.SelectFieldWrap)}>
-                            <Field name="compression">
-                              {({ input }) => (
-                                <SelectField
-                                  label={Messages.compression}
-                                  options={COMPRESSION_OPTIONS}
-                                  placeholder={Messages.selectCompression}
-                                  isSearchable={false}
-                                  className={styles.selectField}
-                                  data-testid="compression-select-input"
-                                  tooltipText={Messages.compressionTooltip}
-                                  {...input}
-                                />
-                              )}
-                            </Field>
-                          </span>
+                              <Field name="compression">
+                                {({ input }) => (
+                                  <AsyncSelectField
+                                    label={Messages.compression}
+                                    key={values.service?.value?.id || 'no-service'}
+                                    defaultOptions
+                                    cacheOptions
+                                    isSearchable={false}
+                                    loadOptions={() => loadCompressionOptions(values.service?.value?.id)}
+                                    className={styles.selectField}
+                                    data-testid="compression-select-input"
+                                    {...input}
+                                  />
+                                )}
+                              </Field>
+                            </span>
                             <TextInputField
                               fieldClassName={styles.textAreaField}
                               name="folder"

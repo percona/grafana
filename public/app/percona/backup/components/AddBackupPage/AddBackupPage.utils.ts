@@ -10,7 +10,6 @@ import { Backup } from '../BackupInventory/BackupInventory.types';
 import { ScheduledBackup } from '../ScheduledBackups/ScheduledBackups.types';
 import { LocationType } from '../StorageLocations/StorageLocations.types';
 
-import { COMPRESSION_OPTIONS } from './AddBackupPage.constants';
 import { AddBackupFormProps } from './AddBackupPage.types';
 import {
   ScheduleSectionFields as ScheduleSectionFieldsEnum,
@@ -55,6 +54,16 @@ const getBackupType = (backup: Backup | ScheduledBackup | null): BackupType => {
   return BackupType.DEMAND;
 };
 
+const compressionValueToKeyMap: Record<string, string> = Object.fromEntries(
+  Object.entries(Compression).map(([key, val]) => [val, key])
+);
+
+export const getCompressionOptionFromValue = (value: Compression): SelectableValue<Compression> => ({
+  value,
+  label: compressionValueToKeyMap[value] ?? value,
+});
+
+
 export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMode?: boolean): AddBackupFormProps => {
   if (!backup) {
     return {
@@ -80,7 +89,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode: BackupMode.SNAPSHOT,
       type: scheduleMode ? BackupType.SCHEDULED : getBackupType(backup),
       folder: '',
-      compression: COMPRESSION_OPTIONS.find((option) => option.value === Compression.NONE)!,
+      compression: getCompressionOptionFromValue(Compression.DEFAULT),
     };
   }
 
@@ -132,7 +141,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode,
       type: BackupType.SCHEDULED,
       folder,
-      compression: COMPRESSION_OPTIONS.find((option) => option.value === backup.compression)!,
+      compression: getCompressionOptionFromValue(backup.compression),
     };
   } else {
     return {
@@ -149,7 +158,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       retryInterval: 30,
       type: BackupType.DEMAND,
       folder,
-      compression: COMPRESSION_OPTIONS.find((option) => option.value === backup.compression)!,
+      compression: getCompressionOptionFromValue(backup.compression),
     };
   }
 };

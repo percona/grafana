@@ -1,4 +1,4 @@
-import { DataModel } from 'app/percona/backup/Backup.types';
+import { Compression, DataModel } from 'app/percona/backup/Backup.types';
 
 export interface ScheduledBackupDetailsProps {
   name: string;
@@ -6,5 +6,5 @@ export interface ScheduledBackupDetailsProps {
   dataModel: DataModel;
   cronExpression: string;
   folder: string;
-  compression: string;
+  compression: Compression;
 }

@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { DataModel, RetryMode, Compression } from 'app/percona/backup/Backup.types';
+import { DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { Databases, DATABASE_LABELS } from 'app/percona/shared/core';
 import { capitalizeText } from 'app/percona/shared/helpers/capitalizeText';
 import { MONTHS, WEEKDAYS } from 'app/percona/shared/helpers/cron/constants';
@@ -88,41 +88,3 @@ export const MAX_RETENTION = 99;
 
 export const MAX_BACKUP_NAME = 100;
 
-export const COMPRESSION_OPTIONS: Array<SelectableValue<string>> = [
-  {
-    value: Compression.DEFAULT,
-    label: 'Default',
-  },
-  {
-    value: Compression.NONE,
-    label: 'No compression',
-  },
-  {
-    value: Compression.QUICKLZ,
-    label: 'QuickLZ compression',
-  },
-  {
-    value: Compression.ZSTD,
-    label: 'Zstandard compression',
-  },
-  {
-    value: Compression.LZ4,
-    label: 'LZ4 compression',
-  },
-  {
-    value: Compression.S2,
-    label: 'S2 compression',
-  },
-  {
-    value: Compression.GZIP,
-    label: 'Gzip compression',
-  },
-  {
-    value: Compression.SNAPPY,
-    label: 'Snappy compression',
-  },
-  {
-    value: Compression.PGZIP,
-    label: 'Parallel Gzip compression',
-  },
-];

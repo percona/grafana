@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { BackupMode, BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, BackupType, Compression, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
 import { ApiVerboseError, Databases } from 'app/percona/shared/core';
 
 import { Backup } from '../BackupInventory/BackupInventory.types';
@@ -39,5 +39,5 @@ export interface AddBackupFormProps extends ScheduledSectionFieldsValuesProps {
   mode: BackupMode;
   type: BackupType;
   folder: string;
-  compression: SelectableValue<string>;
+  compression: SelectableValue<Compression>;
 }
