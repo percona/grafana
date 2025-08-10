@@ -158,11 +158,9 @@ describe('AddBackupPage', () => {
   it('should render compression field in advanced settings', async () => {
     render(
       <AddBackupPageWrapper>
-        <AddBackupPage
-          {...getRouteComponentProps({
-            match: { params: { type: 'scheduled_task_id', id: '' }, isExact: true, path: '', url: '' },
-          })}
-        />
+        <MemoryRouter>
+          <AddBackupPage />
+        </MemoryRouter>
       </AddBackupPageWrapper>
     );
 

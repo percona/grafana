@@ -90,6 +90,10 @@ export const MAX_BACKUP_NAME = 100;
 
 export const COMPRESSION_OPTIONS: Array<SelectableValue<string>> = [
   {
+    value: Compression.DEFAULT,
+    label: 'Default',
+  },
+  {
     value: Compression.NONE,
     label: 'No compression',
   },
