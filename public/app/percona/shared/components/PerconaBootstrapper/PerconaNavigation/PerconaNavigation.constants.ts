@@ -469,7 +469,7 @@ export const PMM_NAV_MONGO: NavModelItem = {
     },
     {
       id: 'mongo-summary',
-      text: 'Summary',
+      text: 'Instance Summary',
       icon: 'percona-nav-summary',
       url: `${config.appSubUrl}/d/mongodb-instance-summary/mongodb-instance-summary`,
       hideFromTabs: true,
@@ -506,17 +506,10 @@ export const PMM_NAV_MONGO: NavModelItem = {
       ],
     },
     {
-      id: 'mongo-memory-details',
-      text: 'InMemory',
+      id: 'mongo-pbm-details',
+      text: 'Backup Status',
       icon: 'sitemap',
-      url: `${config.appSubUrl}/d/mongodb-inmemory/mongodb-inmemory-details`,
-      hideFromTabs: true,
-    },
-    {
-      id: 'mondo-wiredtiger-details',
-      text: 'WiredTiger',
-      icon: 'sitemap',
-      url: `${config.appSubUrl}/d/mongodb-wiredtiger/mongodb-wiredtiger-details`,
+      url: `${config.appSubUrl}/d/mongodb-pbm-details/mongodb-pbm-details`,
       hideFromTabs: true,
     },
     {
@@ -543,7 +536,6 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
   url: `${config.appSubUrl}/d/postgresql-instance-overview/postgresql-instances-overview`,
   sortWeight: WEIGHTS.dashboards,
   hideFromTabs: true,
-
   children: [
     {
       id: 'postgre-overwiew',
@@ -557,6 +549,36 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
       text: 'Summary',
       icon: 'percona-nav-summary',
       url: `${config.appSubUrl}/d/postgresql-instance-summary/postgresql-instance-summary`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'postgre-ha',
+      text: 'High availability',
+      icon: 'percona-cluster',
+      hideFromTabs: true,
+      showChildren: true,
+      url: `${config.appSubUrl}/d/postgresql-replication-overview`,
+      children: [
+        {
+          id: 'postgre-replication',
+          text: 'Replication',
+          icon: 'percona-cluster',
+          url: `${config.appSubUrl}/d/postgresql-replication-overview/postgresql-replication-overview`,
+          hideFromTabs: true,
+        },
+        {
+          id: 'postgre-patroni',
+          text: 'Patroni',
+          icon: 'percona-cluster',
+          url: `${config.appSubUrl}/d/postgresql-patroni-details/postgresql-patroni-details`,
+          hideFromTabs: true,
+        },
+      ],
+    },
+    {
+      id: 'postgre-top-queries',
+      text: 'Top queries',
+      url: `${config.appSubUrl}/d/postgresql-top-queries/postgresql-top-queries`,
       hideFromTabs: true,
     },
   ],

@@ -40,6 +40,9 @@ const alwaysMonoIcons: IconName[] = [
   'percona-database-valkey',
   'percona-asterisk',
   'pmm-logo',
+  'pmm-logo-light',
+  'percona-bell',
+  'percona-bell-slash',
   'qan-logo',
 ];
 
