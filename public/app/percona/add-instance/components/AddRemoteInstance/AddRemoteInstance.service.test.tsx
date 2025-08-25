@@ -37,8 +37,8 @@ describe('AddRemoteInstanceService:: ', () => {
       custom_labels: {
         test: 'test',
       },
-      node_name: 'localhost',
       add_node: {
+        node_name: 'localhost',
         node_type: 'NODE_TYPE_REMOTE_NODE',
       },
       listen_port: '80',
@@ -96,6 +96,7 @@ describe('AddRemoteInstanceService:: ', () => {
       qan_postgresql_pgstatements_agent: true,
       metrics_mode: 1,
       node_id: 'node1',
+      node_name: 'localhost',
     };
     expect(toPayload(data)).toStrictEqual(payload);
   });
