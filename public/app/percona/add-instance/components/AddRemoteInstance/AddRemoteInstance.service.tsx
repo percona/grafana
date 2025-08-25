@@ -147,7 +147,7 @@ export const toPayload = (values: any, discoverName?: string, type?: InstanceAva
     };
   }
 
-  data.node_name  = data.service_name;
+  data.node_name = data.service_name;
 
   if (values.isRDS && discoverName) {
     data.engine = discoverName;
