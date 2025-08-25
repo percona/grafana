@@ -37,8 +37,8 @@ describe('AddRemoteInstanceService:: ', () => {
       custom_labels: {
         test: 'test',
       },
+      node_name: 'localhost',
       add_node: {
-        node_name: 'localhost',
         node_type: 'NODE_TYPE_REMOTE_NODE',
       },
       listen_port: '80',
