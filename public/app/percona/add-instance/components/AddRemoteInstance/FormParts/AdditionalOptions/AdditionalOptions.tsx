@@ -2,7 +2,11 @@ import { FormApi } from 'final-form';
 import { FC, useEffect, useState } from 'react';
 
 import { useStyles2 } from '@grafana/ui';
-import { InstanceAvailableType, RemoteInstanceCredentials } from 'app/percona/add-instance/panel.types';
+import {
+  InstanceAvailableType,
+  InstanceTypesExtra,
+  RemoteInstanceCredentials,
+} from 'app/percona/add-instance/panel.types';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { NumberInputField } from 'app/percona/shared/components/Form/NumberInput';
 import { RadioButtonGroupField } from 'app/percona/shared/components/Form/RadioButtonGroup';
@@ -22,6 +26,7 @@ import {
   TablestatOptionsInterface,
 } from './AdditionalOptions.types';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
+import MysqlExtraDSNParams from './MysqlExtraDSNParams';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
 
@@ -163,6 +168,9 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
 
   return (
     <>
+      <div className={styles.extraDsnOptions}>
+        <MysqlExtraDSNParams />
+      </div>
       <h4>{Messages.form.labels.additionalOptions.tablestatOptions}</h4>
       <div className={styles.group}>
         <RadioButtonGroupField
@@ -277,8 +285,9 @@ export const getAdditionalOptions = (
           />
         </>
       );
+    case InstanceTypesExtra.external:
     case Databases.haproxy:
-      return null;
+      return <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />;
     default:
       return (
         <>
