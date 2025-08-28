@@ -57,3 +57,7 @@ export interface Timeranges {
 export interface TimerangesResponse {
   timeranges: RawTimeranges[];
 }
+
+export interface CompressionResponse {
+  compression_methods: Compression[];
+}
