@@ -29,6 +29,7 @@ export const Messages = {
         port: 'Port',
         username: 'Username',
         password: 'Password',
+        instanceID: 'Instance ID',
       },
       postgresqlDetails: {
         database: 'Database',
@@ -42,6 +43,7 @@ export const Messages = {
       },
       mysqlDetails: {
         maxQueryLength: 'Max query length',
+        extraDsnParams: 'Extra DSN Parameters',
       },
       mongodbDetails: {
         maxQueryLength: 'Max query length',
@@ -93,6 +95,7 @@ export const Messages = {
         serviceName: 'Service name (default: Hostname)',
         username: 'Username',
         password: 'Password',
+        instanceID: 'Instance ID',
       },
       postgresqlDetails: {
         database: 'Database (default: postgres)',
@@ -113,6 +116,7 @@ export const Messages = {
         replicationSet: 'Replication set',
         cluster: 'Cluster',
         customLabels: 'key1:value1\nkey2:value2',
+        extraDsnParams: 'key1:value1\nkey2:value2',
       },
       additionalOptions: {},
     },
@@ -134,6 +138,7 @@ export const Messages = {
         port: 'Port your service is listening on',
         username: 'Your database user name',
         password: 'Your database password',
+        instanceID: 'Instance ID to use',
       },
       postgresqlDetails: {
         database: 'Database name',
@@ -173,6 +178,7 @@ export const Messages = {
       labelsRolesLink: 'custom user roles',
       labelsExisting: 'Editing existing labels may affect your inventory and its data.',
       customLabels: 'Follow the format as exemplified below, one label per line.',
+      extraDsnParams: 'Follow the format as exemplified below, one parameter per line.',
     },
   },
 };
