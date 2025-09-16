@@ -26,6 +26,7 @@ import {
   TablestatOptionsInterface,
 } from './AdditionalOptions.types';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
+import MysqlExtraDSNParams from './MysqlExtraDSNParams';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
 import { ValkeyTLSCertificate } from './ValkeyTLSCertificate';
@@ -168,6 +169,9 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
 
   return (
     <>
+      <div className={styles.extraDsnOptions}>
+        <MysqlExtraDSNParams />
+      </div>
       <h4>{Messages.form.labels.additionalOptions.tablestatOptions}</h4>
       <div className={styles.group}>
         <RadioButtonGroupField
