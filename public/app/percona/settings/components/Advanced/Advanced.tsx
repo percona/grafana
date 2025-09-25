@@ -1,5 +1,5 @@
 import { cx } from '@emotion/css';
-import { FC, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { Button, Icon, Spinner, useStyles2 } from '@grafana/ui';
@@ -12,7 +12,7 @@ import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
-import { getPerconaSettings } from 'app/percona/shared/core/selectors';
+import { getPerconaSettings, getServices } from 'app/percona/shared/core/selectors';
 import validators from 'app/percona/shared/helpers/validators';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -31,8 +31,16 @@ import {
 } from './Advanced.constants';
 import { getStyles } from './Advanced.styles';
 import { AdvancedFormProps } from './Advanced.types';
-import { convertCheckIntervalsToHours, convertHoursStringToSeconds, convertSecondsToDays } from './Advanced.utils';
+import {
+  convertCheckIntervalsToHours,
+  convertHoursStringToSeconds,
+  convertSecondsToDays,
+  getMonitoringAgent,
+} from './Advanced.utils';
 import { SwitchRow } from './SwitchRow';
+import { InventoryService } from 'app/percona/inventory/Inventory.service';
+import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
+import { GET_SERVICES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
 
 const {
   advanced: { sttCheckIntervalsLabel, sttCheckIntervalTooltip, sttCheckIntervalUnit },
@@ -42,7 +50,9 @@ export const Advanced: FC = () => {
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
   const { result: settings } = useSelector(getPerconaSettings);
+  const { services } = useSelector(getServices);
   const dispatch = useAppDispatch();
+  const agent = useMemo(() => getMonitoringAgent(services), [services]);
   const {
     advisorRunIntervals: sttCheckIntervals,
     dataRetention,
@@ -111,6 +121,8 @@ export const Advanced: FC = () => {
     frequentInterval,
     telemetrySummaries,
     accessControl: enableAccessControl,
+    pmmServerMonitoringAgentId: agent?.agentId,
+    pmmServerMonitoringEnabled: !agent?.disabled,
   };
   const [loading, setLoading] = useState(false);
 
@@ -128,6 +140,8 @@ export const Advanced: FC = () => {
       frequentInterval,
       updates,
       accessControl,
+      pmmServerMonitoringEnabled,
+      pmmServerMonitoringAgentId,
     } = values;
     const sttCheckIntervals = {
       rare_interval: `${convertHoursStringToSeconds(rareInterval)}s`,
@@ -149,15 +163,34 @@ export const Advanced: FC = () => {
     };
 
     setLoading(true);
-    await dispatch(
-      updateSettingsAction({
-        body,
-        token: generateToken(SET_SETTINGS_CANCEL_TOKEN),
-      })
+    const promises = new Array<Promise<unknown>>();
+
+    if (pmmServerMonitoringAgentId) {
+      promises.push(
+        InventoryService.updateAgent(pmmServerMonitoringAgentId, {
+          qan_postgresql_pgstatements_agent: {
+            enable: pmmServerMonitoringEnabled,
+          },
+        })
+      );
+    }
+
+    promises.push(
+      dispatch(
+        updateSettingsAction({
+          body,
+          token: generateToken(SET_SETTINGS_CANCEL_TOKEN),
+        })
+      )
     );
+    await Promise.all(promises);
     setLoading(false);
   };
   const { Form } = withTypes<AdvancedFormProps>();
+
+  useEffect(() => {
+    dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
+  }, []);
 
   return (
     <TabbedPage navId="settings-advanced" vertical>
@@ -254,6 +287,16 @@ export const Advanced: FC = () => {
                     tooltipLinkText={tooltipLinkText}
                     link={backupLink}
                     dataTestId="advanced-backup"
+                    component={SwitchRow}
+                  />
+                  <Field
+                    name="pmmServerMonitoringEnabled"
+                    type="checkbox"
+                    label={Messages.advanced.pmmServerMonitoringLabel}
+                    tooltip={Messages.advanced.pmmServerMonitoringTooltip}
+                    tooltipLinkText={Messages.advanced.pmmServerMonitoringTooltip}
+                    link={Messages.advanced.pmmServerMonitoringLink}
+                    dataTestId="access-control"
                     component={SwitchRow}
                   />
                   <div className={styles.advancedRow}>

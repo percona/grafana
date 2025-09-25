@@ -21,7 +21,7 @@ import navigationReducer from './navigation';
 import nodesReducer from './nodes';
 import pmmDumpsReducers from './pmmDump/pmmDump';
 import rolesReducers from './roles/roles';
-import servicesReducer from './services';
+import servicesReducer, { fetchServicesAction } from './services';
 import tourReducer from './tour/tour';
 import updatesReducers from './updates';
 import perconaUserReducers from './user/user';
@@ -113,6 +113,9 @@ export const updateSettingsAction = createAsyncThunk(
           }
           const settings = await SettingsService.setSettings(args.body, args.token, true);
           await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
+          // Refetch services for QAN for PMM Server field
+          // @ts-ignore
+          await thunkAPI.dispatch(fetchServicesAction({}));
           return settings;
         })()
       ),

@@ -2,7 +2,15 @@ import moment from 'moment/moment';
 
 import { AdvisorRunIntervalsSettings } from 'app/percona/settings/Settings.types';
 
-import { HOURS, MINUTES_IN_HOUR, SECONDS_IN_DAY } from './Advanced.constants';
+import {
+  HOURS,
+  MINUTES_IN_HOUR,
+  PMM_SERVER_AGENT_NODE_ID,
+  PMM_SERVER_AGENT_SERVICE_NAME,
+  SECONDS_IN_DAY,
+} from './Advanced.constants';
+import { AgentType } from 'app/percona/inventory/Inventory.types';
+import { Service } from 'app/percona/shared/services/services/Services.types';
 
 export const convertSecondsToDays = (dataRetention: string) => {
   const [count, units] = [+dataRetention.slice(0, -1), dataRetention.slice(-1)];
@@ -35,4 +43,12 @@ export const convertCheckIntervalsToHours = (sttCheckIntervals: AdvisorRunInterv
     standardInterval: `${convertSecondsStringToHour(rawStandardInterval)}`,
     frequentInterval: `${convertSecondsStringToHour(rawFrequentInterval)}`,
   };
+};
+
+export const getMonitoringAgent = (services: Service[]) => {
+  const service = services.find(
+    (s) => s.params.serviceName === PMM_SERVER_AGENT_SERVICE_NAME && s.params.nodeId === PMM_SERVER_AGENT_NODE_ID
+  );
+
+  return service?.params.agents?.find((a) => a.agentType === AgentType.qanPostgresql_pgstatements_agent);
 };
