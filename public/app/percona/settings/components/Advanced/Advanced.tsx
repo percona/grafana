@@ -165,7 +165,7 @@ export const Advanced: FC = () => {
     setLoading(true);
     const promises = new Array<Promise<unknown>>();
 
-    if (pmmServerMonitoringAgentId) {
+    if (pmmServerMonitoringAgentId && initialValues.pmmServerMonitoringEnabled !== pmmServerMonitoringEnabled) {
       promises.push(
         InventoryService.updateAgent(pmmServerMonitoringAgentId, {
           qan_postgresql_pgstatements_agent: {
@@ -296,7 +296,7 @@ export const Advanced: FC = () => {
                     tooltip={Messages.advanced.pmmServerMonitoringTooltip}
                     tooltipLinkText={Messages.advanced.pmmServerMonitoringTooltip}
                     link={Messages.advanced.pmmServerMonitoringLink}
-                    dataTestId="access-control"
+                    dataTestId="pmm-server-monitoring"
                     component={SwitchRow}
                   />
                   <div className={styles.advancedRow}>

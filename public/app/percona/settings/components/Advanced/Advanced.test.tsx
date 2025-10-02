@@ -7,10 +7,77 @@ import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
 import { Advanced } from './Advanced';
+import { Service, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
+import { PMM_SERVER_AGENT_NODE_ID, PMM_SERVER_AGENT_SERVICE_NAME } from './Advanced.constants';
+import { AgentType } from 'app/percona/inventory/Inventory.types';
+import { Databases } from 'app/percona/shared/core';
+import { InventoryService } from 'app/percona/inventory/Inventory.service';
 
 jest.mock('app/percona/settings/Settings.service');
 
+const updateAgentSpy = jest.spyOn(InventoryService, 'updateAgent').mockImplementation(() => Promise.resolve({}));
+
+const setup = (pmmMonitoringEnabled = true) => {
+  const pmmServerService: Service = {
+    type: Databases.postgresql,
+    params: {
+      serviceId: 'service-id',
+      nodeName: 'node-name',
+      status: ServiceStatus.UP,
+      serviceName: PMM_SERVER_AGENT_SERVICE_NAME,
+      nodeId: PMM_SERVER_AGENT_NODE_ID,
+      agents: [
+        {
+          disabled: !pmmMonitoringEnabled,
+          agentId: 'agent-id',
+          agentType: AgentType.qanPostgresql_pgstatements_agent,
+        },
+      ],
+    },
+  };
+
+  return render(
+    <Provider
+      store={configureStore({
+        percona: {
+          user: { isAuthorized: true },
+          services: {
+            isLoading: false,
+            services: [pmmServerService],
+          },
+          settings: {
+            loading: false,
+            result: {
+              advisorRunIntervals: {
+                rareInterval: '280800s',
+                standardInterval: '86400s',
+                frequentInterval: '14400s',
+              },
+              dataRetention: '2592000s',
+              telemetryEnabled: true,
+              telemetrySummaries: ['summary1', 'summary2'],
+              updatesEnabled: false,
+              backupEnabled: false,
+              advisorEnabled: true,
+              azureDiscoverEnabled: true,
+              publicAddress: 'localhost',
+              alertingEnabled: true,
+            },
+          },
+        },
+        navIndex: {},
+      } as StoreState)}
+    >
+      {wrapWithGrafanaContextMock(<Advanced />)}
+    </Provider>
+  );
+};
+
 describe('Advanced::', () => {
+  beforeEach(() => {
+    updateAgentSpy.mockClear();
+  });
+
   it('Renders correctly with props', () => {
     render(
       <Provider
@@ -231,5 +298,59 @@ describe('Advanced::', () => {
         }),
       })
     );
+  });
+
+  it('updates agent when pmm server monitoring is turned on', async () => {
+    const { container } = setup();
+
+    const monitoringSwitch = container.querySelector(
+      '[data-testid="pmm-server-monitoring"] [name="pmmServerMonitoringEnabled"]'
+    );
+
+    expect(monitoringSwitch).toBeInTheDocument();
+
+    fireEvent.click(monitoringSwitch!);
+
+    fireEvent.submit(screen.getByTestId('advanced-button'));
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('Spinner'));
+
+    expect(updateAgentSpy).toHaveBeenCalledWith('agent-id', {
+      qan_postgresql_pgstatements_agent: {
+        enable: false,
+      },
+    });
+  });
+
+  it('updates agent when pmm server monitoring is turned off', async () => {
+    const { container } = setup(false);
+
+    const monitoringSwitch = container.querySelector(
+      '[data-testid="pmm-server-monitoring"] [name="pmmServerMonitoringEnabled"]'
+    );
+
+    expect(monitoringSwitch).toBeInTheDocument();
+
+    fireEvent.click(monitoringSwitch!);
+
+    fireEvent.submit(screen.getByTestId('advanced-button'));
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('Spinner'));
+
+    expect(updateAgentSpy).toHaveBeenCalledWith('agent-id', {
+      qan_postgresql_pgstatements_agent: {
+        enable: true,
+      },
+    });
+  });
+
+  it("doesn't updates agent when pmm server monitoring doesn't change", async () => {
+    setup();
+
+    fireEvent.submit(screen.getByTestId('advanced-button'));
+
+    await waitForElementToBeRemoved(() => screen.getByTestId('Spinner'));
+
+    expect(updateAgentSpy).not.toHaveBeenCalled();
   });
 });
