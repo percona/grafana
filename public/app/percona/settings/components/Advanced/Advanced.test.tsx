@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, fireEvent, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 
 import { InventoryService } from 'app/percona/inventory/Inventory.service';
@@ -12,8 +12,10 @@ import { StoreState } from 'app/types';
 
 import { Advanced } from './Advanced';
 import { PMM_SERVER_AGENT_NODE_ID, PMM_SERVER_AGENT_SERVICE_NAME } from './Advanced.constants';
+import { act } from 'react';
 
 jest.mock('app/percona/settings/Settings.service');
+jest.mock('app/percona/shared/services/services/Services.service');
 
 const updateAgentSpy = jest.spyOn(InventoryService, 'updateAgent').mockImplementation(() => Promise.resolve({}));
 
@@ -78,7 +80,7 @@ describe('Advanced::', () => {
     updateAgentSpy.mockClear();
   });
 
-  it('Renders correctly with props', () => {
+  it('renders correctly with props', async () => {
     render(
       <Provider
         store={configureStore({
@@ -104,17 +106,17 @@ describe('Advanced::', () => {
               },
             },
           },
-        } as StoreState)}
+        } as unknown as StoreState)}
       >
         {wrapWithGrafanaContextMock(<Advanced />)}
       </Provider>
     );
 
-    expect(screen.getByTestId('retention-number-input')).toHaveValue(30);
-    expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('localhost');
+    await waitFor(() => expect(screen.getByTestId('retention-number-input')).toHaveValue(30));
+    await waitFor(() => expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('localhost'));
   });
 
-  it('Calls apply changes', async () => {
+  it('calls apply changes', async () => {
     const spy = jest.spyOn(reducers, 'updateSettingsAction');
     render(
       <Provider
@@ -146,14 +148,16 @@ describe('Advanced::', () => {
         {wrapWithGrafanaContextMock(<Advanced />)}
       </Provider>
     );
+
     fireEvent.change(screen.getByTestId('retention-number-input'), { target: { value: 70 } });
     fireEvent.submit(screen.getByTestId('advanced-button'));
+
     await waitForElementToBeRemoved(() => screen.getByTestId('Spinner'));
 
     expect(spy).toHaveBeenCalled();
   });
 
-  it('Sets correct URL from browser', async () => {
+  it('sets correct URL from browser', async () => {
     const location = {
       ...window.location,
       host: 'pmmtest.percona.com',
@@ -196,10 +200,11 @@ describe('Advanced::', () => {
     );
 
     fireEvent.click(screen.getByTestId('public-address-button'));
-    expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('pmmtest.percona.com');
+
+    await waitFor(() => expect(screen.getByTestId('publicAddress-text-input')).toHaveValue('pmmtest.percona.com'));
   });
 
-  it('Does not include STT check intervals in the change request if STT checks are disabled', async () => {
+  it('does not include STT check intervals in the change request if STT checks are disabled', async () => {
     const spy = jest.spyOn(reducers, 'updateSettingsAction');
 
     render(
@@ -235,6 +240,7 @@ describe('Advanced::', () => {
 
     fireEvent.change(screen.getByTestId('retention-number-input'), { target: { value: 70 } });
     fireEvent.submit(screen.getByTestId('advanced-button'));
+
     await waitForElementToBeRemoved(() => screen.getByTestId('Spinner'));
 
     // expect(spy.calls.mostRecent().args[0].body.stt_check_intervals).toBeUndefined();

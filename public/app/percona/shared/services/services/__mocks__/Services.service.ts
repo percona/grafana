@@ -9,4 +9,9 @@ ServicesService.getActive = () =>
     service_types: [],
   });
 
+ServicesService.getServices = () =>
+  Promise.resolve({
+    services: [],
+  });
+
 ServicesService.removeService = () => Promise.resolve({});

@@ -9,6 +9,7 @@ import { StoreState } from 'app/types';
 import { SSHKey } from './SSHKey';
 
 jest.mock('app/percona/settings/Settings.service');
+jest.mock('app/percona/shared/services/services/Services.service');
 
 describe('SSHKey::', () => {
   it('Renders correctly', () => {
