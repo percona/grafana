@@ -672,6 +672,6 @@ export const PMM_NAV_VALKEY: NavModelItem = {
       text: 'Slow Log',
       url: `${config.appSubUrl}/d/valkey-slowlog/valkey-redis-slowlog`,
       hideFromTabs: true,
-    }
+    },
   ],
 };
