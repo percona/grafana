@@ -1,6 +1,8 @@
 import moment from 'moment/moment';
 
+import { AgentType } from 'app/percona/inventory/Inventory.types';
 import { AdvisorRunIntervalsSettings } from 'app/percona/settings/Settings.types';
+import { Service } from 'app/percona/shared/services/services/Services.types';
 
 import {
   HOURS,
@@ -9,8 +11,6 @@ import {
   PMM_SERVER_AGENT_SERVICE_NAME,
   SECONDS_IN_DAY,
 } from './Advanced.constants';
-import { AgentType } from 'app/percona/inventory/Inventory.types';
-import { Service } from 'app/percona/shared/services/services/Services.types';
 
 export const convertSecondsToDays = (dataRetention: string) => {
   const [count, units] = [+dataRetention.slice(0, -1), dataRetention.slice(-1)];

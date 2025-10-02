@@ -3,6 +3,8 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { Button, Icon, Spinner, useStyles2 } from '@grafana/ui';
+import { GET_SERVICES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
+import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -12,6 +14,7 @@ import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { updateSettingsAction } from 'app/percona/shared/core/reducers';
+import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getPerconaSettings, getServices } from 'app/percona/shared/core/selectors';
 import validators from 'app/percona/shared/helpers/validators';
 import { useAppDispatch } from 'app/store/store';
@@ -38,9 +41,6 @@ import {
   getMonitoringAgent,
 } from './Advanced.utils';
 import { SwitchRow } from './SwitchRow';
-import { InventoryService } from 'app/percona/inventory/Inventory.service';
-import { fetchServicesAction } from 'app/percona/shared/core/reducers/services';
-import { GET_SERVICES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
 
 const {
   advanced: { sttCheckIntervalsLabel, sttCheckIntervalTooltip, sttCheckIntervalUnit },
@@ -163,7 +163,7 @@ export const Advanced: FC = () => {
     };
 
     setLoading(true);
-    const promises = new Array<Promise<unknown>>();
+    const promises: Array<Promise<unknown>> = [];
 
     if (pmmServerMonitoringAgentId && initialValues.pmmServerMonitoringEnabled !== pmmServerMonitoringEnabled) {
       promises.push(
@@ -190,7 +190,7 @@ export const Advanced: FC = () => {
 
   useEffect(() => {
     dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
-  }, []);
+  }, [dispatch, generateToken]);
 
   return (
     <TabbedPage navId="settings-advanced" vertical>

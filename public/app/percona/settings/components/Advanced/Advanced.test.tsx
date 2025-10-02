@@ -1,17 +1,17 @@
 import { render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 import { Provider } from 'react-redux';
 
+import { InventoryService } from 'app/percona/inventory/Inventory.service';
+import { AgentType } from 'app/percona/inventory/Inventory.types';
+import { Databases } from 'app/percona/shared/core';
 import * as reducers from 'app/percona/shared/core/reducers';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
+import { Service, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { configureStore } from 'app/store/configureStore';
 import { StoreState } from 'app/types';
 
 import { Advanced } from './Advanced';
-import { Service, ServiceStatus } from 'app/percona/shared/services/services/Services.types';
 import { PMM_SERVER_AGENT_NODE_ID, PMM_SERVER_AGENT_SERVICE_NAME } from './Advanced.constants';
-import { AgentType } from 'app/percona/inventory/Inventory.types';
-import { Databases } from 'app/percona/shared/core';
-import { InventoryService } from 'app/percona/inventory/Inventory.service';
 
 jest.mock('app/percona/settings/Settings.service');
 
