@@ -12,7 +12,6 @@ import { StoreState } from 'app/types';
 
 import { Advanced } from './Advanced';
 import { PMM_SERVER_AGENT_NODE_ID, PMM_SERVER_AGENT_SERVICE_NAME } from './Advanced.constants';
-import { act } from 'react';
 
 jest.mock('app/percona/settings/Settings.service');
 jest.mock('app/percona/shared/services/services/Services.service');
