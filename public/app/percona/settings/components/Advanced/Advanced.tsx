@@ -103,6 +103,9 @@ export const Advanced: FC = () => {
       backupLabel,
       backupLink,
       backupTooltip,
+      pmmServerMonitoringLabel,
+      pmmServerMonitoringLink,
+      pmmServerMonitoringTooltip,
     },
     tooltipLinkText,
   } = Messages;
@@ -292,10 +295,10 @@ export const Advanced: FC = () => {
                   <Field
                     name="pmmServerMonitoringEnabled"
                     type="checkbox"
-                    label={Messages.advanced.pmmServerMonitoringLabel}
-                    tooltip={Messages.advanced.pmmServerMonitoringTooltip}
-                    tooltipLinkText={Messages.advanced.pmmServerMonitoringTooltip}
-                    link={Messages.advanced.pmmServerMonitoringLink}
+                    label={pmmServerMonitoringLabel}
+                    tooltip={pmmServerMonitoringTooltip}
+                    tooltipLinkText={tooltipLinkText}
+                    link={pmmServerMonitoringLink}
                     dataTestId="pmm-server-monitoring"
                     component={SwitchRow}
                   />
