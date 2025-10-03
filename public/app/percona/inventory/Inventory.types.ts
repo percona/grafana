@@ -189,7 +189,7 @@ export interface AgentsOption {
   label: string;
 }
 
-export interface Agent {
+export interface UpdateAgentItem {
   enable?: boolean;
   custom_labels?: Record<string, string>;
   enable_push_metrics?: boolean;
@@ -197,20 +197,20 @@ export interface Agent {
 }
 
 export interface UpdateAgentBody {
-  node_exporter?: Agent;
-  mysqld_exporter?: Agent;
-  mongodb_exporter?: Agent;
-  postgres_exporter?: Agent;
-  proxysql_exporter?: Agent;
-  external_exporter?: Agent;
-  rds_exporter?: Agent;
-  azure_database_exporter?: Agent;
-  qan_mysql_perfschema_agent?: Agent;
-  qan_mysql_slowlog_agent?: Agent;
-  qan_mongodb_profiler_agent?: Agent;
-  qan_mongodb_mongolog_agent?: Agent;
-  qan_postgresql_pgstatements_agent?: Agent;
-  qan_postgresql_pgstatmonitor_agent?: Agent;
+  node_exporter?: UpdateAgentItem;
+  mysqld_exporter?: UpdateAgentItem;
+  mongodb_exporter?: UpdateAgentItem;
+  postgres_exporter?: UpdateAgentItem;
+  proxysql_exporter?: UpdateAgentItem;
+  external_exporter?: UpdateAgentItem;
+  rds_exporter?: UpdateAgentItem;
+  azure_database_exporter?: UpdateAgentItem;
+  qan_mysql_perfschema_agent?: UpdateAgentItem;
+  qan_mysql_slowlog_agent?: UpdateAgentItem;
+  qan_mongodb_profiler_agent?: UpdateAgentItem;
+  qan_mongodb_mongolog_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatements_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatmonitor_agent?: UpdateAgentItem;
   nomad_agent?: {
     enable?: boolean;
   };
