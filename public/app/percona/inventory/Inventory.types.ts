@@ -189,91 +189,28 @@ export interface AgentsOption {
   label: string;
 }
 
+export interface Agent {
+  enable?: boolean;
+  custom_labels?: Record<string, string>;
+  enable_push_metrics?: boolean;
+  metrics_resolutions?: MetricsResolutions;
+}
+
 export interface UpdateAgentBody {
-  node_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  mysqld_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  mongodb_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  postgres_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  proxysql_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  external_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  rds_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  azure_database_exporter?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  qan_mysql_perfschema_agent?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  qan_mysql_slowlog_agent?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  qan_mongodb_profiler_agent?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  qan_mongodb_mongolog_agent?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  qan_postgresql_pgstatements_agent?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
-  qan_postgresql_pgstatmonitor_agent?: {
-    enable?: boolean;
-    custom_labels?: Record<string, string>;
-    enable_push_metrics?: boolean;
-    metrics_resolutions?: MetricsResolutions;
-  };
+  node_exporter?: Agent;
+  mysqld_exporter?: Agent;
+  mongodb_exporter?: Agent;
+  postgres_exporter?: Agent;
+  proxysql_exporter?: Agent;
+  external_exporter?: Agent;
+  rds_exporter?: Agent;
+  azure_database_exporter?: Agent;
+  qan_mysql_perfschema_agent?: Agent;
+  qan_mysql_slowlog_agent?: Agent;
+  qan_mongodb_profiler_agent?: Agent;
+  qan_mongodb_mongolog_agent?: Agent;
+  qan_postgresql_pgstatements_agent?: Agent;
+  qan_postgresql_pgstatmonitor_agent?: Agent;
   nomad_agent?: {
     enable?: boolean;
   };
