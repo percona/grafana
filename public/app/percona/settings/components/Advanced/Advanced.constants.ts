@@ -36,6 +36,3 @@ export const TECHNICAL_PREVIEW_DOC_URL = 'https://per.co.na/pmm-feature-status';
 
 // all feature flags
 export const FEATURE_KEYS: Array<keyof AdvancedFormProps> = ['alerting', 'backup', 'stt', 'azureDiscover'];
-
-export const PMM_SERVER_AGENT_SERVICE_NAME = 'pmm-server-postgresql';
-export const PMM_SERVER_AGENT_NODE_ID = 'pmm-server';

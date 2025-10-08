@@ -11,7 +11,6 @@ const successFn = jest.fn();
 const removeServiceActionSpy = jest.spyOn(ServicesReducer, 'removeServiceAction');
 
 jest.mock('app/percona/inventory/Inventory.service');
-jest.mock('app/percona/shared/services/services/Services.service');
 
 const renderDefaults = (isOpen = true) =>
   render(

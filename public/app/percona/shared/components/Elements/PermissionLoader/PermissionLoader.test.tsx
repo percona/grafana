@@ -7,7 +7,6 @@ import { StoreState } from 'app/types';
 import { PermissionLoader } from './PermissionLoader';
 
 jest.mock('app/percona/settings/Settings.service');
-jest.mock('app/percona/shared/services/services/Services.service');
 jest.mock('app/percona/shared/helpers/logger', () => {
   const originalModule = jest.requireActual('app/percona/shared/helpers/logger');
   return {

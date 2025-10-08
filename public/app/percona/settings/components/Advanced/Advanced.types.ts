@@ -12,6 +12,5 @@ export interface AdvancedFormProps {
   frequentInterval: string;
   telemetrySummaries: string[];
   accessControl?: boolean;
-  pmmServerMonitoringEnabled?: boolean;
-  pmmServerMonitoringAgentId?: string;
+  enableInternalPgQan?: boolean;
 }

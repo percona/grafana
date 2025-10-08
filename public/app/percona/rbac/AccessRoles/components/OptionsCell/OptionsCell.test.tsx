@@ -14,7 +14,6 @@ import OptionsCell from './OptionsCell';
 
 jest.mock('app/percona/shared/services/roles/Roles.service');
 jest.mock('app/percona/settings/Settings.service');
-jest.mock('app/percona/shared/services/services/Services.service');
 
 const wrapWithProvider = (children: ReactElement) => (
   <Provider

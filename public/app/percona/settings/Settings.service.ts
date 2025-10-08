@@ -78,6 +78,7 @@ const toModel = (response: SettingsPayload): Settings => ({
   isConnectedToPortal: response.connected_to_platform,
   defaultRoleId: response.default_role_id,
   enableAccessControl: response.enable_access_control,
+  enableInternalPgQan: response.enable_internal_pg_qan,
 });
 
 const toReadonlyModel = (response: ReadonlySettingsPayload): Settings => ({
@@ -116,4 +117,5 @@ const toReadonlyModel = (response: ReadonlySettingsPayload): Settings => ({
   isConnectedToPortal: false,
   defaultRoleId: -1,
   enableAccessControl: response.enable_access_control,
+  enableInternalPgQan: false,
 });

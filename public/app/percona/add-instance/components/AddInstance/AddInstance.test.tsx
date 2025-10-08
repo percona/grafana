@@ -12,7 +12,6 @@ import { AddInstance } from './AddInstance';
 import { instanceList } from './AddInstance.constants';
 
 jest.mock('app/percona/settings/Settings.service');
-jest.mock('app/percona/shared/services/services/Services.service');
 
 const selectedInstanceType: InstanceAvailable = { type: '' };
 

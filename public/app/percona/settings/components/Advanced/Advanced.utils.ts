@@ -44,11 +44,3 @@ export const convertCheckIntervalsToHours = (sttCheckIntervals: AdvisorRunInterv
     frequentInterval: `${convertSecondsStringToHour(rawFrequentInterval)}`,
   };
 };
-
-export const getMonitoringAgent = (services: Service[]) => {
-  const service = services.find(
-    (s) => s.params.serviceName === PMM_SERVER_AGENT_SERVICE_NAME && s.params.nodeId === PMM_SERVER_AGENT_NODE_ID
-  );
-
-  return service?.params.agents?.find((a) => a.agentType === AgentType.qanPostgresql_pgstatements_agent);
-};

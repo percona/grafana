@@ -1,10 +1,9 @@
 import { cx } from '@emotion/css';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Field, withTypes } from 'react-final-form';
 
 import { Button, Icon, Spinner, useStyles2 } from '@grafana/ui';
 import { GET_SERVICES_CANCEL_TOKEN } from 'app/percona/inventory/Inventory.constants';
-import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { Messages } from 'app/percona/settings/Settings.messages';
 import { getSettingsStyles } from 'app/percona/settings/Settings.styles';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -34,25 +33,59 @@ import {
 } from './Advanced.constants';
 import { getStyles } from './Advanced.styles';
 import { AdvancedFormProps } from './Advanced.types';
-import {
-  convertCheckIntervalsToHours,
-  convertHoursStringToSeconds,
-  convertSecondsToDays,
-  getMonitoringAgent,
-} from './Advanced.utils';
+import { convertCheckIntervalsToHours, convertHoursStringToSeconds, convertSecondsToDays } from './Advanced.utils';
 import { SwitchRow } from './SwitchRow';
 
 const {
-  advanced: { sttCheckIntervalsLabel, sttCheckIntervalTooltip, sttCheckIntervalUnit },
+  tooltipLinkText,
+  advanced: {
+    action,
+    retentionLabel,
+    retentionTooltip,
+    retentionUnits,
+    telemetryLabel,
+    telemetryLink,
+    telemetryTooltip,
+    telemetrySummaryTitle,
+    telemetryDisclaimer,
+    updatesLabel,
+    updatesLink,
+    updatesTooltip,
+    advisorsLabel,
+    advisorsLink,
+    advisorsTooltip,
+    publicAddressLabel,
+    publicAddressTooltip,
+    publicAddressButton,
+    accessControl,
+    accessControlTooltip,
+    accessControlLink,
+    alertingLabel,
+    alertingTooltip,
+    alertingLink,
+    azureDiscoverLabel,
+    azureDiscoverTooltip,
+    azureDiscoverLink,
+    technicalPreviewLegend,
+    technicalPreviewDescription,
+    technicalPreviewLinkText,
+    backupLabel,
+    backupLink,
+    backupTooltip,
+    enableInternalPgQanLabel,
+    enableInternalPgQanLink,
+    enableInternalPgQanTooltip,
+    sttCheckIntervalsLabel,
+    sttCheckIntervalTooltip,
+    sttCheckIntervalUnit,
+  },
 } = Messages;
 
 export const Advanced: FC = () => {
   const styles = useStyles2(getStyles);
   const [generateToken] = useCancelToken();
   const { result: settings } = useSelector(getPerconaSettings);
-  const { services } = useSelector(getServices);
   const dispatch = useAppDispatch();
-  const agent = useMemo(() => getMonitoringAgent(services), [services]);
   const {
     advisorRunIntervals: sttCheckIntervals,
     dataRetention,
@@ -65,50 +98,10 @@ export const Advanced: FC = () => {
     alertingEnabled,
     telemetrySummaries,
     enableAccessControl,
+    enableInternalPgQan,
   } = settings!;
   const settingsStyles = useStyles2(getSettingsStyles);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
-  const {
-    advanced: {
-      action,
-      retentionLabel,
-      retentionTooltip,
-      retentionUnits,
-      telemetryLabel,
-      telemetryLink,
-      telemetryTooltip,
-      telemetrySummaryTitle,
-      telemetryDisclaimer,
-      updatesLabel,
-      updatesLink,
-      updatesTooltip,
-      advisorsLabel,
-      advisorsLink,
-      advisorsTooltip,
-      publicAddressLabel,
-      publicAddressTooltip,
-      publicAddressButton,
-      accessControl,
-      accessControlTooltip,
-      accessControlLink,
-      alertingLabel,
-      alertingTooltip,
-      alertingLink,
-      azureDiscoverLabel,
-      azureDiscoverTooltip,
-      azureDiscoverLink,
-      technicalPreviewLegend,
-      technicalPreviewDescription,
-      technicalPreviewLinkText,
-      backupLabel,
-      backupLink,
-      backupTooltip,
-      pmmServerMonitoringLabel,
-      pmmServerMonitoringLink,
-      pmmServerMonitoringTooltip,
-    },
-    tooltipLinkText,
-  } = Messages;
 
   const initialValues: AdvancedFormProps = {
     retention: convertSecondsToDays(dataRetention),
@@ -124,8 +117,7 @@ export const Advanced: FC = () => {
     frequentInterval,
     telemetrySummaries,
     accessControl: enableAccessControl,
-    pmmServerMonitoringAgentId: agent?.agentId,
-    pmmServerMonitoringEnabled: !agent?.disabled,
+    enableInternalPgQan,
   };
   const [loading, setLoading] = useState(false);
 
@@ -143,8 +135,7 @@ export const Advanced: FC = () => {
       frequentInterval,
       updates,
       accessControl,
-      pmmServerMonitoringEnabled,
-      pmmServerMonitoringAgentId,
+      enableInternalPgQan,
     } = values;
     const sttCheckIntervals = {
       rare_interval: `${convertHoursStringToSeconds(rareInterval)}s`,
@@ -163,30 +154,16 @@ export const Advanced: FC = () => {
       enable_backup_management: backup,
       enable_updates: updates,
       enable_access_control: accessControl,
+      enable_internal_pg_qan: enableInternalPgQan,
     };
 
     setLoading(true);
-    const promises: Array<Promise<unknown>> = [];
-
-    if (pmmServerMonitoringAgentId && initialValues.pmmServerMonitoringEnabled !== pmmServerMonitoringEnabled) {
-      promises.push(
-        InventoryService.updateAgent(pmmServerMonitoringAgentId, {
-          qan_postgresql_pgstatements_agent: {
-            enable: pmmServerMonitoringEnabled,
-          },
-        })
-      );
-    }
-
-    promises.push(
-      dispatch(
-        updateSettingsAction({
-          body,
-          token: generateToken(SET_SETTINGS_CANCEL_TOKEN),
-        })
-      )
+    await dispatch(
+      updateSettingsAction({
+        body,
+        token: generateToken(SET_SETTINGS_CANCEL_TOKEN),
+      })
     );
-    await Promise.all(promises);
     setLoading(false);
   };
   const { Form } = withTypes<AdvancedFormProps>();
@@ -293,13 +270,13 @@ export const Advanced: FC = () => {
                     component={SwitchRow}
                   />
                   <Field
-                    name="pmmServerMonitoringEnabled"
+                    name="enableInternalPgQan"
                     type="checkbox"
-                    label={pmmServerMonitoringLabel}
-                    tooltip={pmmServerMonitoringTooltip}
+                    label={enableInternalPgQanLabel}
+                    tooltip={enableInternalPgQanTooltip}
                     tooltipLinkText={tooltipLinkText}
-                    link={pmmServerMonitoringLink}
-                    dataTestId="pmm-server-monitoring"
+                    link={enableInternalPgQanLink}
+                    dataTestId="enable-internal-pg-qan"
                     component={SwitchRow}
                   />
                   <div className={styles.advancedRow}>

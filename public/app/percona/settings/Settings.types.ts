@@ -63,6 +63,7 @@ export interface AdvancedChangePayload extends AdvancedPayload {
   enable_azurediscover?: boolean;
   enable_updates?: boolean;
   enable_access_control?: boolean;
+  enable_internal_pg_qan?: boolean;
 }
 
 export interface MetricsResolutionsPayload {
@@ -122,6 +123,7 @@ export interface SettingsPayload
   telemetry_summaries: string[];
   default_role_id: number;
   enable_access_control: boolean;
+  enable_internal_pg_qan: boolean;
 }
 
 export interface SettingsPayload
@@ -180,6 +182,7 @@ export interface Settings extends ReadonlySettings {
   isConnectedToPortal?: boolean;
   telemetrySummaries: string[];
   defaultRoleId: number;
+  enableInternalPgQan: boolean;
 }
 
 export interface MetricsResolutions {
