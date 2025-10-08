@@ -15,6 +15,7 @@ const successFn = jest.fn();
 const removeServicesActionSpy = jest.spyOn(ServicesReducer, 'removeServicesAction');
 
 jest.mock('app/percona/inventory/Inventory.service');
+jest.mock('app/percona/shared/services/services/Services.service');
 
 const serviceStub: FlattenService = {
   nodeId: 'Node #1',

@@ -10,7 +10,6 @@ import { Connected } from './Connected';
 import { Messages } from './Connected.messages';
 
 jest.mock('app/percona/settings/components/Platform/Platform.service');
-
 jest.mock('app/percona/settings/Settings.service');
 
 describe('Connected:', () => {
