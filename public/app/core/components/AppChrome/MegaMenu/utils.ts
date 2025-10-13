@@ -132,21 +132,32 @@ export function getEditionAndUpdateLinks(): NavModelItem[] {
   const stateInfo = licenseInfo.stateInfo ? ` (${licenseInfo.stateInfo})` : '';
   const links: NavModelItem[] = [];
 
-  links.push({
-    target: '_blank',
-    id: 'version',
-    text: `${buildInfo.edition}${stateInfo}`,
-    url: licenseInfo.licenseUrl,
-    icon: 'external-link-alt',
-  });
+  // @PERCONA
+  if (licenseInfo.licenseUrl === '/graph/admin/upgrading') {
+    links.push({
+      target: '_blank',
+      id: 'open-source',
+      text: 'Open source',
+      url: 'https://grafana.com/oss/grafana/?utm_source=grafana_footer',
+      icon: 'external-link-alt',
+    });
+  } else {
+    links.push({
+      target: '_blank',
+      id: 'version',
+      text: `${buildInfo.edition}${stateInfo}`,
+      url: licenseInfo.licenseUrl,
+      icon: 'external-link-alt',
+    });
+  }
 
   if (buildInfo.hasUpdate) {
     links.push({
       target: '_blank',
       id: 'updateVersion',
       text: `New version available!`,
-      icon: 'download-alt',
       url: 'https://grafana.com/grafana/download?utm_source=grafana_footer',
+      icon: 'download-alt',
     });
   }
 
