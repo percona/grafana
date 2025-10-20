@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { FeatureState, getBuiltInThemes, ThemeRegistryItem } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { config, reportInteraction } from '@grafana/runtime';
+import { config, reportInteraction, getAppEvents, ThemeChangedEvent } from '@grafana/runtime';
 import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
 import {
   Button,
@@ -26,11 +26,14 @@ import { t, Trans } from 'app/core/internationalization';
 import { LANGUAGES, PSEUDO_LOCALE } from 'app/core/internationalization/constants';
 import { PreferencesService } from 'app/core/services/PreferencesService';
 import { changeTheme } from 'app/core/services/theme';
+import type { Unsubscribable } from 'rxjs';
+
 export interface Props {
   resourceUri: string;
   disabled?: boolean;
   preferenceType: 'org' | 'team' | 'user';
   onConfirm?: () => Promise<boolean>;
+  eventBus?: { subscribe: Function };
 }
 
 export type State = UserPreferencesDTO & {
@@ -67,6 +70,7 @@ function getLanguageOptions(): ComboboxOption[] {
 export class SharedPreferences extends PureComponent<Props, State> {
   service: PreferencesService;
   themeOptions: ComboboxOption[];
+  private themeChangedSub?: Unsubscribable;
 
   constructor(props: Props) {
     super(props);
@@ -110,6 +114,7 @@ export class SharedPreferences extends PureComponent<Props, State> {
       isLoading: true,
     });
     const prefs = await this.service.load();
+    console.log('Loaded preferences:');
 
     this.setState({
       isLoading: false,
@@ -121,6 +126,32 @@ export class SharedPreferences extends PureComponent<Props, State> {
       queryHistory: prefs.queryHistory,
       navbar: prefs.navbar,
     });
+
+    // Listen to Grafana theme changes and reflect them in the dropdown immediately
+    const eventBus = this.props.eventBus ?? getAppEvents();
+    if (eventBus && typeof eventBus.subscribe === 'function') {
+      this.themeChangedSub = eventBus.subscribe(ThemeChangedEvent, (evt: any) => {
+        try {
+          const payload = evt?.payload;
+          const isDark = typeof payload?.isDark === 'boolean' ? payload.isDark : payload?.colors?.mode === 'dark';
+          const mode: 'light' | 'dark' = isDark ? 'dark' : 'light';
+
+          if (this.state.theme !== mode) {
+            this.setState({ theme: mode });
+          }
+        } catch (err) {
+          console.warn('[SharedPreferences] Failed to sync theme from ThemeChangedEvent:', err);
+        }
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    try {
+      this.themeChangedSub?.unsubscribe();
+    } catch (err) {
+      console.warn('[SharedPreferences] Failed to unsubscribe ThemeChangedEvent:', err);
+    }
   }
 
   onSubmitForm = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -135,15 +166,37 @@ export class SharedPreferences extends PureComponent<Props, State> {
   };
 
   onThemeChanged = (value: ComboboxOption<string>) => {
-    this.setState({ theme: value.value });
+    const raw = value?.value ?? '';
+    const prev = this.state.theme;
+
+    if (prev !== raw) {
+      this.setState({ theme: raw });
+    }
+
     reportInteraction('grafana_preferences_theme_changed', {
-      toTheme: value.value,
+      toTheme: raw,
       preferenceType: this.props.preferenceType,
     });
 
-    if (value.value) {
-      changeTheme(value.value, true);
+    if (raw) {
+      try {
+        changeTheme(raw, true);
+      } catch (err) {}
     }
+
+    try {
+      const theme2 = config?.theme2;
+      if (!theme2) {
+        console.warn('[SharedPreferences] publish skipped: config.theme2 is not available');
+      } else {
+        const appEvents = getAppEvents();
+        if (typeof appEvents.publish === 'function') {
+          appEvents.publish(new ThemeChangedEvent(theme2));
+        } else {
+          console.warn('[SharedPreferences] publish ThemeChangedEvent skipped: publish is not a function');
+        }
+      }
+    } catch (err) {}
   };
 
   onTimeZoneChanged = (timezone?: string) => {
