@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 
 import { AppEvents, OrgRole, UrlQueryMap } from '@grafana/data';
 import { config, locationService } from '@grafana/runtime';
-import { useStyles2 } from '@grafana/ui';
+import { Button, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
@@ -28,6 +28,7 @@ import { Messages } from './AllChecksTab.messages';
 import { getStyles } from './AllChecksTab.styles';
 import { ChangeCheckIntervalModal } from './ChangeCheckIntervalModal';
 import { CheckActions } from './CheckActions/CheckActions';
+import { RunAdvisorChecksYamlModal } from './RunAdvisorChecksYamlModal';
 
 export const AllChecksTab: FC = () => {
   const [queryParams] = useQueryParams();
@@ -36,6 +37,7 @@ export const AllChecksTab: FC = () => {
   const [runChecksPending, setRunChecksPending] = useState(false);
   const [checkIntervalModalVisible, setCheckIntervalModalVisible] = useState(false);
   const [selectedCheck, setSelectedCheck] = useState<CheckDetails>();
+  const [yamlModalVisible, setYamlModalVisible] = useState(false);
   const styles = useStyles2(getStyles);
   const { loading: advisorsPending } = useSelector(getAdvisors);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
@@ -212,6 +214,15 @@ export const AllChecksTab: FC = () => {
                   >
                     {Messages.runDbChecks}
                   </LoaderButton>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="md"
+                    onClick={() => setYamlModalVisible(true)}
+                    data-testid="run-checks-from-yaml-button"
+                  >
+                    {Messages.runChecksFromYaml}
+                  </Button>
                 </div>
               )}
             </div>
@@ -257,6 +268,7 @@ export const AllChecksTab: FC = () => {
               />
             </UpgradePlanWrapper> */}
           </div>
+          <RunAdvisorChecksYamlModal isVisible={yamlModalVisible} setVisible={setYamlModalVisible} />
         </FeatureLoader>
       </Page.Contents>
     </Page>

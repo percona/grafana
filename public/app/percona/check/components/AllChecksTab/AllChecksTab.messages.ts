@@ -25,4 +25,5 @@ export const Messages = {
   checksExecutionStarted: 'All checks started running in the background',
   runDbChecks: 'Run Checks',
   runIndividualDbCheck: 'check started running in the background',
+  runChecksFromYaml: 'Run Checks from YAML',
 };

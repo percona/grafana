@@ -1,0 +1,20 @@
+export const Messages = {
+  title: 'Run Advisor Checks from YAML',
+  runButton: 'Run Checks',
+  uploadButton: 'Upload YAML File',
+  closeButton: 'Close',
+  yamlLabel: 'YAML Check Configuration',
+  yamlPlaceholder: 'Paste your YAML check configuration here or upload a file',
+  success: 'Checks executed successfully',
+  noResults: 'No check results returned',
+  resultsTitle: 'Check Results',
+  table: {
+    checkName: 'Check Name',
+    serviceName: 'Service Name',
+    severity: 'Severity',
+    summary: 'Summary',
+    description: 'Description',
+    readMore: 'Read More',
+    silenced: 'Silenced',
+  },
+};

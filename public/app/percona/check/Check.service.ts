@@ -7,6 +7,9 @@ import {
   CheckResultSummaryPayload,
   FailedCheckSummary,
   ServiceFailedCheck,
+  RunCheckFileRequest,
+  RunCheckFileResponse,
+  FormattedCheckResult,
 } from 'app/percona/check/types';
 import { API, PaginatedFomattedResponse, Severity } from 'app/percona/shared/core';
 import { api } from 'app/percona/shared/helpers/api';
@@ -145,5 +148,37 @@ export const CheckService = {
   },
   changeCheck(body: ChangeCheckBody, token?: CancelToken): Promise<void | {}> {
     return api.post<{}, ChangeCheckBody>(`${BASE_URL}/checks:batchChange`, body, false, token);
+  },
+  async runCheckFile(yaml: string, token?: CancelToken): Promise<FormattedCheckResult[]> {
+    const { results = [] } = await api.post<RunCheckFileResponse, RunCheckFileRequest>(
+      `${BASE_URL}/checks:runFile`,
+      { yaml },
+      false,
+      token
+    );
+
+    return results.map(
+      ({
+        summary,
+        description,
+        severity,
+        labels = {},
+        read_more_url,
+        service_name,
+        service_id,
+        check_name,
+        silenced,
+      }) => ({
+        summary,
+        description,
+        severity: Severity[severity],
+        labels: formatLabels(labels),
+        readMoreUrl: read_more_url,
+        serviceName: service_name,
+        serviceId: service_id,
+        checkName: check_name,
+        silenced: !!silenced,
+      })
+    );
   },
 };

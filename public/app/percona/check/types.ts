@@ -109,3 +109,36 @@ export interface ChangeCheckBody {
 export interface AlertsReload {
   fetchAlerts: () => Promise<void>;
 }
+
+// RunCheckFile types
+export interface RunCheckFileRequest {
+  yaml: string;
+}
+
+export interface CheckResult {
+  summary: string;
+  description: string;
+  severity: keyof typeof Severity;
+  labels: { [key: string]: string };
+  read_more_url: string;
+  service_name: string;
+  service_id: string;
+  check_name: string;
+  silenced: boolean;
+}
+
+export interface RunCheckFileResponse {
+  results: CheckResult[];
+}
+
+export interface FormattedCheckResult {
+  summary: string;
+  description: string;
+  severity: Severity;
+  labels: PrioritizedLabels;
+  readMoreUrl: string;
+  serviceName: string;
+  serviceId: string;
+  checkName: string;
+  silenced: boolean;
+}
