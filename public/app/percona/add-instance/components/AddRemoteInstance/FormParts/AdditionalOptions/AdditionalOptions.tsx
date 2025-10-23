@@ -26,6 +26,7 @@ import {
   TablestatOptionsInterface,
 } from './AdditionalOptions.types';
 import { MongodbTLSCertificate } from './MongodbTLSCertificate';
+import MysqlExtraDSNParams from './MysqlExtraDSNParams';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
 
@@ -167,6 +168,9 @@ const MySQLOptions = ({ form }: { form: FormApi }) => {
 
   return (
     <>
+      <div className={styles.extraDsnOptions}>
+        <MysqlExtraDSNParams />
+      </div>
       <h4>{Messages.form.labels.additionalOptions.tablestatOptions}</h4>
       <div className={styles.group}>
         <RadioButtonGroupField
@@ -204,6 +208,10 @@ export const getAdditionalOptions = (
           <>
             <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
             <CheckboxField
+              label={Messages.form.labels.additionalOptions.disableQueryExamples}
+              name="disable_query_examples"
+            />
+            <CheckboxField
               label={Messages.form.labels.additionalOptions.disableCommentsParsing}
               name="disable_comments_parsing"
             />
@@ -239,7 +247,10 @@ export const getAdditionalOptions = (
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
           <MysqlTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
-          <MySQLOptions form={form} />
+          <CheckboxField
+            label={Messages.form.labels.additionalOptions.disableQueryExamples}
+            name="disable_query_examples"
+          />
           <CheckboxField
             label={Messages.form.labels.additionalOptions.disableCommentsParsing}
             name="disable_comments_parsing"
@@ -248,6 +259,7 @@ export const getAdditionalOptions = (
             label={Messages.form.labels.additionalOptions.qanMysqlPerfschema}
             name="qan_mysql_perfschema"
           />
+          <MySQLOptions form={form} />
           {remoteInstanceCredentials.isRDS ? (
             <>
               <CheckboxField
