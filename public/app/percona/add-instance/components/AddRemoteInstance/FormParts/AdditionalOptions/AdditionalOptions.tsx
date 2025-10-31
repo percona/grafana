@@ -208,6 +208,10 @@ export const getAdditionalOptions = (
           <>
             <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
             <CheckboxField
+              label={Messages.form.labels.additionalOptions.disableQueryExamples}
+              name="disable_query_examples"
+            />
+            <CheckboxField
               label={Messages.form.labels.additionalOptions.disableCommentsParsing}
               name="disable_comments_parsing"
             />
@@ -243,7 +247,10 @@ export const getAdditionalOptions = (
           <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
           <MysqlTLSCertificate form={form} />
           <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
-          <MySQLOptions form={form} />
+          <CheckboxField
+            label={Messages.form.labels.additionalOptions.disableQueryExamples}
+            name="disable_query_examples"
+          />
           <CheckboxField
             label={Messages.form.labels.additionalOptions.disableCommentsParsing}
             name="disable_comments_parsing"
@@ -252,6 +259,7 @@ export const getAdditionalOptions = (
             label={Messages.form.labels.additionalOptions.qanMysqlPerfschema}
             name="qan_mysql_perfschema"
           />
+          <MySQLOptions form={form} />
           {remoteInstanceCredentials.isRDS ? (
             <>
               <CheckboxField
