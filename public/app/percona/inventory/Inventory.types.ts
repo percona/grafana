@@ -1,3 +1,4 @@
+import { MetricsResolutions } from '../settings/Settings.types';
 import { Databases } from '../shared/core';
 import { DbNode, NodeType } from '../shared/services/nodes/Nodes.types';
 import {
@@ -187,4 +188,31 @@ export interface NodesOption {
 export interface AgentsOption {
   value: string;
   label: string;
+}
+
+export interface UpdateAgentItem {
+  enable?: boolean;
+  custom_labels?: Record<string, string>;
+  enable_push_metrics?: boolean;
+  metrics_resolutions?: MetricsResolutions;
+}
+
+export interface UpdateAgentBody {
+  node_exporter?: UpdateAgentItem;
+  mysqld_exporter?: UpdateAgentItem;
+  mongodb_exporter?: UpdateAgentItem;
+  postgres_exporter?: UpdateAgentItem;
+  proxysql_exporter?: UpdateAgentItem;
+  external_exporter?: UpdateAgentItem;
+  rds_exporter?: UpdateAgentItem;
+  azure_database_exporter?: UpdateAgentItem;
+  qan_mysql_perfschema_agent?: UpdateAgentItem;
+  qan_mysql_slowlog_agent?: UpdateAgentItem;
+  qan_mongodb_profiler_agent?: UpdateAgentItem;
+  qan_mongodb_mongolog_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatements_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatmonitor_agent?: UpdateAgentItem;
+  nomad_agent?: {
+    enable?: boolean;
+  };
 }

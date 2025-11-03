@@ -12,4 +12,5 @@ export interface AdvancedFormProps {
   frequentInterval: string;
   telemetrySummaries: string[];
   accessControl?: boolean;
+  enableInternalPgQan?: boolean;
 }

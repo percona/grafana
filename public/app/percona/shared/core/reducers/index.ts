@@ -63,6 +63,7 @@ const initialSettingsState: Settings = {
   isConnectedToPortal: false,
   defaultRoleId: 1,
   enableAccessControl: false,
+  enableInternalPgQan: false,
 };
 
 export const fetchSettingsAction = createAsyncThunk(
