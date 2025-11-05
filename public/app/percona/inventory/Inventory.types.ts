@@ -1,3 +1,4 @@
+import { MetricsResolutions } from '../settings/Settings.types';
 import { Databases } from '../shared/core';
 import { DbNode, NodeType } from '../shared/services/nodes/Nodes.types';
 import {
@@ -25,7 +26,7 @@ export interface Service {
 export type DBServiceList = { [key in Databases]?: Service[] };
 
 export enum AgentType {
-  amazonRdsMysql = 'amazon_rds_mysql',
+  amazonRdsMysql = 'amazon-rds-mysql',
   container = 'container',
   externalExporter = 'externalExporter',
   generic = 'generic',
@@ -39,15 +40,15 @@ export enum AgentType {
   postgresql = 'postgresql',
   proxysql = 'proxysql',
   proxysqlExporter = 'proxysqlExporter',
-  qanMongodb_profiler_agent = 'qan_mongodb_profiler_agent',
-  qanMysql_perfschema_agent = 'qan_mysql_perfschema_agent',
-  qanMysql_slowlog_agent = 'qan_mysql_slowlog_agent',
-  qanPostgresql_pgstatements_agent = 'qan_postgresql_pgstatements_agent',
-  qanPostgresql_pgstatmonitor_agent = 'qan_postgresql_pgstatmonitor_agent',
+  qanMongodb_profiler_agent = 'qan-mongodb-profiler-agent',
+  qanMysql_perfschema_agent = 'qan-mysql-perfschema-agent',
+  qanMysql_slowlog_agent = 'qan-mysql-slowlog-agent',
+  qanPostgresql_pgstatements_agent = 'qan-postgresql-pgstatements-agent',
+  qanPostgresql_pgstatmonitor_agent = 'qan-postgresql-pgstatmonitor-agent',
   rdsExporter = 'rdsExporter',
   remote = 'remote',
-  remote_rds = 'remote_rds',
-  vmAgent = 'vm_agent',
+  remote_rds = 'remote-rds',
+  vmAgent = 'vm-agent',
 }
 
 export enum ServiceAgentStatus {
@@ -62,6 +63,7 @@ export enum ServiceAgentStatus {
 export enum MonitoringStatus {
   OK = 'OK',
   FAILED = 'Failed',
+  WARNING = 'Warning',
 }
 
 export interface ServiceAgentPayload {
@@ -186,4 +188,31 @@ export interface NodesOption {
 export interface AgentsOption {
   value: string;
   label: string;
+}
+
+export interface UpdateAgentItem {
+  enable?: boolean;
+  custom_labels?: Record<string, string>;
+  enable_push_metrics?: boolean;
+  metrics_resolutions?: MetricsResolutions;
+}
+
+export interface UpdateAgentBody {
+  node_exporter?: UpdateAgentItem;
+  mysqld_exporter?: UpdateAgentItem;
+  mongodb_exporter?: UpdateAgentItem;
+  postgres_exporter?: UpdateAgentItem;
+  proxysql_exporter?: UpdateAgentItem;
+  external_exporter?: UpdateAgentItem;
+  rds_exporter?: UpdateAgentItem;
+  azure_database_exporter?: UpdateAgentItem;
+  qan_mysql_perfschema_agent?: UpdateAgentItem;
+  qan_mysql_slowlog_agent?: UpdateAgentItem;
+  qan_mongodb_profiler_agent?: UpdateAgentItem;
+  qan_mongodb_mongolog_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatements_agent?: UpdateAgentItem;
+  qan_postgresql_pgstatmonitor_agent?: UpdateAgentItem;
+  nomad_agent?: {
+    enable?: boolean;
+  };
 }

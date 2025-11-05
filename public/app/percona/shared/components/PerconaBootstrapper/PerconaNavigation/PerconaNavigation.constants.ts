@@ -431,22 +431,16 @@ export const PMM_NAV_MYSQL: NavModelItem = {
       url: `${config.appSubUrl}/d/mysql-performance-schema/mysql-performance-schema-details`,
     },
     {
-      id: 'mysql-query-response-time-details',
-      text: 'Query response time',
-      icon: 'sitemap',
-      url: `${config.appSubUrl}/d/mysql-queryresponsetime/mysql-query-response-time-details`,
-    },
-    {
       id: 'mysql-table-details',
       text: 'Table details',
       icon: 'sitemap',
       url: `${config.appSubUrl}/d/mysql-table/mysql-table-details`,
     },
     {
-      id: 'mysql-tokudb-details',
-      text: 'TokuDB details',
+      id: 'mysql-myrocks-details',
+      text: 'MyRocks details',
       icon: 'sitemap',
-      url: `${config.appSubUrl}/d/mysql-tokudb/mysql-tokudb-details`,
+      url: `${config.appSubUrl}/d/mysql-myrocks/mysql-myrocks-details`,
     },
   ],
 };

@@ -205,8 +205,9 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
 
     expect(screen.getByTestId('qan_mysql_perfschema-checkbox-input')).toBeInTheDocument();
+    expect(screen.getByTestId('disable_query_examples-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_comments_parsing-checkbox-input')).toBeInTheDocument();
-    expect(fields.length).toBe(9);
+    expect(fields.length).toBe(10);
   });
   it('should render correct for RDS MySQL', async () => {
     const type = Databases.mysql;
@@ -222,10 +223,11 @@ describe('getAdditionalOptions ::', () => {
     );
     const fields = container.querySelectorAll('input');
     expect(screen.getByTestId('qan_mysql_perfschema-checkbox-input')).toBeInTheDocument();
+    expect(screen.getByTestId('disable_query_examples-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_comments_parsing-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_basic_metrics-checkbox-input')).toBeInTheDocument();
     expect(screen.getByTestId('disable_enhanced_metrics-checkbox-input')).toBeInTheDocument();
-    expect(fields.length).toBe(11);
+    expect(fields.length).toBe(12);
   });
   it('should render correct for PostgreSQL', async () => {
     const type = Databases.postgresql;
@@ -242,7 +244,7 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
     expect(trakingFields.length).toBe(trackingOptions.length);
-    expect(fields.length).toBe(16);
+    expect(fields.length).toBe(17);
   });
   it('should render correct for RDS PostgreSQL', async () => {
     const type = Databases.postgresql;
@@ -259,6 +261,6 @@ describe('getAdditionalOptions ::', () => {
     const fields = container.querySelectorAll('input');
     const trakingFields = screen.getAllByTestId('tracking-radio-button');
     expect(trakingFields.length).toBe(rdsTrackingOptions.length);
-    expect(fields.length).toBe(17);
+    expect(fields.length).toBe(18);
   });
 });

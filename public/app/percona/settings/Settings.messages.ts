@@ -38,6 +38,10 @@ export const Messages = {
     backupLabel: 'Backup Management',
     backupTooltip: 'Option to enable/disable Backup Management features.',
     backupLink: `https://per.co.na/backup_management`,
+    enableInternalPgQanLabel: 'QAN for PMM Server',
+    enableInternalPgQanTooltip:
+      "Displays queries from PMM Server's internal PostgreSQL database in Query Analytics (QAN). Enable to troubleshoot PMM Server's database performance alongside your monitored instances.",
+    enableInternalPgQanLink: 'https://per.co.na/qan-pmm-server',
     technicalPreviewLegend: 'Technical preview features',
     technicalPreviewDescription:
       'These are technical preview features, not recommended to be used in production environments. Read more\n' +
