@@ -205,6 +205,7 @@
   "mono/percona-database-mongodb",
   "mono/percona-database-proxysql",
   "mono/percona-database-haproxy",
+  "mono/percona-database-valkey",
   "mono/percona-bell",
   "mono/percona-bell-slash",
   "mono/percona-asterisk",

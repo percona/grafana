@@ -13,6 +13,7 @@ export const DATABASE_LABELS = {
   [Databases.proxysql]: 'ProxySQL',
   [Databases.mariadb]: 'MariaDB',
   [Databases.haproxy]: 'HAProxy',
+  [Databases.valkey]: 'Valkey',
 };
 
 export const OPERATOR_LABELS = {
@@ -55,6 +56,7 @@ export const DATABASE_ICONS: Record<Databases, string> = {
   [Databases.proxysql]: 'percona-database-proxysql',
   [Databases.mariadb]: 'percona-database-mysql',
   [Databases.haproxy]: 'percona-database-haproxy',
+  [Databases.valkey]: 'percona-database-valkey',
 };
 
 export const INT_32 = {
