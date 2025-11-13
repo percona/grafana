@@ -1,6 +1,6 @@
 module github.com/grafana/grafana/pkg/storage/unified/resource
 
-go 1.24.4
+go 1.24.9
 
 replace (
 	github.com/grafana/grafana => ../../../..
