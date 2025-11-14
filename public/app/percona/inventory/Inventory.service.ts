@@ -11,6 +11,7 @@ import {
   NodeListDBPayload,
   RemoveNodeBody,
   ServiceAgentListPayload,
+  UpdateAgentBody,
 } from './Inventory.types';
 
 const BASE_URL = `/v1/inventory`;
@@ -24,6 +25,9 @@ export const InventoryService = {
         node_id: nodeId,
       },
     });
+  },
+  updateAgent(agentId: string, payload: UpdateAgentBody, token?: CancelToken) {
+    return api.put(`${BASE_URL}/agents/${agentId}`, payload, false, token);
   },
   removeAgent(agentId: string, forceMode = false, token?: CancelToken) {
     // todo: address forceMode

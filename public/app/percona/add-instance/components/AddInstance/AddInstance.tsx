@@ -40,6 +40,7 @@ export const AddInstance: FC<AddInstanceProps> = ({ selectedInstanceType, onSele
       { type: Databases.postgresql, title: Messages.titles.postgresql, icon: 'percona-database-postgresql' },
       { type: Databases.proxysql, title: Messages.titles.proxysql, icon: 'percona-database-proxysql' },
       { type: Databases.haproxy, title: Messages.titles.haproxy, icon: 'percona-database-haproxy' },
+      { type: Databases.valkey, title: Messages.titles.valkey, icon: 'percona-database-valkey' },
       { type: InstanceTypesExtra.external, title: Messages.titles.external },
       { type: InstanceTypesExtra.azure, title: Messages.titles.azure, isHidden: !showAzure },
     ],

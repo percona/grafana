@@ -257,6 +257,7 @@ export const NAV_FOLDER_MAP: Record<string, string> = {
   mysql: 'MySQL',
   mongo: 'MongoDB',
   postgre: 'PostgreSQL',
+  valkey: 'Valkey',
 };
 
 export const NAV_ID_TO_SERVICE: Record<string, ServiceType> = {
@@ -265,6 +266,7 @@ export const NAV_ID_TO_SERVICE: Record<string, ServiceType> = {
   postgre: ServiceType.posgresql,
   proxysql: ServiceType.proxysql,
   haproxy: ServiceType.haproxy,
+  valkey: ServiceType.valkey,
 };
 
 // 5 mins
@@ -610,4 +612,85 @@ export const PMM_NAV_QAN: NavModelItem = {
   url: `${config.appSubUrl}/d/pmm-qan/pmm-query-analytics`,
   sortWeight: WEIGHTS.dashboards,
   hideFromTabs: true,
+};
+
+export const PMM_NAV_VALKEY: NavModelItem = {
+  id: 'valkey',
+  text: 'Valkey',
+  icon: 'percona-database-valkey',
+  url: `${config.appSubUrl}/d/valkey-overview/valkey-redis-overview`,
+  sortWeight: WEIGHTS.dashboards,
+  hideFromTabs: true,
+  children: [
+    {
+      id: 'valkey-overview',
+      text: 'Overview',
+      icon: 'percona-nav-overview',
+      url: `${config.appSubUrl}/d/valkey-overview/valkey-redis-overview`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-load',
+      text: 'Load',
+      icon: 'sitemap',
+      url: `${config.appSubUrl}/d/valkey-load/valkey-redis-load`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-memory',
+      text: 'Memory',
+      icon: 'percona-memory',
+      url: `${config.appSubUrl}/d/valkey-memory/valkey-redis-memory`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-network',
+      text: 'Network',
+      icon: 'percona-network',
+      url: `${config.appSubUrl}/d/valkey-network/valkey-redis-network`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-clients',
+      text: 'Clients',
+      icon: 'sitemap',
+      url: `${config.appSubUrl}/d/valkey-clients/valkey-redis-clients`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-cluster-details',
+      text: 'Cluster Details',
+      icon: 'percona-cluster',
+      url: `${config.appSubUrl}/d/valkey-cluster-details/valkey-redis-cluster-detail`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-replication',
+      text: 'Replication',
+      icon: 'percona-cluster',
+      url: `${config.appSubUrl}/d/valkey-replication/valkey-redis-replication`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-persistence',
+      text: 'Persistence',
+      icon: 'sitemap',
+      url: `${config.appSubUrl}/d/valkey-persistence-details/valkey-redis-persistence-details`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-commands',
+      text: 'Command details',
+      icon: 'sitemap',
+      url: `${config.appSubUrl}/d/valkey-command-details/valkey-redis-command-detail`,
+      hideFromTabs: true,
+    },
+    {
+      id: 'valkey-slowlog',
+      text: 'Slow Log',
+      icon: 'sitemap',
+      url: `${config.appSubUrl}/d/valkey-slowlog/valkey-redis-slowlog`,
+      hideFromTabs: true,
+    },
+  ],
 };

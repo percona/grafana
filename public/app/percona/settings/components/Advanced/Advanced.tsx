@@ -35,7 +35,48 @@ import { convertCheckIntervalsToHours, convertHoursStringToSeconds, convertSecon
 import { SwitchRow } from './SwitchRow';
 
 const {
-  advanced: { sttCheckIntervalsLabel, sttCheckIntervalTooltip, sttCheckIntervalUnit },
+  tooltipLinkText,
+  advanced: {
+    action,
+    retentionLabel,
+    retentionTooltip,
+    retentionUnits,
+    telemetryLabel,
+    telemetryLink,
+    telemetryTooltip,
+    telemetrySummaryTitle,
+    telemetryDisclaimer,
+    updatesLabel,
+    updatesLink,
+    updatesTooltip,
+    advisorsLabel,
+    advisorsLink,
+    advisorsTooltip,
+    publicAddressLabel,
+    publicAddressTooltip,
+    publicAddressButton,
+    accessControl,
+    accessControlTooltip,
+    accessControlLink,
+    alertingLabel,
+    alertingTooltip,
+    alertingLink,
+    azureDiscoverLabel,
+    azureDiscoverTooltip,
+    azureDiscoverLink,
+    technicalPreviewLegend,
+    technicalPreviewDescription,
+    technicalPreviewLinkText,
+    backupLabel,
+    backupLink,
+    backupTooltip,
+    enableInternalPgQanLabel,
+    enableInternalPgQanLink,
+    enableInternalPgQanTooltip,
+    sttCheckIntervalsLabel,
+    sttCheckIntervalTooltip,
+    sttCheckIntervalUnit,
+  },
 } = Messages;
 
 export const Advanced: FC = () => {
@@ -55,47 +96,10 @@ export const Advanced: FC = () => {
     alertingEnabled,
     telemetrySummaries,
     enableAccessControl,
+    enableInternalPgQan,
   } = settings!;
   const settingsStyles = useStyles2(getSettingsStyles);
   const { rareInterval, standardInterval, frequentInterval } = convertCheckIntervalsToHours(sttCheckIntervals);
-  const {
-    advanced: {
-      action,
-      retentionLabel,
-      retentionTooltip,
-      retentionUnits,
-      telemetryLabel,
-      telemetryLink,
-      telemetryTooltip,
-      telemetrySummaryTitle,
-      telemetryDisclaimer,
-      updatesLabel,
-      updatesLink,
-      updatesTooltip,
-      advisorsLabel,
-      advisorsLink,
-      advisorsTooltip,
-      publicAddressLabel,
-      publicAddressTooltip,
-      publicAddressButton,
-      accessControl,
-      accessControlTooltip,
-      accessControlLink,
-      alertingLabel,
-      alertingTooltip,
-      alertingLink,
-      azureDiscoverLabel,
-      azureDiscoverTooltip,
-      azureDiscoverLink,
-      technicalPreviewLegend,
-      technicalPreviewDescription,
-      technicalPreviewLinkText,
-      backupLabel,
-      backupLink,
-      backupTooltip,
-    },
-    tooltipLinkText,
-  } = Messages;
 
   const initialValues: AdvancedFormProps = {
     retention: convertSecondsToDays(dataRetention),
@@ -111,6 +115,7 @@ export const Advanced: FC = () => {
     frequentInterval,
     telemetrySummaries,
     accessControl: enableAccessControl,
+    enableInternalPgQan,
   };
   const [loading, setLoading] = useState(false);
 
@@ -128,6 +133,7 @@ export const Advanced: FC = () => {
       frequentInterval,
       updates,
       accessControl,
+      enableInternalPgQan,
     } = values;
     const sttCheckIntervals = {
       rare_interval: `${convertHoursStringToSeconds(rareInterval)}s`,
@@ -146,6 +152,7 @@ export const Advanced: FC = () => {
       enable_backup_management: backup,
       enable_updates: updates,
       enable_access_control: accessControl,
+      enable_internal_pg_qan: enableInternalPgQan,
     };
 
     setLoading(true);
@@ -254,6 +261,16 @@ export const Advanced: FC = () => {
                     tooltipLinkText={tooltipLinkText}
                     link={backupLink}
                     dataTestId="advanced-backup"
+                    component={SwitchRow}
+                  />
+                  <Field
+                    name="enableInternalPgQan"
+                    type="checkbox"
+                    label={enableInternalPgQanLabel}
+                    tooltip={enableInternalPgQanTooltip}
+                    tooltipLinkText={tooltipLinkText}
+                    link={enableInternalPgQanLink}
+                    dataTestId="enable-internal-pg-qan"
                     component={SwitchRow}
                   />
                   <div className={styles.advancedRow}>

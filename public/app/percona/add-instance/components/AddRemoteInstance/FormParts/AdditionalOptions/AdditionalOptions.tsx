@@ -29,6 +29,7 @@ import { MongodbTLSCertificate } from './MongodbTLSCertificate';
 import MysqlExtraDSNParams from './MysqlExtraDSNParams';
 import { MysqlTLSCertificate } from './MysqlTLSCertificate';
 import { PostgreTLSCertificate } from './PostgreTLSCertificate';
+import { ValkeyTLSCertificate } from './ValkeyTLSCertificate';
 
 export const AdditionalOptionsFormPart: FC<AdditionalOptionsFormPartProps> = ({
   instanceType,
@@ -291,6 +292,14 @@ export const getAdditionalOptions = (
             data-testid="qan-mongodb-profiler-checkbox"
             label={Messages.form.labels.additionalOptions.qanMongodbProfiler}
           />
+        </>
+      );
+    case Databases.valkey:
+      return (
+        <>
+          <CheckboxField label={Messages.form.labels.additionalOptions.tls} name="tls" />
+          <ValkeyTLSCertificate form={form} />
+          <CheckboxField label={Messages.form.labels.additionalOptions.tlsSkipVerify} name="tls_skip_verify" />
         </>
       );
     case InstanceTypesExtra.external:
