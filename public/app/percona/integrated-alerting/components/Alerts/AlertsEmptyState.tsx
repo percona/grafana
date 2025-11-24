@@ -32,9 +32,9 @@ export const AlertsEmptyState: FC = () => {
       <p className={styles.paragraph}>
         Use{' '}
         <TextLink href="/alerting/alert-rule-templates" inline>
-          Alert rule templates
-        </TextLink>
-        , custom made by our database experts, for a faster start, and configure how you want to receive them at{' '}
+          Alert rule templates,{' '}
+        </TextLink>{' '}
+        custom made by our database experts, for a faster start, and configure how you want to receive them at{' '}
         <TextLink href="/alerting/list" inline>
           Alert rules
         </TextLink>
