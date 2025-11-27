@@ -3,9 +3,9 @@ import { PureComponent } from 'react';
 import * as React from 'react';
 import type { Unsubscribable } from 'rxjs';
 
-import { FeatureState, getBuiltInThemes, ThemeRegistryItem, type GrafanaTheme2 } from '@grafana/data';
+import { FeatureState, getBuiltInThemes, ThemeRegistryItem, type GrafanaTheme2, type BusEventWithPayload } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { config, reportInteraction, getAppEvents, ThemeChangedEvent, type BusEventWithPayload } from '@grafana/runtime';
+import { config, reportInteraction, getAppEvents, ThemeChangedEvent } from '@grafana/runtime';
 import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
 import {
   Button,
