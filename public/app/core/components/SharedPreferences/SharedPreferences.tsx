@@ -75,6 +75,7 @@ function getLanguageOptions(): ComboboxOption[] {
 export class SharedPreferences extends PureComponent<Props, State> {
   service: PreferencesService;
   themeOptions: ComboboxOption[];
+  // @PERCONA: Subscription to ThemeChangedEvent for syncing dropdown with theme changes
   private themeChangedSub?: Unsubscribable;
 
   constructor(props: Props) {
@@ -131,7 +132,7 @@ export class SharedPreferences extends PureComponent<Props, State> {
       navbar: prefs.navbar,
     });
 
-    // Subscribe to theme changes to keep the dropdown in sync with the actual theme.
+    // @PERCONA: Subscribe to theme changes to keep the dropdown in sync with the actual theme.
     // This ensures the dropdown reflects theme changes from any source (system preferences,
     // other UI components, etc.), not just from this component's dropdown selection.
     const eventBus = getAppEvents();
@@ -171,7 +172,6 @@ export class SharedPreferences extends PureComponent<Props, State> {
   };
 
   onThemeChanged = (value: ComboboxOption<string>) => {
-    // Update state immediately so the form has the correct value when saving
     this.setState({ theme: value.value });
 
     reportInteraction('grafana_preferences_theme_changed', {
@@ -182,9 +182,6 @@ export class SharedPreferences extends PureComponent<Props, State> {
     if (value.value) {
       changeTheme(value.value, true);
     }
-    // Note: setState is called twice - once here for immediate form state update,
-    // and again via ThemeChangedEvent subscription after CSS loads. This is intentional
-    // to ensure form correctness while also maintaining sync with rendered theme.
   };
 
   onTimeZoneChanged = (timezone?: string) => {

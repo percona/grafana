@@ -18,25 +18,28 @@ export async function changeTheme(themeId: string, runtimeOnly?: boolean) {
     newCssLink.rel = 'stylesheet';
     newCssLink.href = config.bootData.assets[newTheme.colors.mode];
 
-    // Publish ThemeChangedEvent AFTER CSS loads to ensure UI components (like theme dropdown)
+    // @PERCONA: Publish ThemeChangedEvent AFTER CSS loads to ensure UI components (like theme dropdown)
     // update synchronously with the actual rendered theme. This prevents visual lag where
     // the dropdown updates immediately but the page content updates later.
     const publishThemeChange = () => {
       appEvents.publish(new ThemeChangedEvent(newTheme));
 
-      // Remove old css file only after new one is loaded to prevent flickering
+      // Remove old css file
       const bodyLinks = document.getElementsByTagName('link');
       for (let i = 0; i < bodyLinks.length; i++) {
         const link = bodyLinks[i];
 
         if (link.href && link.href.includes(`build/grafana.${oldTheme.colors.mode}`)) {
+          // Remove existing link once the new css has loaded to avoid flickering
+          // If we add new css at the same time we remove current one the page will be rendered without css
+          // As the new css file is loading
           link.remove();
         }
       }
     };
 
     newCssLink.onload = publishThemeChange;
-    // Ensure event is published even if CSS fails to load (network error, ad blocker, etc.)
+    // @PERCONA: Ensure event is published even if CSS fails to load (network error, ad blocker, etc.)
     // to prevent UI from getting stuck in inconsistent state
     newCssLink.onerror = publishThemeChange;
 
