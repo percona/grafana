@@ -7,6 +7,7 @@ import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/prefe
 
 import SharedPreferences from './SharedPreferences';
 
+// @PERCONA
 // Mock getAppEvents at the module level
 let mockGetAppEvents = jest.fn();
 jest.mock('@grafana/runtime', () => ({
@@ -214,6 +215,7 @@ describe('SharedPreferences', () => {
     expect(mockReload).toHaveBeenCalled();
   });
 
+  // @PERCONA
   describe('ThemeChangedEvent subscription', () => {
     let mockEventBus: {
       subscribe: jest.Mock;
