@@ -6,7 +6,7 @@ import { Cell, Column, Row } from 'react-table';
 
 import { OrgRole } from '@grafana/data';
 import { config } from '@grafana/runtime';
-import { Icon, LinkButton, useStyles2 } from '@grafana/ui';
+import { LinkButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { useNavModel } from 'app/core/hooks/useNavModel';
 import { alertmanagerApi } from 'app/features/alerting/unified/api/alertmanagerApi';
@@ -26,6 +26,7 @@ import { AlertDetails } from './AlertDetails/AlertDetails';
 import { ACTIONS_COLUMN, DATA_INTERVAL, SILENCES_URL } from './Alerts.constants';
 import { Messages as AlertMessages } from './Alerts.messages';
 import { getStyles } from './Alerts.styles';
+import { AlertsEmptyState } from './AlertsEmptyState';
 
 const {
   table: { columns },
@@ -170,11 +171,7 @@ export const Alerts: FC = () => {
             columns={columns}
             pendingRequest={amAlertsIsLoading}
             autoResetExpanded={false}
-            emptyMessage={
-              <h1>
-                <Icon name="check-circle" size="xxl" /> No alerts detected
-              </h1>
-            }
+            emptyMessage={<AlertsEmptyState />}
             getCellProps={getCellProps}
             renderExpandedRow={renderSelectedSubRow}
           />
