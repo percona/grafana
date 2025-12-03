@@ -8,6 +8,14 @@ export const WEIGHTS = {
   config: -900,
 };
 
+export const PMM_BACKUP_ADD_EDIT: NavModelItem = {
+  id: 'backup-add-edit',
+  text: 'Create backup',
+  url: `${config.appSubUrl}/backup/new`,
+  hideFromBreadcrumbs: true,
+  isCreateAction: true,
+};
+
 export const PMM_BACKUP_PAGE: NavModelItem = {
   id: 'backup',
   icon: 'history',
@@ -36,6 +44,7 @@ export const PMM_BACKUP_PAGE: NavModelItem = {
       text: 'Storage Locations',
       url: `${config.appSubUrl}/backup/locations`,
     },
+    PMM_BACKUP_ADD_EDIT,
   ],
 };
 
