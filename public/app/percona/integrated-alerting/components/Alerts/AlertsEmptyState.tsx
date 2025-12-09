@@ -14,9 +14,9 @@ export const AlertsEmptyState: FC = () => {
         <Icon name="check-circle" size="xxl" /> {Messages.heading}
       </h1>
       <p className={styles.paragraph}>
-        Use{' '}
+        To get started, use PMM&apos;s built-in{' '}
         <TextLink href="/alerting/alert-rule-templates" inline>
-          {Messages.templateLink},{' '}
+          {Messages.templateLink}
         </TextLink>{' '}
         {Messages.firstParagraph}{' '}
         <TextLink href="/alerting/list" inline>
