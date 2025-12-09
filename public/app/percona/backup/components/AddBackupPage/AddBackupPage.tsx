@@ -192,7 +192,13 @@ const AddBackupPage: FC = () => {
   );
 
   return (
-    <Page navId="backup-add-edit" layout={PageLayoutType.Custom}>
+    <Page
+      navId="backup-add-edit"
+      pageNav={{
+        text: modalTitle,
+      }}
+      layout={PageLayoutType.Custom}
+    >
       <Overlay isPending={pending}>
         <Form
           initialValues={initialValues}
