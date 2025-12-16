@@ -44,7 +44,7 @@ export const SwitchField: FC<SwitchFieldProps> = ({
             tooltipLinkTarget={tooltipLinkTarget}
             tooltipIcon={tooltipIcon}
           />
-          <Switch {...input} value={input.checked} disabled={disabled} data-testid={`${name}-switch`} />
+          <Switch {...input} disabled={disabled} data-testid={`${name}-switch`} />
           <div data-testid={`${name}-field-error-message`} className={styles.errorMessage}>
             {meta.touched && meta.error}
           </div>

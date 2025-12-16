@@ -14,6 +14,7 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/highAvailability/highAvailability';
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getHighAvailability, getNodes } from 'app/percona/shared/core/selectors';
@@ -36,6 +37,7 @@ import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
+import { InventoryNode } from './Nodes.types';
 import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
 import {
   getBadgeColorForServiceStatus,
@@ -44,9 +46,6 @@ import {
   getTagsFromLabels,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
-import { TRUE_VALUE } from 'app/percona/shared/components/Elements/Table/Filter/Filter.constants';
-import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/highAvailability/highAvailability';
-import { InventoryNode } from './Nodes.types';
 
 export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
@@ -201,20 +200,14 @@ export const NodesTab = () => {
       ...((isHighAvailabilityEnabled
         ? [
             {
-              Header: 'Node Filter',
+              Header: Messages.nodes.columns.isPmmServerNode,
               id: 'isPmmServerNode',
               accessor: 'isPmmServerNode',
               hidden: true,
-              options: [
-                {
-                  label: 'PMM Server only',
-                  value: TRUE_VALUE,
-                },
-              ],
-              type: FilterFieldTypes.RADIO_BUTTON,
+              type: FilterFieldTypes.BOOLEAN,
             },
           ]
-        : []) as ExtendedColumn<InventoryNode>[]),
+        : []) as Array<ExtendedColumn<InventoryNode>>),
       getExpandAndActionsCol(getActions),
     ],
     [styles, getActions, clearClusterToggle, isHighAvailabilityEnabled]

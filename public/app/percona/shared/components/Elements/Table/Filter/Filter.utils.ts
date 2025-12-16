@@ -41,7 +41,9 @@ export const buildObjForQueryParams = <T extends object>(
     const accessor = column.accessor as string;
     const value = values[accessor]?.value ?? values[accessor];
 
-    if (value) {
+    if (column.type === FilterFieldTypes.BOOLEAN) {
+      obj[accessor] = value ? 'true' : 'false';
+    } else if (value) {
       if (column.type === FilterFieldTypes.RADIO_BUTTON || column.type === FilterFieldTypes.DROPDOWN) {
         obj[accessor] = value === ALL_VALUE ? undefined : value.toString();
       }
@@ -86,6 +88,8 @@ export const buildEmptyValues = <T extends object>(columns: Array<ExtendedColumn
   columns.map((column) => {
     if (column.type === FilterFieldTypes.DROPDOWN || column.type === FilterFieldTypes.RADIO_BUTTON) {
       obj = { ...obj, [column.accessor as string]: ALL_VALUE };
+    } else if (column.type === FilterFieldTypes.BOOLEAN) {
+      obj = { ...obj, [column.accessor as string]: false };
     }
   });
   return obj;
@@ -146,6 +150,36 @@ export const isInOptions = <T extends object>(
   return result.every((value) => value);
 };
 
+export const isBooleanMatch = <T extends object>(
+  columns: Array<ExtendedColumn<T>>,
+  filterValue: T,
+  queryParamsObj: Record<string, string>
+) => {
+  const result: boolean[] = [];
+
+  columns.forEach((column) => {
+    const accessor = column.accessor;
+    const queryParamValueAccessor = queryParamsObj[accessor as string];
+    const filterValueAccessor = filterValue[accessor as keyof T];
+
+    if (column.type === FilterFieldTypes.BOOLEAN) {
+      if (queryParamValueAccessor) {
+        const filterBoolean = queryParamValueAccessor === 'true';
+        const rowValue = filterValueAccessor;
+
+        if (filterBoolean) {
+          result.push(rowValue === true);
+        } else {
+          result.push(!rowValue);
+        }
+      } else {
+        result.push(true);
+      }
+    }
+  });
+  return result.every((value) => value);
+};
+
 export const isOtherThanTextType = <T extends object>(columns: Array<ExtendedColumn<T>>): boolean =>
   columns.some((column) => column.type !== undefined && column.type !== FilterFieldTypes.TEXT);
 
@@ -163,5 +197,6 @@ export const getFilteredData = <T extends object>(
     (filterValue) =>
       isValueInTextColumn(columns, filterValue, queryParamsObj) &&
       isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.DROPDOWN) &&
-      isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.RADIO_BUTTON)
+      isInOptions(columns, filterValue, queryParamsObj, FilterFieldTypes.RADIO_BUTTON) &&
+      isBooleanMatch(columns, filterValue, queryParamsObj)
   );

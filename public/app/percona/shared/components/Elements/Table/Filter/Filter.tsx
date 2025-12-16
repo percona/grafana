@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unnecessary-type-assertion */
+import { cx } from '@emotion/css';
 import { FormApi } from 'final-form';
 import { debounce } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,11 +22,11 @@ import {
   getQueryParams,
   isOtherThanTextType,
 } from './Filter.utils';
+import BooleanField from './components/fields/BooleanField';
 import { RadioButtonField } from './components/fields/RadioButtonField';
 import { SearchTextField } from './components/fields/SearchTextField';
 import { SelectColumnField } from './components/fields/SelectColumnField';
 import { SelectDropdownField } from './components/fields/SelectDropdownField';
-import { cx } from '@emotion/css';
 
 export const Filter = <T,>({
   columns,
@@ -176,6 +177,7 @@ export const Filter = <T,>({
               {columns.map(
                 (column) =>
                   (column.type === FilterFieldTypes.DROPDOWN && <SelectDropdownField column={column} />) ||
+                  (column.type === FilterFieldTypes.BOOLEAN && <BooleanField column={column} />) ||
                   (column.type === FilterFieldTypes.RADIO_BUTTON && <RadioButtonField column={column} />)
               )}
             </div>
