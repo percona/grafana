@@ -1,3 +1,4 @@
+import { CancelToken } from 'axios';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { HighAvailabilityState } from './highAvailability.types';
@@ -46,10 +47,10 @@ export const fetchHighAvailabilityStatus = createAsyncThunk<HighAvailabilityStat
   }
 );
 
-export const fetchHighAvailabilityNodes = createAsyncThunk<HighAvailabilityNodesResponse>(
+export const fetchHighAvailabilityNodes = createAsyncThunk<HighAvailabilityNodesResponse, { token?: CancelToken }>(
   'percona/fetchHighAvailabilityNodes',
-  async () => {
-    return await HighAvailabilityService.getNodes();
+  async (params = {}) => {
+    return await HighAvailabilityService.getNodes(params.token);
   }
 );
 

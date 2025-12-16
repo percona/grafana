@@ -26,7 +26,11 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { CLUSTERS_SWITCH_KEY, GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
+import {
+  CLUSTERS_SWITCH_KEY,
+  GET_HIGH_AVAILABILITY_NODES_CANCEL_TOKEN,
+  GET_NODES_CANCEL_TOKEN,
+} from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
@@ -194,7 +198,7 @@ export const NodesTab = () => {
           return <div>{Messages.nodes.servicesCount(value.length)}</div>;
         },
       },
-      ...(isHighAvailabilityEnabled
+      ...((isHighAvailabilityEnabled
         ? [
             {
               Header: 'Node Filter',
@@ -210,7 +214,7 @@ export const NodesTab = () => {
               type: FilterFieldTypes.RADIO_BUTTON,
             },
           ]
-        : []) as ExtendedColumn<InventoryNode>[],
+        : []) as ExtendedColumn<InventoryNode>[]),
       getExpandAndActionsCol(getActions),
     ],
     [styles, getActions, clearClusterToggle, isHighAvailabilityEnabled]
@@ -219,7 +223,9 @@ export const NodesTab = () => {
   const loadData = useCallback(async () => {
     try {
       await Promise.all([
-        dispatch(fetchHighAvailabilityNodes()).unwrap(),
+        dispatch(
+          fetchHighAvailabilityNodes({ token: generateToken(GET_HIGH_AVAILABILITY_NODES_CANCEL_TOKEN) })
+        ).unwrap(),
         dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap(),
       ]);
     } catch (e) {
