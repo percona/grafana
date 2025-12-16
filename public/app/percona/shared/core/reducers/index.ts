@@ -17,6 +17,7 @@ import { ServerInfo } from '../types';
 
 import advisorsReducers from './advisors/advisors';
 import perconaBackupLocations from './backups/backupLocations';
+import highAvailabilityReducer from './highAvailability/highAvailability';
 import navigationReducer from './navigation';
 import nodesReducer from './nodes';
 import pmmDumpsReducers from './pmmDump/pmmDump';
@@ -224,5 +225,6 @@ export default {
     advisors: advisorsReducers,
     pmmDumps: pmmDumpsReducers,
     updates: updatesReducers,
+    highAvailability: highAvailabilityReducer,
   }),
 };

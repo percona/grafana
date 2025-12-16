@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, HorizontalGroup, Icon, Link, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -16,7 +16,7 @@ import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
-import { getNodes } from 'app/percona/shared/core/selectors';
+import { getHighAvailability, getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
@@ -32,7 +32,7 @@ import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
-import { getServiceLink } from './Nodes.utils';
+import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
@@ -40,6 +40,9 @@ import {
   getTagsFromLabels,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
+import { TRUE_VALUE } from 'app/percona/shared/components/Elements/Table/Filter/Filter.constants';
+import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/highAvailability/highAvailability';
+import { InventoryNode } from './Nodes.types';
 
 export const NodesTab = () => {
   const { isLoading, nodes } = useSelector(getNodes);
@@ -50,10 +53,14 @@ export const NodesTab = () => {
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
+  const { nodes: highAvailabilityNodes, isEnabled: isHighAvailabilityEnabled } = useSelector(getHighAvailability);
 
   const mappedNodes = useMemo(
-    () => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
-    [nodes]
+    () =>
+      mapNodesToInventoryNodes(nodeFromDbMapper(nodes), highAvailabilityNodes).sort((a, b) =>
+        a.nodeName.localeCompare(b.nodeName)
+      ),
+    [nodes, highAvailabilityNodes]
   );
 
   const getActions = useCallback(
@@ -80,7 +87,7 @@ export const NodesTab = () => {
   }, []);
 
   const columns = useMemo(
-    (): Array<ExtendedColumn<Node>> => [
+    (): Array<ExtendedColumn<InventoryNode>> => [
       {
         Header: Messages.services.columns.nodeId,
         id: 'nodeId',
@@ -102,6 +109,15 @@ export const NodesTab = () => {
       {
         Header: Messages.nodes.columns.nodeName,
         accessor: 'nodeName',
+        Cell: ({ value, row }) =>
+          isHighAvailabilityEnabled ? (
+            <Stack>
+              <span>{value}</span>
+              {row.original.haRole && <Badge text={getHaRoleBadgeText(row.original.haRole)} color="darkgrey" />}
+            </Stack>
+          ) : (
+            value
+          ),
         type: FilterFieldTypes.TEXT,
       },
       {
@@ -178,14 +194,34 @@ export const NodesTab = () => {
           return <div>{Messages.nodes.servicesCount(value.length)}</div>;
         },
       },
+      ...(isHighAvailabilityEnabled
+        ? [
+            {
+              Header: 'Node Filter',
+              id: 'isPmmServerNode',
+              accessor: 'isPmmServerNode',
+              hidden: true,
+              options: [
+                {
+                  label: 'PMM Server only',
+                  value: TRUE_VALUE,
+                },
+              ],
+              type: FilterFieldTypes.RADIO_BUTTON,
+            },
+          ]
+        : []) as ExtendedColumn<InventoryNode>[],
       getExpandAndActionsCol(getActions),
     ],
-    [styles, getActions, clearClusterToggle]
+    [styles, getActions, clearClusterToggle, isHighAvailabilityEnabled]
   );
 
   const loadData = useCallback(async () => {
     try {
-      await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap();
+      await Promise.all([
+        dispatch(fetchHighAvailabilityNodes()).unwrap(),
+        dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap(),
+      ]);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;

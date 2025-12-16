@@ -25,6 +25,7 @@ import { RadioButtonField } from './components/fields/RadioButtonField';
 import { SearchTextField } from './components/fields/SearchTextField';
 import { SelectColumnField } from './components/fields/SelectColumnField';
 import { SelectDropdownField } from './components/fields/SelectDropdownField';
+import { cx } from '@emotion/css';
 
 export const Filter = <T,>({
   columns,
@@ -171,7 +172,7 @@ export const Filter = <T,>({
             </div>
           </div>
           {showAdvanceFilter && openCollapse && (
-            <div className={styles.advanceFilter}>
+            <div className={cx(styles.advanceFilter, columns.length % 3 === 0 && styles.advancedFilter3Columns)}>
               {columns.map(
                 (column) =>
                   (column.type === FilterFieldTypes.DROPDOWN && <SelectDropdownField column={column} />) ||
