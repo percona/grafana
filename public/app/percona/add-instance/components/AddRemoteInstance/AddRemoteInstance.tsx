@@ -3,6 +3,7 @@
 import { FormApi } from 'final-form';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { Form as FormFinal } from 'react-final-form';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { AppEvents } from '@grafana/data';
 import { useStyles } from '@grafana/ui';
@@ -49,6 +50,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [generateToken] = useCancelToken();
   const initialValues: FormValues = { ...remoteInstanceCredentials };
+  const navigate = useNavigate();
 
   if (type === Databases.mysql) {
     initialValues.qan_mysql_perfschema = true;
@@ -84,7 +86,7 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
           Messages.success.title(values.serviceName || values.address || ''),
           Messages.success.description(INSTANCE_TYPES_LABELS[type as Databases]),
         ]);
-        window.location.href = '/graph/inventory/';
+        navigate('/inventory');
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
