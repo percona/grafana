@@ -1,10 +1,17 @@
 import { css } from '@emotion/css';
 import { PureComponent } from 'react';
 import * as React from 'react';
+import type { Unsubscribable } from 'rxjs';
 
-import { FeatureState, getBuiltInThemes, ThemeRegistryItem } from '@grafana/data';
+import {
+  FeatureState,
+  getBuiltInThemes,
+  ThemeRegistryItem,
+  type GrafanaTheme2,
+  type BusEventWithPayload,
+} from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { config, reportInteraction } from '@grafana/runtime';
+import { config, reportInteraction, getAppEvents, ThemeChangedEvent } from '@grafana/runtime';
 import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
 import {
   Button,
@@ -26,6 +33,7 @@ import { t, Trans } from 'app/core/internationalization';
 import { LANGUAGES, PSEUDO_LOCALE } from 'app/core/internationalization/constants';
 import { PreferencesService } from 'app/core/services/PreferencesService';
 import { changeTheme } from 'app/core/services/theme';
+
 export interface Props {
   resourceUri: string;
   disabled?: boolean;
@@ -67,6 +75,8 @@ function getLanguageOptions(): ComboboxOption[] {
 export class SharedPreferences extends PureComponent<Props, State> {
   service: PreferencesService;
   themeOptions: ComboboxOption[];
+  // @PERCONA: Subscription to ThemeChangedEvent for syncing dropdown with theme changes
+  private themeChangedSub?: Unsubscribable;
 
   constructor(props: Props) {
     super(props);
@@ -121,6 +131,33 @@ export class SharedPreferences extends PureComponent<Props, State> {
       queryHistory: prefs.queryHistory,
       navbar: prefs.navbar,
     });
+
+    // @PERCONA: Subscribe to theme changes to keep the dropdown in sync with the actual theme.
+    // This ensures the dropdown reflects theme changes from any source (system preferences,
+    // other UI components, etc.), not just from this component's dropdown selection.
+    const eventBus = getAppEvents();
+    if (eventBus && typeof eventBus.subscribe === 'function') {
+      this.themeChangedSub = eventBus.subscribe(ThemeChangedEvent, (evt: BusEventWithPayload<GrafanaTheme2>) => {
+        try {
+          const newTheme = evt.payload;
+          const mode = newTheme.colors.mode;
+
+          if (this.state.theme !== mode) {
+            this.setState({ theme: mode });
+          }
+        } catch (err) {
+          console.warn('[SharedPreferences] Failed to sync theme from ThemeChangedEvent:', err);
+        }
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    try {
+      this.themeChangedSub?.unsubscribe();
+    } catch (err) {
+      console.warn('[SharedPreferences] Failed to unsubscribe ThemeChangedEvent:', err);
+    }
   }
 
   onSubmitForm = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -136,6 +173,7 @@ export class SharedPreferences extends PureComponent<Props, State> {
 
   onThemeChanged = (value: ComboboxOption<string>) => {
     this.setState({ theme: value.value });
+
     reportInteraction('grafana_preferences_theme_changed', {
       toTheme: value.value,
       preferenceType: this.props.preferenceType,

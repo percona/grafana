@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { comboboxTestSetup } from 'test/helpers/comboboxTestSetup';
 import { getSelectParent, selectOptionInTest } from 'test/helpers/selectOptionInTest';
@@ -6,6 +6,14 @@ import { getSelectParent, selectOptionInTest } from 'test/helpers/selectOptionIn
 import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
 
 import SharedPreferences from './SharedPreferences';
+
+// @PERCONA
+// Mock getAppEvents at the module level
+let mockGetAppEvents = jest.fn();
+jest.mock('@grafana/runtime', () => ({
+  ...jest.requireActual('@grafana/runtime'),
+  getAppEvents: () => mockGetAppEvents(),
+}));
 
 const selectComboboxOptionInTest = async (input: HTMLElement, optionOrOptions: string) => {
   await userEvent.click(input);
@@ -205,5 +213,99 @@ describe('SharedPreferences', () => {
   it('refreshes the page after saving preferences', async () => {
     await userEvent.click(screen.getByText('Save'));
     expect(mockReload).toHaveBeenCalled();
+  });
+
+  // @PERCONA
+  describe('ThemeChangedEvent subscription', () => {
+    let mockEventBus: {
+      subscribe: jest.Mock;
+      unsubscribe: jest.Mock;
+    };
+
+    beforeEach(() => {
+      // Cleanup the render from the parent beforeEach
+      cleanup();
+
+      mockEventBus = {
+        subscribe: jest.fn(),
+        unsubscribe: jest.fn(),
+      };
+      mockGetAppEvents.mockReturnValue(mockEventBus);
+    });
+
+    it('subscribes to ThemeChangedEvent on mount', async () => {
+      render(<SharedPreferences {...props} />);
+      await waitFor(() => expect(mockPrefsLoad).toHaveBeenCalled());
+
+      expect(mockEventBus.subscribe).toHaveBeenCalledWith(
+        expect.anything(), // ThemeChangedEvent
+        expect.any(Function)
+      );
+    });
+
+    it('updates theme state when ThemeChangedEvent is received with dark theme', async () => {
+      let eventHandler: ((evt: any) => void) | undefined;
+      mockEventBus.subscribe.mockImplementation((_event, handler) => {
+        eventHandler = handler;
+        return { unsubscribe: mockEventBus.unsubscribe };
+      });
+
+      render(<SharedPreferences {...props} />);
+      await waitFor(() => expect(mockPrefsLoad).toHaveBeenCalled());
+
+      // Wait for the form to be fully loaded and verify initial theme is light
+      const themeSelect = await screen.findByRole('combobox', { name: /Interface theme/i });
+      expect(themeSelect).toHaveValue('Light');
+
+      // Simulate ThemeChangedEvent with dark theme using proper GrafanaTheme2 structure
+      act(() => {
+        eventHandler?.({ payload: { colors: { mode: 'dark' } } });
+      });
+
+      await waitFor(() => {
+        expect(themeSelect).toHaveValue('Dark');
+      });
+    });
+
+    it('updates theme state when ThemeChangedEvent is received with light theme', async () => {
+      // Reset mockPrefsLoad to return dark theme for this test
+      mockPrefsLoad.mockResolvedValueOnce({ ...mockPreferences, theme: 'dark' });
+
+      let eventHandler: ((evt: any) => void) | undefined;
+      mockEventBus.subscribe.mockImplementation((_event, handler) => {
+        eventHandler = handler;
+        return { unsubscribe: mockEventBus.unsubscribe };
+      });
+
+      render(<SharedPreferences {...props} />);
+      await waitFor(() => expect(mockPrefsLoad).toHaveBeenCalled());
+
+      // Wait for the form to be fully loaded and verify initial theme is dark
+      const themeSelect = await screen.findByRole('combobox', { name: /Interface theme/i });
+      await waitFor(() => {
+        expect(themeSelect).toHaveValue('Dark');
+      });
+
+      // Simulate ThemeChangedEvent with light theme using proper GrafanaTheme2 structure
+      act(() => {
+        eventHandler?.({ payload: { colors: { mode: 'light' } } });
+      });
+
+      await waitFor(() => {
+        expect(themeSelect).toHaveValue('Light');
+      });
+    });
+
+    it('unsubscribes from ThemeChangedEvent on unmount', async () => {
+      const unsubscribeMock = jest.fn();
+      mockEventBus.subscribe.mockReturnValue({ unsubscribe: unsubscribeMock });
+
+      const { unmount } = render(<SharedPreferences {...props} />);
+      await waitFor(() => expect(mockPrefsLoad).toHaveBeenCalled());
+
+      unmount();
+
+      expect(unsubscribeMock).toHaveBeenCalled();
+    });
   });
 });
