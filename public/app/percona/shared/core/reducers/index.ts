@@ -26,6 +26,8 @@ import tourReducer from './tour/tour';
 import updatesReducers from './updates';
 import perconaUserReducers from './user/user';
 import usersReducers from './users/users';
+import appEvents from 'app/core/app_events';
+import { SettingsUpdatedEvent } from '../events';
 
 const initialSettingsState: Settings = {
   updatesEnabled: false,
@@ -114,6 +116,7 @@ export const updateSettingsAction = createAsyncThunk(
           }
           const settings = await SettingsService.setSettings(args.body, args.token, true);
           await thunkAPI.dispatch(fetchSettingsAction({ usedPassword: password, testEmail }));
+          appEvents.publish(new SettingsUpdatedEvent());
           return settings;
         })()
       ),
