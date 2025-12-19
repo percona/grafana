@@ -84,7 +84,9 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
           Messages.success.title(values.serviceName || values.address || ''),
           Messages.success.description(INSTANCE_TYPES_LABELS[type as Databases]),
         ]);
+        // keep hard reload until we implement sync with native navigation
         window.location.href = '/graph/inventory/';
+        // navigate('/inventory');
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
