@@ -200,13 +200,13 @@ export const Agents: FC = () => {
               </span>
             </Link>
           </HorizontalGroup>
-          {service && !servicesLoading && (
+          {service && (
             <h5 className={styles.agentBreadcrumb}>
               <span>{Messages.agents.breadcrumbLeftService(service.params.serviceName)}</span>
               <span>{Messages.agents.breadcrumbRight}</span>
             </h5>
           )}
-          {node && !nodesLoading && (
+          {node && (
             <h5 className={styles.agentBreadcrumb}>
               <span>{Messages.agents.breadcrumbLeftNode(node.nodeName)}</span>
               <span>{Messages.agents.breadcrumbRight}</span>
