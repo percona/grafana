@@ -183,6 +183,9 @@ export const NodesTab = () => {
     [styles, getActions, clearClusterToggle]
   );
 
+  // FIX PMM-14640: Added all captured variables to dependency array to prevent stale closures.
+  // Problem: Empty dependency array [] caused loadData to capture initial values and never update.
+  // Solution: Include all used variables (dispatch, generateToken) in dependencies.
   const loadData = useCallback(async () => {
     try {
       await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap();
@@ -192,8 +195,7 @@ export const NodesTab = () => {
       }
       logger.error(e);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch, generateToken]);
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<Node>) => {
