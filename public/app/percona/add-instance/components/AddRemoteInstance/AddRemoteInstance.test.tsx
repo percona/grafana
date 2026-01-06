@@ -7,6 +7,7 @@ import { configureStore } from 'app/store/configureStore';
 import { InstanceTypesExtra } from '../../panel.types';
 
 import AddRemoteInstance from './AddRemoteInstance';
+import { MemoryRouter } from 'react-router-dom-v5-compat';
 
 jest.mock('app/percona/shared/helpers/logger', () => {
   const originalModule = jest.requireActual('app/percona/shared/helpers/logger');
@@ -23,7 +24,9 @@ describe('Add remote instance:: ', () => {
     const type = Databases.mysql;
     render(
       <Provider store={configureStore()}>
-        <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
+        <MemoryRouter>
+          <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -42,7 +45,9 @@ describe('Add remote instance:: ', () => {
     const type = InstanceTypesExtra.external;
     render(
       <Provider store={configureStore()}>
-        <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
+        <MemoryRouter>
+          <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
+        </MemoryRouter>
       </Provider>
     );
 
@@ -66,7 +71,9 @@ describe('Add remote instance:: ', () => {
 
     render(
       <Provider store={configureStore()}>
-        <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
+        <MemoryRouter>
+          <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
+        </MemoryRouter>
       </Provider>
     );
 
