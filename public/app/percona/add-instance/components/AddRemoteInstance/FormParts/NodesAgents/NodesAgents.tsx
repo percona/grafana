@@ -77,7 +77,10 @@ export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
       loadData();
     } else if (!selectedNode) {
       // preselect pmm-server node
-      const pmmServerNode = nodesOptions.find((node) => node.value === PMM_SERVER_NODE_ID);
+      const pmmServerNode =
+        nodesOptions.find((node) => node.value === PMM_SERVER_NODE_ID) ||
+        nodesOptions.find((node) => node.isPMMServerNode);
+
       if (pmmServerNode) {
         setNodeAndAgent(pmmServerNode);
       }

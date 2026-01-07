@@ -67,6 +67,7 @@ export const nodesOptionsMapper = (nodeFromDb: NodeDB[]): NodesOption[] =>
         value: node.node_id,
         label: node.node_name,
         agents: agents,
+        isPMMServerNode: node.is_pmm_server_node,
       };
     })
     .filter((node) => node.agents.length > 0);
