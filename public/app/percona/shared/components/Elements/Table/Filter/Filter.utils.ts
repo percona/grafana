@@ -42,7 +42,8 @@ export const buildObjForQueryParams = <T extends object>(
     const value = values[accessor]?.value ?? values[accessor];
 
     if (column.type === FilterFieldTypes.BOOLEAN) {
-      obj[accessor] = value ? 'true' : 'false';
+      // Omit from query params if value is false
+      obj[accessor] = value ? 'true' : undefined;
     } else if (value) {
       if (column.type === FilterFieldTypes.RADIO_BUTTON || column.type === FilterFieldTypes.DROPDOWN) {
         obj[accessor] = value === ALL_VALUE ? undefined : value.toString();
@@ -89,7 +90,7 @@ export const buildEmptyValues = <T extends object>(columns: Array<ExtendedColumn
     if (column.type === FilterFieldTypes.DROPDOWN || column.type === FilterFieldTypes.RADIO_BUTTON) {
       obj = { ...obj, [column.accessor as string]: ALL_VALUE };
     } else if (column.type === FilterFieldTypes.BOOLEAN) {
-      obj = { ...obj, [column.accessor as string]: false };
+      obj = { ...obj, [column.accessor as string]: undefined };
     }
   });
   return obj;
@@ -167,13 +168,10 @@ export const isBooleanMatch = <T extends object>(
         const filterBoolean = queryParamValueAccessor === 'true';
         const rowValue = filterValueAccessor;
 
+        // Only filter out if the filter value is true
         if (filterBoolean) {
           result.push(rowValue === true);
-        } else {
-          result.push(!rowValue);
         }
-      } else {
-        result.push(true);
       }
     }
   });

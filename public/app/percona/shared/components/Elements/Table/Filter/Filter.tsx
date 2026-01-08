@@ -65,8 +65,7 @@ export const Filter = <T,>({
     setQueryParams(buildParamsFromKey(tableKey, columns, values));
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initialValues = useMemo(() => getQueryParams(columns, queryParamsByKey), []);
+  const initialValues = useMemo(() => getQueryParams(columns, queryParamsByKey), [columns, queryParamsByKey]);
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);
@@ -90,8 +89,7 @@ export const Filter = <T,>({
     if (numberOfParams === 2 && initialValues[SEARCH_INPUT_FIELD_NAME] && initialValues[SEARCH_SELECT_FIELD_NAME]) {
       setOpenSearchFields(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialValues]);
 
   useEffect(() => {
     const queryParamsObj = getQueryParams(columns, queryParamsByKey);
