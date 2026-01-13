@@ -58,6 +58,13 @@ export const Agents: FC = () => {
   const node = mappedNodes.find((s) => s.nodeId === nodeId);
   const flattenAgents = useMemo(() => data.map((value) => ({ type: value.type, ...value.params })), [data]);
 
+  // FIX PMM-14640: Extract primitive IDs to avoid object reference issues in useEffect dependencies.
+  // Problem: Using entire service/node objects in dependencies causes excessive re-renders when
+  // Redux state updates, even when the actual service/node we care about hasn't changed.
+  // Solution: Extract only the primitive ID values we need to detect when our specific service/node loads.
+  const currentServiceId = service?.params.serviceId;
+  const currentNodeId = node?.nodeId;
+
   const columns = useMemo(
     (): Array<ExtendedColumn<FlattenAgent>> => [
       {
@@ -110,6 +117,10 @@ export const Agents: FC = () => {
     []
   );
 
+  // FIX PMM-14640: Added all captured variables to dependency array to prevent stale closures.
+  // Problem: Empty dependency array [] caused loadData to capture initial values and never update,
+  // leading to incorrect API calls with stale serviceId/nodeId.
+  // Solution: Include all used variables (params.serviceId, nodeId, generateToken) in dependencies.
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -126,8 +137,7 @@ export const Agents: FC = () => {
       logger.error(e);
     }
     setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params.serviceId, nodeId, generateToken]);
 
   const renderSelectedSubRow = React.useCallback(
     (row: Row<FlattenAgent>) => {
@@ -149,15 +159,34 @@ export const Agents: FC = () => {
 
   const deletionMsg = useMemo(() => Messages.agents.deleteConfirmation(selected.length), [selected]);
 
+  // FIX PMM-14640: Refactored to use only 4 primitive dependencies instead of 7 with unstable objects.
+  // Problem: Original had 7 dependencies including service/node objects which changed on every Redux update,
+  // causing excessive re-renders and making it hard to understand what triggers the effect.
+  // Solution: Use async function pattern with early returns, depend only on URL params (params.serviceId, nodeId)
+  // and primitive IDs (currentServiceId, currentNodeId) that change only when our specific data loads.
+  // This ensures the effect runs when: (1) URL changes, OR (2) when service/node actually loads from Redux.
   useEffect(() => {
-    if (!service && params.serviceId) {
-      dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
-    } else if (!node && nodeId) {
-      dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) }));
-    } else {
+    const initializeData = async () => {
+      // Load service data if needed
+      if (!service && params.serviceId) {
+        await dispatch(fetchServicesAction({ token: generateToken(GET_SERVICES_CANCEL_TOKEN) }));
+        return; // Wait for next render when service data is available
+      }
+
+      // Load node data if needed
+      if (!node && nodeId) {
+        await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) }));
+        return; // Wait for next render when node data is available
+      }
+
+      // Load agents when all required data is available
       loadData();
-    }
-  }, [generateToken, loadData, service, nodeId, params.serviceId, node]);
+    };
+
+    initializeData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.serviceId, nodeId, currentServiceId, currentNodeId]);
+  // Triggers on: URL change OR when service/node loads from Redux
 
   const removeAgents = useCallback(
     async (agents: Array<SelectedTableRows<FlattenAgent>>, forceMode: boolean) => {
@@ -200,13 +229,13 @@ export const Agents: FC = () => {
               </span>
             </Link>
           </HorizontalGroup>
-          {service && !servicesLoading && (
+          {service && (
             <h5 className={styles.agentBreadcrumb}>
               <span>{Messages.agents.breadcrumbLeftService(service.params.serviceName)}</span>
               <span>{Messages.agents.breadcrumbRight}</span>
             </h5>
           )}
-          {node && !nodesLoading && (
+          {node && (
             <h5 className={styles.agentBreadcrumb}>
               <span>{Messages.agents.breadcrumbLeftNode(node.nodeName)}</span>
               <span>{Messages.agents.breadcrumbRight}</span>

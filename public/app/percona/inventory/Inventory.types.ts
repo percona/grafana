@@ -160,6 +160,7 @@ export interface NodeDB {
   updated_at: string;
   status: ServiceStatus;
   services?: ServiceNodeListDB[];
+  is_pmm_server_node?: boolean;
 }
 
 export interface NodeListDBPayload {
@@ -183,6 +184,7 @@ export interface NodesOption {
   value: string;
   label: string;
   agents?: AgentsOption[];
+  isPMMServerNode?: boolean;
 }
 
 export interface AgentsOption {
@@ -215,4 +217,10 @@ export interface UpdateAgentBody {
   nomad_agent?: {
     enable?: boolean;
   };
+}
+
+export enum MetricsMode {
+  UNSPECIFIED = 0,
+  PULL = 1,
+  PUSH = 2,
 }
