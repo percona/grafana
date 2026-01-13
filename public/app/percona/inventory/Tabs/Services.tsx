@@ -5,12 +5,14 @@ import { useLocalStorage } from 'react-use';
 
 import { locationService } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, InlineSwitch, Tooltip, useStyles2 } from '@grafana/ui';
+import appEvents from 'app/core/app_events';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ReadMoreLink } from 'app/percona/shared/components/Elements/TechnicalPreview/TechnicalPreview';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
 import { DATA_INTERVAL } from 'app/percona/shared/core';
+import { ServiceDeletedEvent } from 'app/percona/shared/core/events';
 import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
@@ -131,6 +133,8 @@ export const Services = () => {
     setSelectedRows([]);
     onModalClose();
     loadData();
+
+    appEvents.publish(new ServiceDeletedEvent());
   }, [onModalClose, loadData]);
 
   return (
