@@ -38,12 +38,16 @@ import {
 } from './FormParts';
 import { ExternalServiceConnectionDetails } from './FormParts/ExternalServiceConnectionDetails/ExternalServiceConnectionDetails';
 import { HAProxyConnectionDetails } from './FormParts/HAProxyConnectionDetails/HAProxyConnectionDetails';
+import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
+import { useNavigate } from 'react-router-dom-v5-compat';
+import { ServiceAddedEvent } from 'app/percona/shared/core/events';
 
 const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
   instance: { type, credentials },
   onSubmit: submitWrapper,
 }) => {
   const styles = useStyles(getStyles);
+  const navigate = useNavigate();
 
   const { remoteInstanceCredentials, discoverName } = getInstanceData(type, credentials);
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,9 +88,14 @@ const AddRemoteInstance: FC<AddRemoteInstanceProps> = ({
           Messages.success.title(values.serviceName || values.address || ''),
           Messages.success.description(INSTANCE_TYPES_LABELS[type as Databases]),
         ]);
-        // keep hard reload until we implement sync with native navigation
-        window.location.href = '/graph/inventory/';
-        // navigate('/inventory');
+
+        if (isPmmNavEnabled()) {
+          appEvents.publish(new ServiceAddedEvent());
+
+          navigate('/inventory');
+        } else {
+          window.location.href = '/graph/inventory/';
+        }
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
