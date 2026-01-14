@@ -119,7 +119,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       {isSignedIn && <Telemetry />}
       <PerconaNavigation />
       {!isPmmNavEnabled() && <PerconaTourBootstrapper />}
-      {updateAvailable && showUpdateModal && !isLoadingUpdates ? (
+      {!isPmmNavEnabled() && updateAvailable && showUpdateModal && !isLoadingUpdates ? (
         <PerconaUpdateVersion />
       ) : (
         !isPmmNavEnabled() &&
