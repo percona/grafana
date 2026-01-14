@@ -70,6 +70,7 @@ export const Messages = {
       nodeType: 'Node Type',
       address: 'Address',
       services: 'Services',
+      isPmmServerNode: 'List PMM Server only nodes',
     },
     deleteConfirmation: (nrItems: number) =>
       `Are you sure that you want to permanently delete ${nrItems} node${nrItems ? 's' : ''}`,

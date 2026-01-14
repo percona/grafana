@@ -41,6 +41,7 @@ export enum FilterFieldTypes {
   TEXT,
   RADIO_BUTTON,
   DROPDOWN,
+  BOOLEAN,
 }
 
 export interface TableProps {

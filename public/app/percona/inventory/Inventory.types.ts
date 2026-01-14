@@ -140,6 +140,7 @@ export interface Node {
   services?: ServiceNodeList[];
   properties?: Record<string, string>;
   agentsStatus?: string;
+  isPmmServerNode: boolean;
 }
 
 export interface NodeDB {
@@ -160,7 +161,7 @@ export interface NodeDB {
   updated_at: string;
   status: ServiceStatus;
   services?: ServiceNodeListDB[];
-  is_pmm_server_node?: boolean;
+  is_pmm_server_node: boolean;
 }
 
 export interface NodeListDBPayload {

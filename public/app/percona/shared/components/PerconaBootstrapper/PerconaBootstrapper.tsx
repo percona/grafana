@@ -31,6 +31,7 @@ import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 import PerconaTourBootstrapper from './PerconaTour';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 import { isPmmNavEnabled } from '../../helpers/plugin';
+import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
@@ -102,6 +103,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       }
 
       await getUserDetails();
+      await dispatch(fetchHighAvailabilityStatus());
       await dispatch(fetchServerInfoAction());
       await dispatch(fetchServerSaasHostAction());
       onReady();
