@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, HorizontalGroup, Icon, Link, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -14,9 +14,10 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/highAvailability/highAvailability';
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
-import { getNodes } from 'app/percona/shared/core/selectors';
+import { getHighAvailability, getNodes } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
@@ -26,13 +27,18 @@ import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { appEvents } from '../../../core/app_events';
-import { CLUSTERS_SWITCH_KEY, GET_NODES_CANCEL_TOKEN } from '../Inventory.constants';
+import {
+  CLUSTERS_SWITCH_KEY,
+  GET_HIGH_AVAILABILITY_NODES_CANCEL_TOKEN,
+  GET_NODES_CANCEL_TOKEN,
+} from '../Inventory.constants';
 import { Messages } from '../Inventory.messages';
 import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
 
-import { getServiceLink } from './Nodes.utils';
+import { InventoryNode } from './Nodes.types';
+import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
@@ -50,10 +56,14 @@ export const NodesTab = () => {
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
+  const { nodes: highAvailabilityNodes, isEnabled: isHighAvailabilityEnabled } = useSelector(getHighAvailability);
 
   const mappedNodes = useMemo(
-    () => nodeFromDbMapper(nodes).sort((a, b) => a.nodeName.localeCompare(b.nodeName)),
-    [nodes]
+    () =>
+      mapNodesToInventoryNodes(nodeFromDbMapper(nodes), highAvailabilityNodes).sort((a, b) =>
+        a.nodeName.localeCompare(b.nodeName)
+      ),
+    [nodes, highAvailabilityNodes]
   );
 
   const getActions = useCallback(
@@ -80,7 +90,7 @@ export const NodesTab = () => {
   }, []);
 
   const columns = useMemo(
-    (): Array<ExtendedColumn<Node>> => [
+    (): Array<ExtendedColumn<InventoryNode>> => [
       {
         Header: Messages.services.columns.nodeId,
         id: 'nodeId',
@@ -102,6 +112,15 @@ export const NodesTab = () => {
       {
         Header: Messages.nodes.columns.nodeName,
         accessor: 'nodeName',
+        Cell: ({ value, row }) =>
+          isHighAvailabilityEnabled ? (
+            <Stack>
+              <span>{value}</span>
+              {row.original.haRole && <Badge text={getHaRoleBadgeText(row.original.haRole)} color="darkgrey" />}
+            </Stack>
+          ) : (
+            value
+          ),
         type: FilterFieldTypes.TEXT,
       },
       {
@@ -178,9 +197,20 @@ export const NodesTab = () => {
           return <div>{Messages.nodes.servicesCount(value.length)}</div>;
         },
       },
+      ...((isHighAvailabilityEnabled
+        ? [
+            {
+              Header: Messages.nodes.columns.isPmmServerNode,
+              id: 'isPmmServerNode',
+              accessor: 'isPmmServerNode',
+              hidden: true,
+              type: FilterFieldTypes.BOOLEAN,
+            },
+          ]
+        : []) as Array<ExtendedColumn<InventoryNode>>),
       getExpandAndActionsCol(getActions),
     ],
-    [styles, getActions, clearClusterToggle]
+    [styles, getActions, clearClusterToggle, isHighAvailabilityEnabled]
   );
 
   // FIX PMM-14640: Added all captured variables to dependency array to prevent stale closures.
@@ -188,7 +218,12 @@ export const NodesTab = () => {
   // Solution: Include all used variables (dispatch, generateToken) in dependencies.
   const loadData = useCallback(async () => {
     try {
-      await dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap();
+      await Promise.all([
+        dispatch(
+          fetchHighAvailabilityNodes({ token: generateToken(GET_HIGH_AVAILABILITY_NODES_CANCEL_TOKEN) })
+        ).unwrap(),
+        dispatch(fetchNodesAction({ token: generateToken(GET_NODES_CANCEL_TOKEN) })).unwrap(),
+      ]);
     } catch (e) {
       if (isApiCancelError(e)) {
         return;

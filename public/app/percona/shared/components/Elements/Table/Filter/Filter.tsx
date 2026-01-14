@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unnecessary-type-assertion */
+import { cx } from '@emotion/css';
 import { FormApi } from 'final-form';
 import { debounce } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
@@ -21,6 +22,7 @@ import {
   getQueryParams,
   isOtherThanTextType,
 } from './Filter.utils';
+import BooleanField from './components/fields/BooleanField';
 import { RadioButtonField } from './components/fields/RadioButtonField';
 import { SearchTextField } from './components/fields/SearchTextField';
 import { SelectColumnField } from './components/fields/SelectColumnField';
@@ -63,8 +65,7 @@ export const Filter = <T,>({
     setQueryParams(buildParamsFromKey(tableKey, columns, values));
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initialValues = useMemo(() => getQueryParams(columns, queryParamsByKey), []);
+  const initialValues = useMemo(() => getQueryParams(columns, queryParamsByKey), [columns, queryParamsByKey]);
   const onClearAll = (form: FormApi) => {
     form.initialize(buildEmptyValues(columns));
     setOpenCollapse(false);
@@ -88,8 +89,7 @@ export const Filter = <T,>({
     if (numberOfParams === 2 && initialValues[SEARCH_INPUT_FIELD_NAME] && initialValues[SEARCH_SELECT_FIELD_NAME]) {
       setOpenSearchFields(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialValues]);
 
   useEffect(() => {
     const queryParamsObj = getQueryParams(columns, queryParamsByKey);
@@ -171,10 +171,11 @@ export const Filter = <T,>({
             </div>
           </div>
           {showAdvanceFilter && openCollapse && (
-            <div className={styles.advanceFilter}>
+            <div className={cx(styles.advanceFilter, columns.length % 3 === 0 && styles.advancedFilter3Columns)}>
               {columns.map(
                 (column) =>
                   (column.type === FilterFieldTypes.DROPDOWN && <SelectDropdownField column={column} />) ||
+                  (column.type === FilterFieldTypes.BOOLEAN && <BooleanField column={column} />) ||
                   (column.type === FilterFieldTypes.RADIO_BUTTON && <RadioButtonField column={column} />)
               )}
             </div>

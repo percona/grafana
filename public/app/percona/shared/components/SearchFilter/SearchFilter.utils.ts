@@ -8,7 +8,12 @@ import { buildParamsFromKey } from '../Elements/Table/Filter/Filter.utils';
 import { QueryParamsValues } from './SearchFilter.types';
 
 export const getFilterColumns = <T extends object>(columns: Array<ExtendedColumn<T>>): Array<ExtendedColumn<T>> =>
-  columns.filter((col) => col.type === FilterFieldTypes.DROPDOWN || col.type === FilterFieldTypes.RADIO_BUTTON);
+  columns.filter(
+    (col) =>
+      col.type === FilterFieldTypes.DROPDOWN ||
+      col.type === FilterFieldTypes.RADIO_BUTTON ||
+      col.type === FilterFieldTypes.BOOLEAN
+  );
 
 export const useQueryParamsByKey = (tableKey?: string) => {
   const [queryParams, setQueryParams] = useQueryParams();
