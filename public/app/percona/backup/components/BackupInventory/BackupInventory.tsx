@@ -3,7 +3,7 @@ import { CancelToken } from 'axios';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Row } from 'react-table';
 
-import { AppEvents, SelectableValue } from '@grafana/data';
+import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Alert, LinkButton, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
@@ -30,6 +30,7 @@ import { Status } from '../Status';
 import { LocationType } from '../StorageLocations/StorageLocations.types';
 
 import { LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN } from './BackupInventory.constants';
+import { useServiceNames } from './BackupInventory.hooks';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
 import { BackupRow } from './BackupInventory.types';
@@ -46,7 +47,7 @@ export const BackupInventory: FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logsModalVisible, setLogsModalVisible] = useState(false);
   const [data, setData] = useState<BackupRow[]>([]);
-  const [serviceModes, setServiceModes] = useState<Array<SelectableValue<string>>>([]);
+  const serviceNames = useServiceNames(data);
   const dispatch = useAppDispatch();
   const [restoreErrors, setRestoreErrors] = useState<ApiVerboseError[]>([]);
   const [triggerTimeout] = useRecurringCall();
@@ -116,7 +117,7 @@ export const BackupInventory: FC = () => {
         Header: Messages.backupInventory.table.columns.service,
         accessor: 'serviceName',
         type: FilterFieldTypes.DROPDOWN,
-        options: serviceModes,
+        options: serviceNames,
       },
       {
         Header: Messages.scheduledBackups.table.columns.vendor,
@@ -174,7 +175,7 @@ export const BackupInventory: FC = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [serviceModes]
+    [serviceNames]
   );
   const styles = useStyles2(getStyles);
 
@@ -229,13 +230,6 @@ export const BackupInventory: FC = () => {
         }));
 
         setData(backupsWithLocation);
-
-        setServiceModes(
-          backups.map((item) => ({
-            label: item.serviceName,
-            value: item.serviceName,
-          }))
-        );
       } catch (e) {
         if (isApiCancelError(e)) {
           return;
