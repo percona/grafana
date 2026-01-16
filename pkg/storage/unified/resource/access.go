@@ -9,12 +9,11 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 	"go.opentelemetry.io/otel/trace/noop"
 
 	claims "github.com/grafana/authlib/types"
-	"github.com/grafana/grafana/pkg/infra/tracing"
-	"github.com/grafana/grafana/pkg/services/authn/grpcutils"
 )
 
 type groupResource map[string]map[string]interface{}
@@ -108,7 +107,7 @@ func NewAuthzLimitedClient(client claims.AccessClient, opts AuthzOptions) claims
 }
 
 // Check implements claims.AccessClient.
-func (c authzLimitedClient) Check(ctx context.Context, id claims.AuthInfo, req claims.CheckRequest) (claims.CheckResponse, error) {
+func (c authzLimitedClient) Check(ctx context.Context, id claims.AuthInfo, req claims.CheckRequest, folder string) (claims.CheckResponse, error) {
 	t := time.Now()
 	ctx, span := c.tracer.Start(ctx, "authzLimitedClient.Check", trace.WithAttributes(
 		attribute.String("group", req.Group),
@@ -116,23 +115,42 @@ func (c authzLimitedClient) Check(ctx context.Context, id claims.AuthInfo, req c
 		attribute.String("namespace", req.Namespace),
 		attribute.String("name", req.Name),
 		attribute.String("verb", req.Verb),
-		attribute.String("folder", req.Folder),
-		attribute.Bool("fallback_used", grpcutils.FallbackUsed(ctx)),
+		attribute.String("folder", folder),
+		attribute.Bool("fallback_used", FallbackUsed(ctx)),
 	))
 	defer span.End()
-	if grpcutils.FallbackUsed(ctx) {
+
+	if FallbackUsed(ctx) {
+		if req.Namespace == "" {
+			// cross namespace queries are not allowed when fallback is used
+			span.SetAttributes(attribute.Bool("allowed", false))
+			span.SetStatus(codes.Error, "Namespace empty")
+			err := fmt.Errorf("namespace empty")
+			span.RecordError(err)
+			return claims.CheckResponse{Allowed: false}, err
+		}
+
 		span.SetAttributes(attribute.Bool("allowed", true))
 		return claims.CheckResponse{Allowed: true}, nil
 	}
+
+	if !claims.NamespaceMatches(id.GetNamespace(), req.Namespace) {
+		span.SetAttributes(attribute.Bool("allowed", false))
+		span.SetStatus(codes.Error, "Namespace mismatch")
+		span.RecordError(claims.ErrNamespaceMismatch)
+		return claims.CheckResponse{Allowed: false}, claims.ErrNamespaceMismatch
+	}
+
 	if !c.IsCompatibleWithRBAC(req.Group, req.Resource) {
 		span.SetAttributes(attribute.Bool("allowed", true))
 		return claims.CheckResponse{Allowed: true}, nil
 	}
-	resp, err := c.client.Check(ctx, id, req)
+	resp, err := c.client.Check(ctx, id, req, folder)
 	if err != nil {
-		c.logger.Error("Check", "group", req.Group, "resource", req.Resource, "error", err, "duration", time.Since(t), "traceid", tracing.TraceIDFromContext(ctx, false))
+		c.logger.Error("Check", "group", req.Group, "resource", req.Resource, "error", err, "duration", time.Since(t), "traceid", trace.SpanContextFromContext(ctx).TraceID().String())
 		c.metrics.errorsTotal.WithLabelValues(req.Group, req.Resource, req.Verb).Inc()
-		span.SetAttributes(attribute.String("error", err.Error()))
+		span.SetStatus(codes.Error, fmt.Sprintf("check failed: %v", err))
+		span.RecordError(err)
 		return resp, err
 	}
 	span.SetAttributes(attribute.Bool("allowed", resp.Allowed))
@@ -141,9 +159,9 @@ func (c authzLimitedClient) Check(ctx context.Context, id claims.AuthInfo, req c
 }
 
 // Compile implements claims.AccessClient.
-func (c authzLimitedClient) Compile(ctx context.Context, id claims.AuthInfo, req claims.ListRequest) (claims.ItemChecker, error) {
+func (c authzLimitedClient) Compile(ctx context.Context, id claims.AuthInfo, req claims.ListRequest) (claims.ItemChecker, claims.Zookie, error) {
 	t := time.Now()
-	fallbackUsed := grpcutils.FallbackUsed(ctx)
+	fallbackUsed := FallbackUsed(ctx)
 	ctx, span := c.tracer.Start(ctx, "authzLimitedClient.Compile", trace.WithAttributes(
 		attribute.String("group", req.Group),
 		attribute.String("resource", req.Resource),
@@ -152,20 +170,41 @@ func (c authzLimitedClient) Compile(ctx context.Context, id claims.AuthInfo, req
 		attribute.Bool("fallback_used", fallbackUsed),
 	))
 	defer span.End()
-	if fallbackUsed || !c.IsCompatibleWithRBAC(req.Group, req.Resource) {
+	if fallbackUsed {
+		if req.Namespace == "" {
+			// cross namespace queries are not allowed when fallback is used
+			span.SetAttributes(attribute.Bool("allowed", false))
+			span.SetStatus(codes.Error, "Namespace empty")
+			err := fmt.Errorf("namespace empty")
+			span.RecordError(err)
+			return nil, claims.NoopZookie{}, err
+		}
 		return func(name, folder string) bool {
 			return true
-		}, nil
+		}, claims.NoopZookie{}, nil
 	}
-	checker, err := c.client.Compile(ctx, id, req)
+	if !claims.NamespaceMatches(id.GetNamespace(), req.Namespace) {
+		span.SetAttributes(attribute.Bool("allowed", false))
+		span.SetStatus(codes.Error, "Namespace mismatch")
+		span.RecordError(claims.ErrNamespaceMismatch)
+		return nil, claims.NoopZookie{}, claims.ErrNamespaceMismatch
+	}
+
+	if !c.IsCompatibleWithRBAC(req.Group, req.Resource) {
+		return func(name, folder string) bool {
+			return true
+		}, claims.NoopZookie{}, nil
+	}
+	checker, zookie, err := c.client.Compile(ctx, id, req)
 	if err != nil {
-		c.logger.Error("Compile", "group", req.Group, "resource", req.Resource, "error", err, "traceid", tracing.TraceIDFromContext(ctx, false))
+		c.logger.Error("Compile", "group", req.Group, "resource", req.Resource, "error", err, "traceid", trace.SpanContextFromContext(ctx).TraceID().String())
 		c.metrics.errorsTotal.WithLabelValues(req.Group, req.Resource, req.Verb).Inc()
-		span.SetAttributes(attribute.String("error", err.Error()))
-		return nil, err
+		span.SetStatus(codes.Error, fmt.Sprintf("compile failed: %v", err))
+		span.RecordError(err)
+		return nil, zookie, err
 	}
 	c.metrics.compileDuration.WithLabelValues(req.Group, req.Resource, req.Verb).Observe(time.Since(t).Seconds())
-	return checker, nil
+	return checker, zookie, nil
 }
 
 func (c authzLimitedClient) IsCompatibleWithRBAC(group, resource string) bool {
@@ -178,3 +217,13 @@ func (c authzLimitedClient) IsCompatibleWithRBAC(group, resource string) bool {
 }
 
 var _ claims.AccessClient = &authzLimitedClient{}
+
+type contextFallbackKey struct{}
+
+func WithFallback(ctx context.Context) context.Context {
+	return context.WithValue(ctx, contextFallbackKey{}, true)
+}
+
+func FallbackUsed(ctx context.Context) bool {
+	return ctx.Value(contextFallbackKey{}) != nil
+}

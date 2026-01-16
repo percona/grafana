@@ -2,16 +2,11 @@ import { Scope, ScopeDashboardBinding, ScopeNode } from '@grafana/data';
 import { DataSourceRef } from '@grafana/schema/dist/esm/common/common.gen';
 import { getDashboardScenePageStateManager } from 'app/features/dashboard-scene/pages/DashboardScenePageStateManager';
 
-import * as api from '../../internal/api';
-
 export const mocksScopes: Scope[] = [
   {
     metadata: { name: 'cloud' },
     spec: {
       title: 'Cloud',
-      type: 'indexHelper',
-      description: 'redundant label filter but makes queries faster',
-      category: 'indexHelpers',
       filters: [{ key: 'cloud', value: '.*', operator: 'regex-match' }],
     },
   },
@@ -19,9 +14,6 @@ export const mocksScopes: Scope[] = [
     metadata: { name: 'dev' },
     spec: {
       title: 'Dev',
-      type: 'cloud',
-      description: 'Dev',
-      category: 'cloud',
       filters: [{ key: 'cloud', value: 'dev', operator: 'equals' }],
     },
   },
@@ -29,9 +21,6 @@ export const mocksScopes: Scope[] = [
     metadata: { name: 'ops' },
     spec: {
       title: 'Ops',
-      type: 'cloud',
-      description: 'Ops',
-      category: 'cloud',
       filters: [{ key: 'cloud', value: 'ops', operator: 'equals' }],
     },
   },
@@ -39,9 +28,6 @@ export const mocksScopes: Scope[] = [
     metadata: { name: 'prod' },
     spec: {
       title: 'Prod',
-      type: 'cloud',
-      description: 'Prod',
-      category: 'cloud',
       filters: [{ key: 'cloud', value: 'prod', operator: 'equals' }],
     },
   },
@@ -49,9 +35,6 @@ export const mocksScopes: Scope[] = [
     metadata: { name: 'grafana' },
     spec: {
       title: 'Grafana',
-      type: 'app',
-      description: 'Grafana',
-      category: 'apps',
       filters: [{ key: 'app', value: 'grafana', operator: 'equals' }],
     },
   },
@@ -59,9 +42,6 @@ export const mocksScopes: Scope[] = [
     metadata: { name: 'mimir' },
     spec: {
       title: 'Mimir',
-      type: 'app',
-      description: 'Mimir',
-      category: 'apps',
       filters: [{ key: 'app', value: 'mimir', operator: 'equals' }],
     },
   },
@@ -69,9 +49,6 @@ export const mocksScopes: Scope[] = [
     metadata: { name: 'loki' },
     spec: {
       title: 'Loki',
-      type: 'app',
-      description: 'Loki',
-      category: 'apps',
       filters: [{ key: 'app', value: 'loki', operator: 'equals' }],
     },
   },
@@ -79,10 +56,21 @@ export const mocksScopes: Scope[] = [
     metadata: { name: 'tempo' },
     spec: {
       title: 'Tempo',
-      type: 'app',
-      description: 'Tempo',
-      category: 'apps',
       filters: [{ key: 'app', value: 'tempo', operator: 'equals' }],
+    },
+  },
+  {
+    metadata: { name: 'dev-env' },
+    spec: {
+      title: 'Development',
+      filters: [{ key: 'environment', value: 'dev', operator: 'equals' }],
+    },
+  },
+  {
+    metadata: { name: 'prod-env' },
+    spec: {
+      title: 'Production',
+      filters: [{ key: 'environment', value: 'prod', operator: 'equals' }],
     },
   },
 ] as const;
@@ -171,18 +159,17 @@ export const mocksScopeDashboardBindings: ScopeDashboardBinding[] = [
   ),
 ] as const;
 
-export const mocksNodes: Array<ScopeNode & { parent: string }> = [
+export const mocksNodes: ScopeNode[] = [
   {
-    parent: '',
     metadata: { name: 'applications' },
     spec: {
       nodeType: 'container',
       title: 'Applications',
       description: 'Application Scopes',
+      parentName: '',
     },
   },
   {
-    parent: '',
     metadata: { name: 'cloud' },
     spec: {
       nodeType: 'container',
@@ -191,10 +178,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       disableMultiSelect: true,
       linkType: 'scope',
       linkId: 'cloud',
+      parentName: '',
     },
   },
   {
-    parent: 'applications',
     metadata: { name: 'applications-grafana' },
     spec: {
       nodeType: 'leaf',
@@ -202,10 +189,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Grafana',
       linkType: 'scope',
       linkId: 'grafana',
+      parentName: 'applications',
     },
   },
   {
-    parent: 'applications',
     metadata: { name: 'applications-mimir' },
     spec: {
       nodeType: 'leaf',
@@ -213,10 +200,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Mimir',
       linkType: 'scope',
       linkId: 'mimir',
+      parentName: 'applications',
     },
   },
   {
-    parent: 'applications',
     metadata: { name: 'applications-loki' },
     spec: {
       nodeType: 'leaf',
@@ -224,10 +211,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Loki',
       linkType: 'scope',
       linkId: 'loki',
+      parentName: 'applications',
     },
   },
   {
-    parent: 'applications',
     metadata: { name: 'applications-tempo' },
     spec: {
       nodeType: 'leaf',
@@ -235,10 +222,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Tempo',
       linkType: 'scope',
       linkId: 'tempo',
+      parentName: 'applications',
     },
   },
   {
-    parent: 'applications',
     metadata: { name: 'applications-cloud' },
     spec: {
       nodeType: 'container',
@@ -246,10 +233,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Application/Cloud Scopes',
       linkType: 'scope',
       linkId: 'cloud',
+      parentName: 'applications',
     },
   },
   {
-    parent: 'applications-cloud',
     metadata: { name: 'applications-cloud-dev' },
     spec: {
       nodeType: 'leaf',
@@ -257,10 +244,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Dev',
       linkType: 'scope',
       linkId: 'dev',
+      parentName: 'applications-cloud',
     },
   },
   {
-    parent: 'applications-cloud',
     metadata: { name: 'applications-cloud-ops' },
     spec: {
       nodeType: 'leaf',
@@ -268,10 +255,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Ops',
       linkType: 'scope',
       linkId: 'ops',
+      parentName: 'applications-cloud',
     },
   },
   {
-    parent: 'applications-cloud',
     metadata: { name: 'applications-cloud-prod' },
     spec: {
       nodeType: 'leaf',
@@ -279,10 +266,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Prod',
       linkType: 'scope',
       linkId: 'prod',
+      parentName: 'applications-cloud',
     },
   },
   {
-    parent: 'cloud',
     metadata: { name: 'cloud-dev' },
     spec: {
       nodeType: 'leaf',
@@ -290,10 +277,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Dev',
       linkType: 'scope',
       linkId: 'dev',
+      parentName: 'cloud',
     },
   },
   {
-    parent: 'cloud',
     metadata: { name: 'cloud-ops' },
     spec: {
       nodeType: 'leaf',
@@ -301,10 +288,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Ops',
       linkType: 'scope',
       linkId: 'ops',
+      parentName: 'cloud',
     },
   },
   {
-    parent: 'cloud',
     metadata: { name: 'cloud-prod' },
     spec: {
       nodeType: 'leaf',
@@ -312,19 +299,19 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Prod',
       linkType: 'scope',
       linkId: 'prod',
+      parentName: 'cloud',
     },
   },
   {
-    parent: 'cloud',
     metadata: { name: 'cloud-applications' },
     spec: {
       nodeType: 'container',
       title: 'Applications',
       description: 'Cloud/Application Scopes',
+      parentName: 'cloud',
     },
   },
   {
-    parent: 'cloud-applications',
     metadata: { name: 'cloud-applications-grafana' },
     spec: {
       nodeType: 'leaf',
@@ -332,10 +319,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Grafana',
       linkType: 'scope',
       linkId: 'grafana',
+      parentName: 'cloud-applications',
     },
   },
   {
-    parent: 'cloud-applications',
     metadata: { name: 'cloud-applications-mimir' },
     spec: {
       nodeType: 'leaf',
@@ -343,10 +330,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Mimir',
       linkType: 'scope',
       linkId: 'mimir',
+      parentName: 'cloud-applications',
     },
   },
   {
-    parent: 'cloud-applications',
     metadata: { name: 'cloud-applications-loki' },
     spec: {
       nodeType: 'leaf',
@@ -354,10 +341,10 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Loki',
       linkType: 'scope',
       linkId: 'loki',
+      parentName: 'cloud-applications',
     },
   },
   {
-    parent: 'cloud-applications',
     metadata: { name: 'cloud-applications-tempo' },
     spec: {
       nodeType: 'leaf',
@@ -365,14 +352,43 @@ export const mocksNodes: Array<ScopeNode & { parent: string }> = [
       description: 'Tempo',
       linkType: 'scope',
       linkId: 'tempo',
+      parentName: 'cloud-applications',
+    },
+  },
+  {
+    metadata: { name: 'environments' },
+    spec: {
+      nodeType: 'container',
+      title: 'Environments',
+      description: 'Environment Scopes',
+      disableMultiSelect: true,
+      parentName: '',
+    },
+  },
+  {
+    metadata: { name: 'environments-dev' },
+    spec: {
+      nodeType: 'container',
+      title: 'Development',
+      description: 'Development Environment',
+      linkType: 'scope',
+      linkId: 'dev-env',
+      parentName: 'environments',
+    },
+  },
+  {
+    metadata: { name: 'environments-prod' },
+    spec: {
+      nodeType: 'container',
+      title: 'Production',
+      description: 'Production Environment',
+      linkType: 'scope',
+      linkId: 'prod-env',
+      parentName: 'environments',
     },
   },
 ] as const;
 
-export const fetchNodesSpy = jest.spyOn(api, 'fetchNodes');
-export const fetchScopeSpy = jest.spyOn(api, 'fetchScope');
-export const fetchSelectedScopesSpy = jest.spyOn(api, 'fetchSelectedScopes');
-export const fetchDashboardsSpy = jest.spyOn(api, 'fetchDashboards');
 export const dashboardReloadSpy = jest.spyOn(getDashboardScenePageStateManager(), 'reloadDashboard');
 
 export const getMock = jest
@@ -382,8 +398,8 @@ export const getMock = jest
       if (url.startsWith('/apis/scope.grafana.app/v0alpha1/namespaces/default/find/scope_node_children')) {
         return {
           items: mocksNodes.filter(
-            ({ parent, spec: { title } }) =>
-              parent === params.parent && title.toLowerCase().includes((params.query ?? '').toLowerCase())
+            ({ spec: { title, parentName } }) =>
+              parentName === params.parent && title.toLowerCase().includes((params.query ?? '').toLowerCase())
           ),
         };
       }

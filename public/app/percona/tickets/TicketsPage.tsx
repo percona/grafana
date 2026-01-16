@@ -4,7 +4,7 @@ import { Cell, Column, Row } from 'react-table';
 import { useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { logger } from 'app/percona/shared/helpers/logger';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { Table } from '../shared/components/Elements/Table';

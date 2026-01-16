@@ -1,5 +1,5 @@
 import { SelectableValue } from '@grafana/data';
-import { SelectAsyncProps, SelectCommonProps } from '@grafana/ui/src/components/Select/types';
+import { SelectAsyncProps, SelectCommonProps } from '@grafana/ui';
 
 export interface AsyncSelectFieldProps<T> extends Omit<SelectCommonProps<T>, 'options'>, SelectAsyncProps<T> {
   // AsyncSelect has options stored internally. We cannot enable plain values as we don't have access to the fetched options

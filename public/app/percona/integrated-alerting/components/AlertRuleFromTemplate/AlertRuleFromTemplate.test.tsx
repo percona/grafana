@@ -6,7 +6,7 @@ import { OrgRole } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import AlertRuleFromTemplate from './AlertRuleFromTemplate';
 

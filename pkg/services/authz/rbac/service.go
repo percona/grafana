@@ -19,6 +19,8 @@ import (
 	"github.com/grafana/authlib/cache"
 	"github.com/grafana/authlib/types"
 
+	"github.com/grafana/grafana/pkg/apimachinery/utils"
+
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/registry/apis/iam/common"
@@ -29,10 +31,8 @@ import (
 )
 
 const (
-	shortCacheTTL        = 30 * time.Second
-	shortCleanupInterval = 2 * time.Minute
-	longCacheTTL         = 2 * time.Minute
-	longCleanupInterval  = 4 * time.Minute
+	shortCacheTTL = 30 * time.Second
+	longCacheTTL  = 2 * time.Minute
 )
 
 type Service struct {
@@ -42,8 +42,9 @@ type Service struct {
 	folderStore     store.FolderStore
 	permissionStore store.PermissionStore
 	identityStore   legacy.LegacyIdentityStore
+	settings        Settings
 
-	mapper mapper
+	mapper MapperRegistry
 
 	logger  log.Logger
 	tracer  tracing.Tracer
@@ -53,11 +54,20 @@ type Service struct {
 	sf *singleflight.Group
 
 	// Cache for user permissions, user team memberships and user basic roles
-	idCache        *cacheWrap[store.UserIdentifiers]
-	permCache      *cacheWrap[map[string]bool]
-	teamCache      *cacheWrap[[]int64]
-	basicRoleCache *cacheWrap[store.BasicRole]
-	folderCache    *cacheWrap[folderTree]
+	idCache         cacheWrap[store.UserIdentifiers]
+	permCache       cacheWrap[map[string]bool]
+	permDenialCache cacheWrap[bool]
+	userTeamCache   cacheWrap[[]int64]
+	basicRoleCache  cacheWrap[store.BasicRole]
+	folderCache     cacheWrap[folderTree]
+	teamIDCache     cacheWrap[map[int64]string]
+}
+
+type Settings struct {
+	AnonOrgRole string
+	// CacheTTL is the time to live for the permission cache entries.
+	// Set to 0 to disable caching.
+	CacheTTL time.Duration
 }
 
 func NewService(
@@ -69,21 +79,28 @@ func NewService(
 	tracer tracing.Tracer,
 	reg prometheus.Registerer,
 	cache cache.Cache,
+	settings Settings,
 ) *Service {
+	if settings.AnonOrgRole == "" {
+		settings.AnonOrgRole = "Viewer"
+	}
 	return &Service{
 		store:           store.NewStore(sql, tracer),
 		folderStore:     folderStore,
 		permissionStore: permissionStore,
 		identityStore:   identityStore,
+		settings:        settings,
 		logger:          logger,
 		tracer:          tracer,
 		metrics:         newMetrics(reg),
-		mapper:          newMapper(),
-		idCache:         newCacheWrap[store.UserIdentifiers](cache, logger, longCacheTTL),
-		permCache:       newCacheWrap[map[string]bool](cache, logger, shortCacheTTL),
-		teamCache:       newCacheWrap[[]int64](cache, logger, shortCacheTTL),
-		basicRoleCache:  newCacheWrap[store.BasicRole](cache, logger, shortCacheTTL),
-		folderCache:     newCacheWrap[folderTree](cache, logger, shortCacheTTL),
+		mapper:          NewMapperRegistry(),
+		idCache:         newCacheWrap[store.UserIdentifiers](cache, logger, tracer, longCacheTTL),
+		permCache:       newCacheWrap[map[string]bool](cache, logger, tracer, settings.CacheTTL),
+		permDenialCache: newCacheWrap[bool](cache, logger, tracer, settings.CacheTTL),
+		userTeamCache:   newCacheWrap[[]int64](cache, logger, tracer, settings.CacheTTL),
+		basicRoleCache:  newCacheWrap[store.BasicRole](cache, logger, tracer, settings.CacheTTL),
+		folderCache:     newCacheWrap[folderTree](cache, logger, tracer, settings.CacheTTL),
+		teamIDCache:     newCacheWrap[map[int64]string](cache, logger, tracer, longCacheTTL),
 		sf:              new(singleflight.Group),
 	}
 }
@@ -91,8 +108,18 @@ func NewService(
 func (s *Service) Check(ctx context.Context, req *authzv1.CheckRequest) (*authzv1.CheckResponse, error) {
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.Check")
 	defer span.End()
-	ctxLogger := s.logger.FromContext(ctx)
+	ctxLogger := s.logger.FromContext(ctx).New(
+		"subject", req.GetSubject(),
+		"namespace", req.GetNamespace(),
+		"group", req.GetGroup(),
+		"resource", req.GetResource(),
+		"verb", req.GetVerb(),
+	)
+	defer func(start time.Time) {
+		ctxLogger.Debug("Check execution time", "duration", time.Since(start).Milliseconds())
+	}(time.Now())
 
+	allow := &authzv1.CheckResponse{Allowed: true}
 	deny := &authzv1.CheckResponse{Allowed: false}
 
 	checkReq, err := s.validateCheckRequest(ctx, req)
@@ -103,7 +130,40 @@ func (s *Service) Check(ctx context.Context, req *authzv1.CheckRequest) (*authzv
 	}
 	ctx = request.WithNamespace(ctx, req.GetNamespace())
 
-	permissions, err := s.getIdentityPermissions(ctx, checkReq.Namespace, checkReq.IdentityType, checkReq.UserUID, checkReq.Action)
+	span.SetAttributes(
+		attribute.String("subject", req.Subject),
+		attribute.String("namespace", checkReq.Namespace.Value),
+		attribute.String("action", checkReq.Action),
+		attribute.String("name", checkReq.Name),
+		attribute.String("folder", checkReq.ParentFolder),
+		attribute.Bool("allowed", false),
+	)
+
+	permDenialKey := userPermDenialCacheKey(checkReq.Namespace.Value, checkReq.UserUID, checkReq.Action, checkReq.Name, checkReq.ParentFolder)
+	if _, ok := s.permDenialCache.Get(ctx, permDenialKey); ok {
+		s.metrics.permissionCacheUsage.WithLabelValues("true", checkReq.Action).Inc()
+		s.metrics.requestCount.WithLabelValues("false", "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
+		return deny, nil
+	}
+
+	cachedPerms, err := s.getCachedIdentityPermissions(ctx, checkReq.Namespace, checkReq.IdentityType, checkReq.UserUID, checkReq.Action)
+	if err == nil {
+		allowed, err := s.checkPermission(ctx, cachedPerms, checkReq)
+		if err != nil {
+			ctxLogger.Error("could not check permission", "error", err)
+			s.metrics.requestCount.WithLabelValues("true", "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
+			return deny, err
+		}
+		if allowed {
+			s.metrics.permissionCacheUsage.WithLabelValues("true", checkReq.Action).Inc()
+			s.metrics.requestCount.WithLabelValues("false", "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
+			span.SetAttributes(attribute.Bool("allowed", true))
+			return allow, nil
+		}
+	}
+	s.metrics.permissionCacheUsage.WithLabelValues("false", checkReq.Action).Inc()
+
+	permissions, err := s.getIdentityPermissions(ctx, checkReq.Namespace, checkReq.IdentityType, checkReq.UserUID, checkReq.Action, checkReq.ActionSets)
 	if err != nil {
 		ctxLogger.Error("could not get user permissions", "subject", req.GetSubject(), "error", err)
 		s.metrics.requestCount.WithLabelValues("true", "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
@@ -117,14 +177,28 @@ func (s *Service) Check(ctx context.Context, req *authzv1.CheckRequest) (*authzv
 		return deny, err
 	}
 
+	if !allowed {
+		s.permDenialCache.Set(ctx, permDenialKey, true)
+	}
+
 	s.metrics.requestCount.WithLabelValues("false", "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
+	span.SetAttributes(attribute.Bool("allowed", allowed))
 	return &authzv1.CheckResponse{Allowed: allowed}, nil
 }
 
 func (s *Service) List(ctx context.Context, req *authzv1.ListRequest) (*authzv1.ListResponse, error) {
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.List")
 	defer span.End()
-	ctxLogger := s.logger.FromContext(ctx)
+	ctxLogger := s.logger.FromContext(ctx).New(
+		"subject", req.GetSubject(),
+		"namespace", req.GetNamespace(),
+		"group", req.GetGroup(),
+		"resource", req.GetResource(),
+		"verb", req.GetVerb(),
+	)
+	defer func(start time.Time) {
+		ctxLogger.Debug("List execution time", "duration", time.Since(start).Milliseconds())
+	}(time.Now())
 
 	listReq, err := s.validateListRequest(ctx, req)
 	if err != nil {
@@ -134,19 +208,49 @@ func (s *Service) List(ctx context.Context, req *authzv1.ListRequest) (*authzv1.
 	}
 	ctx = request.WithNamespace(ctx, req.GetNamespace())
 
-	permissions, err := s.getIdentityPermissions(ctx, listReq.Namespace, listReq.IdentityType, listReq.UserUID, listReq.Action)
-	if err != nil {
-		ctxLogger.Error("could not get user permissions", "subject", req.GetSubject(), "error", err)
-		s.metrics.requestCount.WithLabelValues("true", "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
-		return nil, err
+	span.SetAttributes(
+		attribute.String("subject", req.Subject),
+		attribute.String("namespace", listReq.Namespace.Value),
+		attribute.String("action", listReq.Action),
+	)
+
+	var permissions map[string]bool
+	cacheHit := false
+
+	if !listReq.Options.SkipCache {
+		permissions, err = s.getCachedIdentityPermissions(ctx, listReq.Namespace, listReq.IdentityType, listReq.UserUID, listReq.Action)
+		if err == nil {
+			s.metrics.permissionCacheUsage.WithLabelValues("true", listReq.Action).Inc()
+			cacheHit = true
+		}
+	}
+	if err != nil || listReq.Options.SkipCache {
+		s.metrics.permissionCacheUsage.WithLabelValues("false", listReq.Action).Inc()
+
+		permissions, err = s.getIdentityPermissions(ctx, listReq.Namespace, listReq.IdentityType, listReq.UserUID, listReq.Action, listReq.ActionSets)
+		if err != nil {
+			ctxLogger.Error("could not get user permissions", "subject", req.GetSubject(), "error", err)
+			s.metrics.requestCount.WithLabelValues("true", "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
+			return nil, err
+		}
 	}
 
 	resp, err := s.listPermission(ctx, permissions, listReq)
 	s.metrics.requestCount.WithLabelValues(strconv.FormatBool(err != nil), "true", req.GetVerb(), req.GetGroup(), req.GetResource()).Inc()
-	return resp, err
+	if err != nil {
+		return nil, err
+	}
+
+	if resp != nil && resp.Zookie != nil {
+		if cacheHit && time.Duration(time.Now().Unix()-resp.Zookie.Timestamp) < s.settings.CacheTTL {
+			resp.Zookie = &authzv1.Zookie{Timestamp: time.Now().Add(-s.settings.CacheTTL).Unix()}
+		}
+	}
+
+	return resp, nil
 }
 
-func (s *Service) validateCheckRequest(ctx context.Context, req *authzv1.CheckRequest) (*CheckRequest, error) {
+func (s *Service) validateCheckRequest(ctx context.Context, req *authzv1.CheckRequest) (*checkRequest, error) {
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.validateCheckRequest")
 	defer span.End()
 
@@ -160,16 +264,17 @@ func (s *Service) validateCheckRequest(ctx context.Context, req *authzv1.CheckRe
 		return nil, err
 	}
 
-	action, err := s.validateAction(ctx, req.GetGroup(), req.GetResource(), req.GetVerb())
+	action, actionSets, err := s.validateAction(ctx, req.GetGroup(), req.GetResource(), req.GetVerb())
 	if err != nil {
 		return nil, err
 	}
 
-	checkReq := &CheckRequest{
+	checkReq := &checkRequest{
 		Namespace:    ns,
 		UserUID:      userUID,
 		IdentityType: idType,
 		Action:       action,
+		ActionSets:   actionSets,
 		Group:        req.GetGroup(),
 		Resource:     req.GetResource(),
 		Verb:         req.GetVerb(),
@@ -179,7 +284,7 @@ func (s *Service) validateCheckRequest(ctx context.Context, req *authzv1.CheckRe
 	return checkReq, nil
 }
 
-func (s *Service) validateListRequest(ctx context.Context, req *authzv1.ListRequest) (*ListRequest, error) {
+func (s *Service) validateListRequest(ctx context.Context, req *authzv1.ListRequest) (*listRequest, error) {
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.validateListRequest")
 	defer span.End()
 
@@ -193,19 +298,29 @@ func (s *Service) validateListRequest(ctx context.Context, req *authzv1.ListRequ
 		return nil, err
 	}
 
-	action, err := s.validateAction(ctx, req.GetGroup(), req.GetResource(), req.GetVerb())
+	action, actionSets, err := s.validateAction(ctx, req.GetGroup(), req.GetResource(), req.GetVerb())
 	if err != nil {
 		return nil, err
 	}
 
-	listReq := &ListRequest{
+	authzOptions := req.GetOptions()
+	if authzOptions == nil {
+		authzOptions = &authzv1.ListRequestOptions{}
+	}
+	options := &ListRequestOptions{
+		SkipCache: authzOptions.Skipcache,
+	}
+
+	listReq := &listRequest{
 		Namespace:    ns,
 		UserUID:      userUID,
 		IdentityType: idType,
 		Action:       action,
+		ActionSets:   actionSets,
 		Group:        req.GetGroup(),
 		Resource:     req.GetResource(),
 		Verb:         req.GetVerb(),
+		Options:      options,
 	}
 	return listReq, nil
 }
@@ -249,33 +364,30 @@ func (s *Service) validateSubject(ctx context.Context, subject string) (string, 
 	return userUID, identityType, nil
 }
 
-func (s *Service) validateAction(ctx context.Context, group, resource, verb string) (string, error) {
+// Find the action for a selected verb
+func (s *Service) validateAction(ctx context.Context, group, resource, verb string) (string, []string, error) {
 	ctxLogger := s.logger.FromContext(ctx)
 
-	t, ok := s.mapper.translation(group, resource)
+	t, ok := s.mapper.Get(group, resource)
 	if !ok {
-		ctxLogger.Error("unsupport resource", "group", group, "resource", resource)
-		return "", status.Error(codes.NotFound, "unsupported resource")
+		ctxLogger.Error("unsupported resource", "group", group, "resource", resource)
+		return "", nil, status.Error(codes.NotFound, "unsupported resource")
 	}
 
-	action, ok := t.action(verb)
+	action, ok := t.Action(verb)
 	if !ok {
-		ctxLogger.Error("unsupport verb", "group", group, "resource", resource, "verb", verb)
-		return "", status.Error(codes.NotFound, "unsupported verb")
+		ctxLogger.Error("unsupported verb", "group", group, "resource", resource, "verb", verb)
+		return "", nil, status.Error(codes.NotFound, "unsupported verb")
 	}
 
-	return action, nil
+	actionSets := t.ActionSets(verb)
+
+	return action, actionSets, nil
 }
 
-func (s *Service) getIdentityPermissions(ctx context.Context, ns types.NamespaceInfo, idType types.IdentityType, userID, action string) (map[string]bool, error) {
+func (s *Service) getIdentityPermissions(ctx context.Context, ns types.NamespaceInfo, idType types.IdentityType, userID, action string, actionSets []string) (map[string]bool, error) {
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.getIdentityPermissions")
 	defer span.End()
-
-	// When checking folder creation permissions, also check edit and admin action sets for folder, as the scoped folder create actions aren't stored in the DB separately
-	var actionSets []string
-	if action == "folders:create" {
-		actionSets = append(actionSets, "folders:edit", "folders:admin")
-	}
 
 	switch idType {
 	case types.TypeAnonymous:
@@ -284,6 +396,34 @@ func (s *Service) getIdentityPermissions(ctx context.Context, ns types.Namespace
 		return s.getRendererPermissions(ctx, action)
 	case types.TypeUser, types.TypeServiceAccount:
 		return s.getUserPermissions(ctx, ns, userID, action, actionSets)
+	default:
+		return nil, fmt.Errorf("unsupported identity type: %s", idType)
+	}
+}
+
+func (s *Service) getCachedIdentityPermissions(ctx context.Context, ns types.NamespaceInfo, idType types.IdentityType, userID, action string) (map[string]bool, error) {
+	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.getCachedIdentityPermissions")
+	defer span.End()
+
+	switch idType {
+	case types.TypeAnonymous:
+		anonPermKey := anonymousPermCacheKey(ns.Value, action)
+		if cached, ok := s.permCache.Get(ctx, anonPermKey); ok {
+			return cached, nil
+		}
+		return nil, cache.ErrNotFound
+	case types.TypeRenderService:
+		return nil, cache.ErrNotFound
+	case types.TypeUser, types.TypeServiceAccount:
+		userIdentifiers, err := s.GetUserIdentifiers(ctx, ns, userID)
+		if err != nil {
+			return nil, err
+		}
+		userPermKey := userPermCacheKey(ns.Value, userIdentifiers.UID, action)
+		if cached, ok := s.permCache.Get(ctx, userPermKey); ok {
+			return cached, nil
+		}
+		return nil, cache.ErrNotFound
 	default:
 		return nil, fmt.Errorf("unsupported identity type: %s", idType)
 	}
@@ -299,12 +439,6 @@ func (s *Service) getUserPermissions(ctx context.Context, ns types.NamespaceInfo
 	}
 
 	userPermKey := userPermCacheKey(ns.Value, userIdentifiers.UID, action)
-	if cached, ok := s.permCache.Get(ctx, userPermKey); ok {
-		s.metrics.permissionCacheUsage.WithLabelValues("true", action).Inc()
-		return cached, nil
-	}
-	s.metrics.permissionCacheUsage.WithLabelValues("false", action).Inc()
-
 	res, err, _ := s.sf.Do(userPermKey+"_getUserPermissions", func() (interface{}, error) {
 		basicRoles, err := s.getUserBasicRole(ctx, ns, userIdentifiers)
 		if err != nil {
@@ -329,7 +463,12 @@ func (s *Service) getUserPermissions(ctx context.Context, ns types.NamespaceInfo
 		if err != nil {
 			return nil, err
 		}
-		scopeMap := getScopeMap(permissions)
+		scopeMap := s.getScopeMap(permissions)
+
+		scopeMap, err = s.resolveScopeMap(ctx, ns, scopeMap)
+		if err != nil {
+			return nil, fmt.Errorf("could not resolve scope map: %w", err)
+		}
 
 		s.permCache.Set(ctx, userPermKey, scopeMap)
 		span.SetAttributes(attribute.Int("num_permissions_fetched", len(permissions)))
@@ -349,15 +488,12 @@ func (s *Service) getAnonymousPermissions(ctx context.Context, ns types.Namespac
 	defer span.End()
 
 	anonPermKey := anonymousPermCacheKey(ns.Value, action)
-	if cached, ok := s.permCache.Get(ctx, anonPermKey); ok {
-		return cached, nil
-	}
 	res, err, _ := s.sf.Do(anonPermKey+"_getAnonymousPermissions", func() (interface{}, error) {
-		permissions, err := s.permissionStore.GetUserPermissions(ctx, ns, store.PermissionsQuery{Action: action, ActionSets: actionSets, Role: "Viewer"})
+		permissions, err := s.permissionStore.GetUserPermissions(ctx, ns, store.PermissionsQuery{Action: action, ActionSets: actionSets, Role: s.settings.AnonOrgRole})
 		if err != nil {
 			return nil, err
 		}
-		scopeMap := getScopeMap(permissions)
+		scopeMap := s.getScopeMap(permissions)
 		s.permCache.Set(ctx, anonPermKey, scopeMap)
 		return scopeMap, nil
 	})
@@ -415,7 +551,7 @@ func (s *Service) getUserTeams(ctx context.Context, ns types.NamespaceInfo, user
 
 	teamIDs := make([]int64, 0, 50)
 	teamsCacheKey := userTeamCacheKey(ns.Value, userIdentifiers.UID)
-	if cached, ok := s.teamCache.Get(ctx, teamsCacheKey); ok {
+	if cached, ok := s.userTeamCache.Get(ctx, teamsCacheKey); ok {
 		return cached, nil
 	}
 
@@ -437,7 +573,7 @@ func (s *Service) getUserTeams(ctx context.Context, ns types.NamespaceInfo, user
 			break
 		}
 	}
-	s.teamCache.Set(ctx, teamsCacheKey, teamIDs)
+	s.userTeamCache.Set(ctx, teamsCacheKey, teamIDs)
 	span.SetAttributes(attribute.Int("num_user_teams", len(teamIDs)))
 
 	return teamIDs, nil
@@ -464,42 +600,70 @@ func (s *Service) getUserBasicRole(ctx context.Context, ns types.NamespaceInfo, 
 	return *basicRole, nil
 }
 
-func (s *Service) checkPermission(ctx context.Context, scopeMap map[string]bool, req *CheckRequest) (bool, error) {
+func (s *Service) checkPermission(ctx context.Context, scopeMap map[string]bool, req *checkRequest) (bool, error) {
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.checkPermission", trace.WithAttributes(
 		attribute.Int("scope_count", len(scopeMap))))
 	defer span.End()
 	ctxLogger := s.logger.FromContext(ctx)
 
 	// Only check action if the request doesn't specify scope
-	if req.Name == "" {
+	if req.Name == "" && req.Verb != utils.VerbCreate {
 		return len(scopeMap) > 0, nil
 	}
+
+	t, ok := s.mapper.Get(req.Group, req.Resource)
+	if !ok {
+		ctxLogger.Error("unsupport resource", "group", req.Group, "resource", req.Resource)
+		return false, status.Error(codes.NotFound, "unsupported resource")
+	}
+
+	if t.SkipScope(req.Verb) {
+		return scopeMap[""], nil
+	}
+
+	// If creating a resource that goes in a folder, but no folder is specified,
+	// assume parent folder is the general folder
+	if req.Verb == utils.VerbCreate && t.HasFolderSupport() && req.ParentFolder == "" {
+		req.ParentFolder = accesscontrol.GeneralFolderUID
+	}
+
+	//if req.Verb == utils.VerbCreate {
+	//	// Resource doesn't require scope on create, so allow if the user has the action
+	//	if t.SkipScopeOnCreate() {
+	//		return scopeMap[""], nil
+	//	}
+	//	// If creating a resource that goes in a folder, but no folder is specified,
+	//	// assume parent folder is the general folder
+	//	if t.HasFolderSupport() && req.ParentFolder == "" {
+	//		req.ParentFolder = accesscontrol.GeneralFolderUID
+	//	}
+	//}
 
 	// Wildcard grant, no further checks needed
 	if scopeMap["*"] {
 		return true, nil
 	}
 
-	t, ok := s.mapper.translation(req.Group, req.Resource)
-	if !ok {
-		ctxLogger.Error("unsupport resource", "group", req.Group, "resource", req.Resource)
-		return false, status.Error(codes.NotFound, "unsupported resource")
-	}
-
-	if scopeMap[t.scope(req.Name)] {
+	if req.Name != "" && scopeMap[t.Scope(req.Name)] {
 		return true, nil
 	}
 
-	if !t.folderSupport {
+	if !t.HasFolderSupport() {
 		return false, nil
 	}
 
 	return s.checkInheritedPermissions(ctx, scopeMap, req)
 }
 
-func getScopeMap(permissions []accesscontrol.Permission) map[string]bool {
+func (s *Service) getScopeMap(permissions []accesscontrol.Permission) map[string]bool {
 	permMap := make(map[string]bool, len(permissions))
 	for _, perm := range permissions {
+		// We've had cases where the scope wasn't split properly,
+		// failing wildcard checks. This is a recovery mechanism.
+		if perm.Kind == "" && perm.Scope != "" {
+			s.logger.Warn("found unsplit permission scope", "scope", perm.Scope)
+			perm.Kind, perm.Attribute, perm.Identifier = accesscontrol.SplitScope(perm.Scope)
+		}
 		// If has any wildcard, return immediately
 		if perm.Kind == "*" || perm.Attribute == "*" || perm.Identifier == "*" {
 			return map[string]bool{"*": true}
@@ -509,7 +673,7 @@ func getScopeMap(permissions []accesscontrol.Permission) map[string]bool {
 	return permMap
 }
 
-func (s *Service) checkInheritedPermissions(ctx context.Context, scopeMap map[string]bool, req *CheckRequest) (bool, error) {
+func (s *Service) checkInheritedPermissions(ctx context.Context, scopeMap map[string]bool, req *checkRequest) (bool, error) {
 	if req.ParentFolder == "" {
 		return false, nil
 	}
@@ -518,10 +682,21 @@ func (s *Service) checkInheritedPermissions(ctx context.Context, scopeMap map[st
 	defer span.End()
 	ctxLogger := s.logger.FromContext(ctx)
 
-	tree, err := s.buildFolderTree(ctx, req.Namespace)
-	if err != nil {
-		ctxLogger.Error("could not build folder and dashboard tree", "error", err)
-		return false, err
+	tree, ok := s.getCachedFolderTree(ctx, req.Namespace)
+
+	// Check cached tree is up to date
+	if !ok || !s.isFolderInTree(tree, req.ParentFolder) {
+		var err error
+		tree, err = s.buildFolderTree(ctx, req.Namespace)
+		if err != nil {
+			ctxLogger.Error("could not build folder and dashboard tree", "error", err)
+			return false, err
+		}
+		if !s.isFolderInTree(tree, req.ParentFolder) {
+			// Not erroring here as the permission might exist but the folder wasn't synchronized yet
+			// Once in mode 5 we can deny access here
+			ctxLogger.Error("parent folder not found in folder tree", "folder", req.ParentFolder)
+		}
 	}
 
 	if scopeMap["folders:uid:"+req.ParentFolder] {
@@ -537,14 +712,28 @@ func (s *Service) checkInheritedPermissions(ctx context.Context, scopeMap map[st
 	return false, nil
 }
 
+// getCachedFolderTree returns the cached folder tree for the given namespace.
+func (s *Service) getCachedFolderTree(ctx context.Context, ns types.NamespaceInfo) (folderTree, bool) {
+	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.getCachedFolderTree")
+	defer span.End()
+	key := folderCacheKey(ns.Value)
+	return s.folderCache.Get(ctx, key)
+}
+
+// isFolderInTree checks if the given parent folder exists in the folder tree.
+func (s *Service) isFolderInTree(tree folderTree, folder string) bool {
+	// Special case for general folder, which is technically not in the tree
+	if folder == accesscontrol.GeneralFolderUID {
+		return true
+	}
+	_, exists := tree.Index[folder]
+	return exists
+}
+
+// buildFolderTree builds the folder tree for the given namespace and caches it.
 func (s *Service) buildFolderTree(ctx context.Context, ns types.NamespaceInfo) (folderTree, error) {
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.buildFolderTree")
 	defer span.End()
-
-	key := folderCacheKey(ns.Value)
-	if cached, ok := s.folderCache.Get(ctx, key); ok {
-		return cached, nil
-	}
 
 	res, err, _ := s.sf.Do(ns.Value+"_buildFolderTree", func() (interface{}, error) {
 		folders, err := s.folderStore.ListFolders(ctx, ns)
@@ -554,7 +743,11 @@ func (s *Service) buildFolderTree(ctx context.Context, ns types.NamespaceInfo) (
 		span.SetAttributes(attribute.Int("num_folders", len(folders)))
 
 		tree := newFolderTree(folders)
-		s.folderCache.Set(ctx, key, tree)
+		if len(tree.Nodes) != len(folders) {
+			s.logger.FromContext(ctx).Warn("mismatched folder count when building tree", "namespace", ns.Value, "expected", len(folders), "got", len(tree.Nodes))
+		}
+
+		s.folderCache.Set(ctx, folderCacheKey(ns.Value), tree)
 		return tree, nil
 	})
 
@@ -565,28 +758,37 @@ func (s *Service) buildFolderTree(ctx context.Context, ns types.NamespaceInfo) (
 	return res.(folderTree), nil
 }
 
-func (s *Service) listPermission(ctx context.Context, scopeMap map[string]bool, req *ListRequest) (*authzv1.ListResponse, error) {
+func (s *Service) listPermission(ctx context.Context, scopeMap map[string]bool, req *listRequest) (*authzv1.ListResponse, error) {
 	if scopeMap["*"] {
-		return &authzv1.ListResponse{All: true}, nil
+		return &authzv1.ListResponse{
+			All:    true,
+			Zookie: &authzv1.Zookie{Timestamp: time.Now().Unix()},
+		}, nil
 	}
 
 	ctx, span := s.tracer.Start(ctx, "authz_direct_db.service.listPermission")
 	defer span.End()
 	ctxLogger := s.logger.FromContext(ctx)
 
-	t, ok := s.mapper.translation(req.Group, req.Resource)
+	t, ok := s.mapper.Get(req.Group, req.Resource)
 	if !ok {
-		ctxLogger.Error("unsupport resource", "group", req.Group, "resource", req.Resource)
+		ctxLogger.Error("unsupported resource", "group", req.Group, "resource", req.Resource)
 		return nil, status.Error(codes.NotFound, "unsupported resource")
 	}
 
 	var tree folderTree
-	if t.folderSupport {
+	cacheHit := false
+	if t.HasFolderSupport() {
 		var err error
-		tree, err = s.buildFolderTree(ctx, req.Namespace)
-		if err != nil {
-			ctxLogger.Error("could not build folder and dashboard tree", "error", err)
-			return nil, err
+		if !req.Options.SkipCache {
+			tree, cacheHit = s.getCachedFolderTree(ctx, req.Namespace)
+		}
+		if !cacheHit {
+			tree, err = s.buildFolderTree(ctx, req.Namespace)
+			if err != nil {
+				ctxLogger.Error("could not build folder and dashboard tree", "error", err)
+				return nil, err
+			}
 		}
 	}
 
@@ -594,7 +796,13 @@ func (s *Service) listPermission(ctx context.Context, scopeMap map[string]bool, 
 	if strings.HasPrefix(req.Action, "folders:") {
 		res = buildFolderList(scopeMap, tree)
 	} else {
-		res = buildItemList(scopeMap, tree, t.prefix())
+		res = buildItemList(scopeMap, tree, t.Prefix())
+	}
+
+	if cacheHit {
+		res.Zookie = &authzv1.Zookie{Timestamp: time.Now().Add(-s.settings.CacheTTL).Unix()}
+	} else {
+		res.Zookie = &authzv1.Zookie{Timestamp: time.Now().Unix()}
 	}
 
 	span.SetAttributes(attribute.Int("num_folders", len(res.Folders)), attribute.Int("num_items", len(res.Items)))

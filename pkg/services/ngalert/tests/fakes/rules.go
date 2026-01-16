@@ -2,9 +2,9 @@ package fakes
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"slices"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -24,6 +24,7 @@ type RuleStore struct {
 	// OrgID -> RuleGroup -> Namespace -> Rules
 	Rules       map[int64][]*models.AlertRule
 	History     map[string][]*models.AlertRule
+	Deleted     map[int64][]*models.AlertRule
 	Hook        func(cmd any) error // use Hook if you need to intercept some query and return an error
 	RecordedOps []any
 	Folders     map[int64][]*folder.Folder
@@ -102,10 +103,10 @@ func (f *RuleStore) GetRecordedCommands(predicate func(cmd any) (any, bool)) []a
 	return result
 }
 
-func (f *RuleStore) DeleteAlertRulesByUID(_ context.Context, orgID int64, user *models.UserUID, UIDs ...string) error {
+func (f *RuleStore) DeleteAlertRulesByUID(ctx context.Context, orgID int64, user *models.UserUID, permanently bool, UIDs ...string) error {
 	f.RecordedOps = append(f.RecordedOps, GenericRecordedQuery{
 		Name:   "DeleteAlertRulesByUID",
-		Params: []any{orgID, user, UIDs},
+		Params: []any{orgID, user, permanently, UIDs},
 	})
 
 	rules := f.Rules[orgID]
@@ -127,6 +128,14 @@ func (f *RuleStore) DeleteAlertRulesByUID(_ context.Context, orgID int64, user *
 
 	f.Rules[orgID] = result
 	return nil
+}
+
+func (f *RuleStore) DeleteRuleFromTrashByGUID(ctx context.Context, orgID int64, ruleGUID string) (int64, error) {
+	f.RecordedOps = append(f.RecordedOps, GenericRecordedQuery{
+		Name:   "DeleteRuleFromTrashByGUID",
+		Params: []any{orgID, ruleGUID},
+	})
+	return 0, nil
 }
 
 func (f *RuleStore) GetAlertRuleByUID(_ context.Context, q *models.GetAlertRuleByUIDQuery) (*models.AlertRule, error) {
@@ -177,6 +186,104 @@ func (f *RuleStore) GetAlertRulesGroupByRuleUID(_ context.Context, q *models.Get
 	return ruleList, nil
 }
 
+func (f *RuleStore) ListAlertRulesByGroup(_ context.Context, q *models.ListAlertRulesExtendedQuery) (models.RulesGroup, string, error) {
+	f.mtx.Lock()
+	defer f.mtx.Unlock()
+	f.RecordedOps = append(f.RecordedOps, *q)
+
+	if err := f.Hook(*q); err != nil {
+		return nil, "", err
+	}
+
+	query := &models.ListAlertRulesQuery{
+		OrgID:                       q.OrgID,
+		NamespaceUIDs:               q.NamespaceUIDs,
+		DashboardUID:                q.DashboardUID,
+		PanelID:                     q.PanelID,
+		RuleGroups:                  q.RuleGroups,
+		RuleUIDs:                    q.RuleUIDs,
+		ReceiverName:                q.ReceiverName,
+		HasPrometheusRuleDefinition: q.HasPrometheusRuleDefinition,
+	}
+
+	ruleList, err := f.listAlertRules(query)
+	if err != nil {
+		return nil, "", err
+	}
+
+	// < group limit logic >
+
+	// sort rules to ensure order is consistent, pagination depends on this
+	slices.SortFunc(ruleList, func(a, b *models.AlertRule) int {
+		nsCmp := strings.Compare(a.NamespaceUID, b.NamespaceUID)
+		if nsCmp != 0 {
+			return nsCmp
+		}
+		rgCmp := strings.Compare(a.RuleGroup, b.RuleGroup)
+		if rgCmp != 0 {
+			return rgCmp
+		}
+		return models.RulesGroupComparer(a, b)
+	})
+
+	var nextToken string
+	var cursor models.GroupCursor
+	if q.ContinueToken != "" {
+		if cur, err := models.DecodeGroupCursor(q.ContinueToken); err == nil {
+			cursor = cur
+		}
+	}
+
+	if q.Limit < 0 {
+		return ruleList, "", nil
+	}
+
+	outputRules := make([]*models.AlertRule, 0, len(ruleList))
+	var groupsFetched int64
+	initialCursor := cursor
+	for _, r := range ruleList {
+		// skip rules before the initial cursor
+		if initialCursor.NamespaceUID != "" &&
+			(strings.Compare(r.NamespaceUID, initialCursor.NamespaceUID) < 0 ||
+				(strings.Compare(r.NamespaceUID, initialCursor.NamespaceUID) == 0 && strings.Compare(r.RuleGroup, initialCursor.RuleGroup) <= 0)) {
+			continue
+		}
+
+		key := models.GroupCursor{
+			NamespaceUID: r.NamespaceUID,
+			RuleGroup:    r.RuleGroup,
+		}
+		if key != cursor {
+			if q.Limit > 0 && groupsFetched == q.Limit {
+				nextToken = models.EncodeGroupCursor(cursor)
+				break
+			}
+			cursor = key
+			groupsFetched++
+		}
+
+		outputRules = append(outputRules, r)
+	}
+
+	return outputRules, nextToken, nil
+}
+
+// TODO: implement pagination for this fake
+func (f *RuleStore) ListAlertRulesPaginated(_ context.Context, q *models.ListAlertRulesExtendedQuery) (models.RulesGroup, string, error) {
+	f.mtx.Lock()
+	defer f.mtx.Unlock()
+	f.RecordedOps = append(f.RecordedOps, *q)
+
+	if err := f.Hook(*q); err != nil {
+		return nil, "", err
+	}
+	rules, err := f.listAlertRules(&q.ListAlertRulesQuery)
+	if err != nil {
+		return nil, "", err
+	}
+	return rules, "", nil
+}
+
 func (f *RuleStore) ListAlertRules(_ context.Context, q *models.ListAlertRulesQuery) (models.RulesGroup, error) {
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
@@ -186,6 +293,10 @@ func (f *RuleStore) ListAlertRules(_ context.Context, q *models.ListAlertRulesQu
 		return nil, err
 	}
 
+	return f.listAlertRules(q)
+}
+
+func (f *RuleStore) listAlertRules(q *models.ListAlertRulesQuery) (models.RulesGroup, error) {
 	hasDashboard := func(r *models.AlertRule, dashboardUID string, panelID int64) bool {
 		if dashboardUID != "" {
 			if r.DashboardUID == nil || *r.DashboardUID != dashboardUID {
@@ -214,13 +325,17 @@ func (f *RuleStore) ListAlertRules(_ context.Context, q *models.ListAlertRulesQu
 		if len(q.RuleUIDs) > 0 && !slices.Contains(q.RuleUIDs, r.UID) {
 			continue
 		}
-		if q.ImportedPrometheusRule != nil {
-			if *q.ImportedPrometheusRule != r.ImportedFromPrometheus() {
+		if q.HasPrometheusRuleDefinition != nil {
+			if *q.HasPrometheusRuleDefinition != r.HasPrometheusRuleDefinition() {
 				continue
 			}
 		}
 
-		ruleList = append(ruleList, r)
+		if q.ReceiverName != "" && (len(r.NotificationSettings) < 1 || r.NotificationSettings[0].Receiver != q.ReceiverName) {
+			continue
+		}
+		copyR := models.CopyRule(r)
+		ruleList = append(ruleList, copyR)
 	}
 
 	return ruleList, nil
@@ -261,16 +376,16 @@ func (f *RuleStore) GetNamespaceByUID(_ context.Context, uid string, orgID int64
 			return folder, nil
 		}
 	}
-	return nil, fmt.Errorf("not found")
+	return nil, dashboards.ErrFolderNotFound
 }
 
-func (f *RuleStore) GetOrCreateNamespaceByTitle(ctx context.Context, title string, orgID int64, user identity.Requester, parentUID string) (*folder.Folder, error) {
+func (f *RuleStore) GetOrCreateNamespaceByTitle(ctx context.Context, title string, orgID int64, user identity.Requester, parentUID string) (*folder.FolderReference, bool, error) {
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
 
 	for _, folder := range f.Folders[orgID] {
 		if folder.Title == title && folder.ParentUID == parentUID {
-			return folder, nil
+			return folder.ToFolderReference(), false, nil
 		}
 	}
 
@@ -283,31 +398,31 @@ func (f *RuleStore) GetOrCreateNamespaceByTitle(ctx context.Context, title strin
 	}
 
 	f.Folders[orgID] = append(f.Folders[orgID], newFolder)
-	return newFolder, nil
+	return newFolder.ToFolderReference(), true, nil
 }
 
-func (f *RuleStore) GetNamespaceByTitle(ctx context.Context, title string, orgID int64, user identity.Requester, parentUID string) (*folder.Folder, error) {
+func (f *RuleStore) GetNamespaceByTitle(ctx context.Context, title string, orgID int64, user identity.Requester, parentUID string) (*folder.FolderReference, error) {
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
 
 	for _, folder := range f.Folders[orgID] {
 		if folder.Title == title && folder.ParentUID == parentUID {
-			return folder, nil
+			return folder.ToFolderReference(), nil
 		}
 	}
 
 	return nil, dashboards.ErrFolderNotFound
 }
 
-func (f *RuleStore) GetNamespaceChildren(ctx context.Context, uid string, orgID int64, user identity.Requester) ([]*folder.Folder, error) {
+func (f *RuleStore) GetNamespaceChildren(ctx context.Context, uid string, orgID int64, user identity.Requester) ([]*folder.FolderReference, error) {
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
 
-	result := []*folder.Folder{}
+	result := []*folder.FolderReference{}
 
 	for _, folder := range f.Folders[orgID] {
 		if folder.ParentUID == uid {
-			result = append(result, folder)
+			result = append(result, folder.ToFolderReference())
 		}
 	}
 
@@ -459,4 +574,16 @@ func (f *RuleStore) GetAlertRuleVersions(_ context.Context, orgID int64, guid st
 	}
 
 	return f.History[guid], nil
+}
+
+func (f *RuleStore) ListDeletedRules(_ context.Context, orgID int64) ([]*models.AlertRule, error) {
+	f.mtx.Lock()
+	defer f.mtx.Unlock()
+	defer func() {
+		f.RecordedOps = append(f.RecordedOps, GenericRecordedQuery{Name: "ListDeletedRules", Params: []any{orgID}})
+	}()
+	if err := f.Hook(orgID); err != nil {
+		return nil, err
+	}
+	return f.Deleted[orgID], nil
 }

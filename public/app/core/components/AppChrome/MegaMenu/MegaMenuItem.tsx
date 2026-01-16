@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom-v5-compat';
 import { useLocalStorage } from 'react-use';
 
 import { FeatureState, GrafanaTheme2, NavModelItem, toIconName } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import { useStyles2, Text, IconButton, Icon, Stack, FeatureBadge } from '@grafana/ui';
 import { useGrafana } from 'app/core/context/GrafanaContext';
 import { Dot } from 'app/percona/shared/components/Elements/Dot';
@@ -138,7 +139,15 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
         <div className={styles.collapseButtonWrapper}>
           {showExpandButton && (
             <IconButton
-              aria-label={`${sectionExpanded ? 'Collapse' : 'Expand'} section ${link.text}`}
+              aria-label={
+                sectionExpanded
+                  ? t('navigation.megamenu-item.collapse-aria-label', 'Collapse section: {{sectionName}}', {
+                      sectionName: link.text,
+                    })
+                  : t('navigation.megamenu-item.expand-aria-label', 'Expand section: {{sectionName}}', {
+                      sectionName: link.text,
+                    })
+              }
               className={styles.collapseButton}
               onClick={() => setSectionExpanded(!sectionExpanded)}
               name={getIconName(Boolean(sectionExpanded))}
@@ -190,7 +199,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
   menuItem: css({
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(1),
+    gap: theme.spacing(1.5),
     height: theme.spacing(4),
     paddingLeft: theme.spacing(0.5),
     position: 'relative',
@@ -230,12 +239,13 @@ const getStyles = (theme: GrafanaTheme2) => ({
   labelWrapper: css({
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(2),
+    gap: theme.spacing(0.75),
     minWidth: 0,
     paddingLeft: theme.spacing(1),
   }),
   labelWrapperWithIcon: css({
     paddingLeft: theme.spacing(0.5),
+    gap: theme.spacing(2),
   }),
   hasActiveChild: css({
     color: theme.colors.text.primary,

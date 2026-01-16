@@ -3,6 +3,8 @@ import { FC } from 'react';
 
 import { colorManipulator } from '@grafana/data';
 import { useTheme2 } from '@grafana/ui';
+import g8LoginDarkSvg from 'img/g8_login_dark.svg';
+import g8LoginLightSvg from 'img/g8_login_light.svg';
 
 export interface BrandComponentProps {
   className?: string;
@@ -26,13 +28,16 @@ const LoginBackground: FC<BrandComponentProps> = ({ className, children }) => {
       right: 0,
       bottom: 0,
       top: 0,
-      background: `url(public/img/g8_login_${theme.isDark ? 'dark' : 'light'}.svg)`,
+      background: `url(${theme.isDark ? g8LoginDarkSvg : g8LoginLightSvg})`,
       backgroundPosition: 'top center',
       backgroundSize: 'auto',
       backgroundRepeat: 'no-repeat',
 
       opacity: 0,
-      transition: 'opacity 3s ease-in-out',
+
+      [theme.transitions.handleMotion('no-preference', 'reduce')]: {
+        transition: 'opacity 3s ease-in-out',
+      },
 
       [theme.breakpoints.up('md')]: {
         backgroundPosition: 'center',

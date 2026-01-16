@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -26,8 +25,6 @@ var anotherObj = &example.Pod{TypeMeta: metav1.TypeMeta{Kind: "foo"}, ObjectMeta
 var failingObj = &example.Pod{TypeMeta: metav1.TypeMeta{Kind: "foo"}, ObjectMeta: metav1.ObjectMeta{Name: "object-fail", ResourceVersion: "2", GenerateName: "object-fail"}, Spec: example.PodSpec{}, Status: example.PodStatus{}}
 var exampleList = &example.PodList{TypeMeta: metav1.TypeMeta{Kind: "foo"}, ListMeta: metav1.ListMeta{}, Items: []example.Pod{*exampleObj}}
 var anotherList = &example.PodList{Items: []example.Pod{*anotherObj}}
-
-var p = prometheus.NewRegistry()
 
 func TestMode1_Create(t *testing.T) {
 	type testCase struct {
@@ -127,6 +124,15 @@ func TestMode1_Get(t *testing.T) {
 				},
 				setupStorageFn: func(m *mock.Mock, name string) {
 					m.On("Get", mock.Anything, name, mock.Anything).Return(nil, errors.New("error"))
+				},
+			},
+			{
+				name: "should not block for unified storage",
+				setupLegacyFn: func(m *mock.Mock, name string) {
+					m.On("Get", mock.Anything, name, mock.Anything).Return(exampleObj, nil)
+				},
+				setupStorageFn: func(m *mock.Mock, name string) {
+					m.On("Get", mock.Anything, name, mock.Anything).WaitUntil(time.After(time.Hour)).Return(anotherObj, nil)
 				},
 			},
 		}

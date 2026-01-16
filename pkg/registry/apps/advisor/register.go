@@ -7,7 +7,9 @@ import (
 	advisorv0alpha1 "github.com/grafana/grafana/apps/advisor/pkg/apis/advisor/v0alpha1"
 	advisorapp "github.com/grafana/grafana/apps/advisor/pkg/app"
 	"github.com/grafana/grafana/apps/advisor/pkg/app/checkregistry"
+	"github.com/grafana/grafana/pkg/services/apiserver/builder"
 	"github.com/grafana/grafana/pkg/services/apiserver/builder/runner"
+	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/setting"
 )
 
@@ -18,6 +20,7 @@ type AdvisorAppProvider struct {
 func RegisterApp(
 	checkRegistry checkregistry.CheckService,
 	cfg *setting.Cfg,
+	orgService org.Service,
 ) *AdvisorAppProvider {
 	provider := &AdvisorAppProvider{}
 	pluginConfig := cfg.PluginSettings["grafana-advisor-app"]
@@ -25,12 +28,14 @@ func RegisterApp(
 		CheckRegistry: checkRegistry,
 		PluginConfig:  pluginConfig,
 		StackID:       cfg.StackID,
+		OrgService:    orgService,
 	}
 	appCfg := &runner.AppBuilderConfig{
-		OpenAPIDefGetter: advisorv0alpha1.GetOpenAPIDefinitions,
-		ManagedKinds:     advisorapp.GetKinds(),
-		Authorizer:       advisorapp.GetAuthorizer(),
-		CustomConfig:     any(specificConfig),
+		OpenAPIDefGetter:         advisorv0alpha1.GetOpenAPIDefinitions,
+		ManagedKinds:             advisorapp.GetKinds(),
+		Authorizer:               advisorapp.GetAuthorizer(),
+		CustomConfig:             any(specificConfig),
+		AllowedV0Alpha1Resources: []string{builder.AllResourcesAllowed},
 	}
 	provider.Provider = simple.NewAppProvider(apis.LocalManifest(), appCfg, advisorapp.New)
 	return provider

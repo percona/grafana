@@ -2,20 +2,21 @@ import { defaults } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { useAsyncFn } from 'react-use';
 
+import { computeInheritedTree } from '@grafana/alerting';
+import { Trans, t } from '@grafana/i18n';
 import { Alert, Button, Stack } from '@grafana/ui';
 import { useAppNotification } from 'app/core/copy/appNotification';
-import { Trans } from 'app/core/internationalization';
 import { useContactPointsWithStatus } from 'app/features/alerting/unified/components/contact-points/useContactPoints';
 import { AlertmanagerAction, useAlertmanagerAbility } from 'app/features/alerting/unified/hooks/useAbilities';
 import { FormAmRoute } from 'app/features/alerting/unified/types/amroutes';
 import { addUniqueIdentifierToRoute } from 'app/features/alerting/unified/utils/amroutes';
 import { getErrorCode, stringifyErrorLike } from 'app/features/alerting/unified/utils/misc';
-import { computeInheritedTree } from 'app/features/alerting/unified/utils/notification-policies';
 import { ObjectMatcher, ROUTES_META_SYMBOL, RouteWithID } from 'app/plugins/datasource/alertmanager/types';
 
 import { anyOfRequestState, isError } from '../../hooks/useAsync';
 import { useAlertmanager } from '../../state/AlertmanagerContext';
 import { ERROR_NEWER_CONFIGURATION } from '../../utils/k8s/errors';
+import { routeAdapter } from '../../utils/routeAdapter';
 
 import { alertmanagerApi } from './../../api/alertmanagerApi';
 import { useGetContactPointsState } from './../../api/receiversApi';
@@ -201,13 +202,25 @@ export const NotificationPoliciesList = () => {
   return (
     <>
       {hasPoliciesError && (
-        <Alert severity="error" title="Error loading Alertmanager config">
+        <Alert
+          severity="error"
+          title={t(
+            'alerting.notification-policies-list.title-error-loading-alertmanager-config',
+            'Error loading Alertmanager config'
+          )}
+        >
           {stringifyErrorLike(fetchPoliciesError) || 'Unknown error.'}
         </Alert>
       )}
       {/* show when there is an update error */}
       {hasConflictError && (
-        <Alert severity="info" title="Notification policies have changed">
+        <Alert
+          severity="info"
+          title={t(
+            'alerting.notification-policies-list.title-notification-policies-have-changed',
+            'Notification policies have changed'
+          )}
+        >
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Trans i18nKey="alerting.policies.update-errors.conflict">
               The notification policy tree has been updated by another user.
@@ -285,7 +298,10 @@ export const findRoutesMatchingFilters = (rootRoute: RouteWithID, filters: Route
   const matchedRoutes: RouteWithID[][] = [];
 
   // compute fully inherited tree so all policies have their inherited receiver
-  const fullRoute = computeInheritedTree(rootRoute);
+  const adaptedRootRoute = routeAdapter.toPackage(rootRoute);
+  const adaptedFullTree = computeInheritedTree(adaptedRootRoute);
+
+  const fullRoute = routeAdapter.fromPackage(adaptedFullTree);
 
   // find all routes for our contact point filter
   const matchingRoutesForContactPoint = contactPointFilter

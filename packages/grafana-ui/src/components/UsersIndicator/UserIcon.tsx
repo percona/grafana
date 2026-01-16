@@ -2,10 +2,10 @@ import { css, cx } from '@emotion/css';
 import { useMemo, PropsWithChildren } from 'react';
 
 import { dateTime, DateTimeInput, GrafanaTheme2 } from '@grafana/data';
+import { t, Trans } from '@grafana/i18n';
 
-import { useTheme2 } from '../../themes';
-import { Trans } from '../../utils/i18n';
-import { Tooltip } from '../Tooltip';
+import { useTheme2 } from '../../themes/ThemeContext';
+import { Tooltip } from '../Tooltip/Tooltip';
 
 import { UserView } from './types';
 
@@ -51,6 +51,11 @@ const getUserInitials = (name?: string) => {
   return `${first?.[0] ?? ''}${last?.[0] ?? ''}`.toUpperCase();
 };
 
+/**
+ * UserIcon renders a user icon and displays the user's name or initials along with the user's active status or last viewed date.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/iconography-usericon--docs
+ */
 export const UserIcon = ({
   userView,
   className,
@@ -67,7 +72,7 @@ export const UserIcon = ({
       type={'button'}
       onClick={onClick}
       className={cx(styles.container, onClick && styles.pointer, className)}
-      aria-label={`${user.name} icon`}
+      aria-label={t('grafana-ui.user-icon.label', '{{name}} icon', { name: user.name })}
     >
       {children ? (
         <div className={cx(styles.content, styles.textContent)}>{children}</div>

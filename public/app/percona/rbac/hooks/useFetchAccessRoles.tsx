@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { fetchRolesAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { fetchUsersListAction } from 'app/percona/shared/core/reducers/users/users';
-import { useDispatch } from 'app/types';
+import { useDispatch } from 'app/types/store';
 
 import { useAccessRolesEnabled } from './useAccessRolesEnabled';
 

@@ -2,70 +2,128 @@ package featuremgmt
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
+	"time"
 
+	clientauthmiddleware "github.com/grafana/grafana/pkg/clientauth/middleware"
 	"github.com/grafana/grafana/pkg/setting"
+
+	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/open-feature/go-sdk/openfeature"
 )
 
 const (
-	staticProviderType = "static"
-	goffProviderType   = "goff"
-
-	configSectionName  = "feature_toggles.openfeature"
-	contextSectionName = "feature_toggles.openfeature.context"
+	featuresProviderAudience = "features.grafana.app"
 )
 
-type OpenFeatureService struct {
-	provider openfeature.FeatureProvider
-	Client   openfeature.IClient
+// OpenFeatureConfig holds configuration for initializing OpenFeature
+type OpenFeatureConfig struct {
+	// ProviderType is either "static" or "goff"
+	ProviderType string
+	// URL is the GOFF service URL (required for GOFF provider)
+	URL *url.URL
+	// HTTPClient is a pre-configured HTTP client (optional, used for GOFF provider)
+	HTTPClient *http.Client
+	// StaticFlags are the feature flags to use with static provider
+	StaticFlags map[string]bool
+	// TargetingKey is used for evaluation context
+	TargetingKey string
+	// ContextAttrs are additional attributes for evaluation context
+	ContextAttrs map[string]any
 }
 
-func ProvideOpenFeatureService(cfg *setting.Cfg) (*OpenFeatureService, error) {
-	conf := cfg.Raw.Section(configSectionName)
-	provType := conf.Key("provider").MustString(staticProviderType)
-	url := conf.Key("url").MustString("")
-	key := conf.Key("targetingKey").MustString(cfg.AppURL)
-
-	var provider openfeature.FeatureProvider
-	var err error
-	if provType == goffProviderType {
-		provider, err = newGOFFProvider(url)
-	} else {
-		provider, err = newStaticProvider(cfg)
+// InitOpenFeature initializes OpenFeature with the provided configuration
+func InitOpenFeature(config OpenFeatureConfig) error {
+	// For GOFF provider, ensure we have a URL
+	if config.ProviderType == setting.GOFFProviderType && (config.URL == nil || config.URL.String() == "") {
+		return fmt.Errorf("URL is required for GOFF provider")
 	}
+
+	p, err := createProvider(config.ProviderType, config.URL, config.StaticFlags, config.HTTPClient)
+	if err != nil {
+		return err
+	}
+
+	if err = openfeature.SetProviderAndWait(p); err != nil {
+		return fmt.Errorf("failed to set global feature provider: %s, %w", config.ProviderType, err)
+	}
+
+	contextAttrs := make(map[string]any)
+	for k, v := range config.ContextAttrs {
+		contextAttrs[k] = v
+	}
+	openfeature.SetEvaluationContext(openfeature.NewEvaluationContext(config.TargetingKey, contextAttrs))
+
+	return nil
+}
+
+// InitOpenFeatureWithCfg initializes OpenFeature from setting.Cfg
+func InitOpenFeatureWithCfg(cfg *setting.Cfg) error {
+	confFlags, err := setting.ReadFeatureTogglesFromInitFile(cfg.Raw.Section("feature_toggles"))
+	if err != nil {
+		return fmt.Errorf("failed to read feature flags from config: %w", err)
+	}
+
+	var httpcli *http.Client
+	if cfg.OpenFeature.ProviderType == setting.GOFFProviderType {
+		m, err := clientauthmiddleware.NewTokenExchangeMiddleware(cfg)
+		if err != nil {
+			return fmt.Errorf("failed to create token exchange middleware: %w", err)
+		}
+
+		httpcli, err = goffHTTPClient(m)
+		if err != nil {
+			return err
+		}
+	}
+
+	contextAttrs := make(map[string]any)
+	for k, v := range cfg.OpenFeature.ContextAttrs {
+		contextAttrs[k] = v
+	}
+
+	return InitOpenFeature(OpenFeatureConfig{
+		ProviderType: cfg.OpenFeature.ProviderType,
+		URL:          cfg.OpenFeature.URL,
+		HTTPClient:   httpcli,
+		StaticFlags:  confFlags,
+		TargetingKey: cfg.OpenFeature.TargetingKey,
+		ContextAttrs: contextAttrs,
+	})
+}
+
+func createProvider(
+	providerType string,
+	u *url.URL,
+	staticFlags map[string]bool,
+	httpClient *http.Client,
+) (openfeature.FeatureProvider, error) {
+	if providerType != setting.GOFFProviderType {
+		return newStaticProvider(staticFlags)
+	}
+
+	if u == nil || u.String() == "" {
+		return nil, fmt.Errorf("feature provider url is required for GOFFProviderType")
+	}
+
+	return newGOFFProvider(u.String(), httpClient)
+}
+
+func goffHTTPClient(m *clientauthmiddleware.TokenExchangeMiddleware) (*http.Client, error) {
+	httpcli, err := sdkhttpclient.NewProvider().New(sdkhttpclient.Options{
+		TLS: &sdkhttpclient.TLSOptions{InsecureSkipVerify: true},
+		Timeouts: &sdkhttpclient.TimeoutOptions{
+			Timeout: 10 * time.Second,
+		},
+		Middlewares: []sdkhttpclient.Middleware{
+			m.New([]string{featuresProviderAudience}),
+		},
+	})
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to create %s feature provider: %w", provType, err)
+		return nil, fmt.Errorf("failed to create http client for openfeature: %w", err)
 	}
 
-	if err := openfeature.SetProviderAndWait(provider); err != nil {
-		return nil, fmt.Errorf("failed to set global %s feature provider: %w", provType, err)
-	}
-
-	attrs := ctxAttrs(cfg)
-	openfeature.SetEvaluationContext(openfeature.NewEvaluationContext(key, attrs))
-
-	client := openfeature.NewClient("grafana-openfeature-client")
-
-	return &OpenFeatureService{
-		provider: provider,
-		Client:   client,
-	}, nil
-}
-
-// ctxAttrs uses config.ini [feature_toggles.openfeature.context] section to build the eval context attributes
-func ctxAttrs(cfg *setting.Cfg) map[string]any {
-	ctxConf := cfg.Raw.Section(contextSectionName)
-
-	attrs := map[string]any{}
-	for _, key := range ctxConf.KeyStrings() {
-		attrs[key] = ctxConf.Key(key).String()
-	}
-
-	// Some default attributes
-	if _, ok := attrs["grafana_version"]; !ok {
-		attrs["grafana_version"] = setting.BuildVersion
-	}
-
-	return attrs
+	return httpcli, nil
 }

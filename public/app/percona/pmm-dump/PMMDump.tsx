@@ -25,7 +25,7 @@ import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndA
 import { logger } from 'app/percona/shared/helpers/logger';
 import { dateDifferenceInWords } from 'app/percona/shared/helpers/utils/timeRange';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 import { ShowConfirmModalEvent } from 'app/types/events';
 
 import { Messages } from './PMMDump.messages';

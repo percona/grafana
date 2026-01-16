@@ -8,7 +8,7 @@ import {
   DeleteAccessRole,
   UpdateAccessRole,
 } from 'app/percona/shared/services/roles/Roles.types';
-import { createAsyncThunk } from 'app/types';
+import { createAsyncThunk } from 'app/types/store';
 
 import { AssignRoleParams, RolesState } from './role.types';
 

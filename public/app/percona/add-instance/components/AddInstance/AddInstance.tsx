@@ -7,7 +7,7 @@ import { useGrafana } from 'app/core/context/GrafanaContext';
 import { PMM_ADD_INSTANCE_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
 import { Databases } from 'app/percona/shared/core';
 import * as UserFlow from 'app/percona/shared/core/reducers/userFlow';
-import { useDispatch } from 'app/types';
+import { useDispatch } from 'app/types/store';
 
 import { InstanceAvailableType, InstanceTypesExtra } from '../../panel.types';
 

@@ -7,7 +7,7 @@ import { locationService } from '@grafana/runtime';
 import { PageToolbar, ToolbarButton, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Databases } from '../../percona/shared/core';
 import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';

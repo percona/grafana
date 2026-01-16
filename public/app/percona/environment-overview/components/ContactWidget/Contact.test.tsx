@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom-v5-compat';
 
 import { logger } from 'app/percona/shared/helpers/logger';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import Contact from './Contact';
 import { ContactService } from './Contact.service';

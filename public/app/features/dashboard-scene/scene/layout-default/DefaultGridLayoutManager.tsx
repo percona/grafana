@@ -1,3 +1,7 @@
+import { css, cx } from '@emotion/css';
+
+import { GrafanaTheme2 } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import {
   SceneObjectState,
@@ -10,13 +14,22 @@ import {
   SceneComponentProps,
   SceneGridItemLike,
   useSceneObjectState,
+  SceneGridLayoutDragStartEvent,
+  SceneObject,
 } from '@grafana/scenes';
+import { Spec as DashboardV2Spec } from '@grafana/schema/dist/esm/schema/dashboard/v2';
+import { useStyles2 } from '@grafana/ui';
 import { GRID_COLUMN_COUNT } from 'app/core/constants';
-import { t } from 'app/core/internationalization';
-import DashboardEmpty from 'app/features/dashboard/dashgrid/DashboardEmpty';
+import DashboardEmpty from 'app/features/dashboard/dashgrid/DashboardEmpty/DashboardEmpty';
 
-import { NewObjectAddedToCanvasEvent } from '../../edit-pane/shared';
-import { isClonedKey, joinCloneKeys } from '../../utils/clone';
+import {
+  dashboardEditActions,
+  NewObjectAddedToCanvasEvent,
+  ObjectRemovedFromCanvasEvent,
+  ObjectsReorderedOnCanvasEvent,
+} from '../../edit-pane/shared';
+import { serializeDefaultGridLayout } from '../../serialization/layoutSerializers/DefaultGridLayoutSerializer';
+import { isRepeatCloneOrChildOf } from '../../utils/clone';
 import { dashboardSceneGraph } from '../../utils/dashboardSceneGraph';
 import {
   forceRenderChildren,
@@ -25,13 +38,23 @@ import {
   NEW_PANEL_WIDTH,
   getVizPanelKeyForPanelId,
   getGridItemKeyForPanelId,
+  useDashboard,
+  getLayoutOrchestratorFor,
   getDashboardSceneFor,
 } from '../../utils/utils';
+import { useSoloPanelContext } from '../SoloPanelContext';
+import { AutoGridItem } from '../layout-auto-grid/AutoGridItem';
+import { CanvasGridAddActions } from '../layouts-shared/CanvasGridAddActions';
+import { clearClipboard, getDashboardGridItemFromClipboard } from '../layouts-shared/paste';
+import { dashboardCanvasAddButtonHoverStyles } from '../layouts-shared/styles';
+import { getIsLazy } from '../layouts-shared/utils';
+import { DashboardLayoutGrid } from '../types/DashboardLayoutGrid';
 import { DashboardLayoutManager } from '../types/DashboardLayoutManager';
 import { LayoutRegistryItem } from '../types/LayoutRegistryItem';
 
 import { DashboardGridItem } from './DashboardGridItem';
 import { RowRepeaterBehavior } from './RowRepeaterBehavior';
+import { findSpaceForNewPanel } from './findSpaceForNewPanel';
 import { RowActions } from './row-actions/RowActions';
 
 interface DefaultGridLayoutManagerState extends SceneObjectState {
@@ -40,7 +63,7 @@ interface DefaultGridLayoutManagerState extends SceneObjectState {
 
 export class DefaultGridLayoutManager
   extends SceneObjectBase<DefaultGridLayoutManagerState>
-  implements DashboardLayoutManager
+  implements DashboardLayoutGrid
 {
   public static Component = DefaultGridLayoutManagerRenderer;
 
@@ -51,14 +74,71 @@ export class DefaultGridLayoutManager
       return t('dashboard.default-layout.name', 'Custom');
     },
     get description() {
-      return t('dashboard.default-layout.description', 'Manually size and position panels');
+      return t('dashboard.default-layout.description', 'Position and size each panel individually');
     },
-    id: 'default-grid',
+    id: 'GridLayout',
     createFromLayout: DefaultGridLayoutManager.createFromLayout,
-    kind: 'GridLayout',
+    isGridLayout: true,
+    icon: 'window-grid',
   };
 
+  public serialize(): DashboardV2Spec['layout'] {
+    return serializeDefaultGridLayout(this);
+  }
+
   public readonly descriptor = DefaultGridLayoutManager.descriptor;
+
+  public constructor(state: DefaultGridLayoutManagerState) {
+    super(state);
+
+    this.addActivationHandler(() => this._activationHandler());
+  }
+
+  public mergeGrid(other: DashboardLayoutGrid) {
+    let offset = 0;
+    for (const child of this.state.grid.state.children) {
+      const newOffset = (child.state.y ?? 0) + (child.state.height ?? 0);
+      if (newOffset > offset) {
+        offset = newOffset;
+      }
+    }
+
+    const sourceGrid =
+      other instanceof DefaultGridLayoutManager
+        ? other.state.grid
+        : DefaultGridLayoutManager.createFromLayout(other).state.grid;
+    const movedChildren = [...sourceGrid.state.children];
+
+    for (const child of movedChildren) {
+      const currentY = child.state.y ?? 0;
+      child.setState({ y: currentY + offset });
+    }
+
+    // Remove from source and append to destination
+    sourceGrid.setState({ children: [] });
+    for (const child of movedChildren) {
+      child.clearParent();
+    }
+    this.state.grid.setState({ children: [...this.state.grid.state.children, ...movedChildren] });
+  }
+
+  private _activationHandler() {
+    if (config.featureToggles.dashboardNewLayouts) {
+      this._subs.add(
+        this.subscribeToEvent(SceneGridLayoutDragStartEvent, ({ payload: { evt, panel } }) =>
+          getLayoutOrchestratorFor(this)?.startDraggingSync(evt, panel)
+        )
+      );
+    }
+
+    this._subs.add(
+      this.state.grid.subscribeToState(({ children: newChildren }, { children: prevChildren }) => {
+        if (newChildren.length === prevChildren.length) {
+          this.publishEvent(new ObjectsReorderedOnCanvasEvent(this.state.grid), true);
+        }
+      })
+    );
+  }
 
   public addPanel(vizPanel: VizPanel) {
     const panelId = dashboardSceneGraph.getNextPanelId(this);
@@ -66,20 +146,64 @@ export class DefaultGridLayoutManager
     vizPanel.setState({ key: getVizPanelKeyForPanelId(panelId) });
     vizPanel.clearParent();
 
-    const newGridItem = new DashboardGridItem({
-      height: NEW_PANEL_HEIGHT,
-      width: NEW_PANEL_WIDTH,
-      x: 0,
-      y: 0,
-      body: vizPanel,
-      key: getGridItemKeyForPanelId(panelId),
-    });
+    // With new edit mode we add panels to the bottom of the grid
+    if (config.featureToggles.dashboardNewLayouts) {
+      const emptySpace = findSpaceForNewPanel(this.state.grid);
+      const newGridItem = new DashboardGridItem({
+        ...emptySpace,
+        body: vizPanel,
+        key: getGridItemKeyForPanelId(panelId),
+      });
 
-    this.state.grid.setState({
-      children: [newGridItem, ...this.state.grid.state.children],
-    });
+      dashboardEditActions.addElement({
+        addedObject: vizPanel,
+        source: this,
+        perform: () => {
+          this.state.grid.setState({ children: [...this.state.grid.state.children, newGridItem] });
+        },
+        undo: () => {
+          this.state.grid.setState({
+            children: this.state.grid.state.children.filter((child) => child !== newGridItem),
+          });
+        },
+      });
+    } else {
+      const newGridItem = new DashboardGridItem({
+        height: NEW_PANEL_HEIGHT,
+        width: NEW_PANEL_WIDTH,
+        x: 0,
+        y: 0,
+        body: vizPanel,
+        key: getGridItemKeyForPanelId(panelId),
+      });
 
-    this.publishEvent(new NewObjectAddedToCanvasEvent(vizPanel), true);
+      this.state.grid.setState({ children: [newGridItem, ...this.state.grid.state.children] });
+    }
+  }
+
+  public pastePanel() {
+    const emptySpace = findSpaceForNewPanel(this.state.grid);
+    const newGridItem = getDashboardGridItemFromClipboard(getDashboardSceneFor(this), emptySpace);
+
+    if (config.featureToggles.dashboardNewLayouts) {
+      dashboardEditActions.edit({
+        description: t('dashboard.edit-actions.paste-panel', 'Paste panel'),
+        addedObject: newGridItem.state.body,
+        source: this,
+        perform: () => {
+          this.state.grid.setState({ children: [...this.state.grid.state.children, newGridItem] });
+        },
+        undo: () => {
+          this.state.grid.setState({
+            children: this.state.grid.state.children.filter((child) => child !== newGridItem),
+          });
+        },
+      });
+    } else {
+      this.state.grid.setState({ children: [...this.state.grid.state.children, newGridItem] });
+    }
+
+    clearClipboard();
   }
 
   public removePanel(panel: VizPanel) {
@@ -105,8 +229,17 @@ export class DefaultGridLayoutManager
       return;
     }
 
-    this.state.grid.setState({
-      children: layout.state.children.filter((child) => child !== gridItem),
+    if (!config.featureToggles.dashboardNewLayouts) {
+      // No undo/redo support in legacy edit mode
+      layout.setState({ children: layout.state.children.filter((child) => child !== gridItem) });
+      return;
+    }
+
+    dashboardEditActions.removeElement({
+      removedObject: gridItem.state.body,
+      source: this,
+      perform: () => layout.setState({ children: layout.state.children.filter((child) => child !== gridItem) }),
+      undo: () => layout.setState({ children: [...layout.state.children, gridItem] }),
     });
   }
 
@@ -135,7 +268,11 @@ export class DefaultGridLayoutManager
     // when we duplicate a panel we don't want to clone the alert state
     delete panelData.state.data?.alertState;
 
-    const newPanel = new VizPanel({ ...panelState, $data: panelData, key: getVizPanelKeyForPanelId(newPanelId) });
+    const newPanel = new VizPanel({
+      ...panelState,
+      $data: panelData,
+      key: getVizPanelKeyForPanelId(newPanelId),
+    });
 
     newGridItem = new DashboardGridItem({
       x: gridItem.state.x,
@@ -150,17 +287,74 @@ export class DefaultGridLayoutManager
       body: newPanel,
     });
 
-    if (gridItem.parent instanceof SceneGridRow) {
-      const row = gridItem.parent;
+    // No undo/redo support in legacy edit mode
+    if (!config.featureToggles.dashboardNewLayouts) {
+      if (gridItem.parent instanceof SceneGridRow) {
+        const row = gridItem.parent;
 
-      row.setState({ children: [...row.state.children, newGridItem] });
-      grid.forceRender();
+        row.setState({ children: [...row.state.children, newGridItem] });
+        grid.forceRender();
+        return;
+      }
+
+      grid.setState({ children: [...grid.state.children, newGridItem] });
+      this.publishEvent(new NewObjectAddedToCanvasEvent(newPanel), true);
       return;
     }
 
-    grid.setState({ children: [...grid.state.children, newGridItem] });
+    const parent = gridItem.parent instanceof SceneGridRow ? gridItem.parent : grid;
+    dashboardEditActions.edit({
+      description: t('dashboard.edit-actions.duplicate-panel', 'Duplicate panel'),
+      addedObject: newGridItem.state.body,
+      source: this,
+      perform: () => {
+        const oldGridItemIndex = parent.state.children.indexOf(gridItem);
+        const newChildrenArray = [...parent.state.children];
+        newChildrenArray.splice(oldGridItemIndex + 1, 0, newGridItem);
+        parent.setState({ children: newChildrenArray });
+      },
+      undo: () => {
+        parent.setState({
+          children: parent.state.children.filter((child) => child !== newGridItem),
+        });
+      },
+    });
+  }
 
-    this.publishEvent(new NewObjectAddedToCanvasEvent(newPanel), true);
+  public duplicate(): DashboardLayoutManager {
+    const children = this.state.grid.state.children;
+    const hasGridItem = children.find((child) => child instanceof DashboardGridItem);
+    const clonedChildren: SceneGridItemLike[] = [];
+
+    if (children.length) {
+      let panelId = hasGridItem ? dashboardSceneGraph.getNextPanelId(hasGridItem.state.body) : 1;
+
+      children.forEach((child) => {
+        if (child instanceof DashboardGridItem) {
+          const clone = child.clone({
+            key: undefined,
+            body: child.state.body.clone({
+              key: getVizPanelKeyForPanelId(panelId),
+            }),
+          });
+
+          clonedChildren.push(clone);
+          panelId++;
+        } else {
+          clonedChildren.push(child.clone({ key: undefined }));
+        }
+      });
+    }
+
+    const clone = this.clone({
+      key: undefined,
+      grid: this.state.grid.clone({
+        key: undefined,
+        children: clonedChildren,
+      }),
+    });
+
+    return clone;
   }
 
   public getVizPanels(): VizPanel[] {
@@ -190,7 +384,7 @@ export class DefaultGridLayoutManager
 
     const row = new SceneGridRow({
       key: getVizPanelKeyForPanelId(id),
-      title: 'Row title',
+      title: t('dashboard-scene.default-grid-layout-manager.row.title.row-title', 'Row title'),
       actions: new RowActions({}),
       y: 0,
     });
@@ -210,6 +404,7 @@ export class DefaultGridLayoutManager
 
     sceneGridLayout.setState({ children: [row, ...sceneGridLayout.state.children] });
 
+    this.publishEvent(new NewObjectAddedToCanvasEvent(row), true);
     return row;
   }
 
@@ -262,76 +457,21 @@ export class DefaultGridLayoutManager
     });
   }
 
+  public getOutlineChildren(): SceneObject[] {
+    const children: SceneObject[] = [];
+
+    for (const child of this.state.grid.state.children) {
+      // Flatten repeated grid items
+      if (child instanceof DashboardGridItem) {
+        children.push(child.state.body, ...(child.state.repeatedPanels || []));
+      }
+    }
+
+    return children;
+  }
+
   public cloneLayout(ancestorKey: string, isSource: boolean): DashboardLayoutManager {
-    return this.clone({
-      grid: this.state.grid.clone({
-        isResizable: isSource && this.state.grid.state.isResizable,
-        isDraggable: isSource && this.state.grid.state.isDraggable,
-        children: this.state.grid.state.children.reduce<{ panelId: number; children: SceneGridItemLike[] }>(
-          (childrenAcc, child) => {
-            if (child instanceof DashboardGridItem) {
-              const gridItemKey = joinCloneKeys(ancestorKey, getGridItemKeyForPanelId(childrenAcc.panelId));
-
-              const gridItem = child.clone({
-                key: gridItemKey,
-                body: child.state.body.clone({
-                  key: joinCloneKeys(gridItemKey, getVizPanelKeyForPanelId(childrenAcc.panelId++)),
-                }),
-                isDraggable: isSource && child.state.isDraggable,
-                isResizable: isSource && child.state.isResizable,
-              });
-
-              childrenAcc.children.push(gridItem);
-
-              return childrenAcc;
-            }
-
-            if (child instanceof SceneGridRow) {
-              const rowKey = joinCloneKeys(ancestorKey, getVizPanelKeyForPanelId(childrenAcc.panelId++));
-
-              const row = child.clone({
-                key: rowKey,
-                children: child.state.children.reduce<SceneGridItemLike[]>((rowAcc, rowChild) => {
-                  if (isClonedKey(rowChild.state.key!)) {
-                    return rowAcc;
-                  }
-
-                  if (!(rowChild instanceof DashboardGridItem)) {
-                    rowAcc.push(rowChild.clone());
-                    return rowAcc;
-                  }
-
-                  const gridItemKey = joinCloneKeys(rowKey, getGridItemKeyForPanelId(childrenAcc.panelId));
-
-                  const gridItem = rowChild.clone({
-                    key: gridItemKey,
-                    isDraggable: isSource && rowChild.state.isDraggable,
-                    isResizable: isSource && rowChild.state.isResizable,
-                    body: rowChild.state.body.clone({
-                      key: joinCloneKeys(gridItemKey, getVizPanelKeyForPanelId(childrenAcc.panelId++)),
-                    }),
-                  });
-
-                  rowAcc.push(gridItem);
-                  return rowAcc;
-                }, []),
-                isDraggable: isSource && child.state.isDraggable,
-                isResizable: isSource && child.state.isResizable,
-              });
-
-              childrenAcc.children.push(row);
-
-              return childrenAcc;
-            }
-
-            childrenAcc.children.push(child.clone());
-
-            return childrenAcc;
-          },
-          { panelId: 0, children: [] }
-        ).children,
-      }),
-    });
+    return this.clone({});
   }
 
   public removeRow(row: SceneGridRow, removePanels = false) {
@@ -345,6 +485,8 @@ export class DefaultGridLayoutManager
 
       children.splice(indexOfRow, 0, ...rowChildren);
     }
+
+    this.publishEvent(new ObjectRemovedFromCanvasEvent(row), true);
 
     sceneGridLayout.setState({ children });
   }
@@ -375,10 +517,11 @@ export class DefaultGridLayoutManager
 
   public static createFromLayout(currentLayout: DashboardLayoutManager): DefaultGridLayoutManager {
     const panels = currentLayout.getVizPanels();
-    return DefaultGridLayoutManager.fromVizPanels(panels);
+    const isLazy = getIsLazy(getDashboardSceneFor(currentLayout).state.preload)!;
+    return DefaultGridLayoutManager.fromVizPanels(panels, isLazy);
   }
 
-  public static fromVizPanels(panels: VizPanel[] = []): DefaultGridLayoutManager {
+  public static fromVizPanels(panels: VizPanel[] = [], isLazy?: boolean | undefined): DefaultGridLayoutManager {
     const children: DashboardGridItem[] = [];
     const panelHeight = 10;
     const panelWidth = GRID_COLUMN_COUNT / 3;
@@ -386,6 +529,8 @@ export class DefaultGridLayoutManager
     let currentX = 0;
 
     for (let panel of panels) {
+      const variableName = panel.parent instanceof AutoGridItem ? panel.parent.state.variableName : undefined;
+
       panel.clearParent();
 
       children.push(
@@ -395,13 +540,15 @@ export class DefaultGridLayoutManager
           y: currentY,
           width: panelWidth,
           height: panelHeight,
+          itemHeight: panelHeight,
           body: panel,
+          variableName,
         })
       );
 
       currentX += panelWidth;
 
-      if (currentX + panelWidth >= GRID_COLUMN_COUNT) {
+      if (currentX + panelWidth > GRID_COLUMN_COUNT) {
         currentX = 0;
         currentY += panelHeight;
       }
@@ -412,6 +559,7 @@ export class DefaultGridLayoutManager
         children: children,
         isDraggable: true,
         isResizable: true,
+        isLazy,
       }),
     });
   }
@@ -419,7 +567,8 @@ export class DefaultGridLayoutManager
   public static fromGridItems(
     gridItems: SceneGridItemLike[],
     isDraggable?: boolean,
-    isResizable?: boolean
+    isResizable?: boolean,
+    isLazy?: boolean | undefined
   ): DefaultGridLayoutManager {
     const children = gridItems.reduce<SceneGridItemLike[]>((acc, gridItem) => {
       gridItem.clearParent();
@@ -433,6 +582,7 @@ export class DefaultGridLayoutManager
         children,
         isDraggable,
         isResizable,
+        isLazy,
       }),
     });
   }
@@ -440,14 +590,70 @@ export class DefaultGridLayoutManager
 
 function DefaultGridLayoutManagerRenderer({ model }: SceneComponentProps<DefaultGridLayoutManager>) {
   const { children } = useSceneObjectState(model.state.grid, { shouldActivateOrKeepAlive: true });
-  const dashboard = getDashboardSceneFor(model);
+  const dashboard = useDashboard(model);
+  const { isEditing } = dashboard.useState();
+  const hasClonedParents = isRepeatCloneOrChildOf(model);
+  const styles = useStyles2(getStyles);
+  const showCanvasActions = isEditing && config.featureToggles.dashboardNewLayouts && !hasClonedParents;
+  const soloPanelContext = useSoloPanelContext();
 
-  // If we are top level layout and have no children, show empty state
+  if (soloPanelContext) {
+    return children.map((child) => <child.Component model={child} key={child.state.key!} />);
+  }
+
+  // If we are top level layout and we have no children, show empty state
   if (model.parent === dashboard && children.length === 0) {
     return (
       <DashboardEmpty dashboard={dashboard} canCreate={!!dashboard.state.meta.canEdit} key="dashboard-empty-state" />
     );
   }
 
-  return <model.state.grid.Component model={model.state.grid} />;
+  return (
+    <div className={cx(styles.container, isEditing && styles.containerEditing)}>
+      {model.state.grid.Component && <model.state.grid.Component model={model.state.grid} />}
+      {showCanvasActions && (
+        <div className={styles.actionsWrapper}>
+          <CanvasGridAddActions layoutManager={model} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+const OriginalSceneGridRowRenderer = SceneGridRow.Component;
+// @ts-expect-error
+SceneGridRow.Component = SceneGridRowRenderer;
+
+function SceneGridRowRenderer({ model }: SceneComponentProps<SceneGridRow>) {
+  const soloPanelContext = useSoloPanelContext();
+
+  if (soloPanelContext) {
+    return model.state.children.map((child) => <child.Component model={child} key={child.state.key!} />);
+  }
+
+  return <OriginalSceneGridRowRenderer model={model} />;
+}
+
+function getStyles(theme: GrafanaTheme2) {
+  return {
+    container: css({
+      width: '100%',
+      display: 'flex',
+      flexGrow: 1,
+      flexDirection: 'column',
+    }),
+    containerEditing: css({
+      // In editing the add actions should live at the bottom of the grid so we have to
+      // disable flex grow on the SceneGridLayouts first div
+      '> div:first-child': {
+        flexGrow: `0 !important`,
+        minHeight: '250px',
+      },
+      ...dashboardCanvasAddButtonHoverStyles,
+    }),
+    actionsWrapper: css({
+      position: 'relative',
+      paddingBottom: theme.spacing(5),
+    }),
+  };
 }

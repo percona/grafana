@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 
 import { stubRoles, stubUsers, stubUsersMap } from 'app/percona/rbac/__mocks__/stubs';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import AddEditRoleForm from './AddEditRoleForm';
 import { AddEditFormValues, AddEditRoleFormProps } from './AddEditRoleForm.types';

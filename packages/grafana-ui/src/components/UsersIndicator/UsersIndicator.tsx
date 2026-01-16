@@ -1,8 +1,9 @@
 import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { t } from '@grafana/i18n';
 
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 
 import { UserIcon } from './UserIcon';
 import { UserView } from './types';
@@ -15,6 +16,12 @@ export interface UsersIndicatorProps {
   /** onClick handler for the user number indicator */
   onClick?: () => void;
 }
+
+/**
+ * A component that displays a set of user icons indicating which users are currently active. If there are too many users to display all the icons, it will collapse the icons into a single icon with a number indicating the number of additional users.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/iconography-usersindicator--docs
+ */
 export const UsersIndicator = ({ users, onClick, limit = 4 }: UsersIndicatorProps) => {
   const styles = useStyles2(getStyles);
   if (!users.length) {
@@ -28,10 +35,16 @@ export const UsersIndicator = ({ users, onClick, limit = 4 }: UsersIndicatorProp
   const tooManyUsers = extraUsers > 99;
 
   return (
-    <div className={styles.container} aria-label="Users indicator container">
+    <div
+      className={styles.container}
+      aria-label={t('grafana-ui.users-indicator.container-label', 'Users indicator container')}
+    >
       {limitReached && (
         <UserIcon onClick={onClick} userView={{ user: { name: 'Extra users' }, lastActiveAt: '' }} showTooltip={false}>
-          {tooManyUsers ? '...' : `+${extraUsers}`}
+          {tooManyUsers
+            ? // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
+              '...'
+            : `+${extraUsers}`}
         </UserIcon>
       )}
       {users

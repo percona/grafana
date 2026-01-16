@@ -1,22 +1,18 @@
+import { UNSAFE_PortalProvider } from '@react-aria/overlays';
 import { Action, KBarProvider } from 'kbar';
 import { Component, ComponentType, Fragment, ReactNode } from 'react';
 import CacheProvider from 'react-inlinesvg/provider';
 import { Provider } from 'react-redux';
 import { Route, Routes } from 'react-router-dom-v5-compat';
 
-import {
-  config,
-  navigationLogger,
-  reportInteraction,
-  SidecarContext_EXPERIMENTAL,
-  sidecarServiceSingleton_EXPERIMENTAL,
-} from '@grafana/runtime';
-import { ErrorBoundaryAlert, GlobalStyles, PortalContainer, TimeRangeProvider } from '@grafana/ui';
+import { config, navigationLogger, reportInteraction } from '@grafana/runtime';
+import { ErrorBoundaryAlert, getPortalContainer, GlobalStyles, PortalContainer, TimeRangeProvider } from '@grafana/ui';
 import { getAppRoutes } from 'app/routes/routes';
 import { store } from 'app/store/store';
 
-import { loadAndInitAngularIfEnabled } from './angular/loadAndInitAngularIfEnabled';
 import { GrafanaApp } from './app';
+import { ExtensionSidebarContextProvider } from './core/components/AppChrome/ExtensionSidebar/ExtensionSidebarProvider';
+import { ScopesContextProvider } from './features/scopes/ScopesContextProvider';
 import { GrafanaContext } from './core/context/GrafanaContext';
 import { GrafanaRouteWrapper } from './core/navigation/GrafanaRoute';
 import { RouteDescriptor } from './core/navigation/types';
@@ -26,7 +22,7 @@ import { ExtensionRegistriesProvider } from './features/plugins/extensions/Exten
 import { pluginExtensionRegistries } from './features/plugins/extensions/registry/setup';
 import { PerconaBootstrapper } from './percona/shared/components/PerconaBootstrapper';
 import PerconaTourProvider from './percona/tour/TourProvider';
-import { ExperimentalSplitPaneRouterWrapper, RouterWrapper } from './routes/RoutesWrapper';
+import { RouterWrapper } from './routes/RoutesWrapper';
 
 interface AppWrapperProps {
   app: GrafanaApp;
@@ -64,12 +60,11 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
   }
 
   async componentDidMount() {
-    await loadAndInitAngularIfEnabled();
     this.setState({ ready: true });
     $('.preloader').remove();
 
     // clear any old icon caches
-    const cacheKeys = await window.caches.keys();
+    const cacheKeys = (await window.caches?.keys()) ?? [];
     for (const key of cacheKeys) {
       if (key.startsWith('grafana-icon-cache') && key !== this.iconCacheID) {
         window.caches.delete(key);
@@ -120,7 +115,7 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
 
     return (
       <Provider store={store}>
-        <ErrorBoundaryAlert style="page">
+        <ErrorBoundaryAlert boundaryName="app-wrapper" style="page">
           <GrafanaContext.Provider value={app.context}>
             <ThemeProvider value={config.theme2}>
               <CacheProvider name={this.iconCacheID}>
@@ -131,19 +126,20 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
                   <PerconaTourProvider>
                     <GlobalStyles />
                     <MaybeTimeRangeProvider>
-                      <SidecarContext_EXPERIMENTAL.Provider value={sidecarServiceSingleton_EXPERIMENTAL}>
-                        <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
-                          <div className="grafana-app">
-                            {config.featureToggles.appSidecar ? (
-                              <ExperimentalSplitPaneRouterWrapper {...routerWrapperProps} />
-                            ) : (
+                    <ScopesContextProvider>
+                      <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
+                        <ExtensionSidebarContextProvider>
+                          <UNSAFE_PortalProvider getContainer={getPortalContainer}>
+                            <GlobalStyles />
+                            <div className="grafana-app">
                               <RouterWrapper {...routerWrapperProps} />
-                            )}
-                            <LiveConnectionWarning />
-                            <PortalContainer />
-                          </div>
-                        </ExtensionRegistriesProvider>
-                      </SidecarContext_EXPERIMENTAL.Provider>
+                              <LiveConnectionWarning />
+                              <PortalContainer />
+                            </div>
+                          </UNSAFE_PortalProvider>
+                        </ExtensionSidebarContextProvider>
+                      </ExtensionRegistriesProvider>
+                    </ScopesContextProvider>
                     </MaybeTimeRangeProvider>
                   </PerconaTourProvider>
                 </KBarProvider>

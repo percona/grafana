@@ -3,8 +3,8 @@ import moment from 'moment';
 import { useState } from 'react';
 
 import { FieldType, GrafanaTheme2, store } from '@grafana/data';
-import { Button, Card, IconButton, Space, Stack, Text, useStyles2, Box, Sparkline, useTheme2, Icon } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
+import { t } from '@grafana/i18n';
+import { Box, Button, Card, Icon, IconButton, Space, Sparkline, Stack, Text, useStyles2, useTheme2 } from '@grafana/ui';
 import { formatDate } from 'app/core/internationalization/dates';
 
 import { HISTORY_LOCAL_STORAGE_KEY } from '../AppChromeService';
@@ -88,6 +88,7 @@ function HistoryEntryAppView({ entry, isSelected, onClick }: ItemProps) {
   const styles = useStyles2(getStyles);
   const theme = useTheme2();
   const [isExpanded, setIsExpanded] = useState(isSelected && entry.views.length > 0);
+
   const { breadcrumbs, views, time, url, sparklineData } = entry;
   const expandedLabel = isExpanded
     ? t('nav.history-wrapper.collapse', 'Collapse')
@@ -122,6 +123,7 @@ function HistoryEntryAppView({ entry, isSelected, onClick }: ItemProps) {
             className={isExpanded ? styles.iconButtonDot : styles.iconButtonCircle}
           />
           <Card
+            noMargin
             onClick={() => {
               store.setObject('CLICKING_HISTORY', true);
               onClick();
@@ -135,7 +137,11 @@ function HistoryEntryAppView({ entry, isSelected, onClick }: ItemProps) {
               <div>
                 {breadcrumbs.map((breadcrumb, index) => (
                   <Text key={index}>
-                    {breadcrumb.text} {index !== breadcrumbs.length - 1 ? '> ' : ''}
+                    {breadcrumb.text}{' '}
+                    {index !== breadcrumbs.length - 1
+                      ? // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
+                        '> '
+                      : ''}
                   </Text>
                 ))}
               </div>
@@ -177,6 +183,7 @@ function HistoryEntryAppView({ entry, isSelected, onClick }: ItemProps) {
               return (
                 <Card
                   key={index}
+                  noMargin
                   href={view.url}
                   onClick={() => {
                     store.setObject('CLICKING_HISTORY', true);

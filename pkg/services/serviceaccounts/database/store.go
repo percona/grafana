@@ -18,7 +18,6 @@ import (
 	"github.com/grafana/grafana/pkg/services/sqlstore/migrator"
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/setting"
-	"github.com/grafana/grafana/pkg/util/nameutil"
 )
 
 type ServiceAccountsStoreImpl struct {
@@ -44,23 +43,9 @@ func ProvideServiceAccountsStore(cfg *setting.Cfg, store db.DB, apiKeyService ap
 	}
 }
 
-// generateLogin makes a generated string to have a ID for the service account across orgs and it's name
-// this causes you to create a service account with the same name in different orgs
-// not the same name in the same org
-// -- WARNING:
-// -- if you change this function you need to change the ExtSvcLoginPrefix as well
-// -- to make sure they are not considered as regular service accounts
-func generateLogin(prefix string, orgId int64, name string) string {
-	generatedLogin := fmt.Sprintf("%v-%v-%v", prefix, orgId, strings.ToLower(name))
-	// in case the name has multiple spaces or dashes in the prefix or otherwise, replace them with a single dash
-	generatedLogin = strings.Replace(generatedLogin, "--", "-", 1)
-	return strings.Replace(generatedLogin, " ", "-", -1)
-}
-
 // CreateServiceAccount creates service account
 func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, orgId int64, saForm *serviceaccounts.CreateServiceAccountForm) (*serviceaccounts.ServiceAccountDTO, error) {
-	name := nameutil.SanitizeSAName(saForm.Name)
-	login := nameutil.SanitizeSAName(generateLogin(serviceaccounts.ServiceAccountPrefix, orgId, saForm.Name))
+	login := serviceaccounts.GenerateLogin(serviceaccounts.ServiceAccountPrefix, orgId, saForm.Name)
 	isDisabled := false
 	role := org.RoleViewer
 	if saForm.IsDisabled != nil {
@@ -70,48 +55,16 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 		role = *saForm.Role
 	}
 
-	force := false
-	if saForm.Force != nil {
-		force = *saForm.Force
-	}
-
 	newSA, err := s.userService.CreateServiceAccount(ctx, &user.CreateUserCommand{
 		Login:            login,
 		OrgID:            orgId,
-		Name:             name,
+		Name:             saForm.Name,
 		IsDisabled:       isDisabled,
 		IsServiceAccount: true,
 		DefaultOrgRole:   string(role),
 	})
 	if err != nil {
-		if errors.Is(err, serviceaccounts.ErrServiceAccountAlreadyExists) && force {
-			serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
-			if err != nil {
-				return nil, err
-			}
-
-			updateForm := &serviceaccounts.UpdateServiceAccountForm{
-				Name:       &name,
-				Role:       &role,
-				IsDisabled: &isDisabled,
-			}
-			updatedAccount, err := s.UpdateServiceAccount(ctx, orgId, serviceAccountID, updateForm)
-			if err != nil {
-				return nil, err
-			}
-
-			return &serviceaccounts.ServiceAccountDTO{
-				Id:         updatedAccount.Id,
-				Name:       updatedAccount.Name,
-				Login:      updatedAccount.Login,
-				OrgId:      updatedAccount.OrgId,
-				Tokens:     updatedAccount.Tokens,
-				Role:       updatedAccount.Role,
-				IsDisabled: updatedAccount.IsDisabled,
-			}, nil
-		} else {
-			return nil, fmt.Errorf("failed to create service account: %w", err)
-		}
+		return nil, fmt.Errorf("failed to create service account: %w", err)
 	}
 
 	return &serviceaccounts.ServiceAccountDTO{
@@ -203,7 +156,7 @@ func (s *ServiceAccountsStoreImpl) DeleteServiceAccount(ctx context.Context, org
 func (s *ServiceAccountsStoreImpl) deleteServiceAccount(sess *db.Session, orgId, serviceAccountId int64) error {
 	user := user.User{}
 	has, err := sess.Where(`org_id = ? and id = ? and is_service_account = ?`,
-		orgId, serviceAccountId, s.sqlStore.GetDialect().BooleanStr(true)).Get(&user)
+		orgId, serviceAccountId, s.sqlStore.GetDialect().BooleanValue(true)).Get(&user)
 	if err != nil {
 		return err
 	}
@@ -301,7 +254,7 @@ func (s *ServiceAccountsStoreImpl) RetrieveServiceAccountIdByName(ctx context.Co
 		sess := dbSession.Table("user")
 
 		whereConditions := []string{
-			fmt.Sprintf("LOWER(%s.name) = LOWER(?)",
+			fmt.Sprintf("%s.name = ?",
 				s.sqlStore.GetDialect().Quote("user")),
 			fmt.Sprintf("%s.org_id = ?",
 				s.sqlStore.GetDialect().Quote("user")),
@@ -361,9 +314,11 @@ func (s *ServiceAccountsStoreImpl) SearchOrgServiceAccounts(ctx context.Context,
 		whereParams = append(whereParams, acFilter.Args...)
 
 		if query.Query != "" {
-			queryWithWildcards := "%" + query.Query + "%"
-			whereConditions = append(whereConditions, "(email "+s.sqlStore.GetDialect().LikeStr()+" ? OR name "+s.sqlStore.GetDialect().LikeStr()+" ? OR login "+s.sqlStore.GetDialect().LikeStr()+" ?)")
-			whereParams = append(whereParams, queryWithWildcards, queryWithWildcards, queryWithWildcards)
+			sql1, param1 := s.sqlStore.GetDialect().LikeOperator("email", true, query.Query, true)
+			sql2, param2 := s.sqlStore.GetDialect().LikeOperator("name", true, query.Query, true)
+			sql3, param3 := s.sqlStore.GetDialect().LikeOperator("login", true, query.Query, true)
+			whereConditions = append(whereConditions, fmt.Sprintf("(%s OR %s OR %s)", sql1, sql2, sql3))
+			whereParams = append(whereParams, param1, param2, param3)
 		}
 
 		switch query.Filter {
@@ -380,12 +335,11 @@ func (s *ServiceAccountsStoreImpl) SearchOrgServiceAccounts(ctx context.Context,
 			whereConditions = append(
 				whereConditions,
 				"is_disabled = ?")
-			whereParams = append(whereParams, s.sqlStore.GetDialect().BooleanStr(true))
+			whereParams = append(whereParams, s.sqlStore.GetDialect().BooleanValue(true))
 		case serviceaccounts.FilterOnlyExternal:
-			whereConditions = append(
-				whereConditions,
-				"login "+s.sqlStore.GetDialect().LikeStr()+" ?")
-			whereParams = append(whereParams, serviceaccounts.ExtSvcLoginPrefix(query.OrgID)+"%")
+			sql, param := s.sqlStore.GetDialect().LikeOperator("login", false, serviceaccounts.ExtSvcLoginPrefix(query.OrgID), true)
+			whereConditions = append(whereConditions, sql)
+			whereParams = append(whereParams, param)
 		default:
 			s.log.Warn("Invalid filter user for service account filtering", "service account search filtering", query.Filter)
 		}
@@ -500,7 +454,7 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 		for _, key := range basicKeys {
 			err := s.CreateServiceAccountFromApikey(ctx, key)
 			if err != nil {
-				s.log.Error("Migrating to service accounts failed with error", err.Error())
+				s.log.Error("Migating to service accounts failed with error", err.Error())
 				migrationResult.Failed++
 				migrationResult.FailedDetails = append(migrationResult.FailedDetails, fmt.Sprintf("API key name: %s - Error: %s", key.Name, err.Error()))
 				migrationResult.FailedApikeyIDs = append(migrationResult.FailedApikeyIDs, key.ID)
@@ -513,31 +467,11 @@ func (s *ServiceAccountsStoreImpl) MigrateApiKeysToServiceAccounts(ctx context.C
 	return migrationResult, nil
 }
 
-func (s *ServiceAccountsStoreImpl) MigrateApiKey(ctx context.Context, orgId int64, keyId int64) error {
-	basicKeys, err := s.apiKeyService.GetAllAPIKeys(ctx, orgId)
-	if err != nil {
-		return err
-	}
-	if len(basicKeys) == 0 {
-		return fmt.Errorf("no API keys to convert found")
-	}
-	for _, key := range basicKeys {
-		if keyId == key.ID {
-			err := s.CreateServiceAccountFromApikey(ctx, key)
-			if err != nil {
-				s.log.Error("Converting to service account failed with error", "keyId", keyId, "error", err)
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Context, key *apikey.APIKey) error {
 	prefix := "sa-autogen"
 	cmd := user.CreateUserCommand{
-		Login:            nameutil.SanitizeSAName(generateLogin(prefix, key.OrgID, key.Name)),
-		Name:             nameutil.SanitizeSAName(fmt.Sprintf("%v-%v", prefix, key.Name)),
+		Login:            serviceaccounts.GenerateLogin(prefix, key.OrgID, key.Name),
+		Name:             fmt.Sprintf("%v-%v", prefix, key.Name),
 		OrgID:            key.OrgID,
 		DefaultOrgRole:   string(key.Role),
 		IsServiceAccount: true,
@@ -554,7 +488,7 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccountFromApikey(ctx context.Co
 				// a unique service account by adding suffixes to the initial login name (e.g. -001, -002, ... , -010).
 				for i := 1; errCreateSA != nil && i <= attempts; i++ {
 					serviceAccountName := fmt.Sprintf("%s-%03d", key.Name, i)
-					cmd.Login = generateLogin(prefix, key.OrgID, serviceAccountName)
+					cmd.Login = serviceaccounts.GenerateLogin(prefix, key.OrgID, serviceAccountName)
 					newSA, errCreateSA = s.userService.CreateServiceAccount(tctx, &cmd)
 					if errCreateSA != nil && !errors.Is(errCreateSA, serviceaccounts.ErrServiceAccountAlreadyExists) {
 						break

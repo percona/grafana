@@ -9,7 +9,7 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { Advisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { CheckService } from '../../Check.service';
 

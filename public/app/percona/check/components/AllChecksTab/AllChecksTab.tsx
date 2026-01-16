@@ -20,7 +20,7 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import { Advisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { dispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages as mainChecksMessages } from '../../CheckPanel.messages';
 

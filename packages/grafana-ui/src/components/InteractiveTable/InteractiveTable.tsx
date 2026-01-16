@@ -15,10 +15,11 @@ import {
 
 import { GrafanaTheme2, IconName, isTruthy } from '@grafana/data';
 
-import { useStyles2 } from '../../themes';
+import { useStyles2 } from '../../themes/ThemeContext';
 import { Icon } from '../Icon/Icon';
 import { Pagination } from '../Pagination/Pagination';
-import { PopoverContent, Tooltip } from '../Tooltip';
+import { Tooltip } from '../Tooltip/Tooltip';
+import { PopoverContent } from '../Tooltip/types';
 
 import { Column } from './types';
 import { EXPANDER_CELL_ID, getColumns } from './utils';
@@ -171,7 +172,13 @@ interface WithoutExpandableRow<TableData extends object> extends BaseProps<Table
 
 type Props<TableData extends object> = WithExpandableRow<TableData> | WithoutExpandableRow<TableData>;
 
-/** @alpha */
+/**
+ * The InteractiveTable is used to display and select data efficiently. It allows for the display and modification of detailed information.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/layout-interactivetable--docs
+ *
+ * @alpha
+ */
 export function InteractiveTable<TableData extends object>({
   className,
   columns,

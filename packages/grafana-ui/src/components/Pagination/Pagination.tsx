@@ -1,9 +1,10 @@
 import { css, cx } from '@emotion/css';
 import { useMemo } from 'react';
 
-import { useStyles2 } from '../../themes';
-import { t } from '../../utils/i18n';
-import { Button, ButtonVariant } from '../Button';
+import { t } from '@grafana/i18n';
+
+import { useStyles2 } from '../../themes/ThemeContext';
+import { Button, ButtonVariant } from '../Button/Button';
 import { Icon } from '../Icon/Icon';
 
 export interface Props {
@@ -20,6 +21,11 @@ export interface Props {
   className?: string;
 }
 
+/**
+ * Component used for rendering a page selector below paginated content.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/navigation-pagination--docs
+ */
 export const Pagination = ({
   currentPage,
   numberOfPages,
@@ -83,7 +89,7 @@ export const Pagination = ({
           // Renders and ellipsis to represent condensed pages
           pagesToRender.push(
             <li key={page} className={styles.item}>
-              <Icon className={styles.ellipsis} name="ellipsis-v" />
+              <Icon className={styles.ellipsis} name="ellipsis-v" data-testid="pagination-ellipsis-icon" />
             </li>
           );
         }
@@ -102,7 +108,7 @@ export const Pagination = ({
   const nextPageLabel = t('grafana-ui.pagination.next-page', 'next page');
 
   return (
-    <div className={cx(styles.container, className)}>
+    <div className={cx(styles.container, className)} role="navigation">
       <ol>
         <li className={styles.item}>
           <Button

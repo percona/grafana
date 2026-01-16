@@ -5,7 +5,8 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, HorizontalGroup, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
+import { t, Trans } from '@grafana/i18n';
+import { Badge, Button, Stack, Icon, Link, Modal, TagList, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { Agent, FlattenAgent, ServiceAgentStatus } from 'app/percona/inventory/Inventory.types';
 import { SelectedTableRows } from 'app/percona/shared/components/Elements/AnotherTableInstance/Table.types';
@@ -25,7 +26,7 @@ import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndA
 import { logger } from 'app/percona/shared/helpers/logger';
 import { filterFulfilled, processPromiseResults } from 'app/percona/shared/helpers/promises';
 import { dispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { appEvents } from '../../../core/app_events';
 import { GET_AGENTS_CANCEL_TOKEN, GET_NODES_CANCEL_TOKEN, GET_SERVICES_CANCEL_TOKEN } from '../Inventory.constants';
@@ -221,14 +222,14 @@ export const Agents: FC = () => {
     <Page navModel={navModel}>
       <Page.Contents>
         <FeatureLoader>
-          <HorizontalGroup height="auto">
+          <Stack direction="column" height="auto">
             <Link href={`${service ? '/inventory/services' : '/inventory/nodes'}`}>
               <Icon name="arrow-left" size="lg" />
               <span className={styles.goBack}>
                 {service ? Messages.agents.goBackToServices : Messages.agents.goBackToNodes}
               </span>
             </Link>
-          </HorizontalGroup>
+          </Stack>
           {service && (
             <h5 className={styles.agentBreadcrumb}>
               <span>{Messages.agents.breadcrumbLeftService(service.params.serviceName)}</span>
@@ -241,7 +242,7 @@ export const Agents: FC = () => {
               <span>{Messages.agents.breadcrumbRight}</span>
             </h5>
           )}
-          <HorizontalGroup height={40} justify="flex-end" align="flex-start">
+          <Stack direction={'column'} height={40} justifyContent="flex-end" alignItems="flex-start">
             <Button
               size="md"
               disabled={selected.length === 0}
@@ -253,11 +254,14 @@ export const Agents: FC = () => {
             >
               {Messages.delete}
             </Button>
-          </HorizontalGroup>
+          </Stack>
           <Modal
+            ariaLabel={t('percona-inventory.agents.confirmAction', 'Confirm action')}
             title={
               <div className="modal-header-title">
-                <span className="p-l-1">Confirm action</span>
+                <span className="p-l-1">
+                  <Trans i18nKey={'percona-inventory.agents.confirmAction'}>Confirm action</Trans>
+                </span>
               </div>
             }
             isOpen={modalVisible}
@@ -275,7 +279,7 @@ export const Agents: FC = () => {
                       element={<CheckboxField name="force" label={Messages.agents.forceConfirmation} />}
                     />
 
-                    <HorizontalGroup justify="space-between" spacing="md">
+                    <Stack justifyContent="space-between" direction="column">
                       <Button variant="secondary" size="md" onClick={() => setModalVisible(false)}>
                         {Messages.cancel}
                       </Button>
@@ -289,7 +293,7 @@ export const Agents: FC = () => {
                       >
                         {Messages.proceed}
                       </Button>
-                    </HorizontalGroup>
+                    </Stack>
                   </>
                 </form>
               )}

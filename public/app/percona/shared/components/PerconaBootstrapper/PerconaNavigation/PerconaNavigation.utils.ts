@@ -4,7 +4,7 @@ import { Settings } from 'app/percona/settings/Settings.types';
 import { isViewer } from 'app/percona/shared/helpers/permissions';
 import { CategorizedAdvisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { ServiceType } from 'app/percona/shared/services/services/Services.types';
-import { FolderDTO } from 'app/types';
+import { FolderDTO } from 'app/types/folders';
 
 import {
   NAV_FOLDER_MAP,

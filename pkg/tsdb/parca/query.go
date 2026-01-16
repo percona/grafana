@@ -196,6 +196,8 @@ func arrowToNestedSetDataFrame(flamegraph *v1alpha1.FlamegraphArrow) (*data.Fram
 	defer arrowReader.Release()
 
 	arrowReader.Next()
+	//TODO: fix deprecation warning
+	//nolint:staticcheck
 	rec := arrowReader.Record()
 
 	fi, err := newFlamegraphIterator(rec)
@@ -236,6 +238,9 @@ type flamegraphIterator struct {
 	addressBuilder *bytes.Buffer
 }
 
+// TODO: fix deprecation warning
+//
+//nolint:staticcheck
 func newFlamegraphIterator(rec arrow.Record) (*flamegraphIterator, error) {
 	schema := rec.Schema()
 
@@ -282,11 +287,7 @@ func (fi *flamegraphIterator) iterate(fn func(name string, level, value, self in
 	cumulative := fi.columnCumulative(0)
 	fn("total", 0, cumulative, cumulative-childrenValue)
 
-	for {
-		if len(stack) == 0 {
-			break
-		}
-
+	for len(stack) != 0 {
 		// shift stack
 		node := stack[0]
 		stack = stack[1:]

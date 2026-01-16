@@ -12,6 +12,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/dashboardimport/api"
 	"github.com/grafana/grafana/pkg/services/dashboardimport/utils"
 	"github.com/grafana/grafana/pkg/services/dashboards"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/folder"
 	"github.com/grafana/grafana/pkg/services/librarypanels"
 	"github.com/grafana/grafana/pkg/services/plugindashboards"
@@ -23,16 +24,17 @@ func ProvideService(routeRegister routing.RouteRegister,
 	quotaService quota.Service,
 	pluginDashboardService plugindashboards.Service, pluginStore pluginstore.Store,
 	libraryPanelService librarypanels.Service, dashboardService dashboards.DashboardService,
-	ac accesscontrol.AccessControl, folderService folder.Service,
+	ac accesscontrol.AccessControl, folderService folder.Service, features featuremgmt.FeatureToggles,
 ) *ImportDashboardService {
 	s := &ImportDashboardService{
 		pluginDashboardService: pluginDashboardService,
 		dashboardService:       dashboardService,
 		libraryPanelService:    libraryPanelService,
 		folderService:          folderService,
+		features:               features,
 	}
 
-	dashboardImportAPI := api.New(s, quotaService, pluginStore, ac)
+	dashboardImportAPI := api.New(s, quotaService, pluginStore, ac, features)
 	dashboardImportAPI.RegisterAPIEndpoints(routeRegister)
 
 	return s
@@ -43,9 +45,10 @@ type ImportDashboardService struct {
 	dashboardService       dashboards.DashboardService
 	libraryPanelService    librarypanels.Service
 	folderService          folder.Service
+	features               featuremgmt.FeatureToggles
 }
 
-func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashboardimport.ImportDashboardRequest) (*dashboardimport.ImportDashboardResponse, error) {
+func (s *ImportDashboardService) InterpolateDashboard(ctx context.Context, req *dashboardimport.ImportDashboardRequest) (*simplejson.Json, error) {
 	var draftDashboard *dashboards.Dashboard
 	if req.PluginId != "" {
 		loadReq := &plugindashboards.LoadPluginDashboardRequest{
@@ -63,6 +66,15 @@ func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashb
 
 	evaluator := utils.NewDashTemplateEvaluator(draftDashboard.Data, req.Inputs)
 	generatedDash, err := evaluator.Eval()
+	if err != nil {
+		return nil, err
+	}
+
+	return generatedDash, nil
+}
+
+func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashboardimport.ImportDashboardRequest) (*dashboardimport.ImportDashboardResponse, error) {
+	generatedDash, err := s.InterpolateDashboard(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -131,22 +143,17 @@ func (s *ImportDashboardService) ImportDashboard(ctx context.Context, req *dashb
 		User:      req.User,
 	}
 
-	savedDashboard, err := s.dashboardService.ImportDashboard(ctx, dto)
-	if err != nil {
-		return nil, err
-	}
-
-	metrics.MFolderIDsServiceCount.WithLabelValues(metrics.DashboardImport).Inc()
 	// nolint:staticcheck
 	err = s.libraryPanelService.ImportLibraryPanelsForDashboard(ctx, req.User, libraryElements, generatedDash.Get("panels").MustArray(), req.FolderId, req.FolderUid)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.libraryPanelService.ConnectLibraryPanelsForDashboard(ctx, req.User, savedDashboard)
+	savedDashboard, err := s.dashboardService.ImportDashboard(ctx, dto)
 	if err != nil {
 		return nil, err
 	}
+	metrics.MFolderIDsServiceCount.WithLabelValues(metrics.DashboardImport).Inc()
 
 	revision := savedDashboard.Data.Get("revision").MustInt64(0)
 	metrics.MFolderIDsServiceCount.WithLabelValues(metrics.DashboardImport).Inc()
