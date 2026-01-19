@@ -120,6 +120,7 @@ export const ControlledCollapse = ({ isOpen, onToggle, ...otherProps }: React.Pr
   return (
     <Collapse
       isOpen={open}
+      collapsible
       {...otherProps}
       onToggle={() => {
         setOpen(!open);
@@ -173,12 +174,12 @@ export const Collapse = ({
           aria-labelledby={labelId}
           name={isOpen ? 'angle-down' : 'angle-right'}
         />
-        <div id={labelId} className={style.headerLabel}>
+        <div id={labelId} className={cx([style.headerLabel, headerLabelCustomClass])}>
           {label}
         </div>
       </div>
       {isOpen && (
-        <div className={style.collapseBody} id={contentId}>
+        <div className={cx([style.collapseBody, bodyCustomClass])} id={contentId}>
           <div className={loaderClass} />
           <div className={style.bodyContentWrapper}>{children}</div>
         </div>
