@@ -103,17 +103,15 @@ describe('AddEditRoleForm', () => {
   it('calls cancel', () => {
     renderWithDefaults();
     const cancelButton = screen.getByTestId('add-edit-role-cancel');
-    cancelButton.click();
+    fireEvent.click(cancelButton);
     expect(onCancelFc).toHaveBeenCalled();
   });
 
   it('role name is required', async () => {
     renderWithDefaults();
     const submitButton = screen.getByTestId('add-edit-role-submit');
-    submitButton.click();
-
+    fireEvent.click(submitButton);
     expect(onSubmitFc).not.toHaveBeenCalled();
-
     await waitFor(() => expect(screen.queryByText('Role name is required')).toBeInTheDocument());
   });
 
@@ -123,7 +121,7 @@ describe('AddEditRoleForm', () => {
     fireEvent.change(titleField, { target: { value: 'Role Title' } });
 
     const submitButton = screen.getByTestId('add-edit-role-submit');
-    submitButton.click();
+    fireEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitFc).toHaveBeenCalled());
   });
