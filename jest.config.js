@@ -70,6 +70,8 @@ module.exports = {
     // prevent systemjs amd extra from breaking tests.
     'systemjs/dist/extras/amd': '<rootDir>/public/test/mocks/systemjsAMDExtra.ts',
     '@bsull/augurs': '<rootDir>/public/test/mocks/augurs.ts',
+    // uwrap is an ES module (.mjs) that doesn't work well with Jest, so we use a mock
+    '^uwrap$': '<rootDir>/public/test/mocks/uwrap.ts',
   },
   // Log the test results with dynamic Loki tags. Drone CI only
   reporters: ['default', ['<rootDir>/public/test/log-reporter.js', { enable: process.env.DRONE === 'true' }]],
