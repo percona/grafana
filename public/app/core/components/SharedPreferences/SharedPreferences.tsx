@@ -3,12 +3,7 @@ import { PureComponent } from 'react';
 import * as React from 'react';
 import type { Unsubscribable } from 'rxjs';
 
-import {
-  FeatureState,
-  ThemeRegistryItem,
-  type GrafanaTheme2,
-  type BusEventWithPayload,
-} from '@grafana/data';
+import { FeatureState, ThemeRegistryItem, type GrafanaTheme2, type BusEventWithPayload } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { config, reportInteraction, getAppEvents, ThemeChangedEvent } from '@grafana/runtime';
 import { PSEUDO_LOCALE, t, Trans } from '@grafana/i18n';

@@ -126,20 +126,20 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
                   <PerconaTourProvider>
                     <GlobalStyles />
                     <MaybeTimeRangeProvider>
-                    <ScopesContextProvider>
-                      <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
-                        <ExtensionSidebarContextProvider>
-                          <UNSAFE_PortalProvider getContainer={getPortalContainer}>
-                            <GlobalStyles />
-                            <div className="grafana-app">
-                              <RouterWrapper {...routerWrapperProps} />
-                              <LiveConnectionWarning />
-                              <PortalContainer />
-                            </div>
-                          </UNSAFE_PortalProvider>
-                        </ExtensionSidebarContextProvider>
-                      </ExtensionRegistriesProvider>
-                    </ScopesContextProvider>
+                      <ScopesContextProvider>
+                        <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
+                          <ExtensionSidebarContextProvider>
+                            <UNSAFE_PortalProvider getContainer={getPortalContainer}>
+                              <GlobalStyles />
+                              <div className="grafana-app">
+                                <RouterWrapper {...routerWrapperProps} />
+                                <LiveConnectionWarning />
+                                <PortalContainer />
+                              </div>
+                            </UNSAFE_PortalProvider>
+                          </ExtensionSidebarContextProvider>
+                        </ExtensionRegistriesProvider>
+                      </ScopesContextProvider>
                     </MaybeTimeRangeProvider>
                   </PerconaTourProvider>
                 </KBarProvider>
