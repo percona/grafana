@@ -4,7 +4,7 @@ import { payloadToCamelCase } from 'app/percona/shared/helpers/payloadToCamelCas
 
 import { Agent, AgentType, ServiceAgentPayload, ServiceAgentStatus } from '../Inventory.types';
 
-import { AGENTS_MAIN_COLUMNS, AGENT_LABELS_SKIP_KEYS } from './Agents.constants';
+import { AGENTS_MAIN_COLUMNS, AGENT_LABELS_SKIP_KEYS, AGENT_TYPE_NAME } from './Agents.constants';
 import { AgentParamValue } from './Agents.types';
 
 export const toAgentModel = (agentList: ServiceAgentPayload[]): Agent[] => {
@@ -101,7 +101,7 @@ export const getExtraLabels = (agentParams: Partial<ServiceAgentPayload>): Recor
 
 export const getAgentStatusText = (status: ServiceAgentStatus): string => capitalizeText(status.split('_')[2] || '');
 
-export const beautifyAgentType = (type: AgentType): string =>
+export const beautifyAgentType = (type: AgentType): string => AGENT_TYPE_NAME[type] ||
   type.replace(/^\w/, (c) => c.toUpperCase()).replace(/[_-]/g, ' ');
 
 export const getAgentStatusColor = (status: ServiceAgentStatus): BadgeColor => {
