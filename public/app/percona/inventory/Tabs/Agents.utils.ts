@@ -101,8 +101,8 @@ export const getExtraLabels = (agentParams: Partial<ServiceAgentPayload>): Recor
 
 export const getAgentStatusText = (status: ServiceAgentStatus): string => capitalizeText(status.split('_')[2] || '');
 
-export const beautifyAgentType = (type: AgentType): string => AGENT_TYPE_NAME[type] ||
-  type.replace(/^\w/, (c) => c.toUpperCase()).replace(/[_-]/g, ' ');
+export const beautifyAgentType = (type: AgentType): string =>
+  AGENT_TYPE_NAME[type] || type.replace(/^\w/, (c) => c.toUpperCase()).replace(/[_-]/g, ' ');
 
 export const getAgentStatusColor = (status: ServiceAgentStatus): BadgeColor => {
   if (status === ServiceAgentStatus.STARTING || status === ServiceAgentStatus.RUNNING) {
