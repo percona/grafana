@@ -345,6 +345,14 @@
       "tooltip-assigned-role": "A licensed role will be assigned when this user signs in"
     }
   },
+  "alert-labels": {
+    "button": {
+      "hide": "Hide common labels",
+      "show": {
+        "tooltip": "Show common labels"
+      }
+    }
+  },
   "alerting": {
     "active-timing-fields": {
       "am-active-timing-select-label-active-timings": "Active timings"
@@ -7064,6 +7072,11 @@
       "dragging-a-sub-region": "Dragging a sub-region",
       "value": "Value: {{ dividerPos }}"
     },
+    "drilldownInfo": {
+      "action": "Go to Grafana Drilldown",
+      "description": "Looking for the Grafana Explore apps? They are now called the Grafana Drilldown apps and can be found under <1>Menu > Drilldown</1>",
+      "title": "Explore Metrics, Logs, Traces and Profiles have moved!"
+    },
     "drop-down-menu": {
       "aria-label-links": "Links",
       "links": "Links"
@@ -10652,7 +10665,6 @@
     "category-news": "News",
     "description-show-image": "Controls if the news item social (og:image) image is shown above text content",
     "description-url": "Supports RSS and Atom feeds",
-    "link-title": "Go to Grafana labs blog",
     "name-show-image": "Show image",
     "name-url": "URL",
     "news-panel": {
@@ -10848,6 +10860,13 @@
       "edit-tooltip": "Edit title"
     }
   },
+  "pagination": {
+    "first-page": "First page",
+    "last-page": "Last page",
+    "next-page": "Next page",
+    "page-button": "Page {{page}}",
+    "previous-page": "Previous page"
+  },
   "panel": {
     "dashlist": {
       "empty-state-message": "No dashboard groups configured",
@@ -10951,6 +10970,11 @@
     "select-aria-label": "Panel type filter",
     "select-no-options": "No panel types found",
     "select-placeholder": "Filter by type"
+  },
+  "percona-inventory": {
+    "agents": {
+      "confirmAction": "Confirm action"
+    }
   },
   "piechart": {
     "category-legend": "Legend",
@@ -13332,6 +13356,7 @@
       "tooltip-remove-timezone": "Remove timezone"
     }
   },
+  "Timestamp": "",
   "traces": {
     "category-span-filters": "Span filters",
     "name-critical-path-only": "Show critical path only",
