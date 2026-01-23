@@ -15,7 +15,7 @@ export function NavToolbarSeparator({ className, leftActionsSeparator }: Props) 
     return <div className={cx(className, styles.leftActionsSeparator)} />;
   }
 
-  return <div className={cx(className, styles.line)} />;
+  return <div className={cx(className, styles.line)} data-testid='nav-toolbar-separator'/>;
 }
 
 const getStyles = (theme: GrafanaTheme2) => {
