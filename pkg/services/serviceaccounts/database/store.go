@@ -18,6 +18,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/sqlstore/migrator"
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/setting"
+	"github.com/grafana/grafana/pkg/util/nameutil"
 )
 
 type ServiceAccountsStoreImpl struct {
@@ -45,7 +46,9 @@ func ProvideServiceAccountsStore(cfg *setting.Cfg, store db.DB, apiKeyService ap
 
 // CreateServiceAccount creates service account
 func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, orgId int64, saForm *serviceaccounts.CreateServiceAccountForm) (*serviceaccounts.ServiceAccountDTO, error) {
-	login := serviceaccounts.GenerateLogin(serviceaccounts.ServiceAccountPrefix, orgId, saForm.Name)
+	// @PERCONA: sanitize the name to avoid length limit errors
+	name := nameutil.SanitizeSAName(saForm.Name)
+	login := nameutil.SanitizeSAName(serviceaccounts.GenerateLogin(serviceaccounts.ServiceAccountPrefix, orgId, saForm.Name))
 	isDisabled := false
 	role := org.RoleViewer
 	if saForm.IsDisabled != nil {
@@ -55,16 +58,50 @@ func (s *ServiceAccountsStoreImpl) CreateServiceAccount(ctx context.Context, org
 		role = *saForm.Role
 	}
 
+	// @PERCONA: force is used to create a service account even if it already exists
+	force := false
+	if saForm.Force != nil {
+		force = *saForm.Force
+	}
+
 	newSA, err := s.userService.CreateServiceAccount(ctx, &user.CreateUserCommand{
 		Login:            login,
 		OrgID:            orgId,
-		Name:             saForm.Name,
+		Name:             name,
 		IsDisabled:       isDisabled,
 		IsServiceAccount: true,
 		DefaultOrgRole:   string(role),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create service account: %w", err)
+		if errors.Is(err, serviceaccounts.ErrServiceAccountAlreadyExists) && force {
+			serviceAccountID, err := s.RetrieveServiceAccountIdByName(ctx, orgId, name)
+			if err != nil {
+				return nil, err
+			}
+
+			updateForm := &serviceaccounts.UpdateServiceAccountForm{
+				Name:       &name,
+				Role:       &role,
+				IsDisabled: &isDisabled,
+			}
+			updatedAccount, err := s.UpdateServiceAccount(ctx, orgId, serviceAccountID, updateForm)
+
+			if err != nil {
+				return nil, err
+			}
+
+			return &serviceaccounts.ServiceAccountDTO{
+				Id:         updatedAccount.Id,
+				Name:       updatedAccount.Name,
+				Login:      updatedAccount.Login,
+				OrgId:      updatedAccount.OrgId,
+				Tokens:     updatedAccount.Tokens,
+				Role:       updatedAccount.Role,
+				IsDisabled: updatedAccount.IsDisabled,
+			}, nil
+		} else {
+			return nil, fmt.Errorf("failed to create service account: %w", err)
+		}
 	}
 
 	return &serviceaccounts.ServiceAccountDTO{
