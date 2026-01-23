@@ -15,6 +15,7 @@ export function NavToolbarSeparator({ className, leftActionsSeparator }: Props) 
     return <div className={cx(className, styles.leftActionsSeparator)} />;
   }
 
+  // @PERCONA: data-testid is used to select the separator so that it can be hidden by pmm-compat plugin
   return <div className={cx(className, styles.line)} data-testid='nav-toolbar-separator'/>;
 }
 
