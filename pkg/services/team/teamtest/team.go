@@ -20,7 +20,13 @@ func NewFakeService() *FakeService {
 	return &FakeService{}
 }
 
-func (s *FakeService) CreateTeam(ctx context.Context, name, email string, orgID int64) (team.Team, error) {
+func NewFakeServiceWithTeamDTO(teamDTO *team.TeamDTO) *FakeService {
+	return &FakeService{
+		ExpectedTeamDTO: teamDTO,
+	}
+}
+
+func (s *FakeService) CreateTeam(ctx context.Context, cmd *team.CreateTeamCommand) (team.Team, error) {
 	return s.ExpectedTeam, s.ExpectedError
 }
 
@@ -52,7 +58,7 @@ func (s *FakeService) RemoveUsersMemberships(ctx context.Context, userID int64) 
 	return s.ExpectedError
 }
 
-func (s *FakeService) GetUserTeamMemberships(ctx context.Context, orgID, userID int64, external bool) ([]*team.TeamMemberDTO, error) {
+func (s *FakeService) GetUserTeamMemberships(ctx context.Context, orgID, userID int64, external bool, bypassCache bool) ([]*team.TeamMemberDTO, error) {
 	return s.ExpectedMembers, s.ExpectedError
 }
 

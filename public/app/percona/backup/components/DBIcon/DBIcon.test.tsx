@@ -2,8 +2,6 @@ import { render, screen } from '@testing-library/react';
 
 import { Tooltip } from '@grafana/ui';
 
-import { svg } from '../../../../../test/mocks/svg';
-
 import { DBIcon } from './DBIcon';
 import { DBIconType } from './DBIcon.types';
 
@@ -15,7 +13,7 @@ jest.mock('@grafana/ui', () => ({
 describe('DBIcon', () => {
   it('should not display unknown icons', async () => {
     render(<DBIcon type={'unknown' as DBIconType} />);
-    expect(screen.queryAllByRole(svg)).toHaveLength(0);
+    expect(screen.queryAllByRole('svg')).toHaveLength(0);
   });
 
   it('should display known icons', () => {

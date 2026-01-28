@@ -133,7 +133,7 @@ func (st ProtoInstanceDBStore) DeleteAlertInstancesByRule(ctx context.Context, k
 	})
 }
 
-func (st ProtoInstanceDBStore) FullSync(ctx context.Context, instances []models.AlertInstance, batchSize int) error {
+func (st ProtoInstanceDBStore) FullSync(ctx context.Context, instances []models.AlertInstance, batchSize int, jitterFunc func(int) time.Duration) error {
 	logger := st.Logger.FromContext(ctx)
 	logger.Error("FullSync called and not implemented")
 	return errors.New("fullsync is not implemented for proto instance database store")
@@ -149,6 +149,7 @@ func alertInstanceModelToProto(modelInstance models.AlertInstance) *pb.AlertInst
 		CurrentReason:     modelInstance.CurrentReason,
 		LastEvalTime:      timestamppb.New(modelInstance.LastEvalTime),
 		LastSentAt:        nullableTimeToTimestamp(modelInstance.LastSentAt),
+		FiredAt:           nullableTimeToTimestamp(modelInstance.FiredAt),
 		ResolvedAt:        nullableTimeToTimestamp(modelInstance.ResolvedAt),
 		ResultFingerprint: modelInstance.ResultFingerprint,
 	}
@@ -191,6 +192,7 @@ func alertInstanceProtoToModel(ruleUID string, ruleOrgID int64, protoInstance *p
 		CurrentReason:     protoInstance.CurrentReason,
 		LastEvalTime:      protoInstance.LastEvalTime.AsTime(),
 		LastSentAt:        nullableTimestampToTime(protoInstance.LastSentAt),
+		FiredAt:           nullableTimestampToTime(protoInstance.FiredAt),
 		ResolvedAt:        nullableTimestampToTime(protoInstance.ResolvedAt),
 		ResultFingerprint: protoInstance.ResultFingerprint,
 	}

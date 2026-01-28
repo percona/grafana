@@ -10,7 +10,8 @@ import { updateNavTree } from 'app/percona/shared/core/reducers/navigation';
 import { fetchActiveServiceTypesAction } from 'app/percona/shared/core/reducers/services';
 import { isPmmAdmin, isViewer } from 'app/percona/shared/helpers/permissions';
 import { useAppDispatch } from 'app/store/store';
-import { FolderDTO, useSelector } from 'app/types';
+import { FolderDTO } from 'app/types/folders';
+import { useSelector } from 'app/types/store';
 
 import {
   getCategorizedAdvisors,

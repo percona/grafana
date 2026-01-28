@@ -4,7 +4,7 @@ import { getGrafanaContextMock } from 'test/mocks/getGrafanaContextMock';
 
 import { GrafanaContext } from 'app/core/context/GrafanaContext';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import TicketsPage from './TicketsPage';
 

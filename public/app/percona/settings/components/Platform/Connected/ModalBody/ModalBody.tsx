@@ -1,6 +1,6 @@
 import { useStyles2 } from '@grafana/ui';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { URL_DOC } from './ModalBody.constants';
 import { Messages } from './ModalBody.messages';

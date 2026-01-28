@@ -7,7 +7,7 @@ import { deleteRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { getAccessRoles, getDefaultRole, getUsers, getUsersInfo } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from '../../AccessRole.messages';
 

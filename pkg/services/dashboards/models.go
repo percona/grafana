@@ -233,10 +233,23 @@ type DeleteDashboardCommand struct {
 	UID                    string
 	OrgID                  int64
 	ForceDeleteFolderRules bool
+	RemovePermissions      bool
 }
 
 type DeleteOrphanedProvisionedDashboardsCommand struct {
 	ReaderNames []string
+}
+
+type DashboardProvisioningSearchResults struct {
+	ID              int64  `xorm:"id"`
+	UID             string `xorm:"uid"`
+	Title           string `xorm:"title"`
+	FolderUID       string `xorm:"folder_uid"`
+	OrgID           int64  `xorm:"org_id"`
+	Provisioner     string `xorm:"name"`
+	ExternalID      string `xorm:"external_id"`
+	CheckSum        string `xorm:"check_sum"`
+	ProvisionUpdate int64  `xorm:"provisioning_updated"`
 }
 
 //
@@ -265,8 +278,6 @@ type GetDashboardQuery struct {
 	FolderID  *int64
 	FolderUID *string
 	OrgID     int64
-
-	IncludeDeleted bool // only supported when using unified storage
 }
 
 type DashboardTagCloudItem struct {
@@ -290,8 +301,11 @@ type GetDashboardsByPluginIDQuery struct {
 }
 
 type DashboardRef struct {
-	UID  string `xorm:"uid"`
-	Slug string
+	UID       string `xorm:"uid"`
+	Slug      string
+	FolderUID string `xorm:"folder_uid"`
+	// Deprecated: use UID instead
+	ID int64 `xorm:"id"`
 }
 
 type GetDashboardRefByIDQuery struct {
@@ -308,13 +322,14 @@ type SaveDashboardDTO struct {
 }
 
 type DashboardSearchProjection struct {
-	ID       int64  `xorm:"id"`
-	UID      string `xorm:"uid"`
-	OrgID    int64  `xorm:"org_id"`
-	Title    string
-	Slug     string
-	Term     string
-	IsFolder bool
+	ID          int64  `xorm:"id"`
+	UID         string `xorm:"uid"`
+	OrgID       int64  `xorm:"org_id"`
+	Title       string
+	Slug        string
+	Term        string
+	Description string
+	IsFolder    bool
 	// Deprecated: use FolderUID instead
 	FolderID    int64  `xorm:"folder_id"`
 	FolderUID   string `xorm:"folder_uid"`
@@ -423,12 +438,13 @@ type DashboardACLInfoDTO struct {
 }
 
 type FindPersistedDashboardsQuery struct {
-	Title         string
-	OrgId         int64
-	SignedInUser  identity.Requester
-	DashboardIds  []int64
-	DashboardUIDs []string
-	Type          string
+	Title           string
+	TitleExactMatch bool
+	OrgId           int64
+	SignedInUser    identity.Requester
+	DashboardIds    []int64
+	DashboardUIDs   []string
+	Type            string
 	// Deprecated: use FolderUIDs instead
 	FolderIds  []int64
 	FolderUIDs []string

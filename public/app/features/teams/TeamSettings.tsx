@@ -1,12 +1,14 @@
 import { useForm } from 'react-hook-form';
 import { ConnectedProps, connect } from 'react-redux';
 
+import { Trans, t } from '@grafana/i18n';
 import { Button, Field, FieldSet, Input, Stack } from '@grafana/ui';
 import { TeamRolePicker } from 'app/core/components/RolePicker/TeamRolePicker';
 import { useRoleOptions } from 'app/core/components/RolePicker/hooks';
 import { SharedPreferences } from 'app/core/components/SharedPreferences/SharedPreferences';
 import { contextSrv } from 'app/core/services/context_srv';
-import { AccessControlAction, Team } from 'app/types';
+import { AccessControlAction } from 'app/types/accessControl';
+import { Team } from 'app/types/teams';
 
 import { updateTeam } from './state/actions';
 
@@ -47,37 +49,54 @@ export const TeamSettings = ({ team, updateTeam }: Props) => {
   return (
     <Stack direction={'column'} gap={3}>
       <form onSubmit={handleSubmit(onSubmit)} style={{ maxWidth: '600px' }}>
-        <FieldSet label="Team details">
-          <Field label="Numerical identifier" disabled={true}>
-            <Input value={team.id} id="id-input" />
-          </Field>
-          <Field
-            label="Name"
-            disabled={!canWriteTeamSettings}
-            required
-            invalid={!!errors.name}
-            error="Name is required"
-          >
-            <Input {...register('name', { required: true })} id="name-input" />
-          </Field>
-
-          {contextSrv.licensedAccessControlEnabled() && canListRoles && (
-            <Field label="Role">
-              <TeamRolePicker teamId={team.id} roleOptions={roleOptions} disabled={!canUpdateRoles} maxWidth="100%" />
+        <FieldSet label={t('teams.team-settings.label-team-details', 'Team details')}>
+          <Stack direction="column" gap={2}>
+            <Field
+              noMargin
+              label={t('teams.team-settings.label-numerical-identifier', 'Numerical identifier')}
+              disabled={true}
+            >
+              <Input value={team.id} id="id-input" />
             </Field>
-          )}
+            <Field
+              noMargin
+              label={t('teams.team-settings.label-name', 'Name')}
+              disabled={!canWriteTeamSettings || !!team.isProvisioned}
+              required
+              invalid={!!errors.name}
+              error="Name is required"
+            >
+              <Input {...register('name', { required: true })} id="name-input" />
+            </Field>
 
-          <Field
-            label="Email"
-            description="This is optional and is primarily used to set the team profile avatar (via gravatar service)."
-            disabled={!canWriteTeamSettings}
-          >
-            <Input {...register('email')} placeholder="team@email.com" type="email" id="email-input" />
-          </Field>
-          <Button type="submit" disabled={!canWriteTeamSettings}>
-            Save
-          </Button>
+            {contextSrv.licensedAccessControlEnabled() && canListRoles && (
+              <Field noMargin label={t('teams.team-settings.label-role', 'Role')}>
+                <TeamRolePicker teamId={team.id} roleOptions={roleOptions} disabled={!canUpdateRoles} maxWidth="100%" />
+              </Field>
+            )}
+
+            <Field
+              noMargin
+              label={t('teams.team-settings.label-email', 'Email')}
+              description={t(
+                'teams.team-settings.description-email',
+                'This is optional and is primarily used to set the team profile avatar (via the Gravatar service)'
+              )}
+              disabled={!canWriteTeamSettings}
+            >
+              <Input
+                {...register('email')}
+                // eslint-disable-next-line @grafana/i18n/no-untranslated-strings
+                placeholder="team@email.com"
+                type="email"
+                id="email-input"
+              />
+            </Field>
+          </Stack>
         </FieldSet>
+        <Button type="submit" disabled={!canWriteTeamSettings}>
+          <Trans i18nKey="teams.team-settings.save">Save team details</Trans>
+        </Button>
       </form>
       <SharedPreferences resourceUri={`teams/${team.id}`} disabled={!canWriteTeamSettings} preferenceType="team" />
     </Stack>

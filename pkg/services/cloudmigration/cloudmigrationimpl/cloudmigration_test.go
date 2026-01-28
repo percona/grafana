@@ -14,16 +14,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/grafana/grafana/pkg/api/routing"
 	"github.com/grafana/grafana/pkg/bus"
-	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/httpclient"
 	"github.com/grafana/grafana/pkg/infra/kvstore"
 	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/plugins"
+	"github.com/grafana/grafana/pkg/services/accesscontrol/acimpl"
 	"github.com/grafana/grafana/pkg/services/accesscontrol/actest"
 	"github.com/grafana/grafana/pkg/services/annotations/annotationstest"
 	"github.com/grafana/grafana/pkg/services/cloudmigration"
@@ -41,6 +40,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
 	ngalertstore "github.com/grafana/grafana/pkg/services/ngalert/store"
 	ngalertfakes "github.com/grafana/grafana/pkg/services/ngalert/tests/fakes"
+	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginaccesscontrol"
 	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginsettings"
 	"github.com/grafana/grafana/pkg/services/pluginsintegration/pluginstore"
 	"github.com/grafana/grafana/pkg/services/quota/quotatest"
@@ -62,7 +62,7 @@ func Test_NoopServiceDoesNothing(t *testing.T) {
 func Test_CreateGetAndDeleteToken(t *testing.T) {
 	t.Parallel()
 
-	s := setUpServiceTest(t, false)
+	s := setUpServiceTest(t)
 
 	createResp, err := s.CreateToken(context.Background())
 	assert.NoError(t, err)
@@ -87,7 +87,7 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 	t.Parallel()
 
 	setupTest := func(ctx context.Context) (service *Service, snapshotUID string, sessionUID string) {
-		s := setUpServiceTest(t, false).(*Service)
+		s := setUpServiceTest(t).(*Service)
 
 		gmsClientFake := &gmsClientMock{}
 		s.gmsClient = gmsClientFake
@@ -102,14 +102,15 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		uid, err := s.store.CreateSnapshot(ctx, cloudmigration.CloudMigrationSnapshot{
-			UID:            "test uid",
+		uid := "test uid"
+
+		err = s.store.CreateSnapshot(ctx, cloudmigration.CloudMigrationSnapshot{
+			UID:            uid,
 			SessionUID:     sess.UID,
 			Status:         cloudmigration.SnapshotStatusCreating,
 			GMSSnapshotUID: "gms uid",
 		})
 		require.NoError(t, err)
-		assert.Equal(t, "test uid", uid)
 
 		// Make sure status is coming from the db only
 		snapshot, err := s.GetSnapshot(ctx, cloudmigration.GetSnapshotsQuery{
@@ -174,7 +175,7 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.Eventually(t, checkStatusSync(ctx, s, snapshotUID, sessionUID, cloudmigration.SnapshotStatusPendingProcessing), time.Second, 10*time.Millisecond)
-		require.Equal(t, 1, gmsClientFake.GetSnapshotStatusCallCount())
+		require.Eventually(t, gmsClientFake.ValidateSnapshotStatusCallCount, time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("test case: gms snapshot processing", func(t *testing.T) {
@@ -198,7 +199,7 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.Eventually(t, checkStatusSync(ctx, s, snapshotUID, sessionUID, cloudmigration.SnapshotStatusProcessing), time.Second, 10*time.Millisecond)
-		require.Equal(t, 1, gmsClientFake.GetSnapshotStatusCallCount())
+		require.Eventually(t, gmsClientFake.ValidateSnapshotStatusCallCount, time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("test case: gms snapshot finished", func(t *testing.T) {
@@ -222,7 +223,7 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.Eventually(t, checkStatusSync(ctx, s, snapshotUID, sessionUID, cloudmigration.SnapshotStatusFinished), time.Second, 10*time.Millisecond)
-		require.Equal(t, 1, gmsClientFake.GetSnapshotStatusCallCount())
+		require.Eventually(t, gmsClientFake.ValidateSnapshotStatusCallCount, time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("test case: gms snapshot canceled", func(t *testing.T) {
@@ -246,7 +247,7 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.Eventually(t, checkStatusSync(ctx, s, snapshotUID, sessionUID, cloudmigration.SnapshotStatusCanceled), time.Second, 10*time.Millisecond)
-		require.Equal(t, 1, gmsClientFake.GetSnapshotStatusCallCount())
+		require.Eventually(t, gmsClientFake.ValidateSnapshotStatusCallCount, time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("test case: gms snapshot error", func(t *testing.T) {
@@ -270,7 +271,7 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 		})
 		require.NoError(t, err)
 		require.Eventually(t, checkStatusSync(ctx, s, snapshotUID, sessionUID, cloudmigration.SnapshotStatusError), time.Second, 10*time.Millisecond)
-		assert.Equal(t, 1, gmsClientFake.GetSnapshotStatusCallCount())
+		require.Eventually(t, gmsClientFake.ValidateSnapshotStatusCallCount, time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("test case: gms snapshot unknown", func(t *testing.T) {
@@ -340,22 +341,30 @@ func Test_GetSnapshotStatusFromGMS(t *testing.T) {
 		require.NotNil(t, snapshot)
 		require.Eventually(t, func() bool { return gmsClientFake.GetSnapshotStatusCallCount() == 1 }, time.Second, 10*time.Millisecond)
 
-		snapshot, err = s.GetSnapshot(context.Background(), cloudmigration.GetSnapshotsQuery{
-			SnapshotUID: snapshotUID,
-			SessionUID:  sessionUID,
-		})
-		require.NoError(t, err)
-		require.NotNil(t, snapshot)
-		require.Len(t, snapshot.Resources, 1)
-		require.Equal(t, "A", snapshot.Resources[0].RefID)
-		require.Equal(t, "fake", snapshot.Resources[0].Error)
+		require.EventuallyWithTf(t, func(t *assert.CollectT) {
+			snapshot, err := s.GetSnapshot(context.Background(), cloudmigration.GetSnapshotsQuery{
+				SnapshotUID: snapshotUID,
+				SessionUID:  sessionUID,
+				SnapshotResultQueryParams: cloudmigration.SnapshotResultQueryParams{
+					ResultLimit: 10,
+					ResultPage:  1,
+					SortColumn:  cloudmigration.SortColumnID,
+					SortOrder:   cloudmigration.SortOrderAsc,
+				},
+			})
+			assert.NoError(t, err)
+			assert.NotNil(t, snapshot)
+			assert.Len(t, snapshot.Resources, 1)
+			assert.Equal(t, "A", snapshot.Resources[0].RefID)
+			assert.Equal(t, "fake", snapshot.Resources[0].Error)
+		}, 5*time.Second, 100*time.Millisecond, "DB wasn't applied to local snapshot in time")
 	})
 }
 
 func Test_OnlyQueriesStatusFromGMSWhenRequired(t *testing.T) {
 	t.Parallel()
 
-	s := setUpServiceTest(t, false).(*Service)
+	s := setUpServiceTest(t).(*Service)
 
 	gmsClientMock := &gmsClientMock{
 		getSnapshotResponse: &cloudmigration.GetSnapshotStatusResponse{
@@ -374,8 +383,9 @@ func Test_OnlyQueriesStatusFromGMSWhenRequired(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	uid, err := s.store.CreateSnapshot(context.Background(), cloudmigration.CloudMigrationSnapshot{
-		UID:            uuid.NewString(),
+	uid := uuid.NewString()
+	err = s.store.CreateSnapshot(context.Background(), cloudmigration.CloudMigrationSnapshot{
+		UID:            uid,
 		SessionUID:     sess.UID,
 		Status:         cloudmigration.SnapshotStatusCreating,
 		GMSSnapshotUID: "gms uid",
@@ -416,40 +426,30 @@ func Test_OnlyQueriesStatusFromGMSWhenRequired(t *testing.T) {
 			Status:    status,
 		})
 		assert.NoError(t, err)
-		_, err := s.GetSnapshot(context.Background(), cloudmigration.GetSnapshotsQuery{
+		snapshot, err := s.GetSnapshot(context.Background(), cloudmigration.GetSnapshotsQuery{
 			SnapshotUID: uid,
 			SessionUID:  sess.UID,
 		})
 		assert.NoError(t, err)
-		require.Eventually(t, func() bool { return gmsClientMock.GetSnapshotStatusCallCount() == i+1 }, time.Second, 10*time.Millisecond)
+		assert.Equal(t, status, snapshot.Status)
+
+		require.Eventually(
+			t,
+			func() bool { return gmsClientMock.GetSnapshotStatusCallCount() == i+1 },
+			5*time.Second,
+			100*time.Millisecond,
+			"GMS client mock GetSnapshotStatus count: %d on status: %s (want: %d)",
+			gmsClientMock.GetSnapshotStatusCallCount(), string(status), i+1,
+		)
 	}
-	assert.Never(t, func() bool { return gmsClientMock.GetSnapshotStatusCallCount() > 2 }, time.Second, 10*time.Millisecond)
-}
 
-func Test_DeletedDashboardsNotMigrated(t *testing.T) {
-	t.Parallel()
-
-	s := setUpServiceTest(t, false).(*Service)
-
-	// modify what the mock returns for just this test case
-	dashMock := s.dashboardService.(*dashboards.FakeDashboardService)
-	dashMock.On("GetAllDashboardsByOrgId", mock.Anything, int64(1)).Return(
-		[]*dashboards.Dashboard{
-			{UID: "1", OrgID: 1, Data: simplejson.New()},
-			{UID: "2", OrgID: 1, Data: simplejson.New(), Deleted: time.Now()},
-		},
-		nil,
+	assert.Never(
+		t,
+		func() bool { return gmsClientMock.GetSnapshotStatusCallCount() > 2 },
+		5*time.Second,
+		100*time.Millisecond,
+		"GMS client mock GetSnapshotStatus called more than expected: %d times", gmsClientMock.GetSnapshotStatusCallCount(),
 	)
-
-	data, err := s.getMigrationDataJSON(context.TODO(), &user.SignedInUser{OrgID: 1})
-	assert.NoError(t, err)
-	dashCount := 0
-	for _, it := range data.Items {
-		if it.Type == cloudmigration.DashboardDataType {
-			dashCount++
-		}
-	}
-	assert.Equal(t, 1, dashCount)
 }
 
 // Implementation inspired by ChatGPT, OpenAI's language model.
@@ -478,7 +478,7 @@ func Test_SortFolders(t *testing.T) {
 func TestDeleteSession(t *testing.T) {
 	t.Parallel()
 
-	s := setUpServiceTest(t, false).(*Service)
+	s := setUpServiceTest(t).(*Service)
 	user := &user.SignedInUser{UserUID: "user123"}
 
 	t.Run("when deleting a session that does not exist in the database, it returns an error", func(t *testing.T) {
@@ -530,7 +530,7 @@ func TestReportEvent(t *testing.T) {
 
 		gmsMock := &gmsClientMock{}
 
-		s := setUpServiceTest(t, false).(*Service)
+		s := setUpServiceTest(t).(*Service)
 		s.gmsClient = gmsMock
 
 		require.NotPanics(t, func() {
@@ -548,7 +548,7 @@ func TestReportEvent(t *testing.T) {
 
 		gmsMock := &gmsClientMock{}
 
-		s := setUpServiceTest(t, false).(*Service)
+		s := setUpServiceTest(t).(*Service)
 		s.gmsClient = gmsMock
 
 		require.NotPanics(t, func() {
@@ -562,7 +562,7 @@ func TestReportEvent(t *testing.T) {
 func TestGetFolderNamesForFolderUIDs(t *testing.T) {
 	t.Parallel()
 
-	s := setUpServiceTest(t, false).(*Service)
+	s := setUpServiceTest(t).(*Service)
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -628,69 +628,99 @@ func TestGetFolderNamesForFolderUIDs(t *testing.T) {
 func TestGetParentNames(t *testing.T) {
 	t.Parallel()
 
-	s := setUpServiceTest(t, false).(*Service)
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
+	s := setUpServiceTest(t).(*Service)
+
 	user := &user.SignedInUser{OrgID: 1}
-	libraryElementFolderUID := "folderUID-A"
+
 	testcases := []struct {
+		name                string
 		fakeFolders         []*folder.Folder
-		folders             []folder.CreateFolderCommand
-		dashboards          []dashboards.Dashboard
-		libraryElements     []libraryElement
-		alertRules          []alertRule
-		expectedParentNames map[cloudmigration.MigrateDataType][]string
+		folderHierarchy     map[cloudmigration.MigrateDataType]map[string]string
+		expectedParentNames map[cloudmigration.MigrateDataType]map[string]string
 	}{
 		{
+			name: "multiple data types",
 			fakeFolders: []*folder.Folder{
-				{UID: "folderUID-A", Title: "Folder A", OrgID: 1, ParentUID: ""},
-				{UID: "folderUID-B", Title: "Folder B", OrgID: 1, ParentUID: "folderUID-A"},
-				{UID: "folderUID-X", Title: "Folder X", OrgID: 1, ParentUID: ""},
+				{UID: "folderUID-A", Title: "Folder A", OrgID: 1},
+				{UID: "folderUID-B", Title: "Folder B", OrgID: 1},
+				{UID: "folderUID-C", Title: "Folder C", OrgID: 1},
 			},
-			folders: []folder.CreateFolderCommand{
-				{UID: "folderUID-C", Title: "Folder A", OrgID: 1, ParentUID: "folderUID-A"},
+			folderHierarchy: map[cloudmigration.MigrateDataType]map[string]string{
+				cloudmigration.DashboardDataType:      {"dashboard-1": "folderUID-A", "dashboard-2": "folderUID-B", "dashboard-3": ""},
+				cloudmigration.LibraryElementDataType: {"libElement-1": "folderUID-A", "libElement-2": "folderUID-C"},
+				cloudmigration.AlertRuleType:          {"alertRule-1": "folderUID-B"},
 			},
-			dashboards: []dashboards.Dashboard{
-				{UID: "dashboardUID-0", OrgID: 1, FolderUID: ""},
-				{UID: "dashboardUID-1", OrgID: 1, FolderUID: "folderUID-A"},
-				{UID: "dashboardUID-2", OrgID: 1, FolderUID: "folderUID-B"},
+			expectedParentNames: map[cloudmigration.MigrateDataType]map[string]string{
+				cloudmigration.DashboardDataType:      {"dashboard-1": "Folder A", "dashboard-2": "Folder B", "dashboard-3": ""},
+				cloudmigration.LibraryElementDataType: {"libElement-1": "Folder A", "libElement-2": "Folder C"},
+				cloudmigration.AlertRuleType:          {"alertRule-1": "Folder B"},
 			},
-			libraryElements: []libraryElement{
-				{UID: "libraryElementUID-0", FolderUID: &libraryElementFolderUID},
-				{UID: "libraryElementUID-1"},
+		},
+		{
+			name: "empty folder hierarchy",
+			fakeFolders: []*folder.Folder{
+				{UID: "folderUID-A", Title: "Folder A", OrgID: 1},
 			},
-			alertRules: []alertRule{
-				{UID: "alertRuleUID-0", FolderUID: ""},
-				{UID: "alertRuleUID-1", FolderUID: "folderUID-B"},
+			folderHierarchy:     map[cloudmigration.MigrateDataType]map[string]string{},
+			expectedParentNames: map[cloudmigration.MigrateDataType]map[string]string{},
+		},
+		{
+			name: "all root folders (no parents)",
+			fakeFolders: []*folder.Folder{
+				{UID: "folderUID-A", Title: "Folder A", OrgID: 1},
 			},
-			expectedParentNames: map[cloudmigration.MigrateDataType][]string{
-				cloudmigration.DashboardDataType:      {"", "Folder A", "Folder B"},
-				cloudmigration.FolderDataType:         {"Folder A"},
-				cloudmigration.LibraryElementDataType: {"Folder A"},
-				cloudmigration.AlertRuleType:          {"Folder B"},
+			folderHierarchy: map[cloudmigration.MigrateDataType]map[string]string{
+				cloudmigration.DashboardDataType:      {"dashboard-1": "", "dashboard-2": ""},
+				cloudmigration.LibraryElementDataType: {"libElement-1": ""},
+			},
+			expectedParentNames: map[cloudmigration.MigrateDataType]map[string]string{
+				cloudmigration.DashboardDataType:      {"dashboard-1": "", "dashboard-2": ""},
+				cloudmigration.LibraryElementDataType: {"libElement-1": ""},
+			},
+		},
+		{
+			name: "non-existent folder UIDs",
+			fakeFolders: []*folder.Folder{
+				{UID: "folderUID-A", Title: "Folder A", OrgID: 1},
+			},
+			folderHierarchy: map[cloudmigration.MigrateDataType]map[string]string{
+				cloudmigration.DashboardDataType: {"dashboard-1": "folderUID-A", "dashboard-2": "non-existent-uid"},
+			},
+			expectedParentNames: map[cloudmigration.MigrateDataType]map[string]string{
+				cloudmigration.DashboardDataType: {"dashboard-1": "Folder A", "dashboard-2": ""},
 			},
 		},
 	}
 
 	for _, tc := range testcases {
-		s.folderService = &foldertest.FakeService{ExpectedFolders: tc.fakeFolders}
+		t.Run(tc.name, func(t *testing.T) {
+			s.folderService = &foldertest.FakeService{ExpectedFolders: tc.fakeFolders}
 
-		dataUIDsToParentNamesByType, err := s.getParentNames(ctx, user, tc.dashboards, tc.folders, tc.libraryElements, tc.alertRules)
-		require.NoError(t, err)
+			dataUIDsToParentNamesByType, err := s.getParentNames(ctx, user, tc.folderHierarchy)
+			require.NoError(t, err)
 
-		for dataType, expectedParentNames := range tc.expectedParentNames {
-			actualParentNames := slices.Collect(maps.Values(dataUIDsToParentNamesByType[dataType]))
-			require.Len(t, actualParentNames, len(expectedParentNames))
-			require.ElementsMatch(t, expectedParentNames, actualParentNames)
-		}
+			for dataType, expectedParentNames := range tc.expectedParentNames {
+				actualParentNames := dataUIDsToParentNamesByType[dataType]
+
+				require.Equal(t, len(expectedParentNames), len(actualParentNames))
+
+				for uid, expectedName := range expectedParentNames {
+					actualName, exists := actualParentNames[uid]
+					require.True(t, exists)
+					require.Equal(t, expectedName, actualName)
+				}
+			}
+		})
 	}
 }
 
 func TestGetLibraryElementsCommands(t *testing.T) {
 	t.Parallel()
 
-	s := setUpServiceTest(t, false).(*Service)
+	s := setUpServiceTest(t).(*Service)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
@@ -756,12 +786,20 @@ func TestIsPublicSignatureType(t *testing.T) {
 func TestGetPlugins(t *testing.T) {
 	t.Parallel()
 
-	s := setUpServiceTest(t, false).(*Service)
+	s := setUpServiceTest(t).(*Service)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	user := &user.SignedInUser{OrgID: 1}
+	user := &user.SignedInUser{
+		OrgID: 1,
+		Permissions: map[int64]map[string][]string{
+			1: {
+				pluginaccesscontrol.ActionInstall: {pluginaccesscontrol.ScopeProvider.GetResourceAllScope()},
+				pluginaccesscontrol.ActionWrite:   {pluginaccesscontrol.ScopeProvider.GetResourceAllScope()},
+			},
+		},
+	}
 
 	s.pluginStore = pluginstore.NewFakePluginStore([]pluginstore.Plugin{
 		{
@@ -854,16 +892,14 @@ func TestGetPlugins(t *testing.T) {
 
 type configOverrides func(c *setting.Cfg)
 
-func setUpServiceTest(t *testing.T, withDashboardMock bool, cfgOverrides ...configOverrides) cloudmigration.Service {
+func setUpServiceTest(t *testing.T, cfgOverrides ...configOverrides) cloudmigration.Service {
 	secretsService := secretsfakes.NewFakeSecretsService()
 	rr := routing.NewRouteRegister()
 	tracer := tracing.InitializeTracerForTest()
 
-	fakeFolder := &folder.Folder{UID: "folderUID", Title: "Folder"}
-	mockFolder := &foldertest.FakeService{
-		ExpectedFolders: []*folder.Folder{fakeFolder},
-		ExpectedFolder:  fakeFolder,
-	}
+	fakeFolder := &folder.Folder{UID: "folderUID", Title: "Folder", Fullpath: "Folder"}
+	mockFolder := foldertest.NewFakeService()
+	mockFolder.AddFolder(fakeFolder)
 
 	cfg := setting.NewCfg()
 	section, err := cfg.Raw.NewSection("cloud_migration")
@@ -875,17 +911,6 @@ func setUpServiceTest(t *testing.T, withDashboardMock bool, cfgOverrides ...conf
 	cfg.CloudMigration.SnapshotFolder = filepath.Join(os.TempDir(), uuid.NewString())
 
 	dashboardService := dashboards.NewFakeDashboardService(t)
-	if withDashboardMock {
-		dashboardService.On("GetAllDashboards", mock.Anything).Return(
-			[]*dashboards.Dashboard{
-				{
-					UID:  "1",
-					Data: simplejson.New(),
-				},
-			},
-			nil,
-		)
-	}
 
 	dsService := &datafakes.FakeDataSourceService{
 		DataSources: []*datasources.DataSource{
@@ -896,35 +921,34 @@ func setUpServiceTest(t *testing.T, withDashboardMock bool, cfgOverrides ...conf
 
 	featureToggles := featuremgmt.WithFeatures(
 		featuremgmt.FlagOnPremToCloudMigrations,
-		featuremgmt.FlagDashboardRestore, // needed for skipping creating soft-deleted dashboards in the snapshot.
 	)
 
 	sqlStore := sqlstore.NewTestStore(t,
 		sqlstore.WithCfg(cfg),
 		sqlstore.WithFeatureFlags(
 			featuremgmt.FlagOnPremToCloudMigrations,
-			featuremgmt.FlagDashboardRestore, // needed for skipping creating soft-deleted dashboards in the snapshot.
 		),
 	)
 
 	kvStore := kvstore.ProvideService(sqlStore)
 
 	bus := bus.ProvideBus(tracer)
-	fakeAccessControl := actest.FakeAccessControl{ExpectedEvaluate: true}
+
+	accessControl := acimpl.ProvideAccessControl(featureToggles)
 	fakeAccessControlService := actest.FakeService{}
 	alertMetrics := metrics.NewNGAlert(prometheus.NewRegistry())
 
 	cfg.UnifiedAlerting.DefaultRuleEvaluationInterval = time.Minute
 	cfg.UnifiedAlerting.BaseInterval = time.Minute
 	cfg.UnifiedAlerting.InitializationTimeout = 30 * time.Second
-	ruleStore, err := ngalertstore.ProvideDBStore(cfg, featureToggles, sqlStore, mockFolder, dashboardService, fakeAccessControl, bus)
+	ruleStore, err := ngalertstore.ProvideDBStore(cfg, featureToggles, sqlStore, mockFolder, dashboardService, accessControl, bus)
 	require.NoError(t, err)
 
 	ng, err := ngalert.ProvideService(
 		cfg, featureToggles, nil, nil, rr, sqlStore, kvStore, nil, nil, quotatest.New(false, nil),
-		secretsService, nil, alertMetrics, mockFolder, fakeAccessControl, dashboardService, nil, bus, fakeAccessControlService,
+		secretsService, nil, alertMetrics, mockFolder, accessControl, dashboardService, nil, bus, fakeAccessControlService,
 		annotationstest.NewFakeAnnotationsRepo(), &pluginstore.FakePluginStore{}, tracer, ruleStore,
-		httpclient.NewProvider(), ngalertfakes.NewFakeReceiverPermissionsService(), usertest.NewUserServiceFake(),
+		httpclient.NewProvider(), nil, ngalertfakes.NewFakeReceiverPermissionsService(), usertest.NewUserServiceFake(),
 	)
 	require.NoError(t, err)
 
@@ -986,7 +1010,7 @@ func setUpServiceTest(t *testing.T, withDashboardMock bool, cfgOverrides ...conf
 		mockFolder,
 		&pluginstore.FakePluginStore{},
 		&pluginsettings.FakePluginSettings{},
-		actest.FakeAccessControl{ExpectedEvaluate: true},
+		accessControl,
 		fakeAccessControlService,
 		kvstore.ProvideService(sqlStore),
 		&libraryelementsfake.LibraryElementService{},
@@ -1048,4 +1072,8 @@ func (m *gmsClientMock) GetSnapshotStatusCallCount() int {
 	defer m.mu.RUnlock()
 
 	return m.getStatusCalled
+}
+
+func (m *gmsClientMock) ValidateSnapshotStatusCallCount() bool {
+	return m.GetSnapshotStatusCallCount() >= 1
 }

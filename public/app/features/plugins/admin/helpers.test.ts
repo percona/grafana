@@ -1,7 +1,6 @@
-import { PluginSignatureStatus, PluginSignatureType, PluginType } from '@grafana/data';
+import { PluginErrorCode, PluginSignatureStatus, PluginSignatureType, PluginType } from '@grafana/data';
 import { config } from '@grafana/runtime';
 
-import { getLocalPluginMock, getRemotePluginMock, getCatalogPluginMock } from './__mocks__';
 import {
   mapToCatalogPlugin,
   mapRemoteToCatalog,
@@ -12,8 +11,11 @@ import {
   Sorters,
   isLocalPluginVisibleByConfig,
   isRemotePluginVisibleByConfig,
+  isNonAngularVersion,
+  isDisabledAngularPlugin,
 } from './helpers';
-import { RemotePlugin, LocalPlugin, RemotePluginStatus } from './types';
+import { getLocalPluginMock, getRemotePluginMock, getCatalogPluginMock } from './mocks/mockHelpers';
+import { RemotePlugin, LocalPlugin, RemotePluginStatus, Version, CatalogPlugin } from './types';
 
 describe('Plugins/Helpers', () => {
   let remotePlugin: RemotePlugin;
@@ -153,6 +155,29 @@ describe('Plugins/Helpers', () => {
       expect(merged).toHaveLength(1);
       expect(findMerged(pluginId)).not.toBeUndefined();
       expect(findMerged(pluginId)?.hasUpdate).toBe(true);
+
+      config.pluginAdminExternalManageEnabled = oldPluginAdminExternalManageEnabled;
+    });
+
+    test('local plugins without remote counterpart should also also have isProvisioned correctly added', () => {
+      const oldPluginAdminExternalManageEnabled = config.pluginAdminExternalManageEnabled;
+
+      config.pluginAdminExternalManageEnabled = true;
+
+      const merged = mergeLocalsAndRemotes({
+        local: localPlugins,
+        remote: [],
+        provisioned: [{ slug: localPlugins[0].id }],
+      });
+      const findMerged = (mergedId: string) => merged.find(({ id }) => id === mergedId);
+
+      expect(merged).toHaveLength(localPlugins.length);
+      expect(findMerged(localPlugins[0].id)).not.toBeUndefined();
+      expect(findMerged(localPlugins[0].id)?.isProvisioned).toBe(true);
+      expect(findMerged(localPlugins[1].id)).not.toBeUndefined();
+      expect(findMerged(localPlugins[1].id)?.isProvisioned).toBe(false);
+      expect(findMerged(localPlugins[2].id)).not.toBeUndefined();
+      expect(findMerged(localPlugins[2].id)?.isProvisioned).toBe(false);
 
       config.pluginAdminExternalManageEnabled = oldPluginAdminExternalManageEnabled;
     });
@@ -874,6 +899,37 @@ describe('Plugins/Helpers', () => {
       });
 
       expect(isRemotePluginVisibleByConfig(plugin)).toBe(false);
+    });
+  });
+
+  describe('isNonAngularVersion()', () => {
+    test('should return TRUE if the version is not using angular', () => {
+      expect(isNonAngularVersion({ angularDetected: false } as Version)).toBe(true);
+    });
+
+    test('should return FALSE if the version is using angular', () => {
+      expect(isNonAngularVersion({ angularDetected: true } as Version)).toBe(false);
+    });
+
+    test('should return FALSE if the version is not set', () => {
+      expect(isNonAngularVersion(undefined)).toBe(false);
+    });
+  });
+
+  describe('isDisabledAngularPlugin', () => {
+    it('should return true for disabled angular plugins', () => {
+      const plugin = { isDisabled: true, error: PluginErrorCode.angular } as CatalogPlugin;
+      expect(isDisabledAngularPlugin(plugin)).toBe(true);
+    });
+
+    it('should return false for non-angular plugins', () => {
+      const plugin = { isDisabled: true, error: undefined } as CatalogPlugin;
+      expect(isDisabledAngularPlugin(plugin)).toBe(false);
+    });
+
+    it('should return false for plugins that are not disabled', () => {
+      const plugin = { isDisabled: false, error: undefined } as CatalogPlugin;
+      expect(isDisabledAngularPlugin(plugin)).toBe(false);
     });
   });
 });

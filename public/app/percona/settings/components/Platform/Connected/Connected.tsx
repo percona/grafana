@@ -11,7 +11,7 @@ import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { fetchServerInfoAction, fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaServer, getPerconaUser } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
-import { useDispatch, useSelector } from 'app/types';
+import { useDispatch, useSelector } from 'app/types/store';
 
 import { Messages as PlatformMessages } from '../Platform.messages';
 import { PlatformService } from '../Platform.service';

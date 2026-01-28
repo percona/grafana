@@ -3,9 +3,9 @@ import * as React from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
 import { Icon, IconButton, Link, useTheme2 } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
 import { contextSrv } from 'app/core/services/context_srv';
 import { useLinkWithVariables } from 'app/percona/shared/helpers/navigation';
 
@@ -21,6 +21,7 @@ export interface Props {
 
 export function MegaMenuItemText({ children, isActive, onClick, target, url, onPin, isPinned }: Props) {
   const theme = useTheme2();
+
   const styles = getStyles(theme, isActive);
   const LinkComponent = !target && url.startsWith('/') ? Link : 'a';
   // @PERCONA
@@ -126,7 +127,6 @@ const getStyles = (theme: GrafanaTheme2, isActive: Props['isActive']) => ({
       boxShadow: 'none',
       outline: `2px solid ${theme.colors.primary.main}`,
       outlineOffset: '-2px',
-      transition: 'none',
     },
   }),
   linkContent: css({

@@ -129,6 +129,11 @@ export enum AccessControlAction {
   AlertingProvisioningReadSecrets = 'alert.provisioning.secrets:read',
   AlertingProvisioningRead = 'alert.provisioning:read',
   AlertingProvisioningWrite = 'alert.provisioning:write',
+  AlertingRulesProvisioningRead = 'alert.rules.provisioning:read',
+  AlertingRulesProvisioningWrite = 'alert.rules.provisioning:write',
+  AlertingNotificationsProvisioningRead = 'alert.notifications.provisioning:read',
+  AlertingNotificationsProvisioningWrite = 'alert.notifications.provisioning:write',
+  AlertingProvisioningSetStatus = 'alert.provisioning.provenance:write',
 
   // Alerting receivers actions
   AlertingReceiversPermissionsRead = 'receivers.permissions:read',
@@ -136,6 +141,7 @@ export enum AccessControlAction {
   AlertingReceiversCreate = 'alert.notifications.receivers:create',
   AlertingReceiversWrite = 'alert.notifications.receivers:write',
   AlertingReceiversRead = 'alert.notifications.receivers:read',
+  AlertingReceiversUpdateProtected = 'alert.notifications.receivers.protected:write',
 
   // Alerting routes actions
   AlertingRoutesRead = 'alert.notifications.routes:read',
@@ -149,10 +155,6 @@ export enum AccessControlAction {
   AlertingTemplatesRead = 'alert.notifications.templates:read',
   AlertingTemplatesWrite = 'alert.notifications.templates:write',
   AlertingTemplatesDelete = 'alert.notifications.templates:delete',
-
-  ActionAPIKeysRead = 'apikeys:read',
-  ActionAPIKeysCreate = 'apikeys:create',
-  ActionAPIKeysDelete = 'apikeys:delete',
 
   PluginsInstall = 'plugins:install',
   PluginsWrite = 'plugins:write',
@@ -173,6 +175,7 @@ export interface Role {
   uid: string;
   name: string;
   displayName: string;
+  filteredDisplayName: string; // name to be shown in filtered role list
   description: string;
   group: string;
   global: boolean;

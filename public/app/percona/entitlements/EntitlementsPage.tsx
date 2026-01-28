@@ -1,11 +1,10 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 
-import { useStyles2 } from '@grafana/ui';
-import { CollapsableSection } from '@grafana/ui/src/components';
+import { CollapsableSection, useStyles2 } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { Overlay } from 'app/percona/shared/components/Elements/Overlay';
 import { logger } from 'app/percona/shared/helpers/logger';
-import { StoreState, useSelector } from 'app/types';
+import { StoreState, useSelector } from 'app/types/store';
 
 import { PlatformConnectedLoader } from '../shared/components/Elements/PlatformConnectedLoader';
 import { PMM_ENTITLEMENTS_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation';

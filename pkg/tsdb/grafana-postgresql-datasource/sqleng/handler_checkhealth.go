@@ -63,6 +63,7 @@ func ErrToHealthCheckResult(err error) (*backend.CheckHealthResult, error) {
 			res.Message += fmt.Sprintf(". Error message: %s", errMessage)
 		}
 	}
+
 	if errors.Is(err, pq.ErrSSLNotSupported) {
 		res.Message = "SSL error: Failed to connect to the server"
 	}
@@ -79,6 +80,12 @@ func ErrToHealthCheckResult(err error) (*backend.CheckHealthResult, error) {
 				res.Message += fmt.Sprintf(". Postgres error code: %s", pqErr.Code.Name())
 			}
 			details["verboseMessage"] = pqErr.Message
+		}
+	}
+	if errors.Is(err, ErrParsingPostgresURL) {
+		res.Message = fmt.Sprintf("Connection string error: %s", ErrParsingPostgresURL.Error())
+		if unwrappedErr := errors.Unwrap(err); unwrappedErr != nil {
+			details["verboseMessage"] = unwrappedErr.Error()
 		}
 	}
 	detailBytes, marshalErr := json.Marshal(details)
@@ -119,10 +126,10 @@ func logCheckHealthError(ctx context.Context, dsInfo DataSourceInfo, err error) 
 		"config_tls_client_cert_length":     len(dsInfo.DecryptedSecureJSONData["tlsClientCert"]),
 		"config_tls_client_key_length":      len(dsInfo.DecryptedSecureJSONData["tlsClientKey"]),
 	}
-	configSummaryJson, marshalError := json.Marshal(configSummary)
+	configSummaryJSON, marshalError := json.Marshal(configSummary)
 	if marshalError != nil {
 		logger.Error("Check health failed", "error", err, "message_type", "ds_config_health_check_error")
 		return
 	}
-	logger.Error("Check health failed", "error", err, "message_type", "ds_config_health_check_error_detailed", "details", string(configSummaryJson))
+	logger.Error("Check health failed", "error", err, "message_type", "ds_config_health_check_error_detailed", "details", string(configSummaryJSON))
 }

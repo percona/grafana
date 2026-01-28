@@ -10,7 +10,7 @@ import {
 } from 'app/percona/pmm-dump/PmmDump.types';
 import { PmmDumpState, LogsActionProps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
 import { mapDumps, mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
-import { createAsyncThunk } from 'app/types';
+import { createAsyncThunk } from 'app/types/store';
 
 const initialState: PmmDumpState = {
   isLoading: false,

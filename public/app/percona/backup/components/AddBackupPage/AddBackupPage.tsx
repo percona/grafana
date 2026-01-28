@@ -26,7 +26,7 @@ import { apiErrorParser, isApiCancelError } from 'app/percona/shared/helpers/api
 import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { PageSwitcherCard } from '../../../shared/components/Elements/PageSwitcherCard/PageSwitcherCard';
 import { BACKUP_INVENTORY_URL, BACKUP_SCHEDULED_URL } from '../../Backup.constants';
@@ -358,7 +358,6 @@ const AddBackupPage: FC = () => {
                             label={Messages.advanceSettings}
                             isOpen={advancedSectionOpen}
                             onToggle={onToggle}
-                            controlled
                             buttonDataTestId="add-backup-advanced-settings"
                           >
                             <RetryModeSelector retryMode={values.retryMode} />

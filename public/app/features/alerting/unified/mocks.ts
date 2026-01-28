@@ -9,10 +9,10 @@ import {
   PluginExtensionTypes,
   ReducerID,
 } from '@grafana/data';
-import { config } from '@grafana/runtime';
-import { defaultDashboard } from '@grafana/schema';
+import { DataQuery, defaultDashboard } from '@grafana/schema';
 import { contextSrv } from 'app/core/services/context_srv';
 import { MOCK_GRAFANA_ALERT_RULE_TITLE } from 'app/features/alerting/unified/mocks/server/handlers/grafanaRuler';
+import { NotifiersState, ReceiversState } from 'app/features/alerting/unified/types/alerting';
 import { ExpressionQuery, ExpressionQueryType, ReducerMode } from 'app/features/expressions/types';
 import {
   AlertManagerCortexConfig,
@@ -26,7 +26,10 @@ import {
   SilenceState,
 } from 'app/plugins/datasource/alertmanager/types';
 import { configureStore } from 'app/store/configureStore';
-import { AccessControlAction, DashboardDTO, FolderDTO, NotifiersState, ReceiversState, StoreState } from 'app/types';
+import { AccessControlAction } from 'app/types/accessControl';
+import { DashboardDTO } from 'app/types/dashboard';
+import { FolderDTO } from 'app/types/folders';
+import { StoreState } from 'app/types/store';
 import {
   Alert,
   AlertingRule,
@@ -43,6 +46,7 @@ import {
   AlertQuery,
   GrafanaAlertState,
   GrafanaAlertStateDecision,
+  GrafanaPromAlertingRuleDTO,
   GrafanaRuleDefinition,
   PromAlertingRuleState,
   PromRuleType,
@@ -56,7 +60,6 @@ import {
 
 import { DashboardSearchItem, DashboardSearchItemType } from '../../search/types';
 
-import { SimpleConditionIdentifier } from './components/rule-editor/query-and-alert-condition/SimpleCondition';
 import { GRAFANA_RULES_SOURCE_NAME } from './utils/datasource';
 import { parsePromQLStyleMatcherLooseSafe } from './utils/matchers';
 
@@ -125,7 +128,7 @@ export const mockRulerGrafanaRule = (
           datasourceUid: '123',
           refId: 'A',
           queryType: 'huh',
-          model: {} as any,
+          model: {} as unknown as DataQuery,
         },
       ],
       ...partialDef,
@@ -219,6 +222,20 @@ export const mockPromAlertingRule = (partial: Partial<AlertingRule> = {}): Alert
     },
     state: PromAlertingRuleState.Firing,
     health: 'OK',
+    totalsFiltered: { alerting: 1 },
+    ...partial,
+  };
+};
+
+export const mockGrafanaPromAlertingRule = (
+  partial: Partial<GrafanaPromAlertingRuleDTO> = {}
+): GrafanaPromAlertingRuleDTO => {
+  return {
+    ...mockPromAlertingRule(),
+    uid: 'mock-rule-uid-123',
+    folderUid: 'NAMESPACE_UID',
+    isPaused: false,
+    totals: { alerting: 1 },
     totalsFiltered: { alerting: 1 },
     ...partial,
   };
@@ -320,7 +337,7 @@ export const mockSilence = (partial: Partial<Silence> = {}): Silence => {
     startsAt: new Date().toISOString(),
     endsAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
     updatedAt: new Date().toISOString(),
-    createdBy: config.bootData.user.name || 'admin',
+    createdBy: contextSrv.user.name || 'admin',
     comment: 'Silence noisy alerts',
     status: {
       state: SilenceState.Active,
@@ -627,7 +644,7 @@ export const grantUserPermissions = (permissions: AccessControlAction[]) => {
 };
 
 export const grantUserRole = (role: string) => {
-  jest.spyOn(contextSrv, 'hasRole').mockReturnValue(true);
+  jest.spyOn(contextSrv, 'hasRole').mockImplementation((checkRole) => checkRole === role);
 };
 
 export function mockUnifiedAlertingStore(unifiedAlerting?: Partial<StoreState['unifiedAlerting']>) {
@@ -772,30 +789,65 @@ export function mockDashboardDto(
   };
 }
 
-export const dataQuery: AlertQuery<AlertDataQuery | ExpressionQuery> = {
-  refId: SimpleConditionIdentifier.queryId,
+export const mockDataQuery = (partial: Partial<AlertDataQuery> = {}): AlertQuery<AlertDataQuery> => ({
+  refId: partial?.refId ?? 'A',
   datasourceUid: 'abc123',
   queryType: '',
-  model: { refId: SimpleConditionIdentifier.queryId },
-};
+  model: { refId: 'A', ...partial },
+});
 
-export const reduceExpression: AlertQuery<ExpressionQuery> = {
-  refId: SimpleConditionIdentifier.reducerId,
+export const mockReduceExpression = (partial: Partial<ExpressionQuery> = {}): AlertQuery<ExpressionQuery> => ({
+  refId: 'B',
   queryType: 'expression',
   datasourceUid: '__expr__',
   model: {
     type: ExpressionQueryType.reduce,
-    refId: SimpleConditionIdentifier.reducerId,
+    refId: 'B',
     settings: { mode: ReducerMode.Strict },
     reducer: ReducerID.last,
+    ...partial,
   },
-};
-export const thresholdExpression: AlertQuery<ExpressionQuery> = {
-  refId: SimpleConditionIdentifier.thresholdId,
+});
+
+export const mockThresholdExpression = (partial: Partial<ExpressionQuery> = {}): AlertQuery<ExpressionQuery> => ({
+  refId: 'C',
   queryType: 'expression',
   datasourceUid: '__expr__',
   model: {
     type: ExpressionQueryType.threshold,
-    refId: SimpleConditionIdentifier.thresholdId,
+    refId: 'C',
+    ...partial,
   },
-};
+});
+
+class LocalStorageMock implements Storage {
+  [key: string]: any;
+
+  getItem(key: string) {
+    return this[key] ?? null;
+  }
+
+  setItem(key: string, value: string) {
+    this[key] = value;
+  }
+
+  clear() {
+    Object.keys(this).forEach((key) => delete this[key]);
+  }
+
+  removeItem(key: string) {
+    delete this[key];
+  }
+
+  key(index: number) {
+    return Object.keys(this)[index] ?? null;
+  }
+
+  get length() {
+    return Object.keys(this).length;
+  }
+}
+
+export function mockLocalStorage(): Storage {
+  return new LocalStorageMock();
+}

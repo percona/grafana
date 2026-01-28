@@ -5,7 +5,7 @@ import { useGrafana } from 'app/core/context/GrafanaContext';
 import * as TourActions from 'app/percona/shared/core/reducers/tour';
 import { TourStep, TourType } from 'app/percona/shared/core/reducers/tour';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { waitForVisible } from '../../helpers/observer';
 import { getTour } from '../selectors';

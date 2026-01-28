@@ -8,7 +8,7 @@ import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { useShowPMMAddressWarning } from 'app/percona/shared/components/hooks/showPMMAddressWarning';
 import { getPerconaServer } from 'app/percona/shared/core/selectors';
 import validators from 'app/percona/shared/helpers/validators';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from '../Platform.messages';
 import { ConnectRenderProps } from '../types';

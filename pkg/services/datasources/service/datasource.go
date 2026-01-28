@@ -117,6 +117,8 @@ func (s *Service) Usage(ctx context.Context, scopeParams *quota.ScopeParameters)
 type DataSourceRetriever interface {
 	// GetDataSource gets a datasource.
 	GetDataSource(ctx context.Context, query *datasources.GetDataSourceQuery) (*datasources.DataSource, error)
+	// GetDataSourceInNamespace gets a datasource by namespace, name (datasource uid), and group (datasource type).
+	GetDataSourceInNamespace(ctx context.Context, namespace, name, group string) (*datasources.DataSource, error)
 }
 
 // NewNameScopeResolver provides an ScopeAttributeResolver able to
@@ -174,6 +176,10 @@ func NewIDScopeResolver(db DataSourceRetriever) (string, accesscontrol.ScopeAttr
 
 func (s *Service) GetDataSource(ctx context.Context, query *datasources.GetDataSourceQuery) (*datasources.DataSource, error) {
 	return s.SQLStore.GetDataSource(ctx, query)
+}
+
+func (s *Service) GetDataSourceInNamespace(ctx context.Context, namespace, name, group string) (*datasources.DataSource, error) {
+	return s.SQLStore.GetDataSourceInNamespace(ctx, namespace, name, group)
 }
 
 func (s *Service) GetDataSources(ctx context.Context, query *datasources.GetDataSourcesQuery) ([]*datasources.DataSource, error) {
@@ -259,11 +265,9 @@ func (s *Service) AddDataSource(ctx context.Context, cmd *datasources.AddDataSou
 		var err error
 
 		cmd.EncryptedSecureJsonData = make(map[string][]byte)
-		if !s.features.IsEnabled(ctx, featuremgmt.FlagDisableSecretsCompatibility) {
-			cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
-			if err != nil {
-				return err
-			}
+		cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
+		if err != nil {
+			return err
 		}
 
 		cmd.UpdateSecretFn = func() error {
@@ -483,12 +487,15 @@ func (s *Service) UpdateDataSource(ctx context.Context, cmd *datasources.UpdateD
 
 		query := &datasources.GetDataSourceQuery{
 			ID:    cmd.ID,
+			UID:   cmd.UID,
 			OrgID: cmd.OrgID,
 		}
 		dataSource, err = s.SQLStore.GetDataSource(ctx, query)
 		if err != nil {
 			return err
 		}
+		cmd.UID = dataSource.UID
+		cmd.ID = dataSource.ID
 
 		// Validate the command
 		jd, err := cmd.JsonData.ToDB()
@@ -948,11 +955,9 @@ func (s *Service) fillWithSecureJSONData(ctx context.Context, cmd *datasources.U
 	}
 
 	cmd.EncryptedSecureJsonData = make(map[string][]byte)
-	if !s.features.IsEnabled(ctx, featuremgmt.FlagDisableSecretsCompatibility) {
-		cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
-		if err != nil {
-			return err
-		}
+	cmd.EncryptedSecureJsonData, err = s.SecretsService.EncryptJsonData(ctx, cmd.SecureJsonData, secrets.WithoutScope())
+	if err != nil {
+		return err
 	}
 
 	return nil

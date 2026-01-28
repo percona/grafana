@@ -10,7 +10,7 @@ import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/Ta
 import { fetchServerInfoAction, fetchSettingsAction, updateSettingsAction } from 'app/percona/shared/core/reducers';
 import { getPerconaServer, getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
-import { useDispatch, useSelector } from 'app/types';
+import { useDispatch, useSelector } from 'app/types/store';
 
 import { Connect } from './Connect/Connect';
 import { Connected } from './Connected/Connected';

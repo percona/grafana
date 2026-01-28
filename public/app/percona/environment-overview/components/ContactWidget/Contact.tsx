@@ -6,7 +6,7 @@ import appEvents from 'app/core/app_events';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { useCancelToken } from '../../../shared/components/hooks/cancelToken.hook';
 import { WidgetWrapper } from '../WidgetWrapper/WidgetWrapper';

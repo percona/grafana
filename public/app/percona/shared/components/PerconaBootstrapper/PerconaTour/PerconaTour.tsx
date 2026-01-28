@@ -8,7 +8,7 @@ import { getPerconaSettings, getPerconaUser, getServices } from 'app/percona/sha
 import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import getAlertingTourSteps from 'app/percona/tour/steps/alerting';
 import getProductTourSteps from 'app/percona/tour/steps/product';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 const PerconaTourBootstrapper: FC = () => {
   const { startTour, setSteps } = usePerconaTour();

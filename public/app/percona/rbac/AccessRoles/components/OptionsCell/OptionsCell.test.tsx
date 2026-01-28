@@ -6,7 +6,7 @@ import { HistoryWrapper, locationService, setLocationService } from '@grafana/ru
 import * as Reducers from 'app/percona/shared/core/reducers';
 import * as RolesReducer from 'app/percona/shared/core/reducers/roles/roles';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { stubRoles, stubUsers, stubUsersMap } from '../../../__mocks__/stubs';
 

@@ -10,7 +10,14 @@ import {
 } from '@grafana/data';
 import { ConfigSection, ConfigSubSection, DataSourceDescription, EditorStack } from '@grafana/plugin-ui';
 import { config } from '@grafana/runtime';
-import { ConnectionLimits, Divider, TLSSecretsConfig, useMigrateDatabaseFields } from '@grafana/sql';
+import {
+  ConnectionLimits,
+  Divider,
+  MaxLifetimeField,
+  MaxOpenConnectionsField,
+  TLSSecretsConfig,
+  useMigrateDatabaseFields,
+} from '@grafana/sql';
 import {
   Input,
   Select,
@@ -76,6 +83,14 @@ export const PostgresConfigEditor = (props: DataSourcePluginOptionsEditorProps<P
     };
   };
 
+  const onMaxConnectionsChanged = (number?: number) => {
+    updateDatasourcePluginJsonDataOption(props, 'maxOpenConns', number);
+  };
+
+  const onMaxLifetimeChanged = (number?: number) => {
+    updateDatasourcePluginJsonDataOption(props, 'connMaxLifetime', number);
+  };
+
   const onTimeScaleDBChanged = (event: SyntheticEvent<HTMLInputElement>) => {
     updateDatasourcePluginJsonDataOption(props, 'timescaledb', event.currentTarget.checked);
   };
@@ -98,7 +113,7 @@ export const PostgresConfigEditor = (props: DataSourcePluginOptionsEditorProps<P
 
       <Divider />
 
-      <Collapse collapsible label="User Permissions" isOpen={isOpen} onToggle={() => setIsOpen((x) => !x)}>
+      <Collapse label="User Permissions" isOpen={isOpen} onToggle={() => setIsOpen((x) => !x)}>
         The database user should only be granted SELECT permissions on the specified database &amp; tables you want to
         query. <br />
         Grafana does not validate that queries are safe so queries can contain any SQL statement. For example,
@@ -144,7 +159,7 @@ export const PostgresConfigEditor = (props: DataSourcePluginOptionsEditorProps<P
           />
         </Field>
 
-        <Field label="Password" required>
+        <Field label="Password">
           <SecretInput
             width={WIDTH_LONG}
             placeholder="Password"
@@ -397,8 +412,18 @@ export const PostgresConfigEditor = (props: DataSourcePluginOptionsEditorProps<P
           </Field>
         </ConfigSubSection>
 
-        <ConnectionLimits options={options} onOptionsChange={onOptionsChange} />
-
+        {config.featureToggles.postgresDSUsePGX ? (
+          <ConfigSubSection title="Connection limits">
+            <MaxOpenConnectionsField
+              labelWidth={WIDTH_LONG}
+              jsonData={jsonData}
+              onMaxConnectionsChanged={onMaxConnectionsChanged}
+            />
+            <MaxLifetimeField labelWidth={WIDTH_LONG} jsonData={jsonData} onMaxLifetimeChanged={onMaxLifetimeChanged} />
+          </ConfigSubSection>
+        ) : (
+          <ConnectionLimits options={options} onOptionsChange={onOptionsChange} />
+        )}
         {config.secureSocksDSProxyEnabled && (
           <SecureSocksProxySettings options={options} onOptionsChange={onOptionsChange} />
         )}

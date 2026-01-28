@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
+import { Trans, t } from '@grafana/i18n';
 import { config, reportInteraction } from '@grafana/runtime';
 import { Alert, ConfirmModal, Text, Space } from '@grafana/ui';
-import { Trans, t } from 'app/core/internationalization';
+import { useGetAffectedItems } from 'app/api/clients/folder/v1beta1/hooks';
 
-import { useGetAffectedItemsQuery } from '../../api/browseDashboardsAPI';
 import { DashboardTreeSelection } from '../../types';
 
 import { DescendantCount } from './DescendantCount';
@@ -17,9 +17,10 @@ export interface Props {
 }
 
 export const DeleteModal = ({ onConfirm, onDismiss, selectedItems, ...props }: Props) => {
-  const { data } = useGetAffectedItemsQuery(selectedItems);
-  const deleteIsInvalid = Boolean(data && (data.alertRule || data.libraryPanel));
+  const { data } = useGetAffectedItems(selectedItems);
+  const deleteIsInvalid = Boolean(data && (data.alertrules || data.library_elements));
   const [isDeleting, setIsDeleting] = useState(false);
+
   const onDelete = async () => {
     reportInteraction('grafana_manage_dashboards_delete_clicked', {
       item_counts: {
@@ -27,7 +28,7 @@ export const DeleteModal = ({ onConfirm, onDismiss, selectedItems, ...props }: P
         folder: Object.keys(selectedItems.folder).length,
       },
       source: 'browse_dashboards',
-      restore_enabled: Boolean(config.featureToggles.dashboardRestore),
+      restore_enabled: Boolean(config.featureToggles.restoreDashboards),
     });
     setIsDeleting(true);
     try {
@@ -43,13 +44,14 @@ export const DeleteModal = ({ onConfirm, onDismiss, selectedItems, ...props }: P
     <ConfirmModal
       body={
         <>
-          {config.featureToggles.dashboardRestore && (
+          {config.featureToggles.restoreDashboards && (
             <>
               <Text element="p">
                 <Trans i18nKey="browse-dashboards.action.delete-modal-restore-dashboards-text">
-                  This action will delete the selected folders immediately but the selected dashboards will be marked
-                  for deletion in 30 days. Your organization administrator can restore the dashboards anytime before the
-                  30 days expire. Folders cannot be restored.
+                  This action will delete the selected folders immediately. Deleted dashboards will be kept in the
+                  history for up to 12 months and can be restored by your organization administrator during that time.
+                  The history is limited to 1000 dashboards — older ones may be removed sooner if the limit is reached.
+                  Folders cannot be restored.
                 </Trans>
               </Text>
               <Space v={2} />

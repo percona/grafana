@@ -15,7 +15,9 @@ import (
 	"k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/spec3"
 
+	appsdkapiserver "github.com/grafana/grafana-app-sdk/k8s/apiserver"
 	grafanarest "github.com/grafana/grafana/pkg/apiserver/rest"
+	"github.com/grafana/grafana/pkg/services/apiserver/options"
 	"github.com/grafana/grafana/pkg/storage/unified/apistore"
 )
 
@@ -36,7 +38,14 @@ type APIGroupBuilder interface {
 
 	// Get OpenAPI definitions
 	GetOpenAPIDefinitions() common.GetOpenAPIDefinitions
+
+	// Do not return anything unless you have special circumstances! This is a list of resources that are allowed to be accessed in v0alpha1, with AllResourcesAllowed allowing all in the group.
+	// This is to prevent accidental exposure of experimental APIs. While developing, use the feature flag `grafanaAPIServerWithExperimentalAPIs`.
+	// And then, when you're ready to expose this to the end user, go to v1beta1 instead.
+	AllowedV0Alpha1Resources() []string
 }
+
+const AllResourcesAllowed = "*"
 
 type APIGroupVersionProvider interface {
 	GetGroupVersion() schema.GroupVersion
@@ -64,7 +73,7 @@ type APIGroupValidation interface {
 
 type APIGroupRouteProvider interface {
 	// Support direct HTTP routes from an APIGroup
-	GetAPIRoutes() *APIRoutes
+	GetAPIRoutes(gv schema.GroupVersion) *APIRoutes
 }
 
 type APIGroupPostStartHookProvider interface {
@@ -73,11 +82,12 @@ type APIGroupPostStartHookProvider interface {
 }
 
 type APIGroupOptions struct {
-	Scheme           *runtime.Scheme
-	OptsGetter       generic.RESTOptionsGetter
-	DualWriteBuilder grafanarest.DualWriteBuilder
-	MetricsRegister  prometheus.Registerer
-	StorageOptions   apistore.StorageOptionsRegister
+	Scheme              *runtime.Scheme
+	OptsGetter          generic.RESTOptionsGetter
+	DualWriteBuilder    grafanarest.DualWriteBuilder
+	MetricsRegister     prometheus.Registerer
+	StorageOptsRegister apistore.StorageOptionsRegister
+	StorageOpts         *options.StorageOptions
 }
 
 // Builders that implement OpenAPIPostProcessor are given a chance to modify the schema directly
@@ -104,6 +114,7 @@ type APIRoutes struct {
 
 type APIRegistrar interface {
 	RegisterAPI(builder APIGroupBuilder)
+	RegisterAppInstaller(installer appsdkapiserver.AppInstaller)
 }
 
 func getGroup(builder APIGroupBuilder) (string, error) {

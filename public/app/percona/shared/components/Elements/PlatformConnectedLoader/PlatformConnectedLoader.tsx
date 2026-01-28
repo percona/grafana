@@ -1,7 +1,7 @@
 import { FC, PropsWithChildren } from 'react';
 
 import { getPerconaSettings, getPerconaUser } from 'app/percona/shared/core/selectors';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { EmptyBlock } from '../EmptyBlock';
 

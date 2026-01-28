@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/grafana/alerting/receivers/line"
 	"github.com/prometheus/alertmanager/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,9 +32,12 @@ import (
 	"github.com/grafana/grafana/pkg/services/secrets/manager"
 	"github.com/grafana/grafana/pkg/services/user"
 	"github.com/grafana/grafana/pkg/util"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
-func TestReceiverService_GetReceiver(t *testing.T) {
+func TestIntegrationReceiverService_GetReceiver(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	sqlStore := db.InitTestDB(t)
 	secretsService := manager.SetupTestService(t, database.ProvideSecretsStore(sqlStore))
 
@@ -61,7 +65,9 @@ func TestReceiverService_GetReceiver(t *testing.T) {
 	})
 }
 
-func TestReceiverService_GetReceivers(t *testing.T) {
+func TestIntegrationReceiverService_GetReceivers(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	sqlStore := db.InitTestDB(t)
 	secretsService := manager.SetupTestService(t, database.ProvideSecretsStore(sqlStore))
 
@@ -91,7 +97,9 @@ func TestReceiverService_GetReceivers(t *testing.T) {
 	})
 }
 
-func TestReceiverService_DecryptRedact(t *testing.T) {
+func TestIntegrationReceiverService_DecryptRedact(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	sqlStore := db.InitTestDB(t)
 	secretsService := manager.SetupTestService(t, database.ProvideSecretsStore(sqlStore))
 
@@ -109,7 +117,7 @@ func TestReceiverService_DecryptRedact(t *testing.T) {
 		Permissions: map[int64]map[string][]string{
 			1: {
 				accesscontrol.ActionAlertingNotificationsRead:    nil,
-				accesscontrol.ActionAlertingReceiversReadSecrets: {ac.ScopeReceiversAll},
+				accesscontrol.ActionAlertingReceiversReadSecrets: {models.ScopeReceiversAll},
 			},
 		},
 	}
@@ -212,7 +220,7 @@ func TestReceiverService_Delete(t *testing.T) {
 		name             string
 		user             identity.Requester
 		deleteUID        string
-		callerProvenance definitions.Provenance
+		callerProvenance models.Provenance
 		version          string
 		storeSettings    map[models.AlertRuleKey][]models.NotificationSettings
 		existing         *models.Receiver
@@ -234,7 +242,7 @@ func TestReceiverService_Delete(t *testing.T) {
 			name:             "service deletes receiver with provenance",
 			user:             writer,
 			deleteUID:        baseReceiver.UID,
-			callerProvenance: definitions.Provenance(models.ProvenanceAPI),
+			callerProvenance: models.ProvenanceAPI,
 			existing:         util.Pointer(models.CopyReceiverWith(baseReceiver, models.ReceiverMuts.WithProvenance(models.ProvenanceAPI), models.ReceiverMuts.WithIntegrations(slackIntegration, emailIntegration))),
 		},
 		{
@@ -265,7 +273,7 @@ func TestReceiverService_Delete(t *testing.T) {
 			name:             "delete provisioning provenance fails when caller is ProvenanceNone",
 			user:             writer,
 			deleteUID:        baseReceiver.UID,
-			callerProvenance: definitions.Provenance(models.ProvenanceNone),
+			callerProvenance: models.ProvenanceNone,
 			existing:         util.Pointer(models.CopyReceiverWith(baseReceiver, models.ReceiverMuts.WithProvenance(models.ProvenanceFile))),
 			expectedErr:      validation.MakeErrProvenanceChangeNotAllowed(models.ProvenanceFile, models.ProvenanceNone),
 		},
@@ -273,9 +281,9 @@ func TestReceiverService_Delete(t *testing.T) {
 			name:             "delete provisioning provenance fails when caller is a different type", // TODO: This should fail once we move from lenient to strict validation.
 			user:             writer,
 			deleteUID:        baseReceiver.UID,
-			callerProvenance: definitions.Provenance(models.ProvenanceFile),
+			callerProvenance: models.ProvenanceFile,
 			existing:         util.Pointer(models.CopyReceiverWith(baseReceiver, models.ReceiverMuts.WithProvenance(models.ProvenanceAPI))),
-			//expectedErr:      validation.MakeErrProvenanceChangeNotAllowed(models.ProvenanceAPI, models.ProvenanceFile),
+			// expectedErr:      validation.MakeErrProvenanceChangeNotAllowed(models.ProvenanceAPI, models.ProvenanceFile),
 		},
 		{
 			name:        "delete receiver with optimistic version mismatch fails",
@@ -335,7 +343,7 @@ func TestReceiverService_Create(t *testing.T) {
 	}}
 	decryptUser := &user.SignedInUser{OrgID: 1, Permissions: map[int64]map[string][]string{
 		1: {
-			accesscontrol.ActionAlertingReceiversReadSecrets: {ac.ScopeReceiversAll},
+			accesscontrol.ActionAlertingReceiversReadSecrets: {models.ScopeReceiversAll},
 		},
 	}}
 
@@ -345,7 +353,7 @@ func TestReceiverService_Create(t *testing.T) {
 
 	slackIntegration := models.IntegrationGen(models.IntegrationMuts.WithName("test receiver"), models.IntegrationMuts.WithValidConfig("slack"))()
 	emailIntegration := models.IntegrationGen(models.IntegrationMuts.WithName("test receiver"), models.IntegrationMuts.WithValidConfig("email"))()
-	lineIntegration := models.IntegrationGen(models.IntegrationMuts.WithName("test receiver"), models.IntegrationMuts.WithValidConfig("line"))()
+	lineIntegration := models.IntegrationGen(models.IntegrationMuts.WithName("test receiver"), models.IntegrationMuts.WithValidConfig(line.Type))()
 	baseReceiver := models.ReceiverGen(models.ReceiverMuts.WithName("test receiver"), models.ReceiverMuts.WithIntegrations(slackIntegration))()
 
 	for _, tc := range []struct {
@@ -396,6 +404,12 @@ func TestReceiverService_Create(t *testing.T) {
 				models.CopyIntegrationWith(emailIntegration, models.IntegrationMuts.WithUID(generated(1))),
 			), models.ReceiverMuts.Encrypted(models.Base64Enrypt)),
 			expectedProvenances: map[string]models.Provenance{generated(0): models.ProvenanceNone, generated(1): models.ProvenanceNone}, // Mark UIDs as generated so that test will insert generated UID.
+		},
+		{
+			name:        "create receiver with non-Grafana origin fails",
+			user:        writer,
+			receiver:    models.CopyReceiverWith(baseReceiver, models.ReceiverMuts.WithOrigin(models.ResourceOriginImported)),
+			expectedErr: ErrReceiverOrigin,
 		},
 		{
 			name: "create integration with invalid UID fails",
@@ -451,7 +465,7 @@ func TestReceiverService_Create(t *testing.T) {
 						{
 							UID:                   lineIntegration.UID,
 							Name:                  lineIntegration.Name,
-							Type:                  lineIntegration.Config.Type,
+							Type:                  string(lineIntegration.Config.Type()),
 							DisableResolveMessage: lineIntegration.DisableResolveMessage,
 							Settings:              definitions.RawMessage(`{}`), // Empty settings, not nil.
 							SecureSettings: map[string]string{
@@ -461,6 +475,12 @@ func TestReceiverService_Create(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			name:        "receiver with empty name fails",
+			user:        writer,
+			receiver:    models.CopyReceiverWith(baseReceiver, models.ReceiverMuts.WithName("")),
+			expectedErr: legacy_storage.ErrReceiverInvalid,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -519,9 +539,13 @@ func TestReceiverService_Create(t *testing.T) {
 			if tc.expectedStored != nil {
 				revision, err := sut.cfgStore.Get(context.Background(), writer.GetOrgID())
 				require.NoError(t, err)
-				rcv, err := revision.GetReceiver(legacy_storage.NameToUid(tc.expectedStored.Name))
-				require.NoError(t, err)
-				assert.Equal(t, tc.expectedStored, rcv)
+				for _, apiReceiver := range revision.Config.AlertmanagerConfig.Receivers {
+					if apiReceiver.Name == tc.expectedStored.Name {
+						assert.Equal(t, tc.expectedStored, apiReceiver)
+						return
+					}
+				}
+				t.Fatalf("expected to find receiver %q in revision", tc.expectedStored.Name)
 			}
 		})
 	}
@@ -532,13 +556,14 @@ func TestReceiverService_Update(t *testing.T) {
 
 	writer := &user.SignedInUser{OrgID: 1, Permissions: map[int64]map[string][]string{
 		1: {
-			accesscontrol.ActionAlertingNotificationsWrite: nil,
-			accesscontrol.ActionAlertingNotificationsRead:  nil,
+			accesscontrol.ActionAlertingNotificationsWrite:       nil,
+			accesscontrol.ActionAlertingNotificationsRead:        nil,
+			accesscontrol.ActionAlertingReceiversUpdateProtected: {models.ScopeReceiversAll},
 		},
 	}}
 	decryptUser := &user.SignedInUser{OrgID: 1, Permissions: map[int64]map[string][]string{
 		1: {
-			accesscontrol.ActionAlertingReceiversReadSecrets: {ac.ScopeReceiversAll},
+			accesscontrol.ActionAlertingReceiversReadSecrets: {models.ScopeReceiversAll},
 		},
 	}}
 
@@ -673,7 +698,7 @@ func TestReceiverService_Update(t *testing.T) {
 			user:     writer,
 			receiver: models.CopyReceiverWith(baseReceiver, models.ReceiverMuts.WithProvenance(models.ProvenanceAPI)),
 			existing: util.Pointer(models.CopyReceiverWith(baseReceiver, models.ReceiverMuts.WithProvenance(models.ProvenanceFile))),
-			//expectedErr: validation.MakeErrProvenanceChangeNotAllowed(models.ProvenanceFile, models.ProvenanceAPI),
+			// expectedErr: validation.MakeErrProvenanceChangeNotAllowed(models.ProvenanceFile, models.ProvenanceAPI),
 			expectedUpdate: models.CopyReceiverWith(baseReceiver,
 				models.ReceiverMuts.WithProvenance(models.ProvenanceAPI),
 				rm.Encrypted(models.Base64Enrypt)),
@@ -725,11 +750,9 @@ func TestReceiverService_Update(t *testing.T) {
 				// Create route after receivers as they will be referenced.
 				revision, err := sut.cfgStore.Get(context.Background(), tc.user.GetOrgID())
 				require.NoError(t, err)
-				result, err := revision.CreateReceiver(tc.existing)
+				created, err := revision.CreateReceiver(tc.existing)
 				require.NoError(t, err)
 
-				created, err := PostableApiReceiverToReceiver(result, tc.existing.Provenance)
-				require.NoError(t, err)
 				err = sut.cfgStore.Save(context.Background(), revision, tc.user.GetOrgID())
 				require.NoError(t, err)
 
@@ -885,6 +908,16 @@ func TestReceiverService_UpdateReceiverName(t *testing.T) {
 		assert.NotNil(t, ruleStore.Calls[0].Args[4])
 		assert.Falsef(t, ruleStore.Calls[0].Args[5].(bool), "dryrun expected to be false")
 	})
+
+	t.Run("returns ErrReceiverInvalid if empty name", func(t *testing.T) {
+		ruleStore := &fakeAlertRuleNotificationStore{}
+		sut := createReceiverServiceSut(t, &secretsService)
+		sut.ruleNotificationsStore = ruleStore
+		baseReceiver.Name = ""
+
+		_, err := sut.UpdateReceiver(context.Background(), &baseReceiver, nil, writer.GetOrgID(), writer)
+		require.ErrorIs(t, err, legacy_storage.ErrReceiverInvalid)
+	})
 }
 
 func TestReceiverServiceAC_Read(t *testing.T) {
@@ -933,30 +966,30 @@ func TestReceiverServiceAC_Read(t *testing.T) {
 		},
 		{
 			name:        "global receivers permissions - read all",
-			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversRead: {ac.ScopeReceiversAll}},
+			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversRead: {models.ScopeReceiversAll}},
 			existing:    allReceivers(),
 			visible:     allReceivers(),
 		},
 		{
 			name: "single receivers permissions - read some",
 			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversRead: {
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 			}},
 			existing: allReceivers(),
 			visible:  []models.Receiver{recv1, recv3},
 		},
 		{
 			name:        "global receivers secret permissions - read all",
-			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversReadSecrets: {ac.ScopeReceiversAll}},
+			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversReadSecrets: {models.ScopeReceiversAll}},
 			existing:    allReceivers(),
 			visible:     allReceivers(),
 		},
 		{
 			name: "single receivers secret permissions - read some",
 			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversReadSecrets: {
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 			}},
 			existing: allReceivers(),
 			visible:  []models.Receiver{recv1, recv3},
@@ -1125,7 +1158,7 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 		},
 	}}
 
-	slackIntegration := models.IntegrationGen(models.IntegrationMuts.WithName("test receiver"), models.IntegrationMuts.WithValidConfig("slack"))
+	slackIntegration := models.IntegrationGen(models.IntegrationMuts.WithName("test receiver"), models.IntegrationMuts.WithValidConfig("webhook"))
 	emailIntegration := models.IntegrationGen(models.IntegrationMuts.WithName("test receiver"), models.IntegrationMuts.WithValidConfig("email"))
 	recv1 := models.ReceiverGen(models.ReceiverMuts.WithName("receiver1"), models.ReceiverMuts.WithIntegrations(slackIntegration(), emailIntegration()))()
 	recv2 := models.ReceiverGen(models.ReceiverMuts.WithName("receiver2"), models.ReceiverMuts.WithIntegrations(slackIntegration(), emailIntegration()))()
@@ -1137,8 +1170,8 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 		name        string
 		permissions map[string][]string
 		existing    []models.Receiver
-
-		hasAccess []models.Receiver
+		incoming    []models.Receiver
+		hasAccess   []models.Receiver
 	}{
 		{
 			name:      "not authorized without permissions",
@@ -1159,15 +1192,15 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 		},
 		{
 			name:        "global receivers permissions - not authorized without read",
-			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversUpdate: {ac.ScopeReceiversAll}},
+			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversUpdate: {models.ScopeReceiversAll}},
 			existing:    allReceivers(),
 			hasAccess:   nil,
 		},
 		{
 			name: "single receivers permissions - not authorized without read",
 			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversUpdate: {
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 			}},
 			existing:  allReceivers(),
 			hasAccess: nil,
@@ -1180,7 +1213,7 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 		},
 		{
 			name:        "global receivers permissions - update all",
-			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversUpdate: {ac.ScopeReceiversAll}, accesscontrol.ActionAlertingReceiversRead: {ac.ScopeReceiversAll}},
+			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversUpdate: {models.ScopeReceiversAll}, accesscontrol.ActionAlertingReceiversRead: {models.ScopeReceiversAll}},
 			existing:    allReceivers(),
 			hasAccess:   allReceivers(),
 		},
@@ -1188,12 +1221,12 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 			name: "single receivers permissions - update some",
 			permissions: map[string][]string{
 				accesscontrol.ActionAlertingReceiversUpdate: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 				accesscontrol.ActionAlertingReceiversRead: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 			},
 			existing:  allReceivers(),
@@ -1203,12 +1236,12 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 			name: "single receivers mixed read permissions - update some",
 			permissions: map[string][]string{
 				accesscontrol.ActionAlertingReceiversUpdate: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 				accesscontrol.ActionAlertingReceiversRead: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv2.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv2.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 			},
 			existing:  allReceivers(),
@@ -1218,13 +1251,50 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 			name: "single receivers mixed global read permissions - update some",
 			permissions: map[string][]string{
 				accesscontrol.ActionAlertingReceiversUpdate: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 				accesscontrol.ActionAlertingNotificationsRead: nil,
 			},
 			existing:  allReceivers(),
 			hasAccess: []models.Receiver{recv1, recv3},
+		},
+		{
+			name: "protected fields modified without permission",
+			permissions: map[string][]string{
+				accesscontrol.ActionAlertingReceiversUpdate: {models.ScopeReceiversAll},
+				accesscontrol.ActionAlertingReceiversRead:   {models.ScopeReceiversAll},
+			},
+			existing: []models.Receiver{
+				recv1,
+			},
+			incoming: []models.Receiver{
+				func() models.Receiver {
+					f := recv1.Clone()
+					f.Integrations[0].Settings["url"] = "https://example.com/new"
+					return f
+				}(),
+			},
+			hasAccess: nil,
+		},
+		{
+			name: "protected fields modified with permission",
+			permissions: map[string][]string{
+				accesscontrol.ActionAlertingReceiversUpdate:          {models.ScopeReceiversAll},
+				accesscontrol.ActionAlertingReceiversRead:            {models.ScopeReceiversAll},
+				accesscontrol.ActionAlertingReceiversUpdateProtected: {models.ScopeReceiversAll},
+			},
+			existing: []models.Receiver{
+				recv1,
+			},
+			incoming: []models.Receiver{
+				func() models.Receiver {
+					f := recv1.Clone()
+					f.Integrations[0].Settings["url"] = "https://example.com/new"
+					return f
+				}(),
+			},
+			hasAccess: []models.Receiver{recv1},
 		},
 	}
 
@@ -1251,7 +1321,11 @@ func TestReceiverServiceAC_Update(t *testing.T) {
 				}
 				return false
 			}
-			for _, recv := range allReceivers() {
+			incoming := allReceivers()
+			if tc.incoming != nil {
+				incoming = tc.incoming
+			}
+			for _, recv := range incoming {
 				clone := recv.Clone()
 				clone.Version = versions[recv.UID]
 				response, err := sut.UpdateReceiver(context.Background(), &clone, nil, orgId, usr)
@@ -1311,15 +1385,15 @@ func TestReceiverServiceAC_Delete(t *testing.T) {
 		},
 		{
 			name:        "global receivers permissions - not authorized without read",
-			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversDelete: {ac.ScopeReceiversAll}},
+			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversDelete: {models.ScopeReceiversAll}},
 			existing:    allReceivers(),
 			hasAccess:   nil,
 		},
 		{
 			name: "single receivers permissions - not authorized without read",
 			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversDelete: {
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-				ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+				models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 			}},
 			existing:  allReceivers(),
 			hasAccess: nil,
@@ -1332,7 +1406,7 @@ func TestReceiverServiceAC_Delete(t *testing.T) {
 		},
 		{
 			name:        "global receivers permissions - delete all",
-			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversDelete: {ac.ScopeReceiversAll}, accesscontrol.ActionAlertingReceiversRead: {ac.ScopeReceiversAll}},
+			permissions: map[string][]string{accesscontrol.ActionAlertingReceiversDelete: {models.ScopeReceiversAll}, accesscontrol.ActionAlertingReceiversRead: {models.ScopeReceiversAll}},
 			existing:    allReceivers(),
 			hasAccess:   allReceivers(),
 		},
@@ -1340,12 +1414,12 @@ func TestReceiverServiceAC_Delete(t *testing.T) {
 			name: "single receivers permissions - delete some",
 			permissions: map[string][]string{
 				accesscontrol.ActionAlertingReceiversDelete: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 				accesscontrol.ActionAlertingReceiversRead: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 			},
 			existing:  allReceivers(),
@@ -1355,12 +1429,12 @@ func TestReceiverServiceAC_Delete(t *testing.T) {
 			name: "single receivers mixed read permissions - delete some",
 			permissions: map[string][]string{
 				accesscontrol.ActionAlertingReceiversDelete: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 				accesscontrol.ActionAlertingReceiversRead: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv2.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv2.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 			},
 			existing:  allReceivers(),
@@ -1370,8 +1444,8 @@ func TestReceiverServiceAC_Delete(t *testing.T) {
 			name: "single receivers mixed global read permissions - delete some",
 			permissions: map[string][]string{
 				accesscontrol.ActionAlertingReceiversDelete: {
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
-					ac.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv1.UID),
+					models.ScopeReceiversProvider.GetResourceScopeUID(recv3.UID),
 				},
 				accesscontrol.ActionAlertingNotificationsRead: nil,
 			},
@@ -1404,7 +1478,7 @@ func TestReceiverServiceAC_Delete(t *testing.T) {
 				return false
 			}
 			for _, recv := range allReceivers() {
-				err := sut.DeleteReceiver(context.Background(), recv.UID, definitions.Provenance(models.ProvenanceNone), versions[recv.UID], orgId, usr)
+				err := sut.DeleteReceiver(context.Background(), recv.UID, models.ProvenanceNone, versions[recv.UID], orgId, usr)
 				if hasAccess(recv.UID) {
 					require.NoErrorf(t, err, "should have access to receiver '%s', but doesn't", recv.Name)
 				} else {
@@ -1470,18 +1544,22 @@ func TestReceiverService_InUseMetadata(t *testing.T) {
 				legacy_storage.NameToUid("receiver1"): {
 					InUseByRules:  []models.AlertRuleKey{{OrgID: 1, UID: "rule1uid"}},
 					InUseByRoutes: 2,
+					CanUse:        true,
 				},
 				legacy_storage.NameToUid("receiver2"): {
 					InUseByRules:  []models.AlertRuleKey{{OrgID: 1, UID: "rule1uid"}, {OrgID: 1, UID: "rule2uid"}},
 					InUseByRoutes: 1,
+					CanUse:        true,
 				},
 				legacy_storage.NameToUid("receiver3"): {
 					InUseByRules:  []models.AlertRuleKey{{OrgID: 1, UID: "rule2uid"}},
 					InUseByRoutes: 2,
+					CanUse:        true,
 				},
 				legacy_storage.NameToUid("receiver4"): {
 					InUseByRules:  []models.AlertRuleKey{},
 					InUseByRoutes: 1,
+					CanUse:        true,
 				},
 			},
 		},
@@ -1529,7 +1607,7 @@ func createReceiverServiceSut(t *testing.T, encryptSvc secretService) *ReceiverS
 
 	return NewReceiverService(
 		ac.NewReceiverAccess[*models.Receiver](acimpl.ProvideAccessControl(featuremgmt.WithFeatures()), false),
-		legacy_storage.NewAlertmanagerConfigStore(store),
+		legacy_storage.NewAlertmanagerConfigStore(store, NewExtraConfigsCrypto(encryptSvc)),
 		provisioningStore,
 		&fakeAlertRuleNotificationStore{},
 		encryptSvc,

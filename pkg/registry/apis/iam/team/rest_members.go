@@ -77,7 +77,7 @@ func (s *LegacyTeamMemberREST) Connect(ctx context.Context, name string, options
 			list.Items = append(list.Items, mapToTeamMember(m))
 		}
 
-		list.ListMeta.Continue = common.OptionalFormatInt(res.Continue)
+		list.Continue = common.OptionalFormatInt(res.Continue)
 
 		responder.Object(http.StatusOK, list)
 	}), nil
@@ -107,6 +107,6 @@ func mapToTeamMember(m legacy.TeamMember) iamv0.TeamMember {
 			InternalID:  m.UserID,
 		},
 		External:   m.External,
-		Permission: mapPermisson(m.Permission),
+		Permission: common.MapUserTeamPermission(m.Permission),
 	}
 }

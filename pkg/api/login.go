@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"regexp"
 	"strings"
 
@@ -41,8 +40,10 @@ var getViewIndex = func() string {
 	return viewIndex
 }
 
-// Only allow redirects that start with an alphanumerical character, a dash or an underscore.
-var redirectRe = regexp.MustCompile(`^/[a-zA-Z0-9-_].*`)
+var redirectAllowRe = regexp.MustCompile(`^/[a-zA-Z0-9-_./]*$`)
+
+// Do not allow redirect URLs that contain "//" or ".."
+var redirectDenyRe = regexp.MustCompile(`(//|\.\.)`)
 
 var (
 	errAbsoluteRedirectTo  = errors.New("absolute URLs are not allowed for redirect_to cookie value")
@@ -64,21 +65,11 @@ func (hs *HTTPServer) ValidateRedirectTo(redirectTo string) error {
 		return errForbiddenRedirectTo
 	}
 
-	// path should have exactly one leading slash
-	if !strings.HasPrefix(to.Path, "/") {
+	if redirectDenyRe.MatchString(to.Path) {
 		return errForbiddenRedirectTo
 	}
 
-	if strings.HasPrefix(to.Path, "//") {
-		return errForbiddenRedirectTo
-	}
-
-	cleanPath := path.Clean(to.Path)
-	// "." is what path.Clean returns for empty paths
-	if cleanPath == "." {
-		return errForbiddenRedirectTo
-	}
-	if to.Path != "/" && !redirectRe.MatchString(cleanPath) {
+	if to.Path != "/" && !redirectAllowRe.MatchString(to.Path) {
 		return errForbiddenRedirectTo
 	}
 
@@ -144,8 +135,8 @@ func (hs *HTTPServer) LoginView(c *contextmodel.ReqContext) {
 		// LDAP users authenticated by auth proxy are also assigned login token but their auth module is LDAP
 		if hs.Cfg.AuthProxy.Enabled &&
 			hs.Cfg.AuthProxy.EnableLoginToken &&
-			c.SignedInUser.IsAuthenticatedBy(loginservice.AuthProxyAuthModule, loginservice.LDAPAuthModule) {
-			user := &user.User{ID: c.SignedInUser.UserID, Email: c.SignedInUser.Email, Login: c.SignedInUser.Login}
+			c.IsAuthenticatedBy(loginservice.AuthProxyAuthModule, loginservice.LDAPAuthModule) {
+			user := &user.User{ID: c.UserID, Email: c.Email, Login: c.Login}
 			err := hs.loginUserWithUser(user, c)
 			if err != nil {
 				c.Handle(hs.Cfg, http.StatusInternalServerError, "Failed to sign in user", err)
@@ -197,6 +188,7 @@ func (hs *HTTPServer) tryAutoLogin(c *contextmodel.ReqContext) bool {
 	for providerName, provider := range oauthInfos {
 		if provider.AutoLogin || hs.Cfg.OAuthAutoLogin {
 			redirectUrl := hs.Cfg.AppSubURL + "/login/" + providerName
+			//nolint:staticcheck // not yet migrated to OpenFeature
 			if hs.Features.IsEnabledGlobally(featuremgmt.FlagUseSessionStorageForRedirection) {
 				redirectUrl += hs.getRedirectToForAutoLogin(c)
 			}
@@ -208,6 +200,7 @@ func (hs *HTTPServer) tryAutoLogin(c *contextmodel.ReqContext) bool {
 
 	if samlAutoLogin {
 		redirectUrl := hs.Cfg.AppSubURL + "/login/saml"
+		//nolint:staticcheck // not yet migrated to OpenFeature
 		if hs.Features.IsEnabledGlobally(featuremgmt.FlagUseSessionStorageForRedirection) {
 			redirectUrl += hs.getRedirectToForAutoLogin(c)
 		}
@@ -304,7 +297,7 @@ func (hs *HTTPServer) loginUserWithUser(user *user.User, c *contextmodel.ReqCont
 func (hs *HTTPServer) Logout(c *contextmodel.ReqContext) {
 	// FIXME: restructure saml client to implement authn.LogoutClient
 	if hs.samlSingleLogoutEnabled() {
-		if c.SignedInUser.GetAuthenticatedBy() == loginservice.SAMLAuthModule {
+		if c.GetAuthenticatedBy() == loginservice.SAMLAuthModule {
 			c.Redirect(hs.Cfg.AppSubURL + "/logout/saml")
 			return
 		}
@@ -319,7 +312,7 @@ func (hs *HTTPServer) Logout(c *contextmodel.ReqContext) {
 		return
 	}
 
-	hs.log.Info("Successful Logout", "id", c.SignedInUser.GetID())
+	hs.log.Info("Successful Logout", "id", c.GetID())
 	c.Redirect(redirect.URL)
 }
 
@@ -364,15 +357,15 @@ func (hs *HTTPServer) redirectURLWithErrorCookie(c *contextmodel.ReqContext, err
 	setCookie := true
 	if hs.Features.IsEnabled(c.Req.Context(), featuremgmt.FlagIndividualCookiePreferences) {
 		var userID int64
-		if c.SignedInUser != nil && !c.SignedInUser.IsNil() {
+		if c.SignedInUser != nil && !c.IsNil() {
 			var errID error
-			userID, errID = identity.UserIdentifier(c.SignedInUser.GetID())
+			userID, errID = identity.UserIdentifier(c.GetID())
 			if errID != nil {
 				hs.log.Error("failed to retrieve user ID", "error", errID)
 			}
 		}
 
-		prefsQuery := pref.GetPreferenceWithDefaultsQuery{UserID: userID, OrgID: c.SignedInUser.GetOrgID(), Teams: c.Teams}
+		prefsQuery := pref.GetPreferenceWithDefaultsQuery{UserID: userID, OrgID: c.GetOrgID(), Teams: c.Teams}
 		prefs, err := hs.preferenceService.GetWithDefaults(c.Req.Context(), &prefsQuery)
 		if err != nil {
 			c.Redirect(hs.Cfg.AppSubURL + "/login")

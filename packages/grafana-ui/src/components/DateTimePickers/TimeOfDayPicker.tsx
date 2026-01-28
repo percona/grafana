@@ -28,6 +28,7 @@ interface BaseProps {
   allowEmpty?: boolean;
   // @PERCONA
   timepickerProps?: Partial<PickerProps<Moment>>;
+  id?: string;
 }
 
 interface AllowEmptyProps extends BaseProps {
@@ -54,6 +55,7 @@ export const TimeOfDayPicker = ({
   disabledHours,
   disabledMinutes,
   disabledSeconds,
+  id,
   placeholder,
   // @PERCONA
   timepickerProps,
@@ -66,6 +68,7 @@ export const TimeOfDayPicker = ({
 
   return (
     <RcPicker<Moment>
+      id={id}
       generateConfig={generateConfig}
       locale={locale}
       allowClear={

@@ -17,7 +17,7 @@ import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { GET_SERVICES_CANCEL_TOKEN, DUMP_URL, TWELVE_HOURS } from './ExportDataset.constants';
 import { Messages } from './ExportDataset.messages';

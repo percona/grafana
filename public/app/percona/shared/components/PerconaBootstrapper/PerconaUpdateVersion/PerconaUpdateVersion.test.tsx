@@ -7,7 +7,7 @@ import * as GrafanaUpdates from 'app/percona/shared/core/reducers/updates/update
 import * as User from 'app/percona/shared/core/reducers/user/user';
 import { UpdatesService } from 'app/percona/shared/services/updates';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import PerconaUpdateVersion from './PerconaUpdateVersion';
 

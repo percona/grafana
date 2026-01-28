@@ -5,8 +5,7 @@ import { render } from 'test/test-utils';
 import { selectors as e2eSelectors } from '@grafana/e2e-selectors';
 import { config, locationService } from '@grafana/runtime';
 import { backendSrv } from 'app/core/services/backend_srv';
-
-import { DashboardRoutes } from '../../../types';
+import { DashboardRoutes } from 'app/types/dashboard';
 
 import PublicDashboardPageProxy, { PublicDashboardPageProxyProps } from './PublicDashboardPageProxy';
 
@@ -51,6 +50,9 @@ function setup(props: Partial<PublicDashboardPageProxyProps>) {
 describe('PublicDashboardPageProxy', () => {
   beforeEach(() => {
     config.featureToggles.publicDashboardsScene = false;
+
+    // Mock console methods to avoid jest-fail-on-console issues
+    jest.spyOn(console, 'warn').mockImplementation();
 
     // Mock the dashboard UID response so we don't get any refused connection errors
     // from this test (as the fetch polyfill means this logic would actually try and call the API)

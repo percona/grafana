@@ -202,6 +202,14 @@ func TestRules(t *testing.T) {
 	})
 }
 
+func TestRecordingRules(t *testing.T) {
+	t.Run("a valid rule should not error", func(t *testing.T) {
+		rule := validRecordingRuleV1(t)
+		_, err := rule.mapToModel(1)
+		require.NoError(t, err)
+	})
+}
+
 func TestNotificationsSettingsV1MapToModel(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -212,20 +220,22 @@ func TestNotificationsSettingsV1MapToModel(t *testing.T) {
 		{
 			name: "Valid Input",
 			input: NotificationSettingsV1{
-				Receiver:          stringToStringValue("test-receiver"),
-				GroupBy:           []values.StringValue{stringToStringValue("test-group_by")},
-				GroupWait:         stringToStringValue("1s"),
-				GroupInterval:     stringToStringValue("2s"),
-				RepeatInterval:    stringToStringValue("3s"),
-				MuteTimeIntervals: []values.StringValue{stringToStringValue("test-mute")},
+				Receiver:            stringToStringValue("test-receiver"),
+				GroupBy:             []values.StringValue{stringToStringValue("test-group_by")},
+				GroupWait:           stringToStringValue("1s"),
+				GroupInterval:       stringToStringValue("2s"),
+				RepeatInterval:      stringToStringValue("3s"),
+				MuteTimeIntervals:   []values.StringValue{stringToStringValue("test-mute")},
+				ActiveTimeIntervals: []values.StringValue{stringToStringValue("test-active")},
 			},
 			expected: models.NotificationSettings{
-				Receiver:          "test-receiver",
-				GroupBy:           []string{"test-group_by"},
-				GroupWait:         util.Pointer(model.Duration(1 * time.Second)),
-				GroupInterval:     util.Pointer(model.Duration(2 * time.Second)),
-				RepeatInterval:    util.Pointer(model.Duration(3 * time.Second)),
-				MuteTimeIntervals: []string{"test-mute"},
+				Receiver:            "test-receiver",
+				GroupBy:             []string{"test-group_by"},
+				GroupWait:           util.Pointer(model.Duration(1 * time.Second)),
+				GroupInterval:       util.Pointer(model.Duration(2 * time.Second)),
+				RepeatInterval:      util.Pointer(model.Duration(3 * time.Second)),
+				MuteTimeIntervals:   []string{"test-mute"},
+				ActiveTimeIntervals: []string{"test-active"},
 			},
 		},
 		{
@@ -342,6 +352,37 @@ func validRuleV1(t *testing.T) AlertRuleV1 {
 		For:       forDuration,
 		Condition: condition,
 		Data:      []QueryV1{{}},
+	}
+}
+
+func validRecordingRuleV1(t *testing.T) AlertRuleV1 {
+	t.Helper()
+	var (
+		title       values.StringValue
+		uid         values.StringValue
+		forDuration values.StringValue
+		metric      values.StringValue
+		from        values.StringValue
+	)
+	err := yaml.Unmarshal([]byte("test"), &title)
+	require.NoError(t, err)
+	err = yaml.Unmarshal([]byte("test_uid"), &uid)
+	require.NoError(t, err)
+	err = yaml.Unmarshal([]byte("10s"), &forDuration)
+	require.NoError(t, err)
+	err = yaml.Unmarshal([]byte("test_metric"), &metric)
+	require.NoError(t, err)
+	err = yaml.Unmarshal([]byte("A"), &from)
+	require.NoError(t, err)
+	return AlertRuleV1{
+		Title: title,
+		UID:   uid,
+		For:   forDuration,
+		Record: &RecordV1{
+			Metric: metric,
+			From:   from,
+		},
+		Data: []QueryV1{{}},
 	}
 }
 
