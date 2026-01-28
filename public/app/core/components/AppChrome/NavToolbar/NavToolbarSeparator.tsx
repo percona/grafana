@@ -16,7 +16,7 @@ export function NavToolbarSeparator({ className, leftActionsSeparator }: Props) 
   }
 
   // @PERCONA: data-testid is used to select the separator so that it can be hidden by pmm-compat plugin
-  return <div className={cx(className, styles.line)} data-testid='nav-toolbar-separator'/>;
+  return <div className={cx(className, styles.line)} data-testid="nav-toolbar-separator" />;
 }
 
 const getStyles = (theme: GrafanaTheme2) => {
