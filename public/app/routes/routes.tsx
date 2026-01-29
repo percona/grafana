@@ -757,12 +757,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/entitlements',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/entitlements/EntitlementsPage')
-      ),
-    },
-    {
       path: '/roles',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "AccessRolesPage" */ 'app/percona/rbac/AccessRoles/AccessRoles')
