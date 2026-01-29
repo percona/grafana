@@ -763,12 +763,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/tickets',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "TicketsPage" */ 'app/percona/tickets/TicketsPage')
-      ),
-    },
-    {
       path: '/roles',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "AccessRolesPage" */ 'app/percona/rbac/AccessRoles/AccessRoles')

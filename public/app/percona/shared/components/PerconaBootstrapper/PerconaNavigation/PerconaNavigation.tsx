@@ -33,7 +33,6 @@ import {
   PMM_ENTITLEMENTS_PAGE,
   PMM_ENVIRONMENT_OVERVIEW_PAGE,
   PMM_INVENTORY_PAGE,
-  PMM_TICKETS_PAGE,
   PMM_DUMP_PAGE,
   PMM_EXPORT_DUMP_PAGE,
 } from './PerconaNavigation.constants';
@@ -67,7 +66,6 @@ const PerconaNavigation: FC = () => {
   dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
   dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
   dispatch(updateNavIndex(PMM_EDIT_INSTANCE_PAGE));
-  dispatch(updateNavIndex(PMM_TICKETS_PAGE));
   dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
   dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
   dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
@@ -100,7 +98,6 @@ const PerconaNavigation: FC = () => {
 
     if (isPlatformUser) {
       updatedNavTree.push(PMM_ENTITLEMENTS_PAGE);
-      updatedNavTree.push(PMM_TICKETS_PAGE);
       updatedNavTree.push(PMM_ENVIRONMENT_OVERVIEW_PAGE);
     }
 

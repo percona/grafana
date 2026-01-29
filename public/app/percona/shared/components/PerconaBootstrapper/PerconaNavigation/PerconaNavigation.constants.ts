@@ -223,14 +223,6 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
   return page;
 };
 
-export const PMM_TICKETS_PAGE: NavModelItem = {
-  id: 'tickets',
-  icon: 'ticket',
-  text: 'List of tickets opened by Customer Organization',
-  subTitle: 'Percona Support Tickets from Portal',
-  url: `${config.appSubUrl}/tickets`,
-};
-
 export const PMM_ENTITLEMENTS_PAGE: NavModelItem = {
   id: 'entitlements',
   icon: 'cloud',
