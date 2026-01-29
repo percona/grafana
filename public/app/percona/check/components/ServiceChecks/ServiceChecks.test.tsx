@@ -16,7 +16,7 @@ const setup = () =>
       store={configureStore({
         percona: {
           user: { isAuthorized: true },
-          settings: { loading: false, result: { isConnectedToPortal: false } },
+          settings: { loading: false, result: { } },
         },
       } as StoreState)}
     >

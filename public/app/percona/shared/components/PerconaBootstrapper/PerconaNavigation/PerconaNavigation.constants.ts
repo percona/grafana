@@ -195,11 +195,6 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
       text: 'SSH Key',
       url: `${config.appSubUrl}/settings/ssh-key`,
     },
-    {
-      id: 'settings-percona-platform',
-      text: 'Percona Platform',
-      url: `${config.appSubUrl}/settings/percona-platform`,
-    },
   ];
 
   // TODO remove after integrating SMTP/slack with Grafana's alerting system

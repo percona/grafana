@@ -15,7 +15,6 @@ import { FolderDTO, useSelector } from 'app/types';
 import {
   getCategorizedAdvisors,
   getPerconaSettings,
-  getPerconaUser,
   getServices,
   getUpdatesInfo,
 } from '../../../core/selectors';
@@ -50,7 +49,6 @@ const PerconaNavigation: FC = () => {
   const [folders, setFolders] = useState<FolderDTO[]>([]);
   const { result } = useSelector(getPerconaSettings);
   const { alertingEnabled, advisorEnabled, backupEnabled } = result || {};
-  const { isPlatformUser } = useSelector(getPerconaUser);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
   const dispatch = useAppDispatch();
@@ -91,9 +89,6 @@ const PerconaNavigation: FC = () => {
 
     // QAN
     updatedNavTree.push(PMM_NAV_QAN);
-
-    if (isPlatformUser) {
-    }
 
     if (isPmmAdmin(config.bootData.user)) {
       // PMM Dump
@@ -144,7 +139,7 @@ const PerconaNavigation: FC = () => {
 
     dispatch(updateNavTree(filterByServices(updatedNavTree, activeTypes)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, folders, activeTypes, isPlatformUser, advisorsPage, updateAvailable]);
+  }, [result, folders, activeTypes, advisorsPage, updateAvailable]);
 
   return null;
 };

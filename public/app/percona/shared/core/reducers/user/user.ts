@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { withSerializedError } from 'app/features/alerting/unified/utils/redux';
-
 import { UserService } from '../../../services/user/User.service';
 
 import { PerconaUserState, UserDetails } from './user.types';
@@ -12,7 +10,6 @@ export const initialUserState: PerconaUserState = {
   productTourCompleted: true,
   alertingTourCompleted: true,
   isAuthorized: false,
-  isPlatformUser: false,
   snoozedPmmVersion: '',
 };
 
@@ -24,27 +21,12 @@ const perconaUserSlice = createSlice({
       ...state,
       isAuthorized: action.payload,
     }),
-    setIsPlatformUser: (state, action: PayloadAction<boolean>): PerconaUserState => ({
-      ...state,
-      isPlatformUser: action.payload,
-    }),
     setUserDetails: (state, action: PayloadAction<UserDetails>) => ({
       ...state,
       ...action.payload,
     }),
   },
 });
-
-export const fetchUserStatusAction = createAsyncThunk(
-  'percona/fetchUserStatus',
-  (_, thunkAPI): Promise<void> =>
-    withSerializedError(
-      (async () => {
-        const isPlatformUser = await UserService.getUserStatus(undefined, true);
-        thunkAPI.dispatch(setIsPlatformUser(isPlatformUser));
-      })()
-    )
-);
 
 export const fetchUserDetailsAction = createAsyncThunk(
   'percona/fetchUserDetails',
@@ -86,6 +68,6 @@ export const setAlertingTourCompleted = createAsyncThunk(
   }
 );
 
-export const { setAuthorized, setIsPlatformUser, setUserDetails } = perconaUserSlice.actions;
+export const { setAuthorized, setUserDetails } = perconaUserSlice.actions;
 
 export default perconaUserSlice.reducer;

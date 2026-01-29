@@ -677,15 +677,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/settings/percona-platform',
-      component: SafeDynamicImport(
-        () =>
-          import(
-            /* webpackChunkName: "PerconaPlatformSettingsPage" */ 'app/percona/settings/components/Platform/Platform'
-          )
-      ),
-    },
-    {
       path: '/settings/communication',
       component: SafeDynamicImport(
         () =>

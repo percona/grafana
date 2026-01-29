@@ -3,15 +3,12 @@ import { useEffect, useState } from 'react';
 import { config } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, Modal, useStyles2, useTheme2 } from '@grafana/ui';
 import {
-  fetchServerInfoAction,
-  fetchServerSaasHostAction,
   fetchSettingsAction,
 } from 'app/percona/shared/core/reducers';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
 import {
   fetchUserDetailsAction,
-  fetchUserStatusAction,
   setAuthorized,
 } from 'app/percona/shared/core/reducers/user/user';
 import { getUpdatesInfo } from 'app/percona/shared/core/selectors';
@@ -95,8 +92,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
       }
 
       if (isPmmAdmin(user)) {
-        await dispatch(fetchUserStatusAction());
-
         if (settings?.updatesEnabled) {
           await dispatch(checkUpdatesAction());
         }
@@ -104,8 +99,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
       await getUserDetails();
       await dispatch(fetchHighAvailabilityStatus());
-      await dispatch(fetchServerInfoAction());
-      await dispatch(fetchServerSaasHostAction());
       onReady();
     };
 
