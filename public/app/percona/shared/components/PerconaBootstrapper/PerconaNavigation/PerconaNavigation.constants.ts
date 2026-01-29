@@ -223,14 +223,6 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
   return page;
 };
 
-export const PMM_ENVIRONMENT_OVERVIEW_PAGE: NavModelItem = {
-  id: 'environment-overview',
-  icon: 'clouds',
-  text: 'Environment Overview',
-  subTitle: 'Percona Environment Overview',
-  url: `${config.appSubUrl}/environment-overview`,
-};
-
 /**
  * Mapping of menu items id to folders name.
  *

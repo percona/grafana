@@ -30,7 +30,6 @@ import {
   PMM_ADD_INSTANCE_PAGE,
   PMM_BACKUP_PAGE,
   PMM_EDIT_INSTANCE_PAGE,
-  PMM_ENVIRONMENT_OVERVIEW_PAGE,
   PMM_INVENTORY_PAGE,
   PMM_DUMP_PAGE,
   PMM_EXPORT_DUMP_PAGE,
@@ -65,7 +64,6 @@ const PerconaNavigation: FC = () => {
   dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
   dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
   dispatch(updateNavIndex(PMM_EDIT_INSTANCE_PAGE));
-  dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
   dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
   dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
   dispatch(updateNavIndex(advisorsPage));
@@ -95,7 +93,6 @@ const PerconaNavigation: FC = () => {
     updatedNavTree.push(PMM_NAV_QAN);
 
     if (isPlatformUser) {
-      updatedNavTree.push(PMM_ENVIRONMENT_OVERVIEW_PAGE);
     }
 
     if (isPmmAdmin(config.bootData.user)) {

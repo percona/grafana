@@ -774,13 +774,6 @@ export function getAppRoutes(): RouteDescriptor[] {
         () => import(/* webpackChunkName: "AccessRoleCreatePage" */ 'app/percona/rbac/AddEditRole/AddRolePage')
       ),
     },
-    {
-      path: '/environment-overview',
-      component: SafeDynamicImport(
-        () =>
-          import(/* webpackChunkName: "EnvironmentOverview" */ 'app/percona/environment-overview/EnvironmentOverview')
-      ),
-    },
     config.featureToggles.exploreMetrics && {
       path: '/explore/metrics/*',
       roles: () => contextSrv.evaluatePermission([AccessControlAction.DataSourcesExplore]),
