@@ -12,12 +12,7 @@ import { isPmmAdmin, isViewer } from 'app/percona/shared/helpers/permissions';
 import { useAppDispatch } from 'app/store/store';
 import { FolderDTO, useSelector } from 'app/types';
 
-import {
-  getCategorizedAdvisors,
-  getPerconaSettings,
-  getServices,
-  getUpdatesInfo,
-} from '../../../core/selectors';
+import { getCategorizedAdvisors, getPerconaSettings, getServices, getUpdatesInfo } from '../../../core/selectors';
 
 import {
   ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS,

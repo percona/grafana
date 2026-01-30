@@ -2,15 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { config } from '@grafana/runtime';
 import { Button, HorizontalGroup, Icon, Modal, useStyles2, useTheme2 } from '@grafana/ui';
-import {
-  fetchSettingsAction,
-} from 'app/percona/shared/core/reducers';
+import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
-import {
-  fetchUserDetailsAction,
-  setAuthorized,
-} from 'app/percona/shared/core/reducers/user/user';
+import { fetchUserDetailsAction, setAuthorized } from 'app/percona/shared/core/reducers/user/user';
 import { getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
