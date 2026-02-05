@@ -84,7 +84,6 @@ export const Messages = {
     metrics: 'Metrics Resolution',
     advanced: 'Advanced Settings',
     ssh: 'SSH Key',
-    perconaPlatform: 'Percona Platform',
     communication: 'Communication',
   },
   tooltipLinkText: 'Read more',

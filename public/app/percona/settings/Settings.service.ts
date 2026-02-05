@@ -61,7 +61,6 @@ const toModel = (response: SettingsPayload): Settings => ({
   alertManagerUrl: response.alert_manager_url,
   alertManagerRules: response.alert_manager_rules,
   advisorEnabled: response.advisor_enabled,
-  platformEmail: response.platform_email,
   azureDiscoverEnabled: response.azurediscover_enabled,
   alertingEnabled: response.alerting_enabled,
   alertingSettings: {
@@ -75,7 +74,6 @@ const toModel = (response: SettingsPayload): Settings => ({
     frequentInterval: response.advisor_run_intervals.frequent_interval,
   },
   backupEnabled: response.backup_management_enabled,
-  isConnectedToPortal: response.connected_to_platform,
   defaultRoleId: response.default_role_id,
   enableAccessControl: response.enable_access_control,
   enableInternalPgQan: response.enable_internal_pg_qan,
@@ -96,7 +94,6 @@ const toReadonlyModel = (response: ReadonlySettingsPayload): Settings => ({
   alertManagerUrl: '',
   alertManagerRules: '',
   advisorEnabled: response.advisor_enabled,
-  platformEmail: '',
   azureDiscoverEnabled: response.azurediscover_enabled,
   alertingEnabled: response.alerting_enabled,
   alertingSettings: {
@@ -114,7 +111,6 @@ const toReadonlyModel = (response: ReadonlySettingsPayload): Settings => ({
     frequentInterval: '',
   },
   backupEnabled: response.backup_management_enabled,
-  isConnectedToPortal: false,
   defaultRoleId: -1,
   enableAccessControl: response.enable_access_control,
   enableInternalPgQan: false,
