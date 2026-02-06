@@ -35,6 +35,7 @@ import { InventoryService } from '../Inventory.service';
 import { beautifyAgentType, getAgentStatusColor, getAgentStatusText, toAgentModel } from './Agents.utils';
 import { getTagsFromLabels } from './Services.utils';
 import { getStyles } from './Tabs.styles';
+import { AGENT_TYPE_OPTIONS } from './Agents.constants';
 
 export const Agents: FC = () => {
   const [agentsLoading, setLoading] = useState(false);
@@ -105,7 +106,8 @@ export const Agents: FC = () => {
         Header: Messages.agents.columns.agentType,
         accessor: 'type',
         Cell: ({ value }) => <>{beautifyAgentType(value)}</>,
-        type: FilterFieldTypes.TEXT,
+        type: FilterFieldTypes.DROPDOWN,
+        options: AGENT_TYPE_OPTIONS,
       },
       {
         Header: Messages.agents.columns.agentId,
