@@ -12,13 +12,7 @@ import { isPmmAdmin, isViewer } from 'app/percona/shared/helpers/permissions';
 import { useAppDispatch } from 'app/store/store';
 import { FolderDTO, useSelector } from 'app/types';
 
-import {
-  getCategorizedAdvisors,
-  getPerconaSettings,
-  getPerconaUser,
-  getServices,
-  getUpdatesInfo,
-} from '../../../core/selectors';
+import { getCategorizedAdvisors, getPerconaSettings, getServices, getUpdatesInfo } from '../../../core/selectors';
 
 import {
   ACTIVE_SERVICE_TYPES_CHECK_INTERVAL_MS,
@@ -30,10 +24,7 @@ import {
   PMM_ADD_INSTANCE_PAGE,
   PMM_BACKUP_PAGE,
   PMM_EDIT_INSTANCE_PAGE,
-  PMM_ENTITLEMENTS_PAGE,
-  PMM_ENVIRONMENT_OVERVIEW_PAGE,
   PMM_INVENTORY_PAGE,
-  PMM_TICKETS_PAGE,
   PMM_DUMP_PAGE,
   PMM_EXPORT_DUMP_PAGE,
 } from './PerconaNavigation.constants';
@@ -53,7 +44,6 @@ const PerconaNavigation: FC = () => {
   const [folders, setFolders] = useState<FolderDTO[]>([]);
   const { result } = useSelector(getPerconaSettings);
   const { alertingEnabled, advisorEnabled, backupEnabled } = result || {};
-  const { isPlatformUser } = useSelector(getPerconaUser);
   const categorizedAdvisors = useSelector(getCategorizedAdvisors);
   const isLoggedIn = !!contextSrv.user.isSignedIn;
   const dispatch = useAppDispatch();
@@ -67,9 +57,6 @@ const PerconaNavigation: FC = () => {
   dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
   dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
   dispatch(updateNavIndex(PMM_EDIT_INSTANCE_PAGE));
-  dispatch(updateNavIndex(PMM_TICKETS_PAGE));
-  dispatch(updateNavIndex(PMM_ENTITLEMENTS_PAGE));
-  dispatch(updateNavIndex(PMM_ENVIRONMENT_OVERVIEW_PAGE));
   dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
   dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
   dispatch(updateNavIndex(advisorsPage));
@@ -97,12 +84,6 @@ const PerconaNavigation: FC = () => {
 
     // QAN
     updatedNavTree.push(PMM_NAV_QAN);
-
-    if (isPlatformUser) {
-      updatedNavTree.push(PMM_ENTITLEMENTS_PAGE);
-      updatedNavTree.push(PMM_TICKETS_PAGE);
-      updatedNavTree.push(PMM_ENVIRONMENT_OVERVIEW_PAGE);
-    }
 
     if (isPmmAdmin(config.bootData.user)) {
       // PMM Dump
@@ -153,7 +134,7 @@ const PerconaNavigation: FC = () => {
 
     dispatch(updateNavTree(filterByServices(updatedNavTree, activeTypes)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, folders, activeTypes, isPlatformUser, advisorsPage, updateAvailable]);
+  }, [result, folders, activeTypes, advisorsPage, updateAvailable]);
 
   return null;
 };

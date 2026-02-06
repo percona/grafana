@@ -677,15 +677,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/settings/percona-platform',
-      component: SafeDynamicImport(
-        () =>
-          import(
-            /* webpackChunkName: "PerconaPlatformSettingsPage" */ 'app/percona/settings/components/Platform/Platform'
-          )
-      ),
-    },
-    {
       path: '/settings/communication',
       component: SafeDynamicImport(
         () =>
@@ -757,18 +748,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/entitlements',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/entitlements/EntitlementsPage')
-      ),
-    },
-    {
-      path: '/tickets',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "TicketsPage" */ 'app/percona/tickets/TicketsPage')
-      ),
-    },
-    {
       path: '/roles',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "AccessRolesPage" */ 'app/percona/rbac/AccessRoles/AccessRoles')
@@ -784,13 +763,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       path: '/roles/create',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "AccessRoleCreatePage" */ 'app/percona/rbac/AddEditRole/AddRolePage')
-      ),
-    },
-    {
-      path: '/environment-overview',
-      component: SafeDynamicImport(
-        () =>
-          import(/* webpackChunkName: "EnvironmentOverview" */ 'app/percona/environment-overview/EnvironmentOverview')
       ),
     },
     config.featureToggles.exploreMetrics && {

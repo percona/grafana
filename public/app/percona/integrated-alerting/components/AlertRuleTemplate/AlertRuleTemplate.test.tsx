@@ -36,7 +36,7 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -62,7 +62,7 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -91,7 +91,7 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -117,7 +117,7 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: false },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -141,7 +141,7 @@ describe('AlertRuleTemplate', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: false },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
