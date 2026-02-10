@@ -64,7 +64,6 @@ describe('DashboardSceneUrlSync', () => {
       expect(scene.urlSync?.getUrlState().kiosk).toBe(undefined);
       scene.setState({ kioskMode: KioskMode.Full });
       expect(scene.urlSync?.getUrlState().kiosk).toBe('true');
-
     });
   });
 
