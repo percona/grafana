@@ -111,7 +111,6 @@ export interface SettingsPayload
   aws_partitions: {
     values: string[];
   };
-  platform_email: string;
   updates_enabled: boolean;
   telemetry_enabled: boolean;
   advisor_enabled: boolean;
@@ -119,7 +118,6 @@ export interface SettingsPayload
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
   advisor_run_intervals: AdvisorRunIntervalsPayload;
-  connected_to_platform: boolean;
   telemetry_summaries: string[];
   default_role_id: number;
   enable_access_control: boolean;
@@ -136,7 +134,6 @@ export interface SettingsPayload
   aws_partitions: {
     values: string[];
   };
-  platform_email: string;
   updates_enabled: boolean;
   telemetry_enabled: boolean;
   advisor_enabled: boolean;
@@ -144,7 +141,6 @@ export interface SettingsPayload
   backup_management_enabled: boolean;
   azurediscover_enabled: boolean;
   advisor_run_intervals: AdvisorRunIntervalsPayload;
-  connected_to_platform: boolean;
   telemetry_summaries: string[];
   default_role_id: number;
   enable_access_control: boolean;
@@ -177,9 +173,7 @@ export interface Settings extends ReadonlySettings {
   awsPartitions: string[];
   alertManagerUrl: string;
   alertManagerRules: string;
-  platformEmail?: string;
   alertingSettings: AlertingSettings;
-  isConnectedToPortal?: boolean;
   telemetrySummaries: string[];
   defaultRoleId: number;
   enableInternalPgQan: boolean;

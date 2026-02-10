@@ -195,11 +195,6 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
       text: 'SSH Key',
       url: `${config.appSubUrl}/settings/ssh-key`,
     },
-    {
-      id: 'settings-percona-platform',
-      text: 'Percona Platform',
-      url: `${config.appSubUrl}/settings/percona-platform`,
-    },
   ];
 
   // TODO remove after integrating SMTP/slack with Grafana's alerting system
@@ -221,30 +216,6 @@ export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
   };
 
   return page;
-};
-
-export const PMM_TICKETS_PAGE: NavModelItem = {
-  id: 'tickets',
-  icon: 'ticket',
-  text: 'List of tickets opened by Customer Organization',
-  subTitle: 'Percona Support Tickets from Portal',
-  url: `${config.appSubUrl}/tickets`,
-};
-
-export const PMM_ENTITLEMENTS_PAGE: NavModelItem = {
-  id: 'entitlements',
-  icon: 'cloud',
-  text: 'Entitlements',
-  subTitle: 'Percona Entitlements',
-  url: `${config.appSubUrl}/entitlements`,
-};
-
-export const PMM_ENVIRONMENT_OVERVIEW_PAGE: NavModelItem = {
-  id: 'environment-overview',
-  icon: 'clouds',
-  text: 'Environment Overview',
-  subTitle: 'Percona Environment Overview',
-  url: `${config.appSubUrl}/environment-overview`,
 };
 
 /**
