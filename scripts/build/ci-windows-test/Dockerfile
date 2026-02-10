@@ -1,4 +1,4 @@
-FROM golang:1.24.9-windowsservercore-ltsc2025
+FROM golang:1.25.5-windowsservercore-ltsc2025
 
 SHELL ["powershell", "-command"]
 

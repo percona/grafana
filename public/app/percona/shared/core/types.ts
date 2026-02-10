@@ -76,12 +76,6 @@ export interface PrioritizedLabels {
   secondary: string[];
 }
 
-export interface ServerInfo {
-  serverName: string;
-  serverId: string;
-  serverTelemetryId: string;
-}
-
 export enum Severity {
   SEVERITY_EMERGENCY = 'Emergency',
   SEVERITY_ALERT = 'Alert',

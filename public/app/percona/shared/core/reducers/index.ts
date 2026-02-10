@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
-import { combineReducers, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { combineReducers, createAsyncThunk } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 
 import { config } from '@grafana/runtime';
@@ -8,12 +8,9 @@ import { AlertRuleTemplateService } from 'app/percona/integrated-alerting/compon
 import { TemplatesList } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
 import { SettingsService } from 'app/percona/settings/Settings.service';
 import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Settings.types';
-import { PlatformService } from 'app/percona/settings/components/Platform/Platform.service';
-import { api } from 'app/percona/shared/helpers/api';
 import { uiEventsReducer } from 'app/percona/ui-events/reducer';
 
 import { isPmmAdmin } from '../../helpers/permissions';
-import { ServerInfo } from '../types';
 
 import advisorsReducers from './advisors/advisors';
 import perconaBackupLocations from './backups/backupLocations';
@@ -63,7 +60,6 @@ const initialSettingsState: Settings = {
     standardInterval: '10s',
     frequentInterval: '10s',
   },
-  isConnectedToPortal: false,
   defaultRoleId: 1,
   enableAccessControl: false,
   enableInternalPgQan: false,
@@ -127,71 +123,6 @@ export const updateSettingsAction = createAsyncThunk(
     )
 );
 
-export interface PerconaServerState extends ServerInfo {
-  saasHost: string;
-}
-
-export const initialServerState: PerconaServerState = {
-  serverName: '',
-  serverId: '',
-  saasHost: 'https://portal.percona.com',
-  serverTelemetryId: '',
-};
-
-const perconaServerSlice = createSlice({
-  name: 'perconaServer',
-  initialState: initialServerState,
-  reducers: {
-    setServerInfo: (state, action: PayloadAction<ServerInfo>): PerconaServerState => ({
-      ...state,
-      serverName: action.payload.serverName,
-      serverId: action.payload.serverId,
-      serverTelemetryId: action.payload.serverTelemetryId,
-    }),
-    setServerSaasHost: (state, action: PayloadAction<string>): PerconaServerState => ({
-      ...state,
-      saasHost: action.payload,
-    }),
-  },
-});
-
-const { setServerInfo, setServerSaasHost } = perconaServerSlice.actions;
-
-export const perconaServerReducers = perconaServerSlice.reducer;
-
-export const fetchServerInfoAction = createAsyncThunk(
-  'percona/fetchServerInfo',
-  (_, thunkAPI): Promise<void> =>
-    withSerializedError(
-      (async () => {
-        const {
-          pmm_server_id = '',
-          pmm_server_name = '',
-          pmm_server_telemetry_id = '',
-        } = await PlatformService.getServerInfo();
-
-        thunkAPI.dispatch(
-          setServerInfo({
-            serverName: pmm_server_name,
-            serverId: pmm_server_id,
-            serverTelemetryId: pmm_server_telemetry_id,
-          })
-        );
-      })()
-    )
-);
-
-export const fetchServerSaasHostAction = createAsyncThunk(
-  'percona/fetchServerSaasHost',
-  (_, thunkAPI): Promise<void> =>
-    withSerializedError(
-      (async () => {
-        const { host } = (await api.get('/graph/percona-api/saas-host', true)) as { host: string };
-        thunkAPI.dispatch(setServerSaasHost(host));
-      })()
-    )
-);
-
 export const fetchTemplatesAction = createAsyncThunk(
   'percona/fetchTemplates',
   async (): Promise<TemplatesList> =>
@@ -216,7 +147,6 @@ export default {
     settings: settingsReducer,
     updateSettings: updateSettingsReducer,
     user: perconaUserReducers,
-    server: perconaServerReducers,
     templates: templatesReducer,
     services: servicesReducer,
     nodes: nodesReducer,
