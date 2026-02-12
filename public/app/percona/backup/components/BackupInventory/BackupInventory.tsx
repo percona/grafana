@@ -8,7 +8,6 @@ import { locationService } from '@grafana/runtime';
 import { Alert, LinkButton, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
-import { BackupStatus } from 'app/percona/backup/Backup.types';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
@@ -29,7 +28,7 @@ import { DetailedDate } from '../DetailedDate';
 import { Status } from '../Status';
 import { LocationType } from '../StorageLocations/StorageLocations.types';
 
-import { LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN } from './BackupInventory.constants';
+import { LIST_ARTIFACTS_CANCEL_TOKEN, RESTORE_CANCEL_TOKEN, STATUS_FILTER_OPTIONS } from './BackupInventory.constants';
 import { useServiceNames } from './BackupInventory.hooks';
 import { BackupInventoryService } from './BackupInventory.service';
 import { getStyles } from './BackupInventory.styles';
@@ -61,44 +60,7 @@ export const BackupInventory: FC = () => {
         accessor: 'status',
         type: FilterFieldTypes.DROPDOWN,
         width: '100px',
-        options: [
-          {
-            label: Messages.backupInventory.table.columns.status.options.success,
-            value: BackupStatus.BACKUP_STATUS_SUCCESS,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.error,
-            value: BackupStatus.BACKUP_STATUS_ERROR,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.pending,
-            value: BackupStatus.BACKUP_STATUS_PENDING,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.paused,
-            value: BackupStatus.BACKUP_STATUS_PAUSED,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.invalid,
-            value: BackupStatus.BACKUP_STATUS_INVALID,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.inProgress,
-            value: BackupStatus.BACKUP_STATUS_IN_PROGRESS,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.failedToDelete,
-            value: BackupStatus.BACKUP_STATUS_FAILED_TO_DELETE,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.failedNotSupportedByAgent,
-            value: BackupStatus.BACKUP_STATUS_FAILED_NOT_SUPPORTED_BY_AGENT,
-          },
-          {
-            label: Messages.backupInventory.table.columns.status.options.deleting,
-            value: BackupStatus.BACKUP_STATUS_DELETING,
-          },
-        ],
+        options: STATUS_FILTER_OPTIONS,
         Cell: ({ value, row }) => (
           <Status
             showLogsAction={row.original.vendor === Databases.mongodb}
@@ -175,7 +137,22 @@ export const BackupInventory: FC = () => {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [serviceNames]
+    []
+  );
+  // need to create another object to avoid re-rendering the table when the service names change
+  const filterColumns = useMemo(
+    (): Array<ExtendedColumn<BackupRow>> =>
+      columns.map((col) => {
+        if (col.accessor === 'serviceName') {
+          return {
+            ...col,
+            options: serviceNames,
+          };
+        }
+
+        return col;
+      }),
+    [columns, serviceNames]
   );
   const styles = useStyles2(getStyles);
 
@@ -313,13 +290,14 @@ export const BackupInventory: FC = () => {
             data={data}
             totalItems={data.length}
             columns={columns}
+            filterColumns={filterColumns}
             emptyMessage={Messages.backupInventory.table.noData}
             pendingRequest={pending}
             autoResetExpanded={false}
             renderExpandedRow={renderSelectedSubRow}
             getRowId={useCallback((row: BackupRow) => row.id, [])}
             showFilter
-          ></Table>
+          />
           {restoreModalVisible && (
             <RestoreBackupModal
               backup={selectedBackup}

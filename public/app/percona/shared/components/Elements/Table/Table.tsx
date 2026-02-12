@@ -30,6 +30,7 @@ export const Table: FC<TableProps> = ({
   pendingRequest = false,
   data: rawData,
   columns,
+  filterColumns,
   showPagination,
   rowSelection,
   totalPages,
@@ -159,7 +160,7 @@ export const Table: FC<TableProps> = ({
       <Overlay dataTestId="table-loading" isPending={pendingRequest} overlayClassName={overlayClassName}>
         {showFilter && (
           <Filter
-            columns={columns}
+            columns={filterColumns ?? columns}
             rawData={rawData}
             setFilteredData={setFilteredData}
             hasBackendFiltering={hasBackendFiltering}
