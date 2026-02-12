@@ -7,5 +7,4 @@ export interface UserDetails {
 
 export interface PerconaUserState extends UserDetails {
   isAuthorized: boolean;
-  isPlatformUser: boolean;
 }

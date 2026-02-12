@@ -71,18 +71,4 @@ describe('AlertRuleTemplateActions', () => {
     expect(editButton).toBeNull();
     expect(deleteButton).toBeNull();
   });
-
-  it('should not show edit and delete buttons when Portal is the template source', () => {
-    render(
-      <Router history={locationService.getHistory()}>
-        <AlertRuleTemplateActions template={formattedTemplateStubs[4]} getAlertRuleTemplates={jest.fn()} />
-      </Router>
-    );
-
-    const editButton = screen.queryByTestId('edit-template-button');
-    const deleteButton = screen.queryByTestId('delete-template-button');
-
-    expect(editButton).toBeNull();
-    expect(deleteButton).toBeNull();
-  });
 });
