@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { SelectableValue } from '@grafana/data';
-import { BackupMode, BackupType, DataModel, RetryMode } from 'app/percona/backup/Backup.types';
+import { BackupMode, BackupType, DataModel, RetryMode, Compression } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 import { getPeriodFromCronparts, parseCronString } from 'app/percona/shared/helpers/cron/cron';
 import { PeriodType } from 'app/percona/shared/helpers/cron/types';
@@ -54,6 +54,16 @@ const getBackupType = (backup: Backup | ScheduledBackup | null): BackupType => {
   return BackupType.DEMAND;
 };
 
+const compressionValueToKeyMap: Record<string, string> = Object.fromEntries(
+  Object.entries(Compression).map(([key, val]) => [val, key])
+);
+
+export const getCompressionOptionFromValue = (value: Compression): SelectableValue<Compression> => ({
+  value,
+  label: compressionValueToKeyMap[value] ?? value,
+});
+
+
 export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMode?: boolean): AddBackupFormProps => {
   if (!backup) {
     return {
@@ -79,6 +89,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode: BackupMode.SNAPSHOT,
       type: scheduleMode ? BackupType.SCHEDULED : getBackupType(backup),
       folder: '',
+      compression: getCompressionOptionFromValue(Compression.DEFAULT),
     };
   }
 
@@ -130,6 +141,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       mode,
       type: BackupType.SCHEDULED,
       folder,
+      compression: getCompressionOptionFromValue(backup.compression),
     };
   } else {
     return {
@@ -146,6 +158,7 @@ export const toFormBackup = (backup: Backup | ScheduledBackup | null, scheduleMo
       retryInterval: 30,
       type: BackupType.DEMAND,
       folder,
+      compression: getCompressionOptionFromValue(backup.compression),
     };
   }
 };

@@ -4,4 +4,5 @@ export const Messages = {
   dataModel: 'Data model',
   cronExpression: 'Cron expression',
   folder: 'Folder',
+  compression: 'Compression',
 };

@@ -4,7 +4,7 @@ import { api } from 'app/percona/shared/helpers/api';
 
 import { getCronStringFromValues } from '../shared/helpers/cron/cron';
 
-import { BackupMode, BackupType, DataModel, RetryMode } from './Backup.types';
+import { BackupMode, BackupType, Compression, DataModel, RetryMode } from './Backup.types';
 import { AddBackupFormProps } from './components/AddBackupPage/AddBackupPage.types';
 
 const BASE_URL = '/v1/backups';
@@ -32,6 +32,7 @@ export const BackupService = {
       type,
       dataModel,
       folder,
+      compression,
     } = values;
     const strRetryInterval = `${retryInterval}s`;
     const resultRetryTimes = retryMode === RetryMode.MANUAL ? 0 : retryTimes;
@@ -46,6 +47,7 @@ export const BackupService = {
         resultRetryTimes!,
         dataModel,
         folder,
+        compression.value!,
         token
       );
     } else {
@@ -66,7 +68,8 @@ export const BackupService = {
           description ?? '',
           strRetryInterval,
           resultRetryTimes!,
-          retention!
+          retention!,
+          compression.value!
         );
       } else {
         return this.scheduleBackup(
@@ -81,7 +84,8 @@ export const BackupService = {
           active!,
           mode,
           dataModel,
-          folder
+          folder,
+          compression.value!
         );
       }
     }
@@ -95,6 +99,7 @@ export const BackupService = {
     retryTimes: number,
     dataModel: DataModel,
     folder: string,
+    compression: Compression,
     token?: CancelToken
   ) {
     return api.post(
@@ -108,6 +113,7 @@ export const BackupService = {
         retries: retryTimes,
         data_model: dataModel,
         folder,
+        compression,
       },
       false,
       token
@@ -125,7 +131,8 @@ export const BackupService = {
     enabled: boolean,
     mode: BackupMode,
     dataModel: DataModel,
-    folder: string
+    folder: string,
+    compression: Compression
   ) {
     return api.post(`${BASE_URL}:schedule`, {
       service_id: serviceId,
@@ -140,6 +147,7 @@ export const BackupService = {
       mode,
       data_model: dataModel,
       folder,
+      compression,
     });
   },
   async changeScheduleBackup(
@@ -150,7 +158,8 @@ export const BackupService = {
     description: string,
     retryInterval: string,
     retryTimes: number,
-    retention: number
+    retention: number,
+    compression: Compression
   ) {
     return api.put(`${BASE_URL}:changeScheduled`, {
       scheduled_backup_id: id,
@@ -161,6 +170,7 @@ export const BackupService = {
       retry_interval: retryInterval,
       retries: retryTimes,
       retention,
+      compression,
     });
   },
 };

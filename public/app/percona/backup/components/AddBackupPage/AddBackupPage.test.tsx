@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { FC, PropsWithChildren } from 'react';
+import { act, FC, PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom-v5-compat';
 
@@ -153,5 +153,27 @@ describe('AddBackupPage', () => {
     const button = screen.getByText(Messages.onDemand);
     await fireEvent.click(button);
     expect(screen.getByText('Create Backup on demand')).toBeInTheDocument();
+  });
+
+  it('should render compression field in advanced settings', async () => {
+    render(
+      <AddBackupPageWrapper>
+        <MemoryRouter>
+          <AddBackupPage />
+        </MemoryRouter>
+      </AddBackupPageWrapper>
+    );
+
+    await waitFor(() => expect(screen.getAllByText('Choose')).toHaveLength(2));
+
+    const advancedSettingsButton = screen.getByTestId('add-backup-advanced-settings');
+    act(() => {
+      fireEvent.click(advancedSettingsButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('compression-select-input')).toBeInTheDocument();
+      expect(screen.getByText(Messages.compression)).toBeInTheDocument();
+    });
   });
 });

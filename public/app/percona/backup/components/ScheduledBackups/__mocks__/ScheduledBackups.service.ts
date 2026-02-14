@@ -1,4 +1,4 @@
-import { BackupMode, DataModel } from 'app/percona/backup/Backup.types';
+import { BackupMode, DataModel, Compression } from 'app/percona/backup/Backup.types';
 import { Databases } from 'app/percona/shared/core';
 
 import * as service from '../ScheduledBackups.service';
@@ -24,6 +24,7 @@ export const stubs: ScheduledBackup[] = [
     retryInterval: '10s',
     retryTimes: 1,
     folder: 'folder1',
+    compression: Compression.NONE,
   },
   {
     id: 'backup_2',
@@ -44,6 +45,7 @@ export const stubs: ScheduledBackup[] = [
     retryInterval: '0s',
     retryTimes: 1,
     folder: 'folder1',
+    compression: Compression.NONE,
   },
 ];
 
