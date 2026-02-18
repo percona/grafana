@@ -232,13 +232,15 @@ ProxyPassReverse / http://grafana:3000/
 
 With our Grafana and Apache containers running, you can now connect to http://localhost/ and log in using the username/password we created in the htpasswd file.
 
-{{% admonition type="note" %}}
+{{< admonition type="note" >}}
 If the user is deleted from Grafana, the user will be not be able to login and resync until after the `sync_ttl` has expired.
-{{% /admonition %}}
+{{< /admonition >}}
 
-### Team Sync (Enterprise only)
+### Team Sync
 
-> Only available in Grafana Enterprise v6.3+
+{{< admonition type="note" >}}
+Only available in [Grafana Enterprise](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/introduction/grafana-enterprise/) and [Grafana Cloud Advanced](https://grafana.com/docs/grafana-cloud/).
+{{< /admonition >}}
 
 With Team Sync, it's possible to set up synchronization between teams in your authentication provider and Grafana. You can send Grafana values as part of an HTTP header and have Grafana map them to your team structure. This allows you to put users into specific teams automatically.
 
@@ -309,9 +311,9 @@ curl -H "X-WEBAUTH-USER: leonard" -H "X-WEBAUTH-GROUPS: lokiteamOnExternalSystem
 
 With this, the user `leonard` will be automatically placed into the Loki team as part of Grafana authentication.
 
-{{% admonition type="note" %}}
+{{< admonition type="note" >}}
 An empty `X-WEBAUTH-GROUPS` or the absence of a groups header will remove the user from all teams.
-{{% /admonition %}}
+{{< /admonition >}}
 
 [Learn more about Team Sync](../../configure-team-sync/)
 
