@@ -2,12 +2,13 @@ name: Coverage
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
+  # @PERCONA - disable workflow
+  # push:
+  #   branches:
+  #     - main
+  #   paths-ignore:
+  #     - 'docs/**'
+  #     - '**/*.md'
 
 permissions:
   contents: read
