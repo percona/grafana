@@ -49,6 +49,7 @@ export enum AgentType {
   remote = 'remote',
   remote_rds = 'remote-rds',
   vmAgent = 'vm-agent',
+  rtaMongoDbAgent = 'rta-mongodb-agent',
 }
 
 export enum ServiceAgentStatus {
