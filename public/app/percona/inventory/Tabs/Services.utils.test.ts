@@ -73,14 +73,14 @@ describe('getAgentsMonitoringStatus', () => {
 
   it('returns OK if there is only one RTA agent disabled agent in Done status', () => {
     const agents: DbAgent[] = [
-      { agentId: uuidv4(), agentType: AgentType.rtaMongoDbAgent, status: ServiceAgentStatus.DONE, disabled: true },
+      { agentId: uuidv4(), agentType: AgentType.rtaMongoDBAgent, status: ServiceAgentStatus.DONE, disabled: true },
     ];
     expect(getAgentsMonitoringStatus(agents)).toBe(MonitoringStatus.OK);
   });
 
   it('returns status regardless of RTA agent status if that agent is disabled', () => {
     const agents: DbAgent[] = [
-      { agentId: uuidv4(), agentType: AgentType.rtaMongoDbAgent, status: ServiceAgentStatus.RUNNING, disabled: true },
+      { agentId: uuidv4(), agentType: AgentType.rtaMongoDBAgent, status: ServiceAgentStatus.RUNNING, disabled: true },
     ];
     expect(getAgentsMonitoringStatus(agents)).toBe(MonitoringStatus.OK);
   });
@@ -101,7 +101,7 @@ describe('getAgentsMonitoringStatus', () => {
     const agents: DbAgent[] = [
       {
         agentId: uuidv4(),
-        agentType: AgentType.container,
+        agentType: AgentType.nodeExporter,
         status: ServiceAgentStatus.RUNNING,
         disabled: true,
       },

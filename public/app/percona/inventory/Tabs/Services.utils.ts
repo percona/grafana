@@ -59,7 +59,7 @@ export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
     return MonitoringStatus.FAILED;
   }
 
-  const disabledAgents = agents.filter((a) => a.disabled && a.agentType !== AgentType.rtaMongoDbAgent);
+  const disabledAgents = agents.filter((a) => a.disabled && a.agentType !== AgentType.rtaMongoDBAgent);
 
   if (disabledAgents.length === 1) {
     const agent = disabledAgents[0];
