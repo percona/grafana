@@ -7,7 +7,7 @@ describe('toAgentModel', () => {
   it('should correctly convert payload', () => {
     const payload: ServiceAgentPayload[] = [
       {
-        agent_type: AgentType.amazonRdsMysql,
+        agent_type: AgentType.rdsExporter,
         agent_id: 'agent1',
         status: ServiceAgentStatus.RUNNING,
         username: 'john',
@@ -17,7 +17,7 @@ describe('toAgentModel', () => {
         },
       },
       {
-        agent_type: AgentType.mongodb,
+        agent_type: AgentType.mongodbExporter,
         agent_id: 'agent2',
         status: ServiceAgentStatus.STOPPING,
         listen_port: '3000',
@@ -30,7 +30,7 @@ describe('toAgentModel', () => {
 
     expect(toAgentModel(payload)).toEqual<Agent[]>([
       {
-        type: AgentType.amazonRdsMysql,
+        type: AgentType.rdsExporter,
         params: {
           agentId: 'agent1',
           status: ServiceAgentStatus.RUNNING,
@@ -42,7 +42,7 @@ describe('toAgentModel', () => {
         },
       },
       {
-        type: AgentType.mongodb,
+        type: AgentType.mongodbExporter,
         params: {
           agentId: 'agent2',
           status: ServiceAgentStatus.STOPPING,

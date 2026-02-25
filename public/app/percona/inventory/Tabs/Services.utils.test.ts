@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 describe('getAgentsMonitoringStatus', () => {
   it('return OK if all agents are ok', () => {
     const agents: DbAgent[] = [
-      { agentId: uuidv4(), agentType: AgentType.mysql, status: ServiceAgentStatus.RUNNING },
+      { agentId: uuidv4(), agentType: AgentType.mysqldExporter, status: ServiceAgentStatus.RUNNING },
       { agentId: uuidv4(), agentType: AgentType.nodeExporter, status: ServiceAgentStatus.RUNNING },
     ];
     expect(getAgentsMonitoringStatus(agents)).toBe(MonitoringStatus.OK);
@@ -27,7 +27,7 @@ describe('getAgentsMonitoringStatus', () => {
 
   it('returns Warning if there are multiple disabled agents in Done status', () => {
     const agents: DbAgent[] = [
-      { agentId: uuidv4(), agentType: AgentType.mysql, status: ServiceAgentStatus.RUNNING },
+      { agentId: uuidv4(), agentType: AgentType.mysqldExporter, status: ServiceAgentStatus.RUNNING },
       {
         agentId: uuidv4(),
         agentType: AgentType.qanMysql_perfschema_agent,
@@ -46,7 +46,7 @@ describe('getAgentsMonitoringStatus', () => {
 
   it('returns Warning if there are multiple disabled agents in Done status', () => {
     const agents: DbAgent[] = [
-      { agentId: uuidv4(), agentType: AgentType.mysql, status: ServiceAgentStatus.RUNNING },
+      { agentId: uuidv4(), agentType: AgentType.mysqldExporter, status: ServiceAgentStatus.RUNNING },
       {
         agentId: uuidv4(),
         agentType: AgentType.qanMysql_slowlog_agent,
@@ -65,7 +65,7 @@ describe('getAgentsMonitoringStatus', () => {
 
   it('returns Failed if there are failing agents', () => {
     const agents: DbAgent[] = [
-      { agentId: uuidv4(), agentType: AgentType.mysql, status: ServiceAgentStatus.RUNNING },
+      { agentId: uuidv4(), agentType: AgentType.mysqldExporter, status: ServiceAgentStatus.RUNNING },
       { agentId: uuidv4(), agentType: AgentType.nodeExporter, status: ServiceAgentStatus.WAITING },
     ];
     expect(getAgentsMonitoringStatus(agents)).toBe(MonitoringStatus.FAILED);
