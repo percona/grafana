@@ -1,4 +1,5 @@
 import { SelectableValue } from '@grafana/data';
+
 import { AgentType } from '../Inventory.types';
 
 export const AGENTS_MAIN_COLUMNS = [
@@ -41,6 +42,8 @@ export const AGENT_TYPE_NAME: Record<AgentType, string> = {
   [AgentType.nomadAgent]: 'Nomad agent',
   [AgentType.valkeyExporter]: 'Valkey exporter',
   [AgentType.rtaMongoDBAgent]: 'Real-Time Analytics MongoDB agent',
+  [AgentType.remote]: 'Remote agent',
+  [AgentType.remote_rds]: 'Remote RDS agent',
 };
 
 export const AGENT_TYPE_OPTIONS = Object.entries(AGENT_TYPE_NAME)

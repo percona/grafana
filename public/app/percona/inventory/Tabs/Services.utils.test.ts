@@ -1,7 +1,10 @@
-import { DbAgent } from 'app/percona/shared/services/services/Services.types';
-import { AgentType, MonitoringStatus, ServiceAgentStatus } from '../Inventory.types';
-import { getAgentsMonitoringStatus } from './Services.utils';
 import { v4 as uuidv4 } from 'uuid';
+
+import { DbAgent } from 'app/percona/shared/services/services/Services.types';
+
+import { AgentType, MonitoringStatus, ServiceAgentStatus } from '../Inventory.types';
+
+import { getAgentsMonitoringStatus } from './Services.utils';
 
 describe('getAgentsMonitoringStatus', () => {
   it('return OK if all agents are ok', () => {
