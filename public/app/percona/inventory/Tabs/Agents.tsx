@@ -35,6 +35,7 @@ import { InventoryService } from '../Inventory.service';
 import { beautifyAgentType, getAgentStatusColor, getAgentStatusText, toAgentModel } from './Agents.utils';
 import { getTagsFromLabels } from './Services.utils';
 import { getStyles } from './Tabs.styles';
+import { AGENT_TYPE_OPTIONS } from './Agents.constants';
 
 import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 import { DATA_INTERVAL } from 'app/percona/shared/core';
@@ -109,7 +110,8 @@ export const Agents: FC = () => {
         Header: Messages.agents.columns.agentType,
         accessor: 'type',
         Cell: ({ value }) => <>{beautifyAgentType(value)}</>,
-        type: FilterFieldTypes.TEXT,
+        type: FilterFieldTypes.DROPDOWN,
+        options: AGENT_TYPE_OPTIONS,
       },
       {
         Header: Messages.agents.columns.agentId,
