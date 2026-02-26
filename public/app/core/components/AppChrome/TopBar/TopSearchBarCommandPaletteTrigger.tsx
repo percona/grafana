@@ -19,7 +19,7 @@ export function TopSearchBarCommandPaletteTrigger() {
 
   const breakpoint = theme.breakpoints.values.lg;
 
-  const [isSmallScreen, setIsSmallScreen] = useState(!window.matchMedia(`(min-width: ${breakpoint}px)`).matches);
+  const [isSmallScreen, setIsSmallScreen] = useState(() => !window.matchMedia(`(min-width: ${breakpoint}px)`).matches);
 
   useMediaQueryChange({
     breakpoint,
