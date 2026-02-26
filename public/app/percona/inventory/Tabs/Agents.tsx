@@ -36,6 +36,9 @@ import { beautifyAgentType, getAgentStatusColor, getAgentStatusText, toAgentMode
 import { getTagsFromLabels } from './Services.utils';
 import { getStyles } from './Tabs.styles';
 
+import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
+import { DATA_INTERVAL } from 'app/percona/shared/core';
+
 export const Agents: FC = () => {
   const [agentsLoading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -44,6 +47,7 @@ export const Agents: FC = () => {
   const params = useParams();
   const nodeId = params.nodeId ? (params.nodeId === 'pmm-server' ? 'pmm-server' : params.nodeId) : undefined;
   const navModel = usePerconaNavModel(params.serviceId ? 'inventory-services' : 'inventory-nodes');
+  const [triggerTimeout, , stopTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const { isLoading: servicesLoading, services } = useSelector(getServices);
   const { isLoading: nodesLoading, nodes } = useSelector(getNodes);
@@ -122,7 +126,6 @@ export const Agents: FC = () => {
   // leading to incorrect API calls with stale serviceId/nodeId.
   // Solution: Include all used variables (params.serviceId, nodeId, generateToken) in dependencies.
   const loadData = useCallback(async () => {
-    setLoading(true);
     try {
       const { agents = [] } = await InventoryService.getAgents(
         params.serviceId,
@@ -136,7 +139,6 @@ export const Agents: FC = () => {
       }
       logger.error(e);
     }
-    setLoading(false);
   }, [params.serviceId, nodeId, generateToken]);
 
   const renderSelectedSubRow = React.useCallback(
@@ -180,10 +182,14 @@ export const Agents: FC = () => {
       }
 
       // Load agents when all required data is available
-      loadData();
+      setLoading(true);
+      loadData()
+        .then(() => setLoading(false))
+        .then(() => triggerTimeout(loadData, DATA_INTERVAL));
     };
 
     initializeData();
+    return () => stopTimeout();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.serviceId, nodeId, currentServiceId, currentNodeId]);
   // Triggers on: URL change OR when service/node loads from Redux
@@ -301,6 +307,8 @@ export const Agents: FC = () => {
             totalItems={flattenAgents.length}
             rowSelection
             autoResetSelectedRows={false}
+            autoResetExpanded={false}
+            autoResetPage={false}
             onRowSelection={handleSelectionChange}
             showPagination
             pageSize={25}
