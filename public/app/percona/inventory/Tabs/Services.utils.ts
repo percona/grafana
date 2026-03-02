@@ -41,8 +41,9 @@ export const getBadgeTextForServiceStatus = (status: ServiceStatus): string => {
 };
 
 export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
-  const disabledAgents = agents.filter((a) => a.disabled);
-  const pgstatementsAgent = disabledAgents.find((a) => a.agentType === AgentType.qanPostgresql_pgstatements_agent);
+  if (agents.length === 0) {
+    return MonitoringStatus.OK;
+  }
 
   const allAgentsOk = agents?.every((agent) => {
     const ok =
@@ -58,7 +59,15 @@ export const getAgentsMonitoringStatus = (agents: DbAgent[]) => {
     return MonitoringStatus.FAILED;
   }
 
-  if (disabledAgents.length >= 2 || (disabledAgents.length === 1 && !pgstatementsAgent)) {
+  const disabledAgents = agents.filter((a) => a.disabled && a.agentType !== AgentType.rtaMongoDBAgent);
+
+  if (disabledAgents.length === 1) {
+    const agent = disabledAgents[0];
+
+    return agent.agentType === AgentType.qanPostgresql_pgstatements_agent
+      ? MonitoringStatus.OK
+      : MonitoringStatus.WARNING;
+  } else if (disabledAgents.length > 1) {
     return MonitoringStatus.WARNING;
   }
 
