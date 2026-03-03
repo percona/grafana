@@ -47,6 +47,10 @@ export enum FilterFieldTypes {
 export interface TableProps {
   data: object[];
   columns: Array<ExtendedColumn<any>>;
+  /**
+   * Another way to specify columns for filtering, if the filters require dynamic data which would trigger a re-render of the table
+   */
+  filterColumns?: Array<ExtendedColumn<any>>;
   pendingRequest?: boolean;
   emptyMessage?: React.ReactNode;
   showPagination?: boolean;
