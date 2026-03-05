@@ -2,7 +2,7 @@
   "name": "@grafana-plugins/zipkin",
   "description": "Zipkin plugin for Grafana",
   "private": true,
-  "version": "11.6.4",
+  "version": "11.6.13",
   "dependencies": {
     "@emotion/css": "11.13.5",
     "@grafana/data": "workspace:*",
@@ -11,7 +11,7 @@
     "@grafana/plugin-ui": "0.10.1",
     "@grafana/runtime": "workspace:*",
     "@grafana/ui": "workspace:*",
-    "lodash": "4.17.21",
+    "lodash": "^4.17.23",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-select": "5.10.0",
@@ -31,7 +31,7 @@
     "@types/react-dom": "18.3.5",
     "ts-node": "10.9.2",
     "typescript": "5.7.3",
-    "webpack": "5.97.1"
+    "webpack": "^5.105.1"
   },
   "peerDependencies": {
     "@grafana/runtime": "*"

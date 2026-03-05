@@ -475,6 +475,7 @@ func (hs *HTTPServer) registerRoutes() {
 			}
 
 			dashboardRoute.Group("/uid/:uid", func(dashUidRoute routing.RouteRegister) {
+				dashUIDScope := dashboards.ScopeDashboardsProvider.GetResourceScopeUID(ac.Parameter(":uid"))
 				dashUidRoute.Get("/versions", authorize(ac.EvalPermission(dashboards.ActionDashboardsWrite)), routing.Wrap(hs.GetDashboardVersions))
 				dashUidRoute.Post("/restore", authorize(ac.EvalPermission(dashboards.ActionDashboardsWrite)), routing.Wrap(hs.RestoreDashboardVersion))
 				dashUidRoute.Get("/versions/:id", authorize(ac.EvalPermission(dashboards.ActionDashboardsWrite)), routing.Wrap(hs.GetDashboardVersion))
@@ -485,8 +486,8 @@ func (hs *HTTPServer) registerRoutes() {
 				}
 
 				dashUidRoute.Group("/permissions", func(dashboardPermissionRoute routing.RouteRegister) {
-					dashboardPermissionRoute.Get("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsRead)), routing.Wrap(hs.GetDashboardPermissionList))
-					dashboardPermissionRoute.Post("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsWrite)), routing.Wrap(hs.UpdateDashboardPermissions))
+					dashboardPermissionRoute.Get("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsRead, dashUIDScope)), routing.Wrap(hs.GetDashboardPermissionList))
+					dashboardPermissionRoute.Post("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsWrite, dashUIDScope)), routing.Wrap(hs.UpdateDashboardPermissions))
 				})
 			})
 
@@ -501,13 +502,14 @@ func (hs *HTTPServer) registerRoutes() {
 
 			// Deprecated: use /uid/:uid API instead.
 			dashboardRoute.Group("/id/:dashboardId", func(dashIdRoute routing.RouteRegister) {
+				dashIDScope := dashboards.ScopeDashboardsProvider.GetResourceScope(ac.Parameter(":dashboardId"))
 				dashIdRoute.Get("/versions", authorize(ac.EvalPermission(dashboards.ActionDashboardsWrite)), routing.Wrap(hs.GetDashboardVersions))
 				dashIdRoute.Get("/versions/:id", authorize(ac.EvalPermission(dashboards.ActionDashboardsWrite)), routing.Wrap(hs.GetDashboardVersion))
 				dashIdRoute.Post("/restore", authorize(ac.EvalPermission(dashboards.ActionDashboardsWrite)), routing.Wrap(hs.RestoreDashboardVersion))
 
 				dashIdRoute.Group("/permissions", func(dashboardPermissionRoute routing.RouteRegister) {
-					dashboardPermissionRoute.Get("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsRead)), routing.Wrap(hs.GetDashboardPermissionList))
-					dashboardPermissionRoute.Post("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsWrite)), routing.Wrap(hs.UpdateDashboardPermissions))
+					dashboardPermissionRoute.Get("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsRead, dashIDScope)), routing.Wrap(hs.GetDashboardPermissionList))
+					dashboardPermissionRoute.Post("/", authorize(ac.EvalPermission(dashboards.ActionDashboardsPermissionsWrite, dashIDScope)), routing.Wrap(hs.UpdateDashboardPermissions))
 				})
 			})
 		})
@@ -612,7 +614,7 @@ func (hs *HTTPServer) registerRoutes() {
 	r.Any("/api/gnet/*", requestmeta.SetSLOGroup(requestmeta.SLOGroupHighSlow), reqSignedIn, hs.ProxyGnetRequest)
 
 	// Gravatar service
-	r.Get("/avatar/:hash", requestmeta.SetSLOGroup(requestmeta.SLOGroupHighSlow), hs.AvatarCacheServer.Handler)
+	r.Get("/avatar/:hash", requestmeta.SetSLOGroup(requestmeta.SLOGroupHighSlow), reqSignedIn, hs.AvatarCacheServer.Handler)
 
 	// Snapshots
 	r.Get("/api/snapshot/shared-options/", reqSignedIn, hs.GetSharingOptions)
