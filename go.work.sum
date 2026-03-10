@@ -128,6 +128,8 @@ cloud.google.com/go/bigquery v1.63.1 h1:/6syiWrSpardKNxdvldS5CUTRJX1iIkSPXCjLjiG
 cloud.google.com/go/bigquery v1.63.1/go.mod h1:ufaITfroCk17WTqBhMpi8CRjsfHjMX07pDrQaRKKX2o=
 cloud.google.com/go/bigquery v1.66.0 h1:cDM3xEUUTf6RDepFEvNZokCysGFYoivHHTIZOWXbV2E=
 cloud.google.com/go/bigquery v1.66.0/go.mod h1:Cm1hMRzZ8teV4Nn8KikgP8bT9jd54ivP8fvXWZREmG4=
+cloud.google.com/go/bigquery v1.66.2 h1:EKOSqjtO7jPpJoEzDmRctGea3c2EOGoexy8VyY9dNro=
+cloud.google.com/go/bigquery v1.66.2/go.mod h1:+Yd6dRyW8D/FYEjUGodIbu0QaoEmgav7Lwhotup6njo=
 cloud.google.com/go/bigtable v1.1.0/go.mod h1:B6ByKcIdYmhoyDzmOnQxyOhN6r05qnewYIxxG6L0/b4=
 cloud.google.com/go/bigtable v1.2.0/go.mod h1:JcVAOl45lrTmQfLj7T6TxyMzIN/3FGGcFm+2xVAli2o=
 cloud.google.com/go/bigtable v1.3.0/go.mod h1:z5EyKrPE8OQmeg4h5MNdKvuSnI9CCT49Ki3f23aBzio=
@@ -328,6 +330,8 @@ cloud.google.com/go/gsuiteaddons v1.7.1 h1:YLh58kzaK+1Q/CHe8Cjp3hf9ZjNdJkQMavjrJ
 cloud.google.com/go/gsuiteaddons v1.7.1/go.mod h1:SxM63xEPFf0p/plgh4dP82mBSKtp2RWskz5DpVo9jh8=
 cloud.google.com/go/gsuiteaddons v1.7.3 h1:QafYhVhyFGpidBUUlVhy6lUHFogFOycVYm9DV7MinhA=
 cloud.google.com/go/gsuiteaddons v1.7.3/go.mod h1:0rR+LC21v1Sx1Yb6uohHI/F8DF3h2arSJSHvfi3GmyQ=
+cloud.google.com/go/gsuiteaddons v1.7.4 h1:f3eMYsCDdg2AeldIPdKmBRxN1WoiTpE3RvX5orcm/I8=
+cloud.google.com/go/gsuiteaddons v1.7.4/go.mod h1:gpE2RUok+HUhuK7RPE/fCOEgnTffS0lCHRaAZLxAMeE=
 cloud.google.com/go/iam v0.1.1/go.mod h1:CKqrcnI/suGpybEHxZ7BMehL0oA4LpdyJdUlTl9jVMw=
 cloud.google.com/go/iam v1.1.5/go.mod h1:rB6P/Ic3mykPbFio+vo7403drjlgvoWfYpJhMXEbzv8=
 cloud.google.com/go/iam v1.1.13/go.mod h1:K8mY0uSXwEXS30KrnVb+j54LB/ntfZu1dr+4zFMNbus=
@@ -490,6 +494,8 @@ cloud.google.com/go/scheduler v1.11.1 h1:uGaM4mRrGkJ0LLBMyxD8qbvIko4y+UlSOwJQqRd
 cloud.google.com/go/scheduler v1.11.1/go.mod h1:ptS76q0oOS8hCHOH4Fb/y8YunPEN8emaDdtw0D7W1VE=
 cloud.google.com/go/scheduler v1.11.3 h1:p6+h8BoYJC+TvUijGBfORN6nuhOvJ3EwZ2H84CZ1ZEU=
 cloud.google.com/go/scheduler v1.11.3/go.mod h1:Io2+gcvUjLX1GdymwaSPJ6ZYxHN9/NNGL5kIV3Ax5+Q=
+cloud.google.com/go/scheduler v1.11.4 h1:ewVvigBnEnrr9Ih8CKnLVoB5IiULaWfYU5nEnnfVAto=
+cloud.google.com/go/scheduler v1.11.4/go.mod h1:0ylvH3syJnRi8EDVo9ETHW/vzpITR/b+XNnoF+GPSz4=
 cloud.google.com/go/secretmanager v1.3.0/go.mod h1:+oLTkouyiYiabAQNugCeTS3PAArGiMJuBqvJnJsyH+U=
 cloud.google.com/go/secretmanager v1.13.6/go.mod h1:x2ySyOrqv3WGFRFn2Xk10iHmNmvmcEVSSqc30eb1bhw=
 cloud.google.com/go/secretmanager v1.14.1 h1:xlWSIg8rtBn5qCr2f3XtQP19+5COyf/ll49SEvi/0vM=
@@ -3183,6 +3189,7 @@ github.com/ydb-platform/ydb-go-sdk/v3 v3.108.1/go.mod h1:l5sSv153E18VvYcsmr51hok
 github.com/yosssi/ace v0.0.5 h1:tUkIP/BLdKqrlrPwcmH0shwEEhTRHoGnc1wFIWmaBUA=
 github.com/yosssi/ace v0.0.5/go.mod h1:ALfIzm2vT7t5ZE7uoIZqF3TQ7SAOyupFZnkrF5id+K0=
 github.com/yuin/goldmark v1.4.13 h1:fVcFKWvrslecOb/tg+Cc05dkeYx540o0FuFt3nUVDoE=
+github.com/yuin/goldmark v1.7.13 h1:GPddIs617DnBLFFVJFgpo1aBfe/4xcvMc3SB5t/D0pA=
 github.com/yuin/goldmark v1.7.13/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 github.com/yuin/gopher-lua v0.0.0-20200816102855-ee81675732da/go.mod h1:E1AXubJBdNmFERAOucpDIxNzeGfLzg0mYh+UfMWdChA=
 github.com/yuin/gopher-lua v0.0.0-20210529063254-f4c35e4016d9 h1:k/gmLsJDWwWqbLCur2yWnJzwQEKRcAHXo6seXGuSwWw=
