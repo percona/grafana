@@ -1152,21 +1152,6 @@ func NewDashboardActionStyle() *DashboardActionStyle {
 	return &DashboardActionStyle{}
 }
 
-type PanelRepeatDirection string
-
-const (
-	PanelRepeatDirectionH PanelRepeatDirection = "h"
-	PanelRepeatDirectionV PanelRepeatDirection = "v"
-)
-
-type DataTransformerConfigTopic string
-
-const (
-	DataTransformerConfigTopicSeries      DataTransformerConfigTopic = "series"
-	DataTransformerConfigTopicAnnotations DataTransformerConfigTopic = "annotations"
-	DataTransformerConfigTopicAlertStates DataTransformerConfigTopic = "alertStates"
-)
-
 type VariableModelStaticOptionsOrder string
 
 const (
