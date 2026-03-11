@@ -6,8 +6,6 @@ on:
 
 permissions: {}
 
-permissions: {}
-
 jobs:
   codeowners-validator:
     runs-on: ubuntu-latest
