@@ -480,10 +480,10 @@ export const PMM_NAV_MONGO: NavModelItem = {
       ],
     },
     {
-      id: 'mongo-pbm-details',
+      id: 'mongo-backup-details',
       text: 'Backup Status',
       icon: 'sitemap',
-      url: `${config.appSubUrl}/d/mongodb-pbm-details/mongodb-pbm-details`,
+      url: `${config.appSubUrl}/d/mongodb-backup-details/mongodb-backup-details`,
       hideFromTabs: true,
     },
     {
