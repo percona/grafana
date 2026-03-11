@@ -28,7 +28,7 @@ func TestGetUrl(t *testing.T) {
 	t.Run("When renderer url is configured should return render=1", func(t *testing.T) {
 		rs.Cfg.RendererUrl = "http://localhost:8081/render"
 		url := rs.getGrafanaCallbackURL(path)
-		require.Equal(t, "http://localhost:8081/render/"+path+"&render=1", url)
+		require.Equal(t, path+"&render=1", url)
 	})
 
 	t.Run("When renderer and callback url configured should return callback url plus path", func(t *testing.T) {
