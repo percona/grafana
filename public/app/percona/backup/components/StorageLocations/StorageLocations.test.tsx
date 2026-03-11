@@ -19,8 +19,8 @@ describe('StorageLocations', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { backupEnabled: true } },
           },
         } as StoreState)}
       >
@@ -43,8 +43,8 @@ describe('StorageLocations', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { backupEnabled: true } },
           },
         } as StoreState)}
       >
@@ -75,7 +75,7 @@ describe('StorageLocations', () => {
           store={configureStore({
             percona: {
               user: { isAuthorized: true },
-              settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+              settings: { result: { backupEnabled: true } },
             },
           } as StoreState)}
         >

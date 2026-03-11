@@ -197,7 +197,11 @@ However, you can export it by manually copying the content and name of the notif
 
 All notification policies are provisioned through a single resource: the root of the notification policy tree.
 
-{{< docs/shared lookup="alerts/warning-provisioning-tree.md" source="grafana" version="<GRAFANA_VERSION>" >}}
+{{< admonition type="warning" >}}
+
+Since the policy tree is a single resource, provisioning it overwrites a policy tree created through any other means.
+
+{{< /admonition >}}
 
 To export the notification policy tree from the Grafana UI, complete the following steps.
 

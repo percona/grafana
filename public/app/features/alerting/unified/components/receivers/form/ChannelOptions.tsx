@@ -93,7 +93,7 @@ export function ChannelOptions<R extends ChannelValues>({
         const propertyKey = option.secureFieldKey ?? option.propertyName;
         const error = // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
           (errorSource as Record<string, FieldError | DeepMap<Record<string, unknown>, FieldError>> | undefined)?.[
-            propertyKey
+          propertyKey
           ];
 
         const defaultValue = defaultValues?.settings?.[option.propertyName];

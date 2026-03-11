@@ -188,8 +188,8 @@ const AllChecksTabTesting: FC<{ category?: string }> = ({ category = 'security' 
   <Provider
     store={configureStore({
       percona: {
-        user: { isAuthorized: true, isPlatformUser: false },
-        settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+        user: { isAuthorized: true },
+        settings: { result: { advisorEnabled: true } },
         advisors: {
           loading: false,
           result: advisorsArray,

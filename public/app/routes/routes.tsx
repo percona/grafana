@@ -144,7 +144,7 @@ export function getAppRoutes(): RouteDescriptor[] {
           ? import(/* webpackChunkName: "CorrelationsPage" */ 'app/features/correlations/CorrelationsPage')
           : import(
               /* webpackChunkName: "CorrelationsFeatureToggle" */ 'app/features/correlations/CorrelationsFeatureToggle'
-            )
+          )
       ),
     },
     {
@@ -234,9 +234,9 @@ export function getAppRoutes(): RouteDescriptor[] {
       component:
         isDevEnv || config.featureToggles.enableExtensionsAdminPage
           ? SafeDynamicImport(
-              () =>
-                import(/* webpackChunkName: "PluginExtensionsLog" */ 'app/features/plugins/extensions/logs/LogViewer')
-            )
+            () =>
+              import(/* webpackChunkName: "PluginExtensionsLog" */ 'app/features/plugins/extensions/logs/LogViewer')
+          )
           : () => <Navigate replace to="/admin" />,
     },
     {
@@ -324,8 +324,8 @@ export function getAppRoutes(): RouteDescriptor[] {
       path: '/admin/authentication/ldap',
       component: config.featureToggles.ssoSettingsLDAP
         ? SafeDynamicImport(
-            () => import(/* webpackChunkName: "LdapSettingsPage" */ 'app/features/admin/ldap/LdapSettingsPage')
-          )
+          () => import(/* webpackChunkName: "LdapSettingsPage" */ 'app/features/admin/ldap/LdapSettingsPage')
+        )
         : LdapPage,
     },
     {
@@ -410,8 +410,8 @@ export function getAppRoutes(): RouteDescriptor[] {
       component: !config.verifyEmailEnabled
         ? () => <Navigate replace to="/signup" />
         : SafeDynamicImport(
-            () => import(/* webpackChunkName "VerifyEmailPage"*/ 'app/core/components/Signup/VerifyEmailPage')
-          ),
+          () => import(/* webpackChunkName "VerifyEmailPage"*/ 'app/core/components/Signup/VerifyEmailPage')
+        ),
       pageClass: 'login-page',
       chromeless: true,
     },
@@ -674,15 +674,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/settings/percona-platform',
-      component: SafeDynamicImport(
-        () =>
-          import(
-            /* webpackChunkName: "PerconaPlatformSettingsPage" */ 'app/percona/settings/components/Platform/Platform'
-          )
-      ),
-    },
-    {
       path: '/settings/communication',
       component: SafeDynamicImport(
         () =>
@@ -754,18 +745,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/entitlements',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "AddInstancePage" */ 'app/percona/entitlements/EntitlementsPage')
-      ),
-    },
-    {
-      path: '/tickets',
-      component: SafeDynamicImport(
-        () => import(/* webpackChunkName: "TicketsPage" */ 'app/percona/tickets/TicketsPage')
-      ),
-    },
-    {
       path: '/roles',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "AccessRolesPage" */ 'app/percona/rbac/AccessRoles/AccessRoles')
@@ -784,13 +763,6 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
-      path: '/environment-overview',
-      component: SafeDynamicImport(
-        () =>
-          import(/* webpackChunkName: "EnvironmentOverview" */ 'app/percona/environment-overview/EnvironmentOverview')
-      ),
-    },
-    {
       // A redirect to the Grafana Metrics Drilldown app from legacy Explore Metrics routes
       path: '/explore/metrics/*',
       roles: () => contextSrv.evaluatePermission([AccessControlAction.DataSourcesExplore]),
@@ -800,22 +772,22 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     ...(isPmmAdmin(config.bootData.user)
       ? [
-          {
-            path: '/pmm-dump',
-            component: SafeDynamicImport(
-              () => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')
-            ),
-          },
-          {
-            path: '/pmm-dump/new',
-            component: SafeDynamicImport(
-              () =>
-                import(
+        {
+          path: '/pmm-dump',
+          component: SafeDynamicImport(
+            () => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')
+          ),
+        },
+        {
+          path: '/pmm-dump/new',
+          component: SafeDynamicImport(
+            () =>
+              import(
                   /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/pmm-dump/components/ExportDataset/ExportDataset'
-                )
-            ),
-          },
-        ]
+              )
+          ),
+        },
+      ]
       : []),
     {
       path: '/bookmarks',

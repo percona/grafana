@@ -18,7 +18,7 @@ describe('MetricsResolution::', () => {
             user: { isAuthorized: true },
             settings: {
               loading: false,
-              result: { isConnectedToPortal: true, metricsResolutions: defaultResolutions[1] },
+              result: { metricsResolutions: defaultResolutions[1] },
             },
           },
         } as StoreState)}
@@ -42,7 +42,7 @@ describe('MetricsResolution::', () => {
             user: { isAuthorized: true },
             settings: {
               loading: false,
-              result: { isConnectedToPortal: true, metricsResolutions: defaultResolutions[0] },
+              result: { metricsResolutions: defaultResolutions[0] },
             },
           },
         } as StoreState)}
@@ -66,7 +66,7 @@ describe('MetricsResolution::', () => {
             user: { isAuthorized: true },
             settings: {
               loading: false,
-              result: { isConnectedToPortal: true, metricsResolutions: defaultResolutions[2] },
+              result: { metricsResolutions: defaultResolutions[2] },
             },
           },
         } as StoreState)}
@@ -90,7 +90,7 @@ describe('MetricsResolution::', () => {
             user: { isAuthorized: true },
             settings: {
               loading: false,
-              result: { isConnectedToPortal: true, metricsResolutions: defaultResolutions[0] },
+              result: { metricsResolutions: defaultResolutions[0] },
             },
           },
         } as StoreState)}
@@ -117,7 +117,7 @@ describe('MetricsResolution::', () => {
             user: { isAuthorized: true },
             settings: {
               loading: false,
-              result: { isConnectedToPortal: true, metricsResolutions: defaultResolutions[0] },
+              result: { metricsResolutions: defaultResolutions[0] },
             },
           },
         } as StoreState)}

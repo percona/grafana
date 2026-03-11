@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -755,4 +756,24 @@ func (rs *ReceiverService) RenameReceiverInDependentResources(ctx context.Contex
 		rs.log.FromContext(ctx).Info("Updated rules and routes that use renamed receiver", "oldName", oldName, "newName", newName, "rules", len(affected), "routes", updatedRoutes)
 	}
 	return nil
+}
+
+func makeProtectedFieldsAuthzError(err error, diff map[string][]models.IntegrationFieldPath) error {
+	var authzErr errutil.Error
+	if !errors.As(err, &authzErr) {
+		return err
+	}
+	if authzErr.PublicPayload == nil {
+		authzErr.PublicPayload = map[string]interface{}{}
+	}
+	fields := make(map[string][]string, len(diff))
+	for field, paths := range diff {
+		fields[field] = make([]string, len(paths))
+		for i, path := range paths {
+			fields[field][i] = path.String()
+		}
+		slices.Sort(fields[field])
+	}
+	authzErr.PublicPayload["changed_protected_fields"] = fields
+	return authzErr
 }

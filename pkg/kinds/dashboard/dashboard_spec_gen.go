@@ -1175,6 +1175,21 @@ const (
 	VariableModelStaticOptionsOrderSorted VariableModelStaticOptionsOrder = "sorted"
 )
 
+type PanelRepeatDirection string
+
+const (
+	PanelRepeatDirectionH PanelRepeatDirection = "h"
+	PanelRepeatDirectionV PanelRepeatDirection = "v"
+)
+
+type DataTransformerConfigTopic string
+
+const (
+	DataTransformerConfigTopicSeries      DataTransformerConfigTopic = "series"
+	DataTransformerConfigTopicAnnotations DataTransformerConfigTopic = "annotations"
+	DataTransformerConfigTopicAlertStates DataTransformerConfigTopic = "alertStates"
+)
+
 type ValueMapOrRangeMapOrRegexMapOrSpecialValueMap struct {
 	ValueMap        *ValueMap        `json:"ValueMap,omitempty"`
 	RangeMap        *RangeMap        `json:"RangeMap,omitempty"`

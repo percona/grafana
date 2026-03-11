@@ -117,10 +117,13 @@ export class DashboardSceneUrlSync implements SceneObjectUrlSyncHandler {
       }
     }
 
-    if (typeof values.kiosk === 'string') {
-      if (values.kiosk === 'true' || values.kiosk === '') {
-        update.kioskMode = KioskMode.Full;
-      }
+    // @PERCONA
+    const kioskOn =
+      values.kiosk === 'true' || values.kiosk === '' || (values as Record<string, unknown>).kiosk === true;
+    if (kioskOn) {
+      update.kioskMode = KioskMode.Full;
+    } else {
+      update.kioskMode = undefined;
     }
 
     if (Object.keys(update).length > 0) {

@@ -23,7 +23,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: true, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: true, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -43,7 +43,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+            settings: { loading: false, result: { alertingEnabled: true } },
           },
         } as StoreState)}
       >
@@ -62,7 +62,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: false },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+            settings: { loading: false, result: { alertingEnabled: false } },
           },
         } as StoreState)}
       >
@@ -81,7 +81,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+            settings: { loading: false, result: { alertingEnabled: false } },
           },
         } as StoreState)}
       >
@@ -100,7 +100,7 @@ describe('FeatureLoader', () => {
         store={configureStore({
           percona: {
             user: { isAuthorized: true },
-            settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: false } },
+            settings: { loading: false, result: { alertingEnabled: false } },
           },
         } as StoreState)}
       >

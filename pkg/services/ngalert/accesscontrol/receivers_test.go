@@ -132,7 +132,7 @@ func TestReceiverAccess(t *testing.T) {
 				recv3.UID: permissions(),
 			},
 		},
-		//{
+		// {
 		//	name: "legacy global notifications provisioning writer should have full write on provisioning only",
 		//	user: newViewUser(ac.Permission{Action: ac.ActionAlertingNotificationsProvisioningWrite}),
 		//	expected: map[string]models.ReceiverPermissionSet{
@@ -145,8 +145,8 @@ func TestReceiverAccess(t *testing.T) {
 		//		recv2.UID: permissions(models.ReceiverPermissionWrite, models.ReceiverPermissionDelete),
 		//		recv3.UID: permissions(models.ReceiverPermissionWrite, models.ReceiverPermissionDelete),
 		//	},
-		//},
-		//{
+		// },
+		// {
 		//	name: "legacy global provisioning writer should have full write on provisioning only",
 		//	user: newViewUser(ac.Permission{Action: ac.ActionAlertingProvisioningWrite}),
 		//	expected: map[string]models.ReceiverPermissionSet{
@@ -159,7 +159,7 @@ func TestReceiverAccess(t *testing.T) {
 		//		recv2.UID: permissions(models.ReceiverPermissionWrite, models.ReceiverPermissionDelete),
 		//		recv3.UID: permissions(models.ReceiverPermissionWrite, models.ReceiverPermissionDelete),
 		//	},
-		//},
+		// },
 		// Receiver create
 		{
 			name: "receiver create should not have write",

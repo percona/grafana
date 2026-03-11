@@ -8,8 +8,6 @@ export const Messages = {
     telemetryLabel: 'Telemetry',
     telemetryLink: `https://per.co.na/telemetry`,
     telemetryTooltip: 'Option to send usage data back to Percona to let us make our product better.',
-    telemetryDisclaimer:
-      'Disabling Telemetry while Advisors/Percona Alerting is on will prevent PMM from downloading checks and alert templates.',
     telemetrySummaryTitle: 'We gather and send the following information to Percona:',
     updatesLabel: 'Check for updates',
     updatesLink: `https://per.co.na/updates`,
@@ -84,7 +82,6 @@ export const Messages = {
     metrics: 'Metrics Resolution',
     advanced: 'Advanced Settings',
     ssh: 'SSH Key',
-    perconaPlatform: 'Percona Platform',
     communication: 'Communication',
   },
   tooltipLinkText: 'Read more',

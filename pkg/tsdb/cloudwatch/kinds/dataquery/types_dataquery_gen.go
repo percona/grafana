@@ -623,6 +623,60 @@ func (resource *ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression)
 	return errors.Join(errList...)
 }
 
+type ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression struct {
+	ArrayOfQueryEditorExpression      []QueryEditorExpression      `json:"ArrayOfQueryEditorExpression,omitempty"`
+	ArrayOfQueryEditorArrayExpression []QueryEditorArrayExpression `json:"ArrayOfQueryEditorArrayExpression,omitempty"`
+}
+
+// NewArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression creates a new ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression object.
+func NewArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression() *ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression {
+	return &ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression{}
+}
+
+// MarshalJSON implements a custom JSON marshalling logic to encode `ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression` as JSON.
+func (resource ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression) MarshalJSON() ([]byte, error) {
+	if resource.ArrayOfQueryEditorExpression != nil {
+		return json.Marshal(resource.ArrayOfQueryEditorExpression)
+	}
+
+	if resource.ArrayOfQueryEditorArrayExpression != nil {
+		return json.Marshal(resource.ArrayOfQueryEditorArrayExpression)
+	}
+
+	return nil, fmt.Errorf("no value for disjunction of scalars")
+}
+
+// UnmarshalJSON implements a custom JSON unmarshalling logic to decode `ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression` from JSON.
+func (resource *ArrayOfQueryEditorExpressionOrArrayOfQueryEditorArrayExpression) UnmarshalJSON(raw []byte) error {
+	if raw == nil {
+		return nil
+	}
+
+	var errList []error
+
+	// ArrayOfQueryEditorExpression
+	var ArrayOfQueryEditorExpression []QueryEditorExpression
+	if err := json.Unmarshal(raw, &ArrayOfQueryEditorExpression); err != nil {
+		errList = append(errList, err)
+		resource.ArrayOfQueryEditorExpression = nil
+	} else {
+		resource.ArrayOfQueryEditorExpression = ArrayOfQueryEditorExpression
+		return nil
+	}
+
+	// ArrayOfQueryEditorArrayExpression
+	var ArrayOfQueryEditorArrayExpression []QueryEditorArrayExpression
+	if err := json.Unmarshal(raw, &ArrayOfQueryEditorArrayExpression); err != nil {
+		errList = append(errList, err)
+		resource.ArrayOfQueryEditorArrayExpression = nil
+	} else {
+		resource.ArrayOfQueryEditorArrayExpression = ArrayOfQueryEditorArrayExpression
+		return nil
+	}
+
+	return errors.Join(errList...)
+}
+
 type StringOrBoolOrInt64OrArrayOfQueryEditorOperatorType struct {
 	String                         *string                   `json:"String,omitempty"`
 	Bool                           *bool                     `json:"Bool,omitempty"`

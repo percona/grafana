@@ -186,11 +186,12 @@ export function ReceiverForm<R extends ChannelValues>({
               onTest={
                 onTestChannel
                   ? () => {
-                      const currentValues: R = getValues().items[index];
-                      onTestChannel(currentValues);
-                    }
+                    const currentValues: R = getValues().items[index];
+                    onTestChannel(currentValues);
+                  }
                   : undefined
               }
+              integrationIndex={index}
               onDelete={() => remove(index)}
               pathPrefix={pathPrefix}
               notifiers={notifiers}

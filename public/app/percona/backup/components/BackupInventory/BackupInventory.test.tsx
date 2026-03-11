@@ -18,8 +18,8 @@ describe('BackupInventory', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { backupEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { backupEnabled: true } },
           },
         } as StoreState)}
       >

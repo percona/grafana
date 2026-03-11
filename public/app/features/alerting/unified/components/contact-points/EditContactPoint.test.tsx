@@ -41,7 +41,11 @@ const renderEditContactPoint = (contactPointUid: string) =>
   );
 
 beforeEach(() => {
-  grantUserPermissions([AccessControlAction.AlertingNotificationsRead, AccessControlAction.AlertingNotificationsWrite]);
+  grantUserPermissions([
+    AccessControlAction.AlertingNotificationsRead,
+    AccessControlAction.AlertingNotificationsWrite,
+    AccessControlAction.AlertingReceiversWrite,
+  ]);
 });
 
 const getTemplatePreviewContent = async () =>

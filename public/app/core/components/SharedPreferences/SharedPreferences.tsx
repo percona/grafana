@@ -5,7 +5,7 @@ import type { Unsubscribable } from 'rxjs';
 
 import { FeatureState, ThemeRegistryItem, type GrafanaTheme2, type BusEventWithPayload } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { config, reportInteraction, getAppEvents, ThemeChangedEvent } from '@grafana/runtime';
+import { config, reportInteraction, getAppEvents, ThemeChangedEvent, TimeZoneUpdatedEvent } from '@grafana/runtime';
 import { PSEUDO_LOCALE, t, Trans } from '@grafana/i18n';
 import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
 import {
@@ -208,6 +208,11 @@ export class SharedPreferences extends PureComponent<Props, State> {
           this.setState({ isSubmitting: false });
         });
       window.location.reload();
+
+      // @PERCONA: Publish TimeZoneUpdatedEvent to allow other components to listen to timezone changes
+      if (timezone) {
+        getAppEvents().publish(new TimeZoneUpdatedEvent(timezone));
+      }
     }
   };
 

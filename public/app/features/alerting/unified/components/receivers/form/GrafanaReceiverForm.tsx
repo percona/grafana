@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Trans, t } from '@grafana/i18n';
 import { locationService } from '@grafana/runtime';
 import { Alert, LoadingPlaceholder } from '@grafana/ui';
+import { contextSrv } from 'app/core/services/context_srv';
 import {
   useCreateContactPoint,
   useUpdateContactPoint,

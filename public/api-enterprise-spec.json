@@ -2584,25 +2584,6 @@
         }
       }
     },
-    "AddTeamRoleCommand": {
-      "type": "object",
-      "properties": {
-        "roleUid": {
-          "type": "string"
-        }
-      }
-    },
-    "AddUserRoleCommand": {
-      "type": "object",
-      "properties": {
-        "global": {
-          "type": "boolean"
-        },
-        "roleUid": {
-          "type": "string"
-        }
-      }
-    },
     "Address": {
       "type": "object",
       "properties": {
@@ -3035,123 +3016,6 @@
           "$ref": "#/definitions/ObjectIdentifier"
         },
         "Value": {}
-      }
-    },
-    "CacheConfig": {
-      "description": "Config defines the internal representation of a cache configuration, including fields not set by the API caller",
-      "type": "object",
-      "properties": {
-        "created": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "dataSourceID": {
-          "description": "Fields that can be set by the API caller - read/write",
-          "type": "integer",
-          "format": "int64"
-        },
-        "dataSourceUID": {
-          "type": "string"
-        },
-        "defaultTTLMs": {
-          "description": "These are returned by the HTTP API, but are managed internally - read-only\nNote: 'created' and 'updated' are special properties managed automatically by xorm, but we are setting them manually",
-          "type": "integer",
-          "format": "int64"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "ttlQueriesMs": {
-          "description": "TTL MS, or \"time to live\", is how long a cached item will stay in the cache before it is removed (in milliseconds)",
-          "type": "integer",
-          "format": "int64"
-        },
-        "ttlResourcesMs": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "useDefaultTTL": {
-          "description": "If UseDefaultTTL is enabled, then the TTLQueriesMS and TTLResourcesMS in this object is always sent as the default TTL located in grafana.ini",
-          "type": "boolean"
-        }
-      }
-    },
-    "CacheConfigResponse": {
-      "type": "object",
-      "properties": {
-        "created": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "dataSourceID": {
-          "description": "Fields that can be set by the API caller - read/write",
-          "type": "integer",
-          "format": "int64"
-        },
-        "dataSourceUID": {
-          "type": "string"
-        },
-        "defaultTTLMs": {
-          "description": "These are returned by the HTTP API, but are managed internally - read-only\nNote: 'created' and 'updated' are special properties managed automatically by xorm, but we are setting them manually",
-          "type": "integer",
-          "format": "int64"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "message": {
-          "type": "string"
-        },
-        "ttlQueriesMs": {
-          "description": "TTL MS, or \"time to live\", is how long a cached item will stay in the cache before it is removed (in milliseconds)",
-          "type": "integer",
-          "format": "int64"
-        },
-        "ttlResourcesMs": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "updated": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "useDefaultTTL": {
-          "description": "If UseDefaultTTL is enabled, then the TTLQueriesMS and TTLResourcesMS in this object is always sent as the default TTL located in grafana.ini",
-          "type": "boolean"
-        }
-      }
-    },
-    "CacheConfigSetter": {
-      "description": "ConfigSetter defines the cache parameters that users can configure per datasource\nThis is only intended to be consumed by the SetCache HTTP Handler",
-      "type": "object",
-      "properties": {
-        "dataSourceID": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "dataSourceUID": {
-          "type": "string"
-        },
-        "enabled": {
-          "type": "boolean"
-        },
-        "ttlQueriesMs": {
-          "description": "TTL MS, or \"time to live\", is how long a cached item will stay in the cache before it is removed (in milliseconds)",
-          "type": "integer",
-          "format": "int64"
-        },
-        "ttlResourcesMs": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "useDefaultTTL": {
-          "description": "If UseDefaultTTL is enabled, then the TTLQueriesMS and TTLResourcesMS in this object is always sent as the default TTL located in grafana.ini",
-          "type": "boolean"
-        }
       }
     },
     "CalculateDiffTarget": {
@@ -3783,57 +3647,6 @@
         }
       }
     },
-    "CreateOrUpdateReport": {
-      "type": "object",
-      "properties": {
-        "dashboards": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ReportDashboard"
-          }
-        },
-        "enableCsv": {
-          "type": "boolean"
-        },
-        "enableDashboardUrl": {
-          "type": "boolean"
-        },
-        "formats": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Type"
-          }
-        },
-        "message": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "options": {
-          "$ref": "#/definitions/ReportOptions"
-        },
-        "recipients": {
-          "type": "string"
-        },
-        "replyTo": {
-          "type": "string"
-        },
-        "scaleFactor": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "schedule": {
-          "$ref": "#/definitions/ReportSchedule"
-        },
-        "state": {
-          "$ref": "#/definitions/State"
-        },
-        "subject": {
-          "type": "string"
-        }
-      }
-    },
     "CreateOrgCommand": {
       "type": "object",
       "properties": {
@@ -3873,42 +3686,6 @@
         },
         "queries": {
           "$ref": "#/definitions/Json"
-        }
-      }
-    },
-    "CreateRoleForm": {
-      "type": "object",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "displayName": {
-          "type": "string"
-        },
-        "global": {
-          "type": "boolean"
-        },
-        "group": {
-          "type": "string"
-        },
-        "hidden": {
-          "type": "boolean"
-        },
-        "name": {
-          "type": "string"
-        },
-        "permissions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Permission"
-          }
-        },
-        "uid": {
-          "type": "string"
-        },
-        "version": {
-          "type": "integer",
-          "format": "int64"
         }
       }
     },
@@ -4515,14 +4292,6 @@
         }
       }
     },
-    "DeleteTokenCommand": {
-      "type": "object",
-      "properties": {
-        "instance": {
-          "type": "string"
-        }
-      }
-    },
     "DescendantCounts": {
       "type": "object",
       "additionalProperties": {
@@ -4572,16 +4341,6 @@
     },
     "DsAccess": {
       "type": "string"
-    },
-    "DsPermissionType": {
-      "description": "Datasource permission\nDescription:\n`0` - No Access\n`1` - Query\n`2` - Edit\nEnum: 0,1,2",
-      "type": "integer",
-      "format": "int64"
-    },
-    "Duration": {
-      "description": "A Duration represents the elapsed time between two instants\nas an int64 nanosecond count. The representation limits the\nlargest representable duration to approximately 290 years.",
-      "type": "integer",
-      "format": "int64"
     },
     "EmailDTO": {
       "type": "object",
@@ -4673,18 +4432,6 @@
             "type": "integer",
             "format": "uint8"
           }
-        }
-      }
-    },
-    "FailedUser": {
-      "description": "FailedUser holds the information of an user that failed",
-      "type": "object",
-      "properties": {
-        "Error": {
-          "type": "string"
-        },
-        "Login": {
-          "type": "string"
         }
       }
     },
@@ -5112,26 +4859,6 @@
         },
         "uid": {
           "type": "string"
-        }
-      }
-    },
-    "Group": {
-      "type": "object",
-      "properties": {
-        "groupID": {
-          "type": "string"
-        },
-        "mappings": {}
-      }
-    },
-    "GroupAttributes": {
-      "type": "object",
-      "properties": {
-        "roles": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -6429,20 +6156,6 @@
         }
       }
     },
-    "PrometheusRemoteWriteTargetJSON": {
-      "type": "object",
-      "properties": {
-        "data_source_uid": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "remote_write_path": {
-          "type": "string"
-        }
-      }
-    },
     "PublicDashboard": {
       "type": "object",
       "properties": {
@@ -7131,35 +6844,6 @@
         }
       }
     },
-    "RoleAssignmentsDTO": {
-      "type": "object",
-      "properties": {
-        "role_uid": {
-          "type": "string"
-        },
-        "service_accounts": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "teams": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "users": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      }
-    },
     "RoleDTO": {
       "type": "object",
       "properties": {
@@ -7210,32 +6894,6 @@
         }
       }
     },
-    "RolesSearchQuery": {
-      "type": "object",
-      "properties": {
-        "includeHidden": {
-          "type": "boolean"
-        },
-        "orgId": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "teamIds": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "userIds": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      }
-    },
     "SaveDashboardCommand": {
       "type": "object",
       "properties": {
@@ -7266,32 +6924,6 @@
         "userId": {
           "type": "integer",
           "format": "int64"
-        }
-      }
-    },
-    "SearchDTO": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "type": "string"
-        },
-        "basicRole": {
-          "type": "string"
-        },
-        "onlyRoles": {
-          "type": "boolean"
-        },
-        "roleName": {
-          "type": "string"
-        },
-        "scope": {
-          "type": "string"
-        },
-        "teamId": {
-          "type": "string"
-        },
-        "userId": {
-          "type": "string"
         }
       }
     },
@@ -7631,32 +7263,6 @@
         }
       }
     },
-    "SetRoleAssignmentsCommand": {
-      "type": "object",
-      "properties": {
-        "service_accounts": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "teams": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "users": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      }
-    },
     "SetTeamMembershipsCommand": {
       "type": "object",
       "properties": {
@@ -7667,23 +7273,6 @@
           }
         },
         "members": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "SetUserRolesCommand": {
-      "type": "object",
-      "properties": {
-        "global": {
-          "type": "boolean"
-        },
-        "includeHidden": {
-          "type": "boolean"
-        },
-        "roleUids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -7780,10 +7369,6 @@
       "type": "string",
       "title": "Source type defines the status source."
     },
-    "State": {
-      "description": "+enum",
-      "type": "string"
-    },
     "Status": {
       "type": "integer",
       "format": "int64"
@@ -7798,39 +7383,6 @@
     },
     "SupportedTransformationTypes": {
       "type": "string"
-    },
-    "SyncResult": {
-      "type": "object",
-      "title": "SyncResult holds the result of a sync with LDAP. This gives us information on which users were updated and how.",
-      "properties": {
-        "Elapsed": {
-          "$ref": "#/definitions/Duration"
-        },
-        "FailedUsers": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/FailedUser"
-          }
-        },
-        "MissingUserIds": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "Started": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "UpdatedUserIds": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      }
     },
     "TagsDTO": {
       "type": "object",
@@ -7886,58 +7438,6 @@
         },
         "uid": {
           "type": "string"
-        }
-      }
-    },
-    "TeamGroupDTO": {
-      "type": "object",
-      "properties": {
-        "groupId": {
-          "type": "string"
-        },
-        "orgId": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "teamId": {
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
-    "TeamGroupMapping": {
-      "type": "object",
-      "properties": {
-        "groupId": {
-          "type": "string"
-        }
-      }
-    },
-    "TeamLBACRule": {
-      "type": "object",
-      "properties": {
-        "rules": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "teamId": {
-          "type": "string"
-        },
-        "teamUid": {
-          "type": "string"
-        }
-      }
-    },
-    "TeamLBACRules": {
-      "type": "object",
-      "properties": {
-        "rules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TeamLBACRule"
-          }
         }
       }
     },
@@ -8097,97 +7597,6 @@
         }
       }
     },
-    "Token": {
-      "type": "object",
-      "properties": {
-        "account": {
-          "type": "string"
-        },
-        "anonymousRatio": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "company": {
-          "type": "string"
-        },
-        "details_url": {
-          "type": "string"
-        },
-        "exp": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "iat": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "included_users": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "iss": {
-          "type": "string"
-        },
-        "jti": {
-          "type": "string"
-        },
-        "lexp": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "lic_exp_warn_days": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "lid": {
-          "type": "string"
-        },
-        "limit_by": {
-          "type": "string"
-        },
-        "max_concurrent_user_sessions": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "nbf": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "prod": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "slug": {
-          "type": "string"
-        },
-        "status": {
-          "$ref": "#/definitions/TokenStatus"
-        },
-        "sub": {
-          "type": "string"
-        },
-        "tok_exp_warn_days": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "trial": {
-          "type": "boolean"
-        },
-        "trial_exp": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "update_days": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "usage_billing": {
-          "type": "boolean"
-        }
-      }
-    },
     "TokenDTO": {
       "type": "object",
       "properties": {
@@ -8230,10 +7639,6 @@
         }
       }
     },
-    "TokenStatus": {
-      "type": "integer",
-      "format": "int64"
-    },
     "Transformation": {
       "type": "object",
       "properties": {
@@ -8260,10 +7665,6 @@
       "items": {
         "$ref": "#/definitions/Transformation"
       }
-    },
-    "Type": {
-      "description": "+enum",
-      "type": "string"
     },
     "TypeMeta": {
       "description": "+k8s:deepcopy-gen=false",
@@ -8688,17 +8089,6 @@
         }
       }
     },
-    "UpdateTeamLBACCommand": {
-      "type": "object",
-      "properties": {
-        "rules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TeamLBACRule"
-          }
-        }
-      }
-    },
     "UpdateTeamMemberCommand": {
       "type": "object",
       "properties": {
@@ -8980,21 +8370,6 @@
         }
       }
     },
-    "getGroupsResponse": {
-      "type": "object",
-      "properties": {
-        "groups": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Group"
-          }
-        },
-        "total": {
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
     "healthResponse": {
       "type": "object",
       "properties": {
@@ -9008,14 +8383,6 @@
           "type": "string"
         },
         "version": {
-          "type": "string"
-        }
-      }
-    },
-    "messageResponse": {
-      "type": "object",
-      "properties": {
-        "message": {
           "type": "string"
         }
       }
@@ -9164,12 +8531,6 @@
         }
       }
     },
-    "apiResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/messageResponse"
-      }
-    },
     "badRequestError": {
       "description": "BadRequestError is returned when the request is invalid and it cannot be processed.",
       "schema": {
@@ -9235,16 +8596,6 @@
       "description": "ConflictError",
       "schema": {
         "$ref": "#/definitions/ErrorResponseBody"
-      }
-    },
-    "contentResponse": {
-      "description": "",
-      "schema": {
-        "type": "array",
-        "items": {
-          "type": "integer",
-          "format": "uint8"
-        }
       }
     },
     "createCorrelationResponse": {
@@ -9346,27 +8697,6 @@
       "description": "",
       "schema": {
         "$ref": "#/definitions/PublicDashboard"
-      }
-    },
-    "createReportResponse": {
-      "description": "",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "createRoleResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/RoleDTO"
       }
     },
     "createServiceAccountResponse": {
@@ -9691,21 +9021,6 @@
         }
       }
     },
-    "getGroupRolesResponse": {
-      "description": "",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/RoleDTO"
-        }
-      }
-    },
-    "getGroupsResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/getGroupsResponse"
-      }
-    },
     "getHomeDashboardResponse": {
       "description": "",
       "schema": {
@@ -9734,12 +9049,6 @@
       "description": "",
       "schema": {
         "$ref": "#/definitions/LibraryElementSearchResponse"
-      }
-    },
-    "getLicenseTokenResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/Token"
       }
     },
     "getOrgByIDResponse": {
@@ -9859,27 +9168,6 @@
         }
       }
     },
-    "getReportResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/Report"
-      }
-    },
-    "getReportSettingsResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/ReportSettings"
-      }
-    },
-    "getReportsResponse": {
-      "description": "",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/Report"
-        }
-      }
-    },
     "getResourcePermissionsResponse": {
       "description": "",
       "schema": {
@@ -9887,18 +9175,6 @@
         "items": {
           "$ref": "#/definitions/resourcePermissionDTO"
         }
-      }
-    },
-    "getRoleAssignmentsResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/RoleAssignmentsDTO"
-      }
-    },
-    "getRoleResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/RoleDTO"
       }
     },
     "getSSOSettingsResponse": {
@@ -9963,34 +9239,10 @@
         "$ref": "#/definitions/GetSnapshotResponseDTO"
       }
     },
-    "getStatusResponse": {
-      "description": ""
-    },
-    "getSyncStatusResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/ActiveSyncStatusDTO"
-      }
-    },
     "getTeamByIDResponse": {
       "description": "",
       "schema": {
         "$ref": "#/definitions/TeamDTO"
-      }
-    },
-    "getTeamGroupsApiResponse": {
-      "description": "",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/TeamGroupDTO"
-        }
-      }
-    },
-    "getTeamLBACRulesResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/TeamLBACRules"
       }
     },
     "getTeamMembersResponse": {
@@ -10086,40 +9338,10 @@
         }
       }
     },
-    "listBuiltinRolesResponse": {
-      "description": "",
-      "schema": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RoleDTO"
-          }
-        }
-      }
-    },
     "listPublicDashboardsResponse": {
       "description": "",
       "schema": {
         "$ref": "#/definitions/PublicDashboardListResponseWithPagination"
-      }
-    },
-    "listRecordingRulesResponse": {
-      "description": "",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/RecordingRuleJSON"
-        }
-      }
-    },
-    "listRolesResponse": {
-      "description": "",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/RoleDTO"
-        }
       }
     },
     "listSSOSettingsResponse": {
@@ -10166,18 +9388,6 @@
         }
       }
     },
-    "listTeamsRolesResponse": {
-      "description": "",
-      "schema": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RoleDTO"
-          }
-        }
-      }
-    },
     "listTokensResponse": {
       "description": "",
       "schema": {
@@ -10185,24 +9395,6 @@
         "items": {
           "$ref": "#/definitions/TokenDTO"
         }
-      }
-    },
-    "listUsersRolesResponse": {
-      "description": "",
-      "schema": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RoleDTO"
-          }
-        }
-      }
-    },
-    "noContentResponse": {
-      "description": "",
-      "schema": {
-        "type": "object"
       }
     },
     "notAcceptableError": {
@@ -10302,9 +9494,6 @@
           }
         }
       }
-    },
-    "postRenewLicenseTokenResponse": {
-      "description": ""
     },
     "preconditionFailedError": {
       "description": "PreconditionFailedError",
@@ -10441,12 +9630,6 @@
         "$ref": "#/definitions/SearchUserQueryResult"
       }
     },
-    "setRoleAssignmentsResponse": {
-      "description": "",
-      "schema": {
-        "$ref": "#/definitions/RoleAssignmentsDTO"
-      }
-    },
     "snapshotListResponse": {
       "description": "",
       "schema": {
@@ -10512,33 +9695,6 @@
           },
           "serviceaccount": {
             "$ref": "#/definitions/ServiceAccountProfileDTO"
-          }
-        }
-      }
-    },
-    "updateTeamLBACRulesResponse": {
-      "description": "",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "message": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "rules": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/TeamLBACRule"
-            }
-          },
-          "uid": {
-            "type": "string"
           }
         }
       }

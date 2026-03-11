@@ -36,6 +36,7 @@ import { Messages } from '../Inventory.messages';
 import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
+import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 
 import { InventoryNode } from './Nodes.types';
 import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
@@ -46,13 +47,16 @@ import {
   getTagsFromLabels,
 } from './Services.utils';
 import { getStyles } from './Tabs.styles';
+import { DATA_INTERVAL } from 'app/percona/shared/core';
 
 export const NodesTab = () => {
-  const { isLoading, nodes } = useSelector(getNodes);
+  const { nodes } = useSelector(getNodes);
+  const [isLoading, setIsLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelectedRows] = useState<any[]>([]);
   const [actionItem, setActionItem] = useState<Node | null>(null);
   const navModel = usePerconaNavModel('inventory-nodes');
+  const [triggerTimeout, , stopTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
@@ -291,7 +295,11 @@ export const NodesTab = () => {
   }, [actionItem, selected]);
 
   useEffect(() => {
-    loadData();
+    setIsLoading(true);
+    loadData()
+      .then(() => setIsLoading(false))
+      .then(() => triggerTimeout(loadData, DATA_INTERVAL));
+    return () => stopTimeout();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -397,6 +405,8 @@ export const NodesTab = () => {
             totalItems={mappedNodes.length}
             rowSelection
             autoResetSelectedRows={false}
+            autoResetExpanded={false}
+            autoResetPage={false}
             onRowSelection={handleSelectionChange}
             showPagination
             pageSize={25}

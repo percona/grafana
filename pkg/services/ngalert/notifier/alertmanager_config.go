@@ -306,7 +306,7 @@ func (moa *MultiOrgAlertmanager) gettableUserConfigFromAMConfigString(ctx contex
 	return result, nil
 }
 
-func (moa *MultiOrgAlertmanager) SaveAndApplyAlertmanagerConfiguration(ctx context.Context, org int64, config definitions.PostableUserConfig) error {
+func (moa *MultiOrgAlertmanager) SaveAndApplyAlertmanagerConfiguration(ctx context.Context, org int64, config definitions.PostableUserConfig, authzFn AuthorizeProtectedFn) error {
 	// We cannot add this validation to PostableUserConfig as that struct is used for both
 	// Grafana Alertmanager (where inhibition rules are not supported) and External Alertmanagers
 	// (including Mimir) where inhibition rules are supported.

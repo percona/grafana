@@ -31,8 +31,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >
@@ -54,8 +54,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >
@@ -72,8 +72,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: true, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: true },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >
@@ -94,8 +94,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: false, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: false },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >
@@ -114,8 +114,8 @@ describe('FailedChecksTab::', () => {
       <Provider
         store={configureStore({
           percona: {
-            user: { isAuthorized: false, isPlatformUser: false },
-            settings: { result: { advisorEnabled: true, isConnectedToPortal: false } },
+            user: { isAuthorized: false },
+            settings: { result: { advisorEnabled: true } },
           },
         } as StoreState)}
       >

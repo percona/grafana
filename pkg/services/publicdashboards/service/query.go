@@ -34,6 +34,9 @@ func (pd *PublicDashboardServiceImpl) FindAnnotations(ctx context.Context, reqDT
 		return nil, models.ErrInternalServerError.Errorf("FindAnnotations: failed to unmarshal dashboard annotations: %w", err)
 	}
 
+	// Use dashboard time range if time selection is disabled, otherwise use request time range
+	from, to := getAnnotationsTimeRange(dash, reqDTO, pub.TimeSelectionEnabled)
+
 	// We don't have a signed in user for public dashboards. We are using Grafana's Identity to query the annotations.
 	svcCtx, svcIdent := identity.WithServiceIdentity(ctx, dash.OrgID)
 	uniqueEvents := make(map[int64]models.AnnotationEvent, 0)
@@ -43,8 +46,8 @@ func (pd *PublicDashboardServiceImpl) FindAnnotations(ctx context.Context, reqDT
 			continue
 		}
 		annoQuery := &annotations.ItemQuery{
-			From:         reqDTO.From,
-			To:           reqDTO.To,
+			From:         from,
+			To:           to,
 			OrgID:        dash.OrgID,
 			DashboardID:  dash.ID,
 			DashboardUID: dash.UID,

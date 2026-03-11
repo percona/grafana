@@ -96,7 +96,6 @@ jobs:
             .prettierrc.js
           fetch-depth: 0
           fetch-tags: true
-          persist-credentials: false
       - name: Setup nodejs environment
         uses: actions/setup-node@v6
         with:

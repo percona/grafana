@@ -45,7 +45,6 @@ const {
     telemetryLink,
     telemetryTooltip,
     telemetrySummaryTitle,
-    telemetryDisclaimer,
     updatesLabel,
     updatesLink,
     updatesTooltip,
@@ -219,10 +218,6 @@ export const Advanced: FC = () => {
                     dataTestId="advanced-telemetry"
                     component={SwitchRow}
                   />
-                  <div className={styles.infoBox}>
-                    <Icon name="info-circle" size="xl" className={styles.infoBoxIcon} />
-                    <p>{telemetryDisclaimer}</p>
-                  </div>
                   <Field
                     name="updates"
                     type="checkbox"
@@ -231,16 +226,6 @@ export const Advanced: FC = () => {
                     tooltipLinkText={tooltipLinkText}
                     link={updatesLink}
                     dataTestId="advanced-updates"
-                    component={SwitchRow}
-                  />
-                  <Field
-                    name="stt"
-                    type="checkbox"
-                    label={advisorsLabel}
-                    tooltip={advisorsTooltip}
-                    tooltipLinkText={tooltipLinkText}
-                    link={advisorsLink}
-                    dataTestId="advanced-advisors"
                     component={SwitchRow}
                   />
                   <Field
@@ -294,6 +279,16 @@ export const Advanced: FC = () => {
                       </Button>
                     </div>
                   </div>
+                  <Field
+                    name="stt"
+                    type="checkbox"
+                    label={advisorsLabel}
+                    tooltip={advisorsTooltip}
+                    tooltipLinkText={tooltipLinkText}
+                    link={advisorsLink}
+                    dataTestId="advanced-advisors"
+                    component={SwitchRow}
+                  />
                   <div className={styles.advancedRow}>
                     <div className={cx(styles.advancedCol, styles.advancedChildCol, styles.sttCheckIntervalsLabel)}>
                       <div className={settingsStyles.labelWrapper} data-testid="check-intervals-label">

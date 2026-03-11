@@ -19,6 +19,16 @@ export class ThemeChangedEvent extends BusEventWithPayload<GrafanaTheme2> {
 }
 
 /**
+ * @PERCONA: Added this event to allow other components to listen to timezone changes
+ * Called when the timezone settings change
+ *
+ * @public
+ */
+export class TimeZoneUpdatedEvent extends BusEventWithPayload<string> {
+  static type = 'timezone-updated-event';
+}
+
+/**
  * Called when time range is updated
  *
  * @public

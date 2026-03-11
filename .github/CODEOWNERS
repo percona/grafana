@@ -85,8 +85,6 @@
 # Git Sync frontend owned by frontend team as a whole.
 
 /apps/alerting/ @grafana/alerting-backend
-/apps/dashboard/ @grafana/grafana-app-platform-squad @grafana/dashboards-squad
-/apps/folder/ @grafana/grafana-app-platform-squad
 /apps/playlist/ @grafana/grafana-app-platform-squad
 /apps/plugins/ @grafana/plugins-platform-backend
 /apps/preferences/ @grafana/grafana-app-platform-squad @grafana/grafana-frontend-platform
@@ -104,7 +102,6 @@
 /pkg/apis/ @grafana/grafana-app-platform-squad
 /pkg/apis/query @grafana/grafana-datasources-core-services
 /pkg/apis/userstorage @grafana/grafana-app-platform-squad @grafana/plugins-platform-backend
-/pkg/apis/secret @grafana/grafana-operator-experience-squad
 /pkg/bus/ @grafana/grafana-search-and-storage
 /pkg/clientauth/ @grafana/grafana-app-platform-squad
 /pkg/cmd/ @grafana/grafana-backend-group
@@ -153,7 +150,6 @@
 /pkg/operators/iam @grafana/access-squad
 /pkg/promlib @grafana/oss-big-tent
 /pkg/storage/ @grafana/grafana-search-and-storage
-/pkg/storage/secret/ @grafana/grafana-operator-experience-squad
 /pkg/services/annotations/ @grafana/grafana-search-and-storage
 /pkg/services/apikey/ @grafana/identity-squad
 /pkg/services/cleanup/ @grafana/grafana-backend-group
@@ -164,7 +160,6 @@
 /pkg/services/dashboardversion/ @grafana/grafana-backend-group
 /pkg/services/encryption/ @grafana/grafana-operator-experience-squad
 /pkg/services/folder/ @grafana/grafana-search-and-storage
-/pkg/services/frontend/ @grafana/grafana-frontend-platform
 /pkg/services/apiserver @grafana/grafana-app-platform-squad
 /pkg/services/hooks/ @grafana/grafana-backend-group
 /pkg/services/kmsproviders/ @grafana/grafana-operator-experience-squad
@@ -730,7 +725,6 @@ i18next.config.ts @grafana/grafana-frontend-platform
 /packages/grafana-ui/src/components/PluginSignatureBadge/ @grafana/plugins-platform-frontend
 /packages/grafana-ui/src/components/Sparkline/ @grafana/grafana-frontend-platform @grafana/app-o11y-visualizations
 /packages/grafana-ui/src/components/Table/ @grafana/dataviz-squad
-/packages/grafana-ui/src/components/Table/Cells/SparklineCell.tsx @grafana/dataviz-squad @grafana/app-o11y-visualizations
 /packages/grafana-ui/src/components/uPlot/ @grafana/dataviz-squad
 /packages/grafana-ui/src/components/ValuePicker/ @grafana/dataviz-squad
 /packages/grafana-ui/src/components/VizLayout/ @grafana/dataviz-squad
@@ -778,6 +772,7 @@ i18next.config.ts @grafana/grafana-frontend-platform
 /stylelint.config.js @grafana/frontend-ops
 /tools/ @grafana/frontend-ops
 /lefthook.yml @grafana/frontend-ops
+/lefthook.rc @grafana/frontend-ops
 /.husky/pre-commit @grafana/frontend-ops
 /cypress.config.js @grafana/grafana-frontend-platform
 /.levignore.js @grafana/plugins-platform-frontend
@@ -1179,7 +1174,6 @@ embed.go @grafana/grafana-as-code
 /pkg/registry/apis/ @grafana/grafana-app-platform-squad
 /pkg/registry/apis/folders @grafana/grafana-search-and-storage
 /pkg/registry/apis/query @grafana/grafana-datasources-core-services
-/pkg/registry/apis/secret @grafana/grafana-operator-experience-squad
 /pkg/registry/apis/userstorage @grafana/grafana-app-platform-squad @grafana/plugins-platform-backend
 /pkg/registry/apps/advisor @grafana/plugins-platform-backend
 /pkg/registry/apps/alerting @grafana/alerting-backend

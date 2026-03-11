@@ -29,7 +29,11 @@ const renderForm = () =>
   );
 
 beforeEach(() => {
-  grantUserPermissions([AccessControlAction.AlertingNotificationsRead, AccessControlAction.AlertingNotificationsWrite]);
+  grantUserPermissions([
+    AccessControlAction.AlertingNotificationsRead,
+    AccessControlAction.AlertingNotificationsWrite,
+    AccessControlAction.AlertingReceiversRead,
+  ]);
 });
 
 describe('new receiver', () => {
@@ -41,7 +45,7 @@ describe('new receiver', () => {
     await user.type(await ui.inputs.name.find(), 'my new receiver');
 
     // enter some email
-    const email = ui.inputs.email.addresses.get();
+    const email = await ui.inputs.email.addresses.find();
     await user.clear(email);
     await user.type(email, 'tester@grafana.com');
 
@@ -60,7 +64,7 @@ describe('new receiver', () => {
     await user.type(await ui.inputs.name.find(), 'my new receiver');
 
     // enter some email
-    const email = ui.inputs.email.addresses.get();
+    const email = await ui.inputs.email.addresses.find();
     await user.clear(email);
     await user.type(email, 'tester@grafana.com');
 
@@ -98,7 +102,7 @@ describe('new receiver', () => {
     const { user } = renderForm();
 
     await user.type(await ui.inputs.name.find(), 'receiver that should fail');
-    const email = ui.inputs.email.addresses.get();
+    const email = await ui.inputs.email.addresses.find();
     await user.clear(email);
     await user.type(email, 'tester@grafana.com');
 

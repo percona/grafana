@@ -40,7 +40,7 @@ jobs:
             GRAFANABOT_FORUM_KEY=community_release:GRAFANABOT_FORUM_KEY
 
       - name: Run community-release (manually invoked)
-        uses: grafana/grafana-github-actions-go/community-release@main # zizmor: ignore[unpinned-uses]
+        uses: grafana/grafana-github-actions-go/community-release@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ inputs.version }}

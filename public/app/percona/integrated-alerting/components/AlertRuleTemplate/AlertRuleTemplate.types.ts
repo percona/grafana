@@ -31,7 +31,6 @@ export interface TemplatesList extends Omit<TemplatesListAPI, 'templates'> {
 
 export enum SourceDescription {
   BUILT_IN = 'TEMPLATE_SOURCE_BUILT_IN',
-  SAAS = 'TEMPLATE_SOURCE_SAAS',
   USER_FILE = 'TEMPLATE_SOURCE_USER_FILE',
   USER_API = 'TEMPLATE_SOURCE_USER_API',
 }

@@ -1596,6 +1596,16 @@ func (resource *StringOrDataqueryInlineScript) UnmarshalJSON(raw []byte) error {
 	return errors.Join(errList...)
 }
 
+type StringOrDataqueryInlineScript struct {
+	String                *string                `json:"String,omitempty"`
+	DataqueryInlineScript *DataqueryInlineScript `json:"DataqueryInlineScript,omitempty"`
+}
+
+// NewStringOrDataqueryInlineScript creates a new StringOrDataqueryInlineScript object.
+func NewStringOrDataqueryInlineScript() *StringOrDataqueryInlineScript {
+	return &StringOrDataqueryInlineScript{}
+}
+
 type BucketScriptOrCumulativeSumOrDerivativeOrSerialDiffOrRawDataOrRawDocumentOrUniqueCountOrPercentilesOrExtendedStatsOrMinOrMaxOrSumOrAverageOrMovingAverageOrMovingFunctionOrLogsOrRateOrTopMetrics struct {
 	BucketScript   *BucketScript   `json:"BucketScript,omitempty"`
 	CumulativeSum  *CumulativeSum  `json:"CumulativeSum,omitempty"`

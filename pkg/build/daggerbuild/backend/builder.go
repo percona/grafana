@@ -111,7 +111,6 @@ func GolangContainer(
 	}
 
 	container := golang.Container(d, platform, goVersion)
-
 	if opts.CGOEnabled {
 		container = container.
 			WithExec([]string{"apk", "add", "--update", "wget", "build-base", "alpine-sdk", "musl", "musl-dev", "xz"}).

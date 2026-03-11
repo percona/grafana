@@ -20,7 +20,7 @@ const setup = (role = OrgRole.Admin, isAuthorized = true) => {
       store={configureStore({
         percona: {
           user: { isAuthorized },
-          settings: { loading: false, result: { isConnectedToPortal: true, alertingEnabled: true } },
+          settings: { loading: false, result: { alertingEnabled: true } },
         },
       } as StoreState)}
     >
