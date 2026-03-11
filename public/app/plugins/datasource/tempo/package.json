@@ -2,7 +2,7 @@
   "name": "@grafana-plugins/tempo",
   "description": "Grafana plugin for the Tempo data source.",
   "private": true,
-  "version": "11.6.4",
+  "version": "11.6.13",
   "dependencies": {
     "@emotion/css": "11.13.5",
     "@grafana/data": "workspace:*",
@@ -23,7 +23,7 @@
     "buffer": "6.0.3",
     "events": "3.3.0",
     "i18next": "^24.0.0",
-    "lodash": "4.17.21",
+    "lodash": "^4.17.23",
     "lru-cache": "11.0.2",
     "monaco-editor": "0.34.1",
     "prismjs": "1.30.0",
@@ -39,7 +39,7 @@
     "uuid": "11.0.5"
   },
   "devDependencies": {
-    "@grafana/plugin-configs": "11.6.4",
+    "@grafana/plugin-configs": "11.6.13",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",
@@ -56,7 +56,7 @@
     "react-select-event": "5.5.1",
     "ts-node": "10.9.2",
     "typescript": "5.7.3",
-    "webpack": "5.97.1"
+    "webpack": "^5.105.1"
   },
   "peerDependencies": {
     "@grafana/runtime": "*"

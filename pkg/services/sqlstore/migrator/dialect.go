@@ -8,6 +8,8 @@ import (
 
 	"golang.org/x/exp/slices"
 
+	"github.com/grafana/grafana/pkg/infra/log"
+
 	"github.com/grafana/grafana/pkg/services/sqlstore/session"
 	"xorm.io/xorm"
 )
@@ -72,7 +74,7 @@ type Dialect interface {
 	// CreateDatabaseFromSnapshot is called when migration log table is not found.
 	// Dialect can recreate all tables from existing snapshot. After successful (nil error) return,
 	// migrator will list migrations from the log, and apply all missing migrations.
-	CreateDatabaseFromSnapshot(ctx context.Context, engine *xorm.Engine, migrationLogTableName string) error
+	CreateDatabaseFromSnapshot(ctx context.Context, engine *xorm.Engine, migrationLogTableName string, logger log.Logger) error
 
 	IsUniqueConstraintViolation(err error) bool
 	ErrorMessage(err error) string
@@ -241,7 +243,7 @@ func (b *BaseDialect) CopyTableData(sourceTable string, targetTable string, sour
 	targetColsSQL := b.QuoteColList(targetCols)
 
 	quote := b.dialect.Quote
-	return fmt.Sprintf("INSERT INTO %s (%s) SELECT %s FROM %s", quote(targetTable), targetColsSQL, sourceColsSQL, quote(sourceTable))
+	return fmt.Sprintf("INSERT INTO %s (%s)\nSELECT %s\nFROM %s", quote(targetTable), targetColsSQL, sourceColsSQL, quote(sourceTable))
 }
 
 func (b *BaseDialect) DropTable(tableName string) string {
@@ -343,7 +345,7 @@ func (b *BaseDialect) CleanDB(engine *xorm.Engine) error {
 	return nil
 }
 
-func (b *BaseDialect) CreateDatabaseFromSnapshot(ctx context.Context, engine *xorm.Engine, tableName string) error {
+func (b *BaseDialect) CreateDatabaseFromSnapshot(ctx context.Context, engine *xorm.Engine, migrationLogTableName string, logger log.Logger) error {
 	return nil
 }
 
