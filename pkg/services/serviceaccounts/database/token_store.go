@@ -9,6 +9,8 @@ import (
 	"github.com/grafana/grafana/pkg/services/apikey"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/serviceaccounts"
+
+	// @PERCONA
 	"github.com/grafana/grafana/pkg/util/nameutil"
 )
 
@@ -51,6 +53,7 @@ func (s *ServiceAccountsStoreImpl) AddServiceAccountToken(ctx context.Context, s
 		}
 
 		addKeyCmd := &apikey.AddCommand{
+			// @PERCONA
 			Name:             nameutil.SanitizeSAName(cmd.Name),
 			Role:             org.RoleViewer,
 			OrgID:            cmd.OrgId,

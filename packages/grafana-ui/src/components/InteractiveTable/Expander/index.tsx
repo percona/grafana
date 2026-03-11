@@ -17,14 +17,11 @@ export function ExpanderCell<K extends object>({ row, __rowID }: CellProps<K, vo
       <IconButton
         tooltip={t('grafana-ui.interactive-table.expand-row-tooltip', 'Toggle row expanded')}
         aria-controls={__rowID}
-        // @PERCONA - ignore errors related to expandable rows
-        // @ts-ignore
+        // @ts-expect-error react-table doesn't ship with useExpanded types and we can't use declaration merging without affecting the table viz
         name={row.isExpanded ? 'angle-down' : 'angle-right'}
-        // @PERCONA - ignore errors related to expandable rows
-        // @ts-ignore
+        // @ts-expect-error same as the line above
         aria-expanded={row.isExpanded}
-        // @PERCONA - ignore errors related to expandable rows
-        // @ts-ignore
+        // @ts-expect-error same as the line above
         {...row.getToggleRowExpandedProps()}
         size="lg"
       />

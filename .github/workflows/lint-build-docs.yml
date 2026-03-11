@@ -18,8 +18,6 @@ on:
 
 permissions: {}
 
-permissions: {}
-
 jobs:
   docs:
     # Run on `grafana/grafana` main branch, or on pull requests to prevent double-running on mirrors

@@ -181,7 +181,6 @@ export class LoginCtrl extends PureComponent<Props, State> {
   };
 
   toGrafana = () => {
-    // Use window.location.href to force page reload
     if (config.featureToggles.useSessionStorageForRedirection) {
       window.location.assign(config.appSubUrl + '/');
       return;

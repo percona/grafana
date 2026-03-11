@@ -2,7 +2,7 @@ name: "Codeowners Validator"
 
 on:
   pull_request:
-    branches: [ main, release-* ]
+    branches: [ main ]
 
 permissions: {}
 

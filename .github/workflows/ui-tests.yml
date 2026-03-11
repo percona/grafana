@@ -1,11 +1,11 @@
 ---
-name: UI Tests
+name: Percona UI Tests
 on:
   pull_request:
 
 jobs:
   test:
-    name: Run UI tests
+    name: Run Percona UI tests
     runs-on: ubuntu-latest
     strategy:
       matrix:

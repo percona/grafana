@@ -106,10 +106,6 @@
       "matchDepTypes": ["devDependencies"],
       "prPriority": -1
     },
-    {
-      "matchDepTypes": ["devDependencies"],
-      "prPriority": -1
-    },
   ],
   pin: {
     enabled: false,

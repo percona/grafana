@@ -1,7 +1,7 @@
 name: Documentation CI
 on:
   pull_request:
-    branches: ["main", "release-*"]
+    branches: ["main"]
     paths: ["docs/sources/**"]
   workflow_dispatch:
 

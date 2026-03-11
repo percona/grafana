@@ -1868,21 +1868,6 @@ func (dr *DashboardServiceImpl) listDashboardsThroughK8s(ctx context.Context, or
 		users, err := dr.getUsersForList(ctx, out.Items, orgID)
 		if err != nil {
 			return nil, err
-		} else if out == nil {
-			return nil, dashboards.ErrDashboardNotFound
-		}
-
-		for _, item := range out.Items {
-			dash, err := dr.UnstructuredToLegacyDashboard(ctx, &item, orgID)
-			if err != nil {
-				return nil, err
-			}
-			dashes = append(dashes, dash)
-		}
-
-		continueToken = out.GetContinue()
-		if continueToken == "" {
-			break
 		}
 
 		for _, item := range out.Items {
