@@ -10,7 +10,7 @@ import { ThemePicker } from './ThemePicker';
 import { ShareModalTabProps } from './types';
 import { buildImageUrl, buildShareUrl, getTrackingSource } from './utils';
 
-export interface Props extends ShareModalTabProps {}
+export interface Props extends ShareModalTabProps { }
 
 export const ShareLink = memo(({ panel, dashboard }: Props) => {
   const [useCurrentTimeRange, setUseCurrentTimeRange] = useState(true);
@@ -82,14 +82,16 @@ export const ShareLink = memo(({ panel, dashboard }: Props) => {
         {/* @PERCONA */}
         {differentLocalhostDomains && (
           <Alert title="PMM: URL mismatch" severity="warning">
-            <p>
-              Your domain on Grafana&apos;s .ini file is localhost but you are on a different domain. The short URL will
-              point to localhost, which might be wrong.
-            </p>
-            <p>
-              Please change your .ini and restart Grafana if you want the URL shortener to function correctly, or just
-              use the full URL.
-            </p>
+            <Trans i18nKey="share-modal.link.url-mismatch-description">
+              <p>
+                Your domain on Grafana&apos;s .ini file is localhost but you are on a different domain. The short URL will
+                point to localhost, which might be wrong.
+              </p>
+              <p>
+                Please change your .ini and restart Grafana if you want the URL shortener to function correctly, or just
+                use the full URL.
+              </p>
+            </Trans>
           </Alert>
         )}
         <Field label={shortenURLTranslation}>

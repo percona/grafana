@@ -1,8 +1,8 @@
 import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
-import { Drawer, useStyles2, Text } from '@grafana/ui';
 import { t } from '@grafana/i18n';
+import { Drawer, useStyles2, Text } from '@grafana/ui';
 
 import { NewsWrapper } from './NewsWrapper';
 
@@ -24,7 +24,7 @@ export function NewsContainer({ onClose }: NewsContainerProps) {
             href="https://www.percona.com/blog/"
             target="_blank"
             rel="noreferrer"
-            title="Go to Percona blog"
+            title={t('news.go-to-percona-blog', 'Go to Percona blog')}
             className={styles.grot}
           >
             <img src="public/img/percona-logo.svg" alt="Percona logo" />

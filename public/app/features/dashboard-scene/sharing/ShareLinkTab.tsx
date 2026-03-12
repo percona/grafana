@@ -87,7 +87,7 @@ export class ShareLinkTab extends SceneObjectBase<ShareLinkTabState> implements 
 
     const imageUrl = getDashboardUrl({
       uid: dashboard.state.uid,
-      currentQueryParams: location.search,
+      currentQueryParams: window.location.search,
       updateQuery: { ...urlParamsUpdate, ...queryOptions, panelId: panel?.state.key },
       absolute: false,
       soloRoute: true,
@@ -217,13 +217,15 @@ function ShareLinkTabRenderer({ model }: SceneComponentProps<ShareLinkTab>) {
           title={t('share-modal.link.render-alert', 'Image renderer plugin not installed')}
           bottomSpacing={0}
         >
-          {/* @PERCONA */}
-          {/* We modified this text and link */}
-          To render a panel image, you must install the{' '}
-          <a href="https://per.co.na/share_png" target="_blank" rel="noopener noreferrer" className="external-link">
-            Image Renderer plugin
-          </a>
-          . Please contact your PMM administrator to install the plugin.
+          <Trans i18nKey="share-modal.link.render-instructions">
+            {/* @PERCONA */}
+            {/* We modified this text and link */}
+            To render a panel image, you must install the{' '}
+            <a href="https://per.co.na/share_png" target="_blank" rel="noopener noreferrer" className="external-link">
+              Image Renderer plugin
+            </a>
+            . Please contact your PMM administrator to install the plugin.
+          </Trans>
         </Alert>
       )}
     </>

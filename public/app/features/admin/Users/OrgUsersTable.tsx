@@ -30,6 +30,9 @@ import { AccessControlAction, Role } from 'app/types/accessControl';
 import { OrgUser } from 'app/types/user';
 
 import { OrgRolePicker } from '../OrgRolePicker';
+import AccessRoleHeader from 'app/percona/rbac/AccessRoleHeader';
+import { useAccessRolesEnabled } from 'app/percona/rbac/hooks';
+import AccessRoleCell from 'app/percona/rbac/AccessRoleCell';
 
 type Cell<T extends keyof OrgUser = keyof OrgUser> = CellProps<OrgUser, OrgUser[T]>;
 
@@ -184,12 +187,12 @@ export const OrgUsersTable = ({
       // @PERCONA
       ...(accessRolesEnabled
         ? [
-            {
-              id: 'perconaRBAC',
-              header: () => <AccessRoleHeader />,
-              cell: ({ row: { original: user } }: Cell) => <AccessRoleCell user={user} />,
-            },
-          ]
+          {
+            id: 'perconaRBAC',
+            header: () => <AccessRoleHeader />,
+            cell: ({ row: { original: user } }: Cell) => <AccessRoleCell user={user} />,
+          },
+        ]
         : []),
       {
         id: 'info',
