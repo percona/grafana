@@ -236,12 +236,12 @@ export class LoginCtrl extends PureComponent<Props, State> {
       return redirectUrl;
     }
 
-    // /graph - replace with /pmm-ui/graph/
+    // /graph - replace with /pmm-ui/graph
     if (redirectUrl.startsWith(config.appSubUrl)) {
       return redirectUrl.replace(config.appSubUrl, appSubUrl);
     }
 
-    // just a path, add /pmm-ui/graph/ to the beginning
+    // just a path, add /pmm-ui/graph to the beginning
     return appSubUrl + redirectUrl;
   };
 
