@@ -4,17 +4,32 @@ const (
 	// All includes all modules necessary for Grafana to run as a standalone server
 	All string = "all"
 
-	Core                  string = "core"
-	GrafanaAPIServer      string = "grafana-apiserver"
-	StorageServer         string = "storage-server"
-	ZanzanaServer         string = "zanzana-server"
-	InstrumentationServer string = "instrumentation-server"
+	Core                    string = "core"
+	MemberlistKV            string = "memberlistkv"
+	GrafanaAPIServer        string = "grafana-apiserver"
+	SearchServerRing        string = "search-server-ring"
+	SearchServerDistributor string = "search-server-distributor"
+	StorageServer           string = "storage-server"
+	SearchServer            string = "search-server"
+	ZanzanaServer           string = "zanzana-server"
+	InstrumentationServer   string = "instrumentation-server"
+	FrontendServer          string = "frontend-server"
+	OperatorServer          string = "operator"
 )
 
 var dependencyMap = map[string][]string{
+	MemberlistKV:     {InstrumentationServer},
+	SearchServerRing: {InstrumentationServer, MemberlistKV},
 	GrafanaAPIServer: {InstrumentationServer},
-	StorageServer:    {InstrumentationServer},
-	ZanzanaServer:    {InstrumentationServer},
-	Core:             {},
-	All:              {Core},
+
+	// TODO: remove SearchServerRing once we only use sharding in SearchServer
+	StorageServer: {InstrumentationServer, SearchServerRing},
+	SearchServer:  {InstrumentationServer, SearchServerRing},
+
+	ZanzanaServer:           {InstrumentationServer},
+	SearchServerDistributor: {InstrumentationServer, MemberlistKV, SearchServerRing},
+	Core:                    {},
+	All:                     {Core},
+	FrontendServer:          {},
+	OperatorServer:          {InstrumentationServer},
 }

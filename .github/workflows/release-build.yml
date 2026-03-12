@@ -96,7 +96,7 @@ jobs:
           private_key: ${{ env.GRAFANA_DELIVERY_BOT_APP_PEM }}
           repositories: '["grafana-enterprise"]'
           permissions: '{"actions": "write"}'
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         env:
           REF: ${{ github.ref_name }}
           VERSION: ${{ needs.setup.outputs.version }}
@@ -142,40 +142,41 @@ jobs:
         include:
           - name: linux-amd64 # publish-npm relies on this step building npm packages
             artifacts: targz:grafana:linux/amd64,deb:grafana:linux/amd64,rpm:grafana:linux/amd64,docker:grafana:linux/amd64,docker:grafana:linux/amd64:ubuntu,npm:grafana,storybook
-            verify: false
+            verify: true
           - name: linux-arm64
             artifacts: targz:grafana:linux/arm64,deb:grafana:linux/arm64,rpm:grafana:linux/arm64,docker:grafana:linux/arm64,docker:grafana:linux/arm64:ubuntu
             verify: false
           - name: linux-s390x
             artifacts: targz:grafana:linux/s390x,deb:grafana:linux/s390x,rpm:grafana:linux/s390x,docker:grafana:linux/s390x,docker:grafana:linux/s390x:ubuntu
-            verify: false
+            verify: true
           - name: linux-armv7
             artifacts: targz:grafana:linux/arm/v7,deb:grafana:linux/arm/v7,docker:grafana:linux/arm/v7,docker:grafana:linux/arm/v7:ubuntu
-            verify: false
+            verify: true
           - name: linux-armv6
             artifacts: targz:grafana:linux/arm/v6,deb:grafana:linux/arm/v6
-            verify: false
+            verify: true
           - name: windows-amd64
-            artifacts: targz:grafana:windows/amd64,zip:grafana:windows/amd64,msi:grafana:windows/amd64
-            verify: false
+            artifacts: targz:grafana:windows/amd64:nocgo,zip:grafana:windows/amd64:nocgo,msi:grafana:windows/amd64:nocgo
+            verify: true
           - name: windows-arm64
-            artifacts: targz:grafana:windows/arm64,zip:grafana:windows/arm64
-            verify: false
+            artifacts: targz:grafana:windows/arm64:nocgo,zip:grafana:windows/arm64:nocgo
+            verify: true
           - name: darwin-amd64
-            artifacts: targz:grafana:darwin/amd64
-            verify: false
+            artifacts: targz:grafana:darwin/amd64:nocgo
+            verify: true
           - name: darwin-arm64
-            artifacts: targz:grafana:darwin/arm64
-            verify: false
+            artifacts: targz:grafana:darwin/arm64:nocgo
+            verify: true
     steps:
       - uses: grafana/shared-workflows/actions/dockerhub-login@dockerhub-login/v1.0.2
+      - uses: grafana/shared-workflows/actions/login-to-gar@main
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392
+        uses: docker/setup-qemu-action@7e10951aea186e886cef2f1a25a7bbf4e593d710
         with:
-          image: docker.io/tonistiigi/binfmt:qemu-v7.0.0-28
+          image: docker.io/tonistiigi/binfmt:qemu-v10.2.1-65
       - uses: ./.github/actions/build-package
         id: build
         with:
@@ -187,12 +188,13 @@ jobs:
           output: artifacts-${{ matrix.name }}.txt
           verify: ${{ matrix.verify }}
           build-id: ${{ github.run_id }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+          cache-builders: true
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: artifacts-list-${{ matrix.name }}
           path: ${{ steps.build.outputs.file }}
           retention-days: 1
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: artifacts-${{ matrix.name }}
           path: ${{ steps.build.outputs.dist-dir }}
@@ -212,6 +214,7 @@ jobs:
       run-id: ${{ github.run_id }}
       bucket-path: ${{ needs.setup.outputs.version }}_${{ github.run_id }}
       environment: prod
+      runs-on: ubuntu-x64-small
 
   publish-dockerhub:
     if: github.ref_name == 'main'
@@ -224,27 +227,27 @@ jobs:
       - build
     steps:
       - uses: grafana/shared-workflows/actions/dockerhub-login@dockerhub-login/v1.0.2
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: artifacts-list-linux-amd64
           path: .
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: artifacts-list-linux-arm64
           path: .
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: artifacts-list-linux-armv7
           path: .
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: artifacts-linux-amd64
           path: dist
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: artifacts-linux-arm64
           path: dist
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: artifacts-linux-armv7
           path: dist
@@ -271,21 +274,30 @@ jobs:
           docker manifest push "grafana/grafana-dev:${VERSION}"
           docker manifest push "grafana/grafana-dev:${VERSION}-ubuntu"
 
-  publish-npm-canaries:
+  dispatch-npm-canaries:
     if: github.ref_name == 'main'
-    name: Publish NPM canaries
-    uses: ./.github/workflows/release-npm.yml
+    name: Dispatch publish NPM canaries
     permissions:
+      actions: write
       contents: read
-      id-token: write
+    runs-on: ubuntu-x64-small
     needs:
       - setup
-      - build
-    with:
-      grafana_commit: ${{ needs.setup.outputs.grafana-commit }}
-      version: ${{ needs.setup.outputs.version }}
-      build_id: ${{ github.run_id }}
-      version_type: "canary"
+    steps:
+      - name: Dispatch action
+        env:
+          GRAFANA_COMMIT: ${{ needs.setup.outputs.grafana-commit }}
+          VERSION: ${{ needs.setup.outputs.version }}
+          BUILD_ID: ${{ github.run_id }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run release-npm.yml \
+            --repo grafana/grafana \
+            --ref main \
+            --field grafana_commit="$GRAFANA_COMMIT" \
+            --field version="$VERSION" \
+            --field build_id="$BUILD_ID"\
+            --field version_type="canary"
 
   # notify-pr creates (or updates) a comment in a pull request to link to this workflow where the release artifacts are
   # being built.

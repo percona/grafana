@@ -8,19 +8,23 @@
 package v0alpha1
 
 import (
+	commonv0alpha1 "github.com/grafana/grafana/pkg/apimachinery/apis/common/v0alpha1"
 	common "k8s.io/kube-openapi/pkg/common"
 	spec "k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/grafana/grafana/pkg/apis/datasource/v0alpha1.DataSourceConnection":     schema_pkg_apis_datasource_v0alpha1_DataSourceConnection(ref),
-		"github.com/grafana/grafana/pkg/apis/datasource/v0alpha1.DataSourceConnectionList": schema_pkg_apis_datasource_v0alpha1_DataSourceConnectionList(ref),
-		"github.com/grafana/grafana/pkg/apis/datasource/v0alpha1.HealthCheckResult":        schema_pkg_apis_datasource_v0alpha1_HealthCheckResult(ref),
+		DataSource{}.OpenAPIModelName():            schema_pkg_apis_datasource_v0alpha1_DataSource(ref),
+		DataSourceList{}.OpenAPIModelName():        schema_pkg_apis_datasource_v0alpha1_DataSourceList(ref),
+		DatasourceAccessInfo{}.OpenAPIModelName():  schema_pkg_apis_datasource_v0alpha1_DatasourceAccessInfo(ref),
+		GenericDataSourceSpec{}.OpenAPIModelName(): schema_pkg_apis_datasource_v0alpha1_GenericDataSourceSpec(ref),
+		HealthCheckResult{}.OpenAPIModelName():     schema_pkg_apis_datasource_v0alpha1_HealthCheckResult(ref),
+		UnstructuredSpec{}.OpenAPIModelName():      UnstructuredSpec{}.OpenAPIDefinition(),
 	}
 }
 
-func schema_pkg_apis_datasource_v0alpha1_DataSourceConnection(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_datasource_v0alpha1_DataSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -43,34 +47,40 @@ func schema_pkg_apis_datasource_v0alpha1_DataSourceConnection(ref common.Referen
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"),
 						},
 					},
-					"title": {
+					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Description: "The display name",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
+							Description: "DataSource configuration -- these properties are all visible to anyone able to query the data source from their browser",
+							Ref:         ref(UnstructuredSpec{}.OpenAPIModelName()),
 						},
 					},
-					"description": {
+					"secure": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Optional description for the data source (does not exist yet)",
-							Type:        []string{"string"},
-							Format:      "",
+							Description: "Secure values allows setting values that are never shown to users The returned properties are only the names of the configured values",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(commonv0alpha1.InlineSecureValue{}.OpenAPIModelName()),
+									},
+								},
+							},
 						},
 					},
 				},
-				Required: []string{"title"},
+				Required: []string{"metadata", "spec"},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			commonv0alpha1.InlineSecureValue{}.OpenAPIModelName(), UnstructuredSpec{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_datasource_v0alpha1_DataSourceConnectionList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_datasource_v0alpha1_DataSourceList(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -93,7 +103,7 @@ func schema_pkg_apis_datasource_v0alpha1_DataSourceConnectionList(ref common.Ref
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"),
 						},
 					},
 					"items": {
@@ -103,17 +113,146 @@ func schema_pkg_apis_datasource_v0alpha1_DataSourceConnectionList(ref common.Ref
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/pkg/apis/datasource/v0alpha1.DataSourceConnection"),
+										Ref:     ref(DataSource{}.OpenAPIModelName()),
 									},
 								},
 							},
 						},
 					},
 				},
+				Required: []string{"metadata", "items"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apis/datasource/v0alpha1.DataSourceConnection", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+			DataSource{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"},
+	}
+}
+
+func schema_pkg_apis_datasource_v0alpha1_DatasourceAccessInfo(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"Permissions": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: false,
+										Type:    []string{"boolean"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"Permissions"},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_datasource_v0alpha1_GenericDataSourceSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"title": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The display name (previously saved as the \"name\" property)",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"access": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Possible enum values:\n - `\"direct\"` The frontend can connect directly to the remote URL This method is discouraged\n - `\"proxy\"` Connect to the remote datasource through the grafana backend",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"direct", "proxy"},
+						},
+					},
+					"readOnly": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"isDefault": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"url": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Server URL",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"user": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"database": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"basicAuth": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"basicAuthUser": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"withCredentials": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"boolean"},
+							Format: "",
+						},
+					},
+					"jsonData": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Generic unstructured configuration settings",
+							Ref:         ref(commonv0alpha1.Unstructured{}.OpenAPIModelName()),
+						},
+					},
+				},
+				Required: []string{"title", "jsonData"},
+			},
+		},
+		Dependencies: []string{
+			commonv0alpha1.Unstructured{}.OpenAPIModelName()},
 	}
 }
 
@@ -161,13 +300,13 @@ func schema_pkg_apis_datasource_v0alpha1_HealthCheckResult(ref common.ReferenceC
 					"details": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec depends on the plugin",
-							Ref:         ref("github.com/grafana/grafana/pkg/apimachinery/apis/common/v0alpha1.Unstructured"),
+							Ref:         ref(commonv0alpha1.Unstructured{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apimachinery/apis/common/v0alpha1.Unstructured"},
+			commonv0alpha1.Unstructured{}.OpenAPIModelName()},
 	}
 }

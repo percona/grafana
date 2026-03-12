@@ -15,8 +15,8 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.yaml.in/yaml/v3"
 	"golang.org/x/exp/maps"
-	"gopkg.in/yaml.v3"
 
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/util"
@@ -387,6 +387,7 @@ func TestPatchPartialAlertRule(t *testing.T) {
 	})
 }
 
+// nolint:gocyclo
 func TestDiff(t *testing.T) {
 	t.Run("should return nil if there is no diff", func(t *testing.T) {
 		rule1 := RuleGen.GenerateRef()
@@ -407,7 +408,9 @@ func TestDiff(t *testing.T) {
 
 	t.Run("should find diff in simple fields", func(t *testing.T) {
 		rule1 := RuleGen.GenerateRef()
-		rule2 := RuleGen.GenerateRef()
+		rule2 := RuleGen.With(
+			RuleGen.WithMissingSeriesEvalsToResolve(*rule1.MissingSeriesEvalsToResolve + 1),
+		).GenerateRef()
 
 		diffs := rule1.Diff(rule2, "Data", "Annotations", "Labels", "NotificationSettings", "Metadata") // these fields will be tested separately
 
@@ -527,6 +530,13 @@ func TestDiff(t *testing.T) {
 			assert.Equal(t, rule2.For, diff[0].Right.Interface())
 			difCnt++
 		}
+		if rule1.KeepFiringFor != rule2.KeepFiringFor {
+			diff := diffs.GetDiffsForField("KeepFiringFor")
+			assert.Len(t, diff, 1)
+			assert.Equal(t, rule1.KeepFiringFor, diff[0].Left.Interface())
+			assert.Equal(t, rule2.KeepFiringFor, diff[0].Right.Interface())
+			difCnt++
+		}
 		if rule1.RuleGroupIndex != rule2.RuleGroupIndex {
 			diff := diffs.GetDiffsForField("RuleGroupIndex")
 			assert.Len(t, diff, 1)
@@ -539,6 +549,13 @@ func TestDiff(t *testing.T) {
 			assert.Len(t, diff, 1)
 			assert.Equal(t, rule1.Record, diff[0].Left.String())
 			assert.Equal(t, rule2.Record, diff[0].Right.String())
+			difCnt++
+		}
+		if rule1.MissingSeriesEvalsToResolve != rule2.MissingSeriesEvalsToResolve {
+			diff := diffs.GetDiffsForField("MissingSeriesEvalsToResolve")
+			assert.Len(t, diff, 1)
+			assert.Equal(t, *rule1.MissingSeriesEvalsToResolve, diff[0].Left.Int())
+			assert.Equal(t, *rule2.MissingSeriesEvalsToResolve, diff[0].Right.Int())
 			difCnt++
 		}
 
@@ -743,8 +760,9 @@ func TestDiff(t *testing.T) {
 	t.Run("should detect changes in NotificationSettings", func(t *testing.T) {
 		rule1 := RuleGen.GenerateRef()
 
-		baseSettings := NotificationSettingsGen(NSMuts.WithGroupBy("test1", "test2"))()
-		rule1.NotificationSettings = []NotificationSettings{baseSettings}
+		baseNotificationSettings := NotificationSettingsGen(NSMuts.WithGroupBy("test1", "test2"))()
+		baseSettings := baseNotificationSettings.ContactPointRouting
+		rule1.NotificationSettings = &baseNotificationSettings
 
 		addTime := func(d *model.Duration, duration time.Duration) *time.Duration {
 			dur := time.Duration(*d)
@@ -759,10 +777,10 @@ func TestDiff(t *testing.T) {
 		}{
 			{
 				name:                 "should detect changes in Receiver",
-				notificationSettings: CopyNotificationSettings(baseSettings, NSMuts.WithReceiver(baseSettings.Receiver+"-modified")),
+				notificationSettings: CopyNotificationSettings(baseNotificationSettings, NSMuts.WithReceiver(baseSettings.Receiver+"-modified")),
 				diffs: []cmputil.Diff{
 					{
-						Path:  "NotificationSettings[0].Receiver",
+						Path:  "NotificationSettings.ContactPointRouting.Receiver",
 						Left:  reflect.ValueOf(baseSettings.Receiver),
 						Right: reflect.ValueOf(baseSettings.Receiver + "-modified"),
 					},
@@ -770,10 +788,10 @@ func TestDiff(t *testing.T) {
 			},
 			{
 				name:                 "should detect changes in GroupWait",
-				notificationSettings: CopyNotificationSettings(baseSettings, NSMuts.WithGroupWait(addTime(baseSettings.GroupWait, 1*time.Second))),
+				notificationSettings: CopyNotificationSettings(baseNotificationSettings, NSMuts.WithGroupWait(addTime(baseSettings.GroupWait, 1*time.Second))),
 				diffs: []cmputil.Diff{
 					{
-						Path:  "NotificationSettings[0].GroupWait",
+						Path:  "NotificationSettings.ContactPointRouting.GroupWait",
 						Left:  reflect.ValueOf(*baseSettings.GroupWait),
 						Right: reflect.ValueOf(model.Duration(*addTime(baseSettings.GroupWait, 1*time.Second))),
 					},
@@ -781,10 +799,10 @@ func TestDiff(t *testing.T) {
 			},
 			{
 				name:                 "should detect changes in GroupInterval",
-				notificationSettings: CopyNotificationSettings(baseSettings, NSMuts.WithGroupInterval(addTime(baseSettings.GroupInterval, 1*time.Second))),
+				notificationSettings: CopyNotificationSettings(baseNotificationSettings, NSMuts.WithGroupInterval(addTime(baseSettings.GroupInterval, 1*time.Second))),
 				diffs: []cmputil.Diff{
 					{
-						Path:  "NotificationSettings[0].GroupInterval",
+						Path:  "NotificationSettings.ContactPointRouting.GroupInterval",
 						Left:  reflect.ValueOf(*baseSettings.GroupInterval),
 						Right: reflect.ValueOf(model.Duration(*addTime(baseSettings.GroupInterval, 1*time.Second))),
 					},
@@ -792,10 +810,10 @@ func TestDiff(t *testing.T) {
 			},
 			{
 				name:                 "should detect changes in RepeatInterval",
-				notificationSettings: CopyNotificationSettings(baseSettings, NSMuts.WithRepeatInterval(addTime(baseSettings.RepeatInterval, 1*time.Second))),
+				notificationSettings: CopyNotificationSettings(baseNotificationSettings, NSMuts.WithRepeatInterval(addTime(baseSettings.RepeatInterval, 1*time.Second))),
 				diffs: []cmputil.Diff{
 					{
-						Path:  "NotificationSettings[0].RepeatInterval",
+						Path:  "NotificationSettings.ContactPointRouting.RepeatInterval",
 						Left:  reflect.ValueOf(*baseSettings.RepeatInterval),
 						Right: reflect.ValueOf(model.Duration(*addTime(baseSettings.RepeatInterval, 1*time.Second))),
 					},
@@ -803,15 +821,15 @@ func TestDiff(t *testing.T) {
 			},
 			{
 				name:                 "should detect changes in GroupBy",
-				notificationSettings: CopyNotificationSettings(baseSettings, NSMuts.WithGroupBy(baseSettings.GroupBy[0]+"-modified", baseSettings.GroupBy[1]+"-modified")),
+				notificationSettings: CopyNotificationSettings(baseNotificationSettings, NSMuts.WithGroupBy(baseSettings.GroupBy[0]+"-modified", baseSettings.GroupBy[1]+"-modified")),
 				diffs: []cmputil.Diff{
 					{
-						Path:  "NotificationSettings[0].GroupBy[0]",
+						Path:  "NotificationSettings.ContactPointRouting.GroupBy[0]",
 						Left:  reflect.ValueOf(baseSettings.GroupBy[0]),
 						Right: reflect.ValueOf(baseSettings.GroupBy[0] + "-modified"),
 					},
 					{
-						Path:  "NotificationSettings[0].GroupBy[1]",
+						Path:  "NotificationSettings.ContactPointRouting.GroupBy[1]",
 						Left:  reflect.ValueOf(baseSettings.GroupBy[1]),
 						Right: reflect.ValueOf(baseSettings.GroupBy[1] + "-modified"),
 					},
@@ -819,17 +837,33 @@ func TestDiff(t *testing.T) {
 			},
 			{
 				name:                 "should detect changes in MuteTimeIntervals",
-				notificationSettings: CopyNotificationSettings(baseSettings, NSMuts.WithMuteTimeIntervals(baseSettings.MuteTimeIntervals[0]+"-modified", baseSettings.MuteTimeIntervals[1]+"-modified")),
+				notificationSettings: CopyNotificationSettings(baseNotificationSettings, NSMuts.WithMuteTimeIntervals(baseSettings.MuteTimeIntervals[0]+"-modified", baseSettings.MuteTimeIntervals[1]+"-modified")),
 				diffs: []cmputil.Diff{
 					{
-						Path:  "NotificationSettings[0].MuteTimeIntervals[0]",
+						Path:  "NotificationSettings.ContactPointRouting.MuteTimeIntervals[0]",
 						Left:  reflect.ValueOf(baseSettings.MuteTimeIntervals[0]),
 						Right: reflect.ValueOf(baseSettings.MuteTimeIntervals[0] + "-modified"),
 					},
 					{
-						Path:  "NotificationSettings[0].MuteTimeIntervals[1]",
+						Path:  "NotificationSettings.ContactPointRouting.MuteTimeIntervals[1]",
 						Left:  reflect.ValueOf(baseSettings.MuteTimeIntervals[1]),
 						Right: reflect.ValueOf(baseSettings.MuteTimeIntervals[1] + "-modified"),
+					},
+				},
+			},
+			{
+				name:                 "should detect changes in ActiveTimeIntervals",
+				notificationSettings: CopyNotificationSettings(baseNotificationSettings, NSMuts.WithActiveTimeIntervals(baseSettings.ActiveTimeIntervals[0]+"-modified", baseSettings.ActiveTimeIntervals[1]+"-modified")),
+				diffs: []cmputil.Diff{
+					{
+						Path:  "NotificationSettings.ContactPointRouting.ActiveTimeIntervals[0]",
+						Left:  reflect.ValueOf(baseSettings.ActiveTimeIntervals[0]),
+						Right: reflect.ValueOf(baseSettings.ActiveTimeIntervals[0] + "-modified"),
+					},
+					{
+						Path:  "NotificationSettings.ContactPointRouting.ActiveTimeIntervals[1]",
+						Left:  reflect.ValueOf(baseSettings.ActiveTimeIntervals[1]),
+						Right: reflect.ValueOf(baseSettings.ActiveTimeIntervals[1] + "-modified"),
 					},
 				},
 			},
@@ -838,7 +872,7 @@ func TestDiff(t *testing.T) {
 		for _, tt := range testCases {
 			t.Run(tt.name, func(t *testing.T) {
 				rule2 := CopyRule(rule1)
-				rule2.NotificationSettings = []NotificationSettings{tt.notificationSettings}
+				rule2.NotificationSettings = &tt.notificationSettings
 				diffs := rule1.Diff(rule2)
 
 				cOpt := []cmp.Option{
@@ -964,6 +998,21 @@ func TestAlertRuleGetKeyWithGroup(t *testing.T) {
 	})
 }
 
+func TestAlertRuleGetMissingSeriesEvalsToResolve(t *testing.T) {
+	t.Run("should return the default 2 if MissingSeriesEvalsToResolve is nil", func(t *testing.T) {
+		rule := RuleGen.GenerateRef()
+		rule.MissingSeriesEvalsToResolve = nil
+		require.Equal(t, int64(2), rule.GetMissingSeriesEvalsToResolve())
+	})
+
+	t.Run("should return the correct value", func(t *testing.T) {
+		rule := RuleGen.With(
+			RuleMuts.WithMissingSeriesEvalsToResolve(3),
+		).GenerateRef()
+		require.Equal(t, int64(3), rule.GetMissingSeriesEvalsToResolve())
+	})
+}
+
 func TestAlertRuleCopy(t *testing.T) {
 	t.Run("should return a copy of the rule", func(t *testing.T) {
 		for i := 0; i < 100; i++ {
@@ -1069,6 +1118,99 @@ func TestGeneratorFillsAllRecordingRuleFields(t *testing.T) {
 }
 
 func TestValidateAlertRule(t *testing.T) {
+	t.Run("keepFiringFor", func(t *testing.T) {
+		testCases := []struct {
+			name          string
+			keepFiringFor time.Duration
+			expectedErr   error
+		}{
+			{
+				name:          "should accept zero keep firing for",
+				keepFiringFor: 0,
+				expectedErr:   nil,
+			},
+			{
+				name:          "should accept positive keep firing for",
+				keepFiringFor: 1 * time.Minute,
+				expectedErr:   nil,
+			},
+			{
+				name:          "should reject negative keep firing for",
+				keepFiringFor: -1 * time.Minute,
+				expectedErr:   fmt.Errorf("%w: field `keep_firing_for` cannot be negative", ErrAlertRuleFailedValidation),
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				rule := RuleGen.With(
+					RuleGen.WithKeepFiringFor(tc.keepFiringFor),
+					RuleGen.WithIntervalSeconds(10),
+				).GenerateRef()
+
+				err := rule.ValidateAlertRule(setting.UnifiedAlertingSettings{BaseInterval: 10 * time.Second})
+
+				if tc.expectedErr == nil {
+					require.NoError(t, err)
+				} else {
+					require.Error(t, err)
+					require.Equal(t, tc.expectedErr.Error(), err.Error())
+				}
+			})
+		}
+	})
+
+	t.Run("missingSeriesEvalsToResolve", func(t *testing.T) {
+		testCases := []struct {
+			name                        string
+			missingSeriesEvalsToResolve *int64
+			expectedErrorContains       string
+		}{
+			{
+				name:                        "should allow nil value",
+				missingSeriesEvalsToResolve: nil,
+			},
+			{
+				name:                        "should reject negative value",
+				missingSeriesEvalsToResolve: util.Pointer[int64](-1),
+				expectedErrorContains:       "field `missing_series_evals_to_resolve` must be greater than 0",
+			},
+			{
+				name:                        "should reject 0",
+				missingSeriesEvalsToResolve: util.Pointer[int64](0),
+				expectedErrorContains:       "field `missing_series_evals_to_resolve` must be greater than 0",
+			},
+			{
+				name:                        "should accept positive value",
+				missingSeriesEvalsToResolve: util.Pointer[int64](2),
+			},
+		}
+
+		for _, tc := range testCases {
+			t.Run(tc.name, func(t *testing.T) {
+				baseIntervalSeconds := int64(10)
+				cfg := setting.UnifiedAlertingSettings{
+					BaseInterval: time.Duration(baseIntervalSeconds) * time.Second,
+				}
+
+				rule := RuleGen.With(
+					RuleMuts.WithIntervalSeconds(baseIntervalSeconds * 2),
+				).Generate()
+				rule.MissingSeriesEvalsToResolve = tc.missingSeriesEvalsToResolve
+
+				err := rule.ValidateAlertRule(cfg)
+
+				if tc.expectedErrorContains != "" {
+					require.Error(t, err)
+					require.ErrorIs(t, err, ErrAlertRuleFailedValidation)
+					require.Contains(t, err.Error(), tc.expectedErrorContains)
+				} else {
+					require.NoError(t, err)
+				}
+			})
+		}
+	})
+
 	t.Run("ExecErrState & NoDataState", func(t *testing.T) {
 		testCases := []struct {
 			name         string
@@ -1167,7 +1309,7 @@ func TestAlertRule_PrometheusRuleDefinition(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := tt.rule.PrometheusRuleDefinition()
-			isPrometheusRule := tt.rule.ImportedFromPrometheus()
+			isPrometheusRule := tt.rule.HasPrometheusRuleDefinition()
 
 			if tt.expectedErrorMsg != "" {
 				require.Error(t, err)
@@ -1178,6 +1320,132 @@ func TestAlertRule_PrometheusRuleDefinition(t *testing.T) {
 				require.Equal(t, tt.expectedResult, result)
 				require.True(t, isPrometheusRule)
 			}
+		})
+	}
+}
+
+func TestAlertRule_ImportedPrometheusRule(t *testing.T) {
+	tests := []struct {
+		name     string
+		rule     AlertRule
+		expected bool
+	}{
+		{
+			name: "rule with prometheus definition",
+			rule: AlertRule{
+				Metadata: AlertRuleMetadata{
+					PrometheusStyleRule: &PrometheusStyleRule{
+						OriginalRuleDefinition: "some rule definition",
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "rule with converted prometheus rule label",
+			rule: AlertRule{
+				Labels: map[string]string{
+					ConvertedPrometheusRuleLabel: "true",
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "rule with both prometheus definition and converted label",
+			rule: AlertRule{
+				Labels: map[string]string{
+					ConvertedPrometheusRuleLabel: "true",
+				},
+				Metadata: AlertRuleMetadata{
+					PrometheusStyleRule: &PrometheusStyleRule{
+						OriginalRuleDefinition: "some rule definition",
+					},
+				},
+			},
+			expected: true,
+		},
+		{
+			name: "rule with empty prometheus definition",
+			rule: AlertRule{
+				Metadata: AlertRuleMetadata{
+					PrometheusStyleRule: &PrometheusStyleRule{
+						OriginalRuleDefinition: "",
+					},
+				},
+			},
+			expected: false,
+		},
+		{
+			name: "rule with nil prometheus style rule",
+			rule: AlertRule{
+				Metadata: AlertRuleMetadata{
+					PrometheusStyleRule: nil,
+				},
+			},
+			expected: false,
+		},
+		{
+			name:     "rule with empty metadata",
+			rule:     AlertRule{},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.rule.ImportedPrometheusRule()
+			require.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestWithoutPrivateLabels(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    map[string]string
+		expected map[string]string
+	}{
+		{
+			name:     "nil map",
+			input:    nil,
+			expected: nil,
+		},
+		{
+			name:     "empty map",
+			input:    map[string]string{},
+			expected: map[string]string{},
+		},
+		{
+			name: "removes only specific private labels",
+			input: map[string]string{
+				ConvertedPrometheusRuleLabel:        "removed",
+				AutogeneratedRouteLabel:             "removed",
+				AutogeneratedRouteReceiverNameLabel: "removed",
+				AutogeneratedRouteSettingsHashLabel: "removed",
+				DashboardUIDAnnotation:              "kept",
+				PanelIDAnnotation:                   "kept",
+				"__custom_label__":                  "kept", // User-defined labels with __ are kept
+				"normal_label":                      "kept",
+				"another_label":                     "kept",
+			},
+			expected: map[string]string{
+				"__custom_label__":     "kept",
+				"normal_label":         "kept",
+				"another_label":        "kept",
+				DashboardUIDAnnotation: "kept",
+				PanelIDAnnotation:      "kept",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inputCopy := maps.Clone(tt.input)
+
+			result := WithoutPrivateLabels(tt.input)
+
+			require.Equal(t, tt.expected, result)
+			require.Equal(t, inputCopy, tt.input, "input map should not be modified")
 		})
 	}
 }

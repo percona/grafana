@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -15,13 +16,12 @@ import (
 	"github.com/benbjohnson/clock"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/slices"
 
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana/pkg/expr"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/infra/tracing"
@@ -40,13 +40,16 @@ import (
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/tests/testsuite"
 	"github.com/grafana/grafana/pkg/util"
+	tutil "github.com/grafana/grafana/pkg/util/testutil"
 )
 
 func TestMain(m *testing.M) {
 	testsuite.Run(m)
 }
 
-func TestWarmStateCache(t *testing.T) {
+func TestIntegrationWarmStateCache(t *testing.T) {
+	tutil.SkipIntegrationTestInShortMode(t)
+
 	evaluationTime, err := time.Parse("2006-01-02", "2021-03-25")
 	require.NoError(t, err)
 	ctx := context.Background()
@@ -69,9 +72,10 @@ func TestWarmStateCache(t *testing.T) {
 			StartsAt:           evaluationTime.Add(-1 * time.Minute),
 			EndsAt:             evaluationTime.Add(1 * time.Minute),
 			LastEvaluationTime: evaluationTime,
+			EvaluationDuration: 1 * time.Second,
 			LastSentAt:         util.Pointer(evaluationTime),
 			ResolvedAt:         util.Pointer(evaluationTime),
-			Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+			Annotations:        rule.Annotations, // alert instance has no stored annotations, falls back to the rule annotations
 			ResultFingerprint:  data.Fingerprint(math.MaxUint64),
 		}, {
 			AlertRuleUID:       rule.UID,
@@ -82,9 +86,10 @@ func TestWarmStateCache(t *testing.T) {
 			StartsAt:           evaluationTime.Add(-1 * time.Minute),
 			EndsAt:             evaluationTime.Add(1 * time.Minute),
 			LastEvaluationTime: evaluationTime,
+			EvaluationDuration: 2 * time.Second,
 			LastSentAt:         util.Pointer(evaluationTime.Add(-1 * time.Minute)),
 			ResolvedAt:         nil,
-			Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+			Annotations:        map[string]string{"testAnnotation": "value-2"},
 			ResultFingerprint:  data.Fingerprint(math.MaxUint64 - 1),
 		},
 		{
@@ -96,9 +101,10 @@ func TestWarmStateCache(t *testing.T) {
 			StartsAt:           evaluationTime.Add(-1 * time.Minute),
 			EndsAt:             evaluationTime.Add(1 * time.Minute),
 			LastEvaluationTime: evaluationTime,
+			EvaluationDuration: 3 * time.Second,
 			LastSentAt:         util.Pointer(evaluationTime.Add(-1 * time.Minute)),
 			ResolvedAt:         nil,
-			Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+			Annotations:        map[string]string{"testAnnotation": "value-3"},
 			ResultFingerprint:  data.Fingerprint(0),
 		},
 		{
@@ -110,10 +116,12 @@ func TestWarmStateCache(t *testing.T) {
 			StartsAt:           evaluationTime.Add(-1 * time.Minute),
 			EndsAt:             evaluationTime.Add(1 * time.Minute),
 			LastEvaluationTime: evaluationTime,
+			EvaluationDuration: 4 * time.Second,
 			LastSentAt:         util.Pointer(evaluationTime.Add(-1 * time.Minute)),
 			ResolvedAt:         nil,
-			Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+			Annotations:        map[string]string{"testAnnotation": "value-4"},
 			ResultFingerprint:  data.Fingerprint(1),
+			Error:              errors.New("test error message"),
 		},
 		{
 			AlertRuleUID:       rule.UID,
@@ -124,9 +132,10 @@ func TestWarmStateCache(t *testing.T) {
 			StartsAt:           evaluationTime.Add(-1 * time.Minute),
 			EndsAt:             evaluationTime.Add(1 * time.Minute),
 			LastEvaluationTime: evaluationTime,
+			EvaluationDuration: 5 * time.Second,
 			LastSentAt:         nil,
 			ResolvedAt:         nil,
-			Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+			Annotations:        map[string]string{"testAnnotation": "value-5"},
 			ResultFingerprint:  data.Fingerprint(2),
 		},
 	}
@@ -141,14 +150,15 @@ func TestWarmStateCache(t *testing.T) {
 			RuleUID:    rule.UID,
 			LabelsHash: hash,
 		},
-		CurrentState:      models.InstanceStateNormal,
-		LastEvalTime:      evaluationTime,
-		CurrentStateSince: evaluationTime.Add(-1 * time.Minute),
-		CurrentStateEnd:   evaluationTime.Add(1 * time.Minute),
-		LastSentAt:        &evaluationTime,
-		ResolvedAt:        &evaluationTime,
-		Labels:            labels,
-		ResultFingerprint: data.Fingerprint(math.MaxUint64).String(),
+		CurrentState:       models.InstanceStateNormal,
+		LastEvalTime:       evaluationTime,
+		CurrentStateSince:  evaluationTime.Add(-1 * time.Minute),
+		CurrentStateEnd:    evaluationTime.Add(1 * time.Minute),
+		LastSentAt:         &evaluationTime,
+		ResolvedAt:         &evaluationTime,
+		Labels:             labels,
+		ResultFingerprint:  data.Fingerprint(math.MaxUint64).String(),
+		EvaluationDuration: 1 * time.Second,
 	})
 
 	labels = models.InstanceLabels{"test2": "testValue2"}
@@ -159,14 +169,16 @@ func TestWarmStateCache(t *testing.T) {
 			RuleUID:    rule.UID,
 			LabelsHash: hash,
 		},
-		CurrentState:      models.InstanceStateFiring,
-		LastEvalTime:      evaluationTime,
-		CurrentStateSince: evaluationTime.Add(-1 * time.Minute),
-		CurrentStateEnd:   evaluationTime.Add(1 * time.Minute),
-		LastSentAt:        util.Pointer(evaluationTime.Add(-1 * time.Minute)),
-		ResolvedAt:        nil,
-		Labels:            labels,
-		ResultFingerprint: data.Fingerprint(math.MaxUint64 - 1).String(),
+		CurrentState:       models.InstanceStateFiring,
+		LastEvalTime:       evaluationTime,
+		CurrentStateSince:  evaluationTime.Add(-1 * time.Minute),
+		CurrentStateEnd:    evaluationTime.Add(1 * time.Minute),
+		LastSentAt:         util.Pointer(evaluationTime.Add(-1 * time.Minute)),
+		ResolvedAt:         nil,
+		Labels:             labels,
+		Annotations:        models.InstanceAnnotations{"testAnnotation": "value-2"},
+		ResultFingerprint:  data.Fingerprint(math.MaxUint64 - 1).String(),
+		EvaluationDuration: 2 * time.Second,
 	})
 
 	labels = models.InstanceLabels{"test3": "testValue3"}
@@ -177,14 +189,16 @@ func TestWarmStateCache(t *testing.T) {
 			RuleUID:    rule.UID,
 			LabelsHash: hash,
 		},
-		CurrentState:      models.InstanceStateNoData,
-		LastEvalTime:      evaluationTime,
-		CurrentStateSince: evaluationTime.Add(-1 * time.Minute),
-		CurrentStateEnd:   evaluationTime.Add(1 * time.Minute),
-		LastSentAt:        util.Pointer(evaluationTime.Add(-1 * time.Minute)),
-		ResolvedAt:        nil,
-		Labels:            labels,
-		ResultFingerprint: data.Fingerprint(0).String(),
+		CurrentState:       models.InstanceStateNoData,
+		LastEvalTime:       evaluationTime,
+		CurrentStateSince:  evaluationTime.Add(-1 * time.Minute),
+		CurrentStateEnd:    evaluationTime.Add(1 * time.Minute),
+		LastSentAt:         util.Pointer(evaluationTime.Add(-1 * time.Minute)),
+		ResolvedAt:         nil,
+		Labels:             labels,
+		Annotations:        models.InstanceAnnotations{"testAnnotation": "value-3"},
+		ResultFingerprint:  data.Fingerprint(0).String(),
+		EvaluationDuration: 3 * time.Second,
 	})
 
 	labels = models.InstanceLabels{"test4": "testValue4"}
@@ -195,14 +209,17 @@ func TestWarmStateCache(t *testing.T) {
 			RuleUID:    rule.UID,
 			LabelsHash: hash,
 		},
-		CurrentState:      models.InstanceStateError,
-		LastEvalTime:      evaluationTime,
-		CurrentStateSince: evaluationTime.Add(-1 * time.Minute),
-		CurrentStateEnd:   evaluationTime.Add(1 * time.Minute),
-		LastSentAt:        util.Pointer(evaluationTime.Add(-1 * time.Minute)),
-		ResolvedAt:        nil,
-		Labels:            labels,
-		ResultFingerprint: data.Fingerprint(1).String(),
+		CurrentState:       models.InstanceStateError,
+		LastEvalTime:       evaluationTime,
+		CurrentStateSince:  evaluationTime.Add(-1 * time.Minute),
+		CurrentStateEnd:    evaluationTime.Add(1 * time.Minute),
+		LastSentAt:         util.Pointer(evaluationTime.Add(-1 * time.Minute)),
+		ResolvedAt:         nil,
+		Labels:             labels,
+		Annotations:        models.InstanceAnnotations{"testAnnotation": "value-4"},
+		ResultFingerprint:  data.Fingerprint(1).String(),
+		EvaluationDuration: 4 * time.Second,
+		LastError:          "test error message",
 	})
 
 	labels = models.InstanceLabels{"test5": "testValue5"}
@@ -213,15 +230,38 @@ func TestWarmStateCache(t *testing.T) {
 			RuleUID:    rule.UID,
 			LabelsHash: hash,
 		},
-		CurrentState:      models.InstanceStatePending,
-		LastEvalTime:      evaluationTime,
-		CurrentStateSince: evaluationTime.Add(-1 * time.Minute),
-		CurrentStateEnd:   evaluationTime.Add(1 * time.Minute),
-		LastSentAt:        nil,
-		ResolvedAt:        nil,
-		Labels:            labels,
-		ResultFingerprint: data.Fingerprint(2).String(),
+		CurrentState:       models.InstanceStatePending,
+		LastEvalTime:       evaluationTime,
+		CurrentStateSince:  evaluationTime.Add(-1 * time.Minute),
+		CurrentStateEnd:    evaluationTime.Add(1 * time.Minute),
+		LastSentAt:         nil,
+		ResolvedAt:         nil,
+		Labels:             labels,
+		Annotations:        models.InstanceAnnotations{"testAnnotation": "value-5"},
+		ResultFingerprint:  data.Fingerprint(2).String(),
+		EvaluationDuration: 5 * time.Second,
 	})
+
+	labels = models.InstanceLabels{"test6": "testValue6"}
+	_, hash, _ = labels.StringAndHash()
+	instances = append(instances, models.AlertInstance{
+		AlertInstanceKey: models.AlertInstanceKey{
+			RuleOrgID:  rule.OrgID,
+			RuleUID:    rule.UID,
+			LabelsHash: hash,
+		},
+		CurrentState:       models.InstanceStateRecovering,
+		LastEvalTime:       evaluationTime,
+		CurrentStateSince:  evaluationTime.Add(-1 * time.Minute),
+		CurrentStateEnd:    evaluationTime.Add(1 * time.Minute),
+		LastSentAt:         nil,
+		ResolvedAt:         nil,
+		Labels:             labels,
+		Annotations:        models.InstanceAnnotations{"testAnnotation": "value-6"},
+		ResultFingerprint:  data.Fingerprint(2).String(),
+		EvaluationDuration: 6 * time.Second,
+	})
+
 	for _, instance := range instances {
 		_ = ng.InstanceStore.SaveAlertInstance(ctx, instance)
 	}
@@ -244,7 +284,16 @@ func TestWarmStateCache(t *testing.T) {
 			setCacheID(entry)
 			cacheEntry := st.Get(entry.OrgID, entry.AlertRuleUID, entry.CacheID)
 
-			if diff := cmp.Diff(entry, cacheEntry, cmpopts.IgnoreFields(state.State{}, "LatestResult")); diff != "" {
+			errorComparer := cmp.Comparer(func(a, b error) bool {
+				if a == nil && b == nil {
+					return true
+				}
+				if a == nil || b == nil {
+					return false
+				}
+				return a.Error() == b.Error()
+			})
+			if diff := cmp.Diff(entry, cacheEntry, cmpopts.IgnoreFields(state.State{}, "LatestResult"), errorComparer); diff != "" {
 				t.Errorf("Result mismatch (-want +got):\n%s", diff)
 				t.FailNow()
 			}
@@ -252,7 +301,9 @@ func TestWarmStateCache(t *testing.T) {
 	})
 }
 
-func TestDashboardAnnotations(t *testing.T) {
+func TestIntegrationDashboardAnnotations(t *testing.T) {
+	tutil.SkipIntegrationTestInShortMode(t)
+
 	evaluationTime, err := time.Parse("2006-01-02", "2022-01-01")
 	require.NoError(t, err)
 
@@ -264,7 +315,7 @@ func TestDashboardAnnotations(t *testing.T) {
 	store := historian.NewAnnotationStore(fakeAnnoRepo, &dashboards.FakeDashboardService{}, historianMetrics)
 	annotationBackendLogger := log.New("ngalert.state.historian", "backend", "annotations")
 	ac := &acfakes.FakeRuleService{}
-	hist := historian.NewAnnotationBackend(annotationBackendLogger, store, nil, historianMetrics, ac)
+	hist := historian.NewAnnotationBackend(annotationBackendLogger, store, nil, historianMetrics, ac, 500)
 	cfg := state.ManagerCfg{
 		Metrics:       metrics.NewNGAlert(prometheus.NewPedanticRegistry()).GetStateMetrics(),
 		ExternalURL:   nil,
@@ -331,6 +382,7 @@ func TestProcessEvalResults(t *testing.T) {
 
 	t2 := tn(2)
 	t3 := tn(3)
+
 	m := models.RuleMuts
 	baseRule := &models.AlertRule{
 		OrgID: 1,
@@ -379,8 +431,6 @@ func TestProcessEvalResults(t *testing.T) {
 		return r
 	}
 
-	datasourceError := expr.MakeQueryError("A", "datasource_uid_1", errors.New("this is an error"))
-
 	labels1 := data.Labels{
 		"instance_label": "test-1",
 	}
@@ -399,13 +449,6 @@ func TestProcessEvalResults(t *testing.T) {
 		"system + rule + labels1": mergeLabels(mergeLabels(labels1, baseRule.Labels), systemLabels),
 		"system + rule + labels2": mergeLabels(mergeLabels(labels2, baseRule.Labels), systemLabels),
 		"system + rule + no-data": mergeLabels(mergeLabels(noDataLabels, baseRule.Labels), systemLabels),
-	}
-
-	datasourceErrorAnnotations := data.Labels{
-		"annotation":     "test",
-		"datasource_uid": "datasource_uid_1",
-		"ref_id":         "A",
-		"Error":          datasourceError.Error(),
 	}
 
 	// keep it separate to make code folding work correctly.
@@ -465,6 +508,7 @@ func TestProcessEvalResults(t *testing.T) {
 					LatestResult:       newEvaluation(t1, eval.Alerting),
 					StartsAt:           t1,
 					EndsAt:             t1.Add(state.ResendDelay * 4),
+					FiredAt:            &t1,
 					LastEvaluationTime: t1,
 					LastSentAt:         &t1,
 				},
@@ -513,6 +557,7 @@ func TestProcessEvalResults(t *testing.T) {
 					LatestResult:       newEvaluation(t2, eval.Alerting),
 					StartsAt:           t2,
 					EndsAt:             t2.Add(state.ResendDelay * 4),
+					FiredAt:            &t2,
 					LastEvaluationTime: t2,
 					LastSentAt:         &t2,
 				},
@@ -544,6 +589,7 @@ func TestProcessEvalResults(t *testing.T) {
 					LatestResult:       newEvaluation(tn(4), eval.Alerting),
 					StartsAt:           tn(4),
 					EndsAt:             tn(4).Add(state.ResendDelay * 4),
+					FiredAt:            util.Pointer(tn(4)),
 					LastEvaluationTime: tn(4),
 					LastSentAt:         util.Pointer(tn(4)),
 				},
@@ -569,6 +615,7 @@ func TestProcessEvalResults(t *testing.T) {
 					LatestResult:       newEvaluation(t2, eval.Normal),
 					StartsAt:           t2,
 					EndsAt:             t2,
+					FiredAt:            &t1,
 					LastEvaluationTime: t2,
 					ResolvedAt:         &t2,
 					LastSentAt:         &t2,
@@ -598,6 +645,7 @@ func TestProcessEvalResults(t *testing.T) {
 					LatestResult:       newEvaluation(t3, eval.Normal),
 					StartsAt:           t2,
 					EndsAt:             t2,
+					FiredAt:            &t1,
 					LastEvaluationTime: t3,
 					ResolvedAt:         &t2,
 					LastSentAt:         &t2,
@@ -630,6 +678,7 @@ func TestProcessEvalResults(t *testing.T) {
 					LatestResult:       newEvaluation(tn(4), eval.Alerting),
 					StartsAt:           tn(4),
 					EndsAt:             tn(4).Add(state.ResendDelay * 4),
+					FiredAt:            &t2,
 					LastEvaluationTime: tn(4),
 					ResolvedAt:         &t3,
 					LastSentAt:         &t3,
@@ -656,17 +705,18 @@ func TestProcessEvalResults(t *testing.T) {
 					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
 				},
 			},
-			expectedAnnotations: 3, // Normal -> Pending, Pending -> NoData, NoData -> Pending
+			expectedAnnotations: 3, // Normal -> Pending, Pending -> Pending (NoData), Pending (NoData) -> Alerting
 			expectedStates: []*state.State{
 				{
 					Labels:             labels["system + rule + labels1"],
 					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Pending,
+					State:              eval.Alerting,
 					LatestResult:       newEvaluation(tn(5), eval.Alerting),
 					StartsAt:           tn(4),
-					EndsAt:             tn(4).Add(state.ResendDelay * 4),
+					EndsAt:             tn(5).Add(state.ResendDelay * 4),
+					FiredAt:            util.Pointer(tn(4)),
 					LastEvaluationTime: tn(5),
-					LastSentAt:         util.Pointer(tn(3)), // 30s resend delay causing the last sent at to be t3.
+					LastSentAt:         util.Pointer(tn(4)),
 				},
 			},
 		},
@@ -686,18 +736,25 @@ func TestProcessEvalResults(t *testing.T) {
 				tn(4): {
 					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
 				},
+				tn(5): {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+				tn(6): {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
 			},
-			expectedAnnotations: 3,
+			expectedAnnotations: 4,
 			expectedStates: []*state.State{
 				{
 					Labels:             labels["system + rule + labels1"],
 					ResultFingerprint:  labels1.Fingerprint(),
 					State:              eval.NoData,
-					LatestResult:       newEvaluation(tn(4), eval.NoData),
-					StartsAt:           tn(4),
-					EndsAt:             tn(4).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(4),
-					LastSentAt:         &t3, // Resend delay is 30s, so last sent at is t3.
+					LatestResult:       newEvaluation(tn(6), eval.NoData),
+					StartsAt:           tn(6),
+					EndsAt:             tn(6).Add(state.ResendDelay * 4),
+					FiredAt:            &t3,
+					LastEvaluationTime: tn(6),
+					LastSentAt:         util.Pointer(tn(6)), // NoData fired at tn(6).
 				},
 			},
 		},
@@ -747,66 +804,6 @@ func TestProcessEvalResults(t *testing.T) {
 					StartsAt:           t1,
 					EndsAt:             t1.Add(state.ResendDelay * 4),
 					LastEvaluationTime: t2,
-				},
-			},
-		},
-		{
-			desc:      "normal -> pending when For is set but not exceeded, result is NoData and NoDataState is alerting",
-			alertRule: baseRuleWith(m.WithForNTimes(6), m.WithNoDataExecAs(models.Alerting)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
-				},
-			},
-			expectedAnnotations: 1,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Pending,
-					StateReason:        eval.NoData.String(),
-					LatestResult:       newEvaluation(t2, eval.NoData),
-					StartsAt:           t2,
-					EndsAt:             t2.Add(state.ResendDelay * 4),
-					LastEvaluationTime: t2,
-				},
-			},
-		},
-		{
-			desc:      "normal -> alerting when For is exceeded, result is NoData and NoDataState is alerting",
-			alertRule: baseRuleWith(m.WithForNTimes(3), m.WithNoDataExecAs(models.Alerting)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)), // TODO fix it because nodata has no labels of regular result
-				},
-				t3: {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
-				},
-				tn(4): {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
-				},
-				tn(5): {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
-				},
-			},
-			expectedAnnotations: 2,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Alerting,
-					StateReason:        eval.NoData.String(),
-					LatestResult:       newEvaluation(tn(5), eval.NoData),
-					StartsAt:           tn(5),
-					EndsAt:             tn(5).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(5),
-					LastSentAt:         util.Pointer(tn(5)),
 				},
 			},
 		},
@@ -927,7 +924,7 @@ func TestProcessEvalResults(t *testing.T) {
 					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
 				},
 			},
-			expectedAnnotations: 1,
+			expectedAnnotations: 2,
 			expectedStates: []*state.State{
 				{
 					Labels:             labels["system + rule + labels1"],
@@ -937,105 +934,6 @@ func TestProcessEvalResults(t *testing.T) {
 					StartsAt:           t1,
 					EndsAt:             t1,
 					LastEvaluationTime: t3,
-				},
-				{
-					Labels:             labels["system + rule + no-data"],
-					ResultFingerprint:  noDataLabels.Fingerprint(),
-					State:              eval.NoData,
-					LatestResult:       newEvaluation(t2, eval.NoData),
-					StartsAt:           t2,
-					EndsAt:             t2.Add(state.ResendDelay * 4),
-					LastEvaluationTime: t2,
-					LastSentAt:         &t2,
-				},
-			},
-		},
-		{
-			desc:      "normal -> normal (NoData, KeepLastState) -> alerting -> alerting (NoData, KeepLastState) - keeps last state when result is NoData and NoDataState is KeepLast",
-			alertRule: baseRuleWith(m.WithForNTimes(0), m.WithNoDataExecAs(models.KeepLast)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)), // TODO fix it because NoData does not have same labels
-				},
-				t3: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				tn(4): {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)), // TODO fix it because NoData does not have same labels
-				},
-			},
-			expectedAnnotations: 1,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Alerting,
-					StateReason:        models.ConcatReasons(eval.NoData.String(), models.StateReasonKeepLast),
-					LatestResult:       newEvaluation(tn(4), eval.NoData),
-					StartsAt:           t3,
-					EndsAt:             tn(4).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(4),
-					LastSentAt:         &t3, // Resend delay is 30s, so last sent at is t3.
-				},
-			},
-		},
-		{
-			desc:      "normal -> pending -> pending (NoData, KeepLastState) -> alerting (NoData, KeepLastState) - keep last state respects For when result is NoData",
-			alertRule: baseRuleWith(m.WithForNTimes(2), m.WithNoDataExecAs(models.KeepLast)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				t3: {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)), // TODO fix it because NoData does not have same labels
-				},
-				tn(4): {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)), // TODO fix it because NoData does not have same labels
-				},
-			},
-			expectedAnnotations: 2,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Alerting,
-					StateReason:        models.ConcatReasons(eval.NoData.String(), models.StateReasonKeepLast),
-					LatestResult:       newEvaluation(tn(4), eval.NoData),
-					StartsAt:           tn(4),
-					EndsAt:             tn(4).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(4),
-					LastSentAt:         util.Pointer(tn(4)),
-				},
-			},
-		},
-		{
-			desc:      "normal -> normal when result is NoData and NoDataState is ok",
-			alertRule: baseRuleWith(m.WithNoDataExecAs(models.OK)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)), // TODO fix it because NoData does not have same labels
-				},
-			},
-			expectedAnnotations: 0,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Normal,
-					StateReason:        eval.NoData.String(),
-					LatestResult:       newEvaluation(t2, eval.NoData),
-					StartsAt:           t1,
-					EndsAt:             t1,
-					LastEvaluationTime: t2,
 				},
 			},
 		},
@@ -1098,262 +996,427 @@ func TestProcessEvalResults(t *testing.T) {
 					LatestResult:       newEvaluation(tn(5), eval.Error),
 					StartsAt:           tn(5),
 					EndsAt:             tn(5).Add(state.ResendDelay * 4),
+					FiredAt:            util.Pointer(tn(5)),
 					LastEvaluationTime: tn(5),
 					LastSentAt:         util.Pointer(tn(5)),
 				},
 			},
 		},
 		{
-			desc:      "normal -> error when result is Error and ExecErrState is Error",
+			desc:      "normal -> pending when 'for' is set but not exceeded, result is Error and ExecErrState is Error",
 			alertRule: baseRuleWith(m.WithForNTimes(6), m.WithErrorExecAs(models.ErrorErrState)),
 			evalResults: map[time.Time]eval.Results{
 				t1: {
 					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
 				},
 				t2: {
-					newResult(eval.WithError(datasourceError), eval.WithLabels(labels1)), // TODO fix it because error labels are different
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
 				},
 			},
 			expectedAnnotations: 1,
-			expectedStates: []*state.State{
-				{
-					CacheID: func() data.Fingerprint {
-						lbls := models.InstanceLabels(labels["system + rule + labels1"])
-						return lbls.Fingerprint()
-					}(),
-					Labels: mergeLabels(labels["system + rule + labels1"], data.Labels{
-						"datasource_uid": "datasource_uid_1",
-						"ref_id":         "A",
-					}),
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Error,
-					Error:              datasourceError,
-					LatestResult:       newEvaluation(t2, eval.Error),
-					StartsAt:           t2,
-					EndsAt:             t2.Add(state.ResendDelay * 4),
-					LastEvaluationTime: t2,
-					LastSentAt:         &t2,
-					EvaluationDuration: evaluationDuration,
-					Annotations:        map[string]string{"annotation": "test", "Error": "[sse.dataQueryError] failed to execute query [A]: this is an error"},
-				},
-			},
-		},
-		{
-			desc:      "normal -> normal (Error, KeepLastState) -> alerting -> alerting (Error, KeepLastState) - keeps last state when result is Error and ExecErrState is KeepLast",
-			alertRule: baseRuleWith(m.WithForNTimes(0), m.WithErrorExecAs(models.KeepLastErrState)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithError(datasourceError), eval.WithLabels(labels1)), // TODO fix it because error labels are different
-				},
-				t3: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				tn(4): {
-					newResult(eval.WithError(datasourceError), eval.WithLabels(labels1)), // TODO fix it because error labels are different
-				},
-			},
-			expectedAnnotations: 1,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Alerting,
-					StateReason:        models.ConcatReasons(eval.Error.String(), models.StateReasonKeepLast),
-					LatestResult:       newEvaluation(tn(4), eval.Error),
-					StartsAt:           t3,
-					EndsAt:             tn(4).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(4),
-					LastSentAt:         &t3, // Resend delay is 30s, so last sent at is t3.
-					Annotations:        datasourceErrorAnnotations,
-				},
-			},
-		},
-		{
-			desc:      "normal -> pending -> pending (Error, KeepLastState) -> alerting (Error, KeepLastState) - keep last state respects For when result is Error",
-			alertRule: baseRuleWith(m.WithForNTimes(2), m.WithErrorExecAs(models.KeepLastErrState)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				t3: {
-					newResult(eval.WithError(datasourceError), eval.WithLabels(labels1)), // TODO fix it because error labels are different
-				},
-				tn(4): {
-					newResult(eval.WithError(datasourceError), eval.WithLabels(labels1)), // TODO fix it because error labels are different
-				},
-			},
-			expectedAnnotations: 2,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Alerting,
-					StateReason:        models.ConcatReasons(eval.Error.String(), models.StateReasonKeepLast),
-					LatestResult:       newEvaluation(tn(4), eval.Error),
-					StartsAt:           tn(4),
-					EndsAt:             tn(4).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(4),
-					LastSentAt:         util.Pointer(tn(4)),
-					Annotations:        datasourceErrorAnnotations,
-				},
-			},
-		},
-		{
-			desc:      "normal -> normal when result is Error and ExecErrState is OK",
-			alertRule: baseRuleWith(m.WithForNTimes(6), m.WithErrorExecAs(models.OkErrState)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithError(datasourceError), eval.WithLabels(labels1)), // TODO fix it because error labels are different
-				},
-			},
-			expectedAnnotations: 1,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Normal,
-					StateReason:        eval.Error.String(),
-					LatestResult:       newEvaluation(t2, eval.Error),
-					Annotations:        datasourceErrorAnnotations,
-					StartsAt:           t1,
-					EndsAt:             t1,
-					LastEvaluationTime: t2,
-				},
-			},
-		},
-		{
-			desc:      "alerting -> normal when result is Error and ExecErrState is OK",
-			alertRule: baseRuleWith(m.WithForNTimes(6), m.WithErrorExecAs(models.OkErrState)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithError(datasourceError), eval.WithLabels(labels1)), // TODO fix it because error labels are different
-				},
-			},
-			expectedAnnotations: 2,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Normal,
-					StateReason:        eval.Error.String(),
-					LatestResult:       newEvaluation(t2, eval.Error),
-					Annotations:        datasourceErrorAnnotations,
-					StartsAt:           t2,
-					EndsAt:             t2,
-					LastEvaluationTime: t2,
-				},
-			},
-		},
-		{
-			desc:      "normal -> alerting -> error when result is Error and ExecErrorState is Error",
-			alertRule: baseRuleWith(m.WithForNTimes(2)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				t2: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				t3: {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				tn(4): {
-					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)), // TODO this is not how error result is created
-				},
-				tn(5): {
-					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)), // TODO this is not how error result is created
-				},
-				tn(6): {
-					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)), // TODO this is not how error result is created
-				},
-			},
-			expectedAnnotations: 3,
-			expectedStates: []*state.State{
-				{
-					Labels:             labels["system + rule + labels1"],
-					ResultFingerprint:  labels1.Fingerprint(),
-					State:              eval.Error,
-					Error:              fmt.Errorf("with_state_error"),
-					LatestResult:       newEvaluation(tn(6), eval.Error),
-					StartsAt:           tn(4),
-					EndsAt:             tn(6).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(6),
-					LastSentAt:         util.Pointer(tn(6)), // After 30s resend delay, last sent at is t6.
-					Annotations:        map[string]string{"annotation": "test", "Error": "with_state_error"},
-				},
-			},
-		},
-		{
-			desc:      "normal -> alerting -> error -> alerting - it should clear the error",
-			alertRule: baseRuleWith(m.WithForNTimes(3)),
-			evalResults: map[time.Time]eval.Results{
-				t1: {
-					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
-				},
-				tn(4): {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-				tn(5): {
-					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)), // TODO fix it
-				},
-				tn(8): {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
-				},
-			},
-			expectedAnnotations: 3,
 			expectedStates: []*state.State{
 				{
 					Labels:             labels["system + rule + labels1"],
 					ResultFingerprint:  labels1.Fingerprint(),
 					State:              eval.Pending,
-					LatestResult:       newEvaluation(tn(8), eval.Alerting),
-					StartsAt:           tn(8),
-					EndsAt:             tn(8).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(8),
+					StateReason:        eval.Error.String(),
+					Error:              errors.New("with_state_error"),
+					Annotations:        map[string]string{"annotation": "test", "Error": "with_state_error"},
+					LatestResult:       newEvaluation(t2, eval.Error),
+					StartsAt:           t2,
+					EndsAt:             t2.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t2,
+				},
+			},
+		},
+		{
+			desc:      "normal -> error when 'for' is exceeded, result is Error and ExecErrState is Error",
+			alertRule: baseRuleWith(m.WithForNTimes(3), m.WithErrorExecAs(models.ErrorErrState)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+				tn(4): {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+				tn(5): {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Error,
+					Error:              errors.New("with_state_error"),
+					Annotations:        map[string]string{"annotation": "test", "Error": "with_state_error"},
+					LatestResult:       newEvaluation(tn(5), eval.Error),
+					StartsAt:           tn(5),
+					EndsAt:             tn(5).Add(state.ResendDelay * 4),
+					LastEvaluationTime: tn(5),
 					LastSentAt:         util.Pointer(tn(5)),
 				},
 			},
 		},
 		{
-			desc:      "normal -> alerting -> error -> no data - it should clear the error",
+			desc:      "pending+error -> normal when Error resolves before 'for' exceeded",
+			alertRule: baseRuleWith(m.WithForNTimes(3), m.WithErrorExecAs(models.ErrorErrState)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Normal,
+					LatestResult:       newEvaluation(t3, eval.Normal),
+					StartsAt:           t3,
+					EndsAt:             t3,
+					LastEvaluationTime: t3,
+				},
+			},
+		},
+		{
+			desc:      "normal -> pending when 'for' is set but not exceeded, result is NoData and NoDataState is NoData",
+			alertRule: baseRuleWith(m.WithForNTimes(6)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 1,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Pending,
+					StateReason:        eval.NoData.String(),
+					LatestResult:       newEvaluation(t2, eval.NoData),
+					StartsAt:           t2,
+					EndsAt:             t2.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t2,
+				},
+			},
+		},
+		{
+			desc:      "normal -> nodata when 'for' is exceeded, result is NoData and NoDataState is NoData",
 			alertRule: baseRuleWith(m.WithForNTimes(3)),
 			evalResults: map[time.Time]eval.Results{
 				t1: {
 					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
 				},
+				t2: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
 				tn(4): {
-					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
 				},
 				tn(5): {
-					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)), // TODO FIX it
-				},
-				tn(6): {
-					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)), // TODO fix it because it's not possible
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
 				},
 			},
-			expectedAnnotations: 3,
+			expectedAnnotations: 2,
 			expectedStates: []*state.State{
 				{
 					Labels:             labels["system + rule + labels1"],
 					ResultFingerprint:  labels1.Fingerprint(),
 					State:              eval.NoData,
-					LatestResult:       newEvaluation(tn(6), eval.NoData),
-					StartsAt:           tn(6),
-					EndsAt:             tn(6).Add(state.ResendDelay * 4),
-					LastEvaluationTime: tn(6),
+					LatestResult:       newEvaluation(tn(5), eval.NoData),
+					StartsAt:           tn(5),
+					EndsAt:             tn(5).Add(state.ResendDelay * 4),
+					LastEvaluationTime: tn(5),
 					LastSentAt:         util.Pointer(tn(5)),
+				},
+			},
+		},
+		{
+			desc:      "pending+nodata -> pending+alerting when NoData resolves to Alerting before 'for' exceeded",
+			alertRule: baseRuleWith(m.WithForNTimes(3)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Pending,
+					LatestResult:       newEvaluation(t3, eval.Alerting),
+					StartsAt:           t2,
+					EndsAt:             t2.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t3,
+				},
+			},
+		},
+		{
+			desc:      "pending(alerting) + error stays pending when 'for' not exceeded and ExecErrState is Error",
+			alertRule: baseRuleWith(m.WithForNTimes(3), m.WithErrorExecAs(models.ErrorErrState)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2, // Normal -> Pending, Pending -> Pending (Error)
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Pending,
+					StateReason:        eval.Error.String(),
+					Error:              errors.New("with_state_error"),
+					Annotations:        map[string]string{"annotation": "test", "Error": "with_state_error"},
+					LatestResult:       newEvaluation(t3, eval.Error),
+					StartsAt:           t2,
+					EndsAt:             t3.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t3,
+				},
+			},
+		},
+		{
+			desc:      "pending(alerting) + nodata stays pending when 'for' not exceeded and NoDataState is NoData",
+			alertRule: baseRuleWith(m.WithForNTimes(3)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2, // Normal -> Pending, Pending -> Pending (NoData)
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Pending,
+					StateReason:        eval.NoData.String(),
+					LatestResult:       newEvaluation(t3, eval.NoData),
+					StartsAt:           t2,
+					EndsAt:             t3.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t3,
+				},
+			},
+		},
+		{
+			desc:      "pending(nodata) + error stays pending when 'for' not exceeded and ExecErrState is Error",
+			alertRule: baseRuleWith(m.WithForNTimes(3), m.WithErrorExecAs(models.ErrorErrState)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2, // Normal -> Pending (NoData), Pending (NoData) -> Pending (Error)
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Pending,
+					StateReason:        eval.Error.String(),
+					Error:              errors.New("with_state_error"),
+					Annotations:        map[string]string{"annotation": "test", "Error": "with_state_error"},
+					LatestResult:       newEvaluation(t3, eval.Error),
+					StartsAt:           t2,
+					EndsAt:             t3.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t3,
+				},
+			},
+		},
+		{
+			desc:      "pending(error) + nodata stays pending when 'for' not exceeded and NoDataState is NoData",
+			alertRule: baseRuleWith(m.WithForNTimes(3), m.WithErrorExecAs(models.ErrorErrState)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2, // Normal -> Pending (Error), Pending (Error) -> Pending (NoData)
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Pending,
+					StateReason:        eval.NoData.String(),
+					LatestResult:       newEvaluation(t3, eval.NoData),
+					StartsAt:           t2,
+					EndsAt:             t3.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t3,
+				},
+			},
+		},
+		{
+			desc:      "pending(alerting) + error transitions to Error when 'for' exceeded and ExecErrState is Error",
+			alertRule: baseRuleWith(m.WithForNTimes(1), m.WithErrorExecAs(models.ErrorErrState)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2, // Normal -> Pending, Pending -> Error
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Error,
+					Error:              errors.New("with_state_error"),
+					Annotations:        map[string]string{"annotation": "test", "Error": "with_state_error"},
+					LatestResult:       newEvaluation(t3, eval.Error),
+					StartsAt:           t3,
+					EndsAt:             t3.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t3,
+					LastSentAt:         util.Pointer(t3),
+				},
+			},
+		},
+		{
+			desc:      "pending(alerting) + nodata transitions to NoData when 'for' exceeded and NoDataState is NoData",
+			alertRule: baseRuleWith(m.WithForNTimes(1)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2, // Normal -> Pending, Pending -> NoData
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.NoData,
+					LatestResult:       newEvaluation(t3, eval.NoData),
+					StartsAt:           t3,
+					EndsAt:             t3.Add(state.ResendDelay * 4),
+					LastEvaluationTime: t3,
+					LastSentAt:         util.Pointer(t3),
+				},
+			},
+		},
+		{
+			desc:      "recovering -> error when ExecErrState is Error (skip Pending)",
+			alertRule: baseRuleWith(m.WithForNTimes(1), m.WithErrorExecAs(models.ErrorErrState), m.WithKeepFiringForNTimes(2)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				tn(4): {
+					newResult(eval.WithState(eval.Error), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 4,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Error,
+					Error:              errors.New("with_state_error"),
+					Annotations:        map[string]string{"annotation": "test", "Error": "with_state_error"},
+					LatestResult:       newEvaluation(tn(4), eval.Error),
+					StartsAt:           tn(4),
+					EndsAt:             tn(4).Add(state.ResendDelay * 4),
+					LastEvaluationTime: tn(4),
+					FiredAt:            &t2,              // Preserved from when alert was Alerting.
+					LastSentAt:         util.Pointer(t2), // Preserved from when alert was Alerting.
+					ResolvedAt:         nil,
+				},
+			},
+		},
+		{
+			desc:      "recovering -> nodata when NoDataState is NoData (skip Pending)",
+			alertRule: baseRuleWith(m.WithForNTimes(1), m.WithKeepFiringForNTimes(2)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				tn(4): {
+					newResult(eval.WithState(eval.NoData), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 4,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.NoData,
+					LatestResult:       newEvaluation(tn(4), eval.NoData),
+					StartsAt:           tn(4),
+					EndsAt:             tn(4).Add(state.ResendDelay * 4),
+					LastEvaluationTime: tn(4),
+					FiredAt:            &t2,              // Preserved from when alert was Alerting.
+					LastSentAt:         util.Pointer(t2), // Preserved from when alert was Alerting.
+					ResolvedAt:         nil,
 				},
 			},
 		},
@@ -1413,14 +1476,18 @@ func TestProcessEvalResults(t *testing.T) {
 			},
 			expectedStates: []*state.State{
 				{
-					Labels:             labels["system + rule"],
+					Labels:             data.Labels{"label": "test", "system": "owned"},
 					ResultFingerprint:  data.Labels{}.Fingerprint(),
 					State:              eval.Alerting,
 					LatestResult:       newEvaluation(t3, eval.Alerting),
-					StartsAt:           t3,
+					StartsAt:           t1,
 					EndsAt:             t3.Add(state.ResendDelay * 4),
+					FiredAt:            &t1,
 					LastEvaluationTime: t3,
-					LastSentAt:         &t1, // Resend delay is 30s, so last sent at is t1.
+					LastSentAt:         &t1,
+					Annotations: map[string]string{
+						"annotation": "test",
+					},
 				},
 			},
 		},
@@ -1450,6 +1517,7 @@ func TestProcessEvalResults(t *testing.T) {
 					}),
 					StartsAt:           t1,
 					EndsAt:             t1.Add(state.ResendDelay * 4),
+					FiredAt:            &t1,
 					LastEvaluationTime: t1,
 					LastSentAt:         &t1,
 					Values: map[string]float64{
@@ -1485,12 +1553,151 @@ func TestProcessEvalResults(t *testing.T) {
 					}),
 					StartsAt:           t1,
 					EndsAt:             t1.Add(state.ResendDelay * 4),
+					FiredAt:            &t1,
 					LastEvaluationTime: t1,
 					LastSentAt:         &t1,
 					Values: map[string]float64{
 						"B0": 1.0,
 						"B1": 2.0,
 					},
+				},
+			},
+		},
+		{
+			desc:      "normal -> alerting -> normal (recovering) when KeepFiringFor is set but is not exceeded",
+			alertRule: baseRuleWith(m.WithKeepFiringForNTimes(2)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 2,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Recovering,
+					LatestResult:       newEvaluation(t3, eval.Normal),
+					StartsAt:           t3,
+					EndsAt:             t3.Add(state.ResendDelay * 4),
+					FiredAt:            &t2,
+					LastEvaluationTime: t3,
+					LastSentAt:         util.Pointer(t2),
+				},
+			},
+		},
+		{
+			desc:      "normal -> alerting -> normal (recovering) -> normal (recovering) -> normal (resolved) when KeepFiringFor is set and has passed",
+			alertRule: baseRuleWith(m.WithKeepFiringForNTimes(2)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				tn(4): {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				tn(5): {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 3,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Normal,
+					LatestResult:       newEvaluation(tn(5), eval.Normal),
+					StartsAt:           tn(5),
+					EndsAt:             tn(5),
+					FiredAt:            &t2,
+					LastEvaluationTime: tn(5),
+					LastSentAt:         util.Pointer(tn(5)),
+					ResolvedAt:         util.Pointer(tn(5)),
+				},
+			},
+		},
+		{
+			desc:      "normal -> alerting -> normal(recovering) -> alerting -> alerting -> recovering when KeepFiringFor is set",
+			alertRule: baseRuleWith(m.WithKeepFiringForNTimes(3)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				tn(4): {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				tn(5): {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				tn(6): {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 4,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Recovering,
+					LatestResult:       newEvaluation(tn(6), eval.Normal),
+					StartsAt:           tn(6),
+					EndsAt:             tn(6).Add(state.ResendDelay * 4),
+					FiredAt:            util.Pointer(tn(4)),
+					LastEvaluationTime: tn(6),
+					LastSentAt:         util.Pointer(tn(5)),
+				},
+			},
+		},
+		{
+			desc:      "normal -> alerting (pending) -> alerting -> normal (recovering) -> alerting when both KeepFiringFor and For are set",
+			alertRule: baseRuleWith(m.WithKeepFiringForNTimes(2), m.WithForNTimes(1)),
+			evalResults: map[time.Time]eval.Results{
+				t1: {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				t2: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				t3: {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+				tn(4): {
+					newResult(eval.WithState(eval.Normal), eval.WithLabels(labels1)),
+				},
+				tn(5): {
+					newResult(eval.WithState(eval.Alerting), eval.WithLabels(labels1)),
+				},
+			},
+			expectedAnnotations: 4,
+			expectedStates: []*state.State{
+				{
+					Labels:             labels["system + rule + labels1"],
+					ResultFingerprint:  labels1.Fingerprint(),
+					State:              eval.Alerting,
+					LatestResult:       newEvaluation(tn(5), eval.Alerting),
+					StartsAt:           tn(5),
+					EndsAt:             tn(5).Add(state.ResendDelay * 4),
+					FiredAt:            util.Pointer(tn(5)),
+					LastEvaluationTime: tn(5),
+					LastSentAt:         util.Pointer(t3),
 				},
 			},
 		},
@@ -1505,7 +1712,7 @@ func TestProcessEvalResults(t *testing.T) {
 			store := historian.NewAnnotationStore(fakeAnnoRepo, &dashboards.FakeDashboardService{}, m)
 			annotationBackendLogger := log.New("ngalert.state.historian", "backend", "annotations")
 			ac := &acfakes.FakeRuleService{}
-			hist := historian.NewAnnotationBackend(annotationBackendLogger, store, nil, m, ac)
+			hist := historian.NewAnnotationBackend(annotationBackendLogger, store, nil, m, ac, 500)
 			clk := clock.NewMock()
 			cfg := state.ManagerCfg{
 				Metrics:       stateMetrics,
@@ -1537,7 +1744,7 @@ func TestProcessEvalResults(t *testing.T) {
 				results += len(res)
 			}
 
-			states := st.GetStatesForRuleUID(tc.alertRule.OrgID, tc.alertRule.UID)
+			states := st.GetStatesForRuleUID(context.Background(), tc.alertRule.OrgID, tc.alertRule.UID)
 			assert.Len(t, states, len(tc.expectedStates))
 
 			expectedStates := make(map[data.Fingerprint]*state.State, len(tc.expectedStates))
@@ -1635,7 +1842,7 @@ func TestProcessEvalResults(t *testing.T) {
 
 		_ = st.ProcessEvalResults(context.Background(), time, rule, res, systemLabels, state.NoopSender)
 
-		states := st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+		states := st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 		require.Len(t, states, 1)
 		state := states[0]
 		require.NotNil(t, state.Values)
@@ -1660,9 +1867,10 @@ func TestProcessEvalResults(t *testing.T) {
 		statePersister := state.NewSyncStatePersisiter(log.New("ngalert.state.manager.persist"), cfg)
 		st := state.NewManager(cfg, statePersister)
 		rule := models.RuleGen.GenerateRef()
-		var results = eval.GenerateResults(rand.Intn(4)+1, eval.ResultGen(eval.WithEvaluatedAt(clk.Now())))
+		now := clk.Now()
+		var results = eval.GenerateResults(rand.Intn(4)+1, eval.ResultGen(eval.WithEvaluatedAt(now)))
 
-		states := st.ProcessEvalResults(context.Background(), clk.Now(), rule, results, make(data.Labels), nil)
+		states := st.ProcessEvalResults(context.Background(), now, rule, results, make(data.Labels), nil)
 		require.NotEmpty(t, states)
 
 		savedStates := make(map[data.Fingerprint]models.AlertInstance)
@@ -1699,8 +1907,12 @@ func printAllAnnotations(annos map[int64]annotations.Item) string {
 	return b.String()
 }
 
-func TestStaleResultsHandler(t *testing.T) {
-	evaluationTime := time.Now().Truncate(time.Second).UTC() // Truncate to the second since we don't store sub-second precision.
+func TestIntegrationStaleResultsHandler(t *testing.T) {
+	tutil.SkipIntegrationTestInShortMode(t)
+
+	// Truncate to the second since we don't store sub-second precision.
+
+	evaluationTime := time.Now().Truncate(time.Second).UTC()
 	interval := time.Minute
 
 	ctx := context.Background()
@@ -1737,6 +1949,7 @@ func TestStaleResultsHandler(t *testing.T) {
 			},
 			CurrentState:      models.InstanceStateNormal,
 			Labels:            labels1,
+			Annotations:       rule.Annotations,
 			LastEvalTime:      lastEval,
 			CurrentStateSince: lastEval,
 			CurrentStateEnd:   lastEval.Add(3 * interval),
@@ -1752,6 +1965,7 @@ func TestStaleResultsHandler(t *testing.T) {
 			},
 			CurrentState:      models.InstanceStateFiring,
 			Labels:            labels2,
+			Annotations:       rule.Annotations,
 			LastEvalTime:      lastEval,
 			CurrentStateSince: lastEval,
 			CurrentStateEnd:   lastEval.Add(3 * interval),
@@ -1802,7 +2016,7 @@ func TestStaleResultsHandler(t *testing.T) {
 					LastSentAt:         &lastEval,
 					ResolvedAt:         &lastEval,
 					EvaluationDuration: 0,
-					Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+					Annotations:        rule.Annotations,
 					ResultFingerprint:  data.Labels{"test1": "testValue1"}.Fingerprint(),
 				},
 			},
@@ -1825,7 +2039,7 @@ func TestStaleResultsHandler(t *testing.T) {
 		}
 		st := state.NewManager(cfg, state.NewNoopPersister())
 		st.Warm(ctx, dbstore, dbstore, ng.InstanceStore)
-		existingStatesForRule := st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+		existingStatesForRule := st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 
 		// We have loaded the expected number of entries from the db
 		assert.Equal(t, tc.startingStateCount, len(existingStatesForRule))
@@ -1847,7 +2061,7 @@ func TestStaleResultsHandler(t *testing.T) {
 				assert.Equal(t, s, cachedState)
 			}
 		}
-		existingStatesForRule = st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+		existingStatesForRule = st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 
 		// The expected number of state entries remains after results are processed
 		assert.Equal(t, tc.finalStateCount, len(existingStatesForRule))
@@ -1906,7 +2120,7 @@ func TestStaleResults(t *testing.T) {
 	st := state.NewManager(cfg, state.NewNoopPersister())
 
 	gen := models.RuleGen
-	rule := gen.With(gen.WithFor(0)).GenerateRef()
+	rule := gen.With(gen.WithFor(0), gen.WithMissingSeriesEvalsToResolve(2)).GenerateRef()
 
 	initResults := eval.Results{
 		eval.ResultGen(eval.WithState(eval.Alerting), eval.WithEvaluatedAt(clk.Now()))(),
@@ -1934,7 +2148,7 @@ func TestStaleResults(t *testing.T) {
 	// Check that it returns just those state transitions that needs to be sent.
 	checkExpectedStateTransitions(t, statesToSend, map[data.Fingerprint]struct{}{state1: {}, state2: {}}) // Does not contain the Normal state3.
 
-	currentStates := st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+	currentStates := st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 	statesMap := checkExpectedStates(t, currentStates, initStates)
 	require.Equal(t, eval.Alerting, statesMap[state2].State) // make sure the state is alerting because we need it to be resolved later
 
@@ -1967,7 +2181,7 @@ func TestStaleResults(t *testing.T) {
 	})
 
 	t.Run("should remove stale states from cache", func(t *testing.T) {
-		currentStates = st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+		currentStates = st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 		checkExpectedStates(t, currentStates, map[data.Fingerprint]struct{}{
 			getCacheID(t, rule, results[0]): {},
 		})
@@ -1986,7 +2200,9 @@ func TestStaleResults(t *testing.T) {
 	})
 }
 
-func TestDeleteStateByRuleUID(t *testing.T) {
+func TestIntegrationDeleteStateByRuleUID(t *testing.T) {
+	tutil.SkipIntegrationTestInShortMode(t)
+
 	interval := time.Minute
 	ctx := context.Background()
 	ng, dbstore := tests.SetupTestEnv(t, 1)
@@ -2048,7 +2264,7 @@ func TestDeleteStateByRuleUID(t *testing.T) {
 					Labels:             data.Labels{"test1": "testValue1"},
 					State:              eval.Normal,
 					EvaluationDuration: 0,
-					Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+					Annotations:        map[string]string{"testAnnotation": "value-2"},
 				},
 				{
 					AlertRuleUID:       rule.UID,
@@ -2056,7 +2272,7 @@ func TestDeleteStateByRuleUID(t *testing.T) {
 					Labels:             data.Labels{"test2": "testValue2"},
 					State:              eval.Alerting,
 					EvaluationDuration: 0,
-					Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+					Annotations:        map[string]string{"testAnnotation": "value-2"},
 				},
 			},
 			startingStateCacheCount: 2,
@@ -2091,7 +2307,7 @@ func TestDeleteStateByRuleUID(t *testing.T) {
 			st.Warm(ctx, dbstore, dbstore, ng.InstanceStore)
 			q := &models.ListAlertInstancesQuery{RuleOrgID: rule.OrgID, RuleUID: rule.UID}
 			alerts, _ := ng.InstanceStore.ListAlertInstances(ctx, q)
-			existingStatesForRule := st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+			existingStatesForRule := st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 
 			// We have loaded the expected number of entries from the db
 			assert.Equal(t, tc.startingStateCacheCount, len(existingStatesForRule))
@@ -2123,7 +2339,7 @@ func TestDeleteStateByRuleUID(t *testing.T) {
 
 			q = &models.ListAlertInstancesQuery{RuleOrgID: rule.OrgID, RuleUID: rule.UID}
 			alertInstances, _ := ng.InstanceStore.ListAlertInstances(ctx, q)
-			existingStatesForRule = st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+			existingStatesForRule = st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 
 			// The expected number of state entries remains after states are deleted
 			assert.Equal(t, tc.finalStateCacheCount, len(existingStatesForRule))
@@ -2133,6 +2349,8 @@ func TestDeleteStateByRuleUID(t *testing.T) {
 }
 
 func TestIntegrationResetStateByRuleUID(t *testing.T) {
+	tutil.SkipIntegrationTestInShortMode(t)
+
 	interval := time.Minute
 	ctx := context.Background()
 	ng, dbstore := tests.SetupTestEnv(t, 1)
@@ -2195,7 +2413,7 @@ func TestIntegrationResetStateByRuleUID(t *testing.T) {
 					Labels:             data.Labels{"test1": "testValue1"},
 					State:              eval.Normal,
 					EvaluationDuration: 0,
-					Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+					Annotations:        map[string]string{"testAnnotation": "value-2"},
 				},
 				{
 					AlertRuleUID:       rule.UID,
@@ -2203,7 +2421,7 @@ func TestIntegrationResetStateByRuleUID(t *testing.T) {
 					Labels:             data.Labels{"test2": "testValue2"},
 					State:              eval.Alerting,
 					EvaluationDuration: 0,
-					Annotations:        map[string]string{"testAnnoKey": "testAnnoValue"},
+					Annotations:        map[string]string{"testAnnotation": "value-2"},
 				},
 			},
 			startingStateCacheCount:  2,
@@ -2236,7 +2454,7 @@ func TestIntegrationResetStateByRuleUID(t *testing.T) {
 			st.Warm(ctx, dbstore, dbstore, ng.InstanceStore)
 			q := &models.ListAlertInstancesQuery{RuleOrgID: rule.OrgID, RuleUID: rule.UID}
 			alerts, _ := ng.InstanceStore.ListAlertInstances(ctx, q)
-			existingStatesForRule := st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+			existingStatesForRule := st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 
 			// We have loaded the expected number of entries from the db
 			assert.Equal(t, tc.startingStateCacheCount, len(existingStatesForRule))
@@ -2271,7 +2489,7 @@ func TestIntegrationResetStateByRuleUID(t *testing.T) {
 
 			q = &models.ListAlertInstancesQuery{RuleOrgID: rule.OrgID, RuleUID: rule.UID}
 			alertInstances, _ := ng.InstanceStore.ListAlertInstances(ctx, q)
-			existingStatesForRule = st.GetStatesForRuleUID(rule.OrgID, rule.UID)
+			existingStatesForRule = st.GetStatesForRuleUID(context.Background(), rule.OrgID, rule.UID)
 
 			// The expected number of state entries remains after states are deleted
 			assert.Equal(t, tc.finalStateCacheCount, len(existingStatesForRule))
@@ -2339,4 +2557,220 @@ func mergeLabels(a, b data.Labels) data.Labels {
 		result[k] = v
 	}
 	return result
+}
+
+// TestStateManager_HistorianIntegration tests that the state manager properly sends
+// all expected state transitions to the historian backend.
+func TestStateManager_HistorianIntegration(t *testing.T) {
+	baseInterval := 1 * time.Second
+	tN := func(n int) time.Time {
+		return time.Unix(0, 0).UTC().Add(time.Duration(n) * baseInterval)
+	}
+	t1 := tN(1)
+	t2 := tN(2)
+	t3 := tN(3)
+
+	labels1 := data.Labels{"instance": "server1", "job": "webapp"}
+	labels2 := data.Labels{"instance": "server2", "job": "webapp"}
+
+	baseRule := &models.AlertRule{
+		ID:              1,
+		OrgID:           1,
+		Title:           "test rule",
+		UID:             "test-rule-uid",
+		NamespaceUID:    "test-namespace",
+		IntervalSeconds: 10,
+		NoDataState:     models.NoData,
+		ExecErrState:    models.ErrorErrState,
+		For:             0,
+	}
+
+	type transition struct {
+		previousState eval.State
+		currentState  eval.State
+	}
+
+	scenarios := []struct {
+		name                string
+		rule                *models.AlertRule
+		evaluations         map[time.Time][]eval.Result
+		expectedTransitions map[time.Time][]transition
+	}{
+		{
+			name: "1:normal -> 1:alerting -> 1:normal",
+			rule: baseRule,
+			evaluations: map[time.Time][]eval.Result{
+				t1: {
+					{Instance: labels1, State: eval.Normal},
+				},
+				t2: {
+					{Instance: labels1, State: eval.Alerting},
+				},
+				t3: {
+					{Instance: labels1, State: eval.Normal},
+				},
+			},
+			expectedTransitions: map[time.Time][]transition{
+				t1: {
+					{previousState: eval.Normal, currentState: eval.Normal},
+				},
+				t2: {
+					{previousState: eval.Normal, currentState: eval.Alerting},
+				},
+				t3: {
+					{previousState: eval.Alerting, currentState: eval.Normal},
+				},
+			},
+		},
+		{
+			name: "1:alerting, 2:alerting -> 2:alerting -> {}",
+			rule: baseRule,
+			evaluations: map[time.Time][]eval.Result{
+				t1: {
+					{Instance: labels1, State: eval.Alerting},
+					{Instance: labels2, State: eval.Alerting},
+				},
+				t2: {
+					// labels1 is missing from this evaluation
+					{Instance: labels2, State: eval.Alerting},
+				},
+				t3: {
+					// Both labels1 and labels2 are missing
+				},
+			},
+			expectedTransitions: map[time.Time][]transition{
+				t1: {
+					{previousState: eval.Normal, currentState: eval.Alerting},
+					{previousState: eval.Normal, currentState: eval.Alerting},
+				},
+				t2: {
+					{previousState: eval.Alerting, currentState: eval.Alerting},
+					{previousState: eval.Alerting, currentState: eval.Alerting},
+				},
+				t3: {
+					{previousState: eval.Alerting, currentState: eval.Alerting},
+					{previousState: eval.Alerting, currentState: eval.Alerting},
+				},
+			},
+		},
+		{
+			name: "1:alerting -> {} -> {}",
+			rule: baseRule,
+			evaluations: map[time.Time][]eval.Result{
+				t1: {
+					{Instance: labels1, State: eval.Alerting, EvaluatedAt: t1},
+				},
+				t2: {
+					// labels1 is missing - first missing evaluation
+				},
+				t3: {
+					// labels1 is still missing - second missing evaluation
+				},
+			},
+			expectedTransitions: map[time.Time][]transition{
+				t1: {
+					{previousState: eval.Normal, currentState: eval.Alerting},
+				},
+				t2: {
+					{previousState: eval.Alerting, currentState: eval.Alerting},
+				},
+				t3: {
+					{previousState: eval.Alerting, currentState: eval.Alerting},
+				},
+			},
+		},
+		{
+			name: "1:alerting -> 1:recovering -> 1:normal",
+			rule: &models.AlertRule{
+				ID:              1,
+				OrgID:           1,
+				Title:           "test rule",
+				UID:             "test-rule-uid",
+				NamespaceUID:    "test-namespace",
+				IntervalSeconds: 10,
+				NoDataState:     models.NoData,
+				ExecErrState:    models.ErrorErrState,
+				For:             0,
+				KeepFiringFor:   10,
+			},
+			evaluations: map[time.Time][]eval.Result{
+				t1: {
+					{Instance: labels1, State: eval.Alerting},
+				},
+				t2: {
+					{Instance: labels1, State: eval.Normal},
+				},
+				t3: {
+					{Instance: labels1, State: eval.Normal},
+				},
+			},
+			expectedTransitions: map[time.Time][]transition{
+				t1: {
+					{previousState: eval.Normal, currentState: eval.Alerting},
+				},
+				t2: {
+					{previousState: eval.Alerting, currentState: eval.Recovering},
+				},
+				t3: {
+					{previousState: eval.Recovering, currentState: eval.Normal},
+				},
+			},
+		},
+	}
+
+	for _, scenario := range scenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			historian := &state.FakeHistorian{}
+
+			cfg := state.ManagerCfg{
+				Metrics:       metrics.NewNGAlert(prometheus.NewPedanticRegistry()).GetStateMetrics(),
+				ExternalURL:   nil,
+				InstanceStore: &state.FakeInstanceStore{},
+				Images:        &state.NotAvailableImageService{},
+				Clock:         clock.NewMock(),
+				Historian:     historian,
+				Tracer:        tracing.InitializeTracerForTest(),
+				Log:           log.NewNopLogger(),
+			}
+
+			mgr := state.NewManager(cfg, state.NewNoopPersister())
+
+			// Helper function to process one time step and verify historian
+			processTimeStep := func(evalTime time.Time) {
+				results := scenario.evaluations[evalTime]
+				expectedTransitions := scenario.expectedTransitions[evalTime]
+
+				for i := range results {
+					results[i].EvaluatedAt = evalTime
+				}
+
+				// Clear historian state transitions before the evaluation
+				historian.StateTransitions = nil
+
+				mgr.ProcessEvalResults(
+					context.Background(),
+					evalTime,
+					scenario.rule,
+					results,
+					make(data.Labels),
+					nil,
+				)
+
+				// Extract just the data we care about from the actual transitions
+				actualTransitions := make([]transition, len(historian.StateTransitions))
+				for i, t := range historian.StateTransitions {
+					actualTransitions[i] = transition{
+						previousState: t.PreviousState,
+						currentState:  t.State.State,
+					}
+				}
+
+				require.ElementsMatch(t, expectedTransitions, actualTransitions)
+			}
+
+			processTimeStep(t1)
+			processTimeStep(t2)
+			processTimeStep(t3)
+		})
+	}
 }

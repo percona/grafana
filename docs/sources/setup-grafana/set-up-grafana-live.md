@@ -55,7 +55,12 @@ The basic streaming example included in Grafana core streams frames with some ge
 
 ### Data streaming from Telegraf
 
-A new API endpoint `/api/live/push/:streamId` allows accepting metrics data in Influx format from Telegraf. These metrics are transformed into Grafana data frames and published to channels.
+A new API endpoint `/api/live/push/:streamId` allows accepting metrics data in InfluxDB line protocol format from Telegraf. These metrics are transformed into Grafana data frames and published to channels.
+
+**Important:** When streaming data from Telegraf, ensure that:
+
+- The data format is set to `influx` in your Telegraf configuration
+- Timestamps are in nanoseconds (Unix epoch time)
 
 Refer to the tutorial about [streaming metrics from Telegraf to Grafana](/tutorials/stream-metrics-from-telegraf-to-grafana/) for more information.
 
@@ -87,7 +92,44 @@ Channels are lightweight and ephemeral - they are created automatically on user 
 
 ### Data format
 
-All data travelling over Live channels must be JSON-encoded.
+Data sent over Live channels supports multiple formats depending on the endpoint:
+
+#### WebSocket channels
+
+Data transmitted through WebSocket channels for real-time streaming to frontend clients must be **JSON-encoded**. This applies to:
+
+- Dashboard change notifications
+- Data source plugin streaming (`ds` scope channels)
+- Custom application channels
+
+#### HTTP Push API
+
+The `/api/live/push/:streamId` endpoint accepts metrics data in **InfluxDB line protocol format**. This is particularly useful for streaming metrics from tools like Telegraf.
+
+The line protocol format follows this structure:
+
+```
+<measurement>[,<tag_key>=<tag_value>[,<tag_key>=<tag_value>]] <field_key>=<field_value>[,<field_key>=<field_value>] [<timestamp>]
+```
+
+**Important:** Timestamps must be encoded in **nanoseconds** (Unix epoch time in nanoseconds).
+
+**Example:**
+
+```
+temperature,location=room1,sensor=A temp_celsius=23.5,humidity=45 1651498849000000000
+```
+
+In this example:
+
+- `temperature` is the measurement name
+- `location=room1` and `sensor=A` are tags
+- `temp_celsius=23.5` and `humidity=45` are fields
+- `1651498849000000000` is the timestamp in nanoseconds
+
+When data is received via the HTTP Push API, it is automatically transformed into Grafana data frames and published to the appropriate channels for visualization.
+
+For more information about the InfluxDB line protocol format, refer to the [InfluxDB line protocol documentation](https://docs.influxdata.com/influxdb/v1.8/write_protocols/line_protocol_tutorial/).
 
 ## Configure Grafana Live
 
@@ -201,7 +243,7 @@ In a high availability Grafana setup involving several Grafana server instances 
 - Streaming from Telegraf will deliver data only to clients connected to the same instance which received Telegraf data, active stream cache is not shared between different Grafana instances.
 - A separate unidirectional stream between Grafana and backend data source may be opened on different Grafana servers for the same channel.
 
-To bypass these limitations, Grafana v8.1 has an experimental Live HA engine that requires Redis to work.
+To bypass these limitations, Grafana has a Live HA engine that requires Redis to work.
 
 ### Configure Redis Live engine
 
@@ -223,26 +265,19 @@ After running:
 - Streaming from Telegraf delivers messages to all subscribers.
 - A separate unidirectional stream between Grafana and backend data source opens on different Grafana servers. Publishing data to a channel delivers messages to instance subscribers, as a result, publications from different instances on different machines do not produce duplicate data on panels.
 
-At the moment we only support single Redis node.
+{{< admonition type="note" >}}
+Live currently does not support Redis Sentinel. We recommend using a Redis Cluster for high-availability via a k8s helm chart such as the Bitnami Redis chart which has values to provision a Redis Cluster. Grafana Live can then be pointed to the `redis-headless` service.
 
-> **Note:** It's possible to use Redis Sentinel and Haproxy to achieve a highly available Redis setup. Redis nodes should be managed by [Redis Sentinel](https://redis.io/topics/sentinel) to achieve automatic failover. Haproxy configuration example:
->
-> ```
-> listen redis
->   server redis-01 127.0.0.1:6380 check port 6380 check inter 2s weight 1 inter 2s downinter 5s rise 10 fall 2 on-marked-down shutdown-sessions on-marked-up shutdown-backup-sessions
->   server redis-02 127.0.0.1:6381 check port 6381 check inter 2s weight 1 inter 2s downinter 5s rise 10 fall 2 backup
->   bind *:6379
->   mode tcp
->   option tcpka
->   option tcplog
->   option tcp-check
->   tcp-check send PING\r\n
->   tcp-check expect string +PONG
->   tcp-check send info\ replication\r\n
->   tcp-check expect string role:master
->   tcp-check send QUIT\r\n
->   tcp-check expect string +OK
->   balance roundrobin
-> ```
->
-> Next, point Grafana Live to Haproxy address:port.
+```
+ live:
+   ha_engine: redis
+   ha_engine_address: redis-headless.grafana.svc.cluster.local:6379
+   ha_engine_password: $__file{/your/redis/password/secret/mount}
+```
+
+{{< /admonition >}}
+
+{{< admonition type="note" >}}
+The Redis Live HA engine does not currently support TLS.
+
+{{< /admonition >}}

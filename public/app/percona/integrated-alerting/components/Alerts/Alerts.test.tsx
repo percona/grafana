@@ -8,7 +8,7 @@ import { mockAlertmanagerAlert } from 'app/features/alerting/unified/mocks';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { AlertState } from 'app/plugins/datasource/alertmanager/types';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { Alerts } from './Alerts';
 

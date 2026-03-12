@@ -9,6 +9,8 @@ import (
 	"github.com/grafana/grafana/pkg/services/apikey"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/services/serviceaccounts"
+
+	// @PERCONA
 	"github.com/grafana/grafana/pkg/util/nameutil"
 )
 
@@ -51,6 +53,7 @@ func (s *ServiceAccountsStoreImpl) AddServiceAccountToken(ctx context.Context, s
 		}
 
 		addKeyCmd := &apikey.AddCommand{
+			// @PERCONA
 			Name:             nameutil.SanitizeSAName(cmd.Name),
 			Role:             org.RoleViewer,
 			OrgID:            cmd.OrgId,
@@ -97,7 +100,7 @@ func (s *ServiceAccountsStoreImpl) RevokeServiceAccountToken(ctx context.Context
 	rawSQL := "UPDATE api_key SET is_revoked = ? WHERE id=? and org_id=? and service_account_id=?"
 
 	return s.sqlStore.WithDbSession(ctx, func(sess *db.Session) error {
-		result, err := sess.Exec(rawSQL, s.sqlStore.GetDialect().BooleanStr(true), tokenId, orgId, serviceAccountId)
+		result, err := sess.Exec(rawSQL, s.sqlStore.GetDialect().BooleanValue(true), tokenId, orgId, serviceAccountId)
 		if err != nil {
 			return err
 		}

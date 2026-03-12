@@ -1,0 +1,59 @@
+// Code generated - EDITING IS FUTILE. DO NOT EDIT.
+
+package v0alpha1
+
+// +k8s:openapi-gen=true
+type TeamBindingspecSubject struct {
+	// uid of the identity
+	Name string `json:"name"`
+}
+
+// NewTeamBindingspecSubject creates a new TeamBindingspecSubject object.
+func NewTeamBindingspecSubject() *TeamBindingspecSubject {
+	return &TeamBindingspecSubject{}
+}
+
+// +k8s:openapi-gen=true
+type TeamBindingTeamRef struct {
+	// Name is the unique identifier for a team.
+	Name string `json:"name"`
+}
+
+// NewTeamBindingTeamRef creates a new TeamBindingTeamRef object.
+func NewTeamBindingTeamRef() *TeamBindingTeamRef {
+	return &TeamBindingTeamRef{}
+}
+
+// +k8s:openapi-gen=true
+type TeamBindingTeamPermission string
+
+const (
+	TeamBindingTeamPermissionAdmin  TeamBindingTeamPermission = "admin"
+	TeamBindingTeamPermissionMember TeamBindingTeamPermission = "member"
+)
+
+// +k8s:openapi-gen=true
+type TeamBindingSpec struct {
+	Subject TeamBindingspecSubject `json:"subject"`
+	TeamRef TeamBindingTeamRef     `json:"teamRef"`
+	// permission of the identity in the team
+	Permission TeamBindingTeamPermission `json:"permission"`
+	External   bool                      `json:"external"`
+}
+
+// NewTeamBindingSpec creates a new TeamBindingSpec object.
+func NewTeamBindingSpec() *TeamBindingSpec {
+	return &TeamBindingSpec{
+		Subject: *NewTeamBindingspecSubject(),
+		TeamRef: *NewTeamBindingTeamRef(),
+	}
+}
+func (TeamBindingspecSubject) OpenAPIModelName() string {
+	return "com.github.grafana.grafana.apps.iam.pkg.apis.iam.v0alpha1.TeamBindingspecSubject"
+}
+func (TeamBindingTeamRef) OpenAPIModelName() string {
+	return "com.github.grafana.grafana.apps.iam.pkg.apis.iam.v0alpha1.TeamBindingTeamRef"
+}
+func (TeamBindingSpec) OpenAPIModelName() string {
+	return "com.github.grafana.grafana.apps.iam.pkg.apis.iam.v0alpha1.TeamBindingSpec"
+}

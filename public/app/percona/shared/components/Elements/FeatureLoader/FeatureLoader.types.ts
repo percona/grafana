@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 
-import { OrgRole, StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
+import { OrgRole } from '@grafana/data';
 
 export interface FeatureLoaderProps extends PropsWithChildren {
   featureName?: string;

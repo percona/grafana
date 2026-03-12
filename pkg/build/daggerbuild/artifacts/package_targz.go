@@ -55,9 +55,7 @@ type Tarball struct {
 	// Dependent artifacts
 	Backend        *pipeline.Artifact
 	Frontend       *pipeline.Artifact
-	NPMPackages    *pipeline.Artifact
 	BundledPlugins *pipeline.Artifact
-	Storybook      *pipeline.Artifact
 }
 
 func NewTarballFromString(ctx context.Context, log *slog.Logger, artifact string, state pipeline.StateHandler) (*pipeline.Artifact, error) {
@@ -181,15 +179,6 @@ func NewTarball(
 		return nil, err
 	}
 
-	npmArtifact, err := NewNPMPackages(ctx, log, artifact, src, version, cache)
-	if err != nil {
-		return nil, err
-	}
-
-	storybookArtifact, err := NewStorybook(ctx, log, artifact, src, version, cache)
-	if err != nil {
-		return nil, err
-	}
 	tarball := &Tarball{
 		Name:         name,
 		Distribution: distro,
@@ -202,9 +191,7 @@ func NewTarball(
 
 		Backend:        backendArtifact,
 		Frontend:       frontendArtifact,
-		NPMPackages:    npmArtifact,
 		BundledPlugins: bundledPluginsArtifact,
-		Storybook:      storybookArtifact,
 	}
 
 	return pipeline.ArtifactWithLogging(ctx, log, &pipeline.Artifact{
@@ -216,12 +203,9 @@ func NewTarball(
 }
 
 func (t *Tarball) Builder(ctx context.Context, opts *pipeline.ArtifactContainerOpts) (*dagger.Container, error) {
-	version := t.Version
-
 	container := opts.Client.Container().
 		From("alpine:3.23.3").
-		WithExec([]string{"apk", "add", "--update", "tar"}).
-		WithExec([]string{"/bin/sh", "-c", fmt.Sprintf("echo %s > VERSION", version)})
+		WithExec([]string{"apk", "add", "--update", "tar"})
 
 	return container, nil
 }
@@ -231,6 +215,9 @@ func (t *Tarball) BuildFile(ctx context.Context, b *dagger.Container, opts *pipe
 		state = opts.State
 		log   = opts.Log
 	)
+
+	b = b.
+		WithExec([]string{"/bin/sh", "-c", fmt.Sprintf("echo %s > VERSION", t.Version)})
 
 	log.Debug("Getting grafana dir from state...")
 	// The Grafana directory is used for other packaged data like Dockerfile, license.txt, etc.
@@ -242,16 +229,6 @@ func (t *Tarball) BuildFile(ctx context.Context, b *dagger.Container, opts *pipe
 	}
 
 	frontendDir, err := opts.Store.Directory(ctx, t.Frontend)
-	if err != nil {
-		return nil, err
-	}
-
-	npmDir, err := opts.Store.Directory(ctx, t.NPMPackages)
-	if err != nil {
-		return nil, err
-	}
-
-	storybookDir, err := opts.Store.Directory(ctx, t.Storybook)
 	if err != nil {
 		return nil, err
 	}
@@ -284,8 +261,6 @@ func (t *Tarball) BuildFile(ctx context.Context, b *dagger.Container, opts *pipe
 		targz.NewMappedDir("packaging/wrappers", grafanaDir.Directory("packaging/wrappers")),
 		targz.NewMappedDir("bin", backendDir),
 		targz.NewMappedDir("public", frontendDir),
-		targz.NewMappedDir("npm-artifacts", npmDir),
-		targz.NewMappedDir("storybook", storybookDir),
 		targz.NewMappedDir("plugins-bundled", pluginsDir),
 	}
 
@@ -336,14 +311,16 @@ func (t *Tarball) Dependencies(ctx context.Context) ([]*pipeline.Artifact, error
 	return []*pipeline.Artifact{
 		t.Backend,
 		t.Frontend,
-		t.NPMPackages,
 		t.BundledPlugins,
-		t.Storybook,
 	}, nil
 }
 
 func (t *Tarball) Filename(ctx context.Context) (string, error) {
 	return packages.FileName(t.Name, t.Version, t.BuildID, t.Distribution, "tar.gz")
+}
+
+func (t *Tarball) String() string {
+	return "targz"
 }
 
 func verifyTarball(
@@ -385,8 +362,12 @@ func verifyTarball(
 		WithExposedPort(3000).AsService(dagger.ContainerAsServiceOpts{
 		Args: []string{"./bin/grafana", "server"},
 	})
+	result, err := e2e.ValidatePackage(ctx, d, svc, src, yarnCache, nodeVersion)
+	if err != nil {
+		return err
+	}
 
-	if _, err := containers.ExitError(ctx, e2e.ValidatePackage(d, svc, src, yarnCache, nodeVersion)); err != nil {
+	if _, err := containers.ExitError(ctx, result); err != nil {
 		return err
 	}
 	return nil

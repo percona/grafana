@@ -20,7 +20,7 @@ import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { validators } from 'app/percona/shared/helpers/validatorsForm';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 export const NodesAgents: FC<NodesAgentsProps> = ({ form }) => {
   const styles = useStyles2(getStyles);

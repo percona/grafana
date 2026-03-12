@@ -1,9 +1,8 @@
 import { css } from '@emotion/css';
 
 import { GrafanaTheme2 } from '@grafana/data';
-import { selectors } from '@grafana/e2e-selectors';
-import { IconButton, Drawer, useStyles2, Text } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
+import { t } from '@grafana/i18n';
+import { Drawer, useStyles2, Text } from '@grafana/ui';
 
 import { NewsWrapper } from './NewsWrapper';
 
@@ -25,20 +24,11 @@ export function NewsContainer({ onClose }: NewsContainerProps) {
             href="https://www.percona.com/blog/"
             target="_blank"
             rel="noreferrer"
-            title="Go to Percona blog"
+            title={t('news.go-to-percona-blog', 'Go to Percona blog')}
             className={styles.grot}
           >
             <img src="public/img/percona-logo.svg" alt="Percona logo" />
           </a>
-          <div className={styles.actions}>
-            <IconButton
-              name="times"
-              variant="secondary"
-              onClick={onClose}
-              data-testid={selectors.components.Drawer.General.close}
-              tooltip={t(`news.drawer.close`, 'Close Drawer')}
-            />
-          </div>
         </div>
       }
       onClose={onClose}
@@ -57,7 +47,6 @@ const getStyles = (theme: GrafanaTheme2) => {
       alignItems: `center`,
       justifyContent: `center`,
       gap: theme.spacing(2),
-      borderBottom: `1px solid ${theme.colors.border.weak}`,
     }),
     grot: css({
       display: `flex`,
@@ -69,11 +58,6 @@ const getStyles = (theme: GrafanaTheme2) => {
         width: `75px`,
         height: `75px`,
       },
-    }),
-    actions: css({
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(2),
     }),
   };
 };

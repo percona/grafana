@@ -4,21 +4,22 @@ import { from, forkJoin, timeout, lastValueFrom, catchError, of } from 'rxjs';
 import { PanelPlugin, PluginError } from '@grafana/data';
 import { config, getBackendSrv, isFetchError } from '@grafana/runtime';
 import { importPanelPlugin } from 'app/features/plugins/importPanelPlugin';
-import { StoreState, ThunkResult } from 'app/types';
+import { StoreState, ThunkResult } from 'app/types/store';
 
-import { invalidatePluginInCache } from '../../loader/cache';
+import { clearPluginInfoInCache } from '../../loader/pluginInfoCache';
 import {
   getRemotePlugins,
   getPluginErrors,
   getLocalPlugins,
   getPluginDetails,
+  getPluginInsights,
   installPlugin,
   uninstallPlugin,
   getInstancePlugins,
   getProvisionedPlugins,
 } from '../api';
 import { STATE_PREFIX } from '../constants';
-import { mapLocalToCatalog, mergeLocalsAndRemotes, updatePanels } from '../helpers';
+import { mapLocalToCatalog, mergeLocalsAndRemotes } from '../helpers';
 import { CatalogPlugin, RemotePlugin, LocalPlugin, InstancePlugin, ProvisionedPlugin, PluginStatus } from '../types';
 
 // Fetches
@@ -164,6 +165,22 @@ export const fetchDetails = createAsyncThunk<Update<CatalogPlugin, string>, stri
   }
 );
 
+export const fetchPluginInsights = createAsyncThunk<Update<CatalogPlugin, string>, { id: string; version?: string }>(
+  `${STATE_PREFIX}/fetchPluginInsights`,
+  async ({ id, version }, thunkApi) => {
+    try {
+      const insights = await getPluginInsights(id, version);
+
+      return {
+        id,
+        changes: { insights },
+      };
+    } catch (e) {
+      return thunkApi.rejectWithValue('Unknown error.');
+    }
+  }
+);
+
 export const addPlugins = createAction<CatalogPlugin[]>(`${STATE_PREFIX}/addPlugins`);
 
 // 1. gets remote equivalents from the store (if there are any)
@@ -205,7 +222,7 @@ export const install = createAsyncThunk<
     await updatePanels();
 
     if (installType !== PluginStatus.INSTALL) {
-      invalidatePluginInCache(id);
+      clearPluginInfoInCache(id);
     }
 
     return { id, changes };
@@ -230,7 +247,7 @@ export const uninstall = createAsyncThunk<Update<CatalogPlugin, string>, string>
       await uninstallPlugin(id);
       await updatePanels();
 
-      invalidatePluginInCache(id);
+      clearPluginInfoInCache(id);
 
       return {
         id,
@@ -264,7 +281,8 @@ export const panelPluginLoaded = createAction<PanelPlugin>(`${STATE_PREFIX}/pane
 // TODO<remove once the "plugin_admin_enabled" feature flag is removed>
 export const loadPanelPlugin = (id: string): ThunkResult<Promise<PanelPlugin>> => {
   return async (dispatch, getStore) => {
-    let plugin = getStore().plugins.panels[id];
+    const state = getStore();
+    let plugin = state.plugins.panels[id];
 
     if (!plugin) {
       plugin = await importPanelPlugin(id);
@@ -278,3 +296,11 @@ export const loadPanelPlugin = (id: string): ThunkResult<Promise<PanelPlugin>> =
     return plugin;
   };
 };
+
+function updatePanels() {
+  return getBackendSrv()
+    .get('/api/frontend/settings')
+    .then((settings) => {
+      config.panels = settings.panels;
+    });
+}

@@ -6,27 +6,40 @@ go 1.25.8
 use (
 	. // skip:golangci-lint
 	./apps/advisor
+	./apps/alerting/alertenrichment
+	./apps/alerting/historian
 	./apps/alerting/notifications
-	./apps/investigations
+	./apps/alerting/rules
+	./apps/annotation
+	./apps/collections
+	./apps/correlations
+	./apps/dashboard
+	./apps/dashvalidator
+	./apps/example
+	./apps/folder
+	./apps/iam
+	./apps/logsdrilldown
 	./apps/playlist
+	./apps/plugins
+	./apps/preferences
+	./apps/provisioning
+	./apps/quotas
+	./apps/scope
+	./apps/secret
+	./apps/shorturl
 	./pkg/aggregator
 	./pkg/apimachinery
 	./pkg/apiserver
 	./pkg/build
 	./pkg/build/wire // skip:golangci-lint
 	./pkg/codegen
+	./pkg/plugins
 	./pkg/plugins/codegen
 	./pkg/promlib
 	./pkg/semconv
-	./pkg/storage/unified/apistore
-	./pkg/storage/unified/resource
-	./pkg/util/xorm // skip:golangci-lint
+	./pkg/storage/unified/resource/kv
 )
 
-// when we release xorm we would like to release it like github.com/grafana/grafana/pkg/util/xorm
-// but we don't want to change all the imports. so we use replace to handle this situation
-replace xorm.io/xorm => ./pkg/util/xorm
-
-replace github.com/prometheus/alertmanager => github.com/grafana/prometheus-alertmanager v0.25.1-0.20260206185757-70751e6fafe0
+replace github.com/prometheus/alertmanager => github.com/grafana/prometheus-alertmanager v0.25.1-0.20260112162805-d29cc9cf7f0f
 
 replace github.com/crewjam/saml => github.com/grafana/saml v0.4.15-0.20240917091248-ae3bbdad8a56

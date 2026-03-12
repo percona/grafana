@@ -10,7 +10,7 @@ import {
   standardTransformersRegistry,
   toDataFrame,
 } from '@grafana/data';
-import { getPanelPlugin } from '@grafana/data/test/__mocks__/pluginMocks';
+import { getPanelPlugin } from '@grafana/data/test';
 import { setPluginImportUtils, setRunRequest } from '@grafana/runtime';
 import { SceneCanvasText, SceneDataTransformer, SceneGridLayout, SceneQueryRunner, VizPanel } from '@grafana/scenes';
 import * as libpanels from 'app/features/library-panels/state/api';
@@ -70,6 +70,18 @@ jest.mock('@grafana/runtime', () => ({
       }),
       getInstanceSettings: jest.fn().mockResolvedValue({ uid: 'ds1' }),
     };
+  },
+  config: {
+    ...jest.requireActual('@grafana/runtime').config,
+    defaultDatasource: 'ds1',
+    datasources: {
+      ds1: {
+        name: 'ds-uid',
+        meta: {
+          id: 'grafana',
+        },
+      },
+    },
   },
 }));
 
@@ -215,6 +227,75 @@ describe('InspectJsonTab', () => {
     // Verify forceRender was called on the layout to apply position changes
     expect(forceRenderSpy).toHaveBeenCalled();
   });
+
+  it('Can show panel json for V2 dashboard specification', async () => {
+    const { tab } = await buildTestSceneWithV2Spec();
+
+    const obj = JSON.parse(tab.state.jsonText);
+    expect(obj.kind).toEqual('Panel');
+    expect(obj.spec.id).toEqual(12);
+    expect(obj.spec.data.kind).toEqual('QueryGroup');
+    expect(tab.isEditable()).toBe(true);
+  });
+
+  describe('Panel Layout', () => {
+    it('does not show panel-layout option for non-v2 spec', async () => {
+      const { tab } = await buildTestScene();
+      const options = tab.getOptions();
+      expect(options.some((o) => o.value === 'panel-layout')).toBe(false);
+    });
+
+    it('can edit and apply layout changes', async () => {
+      const { tab, panel, scene } = await buildTestSceneWithV2Spec();
+      tab.onChangeSource({ value: 'panel-layout' });
+
+      const layoutManager = scene.state.body as DefaultGridLayoutManager;
+      const grid = layoutManager.state.grid as SceneGridLayout;
+      const forceRenderSpy = jest.spyOn(grid, 'forceRender');
+
+      tab.onCodeEditorBlur(`{
+        "kind": "GridLayoutItem",
+        "spec": {
+          "x": 5,
+          "y": 10,
+          "width": 12,
+          "height": 8,
+          "element": {
+            "kind": "ElementReference",
+            "name": "panel-12"
+          }
+        }
+      }`);
+
+      tab.onApplyChange();
+
+      const gridItem = panel.parent as DashboardGridItem;
+      expect(gridItem.state.x).toBe(5);
+      expect(gridItem.state.y).toBe(10);
+      expect(gridItem.state.width).toBe(12);
+      expect(gridItem.state.height).toBe(8);
+
+      expect(forceRenderSpy).toHaveBeenCalled();
+      expect(tab.state.onClose).toHaveBeenCalled();
+    });
+
+    it('shows error for invalid layout JSON', async () => {
+      const { tab } = await buildTestSceneWithV2Spec();
+      tab.onChangeSource({ value: 'panel-layout' });
+
+      tab.onCodeEditorBlur(`{
+        "kind": "GridLayoutItem",
+        "spec": {
+          "x": "not a number"
+        }
+      }`);
+
+      tab.onApplyChange();
+
+      expect(tab.state.error).toBeDefined();
+      expect(tab.state.onClose).not.toHaveBeenCalled();
+    });
+  });
 });
 
 function buildTestPanel() {
@@ -315,6 +396,32 @@ async function buildTestSceneWithLibraryPanel() {
 
   const tab = new InspectJsonTab({
     panelRef: libraryPanel.getRef(),
+    onClose: jest.fn(),
+  });
+
+  return { scene, tab, panel };
+}
+
+async function buildTestSceneWithV2Spec() {
+  const panel = buildTestPanel();
+  const scene = new DashboardScene(
+    {
+      title: 'hello',
+      uid: 'dash-1',
+      meta: {
+        canEdit: true,
+      },
+      body: DefaultGridLayoutManager.fromVizPanels([panel]),
+    },
+    'v2'
+  );
+
+  activateFullSceneTree(scene);
+
+  await new Promise((r) => setTimeout(r, 1));
+
+  const tab = new InspectJsonTab({
+    panelRef: panel.getRef(),
     onClose: jest.fn(),
   });
 

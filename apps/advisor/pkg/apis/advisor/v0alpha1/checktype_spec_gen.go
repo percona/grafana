@@ -23,5 +23,13 @@ type CheckTypeSpec struct {
 
 // NewCheckTypeSpec creates a new CheckTypeSpec object.
 func NewCheckTypeSpec() *CheckTypeSpec {
-	return &CheckTypeSpec{}
+	return &CheckTypeSpec{
+		Steps: []CheckTypeStep{},
+	}
+}
+func (CheckTypeStep) OpenAPIModelName() string {
+	return "com.github.grafana.grafana.apps.advisor.pkg.apis.advisor.v0alpha1.CheckTypeStep"
+}
+func (CheckTypeSpec) OpenAPIModelName() string {
+	return "com.github.grafana.grafana.apps.advisor.pkg.apis.advisor.v0alpha1.CheckTypeSpec"
 }

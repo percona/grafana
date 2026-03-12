@@ -2,15 +2,14 @@ import { cloneDeep } from 'lodash';
 import { FC, useEffect, useState } from 'react';
 
 import { config } from '@grafana/runtime';
-import { contextSrv } from 'app/core/core';
 import { initialState } from 'app/core/reducers/navBarTree';
 import { updateNavIndex } from 'app/core/reducers/navModel';
-import { fetchFolders } from 'app/features/manage-dashboards/state/actions';
 import { updateNavTree } from 'app/percona/shared/core/reducers/navigation';
 import { fetchActiveServiceTypesAction } from 'app/percona/shared/core/reducers/services';
 import { isPmmAdmin, isViewer } from 'app/percona/shared/helpers/permissions';
 import { useAppDispatch } from 'app/store/store';
-import { FolderDTO, useSelector } from 'app/types';
+import { FolderDTO } from 'app/types/folders';
+import { useSelector } from 'app/types/store';
 
 import { getCategorizedAdvisors, getPerconaSettings, getServices, getUpdatesInfo } from '../../../core/selectors';
 
@@ -39,6 +38,8 @@ import {
   removeAlertingMenuItem,
   sortNavigation,
 } from './PerconaNavigation.utils';
+import { contextSrv } from 'app/core/services/context_srv';
+import { fetchFolders } from 'app/features/manage-dashboards/import/legacy/actions';
 
 const PerconaNavigation: FC = () => {
   const [folders, setFolders] = useState<FolderDTO[]>([]);

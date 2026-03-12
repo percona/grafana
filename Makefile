@@ -5,7 +5,6 @@
 WIRE_TAGS = "oss"
 
 -include local/Makefile
-include .bingo/Variables.mk
 include .citools/Variables.mk
 
 GO = go
@@ -18,6 +17,7 @@ GO_RACE_FLAG := $(if $(GO_RACE),-race)
 GO_BUILD_FLAGS += $(if $(GO_BUILD_DEV),-dev)
 GO_BUILD_FLAGS += $(if $(GO_BUILD_TAGS),-build-tags=$(GO_BUILD_TAGS))
 GO_BUILD_FLAGS += $(GO_RACE_FLAG)
+GO_BUILD_FLAGS += $(if $(GO_BUILD_CGO),-cgo-enabled=$(GO_BUILD_CGO))
 GO_TEST_FLAGS += $(if $(GO_BUILD_TAGS),-tags=$(GO_BUILD_TAGS))
 GIT_BASE = remotes/origin/main
 
@@ -71,6 +71,7 @@ swagger-oss-gen: ## Generate API Swagger specification
 	-x "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions" \
 	-x "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options" \
 	-x "github.com/prometheus/alertmanager" \
+	-x "github.com/docker/docker" \
 	-i pkg/api/swagger_tags.json \
 	--exclude-tag=alpha \
 	--exclude-tag=enterprise
@@ -89,7 +90,9 @@ swagger-enterprise-gen: ## Generate API Swagger specification
 	-x "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions" \
 	-x "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options" \
 	-x "github.com/prometheus/alertmanager" \
+	-x "github.com/docker/docker" \
 	-i pkg/api/swagger_tags.json \
+	-t enterprise \
 	--exclude-tag=alpha \
 	--include-tag=enterprise
 endif
@@ -133,13 +136,17 @@ i18n-extract-enterprise:
 else
 i18n-extract-enterprise:
 	@echo "Extracting i18n strings for Enterprise"
-	yarn run i18next --config public/locales/i18next-parser-enterprise.config.cjs
+	cd public/locales/enterprise && yarn run i18next-cli extract --sync-primary
 endif
 
 .PHONY: i18n-extract
 i18n-extract: i18n-extract-enterprise
 	@echo "Extracting i18n strings for OSS"
-	yarn run i18next --config public/locales/i18next-parser.config.cjs
+	yarn run i18next-cli extract --sync-primary
+	@echo "Extracting i18n strings for packages"
+	yarn run packages:i18n-extract
+	@echo "Extracting i18n strings for plugins"
+	yarn run plugin:i18n-extract
 
 ##@ Building
 .PHONY: gen-cue
@@ -147,13 +154,12 @@ gen-cue: ## Do all CUE/Thema code generation
 	@echo "generate code from .cue files"
 	go generate ./kinds/gen.go
 	go generate ./public/app/plugins/gen.go
-	# Note: App-based dashboard structure not available in release-11.6.4
-	# @echo "// This file is managed by Grafana - DO NOT EDIT MANUALLY" > apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
-	# @echo "// Source: kinds/dashboard/dashboard_kind.cue" >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
-	# @echo "// To sync changes, run: make gen-cue" >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
-	# @echo "" >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
-	# @cat kinds/dashboard/dashboard_kind.cue >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
-	# @cp apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue apps/dashboard/pkg/apis/dashboard/v0alpha1/dashboard_kind.cue
+	@echo "// This file is managed by Grafana - DO NOT EDIT MANUALLY" > apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
+	@echo "// Source: kinds/dashboard/dashboard_kind.cue" >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
+	@echo "// To sync changes, run: make gen-cue" >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
+	@echo "" >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
+	@cat kinds/dashboard/dashboard_kind.cue >> apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue
+	@cp apps/dashboard/pkg/apis/dashboard/v1beta1/dashboard_kind.cue apps/dashboard/pkg/apis/dashboard/v0alpha1/dashboard_kind.cue
 
 
 .PHONY: gen-cuev2
@@ -161,18 +167,48 @@ gen-cuev2: ## Do all CUE code generation
 	@echo "generate code from .cue files (v2)"
 	@$(MAKE) -C ./kindsv2 all
 
-# TODO (@radiohead): uncomment once we want to start generating code for all apps.
-# For now, we want to use an explicit list of apps to generate code for.
-#
-# APPS_DIRS=$(shell find ./apps -mindepth 1 -maxdepth 1 -type d | sort)
-APPS_DIRS := ./apps/dashboard ./apps/folder
+
+APPS_DIRS=$(shell find ./apps -type d -exec test -f "{}/Makefile" \; -print | sort)
+# Alternatively use an explicit list of apps:
+# APPS_DIRS := ./apps/dashboard ./apps/folder ./apps/alerting/notifications
+
+# Optional app variable to specify a single app to generate
+# Usage: make gen-apps app=dashboard
+app ?=
 
 .PHONY: gen-apps
-gen-apps: ## Generate code for Grafana App SDK apps
-	for dir in $(APPS_DIRS); do \
-		$(MAKE) -C $$dir generate; \
-	done
-	./hack/update-codegen.sh
+gen-apps: do-gen-apps gofmt ## Generate code for Grafana App SDK apps and run gofmt. Use app=<name> to generate for a specific app.
+## NOTE: codegen produces some openapi files that result in circular dependencies
+## for now, we revert the zz_openapi_gen.go files before comparison  	  
+	@if [ -n "$$CODEGEN_VERIFY" ]; then \
+	  git checkout HEAD -- apps/alerting/rules/pkg/apis/alerting/v0alpha1/zz_openapi_gen.go; \
+		git checkout HEAD -- apps/iam/pkg/apis/iam/v0alpha1/zz_openapi_gen.go; \
+    git checkout HEAD -- apps/secret/pkg/apis/secret/v1beta1/zz_openapi_gen.go; \
+		echo "Verifying generated code is up to date..."; \
+		if ! git diff --quiet; then \
+			echo "Error: Generated code is not up to date. Please run 'make gen-apps' (optionally with app=<name>), 'make gen-cue', and 'make gen-jsonnet' to regenerate."; \
+			git diff --name-only; \
+			exit 1; \
+		fi; \
+		echo "Generated apps code is up to date."; \
+	fi
+
+.PHONY: do-gen-apps
+do-gen-apps: ## Generate code for Grafana App SDK apps
+	@if [ -n "$(app)" ]; then \
+		app_dir="./apps/$(app)"; \
+		if [ ! -f "$$app_dir/Makefile" ]; then \
+			echo "Error: App '$(app)' not found or does not have a Makefile at $$app_dir"; \
+			exit 1; \
+		fi; \
+		echo "Generating code for app: $(app)"; \
+		$(MAKE) -C $$app_dir generate; \
+	else \
+		for dir in $(APPS_DIRS); do \
+			$(MAKE) -C $$dir generate; \
+		done; \
+		./hack/update-codegen.sh; \
+	fi
 
 .PHONY: gen-feature-toggles
 gen-feature-toggles:
@@ -199,6 +235,20 @@ gen-go: gen-enterprise-go ## Generate Wire graph
 	@echo "generating Wire graph"
 	$(GO) run ./pkg/build/wire/cmd/wire/main.go gen -tags "oss" -gen_tags "(!enterprise && !pro)" ./pkg/server
 
+.PHONY: gen-app-manifests-unistore
+gen-app-manifests-unistore: ## Generate unified storage app manifests list
+	@echo "generating unified storage app manifests"
+	$(GO) generate ./pkg/storage/unified/resource/app_manifests.go
+	@if [ -n "$$CODEGEN_VERIFY" ]; then \
+		echo "Verifying generated code is up to date..."; \
+		if ! git diff --quiet pkg/storage/unified/resource/app_manifests.go; then \
+			echo "Error: pkg/storage/unified/resource/app_manifests.go is not up to date. Please run 'make gen-app-manifests-unistore' to regenerate."; \
+			git diff pkg/storage/unified/resource/app_manifests.go; \
+			exit 1; \
+		fi; \
+		echo "Generated app manifests code is up to date."; \
+	fi
+
 .PHONY: fix-cue
 fix-cue:
 	@echo "formatting cue files"
@@ -209,24 +259,33 @@ fix-cue:
 gen-jsonnet:
 	go generate ./devenv/jsonnet
 
+.PHONY: gen-themes
+gen-themes:
+	go generate ./pkg/services/preference
+
 .PHONY: update-workspace
 update-workspace: gen-go
 	@echo "updating workspace"
 	bash scripts/go-workspace/update-workspace.sh
 
 .PHONY: build-go
-build-go: gen-go update-workspace ## Build all Go binaries.
+build-go: ## Build all Go binaries.
 	@echo "build go files with updated workspace"
 	$(GO) run build.go $(GO_BUILD_FLAGS) build
 
-build-go-fast: gen-go ## Build all Go binaries.
-	@echo "build go files"
-	$(GO) run build.go $(GO_BUILD_FLAGS) build
+.PHONY: build-go-fast
+build-go-fast: ## Build all Go binaries without updating workspace.
+	@echo "!!! [DEPRECATED] use build-go, they do the same thing now. This command will be removed soon"
 
 .PHONY: build-backend
 build-backend: ## Build Grafana backend.
 	@echo "build backend"
+	$(MAKE) gen-themes
 	$(GO) run build.go $(GO_BUILD_FLAGS) build-backend
+
+.PHONY: build-air
+build-air: build-backend
+	@cp ./bin/grafana ./bin/grafana-air
 
 .PHONY: build-server
 build-server: ## Build Grafana server.
@@ -259,8 +318,8 @@ build-plugin-go: ## Build decoupled plugins
 build: build-go build-js ## Build backend and frontend.
 
 .PHONY: run
-run: ## Build and run web server on filesystem changes. See /.bra.toml for configuration.
-	$(bra) run
+run: ## Build and run backend, and watch for changes. See .air.toml for configuration.
+	$(air) -c .air.toml
 
 .PHONY: run-go
 run-go: ## Build and run web server immediately.
@@ -275,6 +334,18 @@ run-frontend: deps-js ## Fetch js dependencies and watch frontend for rebuild
 run-local-env: ## Start local frontend with pmm-server:dev-latest
 	yarn dev
 	docker compose up -d
+	
+.PHONY: run-bra
+run-bra: ## [Deprecated] Build and run web server on filesystem changes. See /.bra.toml for configuration.
+	$(bra) run
+
+.PHONY: frontend-service-check
+frontend-service-check:
+	./devenv/frontend-service/local-init.sh
+
+.PHONY: frontend-service
+frontend-service: frontend-service-check
+	bash ./devenv/frontend-service/run.sh
 
 ##@ Testing
 
@@ -374,6 +445,10 @@ lint-go-diff:
 		sed 's,^,./,' | \
 		$(XARGSR) $(golangci-lint) run --config .golangci.yml
 
+.PHONY: gofmt
+gofmt: ## Run gofmt for all Go files.
+	@go list -m -f '{{.Dir}}' | xargs -I{} sh -c 'test ! -f {}/.nolint && echo {}' | xargs gofmt -s -w 2>&1 | grep -v '/pkg/build/' || true
+
 # with disabled SC1071 we are ignored some TCL,Expect `/usr/bin/env expect` scripts
 .PHONY: shellcheck
 shellcheck: $(SH_FILES) ## Run checks for shell scripts.
@@ -385,13 +460,35 @@ shellcheck: $(SH_FILES) ## Run checks for shell scripts.
 TAG_SUFFIX=$(if $(WIRE_TAGS)!=oss,-$(WIRE_TAGS))
 PLATFORM=linux/amd64
 
+# default to a production build for frontend
+#
+DOCKER_JS_NODE_ENV_FLAG = production
+DOCKER_JS_YARN_BUILD_FLAG = build
+DOCKER_JS_YARN_INSTALL_FLAG = --immutable
+#
+# if go is in dev mode, also build node in dev mode
+ifeq ($(GO_BUILD_DEV), dev)
+  DOCKER_JS_NODE_ENV_FLAG = dev
+  DOCKER_JS_YARN_BUILD_FLAG = dev
+	DOCKER_JS_YARN_INSTALL_FLAG =
+endif
+# if NODE_ENV is set in the environment to dev, build frontend in dev mode, and allow go builds to use their default
+ifeq (${NODE_ENV}, dev)
+  DOCKER_JS_NODE_ENV_FLAG = dev
+  DOCKER_JS_YARN_BUILD_FLAG = dev
+	DOCKER_JS_YARN_INSTALL_FLAG =
+endif
+
 .PHONY: build-docker-full
 build-docker-full: ## Build Docker image for development.
-	@echo "build docker container"
+	@echo "build docker container mode=($(DOCKER_JS_NODE_ENV_FLAG))"
 	tar -ch . | \
 	docker buildx build - \
 	--platform $(PLATFORM) \
-	--build-arg BINGO=false \
+	--build-arg NODE_ENV=$(DOCKER_JS_NODE_ENV_FLAG) \
+	--build-arg JS_NODE_ENV=$(DOCKER_JS_NODE_ENV_FLAG) \
+	--build-arg JS_YARN_INSTALL_FLAG=$(DOCKER_JS_YARN_INSTALL_FLAG) \
+	--build-arg JS_YARN_BUILD_FLAG=$(DOCKER_JS_YARN_BUILD_FLAG) \
 	--build-arg GO_BUILD_TAGS=$(GO_BUILD_TAGS) \
 	--build-arg WIRE_TAGS=$(WIRE_TAGS) \
 	--build-arg COMMIT_SHA=$$(git rev-parse HEAD) \
@@ -401,11 +498,14 @@ build-docker-full: ## Build Docker image for development.
 
 .PHONY: build-docker-full-ubuntu
 build-docker-full-ubuntu: ## Build Docker image based on Ubuntu for development.
-	@echo "build docker container"
+	@echo "build docker container mode=($(DOCKER_JS_NODE_ENV_FLAG))"
 	tar -ch . | \
 	docker buildx build - \
 	--platform $(PLATFORM) \
-	--build-arg BINGO=false \
+	--build-arg NODE_ENV=$(DOCKER_JS_NODE_ENV_FLAG) \
+	--build-arg JS_NODE_ENV=$(DOCKER_JS_NODE_ENV_FLAG) \
+	--build-arg JS_YARN_INSTALL_FLAG=$(DOCKER_JS_YARN_INSTALL_FLAG) \
+	--build-arg JS_YARN_BUILD_FLAG=$(DOCKER_JS_YARN_BUILD_FLAG) \
 	--build-arg GO_BUILD_TAGS=$(GO_BUILD_TAGS) \
 	--build-arg WIRE_TAGS=$(WIRE_TAGS) \
 	--build-arg COMMIT_SHA=$$(git rev-parse HEAD) \
@@ -465,11 +565,11 @@ devenv-mysql:
 .PHONY: protobuf
 protobuf: ## Compile protobuf definitions
 	bash scripts/protobuf-check.sh
-	go install google.golang.org/protobuf/cmd/protoc-gen-go
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.5
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
 	buf generate pkg/plugins/backendplugin/pluginextensionv2 --template pkg/plugins/backendplugin/pluginextensionv2/buf.gen.yaml
-	buf generate pkg/apis/secret/v0alpha1/decrypt --template pkg/apis/secret/v0alpha1/decrypt/buf.gen.yaml
-	buf generate pkg/storage/unified/resource --template pkg/storage/unified/resource/buf.gen.yaml
+	buf generate apps/secret --template apps/secret/buf.gen.yaml
+	buf generate pkg/storage/unified/proto --template pkg/storage/unified/proto/buf.gen.yaml
 	buf generate pkg/services/authz/proto/v1 --template pkg/services/authz/proto/v1/buf.gen.yaml
 	buf generate pkg/services/ngalert/store/proto/v1 --template pkg/services/ngalert/store/proto/v1/buf.gen.yaml
 
@@ -485,25 +585,6 @@ gen-ts:
 	go get github.com/tkrajina/typescriptify-golang-structs/typescriptify@v0.1.7
 	tscriptify -interface -package=github.com/grafana/grafana/pkg/services/live/pipeline -import="import { FieldConfig } from '@grafana/data'" -target=public/app/features/live/pipeline/models.gen.ts pkg/services/live/pipeline/config.go
 	go mod tidy
-
-# This repository's configuration is protected (https://readme.drone.io/signature/).
-# Use this make target to regenerate the configuration YAML files when
-# you modify starlark files.
-.PHONY: drone
-drone: $(DRONE)
-	bash scripts/drone/env-var-check.sh
-	$(DRONE) starlark --format --max-execution-steps 100000
-	$(DRONE) lint .drone.yml --trusted
-	$(DRONE) --server https://drone.grafana.net sign --save grafana/grafana
-
-# Generate an Emacs tags table (https://www.gnu.org/software/emacs/manual/html_node/emacs/Tags-Tables.html) for Starlark files.
-.PHONY: scripts/drone/TAGS
-scripts/drone/TAGS: $(shell find scripts/drone -name '*.star')
-	etags --lang none --regex="/def \(\w+\)[^:]+:/\1/" --regex="/\s*\(\w+\) =/\1/" $^ -o $@
-
-.PHONY: format-drone
-format-drone:
-	buildifier --lint=fix -r scripts/drone
 
 .PHONY: go-race-is-enabled
 go-race-is-enabled:
@@ -526,3 +607,8 @@ check-tparse:
 .PHONY: help
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+# check licenses of used dependencies (can be run using build image using
+# container/check-licenses target)
+check-licenses:
+	license_finder --decisions-file .github/license_finder.yaml

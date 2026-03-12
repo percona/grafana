@@ -8,13 +8,15 @@ import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
 import { fetchUserDetailsAction, setAuthorized } from 'app/percona/shared/core/reducers/user/user';
 import { getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Telemetry } from '../../../ui-events/components/Telemetry';
 import usePerconaTour from '../../core/hooks/tour';
+import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 import { checkUpdatesAction } from '../../core/reducers/updates';
 import { logger } from '../../helpers/logger';
 import { isPmmAdmin, isViewer } from '../../helpers/permissions';
+import { isPmmNavEnabled } from '../../helpers/plugin';
 
 import { Messages } from './PerconaBootstrapper.messages';
 import { getStyles } from './PerconaBootstrapper.styles';
@@ -22,8 +24,6 @@ import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
 import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 import PerconaTourBootstrapper from './PerconaTour';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
-import { isPmmNavEnabled } from '../../helpers/plugin';
-import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {

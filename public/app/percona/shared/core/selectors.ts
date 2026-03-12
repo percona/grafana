@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 
 import { Settings } from 'app/percona/settings/Settings.types';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { groupAdvisorsIntoCategories } from '../services/advisors/Advisors.utils';
 

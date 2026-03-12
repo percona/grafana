@@ -12,7 +12,7 @@ import { setSnoozedVersion } from 'app/percona/shared/core/reducers/user/user';
 import { getPerconaSettings, getPerconaUser, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';

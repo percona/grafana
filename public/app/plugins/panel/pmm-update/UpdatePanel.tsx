@@ -6,7 +6,7 @@ import { checkUpdatesAction } from 'app/percona/shared/core/reducers/updates';
 import { getPerconaUser, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from './UpdatePanel.messages';
 import { styles } from './UpdatePanel.styles';

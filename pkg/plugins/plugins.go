@@ -14,13 +14,11 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
+	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/plugins/auth"
 	"github.com/grafana/grafana/pkg/plugins/backendplugin"
 	"github.com/grafana/grafana/pkg/plugins/backendplugin/pluginextensionv2"
-	"github.com/grafana/grafana/pkg/plugins/backendplugin/secretsmanagerplugin"
 	"github.com/grafana/grafana/pkg/plugins/log"
-	"github.com/grafana/grafana/pkg/services/org"
-	"github.com/grafana/grafana/pkg/util"
 )
 
 var (
@@ -28,7 +26,6 @@ var (
 	ErrPluginFileRead            = errors.New("file could not be read")
 	ErrUninstallInvalidPluginDir = errors.New("cannot recognize as plugin folder")
 	ErrInvalidPluginJSON         = errors.New("did not find valid type or id properties in plugin.json")
-	ErrUnsupportedAlias          = errors.New("can not set alias in plugin.json")
 )
 
 type Plugin struct {
@@ -51,27 +48,30 @@ type Plugin struct {
 	Error         *Error
 
 	// SystemJS fields
-	Module  string
-	BaseURL string
+	Module          string
+	BaseURL         string
+	LoadingStrategy LoadingStrategy
 
 	Angular AngularMeta
 
 	ExternalService *auth.ExternalService
 
-	Renderer       pluginextensionv2.RendererPlugin
-	SecretsManager secretsmanagerplugin.SecretsManagerPlugin
-	client         backendplugin.Plugin
-	log            log.Logger
+	Renderer pluginextensionv2.RendererPlugin
+	client   backendplugin.Plugin
+	log      log.Logger
 
 	SkipHostEnvVars bool
 
 	mu sync.Mutex
+
+	Translations map[string]string
 }
 
 var (
 	_ = backend.CollectMetricsHandler(&Plugin{})
 	_ = backend.CheckHealthHandler(&Plugin{})
 	_ = backend.QueryDataHandler(&Plugin{})
+	_ = backend.QueryChunkedDataHandler(&Plugin{})
 	_ = backend.CallResourceHandler(&Plugin{})
 	_ = backend.StreamHandler(&Plugin{})
 	_ = backend.AdmissionHandler(&Plugin{})
@@ -79,8 +79,7 @@ var (
 )
 
 type AngularMeta struct {
-	Detected        bool `json:"detected"`
-	HideDeprecation bool `json:"hideDeprecation"`
+	Detected bool `json:"detected"`
 }
 
 // JSONData represents the plugin's plugin.json
@@ -106,6 +105,7 @@ type JSONData struct {
 
 	// Panel settings
 	SkipDataQuery bool `json:"skipDataQuery"`
+	Suggestions   bool `json:"suggestions,omitempty"`
 
 	// App settings
 	AutoEnabled bool       `json:"autoEnabled"`
@@ -126,11 +126,17 @@ type JSONData struct {
 	SDK                       bool            `json:"sdk,omitempty"`
 	MultiValueFilterOperators bool            `json:"multiValueFilterOperators,omitempty"`
 
-	// Backend (Datasource + Renderer + SecretsManager)
+	// Backend (Datasource + Renderer)
 	Executable string `json:"executable,omitempty"`
 
 	// App Service Auth Registration
 	IAM *auth.IAM `json:"iam,omitempty"`
+
+	// List of languages supported by the plugin
+	Languages []string `json:"languages,omitempty"`
+
+	// Build mode of the plugin (set automatically at build time)
+	BuildMode string `json:"buildMode,omitempty"`
 }
 
 func ReadPluginJSON(reader io.Reader) (JSONData, error) {
@@ -181,11 +187,11 @@ func ReadPluginJSON(reader io.Reader) (JSONData, error) {
 
 	for _, include := range plugin.Includes {
 		if include.Role == "" {
-			include.Role = org.RoleViewer
+			include.Role = identity.RoleViewer
 		}
 
 		// Default to app access for app plugins
-		if plugin.Type == TypeApp && include.Role == org.RoleViewer && include.Action == "" {
+		if plugin.Type == TypeApp && include.Role == identity.RoleViewer && include.Action == "" {
 			include.Action = ActionAppAccess
 		}
 	}
@@ -214,17 +220,17 @@ func (d JSONData) DashboardIncludes() []*Includes {
 // Route describes a plugin route that is defined in
 // the plugin.json file for a plugin.
 type Route struct {
-	Path         string          `json:"path"`
-	Method       string          `json:"method"`
-	ReqRole      org.RoleType    `json:"reqRole"`
-	ReqAction    string          `json:"reqAction"`
-	URL          string          `json:"url"`
-	URLParams    []URLParam      `json:"urlParams"`
-	Headers      []Header        `json:"headers"`
-	AuthType     string          `json:"authType"`
-	TokenAuth    *JWTTokenAuth   `json:"tokenAuth"`
-	JwtTokenAuth *JWTTokenAuth   `json:"jwtTokenAuth"`
-	Body         json.RawMessage `json:"body"`
+	Path         string            `json:"path"`
+	Method       string            `json:"method"`
+	ReqRole      identity.RoleType `json:"reqRole"`
+	ReqAction    string            `json:"reqAction"`
+	URL          string            `json:"url"`
+	URLParams    []URLParam        `json:"urlParams"`
+	Headers      []Header          `json:"headers"`
+	AuthType     string            `json:"authType"`
+	TokenAuth    *JWTTokenAuth     `json:"tokenAuth"`
+	JwtTokenAuth *JWTTokenAuth     `json:"jwtTokenAuth"`
+	Body         json.RawMessage   `json:"body"`
 }
 
 // Header describes an HTTP header that is forwarded with
@@ -332,6 +338,14 @@ func (p *Plugin) QueryData(ctx context.Context, req *backend.QueryDataRequest) (
 	return pluginClient.QueryData(ctx, req)
 }
 
+func (p *Plugin) QueryChunkedData(ctx context.Context, req *backend.QueryChunkedDataRequest, w backend.ChunkedDataWriter) error {
+	pluginClient, ok := p.Client()
+	if !ok {
+		return ErrPluginUnavailable
+	}
+	return pluginClient.QueryChunkedData(ctx, req, w)
+}
+
 func (p *Plugin) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
 	pluginClient, ok := p.Client()
 	if !ok {
@@ -408,7 +422,7 @@ func (p *Plugin) ConvertObjects(ctx context.Context, req *backend.ConversionRequ
 }
 
 func (p *Plugin) File(name string) (fs.File, error) {
-	cleanPath, err := util.CleanRelativePath(name)
+	cleanPath, err := CleanRelativePath(name)
 	if err != nil {
 		// CleanRelativePath should clean and make the path relative so this is not expected to fail
 		return nil, err
@@ -442,10 +456,6 @@ func (p *Plugin) ExecutablePath() string {
 		return p.executablePath("plugin_start")
 	}
 
-	if p.IsSecretsManager() {
-		return p.executablePath("secrets_plugin_start")
-	}
-
 	return p.executablePath(p.Executable)
 }
 
@@ -462,6 +472,7 @@ func (p *Plugin) executablePath(f string) string {
 
 type PluginClient interface {
 	backend.QueryDataHandler
+	backend.QueryChunkedDataHandler
 	backend.CollectMetricsHandler
 	backend.CheckHealthHandler
 	backend.CallResourceHandler
@@ -486,10 +497,6 @@ func (p *Plugin) IsRenderer() bool {
 	return p.Type == TypeRenderer
 }
 
-func (p *Plugin) IsSecretsManager() bool {
-	return p.Type == TypeSecretsManager
-}
-
 func (p *Plugin) IsApp() bool {
 	return p.Type == TypeApp
 }
@@ -499,7 +506,7 @@ func (p *Plugin) IsCorePlugin() bool {
 }
 
 func (p *Plugin) IsExternalPlugin() bool {
-	return !p.IsCorePlugin()
+	return p.Class == ClassExternal
 }
 
 type Class string
@@ -507,7 +514,6 @@ type Class string
 const (
 	ClassCore     Class = "core"
 	ClassExternal Class = "external"
-	ClassCDN      Class = "cdn"
 )
 
 func (c Class) String() string {
@@ -519,22 +525,20 @@ var PluginTypes = []Type{
 	TypePanel,
 	TypeApp,
 	TypeRenderer,
-	TypeSecretsManager,
 }
 
 type Type string
 
 const (
-	TypeDataSource     Type = "datasource"
-	TypePanel          Type = "panel"
-	TypeApp            Type = "app"
-	TypeRenderer       Type = "renderer"
-	TypeSecretsManager Type = "secretsmanager"
+	TypeDataSource Type = "datasource"
+	TypePanel      Type = "panel"
+	TypeApp        Type = "app"
+	TypeRenderer   Type = "renderer"
 )
 
 func (pt Type) IsValid() bool {
 	switch pt {
-	case TypeDataSource, TypePanel, TypeApp, TypeRenderer, TypeSecretsManager:
+	case TypeDataSource, TypePanel, TypeApp, TypeRenderer:
 		return true
 	}
 	return false

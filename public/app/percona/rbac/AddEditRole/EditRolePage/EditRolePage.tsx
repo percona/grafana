@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { AppEvents, PageLayoutType } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Page } from 'app/core/components/Page/Page';
-import { appEvents } from 'app/core/core';
+import { appEvents } from 'app/core/app_events';
 import {
   PMM_ACCESS_ROLES_PAGE,
   PMM_ACCESS_ROLE_EDIT_PAGE,

@@ -8,29 +8,15 @@ import (
 	"io"
 	"io/fs"
 	"mime"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"time"
-
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
-var netTransport = &http.Transport{
-	Proxy: http.ProxyFromEnvironment,
-	Dial: (&net.Dialer{
-		Timeout: 30 * time.Second,
-	}).Dial,
-	TLSHandshakeTimeout: 5 * time.Second,
-}
-
-var netClient = &http.Client{
-	Transport: otelhttp.NewTransport(netTransport),
-}
-
 const authTokenHeader = "X-Auth-Token" //#nosec G101 -- This is a false positive
+const rateLimiterHeader = "X-Tenant-ID"
 
 var (
 	remoteVersionFetchInterval   time.Duration = time.Second * 15
@@ -71,7 +57,7 @@ func (rs *RenderingService) renderCSVViaHTTP(ctx context.Context, renderKey stri
 }
 
 func (rs *RenderingService) generateImageRendererURL(renderType RenderType, opts Opts, renderKey string) (*url.URL, error) {
-	rendererUrl := rs.Cfg.RendererUrl
+	rendererUrl := rs.Cfg.RendererServerUrl
 	if renderType == RenderCSV {
 		rendererUrl += "/csv"
 	}
@@ -160,6 +146,7 @@ func (rs *RenderingService) doRequest(ctx context.Context, u *url.URL, headers m
 	}
 
 	req.Header.Set(authTokenHeader, rs.Cfg.RendererAuthToken)
+	req.Header.Set(rateLimiterHeader, rs.domain)
 	req.Header.Set("User-Agent", fmt.Sprintf("Grafana/%s", rs.Cfg.BuildVersion))
 	for k, v := range headers {
 		req.Header[k] = v
@@ -168,7 +155,7 @@ func (rs *RenderingService) doRequest(ctx context.Context, u *url.URL, headers m
 	logger.Debug("calling remote rendering service", "url", u)
 
 	// make request to renderer server
-	resp, err := netClient.Do(req)
+	resp, err := rs.netClient.Do(req)
 	if err != nil {
 		logger.Error("Failed to send request to remote rendering service", "error", err)
 		var urlErr *url.Error
@@ -178,6 +165,14 @@ func (rs *RenderingService) doRequest(ctx context.Context, u *url.URL, headers m
 			}
 		}
 		return nil, fmt.Errorf("failed to send request to remote rendering service: %w", err)
+	}
+
+	if resp.StatusCode == http.StatusTooManyRequests {
+		return nil, ErrTooManyRequests
+	}
+
+	if resp.StatusCode == http.StatusRequestTimeout {
+		return nil, ErrServerTimeout
 	}
 
 	return resp, nil
@@ -242,7 +237,7 @@ func (rs *RenderingService) getRemotePluginVersionWithRetry(callback func(string
 }
 
 func (rs *RenderingService) getRemotePluginVersion() (string, error) {
-	rendererURL, err := url.Parse(rs.Cfg.RendererUrl + "/version")
+	rendererURL, err := url.Parse(rs.Cfg.RendererServerUrl + "/version")
 	if err != nil {
 		return "", err
 	}

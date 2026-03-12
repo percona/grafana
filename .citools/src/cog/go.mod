@@ -1,6 +1,6 @@
 module cog
 
-go 1.25.7
+go 1.25.8
 
 tool github.com/grafana/cog/cmd/cli
 
@@ -10,14 +10,14 @@ require (
 	github.com/cockroachdb/apd/v3 v3.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/proto v1.13.2 // indirect
-	github.com/expr-lang/expr v1.17.0 // indirect
+	github.com/expr-lang/expr v1.17.7 // indirect
 	github.com/getkin/kin-openapi v0.132.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grafana/codejen v0.0.4-0.20230321061741-77f656893a3d // indirect
-	github.com/grafana/cog v0.0.28 // indirect
+	github.com/grafana/cog v0.0.34 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
@@ -42,7 +42,7 @@ require (
 	github.com/yalue/merged_fs v1.3.0 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/oauth2 v0.27.0 // indirect
+	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect

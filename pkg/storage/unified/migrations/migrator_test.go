@@ -1,0 +1,962 @@
+package migrations_test
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"sync/atomic"
+	"testing"
+	"time"
+
+	"github.com/grafana/grafana/pkg/services/sqlstore/migrator"
+	sqlBackend "github.com/grafana/grafana/pkg/storage/unified/sql"
+	"github.com/grafana/grafana/pkg/storage/unified/sql/db/dbimpl"
+	"github.com/grafana/grafana/pkg/util/xorm"
+	"google.golang.org/grpc"
+
+	authlib "github.com/grafana/authlib/types"
+	grafanarest "github.com/grafana/grafana/pkg/apiserver/rest"
+	"github.com/grafana/grafana/pkg/infra/db"
+	dashboard "github.com/grafana/grafana/pkg/registry/apis/dashboard"
+	dashboardmigrator "github.com/grafana/grafana/pkg/registry/apis/dashboard/migrator"
+	playlist "github.com/grafana/grafana/pkg/registry/apps/playlist"
+	playlistmigrator "github.com/grafana/grafana/pkg/registry/apps/playlist/migrator"
+	shorturl "github.com/grafana/grafana/pkg/registry/apps/shorturl"
+	shorturlmigrator "github.com/grafana/grafana/pkg/registry/apps/shorturl/migrator"
+	"github.com/grafana/grafana/pkg/setting"
+	"github.com/grafana/grafana/pkg/storage/unified/migrations"
+	"github.com/grafana/grafana/pkg/storage/unified/migrations/testcases"
+	"github.com/grafana/grafana/pkg/storage/unified/resource"
+	"github.com/grafana/grafana/pkg/storage/unified/resourcepb"
+	"github.com/grafana/grafana/pkg/tests/apis"
+	"github.com/grafana/grafana/pkg/tests/testinfra"
+	"github.com/grafana/grafana/pkg/tests/testsuite"
+	"github.com/grafana/grafana/pkg/util/testutil"
+	mock "github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+)
+
+func TestMain(m *testing.M) {
+	testsuite.Run(m)
+}
+
+// TestIntegrationMigrations verifies that legacy storage data is correctly migrated to unified storage.
+// The test follows a three-step process:
+// Step 1: inserts legacy data (migration disabled at startup)
+// Step 2: verifies that the data is not in unified storage
+// Step 3: migration runs at startup, and the test verifies that the data is in unified storage
+func TestIntegrationMigrations(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
+	migrationTestCases := []testcases.ResourceMigratorTestCase{
+		testcases.NewFoldersAndDashboardsTestCase(),
+		testcases.NewPlaylistsTestCase(),
+	}
+
+	runMigrationTestSuite(t, migrationTestCases)
+}
+
+// runMigrationTestSuite executes the migration test suite for the given test cases
+func runMigrationTestSuite(t *testing.T, testCases []testcases.ResourceMigratorTestCase) {
+	if db.IsTestDbSQLite() {
+		// Share the same SQLite DB file between steps
+		tmpDir := t.TempDir()
+		dbPath := tmpDir + "/shared-migration-test-suite.db"
+
+		oldVal := os.Getenv("SQLITE_TEST_DB")
+		require.NoError(t, os.Setenv("SQLITE_TEST_DB", dbPath))
+		t.Cleanup(func() {
+			if oldVal == "" {
+				_ = os.Unsetenv("SQLITE_TEST_DB")
+			} else {
+				_ = os.Setenv("SQLITE_TEST_DB", oldVal)
+			}
+		})
+		t.Logf("Using shared database path: %s", dbPath)
+	}
+
+	// Store UIDs created by each test case
+	type testCaseState struct {
+		tc testcases.ResourceMigratorTestCase
+	}
+	testStates := make([]testCaseState, len(testCases))
+	for i, tc := range testCases {
+		testStates[i].tc = tc
+	}
+
+	// reuse org users throughout the tests
+	var org1 *apis.OrgUsers
+	var orgB *apis.OrgUsers
+	t.Run("Step 1: Create data in legacy", func(t *testing.T) {
+		// Enforce Mode0 for all migrated resources
+		unifiedConfig := make(map[string]setting.UnifiedStorageConfig)
+		for _, tc := range testCases {
+			for _, gvr := range tc.Resources() {
+				resourceKey := fmt.Sprintf("%s.%s", gvr.Resource, gvr.Group)
+				unifiedConfig[resourceKey] = setting.UnifiedStorageConfig{
+					DualWriterMode: grafanarest.Mode0,
+				}
+			}
+		}
+
+		// Set up test environment with Mode0 (writes only to legacy)
+		helper := apis.NewK8sTestHelper(t, testinfra.GrafanaOpts{
+			AppModeProduction:     true,
+			DisableAnonymous:      true,
+			DisableDataMigrations: true,
+			DisableDBCleanup:      true,
+			APIServerStorageType:  "unified",
+			UnifiedStorageConfig:  unifiedConfig,
+		})
+		t.Cleanup(helper.Shutdown)
+		org1 = &helper.Org1
+		orgB = &helper.OrgB
+
+		for i := range testStates {
+			state := &testStates[i]
+			t.Run(state.tc.Name(), func(t *testing.T) {
+				state.tc.Setup(t, helper)
+				// Verify resources were created in legacy storage
+				state.tc.Verify(t, helper, true)
+			})
+		}
+	})
+
+	// Set SKIP_DB_TRUNCATE to not truncate the data created in Step 1
+	oldSkipTruncate := os.Getenv("SKIP_DB_TRUNCATE")
+	require.NoError(t, os.Setenv("SKIP_DB_TRUNCATE", "true"))
+	t.Cleanup(func() {
+		if oldSkipTruncate == "" {
+			_ = os.Unsetenv("SKIP_DB_TRUNCATE")
+		} else {
+			_ = os.Setenv("SKIP_DB_TRUNCATE", oldSkipTruncate)
+		}
+	})
+
+	t.Run("Step 2: Verify data is NOT in unified storage before the migration", func(t *testing.T) {
+		// Build unified storage config for Mode5
+		unifiedConfig := make(map[string]setting.UnifiedStorageConfig)
+		for _, tc := range testCases {
+			for _, gvr := range tc.Resources() {
+				resourceKey := fmt.Sprintf("%s.%s", gvr.Resource, gvr.Group)
+				unifiedConfig[resourceKey] = setting.UnifiedStorageConfig{
+					DualWriterMode: grafanarest.Mode5,
+				}
+			}
+		}
+
+		helper := apis.NewK8sTestHelperWithOpts(t, apis.K8sTestHelperOpts{
+			GrafanaOpts: testinfra.GrafanaOpts{
+				AppModeProduction:     true,
+				DisableAnonymous:      true,
+				DisableDataMigrations: true,
+				DisableDBCleanup:      true,
+				APIServerStorageType:  "unified",
+				UnifiedStorageConfig:  unifiedConfig,
+			},
+			Org1Users: org1,
+			OrgBUsers: orgB,
+		})
+		t.Cleanup(helper.Shutdown)
+
+		for _, state := range testStates {
+			t.Run(state.tc.Name(), func(t *testing.T) {
+				// Verify resources don't exist in unified storage yet
+				state.tc.Verify(t, helper, false)
+			})
+		}
+	})
+
+	t.Run("Step 3: verify that opted-out resources are not migrated", func(t *testing.T) {
+		// Build unified storage config for Mode5
+		unifiedConfig := make(map[string]setting.UnifiedStorageConfig)
+		for _, tc := range testCases {
+			for _, gvr := range tc.Resources() {
+				resourceKey := fmt.Sprintf("%s.%s", gvr.Resource, gvr.Group)
+				unifiedConfig[resourceKey] = setting.UnifiedStorageConfig{
+					DualWriterMode:  grafanarest.Mode5,
+					EnableMigration: false,
+				}
+			}
+		}
+
+		helper := apis.NewK8sTestHelperWithOpts(t, apis.K8sTestHelperOpts{
+			GrafanaOpts: testinfra.GrafanaOpts{
+				AppModeProduction:    true,
+				DisableAnonymous:     true,
+				DisableDBCleanup:     true,
+				APIServerStorageType: "unified",
+				UnifiedStorageConfig: unifiedConfig,
+			},
+			Org1Users: org1,
+			OrgBUsers: orgB,
+		})
+		t.Cleanup(helper.Shutdown)
+
+		for _, state := range testStates {
+			t.Run(state.tc.Name(), func(t *testing.T) {
+				// Verify resources don't exist in unified storage yet
+				state.tc.Verify(t, helper, false)
+			})
+		}
+		verifyRegisteredMigrations(t, helper, false, true)
+	})
+
+	t.Run("Step 4: verify data is migrated to unified storage", func(t *testing.T) {
+		// Migrations enabled by default will run automatically at startup and mode 5 is enforced by the config
+		helper := apis.NewK8sTestHelperWithOpts(t, apis.K8sTestHelperOpts{
+			GrafanaOpts: testinfra.GrafanaOpts{
+				AppModeProduction:     true,
+				DisableAnonymous:      true,
+				DisableDataMigrations: false, // Run migrations at startup
+				DisableDBCleanup:      true,
+				APIServerStorageType:  "unified",
+			},
+			Org1Users: org1,
+			OrgBUsers: orgB,
+		})
+		t.Cleanup(helper.Shutdown)
+
+		for _, state := range testStates {
+			t.Run(state.tc.Name(), func(t *testing.T) {
+				shouldExist := true
+				for _, gvr := range state.tc.Resources() {
+					resourceKey := fmt.Sprintf("%s.%s", gvr.Resource, gvr.Group)
+					// Resources exist if they're either:
+					// 1. In MigratedUnifiedResources (enabled by default), OR
+					// 2. In AutoMigratedUnifiedResources (auto-migrated because count is below threshold)
+					if !setting.MigratedUnifiedResources[resourceKey] && !setting.AutoMigratedUnifiedResources[resourceKey] {
+						shouldExist = false
+						break
+					}
+				}
+				state.tc.Verify(t, helper, shouldExist)
+			})
+		}
+
+		t.Logf("Verifying migrations are correctly registered")
+		verifyRegisteredMigrations(t, helper, true, false)
+	})
+
+	t.Run("Step 5: verify data is migrated for all migrations", func(t *testing.T) {
+		// Trigger migrations that are not enabled by default
+		unifiedConfig := make(map[string]setting.UnifiedStorageConfig)
+		for _, tc := range testCases {
+			for _, gvr := range tc.Resources() {
+				resourceKey := fmt.Sprintf("%s.%s", gvr.Resource, gvr.Group)
+				unifiedConfig[resourceKey] = setting.UnifiedStorageConfig{
+					EnableMigration: true,
+				}
+			}
+		}
+		helper := apis.NewK8sTestHelperWithOpts(t, apis.K8sTestHelperOpts{
+			GrafanaOpts: testinfra.GrafanaOpts{
+				//EnableLog:              true,
+				AppModeProduction:      true,
+				DisableAnonymous:       true,
+				DisableDataMigrations:  false,
+				APIServerStorageType:   "unified",
+				UnifiedStorageConfig:   unifiedConfig,
+				MigrationParquetBuffer: true,
+			},
+			Org1Users: org1,
+			OrgBUsers: orgB,
+		})
+		t.Cleanup(helper.Shutdown)
+
+		for _, state := range testStates {
+			t.Run(state.tc.Name(), func(t *testing.T) {
+				// Verify resources still exist in unified storage after restart
+				state.tc.Verify(t, helper, true)
+			})
+		}
+
+		t.Logf("Verifying migrations are correctly registered")
+		verifyRegisteredMigrations(t, helper, false, false)
+
+		t.Logf("Verifying key_path is populated in resource_history after bulkimport")
+		verifyKeyPathPopulated(t, helper)
+	})
+}
+
+const (
+	migrationScope = "unifiedstorage"
+	migrationTable = migrationScope + "_migration_log"
+
+	playlistsID            = "playlists migration"
+	foldersAndDashboardsID = "folders and dashboards migration"
+)
+
+var migrationIDsToDefault = map[string]bool{
+	playlistsID:            true,
+	foldersAndDashboardsID: true, // Auto-migrated when resource count is below threshold
+}
+
+func verifyRegisteredMigrations(t *testing.T, helper *apis.K8sTestHelper, onlyDefault bool, optOut bool) {
+	getMigrationsQuery := fmt.Sprintf("SELECT migration_id FROM %s", migrationTable)
+	createTableMigrationID := fmt.Sprintf("create %s table", migrationTable)
+	expectedMigrationIDs := []string{createTableMigrationID}
+	for id, enabled := range migrationIDsToDefault {
+		if onlyDefault && !enabled {
+			continue
+		}
+		if optOut {
+			continue
+		}
+		expectedMigrationIDs = append(expectedMigrationIDs, id)
+	}
+	rows, err := helper.GetEnv().SQLStore.GetEngine().DB().Query(getMigrationsQuery)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, rows.Close())
+	}()
+
+	migrationIDs := make(map[string]struct{})
+	for rows.Next() {
+		var migrationID string
+		require.NoError(t, rows.Scan(&migrationID))
+		require.Contains(t, expectedMigrationIDs, migrationID)
+		migrationIDs[migrationID] = struct{}{}
+	}
+	require.NoError(t, rows.Err())
+	require.Len(t, migrationIDs, len(expectedMigrationIDs))
+}
+
+// verifyKeyPathPopulated verifies that all rows in resource_history have a non-empty key_path.
+// This is important because bulkimport must populate key_path for indexing/searching to work.
+func verifyKeyPathPopulated(t *testing.T, helper *apis.K8sTestHelper) {
+	t.Helper()
+
+	query := "SELECT COUNT(*) FROM resource_history WHERE key_path = ''"
+	rows, err := helper.GetEnv().SQLStore.GetEngine().DB().Query(query)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, rows.Close())
+	}()
+
+	var emptyKeyPathCount int
+	require.True(t, rows.Next(), "expected at least one row from COUNT query")
+	require.NoError(t, rows.Scan(&emptyKeyPathCount))
+	require.NoError(t, rows.Err())
+
+	require.Equal(t, 0, emptyKeyPathCount, "found %d rows in resource_history with empty key_path", emptyKeyPathCount)
+
+	// Also verify that there are actually some rows with key_path populated
+	queryTotal := "SELECT COUNT(*) FROM resource_history WHERE key_path != ''"
+	rowsTotal, err := helper.GetEnv().SQLStore.GetEngine().DB().Query(queryTotal)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, rowsTotal.Close())
+	}()
+
+	var populatedKeyPathCount int
+	require.True(t, rowsTotal.Next(), "expected at least one row from COUNT query")
+	require.NoError(t, rowsTotal.Scan(&populatedKeyPathCount))
+	require.NoError(t, rowsTotal.Err())
+
+	t.Logf("Verified %d rows in resource_history have populated key_path", populatedKeyPathCount)
+	require.Greater(t, populatedKeyPathCount, 0, "expected at least one row in resource_history with populated key_path")
+}
+
+// TestUnifiedMigration_Migrate_CancelsStreamContext tests that
+// when BulkProcess or a migrator function fails, the stream
+// context is canceled so the server-side handler releases its bulk lock.
+func TestUnifiedMigration_Migrate_CancelsStreamContext(t *testing.T) {
+	gr := schema.GroupResource{Group: "test.grafana.app", Resource: "tests"}
+
+	tests := []struct {
+		name        string
+		streamErr   error
+		migratorErr error
+	}{
+		{
+			name:      "stream error",
+			streamErr: fmt.Errorf("simulated stream error"),
+		},
+		{
+			name:        "migrator error",
+			migratorErr: fmt.Errorf("simulated migration failure"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := resource.NewMockResourceClient(t)
+
+			var capturedCtx context.Context
+			bulkStream := &noopBulkProcessClient{}
+			var streamResult resourcepb.BulkStore_BulkProcessClient
+			if tt.streamErr == nil {
+				streamResult = bulkStream
+			}
+
+			mockClient.EXPECT().
+				BulkProcess(mock.Anything).
+				Run(func(ctx context.Context, opts ...grpc.CallOption) {
+					capturedCtx = ctx
+				}).
+				Return(streamResult, tt.streamErr)
+
+			registry := migrations.NewMigrationRegistry()
+			registry.Register(migrations.MigrationDefinition{
+				ID:          "test-migration",
+				MigrationID: "test migration",
+				Resources: []migrations.ResourceInfo{
+					{GroupResource: gr},
+				},
+				Migrators: map[schema.GroupResource]migrations.MigratorFunc{
+					gr: func(ctx context.Context, orgId int64, opts migrations.MigrateOptions, stream resourcepb.BulkStore_BulkProcessClient) error {
+						return tt.migratorErr
+					},
+				},
+			})
+
+			migrator := migrations.ProvideUnifiedMigrator(mockClient, registry)
+			_, err := migrator.Migrate(context.Background(), migrations.MigrateOptions{
+				Namespace: "default",
+				Resources: []schema.GroupResource{gr},
+			})
+
+			require.Error(t, err)
+			require.NotNil(t, capturedCtx, "BulkProcess should have been called")
+			require.Error(t, capturedCtx.Err(), "stream context should be canceled after Migrate returns an error")
+		})
+	}
+}
+
+// noopBulkProcessClient is a minimal BulkStore_BulkProcessClient for testing.
+type noopBulkProcessClient struct {
+	grpc.ClientStream
+}
+
+func (n *noopBulkProcessClient) Send(*resourcepb.BulkRequest) error {
+	return nil
+}
+
+func (n *noopBulkProcessClient) CloseAndRecv() (*resourcepb.BulkResponse, error) {
+	return &resourcepb.BulkResponse{}, nil
+}
+
+type testEnv struct {
+	engine *xorm.Engine
+	store  db.DB
+}
+
+func newTestEnv(t *testing.T) testEnv {
+	t.Helper()
+	testutil.SkipIntegrationTestInShortMode(t)
+	dbstore := db.InitTestDB(t)
+	t.Cleanup(db.CleanupTestDB)
+	ensureOrg(t, dbstore.GetEngine())
+	return testEnv{engine: dbstore.GetEngine(), store: dbstore}
+}
+
+func ensureOrg(t *testing.T, engine *xorm.Engine) {
+	t.Helper()
+	var count int64
+	has, _ := engine.NewSession().SQL("SELECT COUNT(*) FROM org WHERE id = 1").Get(&count)
+	if !has || count == 0 {
+		_, err := engine.Exec("INSERT INTO org (id, name, created, updated, version) VALUES (1, 'test', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1)")
+		require.NoError(t, err)
+	}
+}
+
+// TestIntegrationRun_SQLiteRetryReleasesLock verifies that MigrationRunner.Run's
+// SQLite retry path (parquet buffer fallback) works correctly when the first
+// migration attempt fails.
+func TestIntegrationRun_SQLiteRetryReleasesLock(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+	if !db.IsTestDbSQLite() {
+		t.Skip("SQLite-only")
+	}
+
+	env := newTestEnv(t)
+
+	// Create a DB provider that shares the Grafana engine (required for SQLite tx sharing).
+	eDB, err := dbimpl.ProvideResourceDB(env.store, setting.NewCfg(), nil)
+	require.NoError(t, err)
+
+	backend, err := sqlBackend.NewBackend(sqlBackend.BackendOptions{
+		DBProvider: eDB,
+		IsHA:       false,
+	})
+	require.NoError(t, err)
+
+	ctx := testutil.NewTestContext(t, time.Now().Add(1*time.Minute))
+	require.NoError(t, backend.Init(ctx))
+
+	server, err := resource.NewResourceServer(resource.ResourceServerOptions{
+		Backend: backend,
+	})
+	require.NoError(t, err)
+
+	client := resource.NewLocalResourceClient(server)
+
+	gr := schema.GroupResource{Group: "folder.grafana.app", Resource: "folders"}
+	var callCount int32
+
+	registry := migrations.NewMigrationRegistry()
+	registry.Register(migrations.MigrationDefinition{
+		ID:          "test-retry",
+		MigrationID: "test retry migration",
+		Resources:   []migrations.ResourceInfo{{GroupResource: gr}},
+		Migrators: map[schema.GroupResource]migrations.MigratorFunc{
+			gr: func(ctx context.Context, orgId int64, opts migrations.MigrateOptions, stream resourcepb.BulkStore_BulkProcessClient) error {
+				n := atomic.AddInt32(&callCount, 1)
+				if n == 1 {
+					// First call: send a request to ensure the server enters its Recv()
+					// loop and holds the bulk lock, then fail to simulate a SQLite cache spill.
+					_ = stream.Send(&resourcepb.BulkRequest{
+						Key: &resourcepb.ResourceKey{
+							Namespace: opts.Namespace,
+							Group:     gr.Group,
+							Resource:  gr.Resource,
+							Name:      "test-item",
+						},
+						Action: resourcepb.BulkRequest_ADDED,
+						Value:  []byte(`{"apiVersion":"folder.grafana.app/v0alpha1","kind":"Folder","metadata":{"name":"test-item","namespace":"` + opts.Namespace + `"},"spec":{"title":"Test"}}`),
+					})
+					return fmt.Errorf("simulated SQLite cache spill failure")
+				}
+				return nil
+			},
+		},
+	})
+
+	realMigrator := migrations.ProvideUnifiedMigrator(client, registry)
+	wrapped := &retryAwareMigrator{real: realMigrator}
+
+	runnerCfg := setting.NewCfg()
+	runner := migrations.NewMigrationRunner(wrapped, "test retry migration", []schema.GroupResource{gr}, nil, migrations.WithAutoEnableMode5(runnerCfg))
+
+	sess := env.engine.NewSession()
+	defer sess.Close()
+	require.NoError(t, sess.Begin())
+
+	err = runner.Run(context.Background(), sess, migrations.RunOptions{DriverName: migrator.SQLite})
+	require.NoError(t, err)
+
+	// The migrator func should have been called twice: once for the failed first attempt,
+	// once for the successful retry.
+	require.Equal(t, int32(2), atomic.LoadInt32(&callCount))
+}
+
+// retryAwareMigrator delegates Migrate to a real UnifiedMigrator and stubs
+// RebuildIndexes. It waits briefly for the server to release the bulk lock.
+type retryAwareMigrator struct {
+	real      migrations.UnifiedMigrator
+	callCount int32
+}
+
+func (m *retryAwareMigrator) Migrate(ctx context.Context, opts migrations.MigrateOptions) (*resourcepb.BulkResponse, error) {
+	if atomic.AddInt32(&m.callCount, 1) > 1 {
+		// The context cancellation propagates asynchronously to the server goroutine.
+		// Wait briefly for it to release the bulk lock from the previous attempt.
+		time.Sleep(200 * time.Millisecond)
+	}
+	return m.real.Migrate(ctx, opts)
+}
+
+func (m *retryAwareMigrator) RebuildIndexes(ctx context.Context, opts migrations.RebuildIndexOptions) error {
+	return nil
+}
+
+func TestUnifiedMigration_RebuildIndexes(t *testing.T) {
+	tests := []struct {
+		name         string
+		response     *resourcepb.RebuildIndexesResponse
+		responseErr  error
+		expectErr    bool
+		expectErrMsg string
+		numRetries   int // Expected number of RPC calls (1 for success, 5 for max retries)
+	}{
+		{
+			name: "response error retries and returns error",
+			response: &resourcepb.RebuildIndexesResponse{
+				Error: &resourcepb.ErrorResult{
+					Message: "failed to rebuild index",
+					Reason:  "IndexError",
+				},
+			},
+			responseErr:  nil,
+			expectErr:    true,
+			expectErrMsg: "failed to rebuild index",
+			numRetries:   5, // MaxRetries: 5 means 5 total attempts
+		},
+		{
+			name:         "RPC error retries and returns error",
+			response:     nil,
+			responseErr:  fmt.Errorf("connection failed"),
+			expectErr:    true,
+			expectErrMsg: "connection failed",
+			numRetries:   5, // MaxRetries: 5 means 5 total attempts
+		},
+		{
+			name: "no error succeeds on first attempt",
+			response: &resourcepb.RebuildIndexesResponse{
+				Error: nil,
+			},
+			responseErr: nil,
+			expectErr:   false,
+			numRetries:  1, // Only initial attempt, no retries needed
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create mock SearchClient
+			mockClient := resource.NewMockResourceClient(t)
+
+			// Setup expectation for RebuildIndexes call - will be called numRetries times
+			mockClient.EXPECT().
+				RebuildIndexes(mock.Anything, mock.Anything).
+				Return(tt.response, tt.responseErr).
+				Times(tt.numRetries)
+
+			// Create migrator with mock client
+			registry := migrations.NewMigrationRegistry()
+			registry.Register(dashboard.FoldersDashboardsMigration(dashboardmigrator.ProvideFoldersDashboardsMigrator(nil)))
+			registry.Register(playlist.PlaylistMigration(playlistmigrator.ProvidePlaylistMigrator(nil)))
+			registry.Register(shorturl.ShortURLMigration(shorturlmigrator.ProvideShortURLMigrator(nil)))
+			migrator := migrations.ProvideUnifiedMigrator(
+				mockClient,
+				registry,
+			)
+
+			// Create test data
+			info := authlib.NamespaceInfo{
+				OrgID: 1,
+				Value: "stack-123",
+			}
+			resources := []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+			}
+
+			// Execute the method
+			err := migrator.RebuildIndexes(context.Background(), migrations.RebuildIndexOptions{
+				UsingDistributor:    false,
+				NamespaceInfo:       info,
+				Resources:           resources,
+				MigrationFinishedAt: time.Now(),
+			})
+
+			// Verify results
+			if tt.expectErr {
+				require.Error(t, err)
+				if tt.expectErrMsg != "" {
+					require.Contains(t, err.Error(), tt.expectErrMsg)
+				}
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestUnifiedMigration_RebuildIndexes_RetrySuccess(t *testing.T) {
+	// Test that retries work - first call fails, second succeeds
+	mockClient := resource.NewMockResourceClient(t)
+
+	// First call returns an error
+	mockClient.EXPECT().
+		RebuildIndexes(mock.Anything, mock.Anything).
+		Return(nil, fmt.Errorf("temporary failure")).
+		Once()
+
+	// Second call succeeds
+	mockClient.EXPECT().
+		RebuildIndexes(mock.Anything, mock.Anything).
+		Return(&resourcepb.RebuildIndexesResponse{Error: nil}, nil).
+		Once()
+
+	// Create migrator with mock client
+	registry := migrations.NewMigrationRegistry()
+	registry.Register(dashboard.FoldersDashboardsMigration(dashboardmigrator.ProvideFoldersDashboardsMigrator(nil)))
+	registry.Register(playlist.PlaylistMigration(playlistmigrator.ProvidePlaylistMigrator(nil)))
+	registry.Register(shorturl.ShortURLMigration(shorturlmigrator.ProvideShortURLMigrator(nil)))
+	migrator := migrations.ProvideUnifiedMigrator(
+		mockClient,
+		registry,
+	)
+
+	// Create test data
+	info := authlib.NamespaceInfo{
+		OrgID: 1,
+		Value: "stack-123",
+	}
+	resources := []schema.GroupResource{
+		{Group: "dashboard.grafana.app", Resource: "dashboards"},
+	}
+
+	// Execute the method
+	err := migrator.RebuildIndexes(context.Background(), migrations.RebuildIndexOptions{
+		UsingDistributor:    false,
+		NamespaceInfo:       info,
+		Resources:           resources,
+		MigrationFinishedAt: time.Now(),
+	})
+
+	// Should succeed after retry
+	require.NoError(t, err)
+}
+
+func TestUnifiedMigration_RebuildIndexes_UsingDistributor(t *testing.T) {
+	migrationFinishedAt := time.Now()
+
+	tests := []struct {
+		name         string
+		response     *resourcepb.RebuildIndexesResponse
+		resources    []schema.GroupResource
+		expectErr    bool
+		expectErrMsg string
+		numRetries   int // Expected number of RPC calls (1 for success, 5 for max retries)
+	}{
+		{
+			name: "not all pods contacted retries and returns error",
+			response: &resourcepb.RebuildIndexesResponse{
+				ContactedAllInstances: false,
+			},
+			resources: []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+			},
+			expectErr:    true,
+			expectErrMsg: "distributor did not contact all instances",
+			numRetries:   5, // MaxRetries: 5 means 5 total attempts
+		},
+		{
+			name: "missing build time for resource succeeds (index may not exist)",
+			response: &resourcepb.RebuildIndexesResponse{
+				ContactedAllInstances: true,
+				BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+					{
+						Group:         "dashboard.grafana.app",
+						Resource:      "dashboards",
+						BuildTimeUnix: migrationFinishedAt.Unix(),
+					},
+				},
+			},
+			resources: []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+				{Group: "dashboard.grafana.app", Resource: "folders"},
+			},
+			expectErr:  false,
+			numRetries: 1, // Only initial attempt, no retries needed
+		},
+		{
+			name: "build time before migration finished retries and returns error",
+			response: &resourcepb.RebuildIndexesResponse{
+				ContactedAllInstances: true,
+				BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+					{
+						Group:         "dashboard.grafana.app",
+						Resource:      "dashboards",
+						BuildTimeUnix: migrationFinishedAt.Add(-1 * time.Second).Unix(), // 1 second before migration
+					},
+				},
+			},
+			resources: []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+			},
+			expectErr:    true,
+			expectErrMsg: "was built before migration finished",
+			numRetries:   5, // MaxRetries: 5 means 5 total attempts
+		},
+		{
+			name: "build time exactly at migration time succeeds",
+			response: &resourcepb.RebuildIndexesResponse{
+				ContactedAllInstances: true,
+				BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+					{
+						Group:         "dashboard.grafana.app",
+						Resource:      "dashboards",
+						BuildTimeUnix: migrationFinishedAt.Unix(),
+					},
+				},
+			},
+			resources: []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+			},
+			expectErr:  false,
+			numRetries: 1, // Only initial attempt, no retries needed
+		},
+		{
+			name: "build time after migration time succeeds",
+			response: &resourcepb.RebuildIndexesResponse{
+				ContactedAllInstances: true,
+				BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+					{
+						Group:         "dashboard.grafana.app",
+						Resource:      "dashboards",
+						BuildTimeUnix: migrationFinishedAt.Add(10 * time.Second).Unix(),
+					},
+				},
+			},
+			resources: []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+			},
+			expectErr:  false,
+			numRetries: 1, // Only initial attempt, no retries needed
+		},
+		{
+			name: "response error retries and returns error even with valid build times",
+			response: &resourcepb.RebuildIndexesResponse{
+				ContactedAllInstances: true,
+				BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+					{
+						Group:         "dashboard.grafana.app",
+						Resource:      "dashboards",
+						BuildTimeUnix: migrationFinishedAt.Unix(),
+					},
+				},
+				Error: &resourcepb.ErrorResult{
+					Message: "some pods failed to rebuild",
+					Reason:  "PartialFailure",
+				},
+			},
+			resources: []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+			},
+			expectErr:    true,
+			expectErrMsg: "some pods failed to rebuild",
+			numRetries:   5, // MaxRetries: 5 means 5 total attempts
+		},
+		{
+			name: "multiple resources with valid build times succeeds",
+			response: &resourcepb.RebuildIndexesResponse{
+				ContactedAllInstances: true,
+				BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+					{
+						Group:         "dashboard.grafana.app",
+						Resource:      "dashboards",
+						BuildTimeUnix: migrationFinishedAt.Unix(),
+					},
+					{
+						Group:         "dashboard.grafana.app",
+						Resource:      "folders",
+						BuildTimeUnix: migrationFinishedAt.Add(5 * time.Second).Unix(),
+					},
+				},
+			},
+			resources: []schema.GroupResource{
+				{Group: "dashboard.grafana.app", Resource: "dashboards"},
+				{Group: "dashboard.grafana.app", Resource: "folders"},
+			},
+			expectErr:  false,
+			numRetries: 1, // Only initial attempt, no retries needed
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create mock SearchClient
+			mockClient := resource.NewMockResourceClient(t)
+
+			// Setup expectation for RebuildIndexes call - will be called numRetries times
+			mockClient.EXPECT().
+				RebuildIndexes(mock.Anything, mock.Anything).
+				Return(tt.response, nil).
+				Times(tt.numRetries)
+
+			// Create migrator with mock client
+			registry := migrations.NewMigrationRegistry()
+			registry.Register(dashboard.FoldersDashboardsMigration(dashboardmigrator.ProvideFoldersDashboardsMigrator(nil)))
+			registry.Register(playlist.PlaylistMigration(playlistmigrator.ProvidePlaylistMigrator(nil)))
+			registry.Register(shorturl.ShortURLMigration(shorturlmigrator.ProvideShortURLMigrator(nil)))
+			migrator := migrations.ProvideUnifiedMigrator(
+				mockClient,
+				registry,
+			)
+
+			// Create test data
+			info := authlib.NamespaceInfo{
+				OrgID: 1,
+				Value: "stack-123",
+			}
+
+			// Execute the method
+			err := migrator.RebuildIndexes(context.Background(), migrations.RebuildIndexOptions{
+				UsingDistributor:    true,
+				NamespaceInfo:       info,
+				Resources:           tt.resources,
+				MigrationFinishedAt: migrationFinishedAt,
+			})
+
+			// Verify results
+			if tt.expectErr {
+				require.Error(t, err)
+				if tt.expectErrMsg != "" {
+					require.Contains(t, err.Error(), tt.expectErrMsg)
+				}
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestUnifiedMigration_RebuildIndexes_UsingDistributor_RetrySuccess(t *testing.T) {
+	// Test that retries work with distributor - first call has stale build time, second succeeds
+	migrationFinishedAt := time.Now()
+	mockClient := resource.NewMockResourceClient(t)
+
+	// First call returns stale build time (before migration)
+	mockClient.EXPECT().
+		RebuildIndexes(mock.Anything, mock.Anything).
+		Return(&resourcepb.RebuildIndexesResponse{
+			ContactedAllInstances: true,
+			BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+				{
+					Group:         "dashboard.grafana.app",
+					Resource:      "dashboards",
+					BuildTimeUnix: migrationFinishedAt.Add(-1 * time.Second).Unix(),
+				},
+			},
+		}, nil).
+		Once()
+
+	// Second call succeeds with fresh build time
+	mockClient.EXPECT().
+		RebuildIndexes(mock.Anything, mock.Anything).
+		Return(&resourcepb.RebuildIndexesResponse{
+			ContactedAllInstances: true,
+			BuildTimes: []*resourcepb.RebuildIndexesResponse_IndexBuildTime{
+				{
+					Group:         "dashboard.grafana.app",
+					Resource:      "dashboards",
+					BuildTimeUnix: migrationFinishedAt.Unix(),
+				},
+			},
+		}, nil).
+		Once()
+
+	// Create migrator with mock client
+	registry := migrations.NewMigrationRegistry()
+	registry.Register(dashboard.FoldersDashboardsMigration(dashboardmigrator.ProvideFoldersDashboardsMigrator(nil)))
+	registry.Register(playlist.PlaylistMigration(playlistmigrator.ProvidePlaylistMigrator(nil)))
+	registry.Register(shorturl.ShortURLMigration(shorturlmigrator.ProvideShortURLMigrator(nil)))
+	migrator := migrations.ProvideUnifiedMigrator(
+		mockClient,
+		registry,
+	)
+
+	// Create test data
+	info := authlib.NamespaceInfo{
+		OrgID: 1,
+		Value: "stack-123",
+	}
+	resources := []schema.GroupResource{
+		{Group: "dashboard.grafana.app", Resource: "dashboards"},
+	}
+
+	// Execute the method
+	err := migrator.RebuildIndexes(context.Background(), migrations.RebuildIndexOptions{
+		UsingDistributor:    true,
+		NamespaceInfo:       info,
+		Resources:           resources,
+		MigrationFinishedAt: migrationFinishedAt,
+	})
+
+	// Should succeed after retry
+	require.NoError(t, err)
+}

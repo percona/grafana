@@ -2,7 +2,6 @@ package permissions
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"slices"
 	"strings"
@@ -47,7 +46,7 @@ type PermissionsFilter interface {
 	With() (string, []any)
 	Where() (string, []any)
 
-	buildClauses()
+	buildClauses(dialect migrator.Dialect)
 	nestedFoldersSelectors(permSelector string, permSelectorArgs []any, leftTable string, Col string, rightTableCol string, orgID int64) (string, []any)
 }
 
@@ -61,78 +60,52 @@ func NewAccessControlDashboardPermissionFilter(user identity.Requester, permissi
 	var dashboardAction string
 	var folderActionSets []string
 	var dashboardActionSets []string
-	if queryType == searchstore.TypeFolder {
+	switch queryType {
+	case searchstore.TypeFolder:
 		folderAction = dashboards.ActionFoldersRead
-		if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-			folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
-		}
+		folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
 		if needEdit {
 			folderAction = dashboards.ActionDashboardsCreate
-			if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-				folderActionSets = []string{"folders:edit", "folders:admin"}
-			}
+			folderActionSets = []string{"folders:edit", "folders:admin"}
 		}
-	} else if queryType == searchstore.TypeDashboard {
+	case searchstore.TypeDashboard:
 		dashboardAction = dashboards.ActionDashboardsRead
-		if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-			folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
-			dashboardActionSets = []string{"dashboards:view", "dashboards:edit", "dashboards:admin"}
-		}
+		folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
+		dashboardActionSets = []string{"dashboards:view", "dashboards:edit", "dashboards:admin"}
 		if needEdit {
 			dashboardAction = dashboards.ActionDashboardsWrite
-			if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-				folderActionSets = []string{"folders:edit", "folders:admin"}
-				dashboardActionSets = []string{"dashboards:edit", "dashboards:admin"}
-			}
+			folderActionSets = []string{"folders:edit", "folders:admin"}
+			dashboardActionSets = []string{"dashboards:edit", "dashboards:admin"}
 		}
-	} else if queryType == searchstore.TypeAlertFolder {
+	case searchstore.TypeAlertFolder:
 		folderAction = accesscontrol.ActionAlertingRuleRead
-		if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-			folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
-		}
+		folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
 		if needEdit {
 			folderAction = accesscontrol.ActionAlertingRuleCreate
-			if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-				folderActionSets = []string{"folders:edit", "folders:admin"}
-			}
+			folderActionSets = []string{"folders:edit", "folders:admin"}
 		}
-	} else if queryType == searchstore.TypeAnnotation {
+	case searchstore.TypeAnnotation:
 		dashboardAction = accesscontrol.ActionAnnotationsRead
-		if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-			folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
-			dashboardActionSets = []string{"dashboards:view", "dashboards:edit", "dashboards:admin"}
-		}
-	} else {
+		folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
+		dashboardActionSets = []string{"dashboards:view", "dashboards:edit", "dashboards:admin"}
+	default:
 		folderAction = dashboards.ActionFoldersRead
 		dashboardAction = dashboards.ActionDashboardsRead
-		if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-			folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
-			dashboardActionSets = []string{"dashboards:view", "dashboards:edit", "dashboards:admin"}
-		}
+		folderActionSets = []string{"folders:view", "folders:edit", "folders:admin"}
+		dashboardActionSets = []string{"dashboards:view", "dashboards:edit", "dashboards:admin"}
 		if needEdit {
 			folderAction = dashboards.ActionDashboardsCreate
 			dashboardAction = dashboards.ActionDashboardsWrite
-			if features.IsEnabled(context.Background(), featuremgmt.FlagAccessActionSets) {
-				folderActionSets = []string{"folders:edit", "folders:admin"}
-				dashboardActionSets = []string{"dashboards:edit", "dashboards:admin"}
-			}
+			folderActionSets = []string{"folders:edit", "folders:admin"}
+			dashboardActionSets = []string{"dashboards:edit", "dashboards:admin"}
 		}
 	}
 
-	var f PermissionsFilter
-	if features.IsEnabledGlobally(featuremgmt.FlagPermissionsFilterRemoveSubquery) {
-		f = &accessControlDashboardPermissionFilterNoFolderSubquery{
-			accessControlDashboardPermissionFilter: accessControlDashboardPermissionFilter{
-				user: user, folderAction: folderAction, folderActionSets: folderActionSets, dashboardAction: dashboardAction, dashboardActionSets: dashboardActionSets,
-				features: features, recursiveQueriesAreSupported: recursiveQueriesAreSupported, dialect: dialect,
-			},
-		}
-	} else {
-		f = &accessControlDashboardPermissionFilter{user: user, folderAction: folderAction, folderActionSets: folderActionSets, dashboardAction: dashboardAction, dashboardActionSets: dashboardActionSets,
-			features: features, recursiveQueriesAreSupported: recursiveQueriesAreSupported, dialect: dialect,
-		}
+	f := &accessControlDashboardPermissionFilter{
+		user: user, folderAction: folderAction, folderActionSets: folderActionSets, dashboardAction: dashboardAction, dashboardActionSets: dashboardActionSets,
+		features: features, recursiveQueriesAreSupported: recursiveQueriesAreSupported, dialect: dialect,
 	}
-	f.buildClauses()
+	f.buildClauses(dialect)
 	return f
 }
 
@@ -160,7 +133,7 @@ func (f *accessControlDashboardPermissionFilter) hasRequiredActions() bool {
 	return false
 }
 
-func (f *accessControlDashboardPermissionFilter) buildClauses() {
+func (f *accessControlDashboardPermissionFilter) buildClauses(dialect migrator.Dialect) {
 	if f.user == nil || f.user.IsNil() || !f.hasRequiredActions() {
 		f.where = clause{string: "(1 = 0)"}
 		return
@@ -174,7 +147,7 @@ func (f *accessControlDashboardPermissionFilter) buildClauses() {
 	}
 
 	orgID := f.user.GetOrgID()
-	filter, params := accesscontrol.UserRolesFilter(orgID, userID, f.user.GetTeams(), accesscontrol.GetOrgRoles(f.user))
+	filter, params := accesscontrol.UserRolesFilter(orgID, userID, f.user.GetTeams(), accesscontrol.GetOrgRoles(f.user), dialect)
 	rolesFilter := " AND role_id IN(SELECT id FROM role " + filter + ") "
 	var args []any
 	builder := strings.Builder{}
@@ -240,36 +213,23 @@ func (f *accessControlDashboardPermissionFilter) buildClauses() {
 			}
 			permSelector.WriteRune(')')
 
-			switch f.features.IsEnabledGlobally(featuremgmt.FlagNestedFolders) {
-			case true:
-				if len(permSelectorArgs) > 0 {
-					switch f.recursiveQueriesAreSupported {
-					case true:
-						builder.WriteString("(dashboard.folder_id IN (SELECT d.id FROM dashboard as d ")
-						recQueryName := fmt.Sprintf("RecQry%d", len(f.recQueries))
-						f.addRecQry(recQueryName, permSelector.String(), permSelectorArgs, orgID)
-						builder.WriteString(fmt.Sprintf("WHERE d.org_id = ? AND d.uid IN (SELECT uid FROM %s)", recQueryName))
-						args = append(args, orgID)
-					default:
-						nestedFoldersSelectors, nestedFoldersArgs := f.nestedFoldersSelectors(permSelector.String(), permSelectorArgs, "dashboard", "folder_id", "d.id", orgID)
-						builder.WriteRune('(')
-						builder.WriteString(nestedFoldersSelectors)
-						args = append(args, nestedFoldersArgs...)
-					}
-				} else {
+			if len(permSelectorArgs) > 0 {
+				switch f.recursiveQueriesAreSupported {
+				case true:
 					builder.WriteString("(dashboard.folder_id IN (SELECT d.id FROM dashboard as d ")
-					builder.WriteString("WHERE 1 = 0")
-				}
-			default:
-				builder.WriteString("(dashboard.folder_id IN (SELECT d.id FROM dashboard as d ")
-				if len(permSelectorArgs) > 0 {
-					builder.WriteString("WHERE d.org_id = ? AND d.uid IN ")
+					recQueryName := fmt.Sprintf("RecQry%d", len(f.recQueries))
+					f.addRecQry(recQueryName, permSelector.String(), permSelectorArgs, orgID)
+					builder.WriteString(fmt.Sprintf("WHERE d.org_id = ? AND d.uid IN (SELECT uid FROM %s)", recQueryName))
 					args = append(args, orgID)
-					builder.WriteString(permSelector.String())
-					args = append(args, permSelectorArgs...)
-				} else {
-					builder.WriteString("WHERE 1 = 0")
+				default:
+					nestedFoldersSelectors, nestedFoldersArgs := f.nestedFoldersSelectors(permSelector.String(), permSelectorArgs, "dashboard", "folder_id", "d.id", orgID)
+					builder.WriteRune('(')
+					builder.WriteString(nestedFoldersSelectors)
+					args = append(args, nestedFoldersArgs...)
 				}
+			} else {
+				builder.WriteString("(dashboard.folder_id IN (SELECT d.id FROM dashboard as d ")
+				builder.WriteString("WHERE 1 = 0")
 			}
 			builder.WriteString(") AND NOT dashboard.is_folder)")
 
@@ -317,33 +277,22 @@ func (f *accessControlDashboardPermissionFilter) buildClauses() {
 
 			permSelector.WriteRune(')')
 
-			switch f.features.IsEnabledGlobally(featuremgmt.FlagNestedFolders) {
-			case true:
-				if len(permSelectorArgs) > 0 {
-					switch f.recursiveQueriesAreSupported {
-					case true:
-						recQueryName := fmt.Sprintf("RecQry%d", len(f.recQueries))
-						f.addRecQry(recQueryName, permSelector.String(), permSelectorArgs, orgID)
-						builder.WriteString("(dashboard.uid IN ")
-						builder.WriteString(fmt.Sprintf("(SELECT uid FROM %s)", recQueryName))
-					default:
-						nestedFoldersSelectors, nestedFoldersArgs := f.nestedFoldersSelectors(permSelector.String(), permSelectorArgs, "dashboard", "uid", "d.uid", orgID)
-						builder.WriteRune('(')
-						builder.WriteString(nestedFoldersSelectors)
-						builder.WriteRune(')')
-						args = append(args, nestedFoldersArgs...)
-					}
-				} else {
-					builder.WriteString("(1 = 0")
-				}
-			default:
-				if len(permSelectorArgs) > 0 {
+			if len(permSelectorArgs) > 0 {
+				switch f.recursiveQueriesAreSupported {
+				case true:
+					recQueryName := fmt.Sprintf("RecQry%d", len(f.recQueries))
+					f.addRecQry(recQueryName, permSelector.String(), permSelectorArgs, orgID)
 					builder.WriteString("(dashboard.uid IN ")
-					builder.WriteString(permSelector.String())
-					args = append(args, permSelectorArgs...)
-				} else {
-					builder.WriteString("(1 = 0")
+					builder.WriteString(fmt.Sprintf("(SELECT uid FROM %s)", recQueryName))
+				default:
+					nestedFoldersSelectors, nestedFoldersArgs := f.nestedFoldersSelectors(permSelector.String(), permSelectorArgs, "dashboard", "uid", "d.uid", orgID)
+					builder.WriteRune('(')
+					builder.WriteString(nestedFoldersSelectors)
+					builder.WriteRune(')')
+					args = append(args, nestedFoldersArgs...)
 				}
+			} else {
+				builder.WriteString("(1 = 0")
 			}
 			builder.WriteString(" AND dashboard.is_folder)")
 		} else {

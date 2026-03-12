@@ -2,10 +2,11 @@ import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-l
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom-v5-compat';
 
+import { OrgRole } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { OrgRole, StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { AlertRuleTemplate } from './AlertRuleTemplate';
 import { AlertRuleTemplateService } from './AlertRuleTemplate.service';

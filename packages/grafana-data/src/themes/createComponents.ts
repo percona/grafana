@@ -1,5 +1,12 @@
 import { ThemeColors } from './createColors';
 import { ThemeShadows } from './createShadows';
+import type { Radii } from './createShape';
+import type { ThemeSpacingTokens } from './createSpacing';
+
+interface MenuComponentTokens {
+  borderRadius: keyof Radii;
+  padding: ThemeSpacingTokens;
+}
 
 /** @beta */
 export interface ThemeComponents {
@@ -36,6 +43,9 @@ export interface ThemeComponents {
     background: string;
     padding: number;
   };
+  drawer: {
+    padding: number;
+  };
   textHighlight: {
     background: string;
     text: string;
@@ -43,8 +53,9 @@ export interface ThemeComponents {
   sidemenu: {
     width: number;
   };
+  // @PERCONA
   menuTabs: {
-    height: number;
+    height: 5;
   };
   horizontalDrawer: {
     defaultHeight: number;
@@ -53,6 +64,7 @@ export interface ThemeComponents {
     rowHoverBackground: string;
     rowSelected: string;
   };
+  menu: MenuComponentTokens;
 }
 
 export function createComponents(colors: ThemeColors, shadows: ThemeShadows): ThemeComponents {
@@ -69,6 +81,11 @@ export function createComponents(colors: ThemeColors, shadows: ThemeShadows): Th
     borderHover: colors.border.strong,
     text: colors.text.primary,
     background: colors.mode === 'dark' ? colors.background.canvas : colors.background.primary,
+  };
+
+  const menu: MenuComponentTokens = {
+    borderRadius: 'default',
+    padding: 0.5,
   };
 
   return {
@@ -90,6 +107,9 @@ export function createComponents(colors: ThemeColors, shadows: ThemeShadows): Th
       background: colors.background.canvas,
       padding: 1,
     },
+    drawer: {
+      padding: 2,
+    },
     overlay: {
       background: colors.mode === 'dark' ? 'rgba(63, 62, 62, 0.5)' : 'rgba(208, 209, 211, 0.5)',
     },
@@ -110,5 +130,6 @@ export function createComponents(colors: ThemeColors, shadows: ThemeShadows): Th
       rowHoverBackground: colors.action.hover,
       rowSelected: colors.action.selected,
     },
+    menu,
   };
 }

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/consistent-type-assertions */
-
 import { FC, useState, useMemo } from 'react';
-
+import { t } from '@grafana/i18n';
 import { useStyles, IconName, Button, Select } from '@grafana/ui';
 
 import { Messages } from './Pagination.messages';
@@ -62,6 +61,7 @@ export const Pagination: FC<PaginationProps> = ({
         </span>
         <span>
           <Button
+            aria-label={t('pagination.first-page', 'First page')}
             data-testid="first-page-button"
             icon={'angle-double-left' as IconName}
             variant="secondary"
@@ -69,6 +69,7 @@ export const Pagination: FC<PaginationProps> = ({
             onClick={() => gotoPage(0)}
           />
           <Button
+            aria-label={t('pagination.previous-page', 'Previous page')}
             data-testid="previous-page-button"
             icon="angle-left"
             variant="secondary"
@@ -77,6 +78,7 @@ export const Pagination: FC<PaginationProps> = ({
           />
           {shownPages.map((page) => (
             <Button
+              aria-label={t('pagination.page-button', 'Page {{page}}', { page: page + 1 })}
               data-testid={`page-button${activePageIndex === page ? '-active' : ''}`}
               variant={activePageIndex === page ? 'primary' : 'secondary'}
               onClick={() => gotoPage(page)}
@@ -86,6 +88,7 @@ export const Pagination: FC<PaginationProps> = ({
             </Button>
           ))}
           <Button
+            aria-label={t('pagination.next-page', 'Next page')}
             data-testid="next-page-button"
             icon="angle-right"
             variant="secondary"
@@ -94,6 +97,7 @@ export const Pagination: FC<PaginationProps> = ({
             className="next-page"
           />
           <Button
+            aria-label={t('pagination.last-page', 'Last page')}
             data-testid="last-page-button"
             icon={'angle-double-right' as IconName}
             variant="secondary"

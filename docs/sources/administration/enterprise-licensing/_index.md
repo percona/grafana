@@ -18,7 +18,7 @@ labels:
     - enterprise
     - oss
 title: Grafana Enterprise license
-weight: 500
+weight: 5500
 ---
 
 # Grafana Enterprise license
@@ -173,9 +173,9 @@ SAML authentication is not affected by an expired license.
 
 Enterprise plugins might stop working.
 
-#### White labeling
+#### Custom branding
 
-The white labeling feature is turned off, meaning that any white labeling options will not have any effect.
+The custom branding feature is turned off, meaning that any custom branding options will not have any effect.
 
 #### Usage insights
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/grpcplugin"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	errstatus "github.com/grafana/grafana-plugin-sdk-go/experimental/status"
 	"github.com/grafana/grafana-plugin-sdk-go/genproto/pluginv2"
 	"github.com/hashicorp/go-plugin"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/plugins/backendplugin/pluginextensionv2"
-	"github.com/grafana/grafana/pkg/plugins/backendplugin/secretsmanagerplugin"
 	"github.com/grafana/grafana/pkg/plugins/log"
 )
 
@@ -32,7 +32,6 @@ type ClientV2 struct {
 	grpcplugin.AdmissionClient
 	grpcplugin.ConversionClient
 	pluginextensionv2.RendererPlugin
-	secretsmanagerplugin.SecretsManagerPlugin
 }
 
 func newClientV2(descriptor PluginDescriptor, logger log.Logger, rpcClient plugin.ClientProtocol) (*ClientV2, error) {
@@ -67,11 +66,6 @@ func newClientV2(descriptor PluginDescriptor, logger log.Logger, rpcClient plugi
 	}
 
 	rawRenderer, err := rpcClient.Dispense("renderer")
-	if err != nil {
-		return nil, err
-	}
-
-	rawSecretsManager, err := rpcClient.Dispense("secretsmanager")
 	if err != nil {
 		return nil, err
 	}
@@ -119,20 +113,8 @@ func newClientV2(descriptor PluginDescriptor, logger log.Logger, rpcClient plugi
 		}
 	}
 
-	if rawSecretsManager != nil {
-		if secretsManagerPlugin, ok := rawSecretsManager.(secretsmanagerplugin.SecretsManagerPlugin); ok {
-			c.SecretsManagerPlugin = secretsManagerPlugin
-		}
-	}
-
 	if descriptor.startRendererFn != nil {
 		if err := descriptor.startRendererFn(descriptor.pluginID, c.RendererPlugin, logger); err != nil {
-			return nil, err
-		}
-	}
-
-	if descriptor.startSecretsManagerFn != nil {
-		if err := descriptor.startSecretsManagerFn(descriptor.pluginID, c.SecretsManagerPlugin, logger); err != nil {
 			return nil, err
 		}
 	}
@@ -191,6 +173,14 @@ func (c *ClientV2) QueryData(ctx context.Context, req *backend.QueryDataRequest)
 			return nil, plugins.ErrMethodNotImplemented
 		}
 
+		if status.Code(err) == codes.Unavailable {
+			return nil, plugins.ErrPluginGrpcConnectionUnavailableBaseFn(ctx).Errorf("%v", err)
+		}
+
+		if status.Code(err) == codes.ResourceExhausted {
+			return nil, plugins.ErrPluginGrpcResourceExhaustedBase.Errorf("%v", err)
+		}
+
 		if errorSource, ok := backend.ErrorSourceFromGrpcStatusError(ctx, err); ok {
 			return nil, handleGrpcStatusError(ctx, errorSource, err)
 		}
@@ -198,6 +188,53 @@ func (c *ClientV2) QueryData(ctx context.Context, req *backend.QueryDataRequest)
 	}
 
 	return backend.FromProto().QueryDataResponse(protoResp)
+}
+
+func (c *ClientV2) QueryChunkedData(ctx context.Context, req *backend.QueryChunkedDataRequest, w backend.ChunkedDataWriter) error {
+	if c.DataClient == nil {
+		return plugins.ErrMethodNotImplemented
+	}
+
+	protoReq := backend.ToProto().QueryChunkedDataRequest(req)
+	stream, err := c.DataClient.QueryChunkedData(ctx, protoReq)
+	if err != nil {
+		if status.Code(err) == codes.Unimplemented {
+			return plugins.ErrMethodNotImplemented
+		}
+		if errorSource, ok := backend.ErrorSourceFromGrpcStatusError(ctx, err); ok {
+			return handleGrpcStatusError(ctx, errorSource, err)
+		}
+		return fmt.Errorf("%v: %w", "Failed to query data", err)
+	}
+
+	for {
+		chunk, err := stream.Recv()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return nil
+			}
+			return err
+		}
+
+		frame, err := data.UnmarshalArrowFrame(chunk.Frame)
+		if err != nil {
+			return err
+		}
+
+		if chunk.Error != "" {
+			chunkStatus := backend.Status(chunk.Status)
+			errorSource := backend.ErrorSource(chunk.ErrorSource)
+			chunkErr := backend.NewErrorWithSource(errors.New(chunk.Error), errorSource)
+			if err := w.WriteError(ctx, chunk.RefId, chunkStatus, chunkErr); err != nil {
+				return err
+			}
+			continue
+		}
+
+		if err := w.WriteFrame(ctx, chunk.RefId, chunk.FrameId, frame); err != nil {
+			return err
+		}
+	}
 }
 
 func (c *ClientV2) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {

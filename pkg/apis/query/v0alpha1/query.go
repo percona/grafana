@@ -3,10 +3,13 @@ package v0alpha1
 import (
 	"net/http"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	data "github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+const OpenAPIPrefix = "com.github.grafana.grafana.pkg.apis.query.v0alpha1."
 
 // Generic query request with shared time across all values
 // Copied from: https://github.com/grafana/grafana/blob/main/pkg/api/dtos/models.go#L62
@@ -18,6 +21,10 @@ type QueryDataRequest struct {
 	data.QueryDataRequest `json:",inline"`
 }
 
+func (QueryDataRequest) OpenAPIModelName() string {
+	return OpenAPIPrefix + "QueryDataRequest"
+}
+
 // Wraps backend.QueryDataResponse, however it includes TypeMeta and implements runtime.Object
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type QueryDataResponse struct {
@@ -27,14 +34,22 @@ type QueryDataResponse struct {
 	backend.QueryDataResponse `json:",inline"`
 }
 
+func (QueryDataResponse) OpenAPIModelName() string {
+	return OpenAPIPrefix + "QueryDataResponse"
+}
+
 // GetResponseCode return the right status code for the response by checking the responses.
 func GetResponseCode(rsp *backend.QueryDataResponse) int {
 	if rsp == nil {
-		return http.StatusBadRequest
+		return http.StatusBadRequest // rsp is nil, so we return a 400
 	}
 	for _, res := range rsp.Responses {
+		if res.Error != nil && res.Status != 0 {
+			return int(res.Status)
+		}
+
 		if res.Error != nil {
-			return http.StatusBadRequest
+			return http.StatusBadRequest // Status is nil but we have an error, so we return a 400
 		}
 	}
 	return http.StatusOK
@@ -50,10 +65,18 @@ type QueryTypeDefinition struct {
 	Spec data.QueryTypeDefinitionSpec `json:"spec,omitempty"`
 }
 
+func (QueryTypeDefinition) OpenAPIModelName() string {
+	return OpenAPIPrefix + "QueryTypeDefinition"
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type QueryTypeDefinitionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 
-	Items []QueryTypeDefinition `json:"items,omitempty"`
+	Items []QueryTypeDefinition `json:"items"`
+}
+
+func (QueryTypeDefinitionList) OpenAPIModelName() string {
+	return OpenAPIPrefix + "QueryTypeDefinitionList"
 }

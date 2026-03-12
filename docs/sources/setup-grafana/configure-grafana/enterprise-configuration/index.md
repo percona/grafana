@@ -194,9 +194,9 @@ Name of the TrueType font file with italic style. Default is `DejaVuSansCondense
 
 The minimum pixel size that Grafana uses when rendering fonts. Default is `4`.
 
-### max_retries_per_panel
+### max_request_retries
 
-Maximum number of times the following reporting rendering requests are retried before returning an error: generating PDFs, generating embedded dashboard images for report emails, and generating attached CSV files. To disable the retry feature, enter `0`. This is available in public preview and requires the `reportingRetries` feature toggle. Default is `3`.
+Maximum number of times the following reporting rendering requests are retried before returning an error: generating PDFs, generating embedded dashboard images for report emails, and generating attached CSV files. Default is `0`, which means it is disabled.
 
 ### allowed_domains
 
@@ -266,6 +266,14 @@ If true, it establishes a secure connection to Loki. Defaults to true.
 
 Set the tenant ID for Loki communication, which is disabled by default. The tenant ID is required to interact with Loki running in [multi-tenant mode](/docs/loki/latest/operations/multi-tenancy/).
 
+### retries
+
+The amount of times the HTTP or gRPC client will retry a failed request to Loki. The default is `10`.
+
+### timeout
+
+The timeout duration of an HTTP request or gRPC call to Loki. The default is `3s`.
+
 ## [auth.saml]
 
 ### enabled
@@ -318,11 +326,11 @@ Friendly name or name of the attribute within the SAML assertion to use as the u
 
 ### assertion_attribute_login
 
-Friendly name or name of the attribute within the SAML assertion to use as the user login handle.
+Friendly name or name of the attribute within the SAML assertion to use as the user login handle. Defaults to `login`.
 
 ### assertion_attribute_email
 
-Friendly name or name of the attribute within the SAML assertion to use as the user email.
+Friendly name or name of the attribute within the SAML assertion to use as the user email. Defaults to `email`.
 
 ### assertion_attribute_groups
 
@@ -335,6 +343,10 @@ Friendly name or name of the attribute within the SAML assertion to use as the u
 ### assertion_attribute_org
 
 Friendly name or name of the attribute within the SAML assertion to use as the user organization.
+
+### assertion_attribute_external_uid
+
+Friendly name or name of the attribute within the SAML assertion to use as the user external UID. Defaults to `userUID`.
 
 ### allowed_organizations
 
@@ -554,10 +566,6 @@ The default is `"grafana"`.
 A space-separated list of memcached servers. Example: `memcached-server-1:11211 memcached-server-2:11212 memcached-server-3:11211`. Or if there's only one server: `memcached-server:11211`.
 
 The default is `"localhost:11211"`.
-
-{{< admonition type="note" >}}
-The following memcached configuration requires the `tlsMemcached` feature toggle.
-{{< /admonition >}}
 
 ### tls_enabled
 

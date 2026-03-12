@@ -1,3 +1,5 @@
+import { RoleDto } from 'app/api/clients/legacy';
+
 /**
  * UserPermission is a map storing permissions in a form of
  * {
@@ -129,6 +131,11 @@ export enum AccessControlAction {
   AlertingProvisioningReadSecrets = 'alert.provisioning.secrets:read',
   AlertingProvisioningRead = 'alert.provisioning:read',
   AlertingProvisioningWrite = 'alert.provisioning:write',
+  AlertingRulesProvisioningRead = 'alert.rules.provisioning:read',
+  AlertingRulesProvisioningWrite = 'alert.rules.provisioning:write',
+  AlertingNotificationsProvisioningRead = 'alert.notifications.provisioning:read',
+  AlertingNotificationsProvisioningWrite = 'alert.notifications.provisioning:write',
+  AlertingProvisioningSetStatus = 'alert.provisioning.provenance:write',
 
   // Alerting receivers actions
   AlertingReceiversPermissionsRead = 'receivers.permissions:read',
@@ -150,10 +157,11 @@ export enum AccessControlAction {
   AlertingTemplatesRead = 'alert.notifications.templates:read',
   AlertingTemplatesWrite = 'alert.notifications.templates:write',
   AlertingTemplatesDelete = 'alert.notifications.templates:delete',
+  AlertingNotificationsTemplatesTest = 'alert.notifications.templates.test:write',
 
-  ActionAPIKeysRead = 'apikeys:read',
-  ActionAPIKeysCreate = 'apikeys:create',
-  ActionAPIKeysDelete = 'apikeys:delete',
+  // Alerting enrichments actions
+  AlertingEnrichmentsRead = 'alert.enrichments:read',
+  AlertingEnrichmentsWrite = 'alert.enrichments:write',
 
   PluginsInstall = 'plugins:install',
   PluginsWrite = 'plugins:write',
@@ -168,18 +176,12 @@ export enum AccessControlAction {
 
   // Migration Assistant
   MigrationAssistantMigrate = 'migrationassistant:migrate',
+
+  // Saved Queries
+  QueriesRead = 'queries:read',
+  QueriesWrite = 'queries:write',
 }
 
-export interface Role {
-  uid: string;
-  name: string;
-  displayName: string;
-  description: string;
-  group: string;
-  global: boolean;
-  delegatable?: boolean;
-  mapped?: boolean;
-  version: number;
-  created: string;
-  updated: string;
+export interface Role extends RoleDto {
+  filteredDisplayName: string; // name to be shown in filtered role list
 }

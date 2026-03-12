@@ -18,6 +18,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
+
 	"github.com/grafana/codejen"
 	"github.com/grafana/cuetsy"
 	"github.com/grafana/grafana/pkg/codegen"
@@ -48,13 +49,12 @@ func main() {
 	coreKindsGen.Append(
 		&codegen.GoSpecJenny{},
 		&codegen.K8ResourcesJenny{},
-		&codegen.CoreRegistryJenny{},
 		codegen.LatestMajorsOrXJenny(TSCoreKindParentPath),
 		codegen.TSVeneerIndexJenny(filepath.Join("packages", "grafana-schema", "src")),
 	)
 
 	header := codegen.SlashHeaderMapper("kinds/gen.go")
-	coreKindsGen.AddPostprocessors(header)
+	coreKindsGen.AddPostprocessors(header, codegen.GoFormat())
 
 	ctx := cuecontext.New()
 
@@ -172,6 +172,9 @@ func loadCueFiles(ctx *cue.Context, dirs []os.DirEntry) ([]codegen.SchemaForGen,
 			os.Exit(1)
 		}
 
+		if len(entries) == 0 {
+			continue
+		}
 		// It's assuming that we only have one file in each folder
 		entry := filepath.Join(dir.Name(), entries[0].Name())
 		cueFile, err := os.ReadFile(entry)

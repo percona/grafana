@@ -1,6 +1,6 @@
 module golangci-lint
 
-go 1.25.7
+go 1.25.8
 
 tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
@@ -141,7 +141,7 @@ require (
 	github.com/prometheus/client_golang v1.22.0 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.63.0 // indirect
-	github.com/prometheus/procfs v0.16.1 // indirect
+	github.com/prometheus/procfs v0.16.0 // indirect
 	github.com/quasilyte/go-ruleguard v0.4.4 // indirect
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22 // indirect
 	github.com/quasilyte/gogrep v0.5.0 // indirect
@@ -196,7 +196,7 @@ require (
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250911091902-df9299821621 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.47.0 // indirect

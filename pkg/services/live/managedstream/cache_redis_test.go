@@ -7,14 +7,13 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/grafana/grafana/pkg/util/testutil"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 )
 
 func TestIntegrationRedisCacheStorage(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
 
 	u, ok := os.LookupEnv("REDIS_URL")
 	if !ok || u == "" {

@@ -1,57 +1,80 @@
-import { Dropdown, Button, IconButton, Menu, Stack, Icon } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
+import { selectors } from '@grafana/e2e-selectors';
+import { t } from '@grafana/i18n';
+import { Button, Menu, Stack, Dropdown, Icon, Sidebar } from '@grafana/ui';
+import { trackDeleteDashboardElement } from 'app/features/dashboard-scene/utils/tracking';
+
+import { EditableDashboardElement } from '../scene/types/EditableDashboardElement';
+
+import { DashboardEditPane } from './DashboardEditPane';
 
 interface EditPaneHeaderProps {
-  title: string;
-  onDelete?: () => void;
-  onCopy?: () => void;
-  onDuplicate?: () => void;
+  element: EditableDashboardElement;
+  editPane: DashboardEditPane;
 }
 
-export const EditPaneHeader = ({ title, onDelete, onCopy, onDuplicate }: EditPaneHeaderProps) => {
-  const addCopyOrDuplicate = onCopy || onDuplicate;
+export function EditPaneHeader({ element, editPane }: EditPaneHeaderProps) {
+  const elementInfo = element.getEditableElementInfo();
+
+  const onCopy = element.onCopy?.bind(element);
+  const onDuplicate = element.onDuplicate?.bind(element);
+  const onDelete = element.onDelete?.bind(element);
+  const onConfirmDelete = element.onConfirmDelete?.bind(element);
+
+  const onDeleteElement = () => {
+    if (onConfirmDelete) {
+      onConfirmDelete();
+    } else if (onDelete) {
+      onDelete();
+    }
+    trackDeleteDashboardElement(elementInfo);
+  };
+
   return (
-    <Stack justifyContent="space-between" alignItems="center" width="100%">
-      <span>{title}</span>
-      <Stack alignItems="center">
-        {addCopyOrDuplicate ? (
-          <Dropdown overlay={<MenuItems onCopy={onCopy} onDuplicate={onDuplicate} />}>
+    <Sidebar.PaneHeader title={elementInfo.typeName}>
+      <Stack direction="row" gap={1}>
+        {element.renderActions && element.renderActions()}
+        {(onCopy || onDuplicate) && (
+          <Dropdown
+            overlay={
+              <Menu>
+                {onCopy ? (
+                  <Menu.Item icon="copy" label={t('dashboard.layout.common.copy', 'Copy')} onClick={onCopy} />
+                ) : null}
+                {onDuplicate ? (
+                  <Menu.Item
+                    icon="file-copy-alt"
+                    label={t('dashboard.layout.common.duplicate', 'Duplicate')}
+                    onClick={onDuplicate}
+                  />
+                ) : null}
+              </Menu>
+            }
+          >
             <Button
               tooltip={t('dashboard.layout.common.copy-or-duplicate', 'Copy or Duplicate')}
               tooltipPlacement="bottom"
               variant="secondary"
-              fill="text"
-              size="md"
+              size="sm"
+              icon="copy"
+              data-testid={selectors.components.EditPaneHeader.copyDropdown}
             >
-              <Icon name="copy" /> <Icon name="angle-down" />
+              <Icon name="angle-down" />
             </Button>
           </Dropdown>
-        ) : null}
+        )}
 
-        <IconButton
-          size="md"
-          variant="secondary"
-          onClick={onDelete}
-          name="trash-alt"
-          tooltip={t('dashboard.layout.common.delete', 'Delete')}
-        />
+        {(onDelete || onConfirmDelete) && (
+          <Button
+            onClick={onDeleteElement}
+            size="sm"
+            variant="destructive"
+            fill="outline"
+            icon="trash-alt"
+            tooltip={t('dashboard.layout.common.delete', 'Delete')}
+            data-testid={selectors.components.EditPaneHeader.deleteButton}
+          />
+        )}
       </Stack>
-    </Stack>
+    </Sidebar.PaneHeader>
   );
-};
-
-type MenuItemsProps = {
-  onCopy?: () => void;
-  onDuplicate?: () => void;
-};
-
-const MenuItems = ({ onCopy, onDuplicate }: MenuItemsProps) => {
-  return (
-    <Menu>
-      {onCopy ? <Menu.Item label={t('dashboard.layout.common.copy', 'Copy')} onClick={onCopy} /> : null}
-      {onDuplicate ? (
-        <Menu.Item label={t('dashboard.layout.common.duplicate', 'Duplicate')} onClick={onDuplicate} />
-      ) : null}
-    </Menu>
-  );
-};
+}

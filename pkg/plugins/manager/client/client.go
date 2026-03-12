@@ -14,7 +14,6 @@ import (
 
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/plugins/manager/registry"
-	"github.com/grafana/grafana/pkg/util/proxyutil"
 )
 
 const (
@@ -28,7 +27,15 @@ var _ plugins.Client = (*Service)(nil)
 var (
 	errNilRequest = errors.New("req cannot be nil")
 	errNilSender  = errors.New("sender cannot be nil")
+	errNilWriter  = errors.New("writer cannot be nil")
 )
+
+// passthroughErrors contains a list of errors that should be returned directly to the caller without wrapping
+var passthroughErrors = []error{
+	plugins.ErrPluginUnavailable,
+	plugins.ErrMethodNotImplemented,
+	plugins.ErrPluginGrpcResourceExhaustedBase,
+}
 
 type Service struct {
 	pluginRegistry registry.Service
@@ -52,11 +59,15 @@ func (s *Service) QueryData(ctx context.Context, req *backend.QueryDataRequest) 
 
 	resp, err := p.QueryData(ctx, req)
 	if err != nil {
-		if errors.Is(err, plugins.ErrMethodNotImplemented) {
-			return nil, err
+		for _, e := range passthroughErrors {
+			if errors.Is(err, e) {
+				return nil, err
+			}
 		}
 
-		if errors.Is(err, plugins.ErrPluginUnavailable) {
+		// If the error is a plugin grpc connection unavailable error, return it directly
+		// This error is created dynamically based on the context, so we need to check for it here
+		if errors.Is(err, plugins.ErrPluginGrpcConnectionUnavailableBaseFn(ctx)) {
 			return nil, err
 		}
 
@@ -81,6 +92,23 @@ func (s *Service) QueryData(ctx context.Context, req *backend.QueryDataRequest) 
 	}
 
 	return resp, err
+}
+
+func (s *Service) QueryChunkedData(ctx context.Context, req *backend.QueryChunkedDataRequest, w backend.ChunkedDataWriter) error {
+	if req == nil {
+		return errNilRequest
+	}
+
+	if w == nil {
+		return errNilWriter
+	}
+
+	p, exists := s.plugin(ctx, req.PluginContext.PluginID, req.PluginContext.PluginVersion)
+	if !exists {
+		return plugins.ErrPluginNotRegistered
+	}
+
+	return p.QueryChunkedData(ctx, req, w)
 }
 
 func (s *Service) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
@@ -113,7 +141,7 @@ func (s *Service) CallResource(ctx context.Context, req *backend.CallResourceReq
 				res.Headers = map[string][]string{}
 			}
 
-			proxyutil.SetProxyResponseHeaders(res.Headers)
+			SetCSPHeader(res.Headers)
 			ensureContentTypeHeader(res)
 		}
 
@@ -268,6 +296,10 @@ func (s *Service) ValidateAdmission(ctx context.Context, req *backend.AdmissionR
 	}
 
 	return plugin.ValidateAdmission(ctx, req)
+}
+
+func SetCSPHeader(header http.Header) {
+	header.Set("Content-Security-Policy", "sandbox")
 }
 
 // plugin finds a plugin with `pluginID` from the registry that is not decommissioned

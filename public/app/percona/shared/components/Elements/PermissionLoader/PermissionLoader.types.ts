@@ -1,4 +1,4 @@
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 export interface PermissionLoaderProps {
   featureSelector: (state: StoreState) => boolean;

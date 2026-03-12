@@ -1,9 +1,13 @@
 import { useState } from 'react';
 import { DeepMap, FieldError, useFormContext } from 'react-hook-form';
 
+import { Trans, t } from '@grafana/i18n';
 import { Button, useStyles2 } from '@grafana/ui';
-import { Trans, t } from 'app/core/internationalization';
-import { NotificationChannelOption, NotificationChannelSecureFields, OptionMeta } from 'app/types';
+import {
+  NotificationChannelOption,
+  NotificationChannelSecureFields,
+  OptionMeta,
+} from 'app/features/alerting/unified/types/alerting';
 
 import { ActionIcon } from '../../../rules/ActionIcon';
 
