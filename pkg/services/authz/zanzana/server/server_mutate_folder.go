@@ -52,24 +52,7 @@ func (s *Server) mutateFolders(ctx context.Context, store *storeInfo, operations
 		return nil
 	}
 
-	writeReq := &openfgav1.WriteRequest{
-		StoreId:              store.ID,
-		AuthorizationModelId: store.ModelID,
-	}
-	if len(writeTuples) > 0 {
-		writeReq.Writes = &openfgav1.WriteRequestWrites{
-			TupleKeys:   writeTuples,
-			OnDuplicate: "ignore",
-		}
-	}
-	if len(deleteTuples) > 0 {
-		writeReq.Deletes = &openfgav1.WriteRequestDeletes{
-			TupleKeys: deleteTuples,
-			OnMissing: "ignore",
-		}
-	}
-
-	_, err := s.openfga.Write(ctx, writeReq)
+	err := s.writeTuples(ctx, store, writeTuples, deleteTuples)
 	if err != nil {
 		s.logger.Error("failed to write folder tuples", "error", err)
 		return err
@@ -127,7 +110,7 @@ func (s *Server) listFolderParents(ctx context.Context, store *storeInfo, folder
 	defer span.End()
 
 	object := zanzana.NewFolderIdent(folderUID)
-	resp, err := s.openfga.Read(ctx, &openfgav1.ReadRequest{
+	resp, err := s.openFGAClient.Read(ctx, &openfgav1.ReadRequest{
 		StoreId: store.ID,
 		TupleKey: &openfgav1.ReadRequestTupleKey{
 			Object:   object,

@@ -32,11 +32,13 @@ export type AppPluginConfig = {
   path: string;
   version: string;
   preload: boolean;
+  /** @deprecated it will be removed in a future release */
   angular: AngularMeta;
   loadingStrategy: PluginLoadingStrategy;
   dependencies: PluginDependencies;
   extensions: PluginExtensions;
   moduleHash?: string;
+  buildMode?: string;
 };
 
 export type PreinstalledPlugin = {
@@ -71,6 +73,7 @@ export enum GrafanaEdition {
   OpenSource = 'Open Source',
   Pro = 'Pro',
   Enterprise = 'Enterprise',
+  Trial = 'Cloud Trial',
 }
 
 /**
@@ -102,7 +105,6 @@ export interface GrafanaJavascriptAgentConfig {
   performanceInstrumentalizationEnabled: boolean;
   cspInstrumentalizationEnabled: boolean;
   tracingInstrumentalizationEnabled: boolean;
-  webVitalsAttribution: boolean;
 }
 
 export interface UnifiedAlertingStateHistoryConfig {
@@ -216,7 +218,9 @@ export interface GrafanaConfig {
   publicDashboardsEnabled: boolean;
   snapshotEnabled: boolean;
   datasources: { [str: string]: DataSourceInstanceSettings };
+  /** @deprecated it will be removed in a future release */
   panels: { [key: string]: PanelPluginMeta };
+  /** @deprecated it will be removed in a future release */
   apps: Record<string, AppPluginConfig>;
   auth: AuthSettings;
   minRefreshInterval: string;
@@ -232,6 +236,7 @@ export interface GrafanaConfig {
   externalUserMngInfo: string;
   externalUserMngAnalytics: boolean;
   externalUserMngAnalyticsParams: string;
+  externalUserUpgradeLinkUrl: string;
   allowOrgCreate: boolean;
   disableLoginForm: boolean;
   defaultDatasource: string;
@@ -266,6 +271,7 @@ export interface GrafanaConfig {
   expressionsEnabled: boolean;
   liveEnabled: boolean;
   liveMessageSizeLimit: number;
+  liveNamespaced: boolean; // use namespace or orgId prefix
   anonymousEnabled: boolean;
   anonymousDeviceLimit: number;
   featureToggles: FeatureToggles;
@@ -287,10 +293,12 @@ export interface GrafanaConfig {
   rudderstackWriteKey: string;
   rudderstackDataPlaneUrl: string;
   rudderstackSdkUrl: string;
+  rudderstackV3SdkUrl: string;
   rudderstackConfigUrl: string;
   rudderstackIntegrationsUrl: string;
   applicationInsightsConnectionString: string;
   applicationInsightsEndpointUrl: string;
+  applicationInsightsAutoRouteTracking: boolean;
   analyticsConsoleReporting: boolean;
   rendererAvailable: boolean;
   rendererVersion: string;
@@ -303,6 +311,7 @@ export interface GrafanaConfig {
   sharedWithMeFolderUID: string;
   rootFolderUID: string;
   localFileSystemAvailable: boolean;
+  cloudMigrationEnabled: boolean;
   cloudMigrationIsTarget: boolean;
   cloudMigrationPollIntervalMs: number;
   pluginCatalogURL: string;
@@ -311,6 +320,7 @@ export interface GrafanaConfig {
   pluginCatalogHiddenPlugins: string[];
   pluginCatalogManagedPlugins: string[];
   pluginCatalogPreinstalledPlugins: PreinstalledPlugin[];
+  pluginCatalogPreinstalledAutoUpdate?: boolean;
   pluginsCDNBaseURL: string;
   tokenExpirationDayLimit: number;
   listDashboardScopesEndpoint: string;
@@ -327,6 +337,7 @@ export interface GrafanaConfig {
   namespace: string;
   caching: {
     enabled: boolean;
+    defaultTTLMs: number;
   };
   recordedQueries: {
     enabled: boolean;

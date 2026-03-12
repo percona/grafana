@@ -53,10 +53,12 @@ export const MultiCombobox = <T extends string | number>(props: MultiComboboxPro
     maxWidth,
     isClearable,
     createCustomValue = false,
+    customValueDescription,
     'aria-labelledby': ariaLabelledBy,
     'data-testid': dataTestId,
     portalContainer,
     prefixIcon,
+    id,
   } = props;
 
   const styles = useStyles2(getComboboxStyles);
@@ -79,7 +81,7 @@ export const MultiCombobox = <T extends string | number>(props: MultiComboboxPro
     updateOptions,
     asyncLoading,
     asyncError,
-  } = useOptions(props.options, createCustomValue);
+  } = useOptions(props.options, createCustomValue, customValueDescription);
   const options = useMemo(() => {
     // Only add the 'All' option if there's more than 1 option
     const addAllOption = enableAllOption && baseOptions.length > 1;
@@ -152,17 +154,10 @@ export const MultiCombobox = <T extends string | number>(props: MultiComboboxPro
       },
     });
 
-  const {
-    getToggleButtonProps,
-    //getLabelProps,
-    isOpen,
-    highlightedIndex,
-    getMenuProps,
-    getInputProps,
-    getItemProps,
-  } = useCombobox({
+  const { isOpen, highlightedIndex, getMenuProps, getInputProps, getItemProps } = useCombobox({
     items: options,
     itemToString,
+    inputId: id,
     inputValue,
     selectedItem: null,
     stateReducer: (state, actionAndChanges) => {
@@ -325,7 +320,7 @@ export const MultiCombobox = <T extends string | number>(props: MultiComboboxPro
             })}
           />
 
-          <div className={multiStyles.suffix} ref={suffixMeasureRef} {...getToggleButtonProps()}>
+          <div className={multiStyles.suffix} ref={suffixMeasureRef}>
             {isClearable && selectedItems.length > 0 && (
               <Icon
                 name="times"

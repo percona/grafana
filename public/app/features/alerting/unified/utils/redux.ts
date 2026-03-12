@@ -2,9 +2,7 @@ import { AsyncThunk, Draft, PayloadAction, SerializedError, createSlice, isAsync
 
 import { AppEvents } from '@grafana/data';
 import { FetchError, isFetchError } from '@grafana/runtime';
-import { appEvents } from 'app/core/core';
-import { PERCONA_CANCELLED_ERROR_NAME } from 'app/percona/shared/core';
-import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { appEvents } from 'app/core/app_events';
 
 import { LogMessages, logInfo } from '../Analytics';
 

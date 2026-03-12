@@ -23,6 +23,10 @@ import { alertingFactory } from '../mocks/server/db';
 
 import GroupDetailsPage from './GroupDetailsPage';
 
+jest.mock('@grafana/assistant', () => ({
+  useAssistant: () => ({ isAvailable: false, openAssistant: jest.fn() }),
+}));
+
 jest.mock('react-virtualized-auto-sizer', () => {
   return ({ children }: Props) =>
     children({
@@ -43,7 +47,7 @@ const ui = {
   exportButton: byRole('button', { name: 'Export' }),
   ruleItem: byRole('treeitem'),
   export: {
-    dialog: byRole('dialog', { name: /Drawer title Export .* rules/ }),
+    dialog: byRole('dialog', { name: /Export .* rules/ }),
     jsonTab: byRole('tab', { name: /JSON/ }),
     yamlTab: byRole('tab', { name: /YAML/ }),
     editor: byTestId('code-editor'),

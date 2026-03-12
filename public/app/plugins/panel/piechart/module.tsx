@@ -1,6 +1,6 @@
 import { FieldColorModeId, FieldConfigProperty, PanelPlugin } from '@grafana/data';
 import { t } from '@grafana/i18n';
-import { SortOrder } from '@grafana/schema/dist/esm/index';
+import { SortOrder } from '@grafana/schema';
 import { commonOptionsBuilder } from '@grafana/ui';
 import { optsWithHideZeros } from '@grafana/ui/internal';
 
@@ -9,7 +9,7 @@ import { addStandardDataReduceOptions } from '../stat/common';
 import { PieChartPanel } from './PieChartPanel';
 import { PieChartPanelChangedHandler } from './migrations';
 import { Options, FieldConfig, PieChartType, PieChartLabels, PieChartLegendValues } from './panelcfg.gen';
-import { PieChartSuggestionsSupplier } from './suggestions';
+import { piechartSuggestionsSupplier } from './suggestions';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(PieChartPanel)
   .setPanelChangeHandler(PieChartPanelChangedHandler)
@@ -92,4 +92,4 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(PieChartPanel)
       showIf: (c) => c.legend.showLegend !== false,
     });
   })
-  .setSuggestionsSupplier(new PieChartSuggestionsSupplier());
+  .setSuggestionsSupplier(piechartSuggestionsSupplier);

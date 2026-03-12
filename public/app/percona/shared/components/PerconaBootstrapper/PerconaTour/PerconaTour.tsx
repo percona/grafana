@@ -1,7 +1,6 @@
 import { FC, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { contextSrv } from 'app/core/core';
 import usePerconaTour from 'app/percona/shared/core/hooks/tour';
 import { TourType } from 'app/percona/shared/core/reducers/tour';
 import { getPerconaSettings, getPerconaUser, getServices } from 'app/percona/shared/core/selectors';
@@ -9,6 +8,7 @@ import { isPmmAdmin } from 'app/percona/shared/helpers/permissions';
 import getAlertingTourSteps from 'app/percona/tour/steps/alerting';
 import getProductTourSteps from 'app/percona/tour/steps/product';
 import { useSelector } from 'app/types/store';
+import { contextSrv } from 'app/core/services/context_srv';
 
 const PerconaTourBootstrapper: FC = () => {
   const { startTour, setSteps } = usePerconaTour();

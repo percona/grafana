@@ -17,19 +17,14 @@ jest.mock('@grafana/assistant', () => {
 
 export const LogListContext = createContext<LogListContextData>({
   app: CoreApp.Unknown,
-  closeDetails: () => {},
   dedupStrategy: LogsDedupStrategy.none,
-  detailsDisplayed: () => false,
-  detailsWidth: 0,
   displayedFields: [],
   downloadLogs: () => {},
-  enableLogDetails: false,
   filterLevels: [],
   fontSize: 'default',
   forceEscape: false,
   hasUnescapedContent: false,
   setDedupStrategy: () => {},
-  setDetailsWidth: () => {},
   setFilterLevels: () => {},
   setFontSize: () => {},
   setForceEscape: () => {},
@@ -41,16 +36,14 @@ export const LogListContext = createContext<LogListContextData>({
   setSortOrder: () => {},
   setSyntaxHighlighting: () => {},
   setTimestampResolution: () => {},
+  setUnwrappedColumns: () => {},
   setWrapLogMessage: () => {},
-  showDetails: [],
   showTime: true,
   sortOrder: LogsSortOrder.Ascending,
   syntaxHighlighting: true,
   timestampResolution: 'ns',
-  toggleDetails: () => {},
+  unwrappedColumns: false,
   wrapLogMessage: false,
-  detailsMode: 'sidebar',
-  setDetailsMode: () => {},
   isAssistantAvailable: false,
   openAssistantByLog: () => {},
   controlsExpanded: false,
@@ -77,8 +70,6 @@ export const useLogIsPermalinked = (log: LogListModel) => {
 };
 
 export const defaultValue: LogListContextData = {
-  detailsMode: 'sidebar',
-  setDetailsMode: jest.fn(),
   setDedupStrategy: jest.fn(),
   setFilterLevels: jest.fn(),
   setFontSize: jest.fn(),
@@ -91,24 +82,19 @@ export const defaultValue: LogListContextData = {
   setPrettifyJSON: jest.fn(),
   setSyntaxHighlighting: jest.fn(),
   setTimestampResolution: jest.fn(),
+  setUnwrappedColumns: jest.fn(),
   setWrapLogMessage: jest.fn(),
-  closeDetails: jest.fn(),
-  detailsDisplayed: jest.fn(),
-  detailsWidth: 300,
   downloadLogs: jest.fn(),
-  enableLogDetails: false,
   filterLevels: [],
   fontSize: 'default',
   forceEscape: false,
   hasUnescapedContent: false,
-  setDetailsWidth: jest.fn(),
-  showDetails: [],
-  toggleDetails: jest.fn(),
   app: CoreApp.Explore,
   dedupStrategy: LogsDedupStrategy.exact,
   displayedFields: [],
   showTime: false,
   sortOrder: LogsSortOrder.Ascending,
+  unwrappedColumns: false,
   wrapLogMessage: false,
   isAssistantAvailable: false,
   openAssistantByLog: jest.fn(),
@@ -122,7 +108,6 @@ export const defaultProps: Props = {
   containerElement: document.createElement('div'),
   dedupStrategy: LogsDedupStrategy.none,
   displayedFields: [],
-  enableLogDetails: false,
   filterLevels: [],
   fontSize: 'default',
   getRowContextQuery: jest.fn(),
@@ -138,6 +123,7 @@ export const defaultProps: Props = {
   sortOrder: LogsSortOrder.Descending,
   syntaxHighlighting: true,
   timestampResolution: 'ms',
+  unwrappedColumns: false,
   wrapLogMessage: true,
 };
 
@@ -146,7 +132,6 @@ export const LogListContextProvider = ({
   children,
   dedupStrategy = LogsDedupStrategy.none,
   displayedFields = [],
-  enableLogDetails = false,
   filterLevels = [],
   getRowContextQuery = jest.fn(),
   logLineMenuCustomItems = undefined,
@@ -159,13 +144,13 @@ export const LogListContextProvider = ({
   onUnpinLine = jest.fn(),
   permalinkedLogId,
   pinnedLogs = [],
-  showDetails = [],
   showTime = true,
   sortOrder = LogsSortOrder.Descending,
   syntaxHighlighting = true,
   timestampResolution = 'ms',
+  unwrappedColumns = false,
   wrapLogMessage = true,
-}: Partial<Props> & { showDetails?: LogListModel[] }) => {
+}: Partial<Props>) => {
   const hasLogsWithErrors = logs.some((log) => !!checkLogsError(log));
   const hasSampledLogs = logs.some((log) => !!checkLogsSampled(log));
 
@@ -177,7 +162,6 @@ export const LogListContextProvider = ({
         dedupStrategy,
         displayedFields,
         downloadLogs: jest.fn(),
-        enableLogDetails,
         hasLogsWithErrors,
         hasSampledLogs,
         filterLevels,
@@ -203,11 +187,11 @@ export const LogListContextProvider = ({
         setSortOrder: jest.fn(),
         setSyntaxHighlighting: jest.fn(),
         setWrapLogMessage: jest.fn(),
-        showDetails,
         showTime,
         sortOrder,
         syntaxHighlighting,
         timestampResolution,
+        unwrappedColumns,
         wrapLogMessage,
       }}
     >
@@ -215,9 +199,3 @@ export const LogListContextProvider = ({
     </LogListContext.Provider>
   );
 };
-
-export const saveDetailsScrollPosition = jest.fn();
-
-export const getDetailsScrollPosition = jest.fn();
-
-export const removeDetailsScrollPosition = jest.fn();

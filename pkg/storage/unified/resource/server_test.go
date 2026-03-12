@@ -5,19 +5,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	badger "github.com/dgraph-io/badger/v4"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gocloud.dev/blob/fileblob"
-	"gocloud.dev/blob/memblob"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	authlib "github.com/grafana/authlib/types"
@@ -26,6 +25,7 @@ import (
 	"github.com/grafana/grafana/pkg/apimachinery/identity"
 	"github.com/grafana/grafana/pkg/apimachinery/utils"
 	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/storage/unified/resourcepb"
 	"github.com/grafana/grafana/pkg/util/scheduler"
 )
@@ -41,20 +41,19 @@ func TestSimpleServer(t *testing.T) {
 	}
 	ctx := authlib.WithAuthInfo(context.Background(), testUserA)
 
-	bucket := memblob.OpenBucket(nil)
-	if false {
-		tmp, err := os.MkdirTemp("", "xxx-*")
+	// Create in-memory BadgerDB for testing
+	db, err := badger.Open(badger.DefaultOptions("").
+		WithInMemory(true).
+		WithLogger(nil))
+	require.NoError(t, err)
+	defer func() {
+		err := db.Close()
 		require.NoError(t, err)
+	}()
 
-		bucket, err = fileblob.OpenBucket(tmp, &fileblob.Options{
-			CreateDir: true,
-			Metadata:  fileblob.MetadataDontWrite, // skip
-		})
-		require.NoError(t, err)
-		fmt.Printf("ROOT: %s\n\n", tmp)
-	}
-	store, err := NewCDKBackend(ctx, CDKBackendOptions{
-		Bucket: bucket,
+	kv := NewBadgerKV(db)
+	store, err := NewKVStorageBackend(KVBackendOptions{
+		KvStore: kv,
 	})
 	require.NoError(t, err)
 
@@ -585,16 +584,19 @@ func newTestServerWithQueue(t *testing.T, maxSizePerTenant int, numWorkers int) 
 			MaxRetries: 2,
 			MinBackoff: 10 * time.Millisecond,
 		},
-		log: slog.Default(),
+		log: log.NewNopLogger(),
 	}
 	return s, q
 }
 
 func TestArtificialDelayAfterSuccessfulOperation(t *testing.T) {
-	s := &server{artificialSuccessfulWriteDelay: 1 * time.Millisecond}
+	s := &server{
+		artificialSuccessfulWriteDelay: 1 * time.Millisecond,
+		log:                            log.NewNopLogger(),
+	}
 
 	check := func(t *testing.T, expectedSleep bool, res responseWithErrorResult, err error) {
-		slept := s.sleepAfterSuccessfulWriteOperation(res, err)
+		slept := s.sleepAfterSuccessfulWriteOperation("test", &resourcepb.ResourceKey{}, res, err)
 		require.Equal(t, expectedSleep, slept)
 	}
 
@@ -615,4 +617,140 @@ func TestArtificialDelayAfterSuccessfulOperation(t *testing.T) {
 	check(t, false, &resourcepb.CreateResponse{Error: AsErrorResult(errors.New("some error"))}, nil)
 	check(t, false, &resourcepb.UpdateResponse{Error: AsErrorResult(errors.New("some error"))}, nil)
 	check(t, false, &resourcepb.DeleteResponse{Error: AsErrorResult(errors.New("some error"))}, nil)
+}
+
+func TestGetQuotaUsage(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("returns error when overrides service is not configured", func(t *testing.T) {
+		s := &server{
+			overridesService: nil,
+			log:              log.NewNopLogger(),
+		}
+
+		resp, err := s.GetQuotaUsage(ctx, &resourcepb.QuotaUsageRequest{
+			Key: &resourcepb.ResourceKey{
+				Namespace: "stacks-123",
+				Group:     "dashboard.grafana.app",
+				Resource:  "dashboards",
+			},
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp.Error)
+		assert.Equal(t, int32(http.StatusNotImplemented), resp.Error.Code)
+		assert.Equal(t, "overrides service not configured on resource server", resp.Error.Message)
+	})
+
+	t.Run("returns usage and limit successfully", func(t *testing.T) {
+		// Create a temporary overrides config file
+		tmpFile := filepath.Join(t.TempDir(), "overrides.yaml")
+		content := `overrides:
+  "123":
+    quotas:
+      dashboard.grafana.app/dashboards:
+        limit: 500
+`
+		require.NoError(t, os.WriteFile(tmpFile, []byte(content), 0644))
+
+		// Create a real OverridesService with the temp file
+		overridesService, err := NewOverridesService(ctx, log.NewNopLogger(), prometheus.NewRegistry(), tracing.NewNoopTracerService(), ReloadOptions{
+			FilePath: tmpFile,
+		})
+		require.NoError(t, err)
+		require.NoError(t, overridesService.init(ctx))
+		defer func() {
+			_ = overridesService.stop(ctx)
+		}()
+
+		// Create a mock backend that returns resource stats (reusing mockStorageBackend from search_test.go)
+		mockBackend := &mockStorageBackend{
+			resourceStats: []ResourceStats{{Count: 42}},
+		}
+
+		s := &server{
+			backend:          mockBackend,
+			overridesService: overridesService,
+			log:              log.NewNopLogger(),
+		}
+
+		resp, err := s.GetQuotaUsage(ctx, &resourcepb.QuotaUsageRequest{
+			Key: &resourcepb.ResourceKey{
+				Namespace: "stacks-123",
+				Group:     "dashboard.grafana.app",
+				Resource:  "dashboards",
+			},
+		})
+		require.NoError(t, err)
+		require.Nil(t, resp.Error)
+		assert.Equal(t, int64(42), resp.Usage)
+		assert.Equal(t, int64(500), resp.Limit)
+	})
+}
+
+func TestCheckQuotas(t *testing.T) {
+	tests := []struct {
+		name        string
+		limit       int
+		expectError bool
+	}{
+		{
+			name:        "will return error if quota exceeded",
+			limit:       1,
+			expectError: true,
+		},
+		{
+			name:        "will return nil if within quota",
+			limit:       2,
+			expectError: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+
+			overridesFile := filepath.Join(t.TempDir(), "overrides.yaml")
+			overrides := fmt.Sprintf(`overrides:
+  "123":
+    quotas:
+      grafana.dashboard.app/dashboards:
+        limit: %d
+`, tt.limit)
+			require.NoError(t, os.WriteFile(overridesFile, []byte(overrides), 0644))
+
+			tcr := tracing.NewNoopTracerService()
+			overridesService, err := NewOverridesService(ctx, log.NewNopLogger(), prometheus.NewRegistry(), tcr.Tracer, ReloadOptions{
+				FilePath: overridesFile,
+			})
+			require.NoError(t, err)
+
+			nsr := NamespacedResource{
+				Namespace: "stacks-123",
+				Group:     "grafana.dashboard.app",
+				Resource:  "dashboards",
+			}
+
+			server, err := NewResourceServer(ResourceServerOptions{
+				Backend: &mockStorageBackend{
+					resourceStats: []ResourceStats{{
+						NamespacedResource: nsr,
+						Count:              1,
+					}},
+				},
+				OverridesService: overridesService,
+				QuotasConfig:     QuotasConfig{EnforceQuotas: true},
+			})
+			require.NoError(t, err)
+			t.Cleanup(func() {
+				_ = server.Stop(ctx)
+			})
+
+			err = server.checkQuota(ctx, nsr)
+			if tt.expectError {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
 }

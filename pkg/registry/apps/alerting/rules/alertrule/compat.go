@@ -7,16 +7,18 @@ import (
 	"strconv"
 	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/grafana/grafana/pkg/apimachinery/utils"
 	"github.com/grafana/grafana/pkg/expr"
 	"github.com/grafana/grafana/pkg/util"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	prom_model "github.com/prometheus/common/model"
 
 	model "github.com/grafana/grafana/apps/alerting/rules/pkg/apis/alerting/v0alpha1"
 	"github.com/grafana/grafana/pkg/services/apiserver/endpoints/request"
 	gapiutil "github.com/grafana/grafana/pkg/services/apiserver/utils"
 	ngmodels "github.com/grafana/grafana/pkg/services/ngalert/models"
-	prom_model "github.com/prometheus/common/model"
 )
 
 var (
@@ -94,7 +96,7 @@ func convertToK8sResource(
 		k8sRule.Spec.Expressions[query.RefID] = convertToK8sExpression(query, rule)
 	}
 
-	for _, setting := range rule.NotificationSettings {
+	if setting := rule.ContactPointRouting(); setting != nil {
 		nfSetting := model.AlertRuleV0alpha1SpecNotificationSettings{
 			Receiver: setting.Receiver,
 			GroupBy:  setting.GroupBy,
@@ -128,6 +130,10 @@ func convertToK8sResource(
 		return nil, fmt.Errorf("failed to get metadata: %w", err)
 	}
 	meta.SetFolder(rule.NamespaceUID)
+	// Keep metadata label in sync with folder annotation for downstream consumers
+	if rule.NamespaceUID != "" {
+		k8sRule.Labels[model.FolderLabelKey] = rule.NamespaceUID
+	}
 	if rule.UpdatedBy != nil {
 		meta.SetUpdatedBy(string(*rule.UpdatedBy))
 		k8sRule.SetUpdatedBy(string(*rule.UpdatedBy))
@@ -302,14 +308,14 @@ func convertToBaseDomainModel(orgID int64, k8sRule *model.AlertRule) (*ngmodels.
 		if err != nil {
 			return nil, err
 		}
-		domainRule.NotificationSettings = []ngmodels.NotificationSettings{settings}
+		domainRule.NotificationSettings = &settings
 	}
 
 	return domainRule, nil
 }
 
 func convertNotificationSettings(sourceSettings *model.AlertRuleV0alpha1SpecNotificationSettings) (ngmodels.NotificationSettings, error) {
-	settings := ngmodels.NotificationSettings{
+	settings := ngmodels.ContactPointRouting{
 		Receiver: sourceSettings.Receiver,
 		GroupBy:  sourceSettings.GroupBy,
 	}
@@ -348,7 +354,9 @@ func convertNotificationSettings(sourceSettings *model.AlertRuleV0alpha1SpecNoti
 			settings.ActiveTimeIntervals = append(settings.ActiveTimeIntervals, activeTimeInterval)
 		}
 	}
-	return settings, nil
+	return ngmodels.NotificationSettings{
+		ContactPointRouting: &settings,
+	}, nil
 }
 
 func convertToDomainQuery(expression model.AlertRuleExpression, refID string) (ngmodels.AlertQuery, error) {

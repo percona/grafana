@@ -134,7 +134,8 @@ var (
 			Group:       models.AlertRolesGroup,
 			Permissions: []accesscontrol.Permission{
 				{Action: accesscontrol.ActionAlertingReceiversCreate},
-				{Action: accesscontrol.ActionAlertingReceiversTest},
+				{Action: accesscontrol.ActionAlertingReceiversTest}, // deprecated, kept for backward compatibility
+				{Action: accesscontrol.ActionAlertingReceiversTestCreate, Scope: models.ScopeReceiversProvider.GetNewResourceScope()},
 			},
 		},
 	}
@@ -148,6 +149,7 @@ var (
 			Permissions: accesscontrol.ConcatPermissions(receiversReaderRole.Role.Permissions, receiversCreatorRole.Role.Permissions, []accesscontrol.Permission{
 				{Action: accesscontrol.ActionAlertingReceiversUpdate, Scope: models.ScopeReceiversAll},
 				{Action: accesscontrol.ActionAlertingReceiversDelete, Scope: models.ScopeReceiversAll},
+				{Action: accesscontrol.ActionAlertingReceiversTestCreate, Scope: models.ScopeReceiversAll},
 			}),
 		},
 	}
@@ -173,6 +175,7 @@ var (
 			Permissions: accesscontrol.ConcatPermissions(templatesReaderRole.Role.Permissions, []accesscontrol.Permission{
 				{Action: accesscontrol.ActionAlertingNotificationsTemplatesWrite},
 				{Action: accesscontrol.ActionAlertingNotificationsTemplatesDelete},
+				{Action: accesscontrol.ActionAlertingNotificationsTemplatesTest},
 			}),
 		},
 	}

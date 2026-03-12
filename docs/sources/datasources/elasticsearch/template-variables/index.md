@@ -16,27 +16,6 @@ labels:
 menuTitle: Template variables
 title: Elasticsearch template variables
 weight: 400
-refs:
-  variables:
-    - pattern: /docs/grafana/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/
-    - pattern: /docs/grafana-cloud/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/
-  add-template-variables-add-ad-hoc-filters:
-    - pattern: /docs/grafana/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#add-ad-hoc-filters
-    - pattern: /docs/grafana-cloud/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#add-ad-hoc-filters
-  add-template-variables-multi-value-variables:
-    - pattern: /docs/grafana/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#multi-value-variables
-    - pattern: /docs/grafana-cloud/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#multi-value-variables
-  add-template-variables:
-    - pattern: /docs/grafana/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/
-    - pattern: /docs/grafana-cloud/
-      destination: /docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/
 ---
 
 # Elasticsearch template variables
@@ -45,7 +24,25 @@ Instead of hard-coding details such as server, application, and sensor names in 
 Grafana lists these variables in drop-down select boxes at the top of the dashboard to help you change the data displayed in your dashboard.
 Grafana refers to such variables as template variables.
 
-For an introduction to templating and template variables, refer to the [Templating](ref:variables) and [Add and manage variables](ref:add-template-variables) documentation.
+For an introduction to templating and template variables, refer to the [Templating](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/) and [Add and manage variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/) documentation.
+
+## Use ad hoc filters
+
+Elasticsearch supports the **Ad hoc filters** variable type.
+You can use this variable type to specify any number of key/value filters, and Grafana applies them automatically to all of your Elasticsearch queries.
+
+Ad hoc filters support the following operators:
+
+| Operator | Description                                                   |
+| -------- | ------------------------------------------------------------- |
+| `=`      | Equals. Adds `AND field:"value"` to the query.                |
+| `!=`     | Not equals. Adds `AND -field:"value"` to the query.           |
+| `=~`     | Matches regex. Adds `AND field:/value/` to the query.         |
+| `!~`     | Does not match regex. Adds `AND -field:/value/` to the query. |
+| `>`      | Greater than. Adds `AND field:>value` to the query.           |
+| `<`      | Less than. Adds `AND field:<value` to the query.              |
+
+For more information, refer to [Add ad hoc filters](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#add-ad-hoc-filters).
 
 ## Use ad hoc filters
 
@@ -73,7 +70,7 @@ The Elasticsearch data source supports two variable syntaxes for use in the **Qu
 - `[[varname]]`, such as `hostname:[[hostname]]`
 
 When the _Multi-value_ or _Include all value_ options are enabled, Grafana converts the labels from plain text to a Lucene-compatible condition.
-For details, refer to the [Multi-value variables](ref:add-template-variables-multi-value-variables) documentation.
+For details, refer to the [Multi-value variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#multi-value-variables) documentation.
 
 ## Use variables in queries
 

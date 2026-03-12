@@ -31,13 +31,13 @@ func (s *Server) mutateResourcePermissions(ctx context.Context, store *storeInfo
 	for _, operation := range operations {
 		switch op := operation.Operation.(type) {
 		case *authzextv1.MutateOperation_CreatePermission:
-			tuple, err := s.getPermissionWriteTuple(ctx, op.CreatePermission)
+			tuple, err := GetResourcePermissionWriteTuple(op.CreatePermission)
 			if err != nil {
 				return err
 			}
 			writeTuples = append(writeTuples, tuple)
 		case *authzextv1.MutateOperation_DeletePermission:
-			tuple, err := s.getPermissionDeleteTuple(ctx, op.DeletePermission)
+			tuple, err := GetResourcePermissionDeleteTuple(op.DeletePermission)
 			if err != nil {
 				return err
 			}
@@ -47,24 +47,7 @@ func (s *Server) mutateResourcePermissions(ctx context.Context, store *storeInfo
 		}
 	}
 
-	writeReq := &openfgav1.WriteRequest{
-		StoreId:              store.ID,
-		AuthorizationModelId: store.ModelID,
-	}
-	if len(writeTuples) > 0 {
-		writeReq.Writes = &openfgav1.WriteRequestWrites{
-			TupleKeys:   writeTuples,
-			OnDuplicate: "ignore",
-		}
-	}
-	if len(deleteTuples) > 0 {
-		writeReq.Deletes = &openfgav1.WriteRequestDeletes{
-			TupleKeys: deleteTuples,
-			OnMissing: "ignore",
-		}
-	}
-
-	_, err := s.openfga.Write(ctx, writeReq)
+	err := s.writeTuples(ctx, store, writeTuples, deleteTuples)
 	if err != nil {
 		s.logger.Error("failed to write resource permission tuples", "error", err)
 		return err
@@ -73,7 +56,7 @@ func (s *Server) mutateResourcePermissions(ctx context.Context, store *storeInfo
 	return nil
 }
 
-func (s *Server) getPermissionWriteTuple(ctx context.Context, req *authzextv1.CreatePermissionOperation) (*openfgav1.TupleKey, error) {
+func GetResourcePermissionWriteTuple(req *authzextv1.CreatePermissionOperation) (*openfgav1.TupleKey, error) {
 	resource := req.GetResource()
 	permission := req.GetPermission()
 	object := zanzana.NewObjectEntry(toZanzanaType(resource.GetGroup()), resource.GetGroup(), resource.GetResource(), "", resource.GetName())
@@ -85,7 +68,7 @@ func (s *Server) getPermissionWriteTuple(ctx context.Context, req *authzextv1.Cr
 	return tuple, nil
 }
 
-func (s *Server) getPermissionDeleteTuple(ctx context.Context, req *authzextv1.DeletePermissionOperation) (*openfgav1.TupleKeyWithoutCondition, error) {
+func GetResourcePermissionDeleteTuple(req *authzextv1.DeletePermissionOperation) (*openfgav1.TupleKeyWithoutCondition, error) {
 	resource := req.GetResource()
 	permission := req.GetPermission()
 	object := zanzana.NewObjectEntry(toZanzanaType(resource.GetGroup()), resource.GetGroup(), resource.GetResource(), "", resource.GetName())
@@ -156,7 +139,7 @@ func toZanzanaSubject(kind string, name string) (string, error) {
 	case iamv0.ResourcePermissionSpecPermissionKindServiceAccount:
 		return zanzana.NewTupleEntry(zanzana.TypeServiceAccount, name, ""), nil
 	case iamv0.ResourcePermissionSpecPermissionKindTeam:
-		return zanzana.NewTupleEntry(zanzana.TypeTeam, name, ""), nil
+		return zanzana.NewTupleEntry(zanzana.TypeTeam, name, zanzana.RelationTeamMember), nil
 	case iamv0.ResourcePermissionSpecPermissionKindBasicRole:
 		basicRole := zanzana.TranslateBasicRole(name)
 		if basicRole == "" {

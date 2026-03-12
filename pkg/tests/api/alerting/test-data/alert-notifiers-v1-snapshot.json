@@ -3,7 +3,7 @@
     "type": "LINE",
     "name": "LINE",
     "heading": "LINE notify settings",
-    "description": "Send notifications to LINE notify",
+    "description": "Send notifications to LINE notify. This integration is deprecated and will be removed in a future release.",
     "info": "",
     "options": [
       {
@@ -385,6 +385,42 @@
         "description": "",
         "placeholder": "{{ template \"default.message\" . }}",
         "propertyName": "message",
+        "selectOptions": null,
+        "showWhen": {
+          "field": "",
+          "is": ""
+        },
+        "required": false,
+        "validationRule": "",
+        "secure": false,
+        "dependsOn": "",
+        "subformOptions": null
+      },
+      {
+        "element": "checkbox",
+        "inputType": "",
+        "label": "HideOpenButton",
+        "description": "Hide open URL button",
+        "placeholder": "",
+        "propertyName": "hide_open_button",
+        "selectOptions": null,
+        "showWhen": {
+          "field": "",
+          "is": ""
+        },
+        "required": false,
+        "validationRule": "",
+        "secure": false,
+        "dependsOn": "",
+        "subformOptions": null
+      },
+      {
+        "element": "checkbox",
+        "inputType": "",
+        "label": "HideVersionInfo",
+        "description": "Hide version info",
+        "placeholder": "",
+        "propertyName": "hide_version_info",
         "selectOptions": null,
         "showWhen": {
           "field": "",
@@ -2653,6 +2689,24 @@
         "description": "Body of the slack message",
         "placeholder": "{{ template \"slack.default.text\" . }}",
         "propertyName": "text",
+        "selectOptions": null,
+        "showWhen": {
+          "field": "",
+          "is": ""
+        },
+        "required": false,
+        "validationRule": "",
+        "secure": false,
+        "dependsOn": "",
+        "subformOptions": null
+      },
+      {
+        "element": "input",
+        "inputType": "text",
+        "label": "Footer",
+        "description": "Templated footer of the slack message",
+        "placeholder": "{{ template \"slack.default.footer\" . }}",
+        "propertyName": "footer",
         "selectOptions": null,
         "showWhen": {
           "field": "",

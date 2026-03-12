@@ -19,8 +19,12 @@ import (
 	"github.com/grafana/grafana/pkg/login/social/socialimpl"
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/plugins/config"
+	"github.com/grafana/grafana/pkg/plugins/manager/pluginfakes"
+	"github.com/grafana/grafana/pkg/plugins/manager/registry"
 	"github.com/grafana/grafana/pkg/plugins/manager/signature"
 	"github.com/grafana/grafana/pkg/plugins/manager/signature/statickey"
+	pluginassets2 "github.com/grafana/grafana/pkg/plugins/pluginassets"
+	"github.com/grafana/grafana/pkg/plugins/pluginassets/modulehash"
 	"github.com/grafana/grafana/pkg/plugins/pluginscdn"
 	accesscontrolmock "github.com/grafana/grafana/pkg/services/accesscontrol/mock"
 	"github.com/grafana/grafana/pkg/services/apiserver/endpoints/request"
@@ -79,7 +83,8 @@ func setupTestEnvironment(t *testing.T, cfg *setting.Cfg, features featuremgmt.F
 	var pluginsAssets = passets
 	if pluginsAssets == nil {
 		sig := signature.ProvideService(pluginsCfg, statickey.New())
-		pluginsAssets = pluginassets.ProvideService(pluginsCfg, pluginsCDN, sig, pluginStore)
+		calc := modulehash.NewCalculator(pluginsCfg, registry.NewInMemory(), pluginsCDN, sig)
+		pluginsAssets = pluginassets.ProvideService(calc)
 	}
 
 	hs := &HTTPServer{
@@ -237,6 +242,66 @@ func TestIntegrationHTTPServer_GetFrontendSettings_pluginsCDNBaseURL(t *testing.
 	}
 }
 
+func TestIntegrationHTTPServer_GetFrontendSettings_cachingDefaultTTLMs(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
+	type cachingSettings struct {
+		Enabled           bool  `json:"enabled"`
+		CleanCacheEnabled bool  `json:"cleanCacheEnabled"`
+		DefaultTTLMs      int64 `json:"defaultTTLMs"`
+	}
+	type settings struct {
+		Caching cachingSettings `json:"caching"`
+	}
+
+	tests := []struct {
+		desc       string
+		setEnv     func(*testing.T)
+		expectedMs int64
+	}{
+		{
+			desc: "default TTL is 5 minutes (300000ms) when not overridden",
+			setEnv: func(t *testing.T) {
+				t.Setenv("GF_CACHING_TTL", "")
+			},
+			expectedMs: 300000, // 5 * time.Minute
+		},
+		{
+			desc: "TTL from GF_CACHING_TTL env override",
+			setEnv: func(t *testing.T) {
+				t.Setenv("GF_CACHING_TTL", "10m")
+			},
+			expectedMs: 600000, // 10 minutes in ms
+		},
+		{
+			desc: "TTL parses duration string 1m",
+			setEnv: func(t *testing.T) {
+				t.Setenv("GF_CACHING_TTL", "1m")
+			},
+			expectedMs: 60000, // 1 minute in ms
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			if test.setEnv != nil {
+				test.setEnv(t)
+			}
+			cfg := setting.NewCfg()
+			m, _ := setupTestEnvironment(t, cfg, featuremgmt.WithFeatures(), nil, nil, nil)
+			req := httptest.NewRequest(http.MethodGet, "/api/frontend/settings", nil)
+
+			recorder := httptest.NewRecorder()
+			m.ServeHTTP(recorder, req)
+			var got settings
+			err := json.Unmarshal(recorder.Body.Bytes(), &got)
+			require.NoError(t, err)
+			require.Equal(t, http.StatusOK, recorder.Code)
+			require.Equal(t, test.expectedMs, got.Caching.DefaultTTLMs, "caching.defaultTTLMs")
+		})
+	}
+}
+
 func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 	testutil.SkipIntegrationTestInShortMode(t)
 
@@ -265,6 +330,8 @@ func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 								Type:    plugins.TypeApp,
 								Preload: true,
 							},
+							FS:              &pluginfakes.FakePluginFS{},
+							LoadingStrategy: plugins.LoadingStrategyScript,
 						},
 					},
 				}
@@ -302,6 +369,8 @@ func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 								Type:    plugins.TypeApp,
 								Preload: true,
 							},
+							FS:              &pluginfakes.FakePluginFS{},
+							LoadingStrategy: plugins.LoadingStrategyScript,
 						},
 					},
 				}
@@ -338,7 +407,9 @@ func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 								Type:    plugins.TypeApp,
 								Preload: true,
 							},
-							Angular: plugins.AngularMeta{Detected: true},
+							Angular:         plugins.AngularMeta{Detected: true},
+							FS:              &pluginfakes.FakePluginFS{},
+							LoadingStrategy: plugins.LoadingStrategyFetch,
 						},
 					},
 				}
@@ -375,6 +446,7 @@ func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 								Type:    plugins.TypeApp,
 								Preload: true,
 							},
+							LoadingStrategy: plugins.LoadingStrategyScript,
 						},
 					},
 				}
@@ -387,7 +459,7 @@ func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 			pluginAssets: newPluginAssetsWithConfig(&config.PluginManagementCfg{
 				PluginSettings: map[string]map[string]string{
 					"test-app": {
-						pluginassets.CreatePluginVersionCfgKey: pluginassets.CreatePluginVersionScriptSupportEnabled,
+						pluginassets2.CreatePluginVersionCfgKey: pluginassets2.CreatePluginVersionScriptSupportEnabled,
 					},
 				},
 			}),
@@ -404,12 +476,12 @@ func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 			},
 		},
 		{
-			desc: "app plugin with CDN class",
+			desc: "app plugin with CDN fs",
 			pluginStore: func() pluginstore.Store {
 				return &pluginstore.FakePluginStore{
 					PluginList: []pluginstore.Plugin{
 						{
-							Class:  plugins.ClassCDN,
+							Class:  plugins.ClassExternal,
 							Module: fmt.Sprintf("/%s/module.js", "test-app"),
 							JSONData: plugins.JSONData{
 								ID:      "test-app",
@@ -417,6 +489,10 @@ func TestIntegrationHTTPServer_GetFrontendSettings_apps(t *testing.T) {
 								Type:    plugins.TypeApp,
 								Preload: true,
 							},
+							FS: &pluginfakes.FakePluginFS{TypeFunc: func() plugins.FSType {
+								return plugins.FSTypeCDN
+							}},
+							LoadingStrategy: plugins.LoadingStrategyFetch,
 						},
 					},
 				}
@@ -545,6 +621,8 @@ func TestIntegrationHTTPServer_GetFrontendSettings_translations(t *testing.T) {
 								"en-US": "public/plugins/test-app/locales/en-US/test-app.json",
 								"pt-BR": "public/plugins/test-app/locales/pt-BR/test-app.json",
 							},
+							FS:              &pluginfakes.FakePluginFS{},
+							LoadingStrategy: plugins.LoadingStrategyScript,
 						},
 					},
 				}
@@ -594,6 +672,8 @@ func TestIntegrationHTTPServer_GetFrontendSettings_translations(t *testing.T) {
 								"en-US": "public/plugins/test-app/locales/en-US/test-app.json",
 								"pt-BR": "public/plugins/test-app/locales/pt-BR/test-app.json",
 							},
+							FS:              &pluginfakes.FakePluginFS{},
+							LoadingStrategy: plugins.LoadingStrategyScript,
 						},
 					},
 				}
@@ -633,6 +713,8 @@ func TestIntegrationHTTPServer_GetFrontendSettings_translations(t *testing.T) {
 								"en-US": "public/plugins/test-app/locales/en-US/test-app.json",
 								"pt-BR": "public/plugins/test-app/locales/pt-BR/test-app.json",
 							},
+							FS:              &pluginfakes.FakePluginFS{},
+							LoadingStrategy: plugins.LoadingStrategyScript,
 						},
 					},
 				}
@@ -704,6 +786,8 @@ func newPluginAssets() func() *pluginassets.Service {
 
 func newPluginAssetsWithConfig(pCfg *config.PluginManagementCfg) func() *pluginassets.Service {
 	return func() *pluginassets.Service {
-		return pluginassets.ProvideService(pCfg, pluginscdn.ProvideService(pCfg), signature.ProvideService(pCfg, statickey.New()), &pluginstore.FakePluginStore{})
+		cdn := pluginscdn.ProvideService(pCfg)
+		calc := modulehash.NewCalculator(pCfg, registry.NewInMemory(), cdn, signature.ProvideService(pCfg, statickey.New()))
+		return pluginassets.ProvideService(calc)
 	}
 }

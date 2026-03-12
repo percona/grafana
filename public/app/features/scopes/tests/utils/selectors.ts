@@ -35,7 +35,7 @@ const selectors = {
   },
 };
 
-export const getSelectorInput = () => screen.getByTestId<HTMLInputElement>(selectors.selector.input);
+export const getSelectorInput = () => screen.getByTestId(selectors.selector.input);
 export const getSelectorClear = () => screen.getByTestId(selectors.selector.clear);
 export const querySelectorApply = () => screen.queryByTestId(selectors.selector.apply);
 export const getSelectorApply = () => screen.getByTestId(selectors.selector.apply);
@@ -73,6 +73,8 @@ export const queryResultApplicationsGrafanaSelect = () =>
   screen.queryByTestId<HTMLInputElement>(selectors.tree.select('applications-grafana'));
 export const getResultApplicationsGrafanaSelect = () =>
   screen.getByTestId<HTMLInputElement>(selectors.tree.select('applications-grafana'));
+export const findResultApplicationsGrafanaSelect = () =>
+  screen.findByTestId<HTMLInputElement>(selectors.tree.select('applications-grafana'));
 export const queryPersistedApplicationsGrafanaSelect = () =>
   screen.queryByTestId<HTMLInputElement>(selectors.tree.select('applications-grafana'));
 export const getPersistedApplicationsGrafanaSelect = () =>

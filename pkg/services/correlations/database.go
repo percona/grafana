@@ -197,9 +197,8 @@ func (s CorrelationsService) getCorrelation(ctx context.Context, cmd GetCorrelat
 	}
 
 	err := s.SQLStore.WithTransactionalDbSession(ctx, func(session *db.Session) error {
-		// Correlations created before the fix #72498 may have org_id = 0, but it's deprecated and will be removed in #72325
 		sql := session.Select("correlation.*, dss.type as source_type, dst.type as target_type").
-			Join("", "data_source AS dss", "correlation.source_uid = dss.uid and (correlation.org_id = 0 or dss.org_id = correlation.org_id) and dss.org_id = ?", cmd.OrgId).
+			Join("", "data_source AS dss", "correlation.source_uid = dss.uid and dss.org_id = correlation.org_id and dss.org_id = ?", cmd.OrgId).
 			Join("LEFT OUTER", "data_source AS dst", "correlation.target_uid = dst.uid and dst.org_id = ?", cmd.OrgId).
 			Where("correlation.uid = ?", correlation.UID).
 			And("correlation.org_id = ?", correlation.OrgID).
@@ -277,9 +276,8 @@ func (s CorrelationsService) getCorrelations(ctx context.Context, cmd GetCorrela
 	err := s.SQLStore.WithDbSession(ctx, func(session *db.Session) error {
 		offset := cmd.Limit * (cmd.Page - 1)
 
-		// Correlations created before the fix #72498 may have org_id = 0, but it's deprecated and will be removed in #72325
 		q := session.Select("correlation.*, dss.type as source_type, dst.type as target_type").
-			Join("", "data_source AS dss", "correlation.source_uid = dss.uid and (correlation.org_id = 0 or dss.org_id = correlation.org_id) and dss.org_id = ? ", cmd.OrgId).
+			Join("", "data_source AS dss", "correlation.source_uid = dss.uid and dss.org_id = correlation.org_id and dss.org_id = ? ", cmd.OrgId).
 			Join("LEFT OUTER", "data_source AS dst", "correlation.target_uid = dst.uid and dst.org_id = ?", cmd.OrgId)
 
 		if len(cmd.SourceUIDs) > 0 {

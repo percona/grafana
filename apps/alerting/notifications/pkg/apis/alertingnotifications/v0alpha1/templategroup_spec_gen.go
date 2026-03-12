@@ -3,12 +3,26 @@
 package v0alpha1
 
 // +k8s:openapi-gen=true
+type TemplateGroupTemplateKind string
+
+const (
+	TemplateGroupTemplateKindGrafana TemplateGroupTemplateKind = "grafana"
+	TemplateGroupTemplateKindMimir   TemplateGroupTemplateKind = "mimir"
+)
+
+// +k8s:openapi-gen=true
 type TemplateGroupSpec struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title   string                    `json:"title"`
+	Content string                    `json:"content"`
+	Kind    TemplateGroupTemplateKind `json:"kind"`
 }
 
 // NewTemplateGroupSpec creates a new TemplateGroupSpec object.
 func NewTemplateGroupSpec() *TemplateGroupSpec {
-	return &TemplateGroupSpec{}
+	return &TemplateGroupSpec{
+		Kind: TemplateGroupTemplateKindGrafana,
+	}
+}
+func (TemplateGroupSpec) OpenAPIModelName() string {
+	return "com.github.grafana.grafana.apps.alerting.notifications.pkg.apis.alertingnotifications.v0alpha1.TemplateGroupSpec"
 }

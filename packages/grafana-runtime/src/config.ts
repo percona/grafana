@@ -85,7 +85,9 @@ export class GrafanaBootConfig {
   publicDashboardsEnabled = true;
   snapshotEnabled = true;
   datasources: { [str: string]: DataSourceInstanceSettings } = {};
+  /** @deprecated it will be removed in a future release, use isPanelPluginInstalled, getPanelPluginVersion or getListedPanelPluginIds instead */
   panels: { [key: string]: PanelPluginMeta } = {};
+  /** @deprecated it will be removed in a future release, use isAppPluginInstalled or getAppPluginVersion instead */
   apps: Record<string, AppPluginConfigGrafanaData> = {};
   auth: AuthSettings = {};
   minRefreshInterval = '';
@@ -104,6 +106,7 @@ export class GrafanaBootConfig {
   externalUserMngInfo = '';
   externalUserMngAnalytics = false;
   externalUserMngAnalyticsParams = '';
+  externalUserUpgradeLinkUrl = '';
   allowOrgCreate = false;
   feedbackLinksEnabled = true;
   disableLoginForm = false;
@@ -135,6 +138,7 @@ export class GrafanaBootConfig {
   trustedTypesDefaultPolicyEnabled = false;
   cspReportOnlyEnabled = false;
   liveEnabled = true;
+  liveNamespaced = false; // orgId vs namespace
   liveMessageSizeLimit = 65536;
   /** @deprecated Use `theme2` instead. */
   theme: GrafanaTheme;
@@ -159,7 +163,6 @@ export class GrafanaBootConfig {
     performanceInstrumentalizationEnabled: false,
     cspInstrumentalizationEnabled: false,
     tracingInstrumentalizationEnabled: false,
-    webVitalsAttribution: false,
     internalLoggerLevel: 0,
     botFilterEnabled: false,
   };
@@ -169,10 +172,12 @@ export class GrafanaBootConfig {
   pluginCatalogHiddenPlugins: string[] = [];
   pluginCatalogManagedPlugins: string[] = [];
   pluginCatalogPreinstalledPlugins: PreinstalledPluginGrafanaData[] = [];
+  pluginCatalogPreinstalledAutoUpdate?: boolean;
   pluginsCDNBaseURL = '';
   expressionsEnabled = false;
   awsAllowedAuthProviders: string[] = [];
   awsAssumeRoleEnabled = false;
+  awsPerDatasourceHTTPProxyEnabled = false;
   azure: AzureSettingsGrafanaData = {
     managedIdentityEnabled: false,
     workloadIdentityEnabled: false,
@@ -182,6 +187,8 @@ export class GrafanaBootConfig {
   };
   caching = {
     enabled: false,
+    cleanCacheEnabled: true,
+    defaultTTLMs: 300000,
   };
   geomapDefaultBaseLayerConfig?: MapLayerOptions;
   geomapDisableCustomBaseLayer?: boolean;
@@ -203,6 +210,7 @@ export class GrafanaBootConfig {
   };
   applicationInsightsConnectionString?: string;
   applicationInsightsEndpointUrl?: string;
+  applicationInsightsAutoRouteTracking?: boolean;
   recordedQueries = {
     enabled: true,
   };
@@ -221,6 +229,7 @@ export class GrafanaBootConfig {
   rudderstackWriteKey?: string;
   rudderstackDataPlaneUrl?: string;
   rudderstackSdkUrl?: string;
+  rudderstackV3SdkUrl?: string;
   rudderstackConfigUrl?: string;
   rudderstackIntegrationsUrl?: string;
   analyticsConsoleReporting = false;
@@ -238,6 +247,7 @@ export class GrafanaBootConfig {
   sharedWithMeFolderUID?: string;
   rootFolderUID?: string;
   localFileSystemAvailable?: boolean;
+  cloudMigrationEnabled?: boolean;
   cloudMigrationIsTarget?: boolean;
   cloudMigrationPollIntervalMs = 2000;
   reportingStaticContext?: Record<string, string>;
@@ -279,6 +289,8 @@ export class GrafanaBootConfig {
     overrideFeatureTogglesFromUrl(this);
     overrideFeatureTogglesFromLocalStorage(this);
 
+    this.bootData.settings.featureToggles = this.featureToggles;
+
     // Creating theme after applying feature toggle overrides in case we need to toggle anything
     this.theme2 = getThemeById(this.bootData.user.theme);
     this.bootData.user.lightTheme = this.theme2.isLight;
@@ -314,7 +326,7 @@ function overrideFeatureTogglesFromUrl(config: GrafanaBootConfig) {
 
   // Although most flags can not be changed from the URL in production,
   // some of them are safe (and useful!) to change dynamically from the browser URL
-  const safeRuntimeFeatureFlags = new Set(['queryServiceFromUI', 'dashboardSceneSolo']);
+  const safeRuntimeFeatureFlags = new Set(['queryServiceFromUI']);
 
   const params = new URLSearchParams(window.location.search);
   params.forEach((value, key) => {

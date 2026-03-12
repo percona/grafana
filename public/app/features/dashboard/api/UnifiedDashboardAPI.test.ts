@@ -2,7 +2,7 @@ import { Dashboard } from '@grafana/schema';
 import {
   Spec as DashboardV2Spec,
   defaultSpec as defaultDashboardV2Spec,
-} from '@grafana/schema/dist/esm/schema/dashboard/v2';
+} from '@grafana/schema/apis/dashboard.grafana.app/v2';
 import { ResourceList } from 'app/features/apiserver/types';
 import { DashboardDataDTO, DashboardDTO } from 'app/types/dashboard';
 
@@ -89,12 +89,7 @@ describe('UnifiedDashboardAPI', () => {
       };
 
       v1Client.getDashboardDTO.mockRejectedValue(new DashboardVersionError('v2beta1', 'Dashboard is V1 format'));
-      v2Client.getDashboardDTO.mockImplementation((params) => {
-        const actualClient = jest.requireActual('./v2').K8sDashboardV2API;
-        const client = new actualClient();
-        return client.getDashboardDTO(params);
-      });
-      mockBackendSrvGet = mockV2Response;
+      v2Client.getDashboardDTO.mockResolvedValue(mockV2Response as DashboardWithAccessInfo<DashboardV2Spec>);
       const result = await api.getDashboardDTO('123');
       expect(result).toEqual(mockV2Response);
       expect(v2Client.getDashboardDTO).toHaveBeenCalledWith('123');
@@ -104,7 +99,7 @@ describe('UnifiedDashboardAPI', () => {
   describe('saveDashboard', () => {
     it('should use v1 client for v1 dashboard', async () => {
       const mockCommand = { dashboard: { title: 'test' } };
-      v1Client.saveDashboard.mockResolvedValue({ id: 1, status: 'success', slug: '', uid: '', url: '', version: 1 });
+      v1Client.saveDashboard.mockResolvedValue({ status: 'success', slug: '', uid: '', url: '', version: 1 });
 
       await api.saveDashboard(mockCommand as SaveDashboardCommand<Dashboard>);
 
@@ -140,7 +135,7 @@ describe('UnifiedDashboardAPI', () => {
         },
       };
 
-      v2Client.saveDashboard.mockResolvedValue({ id: 1, status: 'success', slug: '', uid: '', url: '', version: 1 });
+      v2Client.saveDashboard.mockResolvedValue({ status: 'success', slug: '', uid: '', url: '', version: 1 });
 
       await api.saveDashboard(mockCommand as SaveDashboardCommand<DashboardV2Spec>);
 

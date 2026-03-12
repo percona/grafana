@@ -1,10 +1,10 @@
-import { PanelPlugin, LogsSortOrder, LogsDedupStrategy, LogsDedupDescription } from '@grafana/data';
+import { PanelPlugin, LogsSortOrder, LogsDedupStrategy, LogsDedupDescription, FieldType } from '@grafana/data';
 import { t } from '@grafana/i18n';
 import { config } from '@grafana/runtime';
+import { showDefaultSuggestion } from 'app/features/panel/suggestions/utils';
 
 import { LogsPanel } from './LogsPanel';
 import { Options } from './panelcfg.gen';
-import { LogsPanelSuggestionsSupplier } from './suggestions';
 
 export const plugin = new PanelPlugin<Options>(LogsPanel)
   .setPanelOptions((builder, context) => {
@@ -57,6 +57,15 @@ export const plugin = new PanelPlugin<Options>(LogsPanel)
       category,
       description: '',
       defaultValue: false,
+    });
+
+    builder.addBooleanSwitch({
+      path: 'unwrappedColumns',
+      name: t('logs.name-unwrapped-columns', 'Enable columns for displayed fields'),
+      category,
+      description: 'Align values using columns when using displayed fields',
+      defaultValue: false,
+      showIf: (currentOptions) => Boolean(currentOptions.wrapLogMessage) === false,
     });
 
     // In the old panel this is an independent option, in the new panel is linked to wrapLogMessage
@@ -207,4 +216,6 @@ export const plugin = new PanelPlugin<Options>(LogsPanel)
         defaultValue: LogsSortOrder.Descending,
       });
   })
-  .setSuggestionsSupplier(new LogsPanelSuggestionsSupplier());
+  .setSuggestionsSupplier(
+    showDefaultSuggestion((ds) => ds.hasData && ds.hasFieldType(FieldType.time) && ds.hasFieldType(FieldType.string))
+  );

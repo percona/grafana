@@ -146,6 +146,14 @@ By hovering over a panel with the mouse you can use some shortcuts that will tar
 - `pd`: Duplicate panel
 - `pr`: Remove panel
 
+## Kiosk mode
+
+In kiosk mode, the main menu and top navigation bar of a dashboard are hidden.
+This can be useful if you want to display as much information as possible on the screen or use the dashboard to present information to a wider audience.
+
+- **Turn on kiosk mode**: Click your user icon and select **Enable kiosk mode**.
+- **Turn off kiosk mode**: Press `Esc`.
+
 ## Set dashboard time range
 
 Grafana provides several ways to manage the time ranges of the data being visualized, for dashboard, panels and also for alerting.
@@ -263,13 +271,16 @@ Click the **Copy time range to clipboard** icon to copy the current time range t
 
 You can also copy and paste a time range using the keyboard shortcuts `t+c` and `t+v` respectively.
 
-#### Zoom out (Cmd+Z or Ctrl+Z)
+#### Zoom out
 
-Click the **Zoom out** icon to view a larger time range in the dashboard or panel visualization.
+- Click the **Zoom out** icon to view a larger time range in the dashboard or panel visualizations
+- Double click on the panel graph area (time series family visualizations only)
+- Type the `t-` keyboard shortcut
 
-#### Zoom in (only applicable to graph visualizations)
+#### Zoom in
 
-Click and drag to select the time range in the visualization that you want to view.
+- Click and drag horizontally in the panel graph area to select a time range (time series family visualizations only)
+- Type the `t+` keyboard shortcut
 
 #### Refresh dashboard
 

@@ -22,6 +22,8 @@ import (
 	fswebassets "github.com/grafana/grafana/pkg/services/frontend/webassets"
 	"github.com/grafana/grafana/pkg/services/hooks"
 	"github.com/grafana/grafana/pkg/services/licensing"
+	publicdashboardsapi "github.com/grafana/grafana/pkg/services/publicdashboards/api"
+	settingservice "github.com/grafana/grafana/pkg/services/setting"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/web"
 )
@@ -48,10 +50,12 @@ type frontendService struct {
 	tracer       trace.Tracer
 	license      licensing.Licensing
 
-	index *IndexProvider
+	index           *IndexProvider
+	settingsService settingservice.Service // nil if not configured
 }
 
 func ProvideFrontendService(cfg *setting.Cfg, features featuremgmt.FeatureToggles, promGatherer prometheus.Gatherer, promRegister prometheus.Registerer, license licensing.Licensing, hooksService *hooks.HooksService) (*frontendService, error) {
+	logger := log.New("frontend-service")
 	assetsManifest, err := fswebassets.GetWebAssets(cfg, license)
 	if err != nil {
 		return nil, err
@@ -62,15 +66,25 @@ func ProvideFrontendService(cfg *setting.Cfg, features featuremgmt.FeatureToggle
 		return nil, err
 	}
 
+	// Initialize Settings Service client if configured
+	var settingsService settingservice.Service
+	if settingsSvc, err := setupSettingsService(cfg, promRegister); err != nil {
+		logger.Error("Settings Service failed to initialize", "err", err)
+		return nil, err
+	} else {
+		settingsService = settingsSvc
+	}
+
 	s := &frontendService{
-		cfg:          cfg,
-		features:     features,
-		log:          log.New("frontend-server"),
-		promGatherer: promGatherer,
-		promRegister: promRegister,
-		tracer:       tracer,
-		license:      license,
-		index:        index,
+		cfg:             cfg,
+		features:        features,
+		log:             logger,
+		promGatherer:    promGatherer,
+		promRegister:    promRegister,
+		tracer:          tracer,
+		license:         license,
+		index:           index,
+		settingsService: settingsService,
 	}
 	s.BasicService = services.NewBasicService(s.start, s.running, s.stop)
 	return s, nil
@@ -139,6 +153,11 @@ func (s *frontendService) addMiddlewares(m *web.Mux) {
 	m.UseMiddleware(s.contextMiddleware())
 	m.UseMiddleware(loggermiddleware.Middleware())
 
+	// Must run before CSP middleware since CSP reads config from context
+	m.UseMiddleware(RequestConfigMiddleware(s.cfg, s.license, s.settingsService))
+
+	m.UseMiddleware(CSPMiddleware())
+
 	m.UseMiddleware(middleware.Recovery(s.cfg, s.license))
 }
 
@@ -163,6 +182,11 @@ func (s *frontendService) registerRoutes(m *web.Mux) {
 	// GET because all POST requests are passed to the backend, even though POST is more correct. The frontend
 	// uses cache busting to ensure requests aren't cached.
 	s.routeGet(m, "/-/fe-boot-error", s.handleBootError)
+
+	s.routeGet(m, "/public-dashboards/:accessToken",
+		publicdashboardsapi.SetPublicDashboardAccessToken,
+		s.index.HandleRequest,
+	)
 
 	// All other requests return index.html
 	s.routeGet(m, "/*", s.index.HandleRequest)

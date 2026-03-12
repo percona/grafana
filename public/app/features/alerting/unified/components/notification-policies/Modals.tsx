@@ -1,5 +1,5 @@
 import { groupBy } from 'lodash';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, type JSX, useCallback, useMemo, useState } from 'react';
 
 import { Trans, t } from '@grafana/i18n';
 import { Button, Icon, Modal, ModalProps, Spinner, Stack } from '@grafana/ui';
@@ -298,10 +298,10 @@ const useAlertGroupsModal = (
   return [modalElement, handleShow, handleDismiss];
 };
 
-const UpdatingModal: FC<Pick<ModalProps, 'isOpen'>> = ({ isOpen }) => (
+export const UpdatingModal: FC<Pick<ModalProps, 'isOpen' | 'onDismiss'>> = ({ isOpen, onDismiss = () => {} }) => (
   <Modal
     isOpen={isOpen}
-    onDismiss={() => {}}
+    onDismiss={onDismiss}
     closeOnBackdropClick={false}
     closeOnEscape={false}
     ariaLabel={t('alerting.policies.update.updating', 'Updating...')}

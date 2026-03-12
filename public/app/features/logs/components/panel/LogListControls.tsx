@@ -5,13 +5,13 @@ import { MouseEvent, useCallback, useMemo } from 'react';
 import {
   CoreApp,
   EventBus,
+  GrafanaTheme2,
   LogLevel,
   LogsDedupDescription,
   LogsDedupStrategy,
   LogsSortOrder,
   store,
 } from '@grafana/data';
-import { GrafanaTheme2 } from '@grafana/data/';
 import { t } from '@grafana/i18n';
 import { config, reportInteraction } from '@grafana/runtime';
 import { Dropdown, Menu, useStyles2 } from '@grafana/ui';
@@ -22,7 +22,7 @@ import { DownloadFormat } from '../../utils';
 import { useLogListContext } from './LogListContext';
 import { LogListControlsOption, LogListControlsSelectOption } from './LogListControlsOption';
 import { useLogListSearchContext } from './LogListSearchContext';
-import { ScrollToLogsEvent } from './virtualization';
+import { LOG_LIST_CONTROLS_WIDTH, ScrollToLogsEvent } from './virtualization';
 
 type Props = {
   eventBus: EventBus;
@@ -69,11 +69,13 @@ export const LogListControls = ({ eventBus, logLevels = FILTER_LEVELS, visualisa
     setShowUniqueLabels,
     setSortOrder,
     setSyntaxHighlighting,
+    setUnwrappedColumns,
     setWrapLogMessage,
     showTime,
     showUniqueLabels,
     sortOrder,
     syntaxHighlighting,
+    unwrappedColumns,
     wrapLogMessage,
   } = useLogListContext();
   const { hideSearch, searchVisible, showSearch } = useLogListSearchContext();
@@ -167,6 +169,17 @@ export const LogListControls = ({ eventBus, logLevels = FILTER_LEVELS, visualisa
     });
     setSyntaxHighlighting(!syntaxHighlighting);
   }, [setSyntaxHighlighting, syntaxHighlighting]);
+
+  const onSetUnwrappedColumnsClick = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault();
+      reportInteraction('logs_log_list_controls_unwrapped_columns_clicked', {
+        state: !unwrappedColumns,
+      });
+      setUnwrappedColumns(!unwrappedColumns);
+    },
+    [setUnwrappedColumns, unwrappedColumns]
+  );
 
   const onWrapLogMessageClick = useCallback(
     (e: MouseEvent) => {
@@ -402,6 +415,34 @@ export const LogListControls = ({ eventBus, logLevels = FILTER_LEVELS, visualisa
                     wrapLogMessage
                       ? t('logs.logs-controls.unwrap-lines', 'Unwrap lines')
                       : t('logs.logs-controls.wrap-lines', 'Wrap lines')
+                  }
+                  size="lg"
+                />
+              )}
+              {config.featureToggles.newLogsPanel && (
+                <LogListControlsOption
+                  expanded={controlsExpanded}
+                  disabled={wrapLogMessage}
+                  name="columns"
+                  aria-pressed={unwrappedColumns}
+                  className={unwrappedColumns ? styles.controlButtonActive : styles.controlButton}
+                  onClick={onSetUnwrappedColumnsClick}
+                  label={
+                    wrapLogMessage
+                      ? t('logs.logs-controls.unwrapped-columns.disabled-label', 'Columns not supported')
+                      : unwrappedColumns
+                        ? t('logs.logs-controls.unwrapped-columns.disabled-text', 'Columns enabled')
+                        : t('logs.logs-controls.unwrapped-columns.enabled-text', 'Columns disabled')
+                  }
+                  tooltip={
+                    wrapLogMessage
+                      ? t(
+                          'logs.logs-controls.unwrapped-columns.not-supported',
+                          'Columns are not supported with line wrapping enabled'
+                        )
+                      : unwrappedColumns
+                        ? t('logs.logs-controls.unwrapped-columns.disable', 'Disable columns')
+                        : t('logs.logs-controls.unwrapped-columns.enable', 'Enable columns')
                   }
                   size="lg"
                 />
@@ -757,7 +798,6 @@ const getWrapButtonStyles = (theme: GrafanaTheme2, expanded: boolean) => {
   };
 };
 
-export const CONTROLS_WIDTH = 35;
 export const CONTROLS_WIDTH_EXPANDED = 176;
 
 const getStyles = (theme: GrafanaTheme2, controlsExpanded: boolean) => {
@@ -769,7 +809,7 @@ const getStyles = (theme: GrafanaTheme2, controlsExpanded: boolean) => {
       gap: theme.spacing(3),
       flexDirection: 'column',
       justifyContent: 'flex-start',
-      width: controlsExpanded ? CONTROLS_WIDTH_EXPANDED : CONTROLS_WIDTH,
+      width: controlsExpanded ? CONTROLS_WIDTH_EXPANDED : LOG_LIST_CONTROLS_WIDTH,
       paddingTop: theme.spacing(0.75),
       paddingLeft: theme.spacing(1),
       borderLeft: `solid 1px ${theme.colors.border.medium}`,

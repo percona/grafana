@@ -2,6 +2,7 @@ import { ReactElement, useEffect, useMemo, useState } from 'react';
 
 import { t } from '@grafana/i18n';
 import {
+  MultiValueVariable,
   SceneComponentProps,
   sceneGraph,
   SceneObjectBase,
@@ -11,8 +12,9 @@ import {
 import {
   ConditionalRenderingVariableKind,
   ConditionalRenderingVariableSpec,
-} from '@grafana/schema/dist/esm/schema/dashboard/v2';
+} from '@grafana/schema/apis/dashboard.grafana.app/v2';
 import { Box, Combobox, ComboboxOption, Field, Input, Stack } from '@grafana/ui';
+import { ALL_VARIABLE_TEXT } from 'app/features/variables/constants';
 
 import { dashboardEditActions } from '../../edit-pane/shared';
 import { getDashboardSceneFor } from '../../utils/utils';
@@ -20,7 +22,7 @@ import { getLowerTranslatedObjectType } from '../object';
 
 import { ConditionalRenderingConditionWrapper } from './ConditionalRenderingConditionWrapper';
 import { ConditionalRenderingConditionsSerializerRegistryItem } from './serializers';
-import { checkGroup, getObjectType } from './utils';
+import { checkGroup, getObject, getObjectType } from './utils';
 
 type VariableConditionValueOperator = '=' | '!=' | '=~' | '!~';
 
@@ -40,14 +42,6 @@ export class ConditionalRenderingVariable extends SceneObjectBase<ConditionalRen
     deserialize: this.deserialize,
   };
 
-  protected _variableDependency = new VariableDependencyConfig(this, {
-    onAnyVariableChanged: (v) => {
-      if (v.state.name === this.state.variable) {
-        this._check();
-      }
-    },
-  });
-
   public constructor(state: ConditionalRenderingVariableState) {
     super(state);
 
@@ -55,6 +49,20 @@ export class ConditionalRenderingVariable extends SceneObjectBase<ConditionalRen
   }
 
   private _activationHandler() {
+    const object = getObject(this);
+
+    if (!object) {
+      return;
+    }
+
+    this._variableDependency = new VariableDependencyConfig(object, {
+      onAnyVariableChanged: (v) => {
+        if (v.state.name === this.state.variable) {
+          this._check();
+        }
+      },
+    });
+
     this.forEachChild((child) => {
       if (!child.isActive) {
         this._subs.add(child.activate());
@@ -78,20 +86,33 @@ export class ConditionalRenderingVariable extends SceneObjectBase<ConditionalRen
       return undefined;
     }
 
-    const variable = sceneGraph.getVariables(this).getByName(this.state.variable);
+    const object = getObject(this);
+
+    if (!object) {
+      return undefined;
+    }
+
+    const variable = sceneGraph.getVariables(object).getByName(this.state.variable);
 
     if (!variable) {
       return undefined;
     }
 
     const variableValue = variable.getValue() ?? '';
+    const comparisonValue = this.state.value.toString();
+
+    // Check if "All" is selected in a multi-value variable with includeAll option
+    const isAllSelected =
+      variable instanceof MultiValueVariable &&
+      variable.hasAllValue() &&
+      comparisonValue.toLowerCase() === ALL_VARIABLE_TEXT.toLowerCase();
 
     let hit: boolean;
 
     if (this.state.operator === '=' || this.state.operator === '!=') {
       hit = Array.isArray(variableValue)
-        ? variableValue.includes(this.state.value.toString())
-        : variableValue === this.state.value.toString();
+        ? variableValue.includes(comparisonValue) || isAllSelected
+        : variableValue === comparisonValue || isAllSelected;
     } else {
       try {
         const regex = new RegExp(this.state.value);
@@ -125,6 +146,10 @@ export class ConditionalRenderingVariable extends SceneObjectBase<ConditionalRen
       this.setState({ value });
       this._check();
     }
+  }
+
+  public forceCheck() {
+    this._check();
   }
 
   public renderCmp(): ReactElement {

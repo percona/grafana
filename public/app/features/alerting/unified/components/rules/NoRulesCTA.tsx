@@ -7,6 +7,7 @@ import { Dropdown, EmptyState, LinkButton, Menu, MenuItem, Stack, Text, TextLink
 
 import { RuleFormType, RuleFormValues } from '../../types/rule-form';
 import { useRulesAccess } from '../../utils/accessControlHooks';
+import { DOCS_URL_PROVISION_ALERTING } from '../../utils/docs';
 import { createRelativeUrl } from '../../utils/url';
 
 const RecordingRulesButtons = () => {
@@ -97,7 +98,7 @@ export const NoRulesSplash = () => {
         <Trans i18nKey="alerting.list-view.empty.provisioning">
           You can also define rules through file provisioning or Terraform
         </Trans>
-        <TextLink href="https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/" external>
+        <TextLink href={DOCS_URL_PROVISION_ALERTING} external>
           <Trans i18nKey="alerting.common.learn-more">Learn more</Trans>
         </TextLink>
       </EmptyState>
@@ -120,10 +121,7 @@ export function GrafanaNoRulesCTA() {
           <Trans i18nKey="alerting.list-view.empty.provisioning">
             You can also define rules through file provisioning or Terraform
           </Trans>
-          <TextLink
-            href="https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/"
-            external
-          >
+          <TextLink href={DOCS_URL_PROVISION_ALERTING} external>
             <Trans i18nKey="alerting.common.learn-more">Learn more</Trans>
           </TextLink>
         </Stack>

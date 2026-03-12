@@ -47,7 +47,12 @@ jobs:
     runs-on: ubuntu-latest-16-cores
     permissions:
       contents: read
+      id-token: write
     steps:
+      - uses: grafana/shared-workflows/actions/dockerhub-login@main
+        if: github.event.pull_request.head.repo.fork == false
+      - uses: grafana/shared-workflows/actions/login-to-gar@main
+        if: github.event.pull_request.head.repo.fork == false
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
@@ -66,10 +71,12 @@ jobs:
       - name: Build Grafana
         if: steps.cache.outputs.cache-hit != 'true'
         uses: dagger/dagger-for-github@d913e70051faf3b907d4dd96ef1161083c88c644
+        env:
+          CACHE_BUILDERS: ${{ github.event.pull_request.head.repo.fork == false }}
         with:
           version: 0.18.8
           verb: run
-          args: go run ./pkg/build/cmd artifacts -a targz:grafana:linux/amd64 -a docker:grafana:linux/amd64 --grafana-dir="${PWD}" > out.txt
+          args: go run ./pkg/build/cmd artifacts -a targz:grafana:linux/amd64 -a docker:grafana:linux/amd64 --grafana-dir="${PWD}" --cache-builders=${CACHE_BUILDERS} > out.txt
       - name: Cat built artifact
         if: steps.cache.outputs.cache-hit != 'true'
         run: cat out.txt
@@ -94,14 +101,14 @@ jobs:
         id: artifact
 
       - name: Upload grafana.tar.gz
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           retention-days: 1
           name: grafana-tar-gz
           path: build-dir/grafana.tar.gz
 
       - name: Upload grafana docker tarball
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           retention-days: 1
           name: grafana-docker-tar-gz
@@ -133,7 +140,7 @@ jobs:
           # We want a static binary, so we need to set CGO_ENABLED=0
           CGO_ENABLED=0 go build -o ./e2e-runner ./e2e/
           echo "artifact=e2e-runner-${{github.run_number}}" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         id: upload
         with:
           retention-days: 1
@@ -245,7 +252,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "suite=$(echo "$SUITE" | sed 's/\//-/g')" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: success() || failure()
         with:
           name: ${{ steps.set-suite-name.outputs.suite }}-${{ github.run_number }}
@@ -307,7 +314,7 @@ jobs:
           version: 0.18.8
           verb: run
           args: go run ./pkg/build/e2e-playwright --package=grafana.tar.gz --shard=${{ matrix.shard }}/${{ matrix.shardTotal }} --blob-dir=./blob-report
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: success() || failure()
         with:
           name: playwright-blob-${{ github.run_number }}-${{ matrix.shard }}
@@ -439,7 +446,7 @@ jobs:
 
       - name: Upload HTML report
         id: upload-html
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-html-${{ github.run_number }}
           path: playwright-report
@@ -498,7 +505,7 @@ jobs:
           args: go run ./pkg/build/a11y --package=grafana.tar.gz --no-threshold-fail --results=./pa11y-ci-results.json
       - name: Upload pa11y results
         if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           retention-days: 1
           name: pa11y-ci-results

@@ -18,6 +18,7 @@ import {
   getJsonInputFiles,
   constructLatestVersionOutputFilename,
 } from './__tests__/migrationTestUtils';
+import { getPanelPluginToMigrateTo } from './getPanelPluginToMigrateTo';
 
 /*
  * Backend / Frontend Migration Comparison Test Design Explanation:
@@ -67,6 +68,7 @@ describe('Backend / Frontend result comparison', () => {
       // Construct the backend output filename: v30.something.json -> v30.something.v41.json
       const backendOutputFilename = constructLatestVersionOutputFilename(inputFile, DASHBOARD_SCHEMA_VERSION);
       const backendMigrationResult = JSON.parse(readFileSync(path.join(outputDir, backendOutputFilename), 'utf8'));
+      delete backendMigrationResult.id; // Remove id to match frontend behavior
 
       expect(backendMigrationResult.schemaVersion).toEqual(DASHBOARD_SCHEMA_VERSION);
 
@@ -83,6 +85,22 @@ describe('Backend / Frontend result comparison', () => {
 
       // version in the backend is never added because it is returned from the backend as metadata
       delete frontendMigrationResult.version;
+
+      // since we are initializing panels inside collapsed rows with PanelModel in transformSceneToSaveModel (see createRowItemFromLegacyRow)
+      // and not in DashboardModel, this means that these panels will have automigratedFrom and panel type changed to the new panel type
+      // backend matches this behaviour by setting up autoMigrateFrom and type for nested panels too
+      // @ts-expect-error - we are using the type from the frontend migration result
+      for (const panel of frontendMigrationResult.panels) {
+        if (panel.type === 'row' && 'panels' in panel) {
+          for (const nestedPanel of panel.panels) {
+            const panelPluginToMigrateTo = getPanelPluginToMigrateTo(nestedPanel);
+            if (panelPluginToMigrateTo) {
+              nestedPanel.autoMigrateFrom = nestedPanel.type;
+              nestedPanel.type = panelPluginToMigrateTo;
+            }
+          }
+        }
+      }
 
       expect(backendMigrationResult).toEqual(frontendMigrationResult);
     });

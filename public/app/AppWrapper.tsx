@@ -1,3 +1,4 @@
+import { OpenFeatureProvider } from '@openfeature/react-sdk';
 import { UNSAFE_PortalProvider } from '@react-aria/overlays';
 import { Action, KBarProvider } from 'kbar';
 import { Component, ComponentType, Fragment, ReactNode } from 'react';
@@ -6,32 +7,34 @@ import { Provider } from 'react-redux';
 import { Route, Routes } from 'react-router-dom-v5-compat';
 
 import { config, navigationLogger, reportInteraction } from '@grafana/runtime';
+import { getFeatureFlagClient } from '@grafana/runtime/internal';
 import { ErrorBoundaryAlert, getPortalContainer, GlobalStyles, PortalContainer, TimeRangeProvider } from '@grafana/ui';
 import { getAppRoutes } from 'app/routes/routes';
 import { store } from 'app/store/store';
 
-import { GrafanaApp } from './app';
 import { ExtensionSidebarContextProvider } from './core/components/AppChrome/ExtensionSidebar/ExtensionSidebarProvider';
-import { ScopesContextProvider } from './features/scopes/ScopesContextProvider';
-import { GrafanaContext } from './core/context/GrafanaContext';
+import { GrafanaContext, GrafanaContextType } from './core/context/GrafanaContext';
 import { GrafanaRouteWrapper } from './core/navigation/GrafanaRoute';
 import { RouteDescriptor } from './core/navigation/types';
 import { ThemeProvider } from './core/utils/ConfigProvider';
 import { LiveConnectionWarning } from './features/live/LiveConnectionWarning';
 import { ExtensionRegistriesProvider } from './features/plugins/extensions/ExtensionRegistriesContext';
-import { pluginExtensionRegistries } from './features/plugins/extensions/registry/setup';
+import { getPluginExtensionRegistries } from './features/plugins/extensions/registry/setup';
+import { PluginExtensionRegistries } from './features/plugins/extensions/registry/types';
+import { ScopesContextProvider } from './features/scopes/ScopesContextProvider';
 import { PerconaBootstrapper } from './percona/shared/components/PerconaBootstrapper';
 import PerconaTourProvider from './percona/tour/TourProvider';
 import { RouterWrapper } from './routes/RoutesWrapper';
 
 interface AppWrapperProps {
-  app: GrafanaApp;
+  context: GrafanaContextType;
 }
 
 interface AppWrapperState {
   ready?: boolean;
   // @PERCONA
   perconaReady?: boolean;
+  registries?: PluginExtensionRegistries;
 }
 
 /** Used by enterprise */
@@ -60,8 +63,9 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
   }
 
   async componentDidMount() {
-    this.setState({ ready: true });
-    $('.preloader').remove();
+    const registries = await getPluginExtensionRegistries();
+    this.setState({ ready: true, registries });
+    this.removePreloader();
 
     // clear any old icon caches
     const cacheKeys = (await window.caches?.keys()) ?? [];
@@ -73,6 +77,14 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
   }
 
   perconaReadyCallback = () => this.setState({ perconaReady: true });
+  removePreloader() {
+    const preloader = document.querySelector('.preloader');
+    if (preloader) {
+      preloader.remove();
+    } else {
+      console.warn('Preloader element not found');
+    }
+  }
 
   renderRoute = (route: RouteDescriptor) => {
     return (
@@ -90,8 +102,8 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
   }
 
   render() {
-    const { app } = this.props;
-    const { ready, perconaReady } = this.state;
+    const { app, context } = this.props;
+    const { ready, registries, perconaReady } = this.state;
 
     navigationLogger('AppWrapper', false, 'rendering');
 
@@ -116,38 +128,39 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
     return (
       <Provider store={store}>
         <ErrorBoundaryAlert boundaryName="app-wrapper" style="page">
-          <GrafanaContext.Provider value={app.context}>
-            <ThemeProvider value={config.theme2}>
-              <CacheProvider name={this.iconCacheID}>
-                <KBarProvider
-                  actions={[]}
-                  options={{ enableHistory: true, callbacks: { onSelectAction: commandPaletteActionSelected } }}
-                >
-                  <PerconaTourProvider>
-                    <GlobalStyles />
-                    <MaybeTimeRangeProvider>
-                      <ScopesContextProvider>
-                        <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
-                          <ExtensionSidebarContextProvider>
-                            <UNSAFE_PortalProvider getContainer={getPortalContainer}>
-                              <GlobalStyles />
-                              <div className="grafana-app">
-                                <RouterWrapper {...routerWrapperProps} />
-                                <LiveConnectionWarning />
-                                <PortalContainer />
-                              </div>
-                            </UNSAFE_PortalProvider>
-                          </ExtensionSidebarContextProvider>
-                        </ExtensionRegistriesProvider>
-                      </ScopesContextProvider>
-                    </MaybeTimeRangeProvider>
-                  </PerconaTourProvider>
-                </KBarProvider>
-              </CacheProvider>
-            </ThemeProvider>
-          </GrafanaContext.Provider>
-        </ErrorBoundaryAlert>
-      </Provider>
+          <OpenFeatureProvider client={getFeatureFlagClient()}>
+            <GrafanaContext.Provider value={context}>
+              <ThemeProvider value={config.theme2}>
+                <CacheProvider name={this.iconCacheID}>
+                  <KBarProvider
+                    actions={[]}
+                    options={{ enableHistory: true, callbacks: { onSelectAction: commandPaletteActionSelected } }}
+                  >
+                    <PerconaTourProvider>
+                      <MaybeTimeRangeProvider>
+                        <ScopesContextProvider>
+                          <ExtensionRegistriesProvider registries={registries}>
+                            <ExtensionSidebarContextProvider>
+                              <UNSAFE_PortalProvider getContainer={getPortalContainer}>
+                                <GlobalStyles />
+                                <div className="grafana-app">
+                                  <RouterWrapper {...routerWrapperProps} />
+                                  <LiveConnectionWarning />
+                                  <PortalContainer />
+                                </div>
+                              </UNSAFE_PortalProvider>
+                            </ExtensionSidebarContextProvider>
+                          </ExtensionRegistriesProvider>
+                        </ScopesContextProvider>
+                      </MaybeTimeRangeProvider>
+                    </PerconaTourProvider>
+                  </KBarProvider>
+                </CacheProvider>
+              </ThemeProvider>
+            </GrafanaContext.Provider>
+          </OpenFeatureProvider>
+        </ErrorBoundaryAlert >
+      </Provider >
     );
   }
 }

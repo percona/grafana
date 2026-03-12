@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace/noop"
-	"k8s.io/utils/ptr"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	secretv1beta1 "github.com/grafana/grafana/apps/secret/pkg/apis/secret/v1beta1"
 	"github.com/grafana/grafana/pkg/registry/apis/secret/contracts"
@@ -40,9 +40,9 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		keeperMetadataStorage := initStorage(t)
 
 		// get system keeper config
-		keeperConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, defaultKeeperNS, nil, contracts.ReadOpts{})
+		keeperConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, defaultKeeperNS, contracts.SystemKeeperName, contracts.ReadOpts{})
 		require.NoError(t, err)
-		require.IsType(t, &secretv1beta1.SystemKeeperConfig{}, keeperConfig)
+		require.IsType(t, &secretv1beta1.NamedKeeperConfig[*secretv1beta1.SystemKeeperConfig]{}, keeperConfig)
 	})
 
 	t.Run("get test keeper config", func(t *testing.T) {
@@ -55,7 +55,7 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		_, err := keeperMetadataStorage.Create(ctx, testKeeper, "testuser")
 		require.NoError(t, err)
 
-		keeperConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, defaultKeeperNS, &defaultKeeperName, contracts.ReadOpts{})
+		keeperConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, defaultKeeperNS, defaultKeeperName, contracts.ReadOpts{})
 		require.NoError(t, err)
 		require.NotNil(t, keeperConfig)
 		require.NotEmpty(t, keeperConfig.Type())
@@ -105,7 +105,7 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		require.NoError(t, err)
 
 		// we are able to get it
-		keeperConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, keeperNamespaceTest, &keeperTest, contracts.ReadOpts{})
+		keeperConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, keeperNamespaceTest, keeperTest, contracts.ReadOpts{})
 		require.NoError(t, err)
 		require.NotNil(t, keeperConfig)
 		require.NotEmpty(t, keeperConfig.Type())
@@ -115,7 +115,7 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		require.NoError(t, delErr)
 
 		// and we shouldn't be able to get it again
-		_, getErr := keeperMetadataStorage.GetKeeperConfig(ctx, keeperNamespaceTest, &keeperTest, contracts.ReadOpts{})
+		_, getErr := keeperMetadataStorage.GetKeeperConfig(ctx, keeperNamespaceTest, keeperTest, contracts.ReadOpts{})
 		require.Errorf(t, getErr, "keeper not found")
 	})
 
@@ -162,7 +162,7 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		require.NoError(t, err)
 
 		// Validate updated values
-		updatedConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, keeperNamespaceTest, &keeperTest, contracts.ReadOpts{})
+		updatedConfig, err := keeperMetadataStorage.GetKeeperConfig(ctx, keeperNamespaceTest, keeperTest, contracts.ReadOpts{})
 		require.NoError(t, err)
 		require.NotNil(t, updatedConfig)
 		require.NotEmpty(t, updatedConfig.Type())
@@ -187,13 +187,11 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 			Spec: secretv1beta1.KeeperSpec{
 				Description: "initial description",
 				Aws: &secretv1beta1.KeeperAWSConfig{
-					AccessKeyID: secretv1beta1.KeeperCredentialValue{
-						ValueFromEnv: "AWS_ACCESS_KEY_ID_1",
+					Region: "us-east-1",
+					AssumeRole: &secretv1beta1.KeeperAWSAssumeRole{
+						AssumeRoleArn: "arn",
+						ExternalID:    "external-id",
 					},
-					SecretAccessKey: secretv1beta1.KeeperCredentialValue{
-						ValueFromEnv: "AWS_SECRET_ACCESS_KEY_1",
-					},
-					KmsKeyID: ptr.To("kms-key-id-1"),
 				},
 			},
 		}
@@ -207,22 +205,20 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		// Verify initial AWS config
 		keeper, err := keeperMetadataStorage.Read(ctx, xkube.Namespace(keeperNamespaceTest), keeperTest, contracts.ReadOpts{})
 		require.NoError(t, err)
-		require.Equal(t, "AWS_ACCESS_KEY_ID_1", keeper.Spec.Aws.AccessKeyID.ValueFromEnv)
-		require.Equal(t, "AWS_SECRET_ACCESS_KEY_1", keeper.Spec.Aws.SecretAccessKey.ValueFromEnv)
-		require.Equal(t, "kms-key-id-1", *keeper.Spec.Aws.KmsKeyID)
+		require.Equal(t, "us-east-1", keeper.Spec.Aws.Region)
+		require.Equal(t, "arn", keeper.Spec.Aws.AssumeRole.AssumeRoleArn)
+		require.Equal(t, "external-id", keeper.Spec.Aws.AssumeRole.ExternalID)
 
 		// Update with new AWS config
 		updatedKeeper := &secretv1beta1.Keeper{
 			Spec: secretv1beta1.KeeperSpec{
 				Description: "updated description",
 				Aws: &secretv1beta1.KeeperAWSConfig{
-					AccessKeyID: secretv1beta1.KeeperCredentialValue{
-						ValueFromEnv: "AWS_ACCESS_KEY_ID_2",
+					Region: "us-east-2",
+					AssumeRole: &secretv1beta1.KeeperAWSAssumeRole{
+						AssumeRoleArn: "arn-2",
+						ExternalID:    "external-id-2",
 					},
-					SecretAccessKey: secretv1beta1.KeeperCredentialValue{
-						ValueFromEnv: "AWS_SECRET_ACCESS_KEY_2",
-					},
-					KmsKeyID: ptr.To("kms-key-id-2"),
 				},
 			},
 		}
@@ -236,9 +232,9 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		// Verify updated AWS config
 		updatedKeeper, err = keeperMetadataStorage.Read(ctx, xkube.Namespace(keeperNamespaceTest), keeperTest, contracts.ReadOpts{})
 		require.NoError(t, err)
-		require.Equal(t, "AWS_ACCESS_KEY_ID_2", updatedKeeper.Spec.Aws.AccessKeyID.ValueFromEnv)
-		require.Equal(t, "AWS_SECRET_ACCESS_KEY_2", updatedKeeper.Spec.Aws.SecretAccessKey.ValueFromEnv)
-		require.Equal(t, "kms-key-id-2", *updatedKeeper.Spec.Aws.KmsKeyID)
+		require.Equal(t, "us-east-2", updatedKeeper.Spec.Aws.Region)
+		require.Equal(t, "arn-2", updatedKeeper.Spec.Aws.AssumeRole.AssumeRoleArn)
+		require.Equal(t, "external-id-2", updatedKeeper.Spec.Aws.AssumeRole.ExternalID)
 	})
 
 	t.Run("list keepers in empty namespace", func(t *testing.T) {
@@ -260,7 +256,7 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 
 		_, err := keeperMetadataStorage.Read(ctx, "ns", "non-existent", contracts.ReadOpts{})
 		require.Error(t, err)
-		require.Equal(t, contracts.ErrKeeperNotFound, err)
+		require.ErrorIs(t, err, contracts.ErrKeeperNotFound)
 	})
 
 	t.Run("update keeper with different namespace", func(t *testing.T) {
@@ -277,11 +273,10 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 			Spec: secretv1beta1.KeeperSpec{
 				Description: "initial description",
 				Aws: &secretv1beta1.KeeperAWSConfig{
-					AccessKeyID: secretv1beta1.KeeperCredentialValue{
-						ValueFromEnv: "AWS_ACCESS_KEY_ID",
-					},
-					SecretAccessKey: secretv1beta1.KeeperCredentialValue{
-						ValueFromEnv: "AWS_SECRET_ACCESS_KEY",
+					Region: "us-east-1",
+					AssumeRole: &secretv1beta1.KeeperAWSAssumeRole{
+						AssumeRoleArn: "arn",
+						ExternalID:    "external-id",
 					},
 				},
 			},
@@ -327,6 +322,40 @@ func Test_KeeperMetadataStorage_GetKeeperConfig(t *testing.T) {
 		_, err := keeperMetadataStorage.Update(ctx, nonExistentKeeper, "testuser")
 		require.Error(t, err, "db failure: keeper not found")
 	})
+}
+
+func Test_KeeperMetadataStorage_SetAsActive(t *testing.T) {
+	t.Parallel()
+
+	keeperMetadataStorage := initStorage(t)
+
+	k1, err := keeperMetadataStorage.Create(t.Context(), &secretv1beta1.Keeper{
+		ObjectMeta: v1.ObjectMeta{Namespace: "ns1", Name: "k1"},
+		Spec: secretv1beta1.KeeperSpec{
+			Description: "description",
+			Aws:         &secretv1beta1.KeeperAWSConfig{},
+		},
+	}, "actor-uid")
+	require.NoError(t, err)
+
+	k2, err := keeperMetadataStorage.Create(t.Context(), &secretv1beta1.Keeper{
+		ObjectMeta: v1.ObjectMeta{Namespace: "ns1", Name: "k2"},
+		Spec: secretv1beta1.KeeperSpec{
+			Description: "description",
+			Aws:         &secretv1beta1.KeeperAWSConfig{},
+		},
+	}, "actor-uid")
+	require.NoError(t, err)
+
+	require.NoError(t, keeperMetadataStorage.SetAsActive(t.Context(), xkube.Namespace(k1.Namespace), k1.Name))
+	keeperName, _, err := keeperMetadataStorage.GetActiveKeeperConfig(t.Context(), k1.Namespace)
+	require.NoError(t, err)
+	require.Equal(t, k1.Name, keeperName)
+
+	require.NoError(t, keeperMetadataStorage.SetAsActive(t.Context(), xkube.Namespace(k2.Namespace), k2.Name))
+	keeperName, _, err = keeperMetadataStorage.GetActiveKeeperConfig(t.Context(), k2.Namespace)
+	require.NoError(t, err)
+	require.Equal(t, k2.Name, keeperName)
 }
 
 func initStorage(t *testing.T) contracts.KeeperMetadataStorage {

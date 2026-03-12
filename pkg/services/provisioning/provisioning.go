@@ -8,8 +8,10 @@ import (
 	"sync"
 
 	"github.com/grafana/dskit/services"
+
 	"github.com/grafana/grafana/pkg/infra/db"
 	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/infra/serverlock"
 	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/registry"
 	"github.com/grafana/grafana/pkg/services/accesscontrol"
@@ -17,12 +19,15 @@ import (
 	dashboardservice "github.com/grafana/grafana/pkg/services/dashboards"
 	datasourceservice "github.com/grafana/grafana/pkg/services/datasources"
 	"github.com/grafana/grafana/pkg/services/encryption"
+	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/services/folder"
 	alertingauthz "github.com/grafana/grafana/pkg/services/ngalert/accesscontrol"
 	ngmodels "github.com/grafana/grafana/pkg/services/ngalert/models"
 	"github.com/grafana/grafana/pkg/services/ngalert/notifier"
 	"github.com/grafana/grafana/pkg/services/ngalert/notifier/legacy_storage"
+	"github.com/grafana/grafana/pkg/services/ngalert/notifier/routes"
 	"github.com/grafana/grafana/pkg/services/ngalert/provisioning"
+	"github.com/grafana/grafana/pkg/services/ngalert/provisioning/validation"
 	alertstore "github.com/grafana/grafana/pkg/services/ngalert/store"
 	"github.com/grafana/grafana/pkg/services/notifications"
 	"github.com/grafana/grafana/pkg/services/org"
@@ -34,7 +39,6 @@ import (
 	"github.com/grafana/grafana/pkg/services/provisioning/datasources"
 	"github.com/grafana/grafana/pkg/services/provisioning/plugins"
 	"github.com/grafana/grafana/pkg/services/quota"
-	"github.com/grafana/grafana/pkg/services/searchV2"
 	"github.com/grafana/grafana/pkg/services/secrets"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/storage/legacysql/dualwrite"
@@ -56,7 +60,6 @@ func ProvideService(
 	dashboardService dashboardservice.DashboardService,
 	folderService folder.Service,
 	pluginSettings pluginsettings.Service,
-	searchService searchV2.SearchService,
 	quotaService quota.Service,
 	secrectService secrets.Service,
 	orgService org.Service,
@@ -64,6 +67,7 @@ func ProvideService(
 	tracer tracing.Tracer,
 	dual dualwrite.Service,
 	promTypeMigrationProvider promtypemigration.PromTypeMigrationProvider,
+	serverLockService *serverlock.ServerLockService,
 ) (*ProvisioningServiceImpl, error) {
 	s := &ProvisioningServiceImpl{
 		Cfg:                          cfg,
@@ -82,7 +86,6 @@ func ProvideService(
 		datasourceService:            datasourceService,
 		correlationsService:          correlationsService,
 		pluginsSettings:              pluginSettings,
-		searchService:                searchService,
 		quotaService:                 quotaService,
 		secretService:                secrectService,
 		log:                          log.New("provisioning"),
@@ -92,6 +95,7 @@ func ProvideService(
 		tracer:                       tracer,
 		migratePrometheusType:        promTypeMigrationProvider.Run,
 		dual:                         dual,
+		serverLock:                   serverLockService,
 	}
 
 	s.NamedService = services.NewBasicService(s.starting, s.running, nil).WithName(ServiceName)
@@ -135,9 +139,6 @@ func (ps *ProvisioningServiceImpl) starting(ctx context.Context) error {
 			return err
 		}
 	}
-	if ps.dashboardProvisioner.HasDashboardSources() {
-		ps.searchService.TriggerReIndex()
-	}
 	return nil
 }
 
@@ -166,7 +167,7 @@ func (ps *ProvisioningServiceImpl) running(ctx context.Context) error {
 
 func (ps *ProvisioningServiceImpl) setDashboardProvisioner() error {
 	dashboardPath := filepath.Join(ps.Cfg.ProvisioningPath, "dashboards")
-	dashProvisioner, err := ps.newDashboardProvisioner(context.Background(), dashboardPath, ps.dashboardProvisioningService, ps.orgService, ps.dashboardService, ps.folderService, ps.dual)
+	dashProvisioner, err := ps.newDashboardProvisioner(context.Background(), dashboardPath, ps.dashboardProvisioningService, ps.Cfg, ps.orgService, ps.dashboardService, ps.folderService, ps.dual, ps.serverLock)
 	if err != nil {
 		return fmt.Errorf("%v: %w", "Failed to create provisioner", err)
 	}
@@ -191,7 +192,6 @@ func newProvisioningServiceImpl(
 	provisionDatasources func(context.Context, string, datasources.BaseDataSourceService, datasources.CorrelationsStore, org.Service) error,
 	provisionPlugins func(context.Context, string, pluginstore.Store, pluginsettings.Service, org.Service) error,
 	migratePrometheusType func(context.Context) error,
-	searchService searchV2.SearchService,
 ) (*ProvisioningServiceImpl, error) {
 	s := &ProvisioningServiceImpl{
 		log:                     log.New("provisioning"),
@@ -199,7 +199,6 @@ func newProvisioningServiceImpl(
 		provisionDatasources:    provisionDatasources,
 		provisionPlugins:        provisionPlugins,
 		Cfg:                     setting.NewCfg(),
-		searchService:           searchService,
 		migratePrometheusType:   migratePrometheusType,
 	}
 
@@ -235,13 +234,13 @@ type ProvisioningServiceImpl struct {
 	datasourceService            datasourceservice.DataSourceService
 	correlationsService          correlations.Service
 	pluginsSettings              pluginsettings.Service
-	searchService                searchV2.SearchService
 	quotaService                 quota.Service
 	secretService                secrets.Service
 	folderService                folder.Service
 	resourcePermissions          accesscontrol.ReceiverPermissionsService
 	tracer                       tracing.Tracer
 	dual                         dualwrite.Service
+	serverLock                   *serverlock.ServerLockService
 	migratePrometheusType        func(context.Context) error
 }
 
@@ -321,23 +320,30 @@ func (ps *ProvisioningServiceImpl) ProvisionAlerting(ctx context.Context) error 
 		notifier.NewCachedNotificationSettingsValidationService(ps.alertingStore),
 		alertingauthz.NewRuleService(ps.ac),
 	)
-	configStore := legacy_storage.NewAlertmanagerConfigStore(ps.alertingStore, notifier.NewExtraConfigsCrypto(ps.secretService))
+	var features featuremgmt.FeatureToggles
+	if ps.alertingStore != nil {
+		features = ps.alertingStore.FeatureToggles
+	}
+	configStore := legacy_storage.NewAlertmanagerConfigStore(ps.alertingStore, notifier.NewExtraConfigsCrypto(ps.secretService), features)
+	routeService := routes.NewService(configStore, ps.alertingStore, ps.alertingStore, ps.Cfg.UnifiedAlerting, features, ps.log, validation.ValidateProvenanceRelaxed, ps.tracer)
 	receiverSvc := notifier.NewReceiverService(
 		alertingauthz.NewReceiverAccess[*ngmodels.Receiver](ps.ac, true),
 		configStore,
 		ps.alertingStore,
 		ps.alertingStore,
+		routeService,
 		ps.secretService,
 		ps.SQLStore,
 		ps.log,
 		ps.resourcePermissions,
 		ps.tracer,
+		false,
 	)
 	contactPointService := provisioning.NewContactPointService(configStore, ps.secretService,
 		ps.alertingStore, ps.SQLStore, receiverSvc, ps.log, ps.alertingStore, ps.resourcePermissions)
 	notificationPolicyService := provisioning.NewNotificationPolicyService(configStore,
 		ps.alertingStore, ps.SQLStore, ps.Cfg.UnifiedAlerting, ps.log)
-	mutetimingsService := provisioning.NewMuteTimingService(configStore, ps.alertingStore, ps.alertingStore, ps.log, ps.alertingStore)
+	mutetimingsService := provisioning.NewMuteTimingService(configStore, ps.alertingStore, ps.alertingStore, ps.log, ps.alertingStore, routeService)
 	templateService := provisioning.NewTemplateService(configStore, ps.alertingStore, ps.alertingStore, ps.log)
 	cfg := prov_alerting.ProvisionerConfig{
 		Path:                       alertingPath,

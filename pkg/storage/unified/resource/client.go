@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"crypto/tls"
 	"fmt"
-	"log/slog"
 	"net/http"
 
 	"github.com/fullstorydev/grpchan"
@@ -24,6 +23,7 @@ import (
 	"github.com/grafana/authlib/types"
 
 	"github.com/grafana/grafana/pkg/apimachinery/identity"
+	"github.com/grafana/grafana/pkg/infra/log"
 	authnGrpcUtils "github.com/grafana/grafana/pkg/services/authn/grpcutils"
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/setting"
@@ -33,11 +33,16 @@ import (
 
 //go:generate mockery --name ResourceClient --structname MockResourceClient --inpackage --filename client_mock.go --with-expecter
 type ResourceClient interface {
+	SearchClient
 	resourcepb.ResourceStoreClient
-	resourcepb.ResourceIndexClient
-	resourcepb.ManagedObjectIndexClient
 	resourcepb.BulkStoreClient
 	resourcepb.BlobStoreClient
+	resourcepb.QuotasClient
+}
+
+type SearchClient interface {
+	resourcepb.ResourceIndexClient
+	resourcepb.ManagedObjectIndexClient
 	resourcepb.DiagnosticsClient
 }
 
@@ -49,6 +54,7 @@ type resourceClient struct {
 	resourcepb.BulkStoreClient
 	resourcepb.BlobStoreClient
 	resourcepb.DiagnosticsClient
+	resourcepb.QuotasClient
 }
 
 func NewResourceClient(conn, indexConn grpc.ClientConnInterface, cfg *setting.Cfg, features featuremgmt.FeatureToggles, tracer trace.Tracer) (ResourceClient, error) {
@@ -76,6 +82,7 @@ func newResourceClient(storageCc grpc.ClientConnInterface, indexCc grpc.ClientCo
 		BulkStoreClient:          resourcepb.NewBulkStoreClient(storageCc),
 		BlobStoreClient:          resourcepb.NewBlobStoreClient(storageCc),
 		DiagnosticsClient:        resourcepb.NewDiagnosticsClient(storageCc),
+		QuotasClient:             resourcepb.NewQuotasClient(storageCc),
 	}
 }
 
@@ -102,6 +109,7 @@ func NewLocalResourceClient(server ResourceServer) ResourceClient {
 		&resourcepb.BlobStore_ServiceDesc,
 		&resourcepb.BulkStore_ServiceDesc,
 		&resourcepb.Diagnostics_ServiceDesc,
+		&resourcepb.Quotas_ServiceDesc,
 	} {
 		channel.RegisterService(
 			grpchan.InterceptServer(
@@ -158,7 +166,7 @@ func NewRemoteResourceClient(tracer trace.Tracer, conn grpc.ClientConnInterface,
 	return newResourceClient(cc, cci), nil
 }
 
-var authLogger = slog.Default().With("logger", "resource-client-auth-interceptor")
+var authLogger = log.New("resource-client-auth-interceptor")
 
 func idTokenExtractor(ctx context.Context) (string, error) {
 	if identity.IsServiceIdentity(ctx) {
@@ -170,17 +178,20 @@ func idTokenExtractor(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("no claims found")
 	}
 
+	// If the identity is the service identity, we don't need to extract the ID token
+	if info.GetIdentityType() == types.TypeAccessPolicy {
+		return "", nil
+	}
+
 	if token := info.GetIDToken(); len(token) != 0 {
 		return token, nil
 	}
 
-	if !types.IsIdentityType(info.GetIdentityType(), types.TypeAccessPolicy) {
-		authLogger.Warn(
-			"calling resource store as the service without id token or marking it as the service identity",
-			"subject", info.GetSubject(),
-			"uid", info.GetUID(),
-		)
-	}
+	authLogger.FromContext(ctx).Warn(
+		"calling resource store as the service without id token or marking it as the service identity",
+		"subject", info.GetSubject(),
+		"uid", info.GetUID(),
+	)
 
 	return "", nil
 }

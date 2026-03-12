@@ -14,16 +14,11 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.Preferences":                       schema_pkg_apis_preferences_v1alpha1_Preferences(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesCookiePreferences":      schema_pkg_apis_preferences_v1alpha1_PreferencesCookiePreferences(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesList":                   schema_pkg_apis_preferences_v1alpha1_PreferencesList(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesNavbarPreference":       schema_pkg_apis_preferences_v1alpha1_PreferencesNavbarPreference(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesQueryHistoryPreference": schema_pkg_apis_preferences_v1alpha1_PreferencesQueryHistoryPreference(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesSpec":                   schema_pkg_apis_preferences_v1alpha1_PreferencesSpec(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.Stars":                             schema_pkg_apis_preferences_v1alpha1_Stars(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.StarsList":                         schema_pkg_apis_preferences_v1alpha1_StarsList(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.StarsResource":                     schema_pkg_apis_preferences_v1alpha1_StarsResource(ref),
-		"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.StarsSpec":                         schema_pkg_apis_preferences_v1alpha1_StarsSpec(ref),
+		Preferences{}.OpenAPIModelName():                       schema_pkg_apis_preferences_v1alpha1_Preferences(ref),
+		PreferencesList{}.OpenAPIModelName():                   schema_pkg_apis_preferences_v1alpha1_PreferencesList(ref),
+		PreferencesNavbarPreference{}.OpenAPIModelName():       schema_pkg_apis_preferences_v1alpha1_PreferencesNavbarPreference(ref),
+		PreferencesQueryHistoryPreference{}.OpenAPIModelName(): schema_pkg_apis_preferences_v1alpha1_PreferencesQueryHistoryPreference(ref),
+		PreferencesSpec{}.OpenAPIModelName():                   schema_pkg_apis_preferences_v1alpha1_PreferencesSpec(ref),
 	}
 }
 
@@ -50,14 +45,14 @@ func schema_pkg_apis_preferences_v1alpha1_Preferences(ref common.ReferenceCallba
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"),
 						},
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec is the spec of the Preferences",
 							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesSpec"),
+							Ref:         ref(PreferencesSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -65,37 +60,7 @@ func schema_pkg_apis_preferences_v1alpha1_Preferences(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_pkg_apis_preferences_v1alpha1_PreferencesCookiePreferences(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"analytics": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"object"},
-							Format: "",
-						},
-					},
-					"performance": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"object"},
-							Format: "",
-						},
-					},
-					"functional": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"object"},
-							Format: "",
-						},
-					},
-				},
-			},
-		},
+			PreferencesSpec{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"},
 	}
 }
 
@@ -122,7 +87,7 @@ func schema_pkg_apis_preferences_v1alpha1_PreferencesList(ref common.ReferenceCa
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"),
 						},
 					},
 					"items": {
@@ -132,7 +97,7 @@ func schema_pkg_apis_preferences_v1alpha1_PreferencesList(ref common.ReferenceCa
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.Preferences"),
+										Ref:     ref(Preferences{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -143,7 +108,7 @@ func schema_pkg_apis_preferences_v1alpha1_PreferencesList(ref common.ReferenceCa
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.Preferences", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+			Preferences{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"},
 	}
 }
 
@@ -244,190 +209,19 @@ func schema_pkg_apis_preferences_v1alpha1_PreferencesSpec(ref common.ReferenceCa
 					"queryHistory": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Explore query history preferences",
-							Ref:         ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesQueryHistoryPreference"),
-						},
-					},
-					"cookiePreferences": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Cookie preferences",
-							Ref:         ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesCookiePreferences"),
+							Ref:         ref(PreferencesQueryHistoryPreference{}.OpenAPIModelName()),
 						},
 					},
 					"navbar": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Navigation preferences",
-							Ref:         ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesNavbarPreference"),
+							Ref:         ref(PreferencesNavbarPreference{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesCookiePreferences", "github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesNavbarPreference", "github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.PreferencesQueryHistoryPreference"},
-	}
-}
-
-func schema_pkg_apis_preferences_v1alpha1_Stars(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec is the spec of the Stars",
-							Default:     map[string]interface{}{},
-							Ref:         ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.StarsSpec"),
-						},
-					},
-				},
-				Required: []string{"metadata", "spec"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.StarsSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
-	}
-}
-
-func schema_pkg_apis_preferences_v1alpha1_StarsList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.Stars"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"metadata", "items"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.Stars", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
-	}
-}
-
-func schema_pkg_apis_preferences_v1alpha1_StarsResource(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Default: "",
-							Type:    []string{"string"},
-							Format:  "",
-						},
-					},
-					"names": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "set",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "The set of resources",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"group", "kind", "names"},
-			},
-		},
-	}
-}
-
-func schema_pkg_apis_preferences_v1alpha1_StarsSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"resource": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.StarsResource"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"resource"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/grafana/grafana/apps/preferences/pkg/apis/preferences/v1alpha1.StarsResource"},
+			PreferencesNavbarPreference{}.OpenAPIModelName(), PreferencesQueryHistoryPreference{}.OpenAPIModelName()},
 	}
 }

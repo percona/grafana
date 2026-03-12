@@ -775,8 +775,12 @@ type ElasticsearchDataQuery struct {
 	Alias *string `json:"alias,omitempty"`
 	// Lucene query
 	Query *string `json:"query,omitempty"`
+	// Raw DSL query
+	RawDSLQuery *string `json:"rawDSLQuery,omitempty"`
 	// Name of time field
 	TimeField *string `json:"timeField,omitempty"`
+	// Editor type
+	EditorType *string `json:"editorType,omitempty"`
 	// List of bucket aggregations
 	BucketAggs []BucketAggregation `json:"bucketAggs,omitempty"`
 	// List of metric aggregations
@@ -1594,16 +1598,6 @@ func (resource *StringOrDataqueryInlineScript) UnmarshalJSON(raw []byte) error {
 	}
 
 	return errors.Join(errList...)
-}
-
-type StringOrDataqueryInlineScript struct {
-	String                *string                `json:"String,omitempty"`
-	DataqueryInlineScript *DataqueryInlineScript `json:"DataqueryInlineScript,omitempty"`
-}
-
-// NewStringOrDataqueryInlineScript creates a new StringOrDataqueryInlineScript object.
-func NewStringOrDataqueryInlineScript() *StringOrDataqueryInlineScript {
-	return &StringOrDataqueryInlineScript{}
 }
 
 type BucketScriptOrCumulativeSumOrDerivativeOrSerialDiffOrRawDataOrRawDocumentOrUniqueCountOrPercentilesOrExtendedStatsOrMinOrMaxOrSumOrAverageOrMovingAverageOrMovingFunctionOrLogsOrRateOrTopMetrics struct {

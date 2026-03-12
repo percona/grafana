@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	data "github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	data "github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1"
 	query "github.com/grafana/grafana/pkg/apis/query/v0alpha1"
 )
 
@@ -73,7 +73,7 @@ func TestParseQueriesIntoQueryDataRequest(t *testing.T) {
 		"maxDataPoints": 10,
 		"queryType": "foo",
 		"refId": "Z",
-		"_timeRange": {
+		"timeRange": {
 		  "from": "100",
 		  "to": "200"
 		}

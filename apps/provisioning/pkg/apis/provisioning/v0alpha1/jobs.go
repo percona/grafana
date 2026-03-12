@@ -19,6 +19,10 @@ type Job struct {
 	Status JobStatus `json:"status,omitempty"`
 }
 
+func (Job) OpenAPIModelName() string {
+	return OpenAPIPrefix + "Job"
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type JobList struct {
 	metav1.TypeMeta `json:",inline"`
@@ -27,8 +31,16 @@ type JobList struct {
 	Items []Job `json:"items"`
 }
 
+func (JobList) OpenAPIModelName() string {
+	return OpenAPIPrefix + "JobList"
+}
+
 // +enum
 type JobAction string
+
+func (JobAction) OpenAPIModelName() string {
+	return OpenAPIPrefix + "JobAction"
+}
 
 const (
 	// JobActionPull replicates the remote branch in the local copy of the repository.
@@ -100,6 +112,10 @@ type JobSpec struct {
 	Move *MoveJobOptions `json:"move,omitempty"`
 }
 
+func (JobSpec) OpenAPIModelName() string {
+	return OpenAPIPrefix + "JobSpec"
+}
+
 type PullRequestJobOptions struct {
 	// The branch of commit hash
 	Ref string `json:"ref,omitempty"`
@@ -114,9 +130,17 @@ type PullRequestJobOptions struct {
 	URL string `json:"url,omitempty"`
 }
 
+func (PullRequestJobOptions) OpenAPIModelName() string {
+	return OpenAPIPrefix + "PullRequestJobOptions"
+}
+
 type SyncJobOptions struct {
 	// Incremental synchronization for versioned repositories
 	Incremental bool `json:"incremental"`
+}
+
+func (SyncJobOptions) OpenAPIModelName() string {
+	return OpenAPIPrefix + "SyncJobOptions"
 }
 
 type ExportJobOptions struct {
@@ -135,12 +159,17 @@ type ExportJobOptions struct {
 	Path string `json:"path,omitempty"`
 }
 
-type MigrateJobOptions struct {
-	// Preserve history (if possible)
-	History bool `json:"history,omitempty"`
+func (ExportJobOptions) OpenAPIModelName() string {
+	return OpenAPIPrefix + "ExportJobOptions"
+}
 
+type MigrateJobOptions struct {
 	// Message to use when committing the changes in a single commit
 	Message string `json:"message,omitempty"`
+}
+
+func (MigrateJobOptions) OpenAPIModelName() string {
+	return OpenAPIPrefix + "MigrateJobOptions"
 }
 
 type DeleteJobOptions struct {
@@ -160,6 +189,10 @@ type DeleteJobOptions struct {
 	Resources []ResourceRef `json:"resources,omitempty"`
 }
 
+func (DeleteJobOptions) OpenAPIModelName() string {
+	return OpenAPIPrefix + "DeleteJobOptions"
+}
+
 type ResourceRef struct {
 	// Name is the name of the resource, such as a dashboard UID.
 	Name string `json:"name,omitempty"`
@@ -169,6 +202,10 @@ type ResourceRef struct {
 
 	// Group is the group of the resource, such as "dashboard.grafana.app".
 	Group string `json:"group,omitempty"`
+}
+
+func (ResourceRef) OpenAPIModelName() string {
+	return OpenAPIPrefix + "ResourceRef"
 }
 
 type MoveJobOptions struct {
@@ -191,6 +228,10 @@ type MoveJobOptions struct {
 	Resources []ResourceRef `json:"resources,omitempty"`
 }
 
+func (MoveJobOptions) OpenAPIModelName() string {
+	return OpenAPIPrefix + "MoveJobOptions"
+}
+
 // The job status
 type JobStatus struct {
 	State    JobState `json:"state,omitempty"`
@@ -198,6 +239,7 @@ type JobStatus struct {
 	Finished int64    `json:"finished,omitempty"`
 	Message  string   `json:"message,omitempty"`
 	Errors   []string `json:"errors,omitempty"`
+	Warnings []string `json:"warnings,omitempty"`
 
 	// Optional value 0-100 that can be set while running
 	Progress float64 `json:"progress,omitempty"`
@@ -207,6 +249,10 @@ type JobStatus struct {
 
 	// URLs contains URLs for the reference branch or commit if applicable.
 	URLs *RepositoryURLs `json:"url,omitempty"`
+}
+
+func (JobStatus) OpenAPIModelName() string {
+	return OpenAPIPrefix + "JobStatus"
 }
 
 // Convert a JOB to a
@@ -225,18 +271,24 @@ type JobResourceSummary struct {
 	Kind  string `json:"kind,omitempty"`
 	Total int64  `json:"total,omitempty"` // the count (if known)
 
-	Create int64 `json:"create,omitempty"`
-	Update int64 `json:"update,omitempty"`
-	Delete int64 `json:"delete,omitempty"`
-	Write  int64 `json:"write,omitempty"` // Create or update (export)
-	Error  int64 `json:"error,omitempty"` // The error count
+	Create  int64 `json:"create,omitempty"`
+	Update  int64 `json:"update,omitempty"`
+	Delete  int64 `json:"delete,omitempty"`
+	Write   int64 `json:"write,omitempty"`   // Create or update (export)
+	Error   int64 `json:"error,omitempty"`   // The error count
+	Warning int64 `json:"warning,omitempty"` // The warning count
 
 	// No action required (useful for sync)
 	Noop int64 `json:"noop,omitempty"`
 
-	// Report errors for this resource type
+	// Report errors/warnings for this resource type
 	// This may not be an exhaustive list and recommend looking at the logs for more info
-	Errors []string `json:"errors,omitempty"`
+	Errors   []string `json:"errors,omitempty"`
+	Warnings []string `json:"warnings,omitempty"`
+}
+
+func (JobResourceSummary) OpenAPIModelName() string {
+	return OpenAPIPrefix + "JobResourceSummary"
 }
 
 // HistoricJob is an append only log, saving all jobs that have been processed.
@@ -256,10 +308,18 @@ type HistoricJob struct {
 	Status JobStatus `json:"status,omitempty"`
 }
 
+func (HistoricJob) OpenAPIModelName() string {
+	return OpenAPIPrefix + "HistoricJob"
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type HistoricJobList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 
 	Items []HistoricJob `json:"items,omitempty"`
+}
+
+func (HistoricJobList) OpenAPIModelName() string {
+	return OpenAPIPrefix + "HistoricJobList"
 }

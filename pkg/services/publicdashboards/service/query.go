@@ -639,3 +639,36 @@ func getPanelRelativeTimeRangeV2(dashboard *simplejson.Json, panelID int64) stri
 
 	return ""
 }
+
+func getAnnotationsTimeRange(d *dashboards.Dashboard, reqDTO models.AnnotationsQueryDTO, timeSelectionEnabled bool) (int64, int64) {
+	// Use request time range if time selection is enabled
+	if timeSelectionEnabled {
+		return reqDTO.From, reqDTO.To
+	}
+
+	// Parse dashboard time range depending on version
+	isV2 := d.Data.Get("elements").Interface() != nil
+	var fromStr, toStr, dashboardTimezone string
+
+	if isV2 {
+		timeSettings := d.Data.Get("timeSettings")
+		fromStr = timeSettings.Get("from").MustString()
+		toStr = timeSettings.Get("to").MustString()
+		dashboardTimezone = timeSettings.Get("timezone").MustString()
+	} else {
+		fromStr = d.Data.GetPath("time", "from").MustString()
+		toStr = d.Data.GetPath("time", "to").MustString()
+		dashboardTimezone = d.Data.GetPath("timezone").MustString()
+	}
+
+	timezone, err := time.LoadLocation(dashboardTimezone)
+	if err != nil {
+		timezone = time.UTC
+	}
+
+	timeRange := NewTimeRange(fromStr, toStr)
+	timeFrom, _ := timeRange.ParseFrom(gtime.WithLocation(timezone))
+	timeTo, _ := timeRange.ParseTo(gtime.WithLocation(timezone))
+
+	return timeFrom.UnixMilli(), timeTo.UnixMilli()
+}

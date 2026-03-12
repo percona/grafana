@@ -389,7 +389,7 @@ export class Explore extends PureComponent<Props, ExploreState> {
   }
 
   renderGraphPanel(width: number) {
-    const { graphResult, timeZone, queryResponse, showFlameGraph } = this.props;
+    const { graphResult, timeZone, queryResponse, showFlameGraph, queriesChangedIndexAtRun } = this.props;
 
     return (
       <ContentOutlineItem panelId="Graph" title={t('explore.explore.title-graph', 'Graph')} icon="graph-bar">
@@ -404,13 +404,14 @@ export class Explore extends PureComponent<Props, ExploreState> {
           splitOpenFn={this.onSplitOpen('graph')}
           loadingState={queryResponse.state}
           eventBus={this.graphEventBus}
+          queriesChangedIndexAtRun={queriesChangedIndexAtRun}
         />
       </ContentOutlineItem>
     );
   }
 
   renderTablePanel(width: number) {
-    const { exploreId, timeZone } = this.props;
+    const { exploreId, timeZone, eventBus } = this.props;
     return (
       <ContentOutlineItem panelId="Table" title={t('explore.explore.title-table', 'Table')} icon="table">
         <TableContainer
@@ -420,6 +421,7 @@ export class Explore extends PureComponent<Props, ExploreState> {
           onCellFilterAdded={this.onCellFilterAdded}
           timeZone={timeZone}
           splitOpenFn={this.onSplitOpen('table')}
+          eventBus={eventBus}
         />
       </ContentOutlineItem>
     );
@@ -475,7 +477,6 @@ export class Explore extends PureComponent<Props, ExploreState> {
           onStopScanning={this.onStopScanning}
           eventBus={this.logsEventBus}
           splitOpenFn={this.splitOpenFnLogs}
-          scrollElement={this.scrollElement}
           isFilterLabelActive={this.isFilterLabelActive}
           onClickFilterString={this.onClickFilterString}
           onClickFilterOutString={this.onClickFilterOutString}
@@ -641,7 +642,9 @@ export class Explore extends PureComponent<Props, ExploreState> {
             )}
             <ScrollContainer
               data-testid={selectors.pages.Explore.General.scrollView}
-              ref={(scrollElement) => (this.scrollElement = scrollElement || undefined)}
+              ref={(scrollElement) => {
+                this.scrollElement = scrollElement || undefined;
+              }}
             >
               <div className={styles.exploreContainer}>
                 {datasourceInstance ? (
@@ -811,6 +814,7 @@ function mapStateToProps(state: StoreState, { exploreId }: ExploreProps) {
     correlationEditorHelperData,
     compact,
     queryLibraryRef,
+    queriesChangedIndexAtRun,
   } = item;
 
   const loading = selectIsWaitingForData(exploreId)(state);
@@ -845,6 +849,7 @@ function mapStateToProps(state: StoreState, { exploreId }: ExploreProps) {
     correlationEditorDetails: explore.correlationEditorDetails,
     exploreActiveDS: selectExploreDSMaps(state),
     queryLibraryRef,
+    queriesChangedIndexAtRun,
   };
 }
 

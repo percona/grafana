@@ -77,6 +77,10 @@ var (
 		"user.sync.user-externalUID-mismatch",
 		errutil.WithPublicMessage("User externalUID mismatch"),
 	)
+	errSCIMAuthModuleMismatch = errutil.Unauthorized(
+		"user.sync.scim-auth-module-mismatch",
+		errutil.WithPublicMessage("User was provisioned via SCIM and must login via SAML"),
+	)
 )
 
 var (
@@ -101,10 +105,12 @@ func ProvideUserSync(userService user.Service, userProtectionService login.UserP
 		RejectNonProvisionedUsers: scimSection.Key("reject_non_provisioned_users").MustBool(false),
 	}
 
+	userProxy := NewLegacyUserProxy(userService)
+
 	return &UserSync{
 		isUserProvisioningEnabled: staticConfig.IsUserProvisioningEnabled,
 		rejectNonProvisionedUsers: staticConfig.RejectNonProvisionedUsers,
-		userService:               userService,
+		userService:               userProxy,
 		authInfoService:           authInfoService,
 		userProtectionService:     userProtectionService,
 		quotaService:              quotaService,
@@ -120,7 +126,7 @@ func ProvideUserSync(userService user.Service, userProtectionService login.UserP
 type UserSync struct {
 	isUserProvisioningEnabled bool
 	rejectNonProvisionedUsers bool
-	userService               user.Service
+	userService               UserProxy
 	authInfoService           login.AuthInfoService
 	userProtectionService     login.UserProtectionService
 	quotaService              quota.Service
@@ -308,6 +314,21 @@ func (s *UserSync) SyncUserHook(ctx context.Context, id *authn.Identity, _ *auth
 		// just try to fetch the user one more to make the other request work.
 		if errors.Is(err, user.ErrUserAlreadyExists) {
 			usr, _, err = s.getUser(ctx, id)
+
+			// Check if this is a SCIM-provisioned user trying to login via an auth module that is not SAML or GCOM
+			if err == nil && usr != nil && usr.IsProvisioned && id.AuthenticatedBy != login.GrafanaComAuthModule {
+				_, authErr := s.authInfoService.GetAuthInfo(ctx, &login.GetAuthInfoQuery{
+					UserId:     usr.ID,
+					AuthModule: id.AuthenticatedBy,
+				})
+				if errors.Is(authErr, user.ErrUserNotFound) {
+					s.log.FromContext(ctx).Error("SCIM-provisioned user attempted login via non-SAML auth module",
+						"user_id", usr.ID,
+						"attempted_module", id.AuthenticatedBy,
+					)
+					return errSCIMAuthModuleMismatch.Errorf("user was provisioned via SCIM but attempted login via %s", id.AuthenticatedBy)
+				}
+			}
 		}
 
 		if err != nil {
@@ -344,10 +365,7 @@ func (s *UserSync) FetchSyncedUserHook(ctx context.Context, id *authn.Identity, 
 		return nil
 	}
 
-	usr, err := s.userService.GetSignedInUser(ctx, &user.GetSignedInUserQuery{
-		UserID: userID,
-		OrgID:  r.OrgID,
-	})
+	usr, err := s.userService.GetSignedInUser(ctx, userID, r.OrgID)
 	if err != nil {
 		if errors.Is(err, user.ErrUserNotFound) {
 			return errFetchingSignedInUserNotFound.Errorf("%w", err)
@@ -388,7 +406,7 @@ func (s *UserSync) SyncLastSeenHook(ctx context.Context, id *authn.Identity, r *
 	goCtx := context.WithoutCancel(ctx)
 	// nolint:dogsled
 	_, _, _ = s.lastSeenSF.Do(fmt.Sprintf("%d-%d", id.GetOrgID(), userID), func() (interface{}, error) {
-		err := s.userService.UpdateLastSeenAt(goCtx, &user.UpdateUserLastSeenAtCommand{UserID: userID, OrgID: id.GetOrgID()})
+		err := s.userService.UpdateLastSeenAt(goCtx, userID, id.GetOrgID())
 		if err != nil && !errors.Is(err, user.ErrLastSeenUpToDate) {
 			s.log.Error("Failed to update last_seen_at", "err", err, "userId", userID)
 		}
@@ -420,7 +438,7 @@ func (s *UserSync) EnableUserHook(ctx context.Context, id *authn.Identity, _ *au
 	return s.userService.Update(ctx, &user.UpdateUserCommand{UserID: userID, IsDisabled: &isDisabled})
 }
 
-func (s *UserSync) upsertAuthConnection(ctx context.Context, userID int64, identity *authn.Identity, createConnection bool) error {
+func (s *UserSync) upsertAuthConnection(ctx context.Context, usr *user.User, identity *authn.Identity, createConnection bool) error {
 	ctx, span := s.tracer.Start(ctx, "user.sync.upsertAuthConnection")
 	defer span.End()
 
@@ -433,7 +451,8 @@ func (s *UserSync) upsertAuthConnection(ctx context.Context, userID int64, ident
 	// changing to new auth client
 	if createConnection {
 		setAuthInfoCmd := &login.SetAuthInfoCommand{
-			UserId:     userID,
+			UserId:     usr.ID,
+			UserUID:    usr.UID,
 			AuthModule: identity.AuthenticatedBy,
 			AuthId:     identity.AuthID,
 		}
@@ -446,7 +465,7 @@ func (s *UserSync) upsertAuthConnection(ctx context.Context, userID int64, ident
 	}
 
 	updateAuthInfoCmd := &login.UpdateAuthInfoCommand{
-		UserId:     userID,
+		UserId:     usr.ID,
 		AuthId:     identity.AuthID,
 		AuthModule: identity.AuthenticatedBy,
 	}
@@ -575,7 +594,7 @@ func (s *UserSync) updateUserAttributes(ctx context.Context, usr *user.User, id 
 		}
 	}
 
-	return s.upsertAuthConnection(ctx, usr.ID, id, needsConnectionCreation)
+	return s.upsertAuthConnection(ctx, usr, id, needsConnectionCreation)
 }
 
 func (s *UserSync) createUser(ctx context.Context, id *authn.Identity) (*user.User, error) {
@@ -612,7 +631,7 @@ func (s *UserSync) createUser(ctx context.Context, id *authn.Identity) (*user.Us
 		return nil, err
 	}
 
-	if err := s.upsertAuthConnection(ctx, usr.ID, id, true); err != nil {
+	if err := s.upsertAuthConnection(ctx, usr, id, true); err != nil {
 		return nil, err
 	}
 
@@ -633,7 +652,7 @@ func (s *UserSync) getUser(ctx context.Context, identity *authn.Identity) (*user
 		}
 
 		if !errors.Is(errGetAuthInfo, user.ErrUserNotFound) {
-			usr, errGetByID := s.userService.GetByID(ctx, &user.GetUserByIDQuery{ID: authInfo.UserId})
+			usr, errGetByID := s.userService.GetByUserAuth(ctx, authInfo)
 			if errGetByID == nil {
 				return usr, authInfo, nil
 			}
@@ -680,7 +699,7 @@ func (s *UserSync) lookupByOneOf(ctx context.Context, params login.UserLookupPar
 
 	// If not found, try to find the user by email address
 	if params.Email != nil && *params.Email != "" {
-		usr, err = s.userService.GetByEmail(ctx, &user.GetUserByEmailQuery{Email: *params.Email})
+		usr, err = s.userService.GetByEmail(ctx, *params.Email)
 		if err != nil && !errors.Is(err, user.ErrUserNotFound) {
 			return nil, err
 		}
@@ -688,7 +707,7 @@ func (s *UserSync) lookupByOneOf(ctx context.Context, params login.UserLookupPar
 
 	// If not found, try to find the user by login
 	if usr == nil && params.Login != nil && *params.Login != "" {
-		usr, err = s.userService.GetByLogin(ctx, &user.GetUserByLoginQuery{LoginOrEmail: *params.Login})
+		usr, err = s.userService.GetByLogin(ctx, *params.Login)
 		if err != nil && !errors.Is(err, user.ErrUserNotFound) {
 			return nil, err
 		}

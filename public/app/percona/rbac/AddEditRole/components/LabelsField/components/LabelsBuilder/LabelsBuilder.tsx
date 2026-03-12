@@ -1,13 +1,13 @@
 import { FC, useMemo } from 'react';
 
-import { MetricsLabelsSection, PromQuery, PrometheusDatasource, QueryPreview } from '@grafana/prometheus';
-import { buildVisualQueryFromString } from '@grafana/prometheus/src/querybuilder/parsing';
-import { PromVisualQuery } from '@grafana/prometheus/src/querybuilder/types';
+import { MetricsLabelsSection, PromQuery, PrometheusDatasource, QueryPreview, buildVisualQueryFromString } from '@grafana/prometheus';
+
 import { getDataSourceSrv } from '@grafana/runtime';
-import { promQueryModeller } from '@grafana/prometheus/src/querybuilder/shared/modeller_instance';
 
 import { styles } from './LabelsBuilder.styles';
 import { getDefaultTimeRange } from '@grafana/data';
+import { PromVisualQuery } from '../../../../../../../../../packages/grafana-prometheus/src/querybuilder/types';
+import { promQueryModeller } from '../../../../../../../../../packages/grafana-prometheus/src/querybuilder/shared/modeller_instance';
 
 interface LabelsBuilderProps {
   value: string;

@@ -12,7 +12,7 @@ import {
   getResultApplicationsCloudSelect,
   getResultApplicationsGrafanaSelect,
   getResultApplicationsMimirSelect,
-  getSelectorInput,
+  getSelectorInput as getSelectorButton,
   getTreeHeadline,
   queryAllDashboard,
   queryDashboard,
@@ -29,6 +29,7 @@ import {
   getResultEnvironmentsDevSelect,
   getResultEnvironmentsProdSelect,
   querySelectorApply,
+  findResultApplicationsGrafanaSelect,
 } from './selectors';
 
 const expectInDocument = (selector: () => HTMLElement) => expect(selector()).toBeInTheDocument();
@@ -45,13 +46,15 @@ export const expectRecentScope = (scope: string) => expectInDocument(() => getRe
 export const expectRecentScopeNotPresentInDocument = () => expectNotInDocument(queryRecentScopesSection);
 export const expectRecentScopesSection = () => expectInDocument(getRecentScopesSection);
 export const expectScopesSelectorClosed = () => expectNotInDocument(querySelectorApply);
-export const expectScopesSelectorDisabled = () => expectDisabled(getSelectorInput);
-export const expectScopesSelectorValue = (value: string) => expectValue(getSelectorInput, value);
+export const expectScopesSelectorDisabled = () => expectDisabled(getSelectorButton);
+export const expectScopesSelectorValue = (value: string) => expect(getSelectorButton().dataset.value).toBe(value);
 export const expectScopesHeadline = (value: string) => expectTextContent(getTreeHeadline, value);
 export const expectPersistedApplicationsGrafanaNotPresent = () =>
   expectNotInDocument(queryPersistedApplicationsGrafanaSelect);
 export const expectResultApplicationsGrafanaSelected = () => expectChecked(getResultApplicationsGrafanaSelect);
 export const expectResultApplicationsGrafanaPresent = () => expectInDocument(getResultApplicationsGrafanaSelect);
+export const expectResultApplicationsGrafanaPresentAsync = async () =>
+  expect(await findResultApplicationsGrafanaSelect()).toBeInTheDocument();
 export const expectResultApplicationsGrafanaNotPresent = () =>
   expectNotInDocument(queryResultApplicationsGrafanaSelect);
 export const expectPersistedApplicationsMimirPresent = () => expectInDocument(getPersistedApplicationsMimirSelect);

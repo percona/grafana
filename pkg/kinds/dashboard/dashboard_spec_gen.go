@@ -204,6 +204,9 @@ type Panel struct {
 	Options map[string]any `json:"options,omitempty"`
 	// Field options allow you to change how the data is displayed in your visualizations.
 	FieldConfig *FieldConfigSource `json:"fieldConfig,omitempty"`
+	// When a panel is migrated from a previous version (Angular to React), this field is set to the original panel type.
+	// This is used to determine the original panel type when migrating to a new version so the plugin migration can be applied.
+	AutoMigrateFrom *string `json:"autoMigrateFrom,omitempty"`
 }
 
 // NewPanel creates a new Panel object.
@@ -404,7 +407,7 @@ type FieldConfig struct {
 	// True if data source field supports ad-hoc filters
 	Filterable *bool `json:"filterable,omitempty"`
 	// Unit a field should use. The unit you select is applied to all fields except time.
-	// You can use the units ID availables in Grafana or a custom unit.
+	// You can use the units ID available in Grafana or a custom unit.
 	// Available units in Grafana: https://github.com/grafana/grafana/blob/main/packages/grafana-data/src/valueFormats/categories.ts
 	// As custom unit, you can use the following formats:
 	// `suffix:<suffix>` for custom unit that should go after value.
@@ -619,7 +622,12 @@ func NewFieldColor() *FieldColor {
 // `thresholds`: From thresholds. Informs Grafana to take the color from the matching threshold
 // `palette-classic`: Classic palette. Grafana will assign color by looking up a color in a palette by series index. Useful for Graphs and pie charts and other categorical data visualizations
 // `palette-classic-by-name`: Classic palette (by name). Grafana will assign color by looking up a color in a palette by series name. Useful for Graphs and pie charts and other categorical data visualizations
-// `continuous-GrYlRd`: ontinuous Green-Yellow-Red palette mode
+// `continuous-viridis`: Continuous Viridis palette mode
+// `continuous-magma`: Continuous Magma palette mode
+// `continuous-plasma`: Continuous Plasma palette mode
+// `continuous-inferno`: Continuous Inferno palette mode
+// `continuous-cividis`: Continuous Cividis palette mode
+// `continuous-GrYlRd`: Continuous Green-Yellow-Red palette mode
 // `continuous-RdYlGr`: Continuous Red-Yellow-Green palette mode
 // `continuous-BlYlRd`: Continuous Blue-Yellow-Red palette mode
 // `continuous-YlRd`: Continuous Yellow-Red palette mode
@@ -637,6 +645,11 @@ const (
 	FieldColorModeIdThresholds           FieldColorModeId = "thresholds"
 	FieldColorModeIdPaletteClassic       FieldColorModeId = "palette-classic"
 	FieldColorModeIdPaletteClassicByName FieldColorModeId = "palette-classic-by-name"
+	FieldColorModeIdContinuousViridis    FieldColorModeId = "continuous-viridis"
+	FieldColorModeIdContinuousMagma      FieldColorModeId = "continuous-magma"
+	FieldColorModeIdContinuousPlasma     FieldColorModeId = "continuous-plasma"
+	FieldColorModeIdContinuousInferno    FieldColorModeId = "continuous-inferno"
+	FieldColorModeIdContinuousCividis    FieldColorModeId = "continuous-cividis"
 	FieldColorModeIdContinuousGrYlRd     FieldColorModeId = "continuous-GrYlRd"
 	FieldColorModeIdContinuousRdYlGr     FieldColorModeId = "continuous-RdYlGr"
 	FieldColorModeIdContinuousBlYlRd     FieldColorModeId = "continuous-BlYlRd"
@@ -824,6 +837,10 @@ type VariableModel struct {
 	// Optional field, if you want to extract part of a series name or metric node segment.
 	// Named capture groups can be used to separate the display text and value.
 	Regex *string `json:"regex,omitempty"`
+	// Optional, indicates whether a custom type variable uses CSV or JSON to define its values
+	ValuesFormat *VariableModelValuesFormat `json:"valuesFormat,omitempty"`
+	// Determine whether regex applies to variable value or display text
+	RegexApplyTo *VariableRegexApplyTo `json:"regexApplyTo,omitempty"`
 	// Additional static options for query variable
 	StaticOptions []VariableOption `json:"staticOptions,omitempty"`
 	// Ordering of static options in relation to options returned from data source for query variable
@@ -837,6 +854,7 @@ func NewVariableModel() *VariableModel {
 		Multi:            (func(input bool) *bool { return &input })(false),
 		AllowCustomValue: (func(input bool) *bool { return &input })(true),
 		IncludeAll:       (func(input bool) *bool { return &input })(false),
+		ValuesFormat:     (func(input VariableModelValuesFormat) *VariableModelValuesFormat { return &input })(VariableModelValuesFormatCsv),
 	}
 }
 
@@ -885,6 +903,8 @@ type VariableOption struct {
 	Text StringOrArrayOfString `json:"text"`
 	// Value of the option
 	Value StringOrArrayOfString `json:"value"`
+	// Additional properties for multi-props variables
+	Properties map[string]string `json:"properties,omitempty"`
 }
 
 // NewVariableOption creates a new VariableOption object.
@@ -930,6 +950,15 @@ const (
 	VariableSortAlphabeticalCaseInsensitiveDesc VariableSort = 6
 	VariableSortNaturalAsc                      VariableSort = 7
 	VariableSortNaturalDesc                     VariableSort = 8
+)
+
+// Determine whether regex applies to variable value or display text
+// Accepted values are "value" (apply to value used in queries) or "text" (apply to display text shown to users)
+type VariableRegexApplyTo string
+
+const (
+	VariableRegexApplyToValue VariableRegexApplyTo = "value"
+	VariableRegexApplyToText  VariableRegexApplyTo = "text"
 )
 
 // Contains the list of annotations that are associated with the dashboard.
@@ -1152,14 +1181,6 @@ func NewDashboardActionStyle() *DashboardActionStyle {
 	return &DashboardActionStyle{}
 }
 
-type VariableModelStaticOptionsOrder string
-
-const (
-	VariableModelStaticOptionsOrderBefore VariableModelStaticOptionsOrder = "before"
-	VariableModelStaticOptionsOrderAfter  VariableModelStaticOptionsOrder = "after"
-	VariableModelStaticOptionsOrderSorted VariableModelStaticOptionsOrder = "sorted"
-)
-
 type PanelRepeatDirection string
 
 const (
@@ -1173,6 +1194,21 @@ const (
 	DataTransformerConfigTopicSeries      DataTransformerConfigTopic = "series"
 	DataTransformerConfigTopicAnnotations DataTransformerConfigTopic = "annotations"
 	DataTransformerConfigTopicAlertStates DataTransformerConfigTopic = "alertStates"
+)
+
+type VariableModelValuesFormat string
+
+const (
+	VariableModelValuesFormatCsv  VariableModelValuesFormat = "csv"
+	VariableModelValuesFormatJson VariableModelValuesFormat = "json"
+)
+
+type VariableModelStaticOptionsOrder string
+
+const (
+	VariableModelStaticOptionsOrderBefore VariableModelStaticOptionsOrder = "before"
+	VariableModelStaticOptionsOrderAfter  VariableModelStaticOptionsOrder = "after"
+	VariableModelStaticOptionsOrderSorted VariableModelStaticOptionsOrder = "sorted"
 )
 
 type ValueMapOrRangeMapOrRegexMapOrSpecialValueMap struct {

@@ -12,9 +12,9 @@ import { Dot } from 'app/percona/shared/components/Elements/Dot';
 
 import { Indent } from '../../Indent/Indent';
 
-import { FeatureHighlight } from './FeatureHighlight';
 import { MegaMenuItemText } from './MegaMenuItemText';
 import { hasChildMatch } from './utils';
+import { FeatureHighlight } from './FeatureHighlight';
 
 interface Props {
   link: NavModelItem;
@@ -82,11 +82,7 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
 
   return (
     <li ref={item} className={styles.listItem}>
-      <div
-        className={cx(styles.menuItem, {
-          [styles.menuItemWithIcon]: Boolean(level === 0 && iconElement),
-        })}
-      >
+      <div className={styles.menuItem}>
         {level !== 0 && <Indent level={level === MAX_DEPTH ? level - 1 : level} spacing={3} />}
         {level === MAX_DEPTH && <div className={styles.itemConnector} />}
         <div
@@ -113,19 +109,21 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
               })}
             >
               {/* @PERCONA - show icons for inner items */}
-              {level <= 1 && link.icon && (
-                <FeatureHighlightWrapper>
-                  <>
-                    <Icon
-                      className={cx(styles.icon, level > 0 && styles.deepIcon)}
-                      name={toIconName(link.icon) ?? 'link'}
-                      size={level === 0 ? 'lg' : 'md'}
-                    />
-                    {/* @PERCONA */}
-                    {!!link.showDot && <Dot left={23} top={0} />}
-                  </>
-                </FeatureHighlightWrapper>
-              )}
+              {
+                level <= 1 && link.icon && (
+                  <FeatureHighlightWrapper>
+                    <>
+                      <Icon
+                        className={cx(styles.icon, level > 0 && styles.deepIcon)}
+                        name={toIconName(link.icon) ?? 'link'}
+                        size={level === 0 ? 'lg' : 'md'}
+                      />
+                      {/* @PERCONA */}
+                      {!!link.showDot && <Dot left={23} top={0} />}
+                    </>
+                  </FeatureHighlightWrapper>
+                )
+              }
               {/* @PERCONA */}
               <div className={styles.relativeText}>
                 <Text truncate>{link.text}</Text>
@@ -133,21 +131,22 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
                 {!!link.showDot && !link.icon && <Dot right={-8} top={2} />}
               </div>
               {link.isNew && <FeatureBadge featureState={FeatureState.new} />}
-            </div>
-          </MegaMenuItemText>
-        </div>
+            </div >
+          </MegaMenuItemText >
+        </div >
         <div className={styles.collapseButtonWrapper}>
           {showExpandButton && (
             <IconButton
               aria-label={
                 sectionExpanded
                   ? t('navigation.megamenu-item.collapse-aria-label', 'Collapse section: {{sectionName}}', {
-                      sectionName: link.text,
-                    })
+                    sectionName: link.text,
+                  })
                   : t('navigation.megamenu-item.expand-aria-label', 'Expand section: {{sectionName}}', {
-                      sectionName: link.text,
-                    })
+                    sectionName: link.text,
+                  })
               }
+              aria-expanded={Boolean(sectionExpanded)}
               className={styles.collapseButton}
               onClick={() => setSectionExpanded(!sectionExpanded)}
               name={getIconName(Boolean(sectionExpanded))}
@@ -156,7 +155,7 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
             />
           )}
         </div>
-      </div>
+      </div >
       {showExpandButton && sectionExpanded && (
         <ul className={styles.children}>
           {linkHasChildren(link) ? (
@@ -179,8 +178,9 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
             </div>
           )}
         </ul>
-      )}
-    </li>
+      )
+      }
+    </li >
   );
 }
 
@@ -201,11 +201,7 @@ const getStyles = (theme: GrafanaTheme2) => ({
     alignItems: 'center',
     gap: theme.spacing(1.5),
     height: theme.spacing(4),
-    paddingLeft: theme.spacing(0.5),
     position: 'relative',
-  }),
-  menuItemWithIcon: css({
-    paddingLeft: theme.spacing(0),
   }),
   collapseButtonWrapper: css({
     display: 'flex',
@@ -239,16 +235,16 @@ const getStyles = (theme: GrafanaTheme2) => ({
   labelWrapper: css({
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(0.75),
-    minWidth: 0,
+    gap: theme.spacing(1),
     paddingLeft: theme.spacing(1),
-  }),
-  labelWrapperWithIcon: css({
-    paddingLeft: theme.spacing(0.5),
-    gap: theme.spacing(2),
+    minWidth: 0,
   }),
   hasActiveChild: css({
     color: theme.colors.text.primary,
+  }),
+  labelWrapperWithIcon: css({
+    minWidth: theme.spacing(7),
+    paddingLeft: theme.spacing(0.5),
   }),
   children: css({
     display: 'flex',

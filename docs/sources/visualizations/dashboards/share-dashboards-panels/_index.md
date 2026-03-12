@@ -98,7 +98,7 @@ You can share dashboards in the following ways:
 - [As a report](#schedule-a-report)
 - [As a snapshot](#share-a-snapshot)
 - [As a PDF export](#export-a-dashboard-as-pdf)
-- [As a JSON file export](#export-a-dashboard-as-json)
+- [As a JSON file export](#export-a-dashboard-as-code)
 - [As an image export](#export-a-dashboard-as-an-image)
 
 When you share a dashboard externally as a link or by email, those dashboards are included in a list of your shared dashboards. To view the list and manage these dashboards, navigate to **Dashboards > Shared dashboards**.
@@ -223,17 +223,25 @@ To export a dashboard in its current state as a PDF, follow these steps:
 
 1. Click the **X** at the top-right corner to close the share drawer.
 
-### Export a dashboard as JSON
+### Export a dashboard as code
 
 Export a Grafana JSON file that contains everything you need, including layout, variables, styles, data sources, queries, and so on, so that you can later import the dashboard. To export a JSON file, follow these steps:
 
 1. Click **Dashboards** in the main menu.
 1. Open the dashboard you want to export.
-1. Click the **Export** drop-down list in the top-right corner and select **Export as JSON**.
+1. Click the **Export** drop-down list in the top-right corner and select **Export as code**.
 
-   The **Export dashboard JSON** drawer opens.
+   The **Export dashboard** drawer opens.
 
-1. Toggle the **Export the dashboard to use in another instance** switch to generate the JSON with a different data source UID.
+1. Select the dashboard JSON model that you to export:
+   - **Classic** - Export dashboards created using the [current dashboard schema](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/visualizations/dashboards/build-dashboards/view-dashboard-json-model/).
+   - **V1 Resource** - Export dashboards created using the [current dashboard schema](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/visualizations/dashboards/build-dashboards/view-dashboard-json-model/) wrapped in the `spec` property of the [V1 Kubernetes-style resource](https://play.grafana.org/swagger?api=dashboard.grafana.app-v2alpha1). Choose between **JSON** and **YAML** format.
+   - **V2 Resource** - Export dashboards created using the [V2 Resource schema](https://play.grafana.org/swagger?api=dashboard.grafana.app-v2beta1). Choose between **JSON** and **YAML** format.
+
+1. Do one of the following:
+   - Toggle the **Export for sharing externally** switch to generate the JSON with a different data source UID.
+   - Toggle the **Remove deployment details** switch to make the dashboard externally shareable.
+
 1. Click **Download file** or **Copy to clipboard**.
 1. Click the **X** at the top-right corner to close the share drawer.
 
@@ -309,12 +317,16 @@ When you click **Generate image** in the panel link settings, Grafana generates 
 | timeout   | Number of seconds. The timeout can be increased if the query for the panel needs more than the default 30 seconds.             |
 | scale     | Numeric value to configure device scale factor. Default is 1. Use a higher value to produce more detailed images (higher DPI). |
 
-You can also update these parameters in the [image rendering configuration](ref:image-rendering-config).
+{{< admonition type="note" >}}
+The image renderer enforces minimum width and height requirements. You can customize these minimums in self-managed Grafana installations through the [image renderer configuration](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/setup-grafana/image-rendering/#configuration). In Grafana Cloud, the configuration is managed by Grafana and can't be modified. If you encounter size-related errors when rendering images using the API, ensure your dimensions meet the minimum requirements.
+{{< /admonition >}}
+
+You can also update these parameters in the [image rendering configuration](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/setup-grafana/image-rendering/#configuration).
 
 The following example shows a link to a server-side rendered PNG:
 
 ```bash
-https://play.grafana.org/render/d-solo/ktMs4D6Mk?from=2024-09-03T11:55:44.442Z&to=2024-09-03T17:55:44.442Z&panelId=panel-13&__feature.dashboardSceneSolo&width=1000&height=500&tz=UTC
+https://play.grafana.org/render/d-solo/ktMs4D6Mk?from=2024-09-03T11:55:44.442Z&to=2024-09-03T17:55:44.442Z&panelId=panel-13&__feature.dashboardScene&width=1000&height=500&tz=UTC
 ```
 
 ### Share an embed

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 	openapi "k8s.io/kube-openapi/pkg/common"
 	spec "k8s.io/kube-openapi/pkg/validation/spec"
 	ptr "k8s.io/utils/ptr"
@@ -45,6 +45,10 @@ type InlineSecureValue struct {
 
 func (v InlineSecureValue) IsZero() bool {
 	return v.Create.IsZero() && v.Name == "" && !v.Remove
+}
+
+func (InlineSecureValue) OpenAPIModelName() string {
+	return OpenAPIPrefix + "InlineSecureValue"
 }
 
 // OpenAPIDefinition returns the JSONSchema that manually ensures oneOf(create | name | remove) is set.

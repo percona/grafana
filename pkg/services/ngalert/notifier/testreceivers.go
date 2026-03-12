@@ -9,6 +9,7 @@ import (
 	v2 "github.com/prometheus/alertmanager/api/v2"
 
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
+	ngmodels "github.com/grafana/grafana/pkg/services/ngalert/models"
 )
 
 func (am *alertmanager) TestReceivers(ctx context.Context, c apimodels.TestReceiversConfigBodyParams) (*alertingNotify.TestReceiversResult, int, error) {
@@ -44,12 +45,20 @@ func (am *alertmanager) TestReceivers(ctx context.Context, c apimodels.TestRecei
 	}
 	AddDefaultLabelsAndAnnotations(a)
 	return am.Base.TestReceivers(ctx, alertingNotify.TestReceiversConfigBodyParams{
-		Alert: &alertingNotify.TestReceiversConfigAlertParams{
+		Alert: &models.TestReceiversConfigAlertParams{
 			Annotations: v2.APILabelSetToModelLabelSet(a.Annotations),
 			Labels:      v2.APILabelSetToModelLabelSet(a.Labels),
 		},
 		Receivers: receivers,
 	})
+}
+
+func (am *alertmanager) TestIntegration(ctx context.Context, receiverName string, integrationConfig ngmodels.Integration, alert models.TestReceiversConfigAlertParams) (models.IntegrationStatus, error) {
+	cfg, err := IntegrationToIntegrationConfig(integrationConfig)
+	if err != nil {
+		return models.IntegrationStatus{}, err
+	}
+	return am.Base.TestIntegration(ctx, receiverName, cfg, alert)
 }
 
 func (am *alertmanager) GetReceivers(_ context.Context) ([]apimodels.Receiver, error) {

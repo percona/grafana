@@ -3,11 +3,11 @@ import { PureComponent } from 'react';
 import * as React from 'react';
 import type { Unsubscribable } from 'rxjs';
 
-import { FeatureState, ThemeRegistryItem, type GrafanaTheme2, type BusEventWithPayload } from '@grafana/data';
+import { PreferencesSpec as UserPreferencesDTO } from '@grafana/api-clients/rtkq/preferences/v1alpha1';
+import { BusEventWithPayload, FeatureState, GrafanaTheme2, ThemeRegistryItem } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { config, reportInteraction, getAppEvents, ThemeChangedEvent, TimeZoneUpdatedEvent } from '@grafana/runtime';
 import { PSEUDO_LOCALE, t, Trans } from '@grafana/i18n';
-import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
 import {
   Button,
   Field,

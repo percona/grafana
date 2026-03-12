@@ -4,13 +4,15 @@ import { useLocation } from 'react-router';
 
 import { GrafanaTheme2, locationUtil, textUtil } from '@grafana/data';
 import { t } from '@grafana/i18n';
+import { locationService } from '@grafana/runtime';
 import { SceneComponentProps, sceneGraph } from '@grafana/scenes';
 import { Box, Icon, Tab, TabContent, Tooltip, useElementSelection, usePointerDistance, useStyles2 } from '@grafana/ui';
 
 import { useIsConditionallyHidden } from '../../conditional-rendering/hooks/useIsConditionallyHidden';
 import { isRepeatCloneOrChildOf } from '../../utils/clone';
-import { useDashboardState } from '../../utils/utils';
+import { getDashboardSceneFor, useDashboardState } from '../../utils/utils';
 import { useSoloPanelContext } from '../SoloPanelContext';
+import { DASHBOARD_DROP_TARGET_KEY_ATTR } from '../types/DashboardDropTarget';
 
 import { TabItem } from './TabItem';
 
@@ -19,7 +21,7 @@ export function TabItemRenderer({ model }: SceneComponentProps<TabItem>) {
   const parentLayout = model.getParentLayout();
   const { currentTabSlug } = parentLayout.useState();
   const titleInterpolated = sceneGraph.interpolate(model, title, undefined, 'text');
-  const { isSelected, onSelect, isSelectable } = useElementSelection(key);
+  const { isSelected, onSelect, isSelectable, onClear: onClearSelection } = useElementSelection(key);
   const { isEditing } = useDashboardState(model);
   const mySlug = model.getSlug();
   const urlKey = parentLayout.getUrlKey();
@@ -29,7 +31,7 @@ export function TabItemRenderer({ model }: SceneComponentProps<TabItem>) {
   const href = textUtil.sanitize(locationUtil.getUrlForPartial(location, { [urlKey]: mySlug }));
   const styles = useStyles2(getStyles);
   const pointerDistance = usePointerDistance();
-  const [isConditionallyHidden] = useIsConditionallyHidden(model);
+  const [isConditionallyHidden] = useIsConditionallyHidden(model.state.conditionalRendering);
   const isClone = isRepeatCloneOrChildOf(model);
   const soloPanelContext = useSoloPanelContext();
 
@@ -56,7 +58,9 @@ export function TabItemRenderer({ model }: SceneComponentProps<TabItem>) {
     <Draggable key={key!} draggableId={key!} index={myIndex} isDragDisabled={!isDraggable}>
       {(dragProvided, dragSnapshot) => (
         <div
-          ref={(ref) => dragProvided.innerRef(ref)}
+          ref={(ref) => {
+            dragProvided.innerRef(ref);
+          }}
           className={cx(dragSnapshot.isDragging && styles.dragging)}
           {...dragProvided.draggableProps}
           {...dragProvided.dragHandleProps}
@@ -75,6 +79,26 @@ export function TabItemRenderer({ model }: SceneComponentProps<TabItem>) {
             suffix={isConditionallyHidden ? IsHiddenSuffix : undefined}
             href={href}
             aria-selected={isActive}
+            onChangeTab={(evt) => {
+              evt.preventDefault();
+
+              const dashboard = getDashboardSceneFor(model);
+              dashboard.rememberScrollPos();
+
+              // When switching tabs, React unmounts old content and mounts new content.
+              // This causes the browser to adjust scroll position if we're at the bottom of the page.
+              // We use MutationObserver to detect when React has committed the DOM changes,
+              // then restore scroll after the browser has completed its layout adjustments.
+              const observer = new MutationObserver(() => {
+                observer.disconnect();
+                requestAnimationFrame(() => {
+                  dashboard.restoreScrollPos();
+                });
+              });
+              observer.observe(document.body, { childList: true, subtree: true });
+
+              locationService.partial({ [urlKey]: mySlug });
+            }}
             onPointerDown={(evt) => {
               evt.stopPropagation();
               pointerDistance.set(evt);
@@ -86,10 +110,15 @@ export function TabItemRenderer({ model }: SceneComponentProps<TabItem>) {
                 return;
               }
 
+              if (!isActive) {
+                onClearSelection?.();
+                return;
+              }
+
               onSelect?.(evt);
             }}
             label={titleInterpolated}
-            data-dashboard-drop-target-key={model.state.key}
+            data-tab-activation-key={key}
             {...titleCollisionProps}
           />
         </div>
@@ -116,12 +145,14 @@ interface TabItemLayoutRendererProps {
 export function TabItemLayoutRenderer({ tab, isEditing }: TabItemLayoutRendererProps) {
   const { layout, key } = tab.useState();
   const styles = useStyles2(getStyles);
-  const [_, conditionalRenderingClass, conditionalRenderingOverlay] = useIsConditionallyHidden(tab);
+  const [_, conditionalRenderingClass, conditionalRenderingOverlay] = useIsConditionallyHidden(
+    tab.state.conditionalRendering
+  );
 
   return (
     <TabContent
       className={cx(styles.tabContentContainer, isEditing && conditionalRenderingClass)}
-      data-dashboard-drop-target-key={key}
+      {...{ [DASHBOARD_DROP_TARGET_KEY_ATTR]: key }}
     >
       <layout.Component model={layout} />
       {isEditing && conditionalRenderingOverlay}
@@ -146,10 +177,23 @@ const getStyles = (theme: GrafanaTheme2) => ({
     display: 'flex',
     flexDirection: 'column',
     flex: 1,
-    // Without this min height, the custom grid (SceneGridLayout) wont render
+    // Without this min height, the custom grid (SceneGridLayout) wont render
     // Should be bigger than paddingTop value
     // consist of paddingTop + 0.125 = 9px
     minHeight: theme.spacing(1 + 0.125),
     paddingTop: theme.spacing(1),
+
+    // Show grid controls when hovering over the tab content
+    '&:hover .dashboard-canvas-controls': {
+      opacity: 1,
+    },
+    // But hide controls inside nested rows (they'll show when that row is hovered)
+    '&:hover .dashboard-row-wrapper .dashboard-canvas-controls': {
+      opacity: 0,
+    },
+    // Re-enable for the specific nested row being hovered
+    '&:hover .dashboard-row-wrapper:hover .dashboard-canvas-controls': {
+      opacity: 1,
+    },
   }),
 });

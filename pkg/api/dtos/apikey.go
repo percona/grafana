@@ -5,6 +5,6 @@ type NewApiKeyResult struct {
 	ID int64 `json:"id"`
 	// example: grafana
 	Name string `json:"name"`
-	// example: eyJrIjoiWDZTTmtVMjZmcDNWNDA3dE43bGJoVEd2NDFmRkVpMVoiLCJuIjoidGVzdCIsImlkIjoxfQ==a
+	// example: glsa_iNValIdinValiDinvalidinvalidinva_5b582697
 	Key string `json:"key"`
 }
