@@ -1,6 +1,12 @@
 import { FC, useMemo } from 'react';
 
-import { MetricsLabelsSection, PromQuery, PrometheusDatasource, QueryPreview, buildVisualQueryFromString } from '@grafana/prometheus';
+import {
+  MetricsLabelsSection,
+  PromQuery,
+  PrometheusDatasource,
+  QueryPreview,
+  buildVisualQueryFromString,
+} from '@grafana/prometheus';
 
 import { getDataSourceSrv } from '@grafana/runtime';
 

@@ -41,7 +41,8 @@ export type RepeatDirection = 'v' | 'h';
 
 export class DashboardGridItem
   extends SceneObjectBase<DashboardGridItemState>
-  implements SceneGridItemLike, DashboardLayoutItem {
+  implements SceneGridItemLike, DashboardLayoutItem
+{
   public static Component = DashboardGridItemRenderer;
 
   protected _variableDependency = new DashboardGridItemVariableDependencyHandler(this);
@@ -178,9 +179,9 @@ export class DashboardGridItem
       const clone = isSource
         ? panelToRepeat
         : panelToRepeat.clone({
-          key: getCloneKey(panelToRepeat.state.key!, index),
-          repeatSourceKey: panelToRepeat.state.key,
-        });
+            key: getCloneKey(panelToRepeat.state.key!, index),
+            repeatSourceKey: panelToRepeat.state.key,
+          });
 
       clone.setState({ $variables: getLocalVariableValueSet(variable, variableValues[index], variableTexts[index]) });
 

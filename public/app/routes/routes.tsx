@@ -241,9 +241,9 @@ export function getAppRoutes(): RouteDescriptor[] {
       component:
         isDevEnv || config.featureToggles.enableExtensionsAdminPage
           ? SafeDynamicImport(
-            () =>
-              import(/* webpackChunkName: "PluginExtensionsLog" */ 'app/features/plugins/extensions/logs/LogViewer')
-          )
+              () =>
+                import(/* webpackChunkName: "PluginExtensionsLog" */ 'app/features/plugins/extensions/logs/LogViewer')
+            )
           : () => <Navigate replace to="/admin" />,
     },
     {
@@ -416,8 +416,8 @@ export function getAppRoutes(): RouteDescriptor[] {
       component: !config.verifyEmailEnabled
         ? () => <Navigate replace to="/signup" />
         : SafeDynamicImport(
-          () => import(/* webpackChunkName "VerifyEmailPage"*/ 'app/core/components/Signup/VerifyEmailPage')
-        ),
+            () => import(/* webpackChunkName "VerifyEmailPage"*/ 'app/core/components/Signup/VerifyEmailPage')
+          ),
       pageClass: 'login-page',
       chromeless: true,
     },
@@ -778,22 +778,22 @@ export function getAppRoutes(): RouteDescriptor[] {
     },
     ...(isPmmAdmin(config.bootData.user)
       ? [
-        {
-          path: '/pmm-dump',
-          component: SafeDynamicImport(
-            () => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')
-          ),
-        },
-        {
-          path: '/pmm-dump/new',
-          component: SafeDynamicImport(
-            () =>
-              import(
+          {
+            path: '/pmm-dump',
+            component: SafeDynamicImport(
+              () => import(/* webpackChunkName: "PMMDump" */ 'app/percona/pmm-dump/PMMDump')
+            ),
+          },
+          {
+            path: '/pmm-dump/new',
+            component: SafeDynamicImport(
+              () =>
+                import(
                   /* webpackChunkName: "BackupInventoryPage" */ 'app/percona/pmm-dump/components/ExportDataset/ExportDataset'
-              )
-          ),
-        },
-      ]
+                )
+            ),
+          },
+        ]
       : []),
     {
       path: '/bookmarks',

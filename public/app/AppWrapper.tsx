@@ -159,8 +159,8 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
               </ThemeProvider>
             </GrafanaContext.Provider>
           </OpenFeatureProvider>
-        </ErrorBoundaryAlert >
-      </Provider >
+        </ErrorBoundaryAlert>
+      </Provider>
     );
   }
 }

@@ -96,7 +96,12 @@ export const Alert = React.forwardRef<HTMLDivElement, Props>(
           {/* @Percona */}
           {customButtonContent && (
             <Box display="flex" alignItems="center">
-              <Button aria-label="Custom button" variant="primary" onClick={onCustomButtonClick} type="button">
+              <Button
+                aria-label={t('grafana-ui.alert.custom-button-aria-label', 'Custom button')}
+                variant="primary"
+                onClick={onCustomButtonClick}
+                type="button"
+              >
                 {customButtonContent}
               </Button>
             </Box>

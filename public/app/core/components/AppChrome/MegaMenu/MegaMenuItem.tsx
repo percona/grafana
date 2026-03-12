@@ -109,21 +109,19 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
               })}
             >
               {/* @PERCONA - show icons for inner items */}
-              {
-                level <= 1 && link.icon && (
-                  <FeatureHighlightWrapper>
-                    <>
-                      <Icon
-                        className={cx(styles.icon, level > 0 && styles.deepIcon)}
-                        name={toIconName(link.icon) ?? 'link'}
-                        size={level === 0 ? 'lg' : 'md'}
-                      />
-                      {/* @PERCONA */}
-                      {!!link.showDot && <Dot left={23} top={0} />}
-                    </>
-                  </FeatureHighlightWrapper>
-                )
-              }
+              {level <= 1 && link.icon && (
+                <FeatureHighlightWrapper>
+                  <>
+                    <Icon
+                      className={cx(styles.icon, level > 0 && styles.deepIcon)}
+                      name={toIconName(link.icon) ?? 'link'}
+                      size={level === 0 ? 'lg' : 'md'}
+                    />
+                    {/* @PERCONA */}
+                    {!!link.showDot && <Dot left={23} top={0} />}
+                  </>
+                </FeatureHighlightWrapper>
+              )}
               {/* @PERCONA */}
               <div className={styles.relativeText}>
                 <Text truncate>{link.text}</Text>
@@ -131,20 +129,20 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
                 {!!link.showDot && !link.icon && <Dot right={-8} top={2} />}
               </div>
               {link.isNew && <FeatureBadge featureState={FeatureState.new} />}
-            </div >
-          </MegaMenuItemText >
-        </div >
+            </div>
+          </MegaMenuItemText>
+        </div>
         <div className={styles.collapseButtonWrapper}>
           {showExpandButton && (
             <IconButton
               aria-label={
                 sectionExpanded
                   ? t('navigation.megamenu-item.collapse-aria-label', 'Collapse section: {{sectionName}}', {
-                    sectionName: link.text,
-                  })
+                      sectionName: link.text,
+                    })
                   : t('navigation.megamenu-item.expand-aria-label', 'Expand section: {{sectionName}}', {
-                    sectionName: link.text,
-                  })
+                      sectionName: link.text,
+                    })
               }
               aria-expanded={Boolean(sectionExpanded)}
               className={styles.collapseButton}
@@ -155,7 +153,7 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
             />
           )}
         </div>
-      </div >
+      </div>
       {showExpandButton && sectionExpanded && (
         <ul className={styles.children}>
           {linkHasChildren(link) ? (
@@ -178,9 +176,8 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
             </div>
           )}
         </ul>
-      )
-      }
-    </li >
+      )}
+    </li>
   );
 }
 

@@ -20,7 +20,7 @@ import { SoloPanelContextProvider, useDefineSoloPanelContext } from '../scene/So
 import { SoloPanelPageLogo } from './SoloPanelPageLogo';
 
 export interface Props
-  extends GrafanaRouteComponentProps<DashboardPageRouteParams, { panelId: string; hideLogo?: UrlQueryValue }> { }
+  extends GrafanaRouteComponentProps<DashboardPageRouteParams, { panelId: string; hideLogo?: UrlQueryValue }> {}
 
 /**
  * Used for iframe embedding and image rendering of single panels

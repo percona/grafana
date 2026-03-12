@@ -557,7 +557,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     appEvents.publish(new SetPanelAttentionEvent({ panelId: this.props.panel.id }));
   }
 
-  debouncedSetPanelAttention() { }
+  debouncedSetPanelAttention() {}
 
   render() {
     const { dashboard, panel, width, height, plugin } = this.props;

@@ -184,12 +184,12 @@ export const OrgUsersTable = ({
       // @PERCONA
       ...(accessRolesEnabled
         ? [
-          {
-            id: 'perconaRBAC',
-            header: () => <AccessRoleHeader />,
-            cell: ({ row: { original: user } }: Cell) => <AccessRoleCell user={user} />,
-          },
-        ]
+            {
+              id: 'perconaRBAC',
+              header: () => <AccessRoleHeader />,
+              cell: ({ row: { original: user } }: Cell) => <AccessRoleCell user={user} />,
+            },
+          ]
         : []),
       {
         id: 'info',
