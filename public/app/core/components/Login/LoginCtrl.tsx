@@ -3,6 +3,7 @@ import { PureComponent } from 'react';
 import { FetchError, getBackendSrv, isFetchError, locationService } from '@grafana/runtime';
 import config from 'app/core/config';
 import { t } from 'app/core/internationalization';
+import { getPmmAppSubUrl, isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 
 import { LoginDTO, AuthNRedirectDTO } from './types';
 
@@ -181,6 +182,12 @@ export class LoginCtrl extends PureComponent<Props, State> {
   };
 
   toGrafana = () => {
+    // @PERCONA
+    if (isPmmNavEnabled()) {
+      this.toPMM();
+      return;
+    }
+
     // Use window.location.href to force page reload
     if (config.featureToggles.useSessionStorageForRedirection) {
       window.location.assign(config.appSubUrl + '/');
@@ -196,6 +203,46 @@ export class LoginCtrl extends PureComponent<Props, State> {
     } else {
       window.location.assign(config.appSubUrl + '/');
     }
+  };
+
+  // @PERCONA
+  toPMM = () => {
+    const appSubUrl = getPmmAppSubUrl();
+
+    if (config.featureToggles.useSessionStorageForRedirection) {
+      window.location.assign(appSubUrl + '/');
+      return;
+    }
+
+    if (this.result?.redirectUrl) {
+      const redirectUrl = this.normalizeRedirectUrl(this.result.redirectUrl);
+
+      window.location.assign(redirectUrl);
+    } else {
+      window.location.assign(appSubUrl + '/');
+    }
+  };
+
+  // @PERCONA
+  normalizeRedirectUrl = (redirectUrl: string) => {
+    const appSubUrl = getPmmAppSubUrl();
+
+    if (!redirectUrl) {
+      return redirectUrl;
+    }
+
+    // /pmm-ui/graph - do nothing
+    if (redirectUrl.startsWith(appSubUrl)) {
+      return redirectUrl;
+    }
+
+    // /graph - replace with /pmm-ui/graph
+    if (redirectUrl.startsWith(config.appSubUrl)) {
+      return redirectUrl.replace(config.appSubUrl, appSubUrl);
+    }
+
+    // just a path, add /pmm-ui/graph to the beginning
+    return appSubUrl + redirectUrl;
   };
 
   render() {
