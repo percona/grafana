@@ -79,7 +79,7 @@ export class LoginCtrl extends PureComponent<Props, State> {
     };
   }
 
-  // @PERCONA 
+  // @PERCONA
   componentDidMount() {
     this.getPmmDemoCredentials();
   }
@@ -253,9 +253,9 @@ export class LoginCtrl extends PureComponent<Props, State> {
     return appSubUrl + redirectUrl;
   };
 
-  // @PERCONA 
+  // @PERCONA
   getPmmDemoCredentials = async (): Promise<{ username: string; password: string } | null> => {
-    try { 
+    try {
       const response = await fetch('/v1/users/demo/credentials');
       const data = await response.json();
       this.setState({ pmmDemoCredentials: data });
@@ -269,7 +269,8 @@ export class LoginCtrl extends PureComponent<Props, State> {
 
   render() {
     const { children } = this.props;
-    const { isLoggingIn, isChangingPassword, showDefaultPasswordWarning, loginErrorMessage, pmmDemoCredentials } = this.state;
+    const { isLoggingIn, isChangingPassword, showDefaultPasswordWarning, loginErrorMessage, pmmDemoCredentials } =
+      this.state;
     const { login, toGrafana, changePassword, passwordlessStart, passwordlessConfirm } = this;
     const { loginHint, passwordHint, disableLoginForm, disableUserSignUp } = config;
 
