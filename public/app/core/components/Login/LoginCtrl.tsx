@@ -265,7 +265,7 @@ export class LoginCtrl extends PureComponent<Props, State> {
       this.setState({ pmmDemoCredentials: null });
       return null;
     }
-  }
+  };
 
   render() {
     const { children } = this.props;

@@ -73,7 +73,7 @@ const LoginPage = () => {
               {pmmDemoCredentials && (
                 <>
                   <Divider direction="horizontal" spacing={2} />
-                  <Button style={{ width: '100%', justifyContent: 'center', marginBottom: theme.spacing(2) }} variant="secondary" onClick={() => login({ user: pmmDemoCredentials.username, password: pmmDemoCredentials.password, email: '' })}>
+                  <Button disabled={isLoggingIn} style={{ width: '100%', justifyContent: 'center', marginBottom: theme.spacing(2) }} variant="secondary" onClick={() => login({ user: pmmDemoCredentials.username, password: pmmDemoCredentials.password, email: '' })}>
                     <Trans i18nKey="login.guest-login">Log in as guest</Trans>
                   </Button>
                 </>
