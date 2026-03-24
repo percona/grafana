@@ -4,7 +4,7 @@ import { css } from '@emotion/css';
 // Components
 import { GrafanaTheme2 } from '@grafana/data';
 import { config } from '@grafana/runtime';
-import { Alert, Button, Divider, LinkButton, Stack, useStyles2, useTheme2 } from '@grafana/ui';
+import { Alert, LinkButton, Stack, useStyles2 } from '@grafana/ui';
 import { Branding } from 'app/core/components/Branding/Branding';
 import { t, Trans } from 'app/core/internationalization';
 
@@ -20,7 +20,6 @@ import { UserSignup } from './UserSignup';
 
 const LoginPage = () => {
   const styles = useStyles2(getStyles);
-  const theme = useTheme2();
   document.title = Branding.AppTitle;
 
   return (
@@ -39,8 +38,7 @@ const LoginPage = () => {
         skipPasswordChange,
         isChangingPassword,
         showDefaultPasswordWarning,
-        loginErrorMessage,
-        pmmDemoCredentials,
+        loginErrorMessage
       }) => (
         <LoginLayout isChangingPassword={isChangingPassword}>
           {!isChangingPassword && !showPasswordlessConfirmation && (
@@ -68,22 +66,6 @@ const LoginPage = () => {
               )}
               {config.auth.passwordlessEnabled && (
                 <PasswordlessLoginForm onSubmit={passwordlessStart} isLoggingIn={isLoggingIn}></PasswordlessLoginForm>
-              )}
-              {/* @PERCONA */}
-              {pmmDemoCredentials && (
-                <>
-                  <Divider direction="horizontal" spacing={2} />
-                  <Button
-                    disabled={isLoggingIn}
-                    style={{ width: '100%', justifyContent: 'center', marginBottom: theme.spacing(2) }}
-                    variant="secondary"
-                    onClick={() =>
-                      login({ user: pmmDemoCredentials.username, password: pmmDemoCredentials.password, email: '' })
-                    }
-                  >
-                    <Trans i18nKey="login.guest-login">Log in as guest</Trans>
-                  </Button>
-                </>
               )}
               <LoginServiceButtons />
               {!disableUserSignUp && <UserSignup />}

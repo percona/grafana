@@ -101,30 +101,6 @@ describe('Login Page', () => {
     expect(window.location.assign).toHaveBeenCalledWith('/');
   });
 
-  // @PERCONA
-  it('shows Log in as guest when PMM demo credentials are available', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      json: () => Promise.resolve({ username: 'guest', password: 'guest-demo' }),
-    } as unknown as Response);
-
-    render(<LoginPage />);
-
-    const guestButton = await screen.findByRole('button', { name: 'Log in as guest' });
-    expect(guestButton).toBeInTheDocument();
-    expect(global.fetch).toHaveBeenCalledWith('/v1/users/demo/credentials');
-  });
-
-  // @PERCONA
-  it('does not show Log in as guest when PMM demo credentials are not available', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Not found'));
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    render(<LoginPage />);
-
-    const guestButton = await screen.queryByRole('button', { name: 'Log in as guest' });
-    expect(guestButton).not.toBeInTheDocument();
-  });
-
   it('renders social logins correctly', () => {
     runtimeMock.config.oauth = {
       okta: {

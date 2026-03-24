@@ -274,6 +274,7 @@ func (hs *HTTPServer) getFrontendSettings(c *contextmodel.ReqContext) (*dtos.Fro
 
 		FeatureToggles:                   featureToggles,
 		AnonymousEnabled:                 hs.Cfg.Anonymous.Enabled,
+		AnonymousOrgRole:                 hs.Cfg.Anonymous.OrgRole,
 		AnonymousDeviceLimit:             hs.Cfg.Anonymous.DeviceLimit,
 		RendererAvailable:                hs.RenderService.IsAvailable(c.Req.Context()),
 		RendererVersion:                  hs.RenderService.Version(),

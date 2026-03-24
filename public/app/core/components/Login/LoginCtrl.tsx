@@ -52,7 +52,6 @@ interface Props {
     passwordHint: string;
     showDefaultPasswordWarning: boolean;
     loginErrorMessage: string | undefined;
-    pmmDemoCredentials: { username: string; password: string } | null;
   }) => JSX.Element;
 }
 
@@ -61,7 +60,6 @@ interface State {
   isChangingPassword: boolean;
   showDefaultPasswordWarning: boolean;
   loginErrorMessage?: string;
-  pmmDemoCredentials: { username: string; password: string } | null;
 }
 
 export class LoginCtrl extends PureComponent<Props, State> {
@@ -75,13 +73,7 @@ export class LoginCtrl extends PureComponent<Props, State> {
       showDefaultPasswordWarning: false,
       // oAuth unauthorized sets the redirect error message in the bootdata, hence we need to check the key here
       loginErrorMessage: getBootDataErrMessage(config.loginError),
-      pmmDemoCredentials: null,
     };
-  }
-
-  // @PERCONA
-  componentDidMount() {
-    this.getPmmDemoCredentials();
   }
 
   changePassword = (password: string) => {
@@ -253,23 +245,9 @@ export class LoginCtrl extends PureComponent<Props, State> {
     return appSubUrl + redirectUrl;
   };
 
-  // @PERCONA
-  getPmmDemoCredentials = async (): Promise<{ username: string; password: string } | null> => {
-    try {
-      const response = await fetch('/v1/users/demo/credentials');
-      const data = await response.json();
-      this.setState({ pmmDemoCredentials: data });
-      return data;
-    } catch (err) {
-      console.error('Error fetching PMM demo credentials', err);
-      this.setState({ pmmDemoCredentials: null });
-      return null;
-    }
-  };
-
   render() {
     const { children } = this.props;
-    const { isLoggingIn, isChangingPassword, showDefaultPasswordWarning, loginErrorMessage, pmmDemoCredentials } =
+    const { isLoggingIn, isChangingPassword, showDefaultPasswordWarning, loginErrorMessage } =
       this.state;
     const { login, toGrafana, changePassword, passwordlessStart, passwordlessConfirm } = this;
     const { loginHint, passwordHint, disableLoginForm, disableUserSignUp } = config;
@@ -292,7 +270,6 @@ export class LoginCtrl extends PureComponent<Props, State> {
           isChangingPassword,
           showDefaultPasswordWarning,
           loginErrorMessage,
-          pmmDemoCredentials,
         })}
       </>
     );
