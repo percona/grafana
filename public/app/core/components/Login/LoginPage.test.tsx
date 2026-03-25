@@ -34,15 +34,9 @@ jest.mock('@grafana/runtime', () => ({
 }));
 
 describe('Login Page', () => {
-  const originalFetch = global.fetch;
 
   beforeEach(() => {
     jest.resetAllMocks();
-    global.fetch = originalFetch;
-  });
-
-  afterAll(() => {
-    global.fetch = originalFetch;
   });
 
   it('renders correctly', () => {
