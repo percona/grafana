@@ -4,14 +4,10 @@ export interface UserStatusResponse {
 
 export interface UserDetailsResponse {
   user_id: number;
-  product_tour_completed?: boolean;
-  alerting_tour_completed?: boolean;
   snoozed_pmm_version?: string;
 }
 
 export interface UserDetailsPutPayload {
-  product_tour_completed?: boolean;
-  alerting_tour_completed?: boolean;
   snoozed_pmm_version?: string;
 }
 
