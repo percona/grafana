@@ -30,6 +30,7 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
         instanceID: 'Instance ID',
+        timeout: 'Connection timeout',
       },
       postgresqlDetails: {
         database: 'Database',
@@ -97,6 +98,7 @@ export const Messages = {
         username: 'Username',
         password: 'Password',
         instanceID: 'Instance ID',
+        timeout: 'Connection timeout',
       },
       postgresqlDetails: {
         database: 'Database (default: postgres)',
@@ -140,6 +142,8 @@ export const Messages = {
         username: 'Your database user name',
         password: 'Your database password',
         instanceID: 'Instance ID to use',
+        // todo: add tooltip
+        timeout: 'TODO: add tooltip',
       },
       postgresqlDetails: {
         database: 'Database name',

@@ -1,3 +1,5 @@
+import { durationToMilliseconds, isValidGoDuration, parseDuration } from '@grafana/data';
+
 import { Validator, VResult } from './validator.types';
 
 export const validators = {
@@ -103,6 +105,27 @@ export const validators = {
   required: (value: any) => (value ? undefined : 'Required field'),
 
   requiredTrue: (value: boolean) => (value === true ? undefined : 'Required field'),
+
+  duration: (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    return isValidGoDuration(value) ? undefined : 'Invalid duration';
+  },
+
+  minDuration: (minDuration: string) => (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    const min = durationToMilliseconds(parseDuration(minDuration));
+    const duration = value.startsWith('-')
+      ? -durationToMilliseconds(parseDuration(value))
+      : durationToMilliseconds(parseDuration(value));
+
+    return duration >= min ? undefined : `Duration should be greater or equal to ${minDuration}`;
+  },
 
   compose:
     (...validators: Validator[]) =>
