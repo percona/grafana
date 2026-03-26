@@ -16,7 +16,6 @@ import { isPmmAdmin, isViewer } from '../../helpers/permissions';
 import { isPmmNavEnabled } from '../../helpers/plugin';
 
 import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
-import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 
 // This component is only responsible for populating the store with Percona's settings initially
@@ -70,7 +69,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   return (
     <>
       {isSignedIn && <Telemetry />}
-      <PerconaNavigation />
       {!isPmmNavEnabled() && updateAvailable && showUpdateModal && !isLoadingUpdates && <PerconaUpdateVersion />}
     </>
   );
