@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { config } from '@grafana/runtime';
 import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
-import { setAuthorized } from 'app/percona/shared/core/reducers/user/user';
+import { fetchUserDetailsAction, setAuthorized } from 'app/percona/shared/core/reducers/user/user';
 import { getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
@@ -55,6 +55,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
         }
       }
 
+      await dispatch(fetchUserDetailsAction());
       await dispatch(fetchHighAvailabilityStatus());
       onReady();
     };
