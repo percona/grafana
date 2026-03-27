@@ -142,8 +142,8 @@ export const Messages = {
         username: 'Your database user name',
         password: 'Your database password',
         instanceID: 'Instance ID to use',
-        // todo: add tooltip
-        timeout: 'TODO: add tooltip',
+        // todo: update tooltip
+        timeout: 'Connection timeout for the database connection (e.g. 10s, 500ms, 5m)',
       },
       postgresqlDetails: {
         database: 'Database name',

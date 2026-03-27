@@ -256,4 +256,44 @@ describe('validators compose', () => {
 
     expect(validate(120, {})).toEqual(errorMessage);
   });
+
+  describe('validate duration', () => {
+    it('return undefined when value is valid', () => {
+      expect(validators.duration('1s')).toBeUndefined();
+      expect(validators.duration('1ms')).toBeUndefined();
+      expect(validators.duration('1.5s')).toBeUndefined();
+      expect(validators.duration('1.5ms')).toBeUndefined();
+      expect(validators.duration('1m')).toBeUndefined();
+      expect(validators.duration('0.5m')).toBeUndefined();
+      expect(validators.duration('60m')).toBeUndefined();
+    });
+
+    it('return error message when value is invalid', () => {
+      expect(validators.duration('1')).toEqual('Invalid duration');
+      expect(validators.duration('1m.1s')).toEqual('Invalid duration');
+      expect(validators.duration('1h.1m')).toEqual('Invalid duration');
+      expect(validators.duration('1d.1h')).toEqual('Invalid duration');
+      expect(validators.duration('1w.1d')).toEqual('Invalid duration');
+      expect(validators.duration('1y.1w')).toEqual('Invalid duration');
+      expect(validators.duration('1h')).toEqual('Invalid duration');
+    });
+  });
+
+  describe('validate min duration', () => {
+    it('return undefined when value is valid', () => {
+      expect(validators.minDuration('1s')('1s')).toBeUndefined();
+      expect(validators.minDuration('1ms')('1ms')).toBeUndefined();
+      expect(validators.minDuration('1m')('1m')).toBeUndefined();
+      expect(validators.minDuration('1m')('2m')).toBeUndefined();
+      expect(validators.minDuration('30s')('1m')).toBeUndefined();
+      expect(validators.minDuration('1m')('90s')).toBeUndefined();
+    });
+
+    it('return error message when value is invalid', () => {
+      expect(validators.minDuration('1s')('0s')).toEqual('Duration should be greater or equal to 1s');
+      expect(validators.minDuration('1ms')('0s')).toEqual('Duration should be greater or equal to 1ms');
+      expect(validators.minDuration('1m')('30s')).toEqual('Duration should be greater or equal to 1m');
+      expect(validators.minDuration('2m')('1m')).toEqual('Duration should be greater or equal to 2m');
+    });
+  });
 });

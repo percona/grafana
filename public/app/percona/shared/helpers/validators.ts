@@ -1,6 +1,5 @@
-import { durationToMilliseconds, isValidGoDuration, parseDuration } from '@grafana/data';
-
 import { Validator, VResult } from './validator.types';
+import { durationToMs, isValidProtobufDuration } from './duration';
 
 export const validators = {
   validatePort: (value: any) => {
@@ -111,7 +110,7 @@ export const validators = {
       return undefined;
     }
 
-    return isValidGoDuration(value) ? undefined : 'Invalid duration';
+    return isValidProtobufDuration(value) ? undefined : 'Invalid duration';
   },
 
   minDuration: (minDuration: string) => (value: string) => {
@@ -119,10 +118,8 @@ export const validators = {
       return undefined;
     }
 
-    const min = durationToMilliseconds(parseDuration(minDuration));
-    const duration = value.startsWith('-')
-      ? -durationToMilliseconds(parseDuration(value))
-      : durationToMilliseconds(parseDuration(value));
+    const min = durationToMs(minDuration);
+    const duration = durationToMs(value);
 
     return duration >= min ? undefined : `Duration should be greater or equal to ${minDuration}`;
   },
