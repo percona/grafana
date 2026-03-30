@@ -3,7 +3,7 @@
   "license": "AGPL-3.0-only",
   "private": true,
   "name": "grafana",
-  "version": "12.4.2",
+  "version": "12.4.3",
   "repository": "github:grafana/grafana",
   "scripts": {
     "check-frontend-dev": "./scripts/check-frontend-dev.sh",
@@ -304,7 +304,7 @@
     "@grafana/google-sdk": "0.3.5",
     "@grafana/i18n": "workspace:*",
     "@grafana/lezer-logql": "0.2.9",
-    "@grafana/llm": "1.0.2",
+    "@grafana/llm": "1.0.3",
     "@grafana/monaco-logql": "^0.0.8",
     "@grafana/o11y-ds-frontend": "workspace:*",
     "@grafana/plugin-ui": "^0.12.1",
