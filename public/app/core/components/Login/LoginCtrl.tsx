@@ -3,6 +3,7 @@ import { memo, useState, useCallback, type JSX } from 'react';
 import { t } from '@grafana/i18n';
 import { FetchError, getBackendSrv, isFetchError, locationService } from '@grafana/runtime';
 import config from 'app/core/config';
+import { getPmmAppSubUrl, isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 
 import { LoginDTO, AuthNRedirectDTO } from './types';
 
@@ -65,6 +66,11 @@ export const LoginCtrl = memo(({ resetCode, children }: Props) => {
   );
 
   const toGrafana = useCallback(() => {
+    // @PERCONA
+    if (isPmmNavEnabled()) {
+      toPMM();
+      return;
+    }
     if (config.featureToggles.useSessionStorageForRedirection) {
       window.location.assign(config.appSubUrl + '/');
       return;
@@ -180,6 +186,46 @@ export const LoginCtrl = memo(({ resetCode, children }: Props) => {
     },
     [toGrafana]
   );
+
+    // @PERCONA
+    const normalizeRedirectUrl = (redirectUrl: string) => {
+      const appSubUrl = getPmmAppSubUrl();
+  
+      if (!redirectUrl) {
+        return redirectUrl;
+      }
+  
+      // /pmm-ui/graph - do nothing
+      if (redirectUrl.startsWith(appSubUrl)) {
+        return redirectUrl;
+      }
+  
+      // /graph - replace with /pmm-ui/graph
+      if (redirectUrl.startsWith(config.appSubUrl)) {
+        return redirectUrl.replace(config.appSubUrl, appSubUrl);
+      }
+  
+      // just a path, add /pmm-ui/graph to the beginning
+      return appSubUrl + redirectUrl;
+    };
+
+  // @PERCONA
+  const toPMM = () => {
+    const appSubUrl = getPmmAppSubUrl();
+
+    if (config.featureToggles.useSessionStorageForRedirection) {
+      window.location.assign(appSubUrl + '/');
+      return;
+    }
+
+    if (result?.redirectUrl) {
+      const redirectUrl = normalizeRedirectUrl(result.redirectUrl);
+
+      window.location.assign(redirectUrl);
+    } else {
+      window.location.assign(appSubUrl + '/');
+    }
+  };
 
   const { loginHint, passwordHint, disableLoginForm, disableUserSignUp } = config;
 

@@ -25,6 +25,13 @@ func TestGetUrl(t *testing.T) {
 		Cfg: cfg,
 	}
 
+	// @PERCONA we need to make sure this query param is present for the sidebar not to show
+	t.Run("When renderer url is configured should return render=1", func(t *testing.T) {
+		rs.Cfg.RendererUrl = "http://localhost:8081/render"
+		url := rs.getGrafanaCallbackURL(path)
+		require.Equal(t, path+"&render=1", url)
+	})
+
 	t.Run("When renderer and callback url configured should return callback url plus path", func(t *testing.T) {
 		rs.Cfg.RendererServerUrl = "http://localhost:8081/render"
 		rs.rendererCallbackURL = "http://public-grafana.com/"
