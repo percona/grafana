@@ -36,7 +36,6 @@ export const fetchUserDetailsAction = createAsyncThunk(
   }
 );
 
-
 export const setSnoozedVersion = createAsyncThunk(
   'percona/setSnoozedVersion',
   async (version: string, thunkAPI): Promise<UserDetails> => {

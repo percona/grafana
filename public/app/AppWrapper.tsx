@@ -127,22 +127,22 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
                   actions={[]}
                   options={{ enableHistory: true, callbacks: { onSelectAction: commandPaletteActionSelected } }}
                 >
-                    <GlobalStyles />
-                    <MaybeTimeRangeProvider>
-                      <SidecarContext_EXPERIMENTAL.Provider value={sidecarServiceSingleton_EXPERIMENTAL}>
-                        <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
-                          <div className="grafana-app">
-                            {config.featureToggles.appSidecar ? (
-                              <ExperimentalSplitPaneRouterWrapper {...routerWrapperProps} />
-                            ) : (
-                              <RouterWrapper {...routerWrapperProps} />
-                            )}
-                            <LiveConnectionWarning />
-                            <PortalContainer />
-                          </div>
-                        </ExtensionRegistriesProvider>
-                      </SidecarContext_EXPERIMENTAL.Provider>
-                    </MaybeTimeRangeProvider>
+                  <GlobalStyles />
+                  <MaybeTimeRangeProvider>
+                    <SidecarContext_EXPERIMENTAL.Provider value={sidecarServiceSingleton_EXPERIMENTAL}>
+                      <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
+                        <div className="grafana-app">
+                          {config.featureToggles.appSidecar ? (
+                            <ExperimentalSplitPaneRouterWrapper {...routerWrapperProps} />
+                          ) : (
+                            <RouterWrapper {...routerWrapperProps} />
+                          )}
+                          <LiveConnectionWarning />
+                          <PortalContainer />
+                        </div>
+                      </ExtensionRegistriesProvider>
+                    </SidecarContext_EXPERIMENTAL.Provider>
+                  </MaybeTimeRangeProvider>
                 </KBarProvider>
               </CacheProvider>
             </ThemeProvider>
