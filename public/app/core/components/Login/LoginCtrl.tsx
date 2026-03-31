@@ -187,27 +187,27 @@ export const LoginCtrl = memo(({ resetCode, children }: Props) => {
     [toGrafana]
   );
 
-    // @PERCONA
-    const normalizeRedirectUrl = (redirectUrl: string) => {
-      const appSubUrl = getPmmAppSubUrl();
-  
-      if (!redirectUrl) {
-        return redirectUrl;
-      }
-  
-      // /pmm-ui/graph - do nothing
-      if (redirectUrl.startsWith(appSubUrl)) {
-        return redirectUrl;
-      }
-  
-      // /graph - replace with /pmm-ui/graph
-      if (redirectUrl.startsWith(config.appSubUrl)) {
-        return redirectUrl.replace(config.appSubUrl, appSubUrl);
-      }
-  
-      // just a path, add /pmm-ui/graph to the beginning
-      return appSubUrl + redirectUrl;
-    };
+  // @PERCONA
+  const normalizeRedirectUrl = (redirectUrl: string) => {
+    const appSubUrl = getPmmAppSubUrl();
+
+    if (!redirectUrl) {
+      return redirectUrl;
+    }
+
+    // /pmm-ui/graph - do nothing
+    if (redirectUrl.startsWith(appSubUrl)) {
+      return redirectUrl;
+    }
+
+    // /graph - replace with /pmm-ui/graph
+    if (redirectUrl.startsWith(config.appSubUrl)) {
+      return redirectUrl.replace(config.appSubUrl, appSubUrl);
+    }
+
+    // just a path, add /pmm-ui/graph to the beginning
+    return appSubUrl + redirectUrl;
+  };
 
   // @PERCONA
   const toPMM = () => {

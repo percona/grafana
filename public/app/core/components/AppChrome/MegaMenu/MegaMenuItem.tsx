@@ -138,11 +138,11 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
               aria-label={
                 sectionExpanded
                   ? t('navigation.megamenu-item.collapse-aria-label', 'Collapse section: {{sectionName}}', {
-                    sectionName: link.text,
-                  })
+                      sectionName: link.text,
+                    })
                   : t('navigation.megamenu-item.expand-aria-label', 'Expand section: {{sectionName}}', {
-                    sectionName: link.text,
-                  })
+                      sectionName: link.text,
+                    })
               }
               aria-expanded={Boolean(sectionExpanded)}
               className={styles.collapseButton}
