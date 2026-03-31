@@ -40,12 +40,6 @@ export interface NavModelItem extends NavLinkDTO {
   tabCounter?: number;
   hideFromBreadcrumbs?: boolean;
   emptyMessage?: string;
-
-  // @PERCONA
-  isDivider?: boolean;
-  isHeading?: boolean;
-  showChildren?: boolean;
-  showDot?: boolean;
 }
 
 /**

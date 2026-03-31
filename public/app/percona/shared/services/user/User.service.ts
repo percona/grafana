@@ -14,14 +14,6 @@ export const UserService = {
     return is_platform_user;
   },
   getUserDetails: async (): Promise<UserDetailsResponse> => await api.get('/v1/users/me', true),
-  async setProductTourCompleted(completed: boolean): Promise<UserDetailsResponse> {
-    const payload: UserDetailsPutPayload = { product_tour_completed: completed };
-    return await api.put('/v1/users/me', payload);
-  },
-  async setAlertingTourCompeted(completed: boolean): Promise<UserDetailsResponse> {
-    const payload: UserDetailsPutPayload = { alerting_tour_completed: completed };
-    return await api.put('/v1/users/me', payload);
-  },
   async setSnoozedVersion(version: string): Promise<UserDetailsResponse> {
     const payload: UserDetailsPutPayload = { snoozed_pmm_version: version };
     return await api.put('/v1/users/me', payload);

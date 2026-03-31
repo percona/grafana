@@ -23,7 +23,6 @@ import { getPluginExtensionRegistries } from './features/plugins/extensions/regi
 import { PluginExtensionRegistries } from './features/plugins/extensions/registry/types';
 import { ScopesContextProvider } from './features/scopes/ScopesContextProvider';
 import { PerconaBootstrapper } from './percona/shared/components/PerconaBootstrapper';
-import PerconaTourProvider from './percona/tour/TourProvider';
 import { RouterWrapper } from './routes/RoutesWrapper';
 
 interface AppWrapperProps {
@@ -102,7 +101,7 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
   }
 
   render() {
-    const { app, context } = this.props;
+    const { context } = this.props;
     const { ready, registries, perconaReady } = this.state;
 
     navigationLogger('AppWrapper', false, 'rendering');
@@ -136,24 +135,22 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
                     actions={[]}
                     options={{ enableHistory: true, callbacks: { onSelectAction: commandPaletteActionSelected } }}
                   >
-                    <PerconaTourProvider>
-                      <MaybeTimeRangeProvider>
-                        <ScopesContextProvider>
-                          <ExtensionRegistriesProvider registries={registries}>
-                            <ExtensionSidebarContextProvider>
-                              <UNSAFE_PortalProvider getContainer={getPortalContainer}>
-                                <GlobalStyles />
-                                <div className="grafana-app">
-                                  <RouterWrapper {...routerWrapperProps} />
-                                  <LiveConnectionWarning />
-                                  <PortalContainer />
-                                </div>
-                              </UNSAFE_PortalProvider>
-                            </ExtensionSidebarContextProvider>
-                          </ExtensionRegistriesProvider>
-                        </ScopesContextProvider>
-                      </MaybeTimeRangeProvider>
-                    </PerconaTourProvider>
+                    <MaybeTimeRangeProvider>
+                      <ScopesContextProvider>
+                        <ExtensionRegistriesProvider registries={registries}>
+                          <ExtensionSidebarContextProvider>
+                            <UNSAFE_PortalProvider getContainer={getPortalContainer}>
+                              <GlobalStyles />
+                              <div className="grafana-app">
+                                <RouterWrapper {...routerWrapperProps} />
+                                <LiveConnectionWarning />
+                                <PortalContainer />
+                              </div>
+                            </UNSAFE_PortalProvider>
+                          </ExtensionSidebarContextProvider>
+                        </ExtensionRegistriesProvider>
+                      </ScopesContextProvider>
+                    </MaybeTimeRangeProvider>
                   </KBarProvider>
                 </CacheProvider>
               </ThemeProvider>

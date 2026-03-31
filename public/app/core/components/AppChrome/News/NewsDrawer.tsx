@@ -3,6 +3,8 @@ import { css } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
 import { t } from '@grafana/i18n';
 import { Drawer, useStyles2, Text } from '@grafana/ui';
+import { DEFAULT_FEED_URL } from 'app/plugins/panel/news/constants';
+import grotNewsSvg from 'img/grot-news.svg';
 
 import { NewsWrapper } from './NewsWrapper';
 
@@ -19,23 +21,21 @@ export function NewsContainer({ onClose }: NewsContainerProps) {
       title={
         <div className={styles.title}>
           <Text element="h2">{t('news.title', 'Latest from the blog')}</Text>
-          {/* @PERCONA - point to percona blog */}
           <a
-            href="https://www.percona.com/blog/"
+            href="https://grafana.com/blog/"
             target="_blank"
             rel="noreferrer"
             title={t('news.go-to-percona-blog', 'Go to Percona blog')}
             className={styles.grot}
           >
-            <img src="public/img/percona-logo.svg" alt="Percona logo" />
+            <img src={grotNewsSvg} alt="Grot reading news" />
           </a>
         </div>
       }
       onClose={onClose}
       size="md"
     >
-      {/* @PERCONA */}
-      <NewsWrapper feedUrl="/percona-blog/feed" />
+      <NewsWrapper feedUrl={DEFAULT_FEED_URL} />
     </Drawer>
   );
 }

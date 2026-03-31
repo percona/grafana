@@ -6,7 +6,6 @@ import { selectors } from '@grafana/e2e-selectors';
 import { t } from '@grafana/i18n';
 import { Icon, IconButton, Link, useTheme2 } from '@grafana/ui';
 import { contextSrv } from 'app/core/services/context_srv';
-import { useLinkWithVariables } from 'app/percona/shared/helpers/navigation';
 
 export interface Props {
   children: React.ReactNode;
@@ -23,8 +22,6 @@ export function MegaMenuItemText({ children, isActive, onClick, target, url, onP
 
   const styles = getStyles(theme, isActive);
   const LinkComponent = !target && url.startsWith('/') ? Link : 'a';
-  // @PERCONA
-  const urlWithVariables = useLinkWithVariables(url);
 
   const linkContent = (
     <div className={styles.linkContent}>
@@ -42,7 +39,7 @@ export function MegaMenuItemText({ children, isActive, onClick, target, url, onP
       <LinkComponent
         data-testid={selectors.components.NavMenu.item}
         className={styles.container}
-        href={urlWithVariables}
+        href={url}
         target={target}
         onClick={onClick}
         {...(isActive && { 'aria-current': 'page' })}
@@ -54,7 +51,7 @@ export function MegaMenuItemText({ children, isActive, onClick, target, url, onP
           name="bookmark"
           className={'pin-icon'}
           iconType={isPinned ? 'solid' : 'default'}
-          onClick={() => onPin(urlWithVariables)}
+          onClick={() => onPin(url)}
           aria-label={
             isPinned
               ? t('navigation.item.remove-bookmark', 'Remove from Bookmarks')
