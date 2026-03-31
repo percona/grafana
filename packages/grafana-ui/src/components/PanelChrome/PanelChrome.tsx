@@ -1,5 +1,5 @@
 import { css, cx } from '@emotion/css';
-import { CSSProperties, PropsWithChildren, ReactElement, ReactNode, useId, useState } from 'react';
+import { CSSProperties, ReactElement, ReactNode, useId, useState } from 'react';
 import * as React from 'react';
 import { useMeasure, useToggle } from 'react-use';
 
@@ -114,11 +114,6 @@ interface HoverHeader {
   hoverHeader?: boolean;
   hoverHeaderOffset?: number;
 }
-
-const MaybeWrap = ({ children }: PropsWithChildren<{}>) => {
-  const styles = useStyles2(getStyles);
-  return getFeatureToggle('preventPanelChromeOverflow') ? <div className={styles.container}>{children}</div> : children;
-};
 
 /**
  * @internal
@@ -388,7 +383,6 @@ export function PanelChrome({
                 menu={menu}
                 title={typeof title === 'string' ? title : undefined}
                 dragClass={dragClass}
-                onDragStart={onDragStart}
                 offset={hoverHeaderOffset}
                 onOpenMenu={onOpenMenu}
               >
