@@ -3,7 +3,7 @@ import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { Row } from 'react-table';
 
 import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { DetailedDate } from 'app/percona/backup/components/DetailedDate';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';

@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 
 import { AppEvents, SelectableValue } from '@grafana/data';
 import { Select } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { assignRoleAction } from 'app/percona/shared/core/reducers/roles/roles';
 import { getAccessRoles, getUsersInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';

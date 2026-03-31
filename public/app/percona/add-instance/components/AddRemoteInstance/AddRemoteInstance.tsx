@@ -6,7 +6,7 @@ import { Form as FormFinal } from 'react-final-form';
 
 import { AppEvents } from '@grafana/data';
 import { useStyles } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { Databases } from 'app/percona/shared/core';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';

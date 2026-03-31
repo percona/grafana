@@ -3,7 +3,7 @@ import { getSelectParent, selectOptionInTest } from 'test/helpers/selectOptionIn
 import { render, screen, userEvent, waitFor, within, cleanup, act } from 'test/test-utils';
 
 import { setBackendSrv } from '@grafana/runtime';
-import { Preferences as UserPreferencesDTO } from '@grafana/schema/src/raw/preferences/x/preferences_types.gen';
+import { PreferencesSpec as UserPreferencesDTO } from '@grafana/api-clients/rtkq/preferences/v1alpha1';
 import { setupMockServer } from '@grafana/test-utils/server';
 import { getFolderFixtures } from '@grafana/test-utils/unstable';
 import { backendSrv } from 'app/core/services/backend_srv';

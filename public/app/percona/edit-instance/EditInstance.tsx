@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Alert, Button, HorizontalGroup, Modal, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
 import { Page } from 'app/core/components/Page/Page';
 import { InventoryService } from 'app/percona/inventory/Inventory.service';

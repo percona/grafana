@@ -6,7 +6,7 @@ import { Row } from 'react-table';
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { Alert, LinkButton, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { DeleteModal } from 'app/percona/shared/components/Elements/DeleteModal';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';

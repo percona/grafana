@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { AppEvents, OrgRole, UrlQueryMap } from '@grafana/data';
 import { config, locationService } from '@grafana/runtime';
 import { useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { CheckService } from 'app/percona/check/Check.service';

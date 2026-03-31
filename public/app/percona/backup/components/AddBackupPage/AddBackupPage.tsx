@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 import { AppEvents, PageLayoutType, SelectableValue } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
 import { CollapsableSection, CustomScrollbar, LinkButton, PageToolbar, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';

@@ -7,6 +7,8 @@ import { appEvents } from 'app/core/app_events';
 import { LogMessages, logInfo } from '../Analytics';
 
 import { isErrorLike } from './misc';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { PERCONA_CANCELLED_ERROR_NAME } from 'app/percona/shared/core';
 
 export interface AsyncRequestState<T> {
   result?: T;

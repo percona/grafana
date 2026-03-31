@@ -2,7 +2,7 @@ import { FC } from 'react';
 
 import { AppEvents, PageLayoutType } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import {
   PMM_ACCESS_ROLE_CREATE_PAGE,

@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 import { SelectableValue, DateTime, dateTime, AppEvents, PageLayoutType } from '@grafana/data';
 import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { SwitchRow } from 'app/percona/settings/components/Advanced/SwitchRow';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
