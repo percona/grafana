@@ -133,18 +133,6 @@ For detailed instructions, refer to:
 - [Configure Grafana-managed alert rules](ref:configure-grafana-alerts-notifications)
 - [Configure notification policies](ref:configure-notification-policies)
 
-## Use an Alertmanager as a contact point to receive specific alerts
-
-The previous instructions enable sending **all** Grafana-managed alerts to an Alertmanager.
-
-To send **specific** alerts to an Alertmanager, configure the Alertmanager as a contact point. You can then assign this contact point to notification policies or individual alert rules.
-
-For detailed instructions, refer to:
-
-- [Alertmanager contact point](ref:alertmanager-contact-point)
-- [Configure Grafana-managed alert rules](ref:configure-grafana-alerts-notifications)
-- [Configure notification policies](ref:configure-notification-policies)
-
 ## Manage Alertmanager configurations
 
 On the Settings page, you can also manage your Alertmanager configurations.

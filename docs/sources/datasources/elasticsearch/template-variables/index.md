@@ -44,24 +44,6 @@ Ad hoc filters support the following operators:
 
 For more information, refer to [Add ad hoc filters](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#add-ad-hoc-filters).
 
-## Use ad hoc filters
-
-Elasticsearch supports the **Ad hoc filters** variable type.
-You can use this variable type to specify any number of key/value filters, and Grafana applies them automatically to all of your Elasticsearch queries.
-
-Ad hoc filters support the following operators:
-
-| Operator | Description                                                   |
-| -------- | ------------------------------------------------------------- |
-| `=`      | Equals. Adds `AND field:"value"` to the query.                |
-| `!=`     | Not equals. Adds `AND -field:"value"` to the query.           |
-| `=~`     | Matches regex. Adds `AND field:/value/` to the query.         |
-| `!~`     | Does not match regex. Adds `AND -field:/value/` to the query. |
-| `>`      | Greater than. Adds `AND field:>value` to the query.           |
-| `<`      | Less than. Adds `AND field:<value` to the query.              |
-
-For more information, refer to [Add ad hoc filters](ref:add-template-variables-add-ad-hoc-filters).
-
 ## Choose a variable syntax
 
 The Elasticsearch data source supports two variable syntaxes for use in the **Query** field:

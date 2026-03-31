@@ -1626,7 +1626,7 @@ Status: Accepted
 
 ### <span id="contact-points"></span> ContactPoints
 
-[][embeddedcontactpoint](#embedded-contact-point)
+[][EmbeddedContactPoint](#embedded-contact-point)
 
 ### <span id="duration"></span> Duration
 
@@ -1689,7 +1689,7 @@ When creating a contact point, the `EmbeddedContactPoint.name` property determin
 > provides a Matches method to match a LabelSet against all Matchers in the
 > slice. Note that some users of Matchers might require it to be sorted.
 
-[][matcher](#matcher)
+[][Matcher](#matcher)
 
 ### <span id="mute-time-interval"></span> MuteTimeInterval
 
@@ -1715,7 +1715,7 @@ When creating a contact point, the `EmbeddedContactPoint.name` property determin
 
 ### <span id="mute-timings"></span> MuteTimings
 
-[][mutetimeinterval](#mute-time-interval)
+[][MuteTimeInterval](#mute-time-interval)
 
 ### <span id="not-found"></span> NotFound
 
@@ -1760,7 +1760,7 @@ When creating a contact point, the `EmbeddedContactPoint.name` property determin
 
 ### <span id="notification-templates"></span> NotificationTemplates
 
-[][notificationtemplate](#notification-template)
+[][NotificationTemplate](#notification-template)
 
 ### <span id="object-matchers"></span> ObjectMatchers
 
@@ -1807,7 +1807,7 @@ When creating a contact point, the `EmbeddedContactPoint.name` property determin
 
 ### <span id="provisioned-alert-rules"></span> ProvisionedAlertRules
 
-[][provisionedalertrule](#provisioned-alert-rule)
+[][ProvisionedAlertRule](#provisioned-alert-rule)
 
 ### <span id="raw-message"></span> RawMessage
 

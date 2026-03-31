@@ -176,12 +176,6 @@ If you used saved queries prior to the addition of RBAC support in Grafana v12.4
 - Editor > Writer
 - Viewer > Reader
 
-{{< admonition type="note" >}}
-Users with Admin and Editor roles can create and save queries for reuse.
-While Admin users can edit or delete any saved queries, users with the Editor role can only edit or delete the queries they've saved.
-Viewers can only reuse queries.
-{{< /admonition >}}
-
 #### Save a query
 
 To save a query you've created:
