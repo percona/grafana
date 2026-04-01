@@ -18,7 +18,7 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, 
   const tlsFlag = formValues && formValues['tls'];
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
-  const timeoutValidators = useMemo(() => [Validators.duration, Validators.minDuration('0s')], []);
+  // const timeoutValidators = useMemo(() => [Validators.duration, Validators.minDuration('0s')], []);
   const userPassValidators = useMemo(
     () => (tlsFlag || type === Databases.valkey ? [] : [validators.required]),
     [tlsFlag, type]
@@ -72,7 +72,7 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, 
           validators={userPassValidators}
         />
       </div>
-      <div className={styles.group}>
+      {/* <div className={styles.group}>
         <TextInputField
           key="timeout"
           name="timeout"
@@ -82,7 +82,7 @@ export const MainDetailsFormPart: FC<MainDetailsFormPartProps> = ({ form, type, 
           validators={timeoutValidators}
         />
         <div />
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -18,7 +18,7 @@ export const ExternalServiceConnectionDetails: FC<FormPartProps> = ({ form }) =>
   const selectedOption = formValues?.metricsParameters;
   const urlValue = formValues?.url;
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
-  const timeoutValidators = useMemo(() => [Validators.duration, Validators.minDuration('0s')], []);
+  // const timeoutValidators = useMemo(() => [Validators.duration, Validators.minDuration('0s')], []);
 
   const trim = useCallback((value?: string) => (value ? value.trim() : value), []);
   const getUrlParts = () => {
@@ -122,6 +122,14 @@ export const ExternalServiceConnectionDetails: FC<FormPartProps> = ({ form }) =>
               tooltipText={Messages.form.tooltips.externalService.port}
               validators={portValidators}
             />
+            {/* <TextInputField
+              key="timeout"
+              name="timeout"
+              label={Messages.form.labels.mainDetails.timeout}
+              tooltipText={Messages.form.tooltips.mainDetails.timeout}
+              placeholder={Messages.form.placeholders.mainDetails.timeout}
+              validators={timeoutValidators}
+            /> */}
             <div />
           </div>
           <div className={styles.group}>
@@ -141,17 +149,6 @@ export const ExternalServiceConnectionDetails: FC<FormPartProps> = ({ form }) =>
               placeholder={Messages.form.placeholders.externalService.password}
               format={trim}
             />
-          </div>
-          <div className={styles.group}>
-            <TextInputField
-              key="timeout"
-              name="timeout"
-              label={Messages.form.labels.mainDetails.timeout}
-              tooltipText={Messages.form.tooltips.mainDetails.timeout}
-              placeholder={Messages.form.placeholders.mainDetails.timeout}
-              validators={timeoutValidators}
-            />
-            <div />
           </div>
         </>
       )}
