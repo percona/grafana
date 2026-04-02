@@ -24,7 +24,9 @@ describe('StorageLocations', () => {
           },
         } as StoreState)}
       >
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{wrapWithGrafanaContextMock(<StorageLocations />)}</MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<StorageLocations />)}
+        </MemoryRouter>
       </Provider>
     );
 
@@ -48,7 +50,9 @@ describe('StorageLocations', () => {
           },
         } as StoreState)}
       >
-        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{wrapWithGrafanaContextMock(<StorageLocations />)}</MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<StorageLocations />)}
+        </MemoryRouter>
       </Provider>
     );
 
@@ -79,7 +83,9 @@ describe('StorageLocations', () => {
             },
           } as StoreState)}
         >
-          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{wrapWithGrafanaContextMock(<StorageLocations />)}</MemoryRouter>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            {wrapWithGrafanaContextMock(<StorageLocations />)}
+          </MemoryRouter>
         </Provider>
       )
     );

@@ -73,7 +73,10 @@ describe('AddBackupPage', () => {
   it('should render advanced fields when in schedule mode', async () => {
     render(
       <AddBackupPageWrapper>
-        <MemoryRouter initialEntries={[scheduledInitialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter
+          initialEntries={[scheduledInitialEntry]}
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           <AddBackupPage />
         </MemoryRouter>
       </AddBackupPageWrapper>
@@ -88,7 +91,10 @@ describe('AddBackupPage', () => {
   it('should render backup mode selector when in schedule mode', async () => {
     render(
       <AddBackupPageWrapper>
-        <MemoryRouter initialEntries={[scheduledInitialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter
+          initialEntries={[scheduledInitialEntry]}
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           <AddBackupPage />
         </MemoryRouter>
       </AddBackupPageWrapper>
@@ -114,7 +120,10 @@ describe('AddBackupPage', () => {
   it('should render schedule page backup with schedule params', async () => {
     render(
       <AddBackupPageWrapper>
-        <MemoryRouter initialEntries={[scheduledInitialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter
+          initialEntries={[scheduledInitialEntry]}
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           <AddBackupPage />
         </MemoryRouter>
       </AddBackupPageWrapper>
@@ -143,7 +152,10 @@ describe('AddBackupPage', () => {
   it('should switch back to demand backup page when click on demand backup button', async () => {
     render(
       <AddBackupPageWrapper>
-        <MemoryRouter initialEntries={[scheduledInitialEntry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <MemoryRouter
+          initialEntries={[scheduledInitialEntry]}
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           <AddBackupPage />
         </MemoryRouter>
       </AddBackupPageWrapper>

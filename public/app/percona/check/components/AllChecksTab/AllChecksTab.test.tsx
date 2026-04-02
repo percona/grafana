@@ -199,7 +199,10 @@ const AllChecksTabTesting: FC<{ category?: string }> = ({ category = 'security' 
     } as StoreState)}
   >
     {wrapWithGrafanaContextMock(
-      <MemoryRouter initialEntries={['/advisors/' + category]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter
+        initialEntries={['/advisors/' + category]}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <Routes>
           <Route path="/advisors/:category" element={<AllChecksTab />} />
         </Routes>
