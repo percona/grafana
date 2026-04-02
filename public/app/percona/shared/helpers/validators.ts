@@ -1,5 +1,5 @@
-import { Validator, VResult } from './validator.types';
-import { durationToMs, isValidProtobufDuration } from './duration';
+import { UnitOptions, Validator, VResult } from './validator.types';
+import { durationToMs, getDurationUnit, isValidProtobufDuration } from './duration';
 
 export const validators = {
   validatePort: (value: any) => {
@@ -111,6 +111,25 @@ export const validators = {
     }
 
     return isValidProtobufDuration(value) ? undefined : 'Invalid duration';
+  },
+
+  durationUnit: (options: UnitOptions) => (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    const allowed = Object.keys(options).filter((unit) => options[unit as keyof UnitOptions]);
+    const unit = getDurationUnit(value);
+
+    if (!unit) {
+      return 'Invalid duration';
+    }
+
+    if (!allowed.includes(unit)) {
+      return `Invalid unit. Allowed units: ${allowed.join(', ')}`;
+    }
+
+    return undefined;
   },
 
   minDuration: (minDuration: string) => (value: string) => {

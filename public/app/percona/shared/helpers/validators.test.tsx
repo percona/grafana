@@ -296,4 +296,38 @@ describe('validators compose', () => {
       expect(validators.minDuration('2m')('1m')).toEqual('Duration should be greater or equal to 2m');
     });
   });
+
+  describe('validate duration unit', () => {
+    it('return undefined when value is valid', () => {
+      const values = {
+        ms: '1ms',
+        s: '1s',
+        m: '1m',
+      };
+
+      for (const [unit, value] of Object.entries(values)) {
+        expect(validators.durationUnit({ [unit]: true })(value)).toBeUndefined();
+
+        for (const [otherUnit, otherValue] of Object.entries(values)) {
+          if (unit !== otherUnit) {
+            expect(validators.durationUnit({ [unit]: true })(otherValue)).toEqual(
+              `Invalid unit. Allowed units: ${unit}`
+            );
+          }
+        }
+      }
+    });
+
+    it('allows only s and m when configured', () => {
+      const validator = validators.durationUnit({ s: true, m: true, ms: false });
+
+      expect(validator('1s')).toBeUndefined();
+      expect(validator('1m')).toBeUndefined();
+      expect(validator('1ms')).toEqual('Invalid unit. Allowed units: s, m');
+    });
+
+    it('returns invalid duration when format is wrong', () => {
+      expect(validators.durationUnit({ s: true, m: true })('1')).toEqual('Invalid duration');
+    });
+  });
 });

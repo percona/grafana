@@ -19,7 +19,10 @@ export const PostgreSQLConnectionDetails: FC<MainDetailsFormPartProps> = ({ form
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
   const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
   const maxQueryLengthValidators = useMemo(() => [Validators.min(-1)], []);
-  const timeoutValidators = useMemo(() => [Validators.duration, Validators.minDuration('0s')], []);
+  const timeoutValidators = useMemo(
+    () => [Validators.duration, Validators.minDuration('0s'), Validators.durationUnit({ s: true, m: true })],
+    []
+  );
 
   return (
     <div className={styles.groupWrapper}>
