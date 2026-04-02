@@ -42,7 +42,7 @@ describe('AlertRuleTemplate', () => {
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <MemoryRouter>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
           </MemoryRouter>
         )}
@@ -68,7 +68,7 @@ describe('AlertRuleTemplate', () => {
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <MemoryRouter>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
           </MemoryRouter>
         )}
@@ -97,7 +97,7 @@ describe('AlertRuleTemplate', () => {
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <MemoryRouter>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
           </MemoryRouter>
         )}
@@ -123,7 +123,7 @@ describe('AlertRuleTemplate', () => {
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <MemoryRouter>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
           </MemoryRouter>
         )}
@@ -147,7 +147,7 @@ describe('AlertRuleTemplate', () => {
         } as StoreState)}
       >
         {wrapWithGrafanaContextMock(
-          <MemoryRouter>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AlertRuleTemplate />
           </MemoryRouter>
         )}

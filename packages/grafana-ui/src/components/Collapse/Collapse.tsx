@@ -169,6 +169,7 @@ export const Collapse = ({
           className={cx([style.button, buttonCustomClass])}
           aria-labelledby={labelId}
           name={isOpen ? 'angle-down' : 'angle-right'}
+          data-testid="collapse-clickable"
         />
         <div id={labelId} className={cx([style.headerLabel, headerLabelCustomClass])}>
           {label}

@@ -29,7 +29,7 @@ describe('ScheduledBackups', () => {
           },
         } as StoreState)}
       >
-        <MemoryRouter>{wrapWithGrafanaContextMock(<ScheduledBackups />)}</MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{wrapWithGrafanaContextMock(<ScheduledBackups />)}</MemoryRouter>
       </Provider>
     );
     await screen.findByText('Backup 1');

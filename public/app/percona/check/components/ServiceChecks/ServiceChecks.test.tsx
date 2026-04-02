@@ -21,7 +21,7 @@ const setup = () =>
       } as StoreState)}
     >
       {wrapWithGrafanaContextMock(
-        <MemoryRouter initialEntries={['/service_1/']}>
+        <MemoryRouter initialEntries={['/service_1/']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/:service" Component={ServiceChecks} />
           </Routes>

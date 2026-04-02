@@ -7,12 +7,12 @@ import { StatusBadge } from './StatusBadge';
 
 describe('StatusBadge', () => {
   it('should not render with empty agents list', () => {
-    render(<StatusBadge agents={[]} type="services" strippedId="" />);
+    render(<StatusBadge agents={[]} type="services" strippedId="foo" />);
     expect(screen.queryByTestId('status-badge')).not.toBeInTheDocument();
   });
   it('should render green if all agents are running or starting', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <StatusBadge
           agents={[
             { agentId: 'agent_1', status: ServiceAgentStatus.RUNNING },
@@ -20,7 +20,7 @@ describe('StatusBadge', () => {
             { agentId: 'agent_3', status: ServiceAgentStatus.STARTING },
           ]}
           type="services"
-          strippedId=""
+          strippedId="foo"
         />
       </MemoryRouter>
     );
@@ -29,7 +29,7 @@ describe('StatusBadge', () => {
   });
   it('should render orange if some agent is not running or starting', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <StatusBadge
           agents={[
             { agentId: 'agent_1', status: ServiceAgentStatus.RUNNING },
@@ -37,7 +37,7 @@ describe('StatusBadge', () => {
             { agentId: 'agent_3', status: ServiceAgentStatus.DONE },
           ]}
           type="services"
-          strippedId=""
+          strippedId="foo"
         />
       </MemoryRouter>
     );
@@ -46,7 +46,7 @@ describe('StatusBadge', () => {
   });
   it('should render red if all agents are not running or starting', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <StatusBadge
           agents={[
             { agentId: 'agent_1', status: ServiceAgentStatus.STOPPING },
@@ -54,7 +54,7 @@ describe('StatusBadge', () => {
             { agentId: 'agent_3', status: ServiceAgentStatus.DONE },
           ]}
           type="services"
-          strippedId=""
+          strippedId="foo"
         />
       </MemoryRouter>
     );

@@ -25,7 +25,7 @@ const setup = (role = OrgRole.Admin, isAuthorized = true) => {
       } as StoreState)}
     >
       {wrapWithGrafanaContextMock(
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AlertRuleFromTemplate />
         </MemoryRouter>
       )}
