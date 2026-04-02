@@ -24,6 +24,8 @@ import PerconaTourBootstrapper from './PerconaTour';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 import { isPmmNavEnabled } from '../../helpers/plugin';
 import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
+import appEvents from 'app/core/app_events';
+import { SettingsUpdatedEvent } from '../../core/events';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
@@ -53,6 +55,10 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   };
 
   useEffect(() => {
+    const setupSubscriptions = async () => {
+      appEvents.subscribe(SettingsUpdatedEvent, () => dispatch(fetchSettingsAction()));
+    };
+
     const getSettings = async () => {
       try {
         const settings = await dispatch(fetchSettingsAction()).unwrap();
@@ -94,6 +100,9 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
       await getUserDetails();
       await dispatch(fetchHighAvailabilityStatus());
+
+      setupSubscriptions();
+
       onReady();
     };
 
