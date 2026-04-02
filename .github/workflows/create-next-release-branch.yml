@@ -1,5 +1,6 @@
 name: Create next release branch
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: read

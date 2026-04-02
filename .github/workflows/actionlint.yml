@@ -2,6 +2,7 @@
 name: Actionlint
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

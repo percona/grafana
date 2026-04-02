@@ -1,6 +1,7 @@
 name: "Ephemeral instances"
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

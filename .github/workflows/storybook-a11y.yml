@@ -1,5 +1,6 @@
 name: Run Storybook a11y tests
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

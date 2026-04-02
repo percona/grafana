@@ -1,6 +1,7 @@
 name: "Codeowners Validator"
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

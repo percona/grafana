@@ -3,6 +3,7 @@
 name: Backport (workflow)
 run-name: "Backport for ${{ github.event.workflow_run.head_branch }} #${{ github.event.workflow_run.run_number }}"
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

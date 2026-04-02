@@ -3,6 +3,7 @@
 name: Create security patch
 run-name: create-security-patch
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   trigger_downstream_create_security_patch:

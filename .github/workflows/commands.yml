@@ -4,6 +4,7 @@ name: Run commands when issues are labeled or comments added
 # to issues. If you want to change the triggers for this workflow,
 # please review if the permissions are still sufficient.
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 concurrency:
   group: issue-commands-${{ github.event.issue.number }}

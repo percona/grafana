@@ -1,6 +1,7 @@
 name: "K8s Codegen Check"
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   check:

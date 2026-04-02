@@ -1,6 +1,7 @@
 name: Update Alerting Module
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 
 concurrency:

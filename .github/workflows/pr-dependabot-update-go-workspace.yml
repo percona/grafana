@@ -1,5 +1,6 @@
 name: "Update Go Workspace for Dependabot PRs"
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: write

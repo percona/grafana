@@ -1,6 +1,7 @@
 name: External PR labelling
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

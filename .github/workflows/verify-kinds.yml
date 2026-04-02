@@ -1,6 +1,7 @@
 name: "verify-kinds"
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

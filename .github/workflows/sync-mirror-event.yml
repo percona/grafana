@@ -3,6 +3,7 @@
 name: Dispatch sync to mirror
 run-name: dispatch-sync-to-mirror-${{ github.ref_name }}
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

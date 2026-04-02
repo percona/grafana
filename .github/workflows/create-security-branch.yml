@@ -1,5 +1,6 @@
 name: Create security branch
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: write

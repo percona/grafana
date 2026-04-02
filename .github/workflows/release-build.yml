@@ -1,5 +1,6 @@
 name: Build Release Packages
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: read

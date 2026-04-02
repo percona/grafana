@@ -1,5 +1,6 @@
 name: Create community release post
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: read

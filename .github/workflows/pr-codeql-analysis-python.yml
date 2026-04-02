@@ -1,6 +1,7 @@
 name: "CodeQL for PR / python"
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   security-events: write

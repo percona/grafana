@@ -8,6 +8,7 @@ concurrency:
 permissions: {}
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 env:
   # Space-separated list of keywords referring to plugin extensions

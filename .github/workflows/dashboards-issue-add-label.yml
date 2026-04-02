@@ -1,5 +1,6 @@
 name: When an issue changes and it's part of the dashboards project, add the dashboards squad label
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: read

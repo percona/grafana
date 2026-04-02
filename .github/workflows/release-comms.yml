@@ -3,6 +3,7 @@
 # Only things that happen after a release is completed and all of the necessary code changes (like the changelog) are made.
 name: Post-release
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: write

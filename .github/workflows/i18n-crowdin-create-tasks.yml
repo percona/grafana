@@ -1,6 +1,7 @@
 name: Crowdin automatic task management
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   create-tasks-in-crowdin:

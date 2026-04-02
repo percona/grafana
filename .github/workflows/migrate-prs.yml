@@ -1,6 +1,7 @@
 name: Migrate open PRs
 # Migrate open PRs from a superseded release branch to the current release branch and notify authors
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: read

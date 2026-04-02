@@ -1,6 +1,7 @@
 name: "MT Service Compatibility"
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: read

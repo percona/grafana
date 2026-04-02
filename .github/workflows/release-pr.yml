@@ -6,6 +6,7 @@
 # this PR).
 name: Grafana Release PR
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
     inputs:
       previous_version:

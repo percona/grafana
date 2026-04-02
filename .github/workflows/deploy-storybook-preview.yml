@@ -1,6 +1,7 @@
 name: Deploy Storybook preview
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

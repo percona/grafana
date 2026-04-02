@@ -1,5 +1,6 @@
 name: Add issues to Skye project board
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   contents: read

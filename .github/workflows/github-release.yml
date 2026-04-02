@@ -1,5 +1,6 @@
 name: Create or update GitHub release
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   # contents: write allows the action(s) to create github releases

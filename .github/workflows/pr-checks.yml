@@ -1,5 +1,6 @@
 name: PR Checks
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 concurrency:
   group: pr-checks-${{ github.event.number }}

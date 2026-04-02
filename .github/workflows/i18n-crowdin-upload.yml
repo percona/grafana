@@ -1,6 +1,7 @@
 name: Crowdin Upload Action
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   upload-sources-to-crowdin:

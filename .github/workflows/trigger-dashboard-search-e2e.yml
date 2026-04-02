@@ -2,6 +2,7 @@ name: trigger-dashboard-search-e2e
 # triggers the dashboard search e2e tests which runs async 
 # doesn't block prs, allows setting up notifications from grafana
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 env:
   ARCH: linux-amd64

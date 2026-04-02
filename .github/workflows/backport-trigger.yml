@@ -4,6 +4,7 @@
 
 name: Backport (trigger)
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

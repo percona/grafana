@@ -1,5 +1,6 @@
 name: Auto-milestone
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   pull-requests: write

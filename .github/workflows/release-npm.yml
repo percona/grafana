@@ -1,6 +1,7 @@
 name: Release NPM packages
 run-name: Publish NPM ${{ inputs.version_type }} ${{ inputs.version }}
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

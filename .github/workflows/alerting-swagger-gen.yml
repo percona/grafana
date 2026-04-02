@@ -1,4 +1,5 @@
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   gen-swagger:

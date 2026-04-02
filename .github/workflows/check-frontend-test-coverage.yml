@@ -1,6 +1,7 @@
 name: Check Frontend Test Coverage
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions: {}
 

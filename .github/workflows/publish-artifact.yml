@@ -1,5 +1,6 @@
 name: Publish artifacts to bucket
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   publish:

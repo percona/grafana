@@ -1,5 +1,6 @@
 name: Bump version
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 permissions:
   id-token: write

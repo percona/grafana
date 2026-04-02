@@ -1,6 +1,7 @@
 name: run-dashboard-search-e2e
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 env:
   ARCH: linux-amd64

@@ -1,6 +1,7 @@
 name: Crowdin Download Action
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   download-sources-from-crowdin:

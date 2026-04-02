@@ -1,6 +1,7 @@
 name: publish-technical-documentation-next
 
 on:
+  # @PERCONA - disable workflow
   workflow_dispatch:
 jobs:
   sync:
