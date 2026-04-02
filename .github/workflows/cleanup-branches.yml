@@ -1,9 +1,6 @@
 name: Clean up orphaned branches
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 9 * * 1"
-
 jobs:
   cleanup-branches:
     runs-on: ubuntu-latest

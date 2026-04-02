@@ -2,16 +2,7 @@
 name: Actionlint
 
 on:
-  push:
-    branches:
-      - main
-      - release-*
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-
+  workflow_dispatch:
 permissions: {}
 
 concurrency:

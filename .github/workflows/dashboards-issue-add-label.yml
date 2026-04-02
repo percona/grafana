@@ -1,8 +1,6 @@
 name: When an issue changes and it's part of the dashboards project, add the dashboards squad label
 on:
-  issues:
-    types: [opened, closed, edited, reopened, assigned, unassigned, labeled, unlabeled]
-
+  workflow_dispatch:
 permissions:
   contents: read
   id-token: write

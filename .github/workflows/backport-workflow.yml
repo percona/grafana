@@ -3,11 +3,7 @@
 name: Backport (workflow)
 run-name: "Backport for ${{ github.event.workflow_run.head_branch }} #${{ github.event.workflow_run.run_number }}"
 on:
-  workflow_run: # zizmor: ignore[dangerous-triggers] backport-trigger.yml does not run any user code
-    workflows: ["Backport (trigger)"]
-    types:
-      - completed
-
+  workflow_dispatch:
 permissions: {}
 
 jobs:

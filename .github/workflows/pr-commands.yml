@@ -1,10 +1,6 @@
 name: PR automation
 on:
-  pull_request_target:
-    types:
-      - labeled
-      - opened
-      - synchronize
+  workflow_dispatch:
 permissions: {}
 concurrency:
   group: pr-commands-${{ github.event.number }}

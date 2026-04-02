@@ -1,12 +1,7 @@
 name: Shellcheck
 
 on:
-  push:
-    branches:
-      - main
-      - release-*
-  pull_request:
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

@@ -1,12 +1,6 @@
 name: Auto-milestone
 on:
-  pull_request_target:
-    types:
-      - opened
-      - reopened
-      - closed
-      - ready_for_review
-
+  workflow_dispatch:
 permissions:
   pull-requests: write
   contents: write

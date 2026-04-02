@@ -4,11 +4,7 @@ name: Run commands when issues are labeled or comments added
 # to issues. If you want to change the triggers for this workflow,
 # please review if the permissions are still sufficient.
 on:
-  issues:
-    types: [labeled, unlabeled]
-  issue_comment:
-    types: [created]
-
+  workflow_dispatch:
 concurrency:
   group: issue-commands-${{ github.event.issue.number }}
 

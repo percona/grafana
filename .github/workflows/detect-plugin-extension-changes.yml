@@ -8,13 +8,7 @@ concurrency:
 permissions: {}
 
 on:
-  pull_request:
-    branches:
-      - 'main'
-    paths:
-      - 'packages/**'
-      - 'public/**'
-
+  workflow_dispatch:
 env:
   # Space-separated list of keywords referring to plugin extensions
   PLUGIN_EXTENSION_KEYWORDS: "usePluginLinks, usePluginComponent, usePluginComponents, usePluginFunctions, PluginExtensionPoints"

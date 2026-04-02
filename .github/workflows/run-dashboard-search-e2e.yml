@@ -1,13 +1,7 @@
 name: run-dashboard-search-e2e
 
 on:
-  workflow_run:
-    workflows:
-      - trigger-dashboard-search-e2e
-    types:
-      - completed
   workflow_dispatch:
-
 env:
   ARCH: linux-amd64
 

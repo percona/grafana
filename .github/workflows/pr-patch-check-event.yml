@@ -1,14 +1,6 @@
 name: Dispatch check for patch conflicts
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-    branches:
-      - "main"
-      - "release-*"
-
+  workflow_dispatch:
 permissions:
   id-token: write
   contents: read

@@ -1,16 +1,7 @@
 name: Check Frontend Test Coverage
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
-    paths:
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - 'package.json'
-      - '.github/CODEOWNERS'
-
+  workflow_dispatch:
 permissions: {}
 
 jobs:

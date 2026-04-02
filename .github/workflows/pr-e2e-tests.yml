@@ -1,17 +1,7 @@
 name: End-to-end tests
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - release-*.*.*
-
-# TODO: re-enable this before merging
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.ref }}
-#   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
-
+  workflow_dispatch:
 permissions: {}
 
 env:

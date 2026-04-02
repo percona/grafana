@@ -1,11 +1,7 @@
 name: "Ephemeral instances"
 
 on:
-  issue_comment:
-    types: [created]
-  pull_request:
-    types: [closed]
-
+  workflow_dispatch:
 permissions: {}
 
 jobs:

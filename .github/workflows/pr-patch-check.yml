@@ -1,26 +1,6 @@
 name: Dispatch check for patch conflicts
 on:
-  workflow_call:
-    inputs:
-      head_ref:
-        type: string
-        required: true
-      base_ref:
-        type: string
-        required: true
-      repo:
-        type: string
-        required: true
-      sender_login:
-        type: string
-        required: true
-      sha:
-        type: string
-        required: true
-      pr_commit_sha:
-        type: string
-        required: true
-
+  workflow_dispatch:
 permissions:
   id-token: write
   contents: read

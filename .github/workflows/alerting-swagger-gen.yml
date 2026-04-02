@@ -1,8 +1,5 @@
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 1'
-
 jobs:
   gen-swagger:
     name: Alerting Swagger spec generation cron job

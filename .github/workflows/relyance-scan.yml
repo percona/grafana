@@ -1,9 +1,6 @@
 name: Relyance Compliance Inspection
 on:
-  schedule:
-    - cron: '0 0 * * *' # Run daily at 00:00 UTC
-  workflow_dispatch: # Allow for manual trigger
-
+  workflow_dispatch:
 jobs:
   relyance-compliance-inspector:
     permissions:

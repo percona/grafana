@@ -4,11 +4,7 @@
 
 name: Backport (trigger)
 on:
-  pull_request:
-    types:
-      - closed
-      - labeled
-
+  workflow_dispatch:
 permissions: {}
 
 jobs:

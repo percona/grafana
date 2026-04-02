@@ -1,11 +1,7 @@
 name: "verify-kinds"
 
 on:
-  pull_request:
-    branches: [ main ]
-    paths:
-      - '**/*.cue'
-
+  workflow_dispatch:
 permissions: {}
 
 jobs:

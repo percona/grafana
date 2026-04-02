@@ -1,16 +1,6 @@
 name: Add issues to Skye project board
 on:
   workflow_dispatch:
-    inputs:
-      manual_issue_number:
-        description: 'Issue to add to project'
-        required: false
-        type: number
-  # Ideally we could trigger this for PRs as well, but getting the secrets on that is tricky
-  # so we just won't bother for now
-  issues:
-    types: [opened]
-
 permissions:
   contents: read
   id-token: write

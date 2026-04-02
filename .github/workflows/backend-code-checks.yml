@@ -1,19 +1,7 @@
 name: Backend Code Checks
 
 on:
-  pull_request:
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
-      - 'latest.json'
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
-      - 'latest.json'
-
+  workflow_dispatch:
 jobs:
   detect-changes:
     name: Detect whether code changed

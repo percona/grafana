@@ -1,10 +1,7 @@
 name: "MT Service Compatibility"
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
-    branches: [main, test/frontend-backend-separation-action]
-
+  workflow_dispatch:
 permissions:
   contents: read
 

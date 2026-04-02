@@ -4,23 +4,6 @@
 name: Post-release
 on:
   workflow_dispatch:
-    inputs:
-      dry_run:
-        required: false
-        default: true
-        type: boolean
-      version:
-        required: true
-      latest:
-        type: boolean
-        default: false
-  pull_request:
-    types:
-    - closed
-    branches:
-    - 'main'
-    - 'release-*.*.*'
-
 permissions:
   contents: write
   pull-requests: write

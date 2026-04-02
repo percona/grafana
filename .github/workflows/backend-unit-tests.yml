@@ -1,12 +1,7 @@
 name: Backend Unit Tests
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - release-*.*.*
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}

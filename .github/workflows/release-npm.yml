@@ -1,40 +1,7 @@
 name: Release NPM packages
 run-name: Publish NPM ${{ inputs.version_type }} ${{ inputs.version }}
 on:
-  workflow_call:
-    inputs:
-      grafana_commit:
-        description: 'Grafana commit SHA to build against'
-        required: true
-        type: string
-      version:
-        description: 'Version to publish as'
-        required: true
-        type: string
-      build_id:
-        description: 'Run ID from the original release-build workflow'
-        required: true
-        type: string
-      version_type:
-        description: 'Version type (canary, nightly, stable)'
-        required: true
-        type: string
-
   workflow_dispatch:
-    inputs:
-      grafana_commit:
-        description: 'Grafana commit SHA to build against'
-        required: true
-      version:
-        description: 'Version to publish as'
-        required: true
-      build_id:
-        description: 'Run ID from the original release-build workflow'
-        required: true
-      version_type:
-        description: 'Version type (canary, nightly, stable)'
-        required: true
-
 permissions: {}
 
 jobs:

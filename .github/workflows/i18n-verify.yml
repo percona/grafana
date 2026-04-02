@@ -4,12 +4,7 @@ permissions:
   contents: read
 
 on:
-  pull_request:
-  push:
-    branches:
-      - main
-      - release-*.*.*
-
+  workflow_dispatch:
 jobs:
   verify-i18n:
     # Run on `grafana/grafana` main branch, or on pull requests to prevent double-running on mirrors

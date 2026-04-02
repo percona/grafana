@@ -4,12 +4,6 @@ name: Dispatch sync to mirror
 run-name: dispatch-sync-to-mirror-${{ github.ref_name }}
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "main"
-      - "v*.*.*"
-      - "release-*"
-
 permissions: {}
 
 # This is run after the pull request has been merged, so we'll run against the target branch

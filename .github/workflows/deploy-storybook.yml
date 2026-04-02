@@ -1,12 +1,7 @@
 name: Deploy Storybook
 
 on:
-  push:
-    branches:
-      - main
-  release:
-    types: [released]
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
