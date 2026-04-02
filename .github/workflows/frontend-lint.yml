@@ -41,9 +41,6 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true && needs.detect-changes.outputs.prettier == 'true'
     name: Lint
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
     - uses: actions/checkout@v5
       with:
