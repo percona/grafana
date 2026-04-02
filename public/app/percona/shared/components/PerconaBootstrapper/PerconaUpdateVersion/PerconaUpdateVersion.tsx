@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 
+import { locationService } from '@grafana/runtime';
 import { dateTimeFormat } from '@grafana/data';
 import { Modal, useStyles2, Button } from '@grafana/ui';
-import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import {
   checkUpdatesChangeLogs,
   setShowUpdateModal,
@@ -16,7 +17,6 @@ import { useSelector } from 'app/types/store';
 
 import { Messages } from './PerconaUpdateVersion.constants';
 import { getStyles } from './PerconaUpdateVersion.styles';
-import { locationService } from '@grafana/runtime';
 
 const PerconaUpdateVersion = () => {
   const { updateAvailable, installed, latest, changeLogs, showUpdateModal, latestNewsUrl } =

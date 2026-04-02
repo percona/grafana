@@ -11,7 +11,7 @@ import { useSelector } from 'app/types/store';
 
 import { Databases } from '../../percona/shared/core';
 import { FeatureLoader } from '../shared/components/Elements/FeatureLoader';
-import { PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 
 import { AddInstance } from './components/AddInstance/AddInstance';
 import AddRemoteInstance from './components/AddRemoteInstance/AddRemoteInstance';

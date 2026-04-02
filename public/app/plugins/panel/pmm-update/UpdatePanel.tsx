@@ -1,7 +1,8 @@
 import { FC, MouseEvent, useState } from 'react';
 
+import { locationService } from '@grafana/runtime';
 import { Button, Spinner } from '@grafana/ui';
-import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { checkUpdatesAction } from 'app/percona/shared/core/reducers/updates';
 import { getPerconaUser, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
@@ -12,7 +13,6 @@ import { Messages } from './UpdatePanel.messages';
 import { styles } from './UpdatePanel.styles';
 import { formatDateWithTime } from './UpdatePanel.utils';
 import { AvailableUpdate, CurrentVersion, InfoBox, LastCheck } from './components';
-import { locationService } from '@grafana/runtime';
 
 export const UpdatePanel: FC = () => {
   const isOnline = navigator.onLine;

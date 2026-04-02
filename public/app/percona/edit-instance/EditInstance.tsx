@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom-v5-compat';
 
 import { AppEvents } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { Alert, Button, HorizontalGroup, Modal, useStyles2 } from '@grafana/ui';
+import { Alert, Button, Stack, Modal, useStyles2 } from '@grafana/ui';
 import { appEvents } from 'app/core/app_events';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
 import { Page } from 'app/core/components/Page/Page';
@@ -12,7 +12,10 @@ import { InventoryService } from 'app/percona/inventory/Inventory.service';
 import { useAppDispatch } from 'app/store/store';
 
 import { Labels } from '../add-instance/components/AddRemoteInstance/FormParts';
-import { PMM_EDIT_INSTANCE_PAGE, PMM_SERVICES_PAGE } from '../shared/components/PerconaBootstrapper/PerconaNavigation';
+import {
+  PMM_EDIT_INSTANCE_PAGE,
+  PMM_SERVICES_PAGE,
+} from '../shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { useCancelToken } from '../shared/components/hooks/cancelToken.hook';
 import { updateServiceAction } from '../shared/core/reducers/services';
 import { CustomLabelsUtils } from '../shared/helpers/customLabels';
@@ -22,12 +25,12 @@ import { DbServicePayload } from '../shared/services/services/Services.types';
 import { EDIT_INSTANCE_DOCS_LINK, FETCH_SERVICE_CANCEL_TOKEN } from './EditInstance.constants';
 import { Messages } from './EditInstance.messages';
 import { getStyles } from './EditInstance.styles';
-import { EditInstanceFormValues, EditInstanceRouteParams } from './EditInstance.types';
+import { EditInstanceFormValues } from './EditInstance.types';
 import { getInitialValues, getService } from './EditInstance.utils';
 
 const EditInstancePage: FC = () => {
   const dispatch = useAppDispatch();
-  const { serviceId } = useParams() as unknown as EditInstanceRouteParams;
+  const { serviceId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [service, setService] = useState<DbServicePayload>();
   const [generateToken] = useCancelToken();
@@ -100,7 +103,7 @@ const EditInstancePage: FC = () => {
         <>
           <AppChromeUpdate
             actions={
-              <HorizontalGroup height="auto" justify="flex-end">
+              <Stack direction="row" height="auto" justifyContent="flex-end">
                 <Button
                   size="sm"
                   variant="secondary"
@@ -120,7 +123,7 @@ const EditInstancePage: FC = () => {
                 >
                   {Messages.saveChanges}
                 </Button>
-              </HorizontalGroup>
+              </Stack>
             }
           />
           <Modal

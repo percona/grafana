@@ -10,7 +10,7 @@ import { Page } from 'app/core/components/Page/Page';
 import { SwitchRow } from 'app/percona/settings/components/Advanced/SwitchRow';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
-import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { triggerDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';

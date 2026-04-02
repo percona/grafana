@@ -41,10 +41,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     background: 'none',
     margin: theme.spacing(0.5),
   }),
-  headerCollapsed: css({
-    label: 'collapse__header--collapsed',
-    padding: theme.spacing(1, 2, 1, 2),
-  }),
   loaderActive: css({
     label: 'collapse__loader_active',
     '&:after': {
@@ -96,8 +92,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
 });
 
 export interface Props {
-  /** Whether the collapse is collapsible */
-  collapsible?: boolean;
   /** Expand or collapse te content */
   isOpen?: boolean;
   /** Element or text for the Collapse header */
@@ -108,11 +102,13 @@ export interface Props {
   onToggle?: (isOpen: boolean) => void;
   /** Additional class name for the root element */
   className?: string;
+  /** @deprecated this prop is no longer used and will be removed in Grafana 13 */
+  collapsible?: boolean;
   // @Percona
   headerCustomClass?: string;
   bodyCustomClass?: string;
   headerLabelCustomClass?: string;
-  disabled?: boolean;
+  buttonCustomClass?: string;
 }
 
 export const ControlledCollapse = ({ isOpen, onToggle, ...otherProps }: React.PropsWithChildren<Props>) => {
@@ -120,7 +116,6 @@ export const ControlledCollapse = ({ isOpen, onToggle, ...otherProps }: React.Pr
   return (
     <Collapse
       isOpen={open}
-      collapsible
       {...otherProps}
       onToggle={() => {
         setOpen(!open);
@@ -132,45 +127,46 @@ export const ControlledCollapse = ({ isOpen, onToggle, ...otherProps }: React.Pr
   );
 };
 
+/**
+ * A content area, which can be horizontally collapsed and expanded. Can be used to hide extra information on the page.
+ *
+ * https://developers.grafana.com/ui/latest/index.html?path=/docs/layout-collapse--docs
+ */
 export const Collapse = ({
   isOpen,
   label,
   loading,
-  // @Percona
-  collapsible,
   onToggle,
   className,
+  children,
   // @Percona
   headerCustomClass,
   headerLabelCustomClass,
   bodyCustomClass,
-  disabled = false,
-  children,
+  buttonCustomClass,
 }: React.PropsWithChildren<Props>) => {
   const style = useStyles2(getStyles);
   const labelId = useId();
   const contentId = useId();
 
   const onClickToggle = () => {
-    if (onToggle && collapsible && !disabled) {
+    if (onToggle) {
       onToggle(!isOpen);
     }
   };
   const panelClass = cx([style.collapse, className]);
   const loaderClass = loading ? cx([style.loader, style.loaderActive]) : style.loader;
-  const headerClass = collapsible ? cx([style.header]) : cx([style.headerCollapsed]);
 
   return (
     <div className={panelClass}>
       {/* the inner button handles keyboard a11y. this is a convenience for mouse users */}
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-      <div className={style.header} onClick={onClickToggle}>
+      <div className={cx([style.header, headerCustomClass])} onClick={onClickToggle}>
         <IconButton
-          data-testid="collapse-clickable"
-          className={cx(style.button, headerClass, headerCustomClass)}
           aria-describedby={labelId}
           aria-expanded={isOpen}
           aria-controls={contentId}
+          className={cx([style.button, buttonCustomClass])}
           aria-labelledby={labelId}
           name={isOpen ? 'angle-down' : 'angle-right'}
         />

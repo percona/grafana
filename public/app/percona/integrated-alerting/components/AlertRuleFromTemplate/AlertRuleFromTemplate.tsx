@@ -11,7 +11,7 @@ import { Page } from 'app/core/components/Page/Page';
 import { useAppNotification } from 'app/core/copy/appNotification';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
-import { PMM_ALERTING_CREATE_ALERT_TEMPLATE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_ALERTING_CREATE_ALERT_TEMPLATE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { ApiErrorResponse } from 'app/percona/shared/core';
 import { getPerconaSettingFlag } from 'app/percona/shared/core/selectors';
 import { logger } from 'app/percona/shared/helpers/logger';
@@ -23,6 +23,7 @@ import { TemplateForm } from '../TemplateForm/TemplateForm';
 import { formatCreateAPIPayload } from '../TemplateForm/TemplateForm.utils';
 
 import { getStyles } from './AlertRuleFromTemplate.styles';
+import { Trans } from '@grafana/i18n';
 
 export const AlertRuleFromTemplate: FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +60,7 @@ export const AlertRuleFromTemplate: FC = () => {
       notifyApp.success(`Rule "${values.ruleName}" saved.`);
 
       locationService.push(returnTo);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error(error);
       const message = (error as AxiosError<ApiErrorResponse>)?.response?.data?.message;
       notifyApp.error(message || 'Failed to save rule');
@@ -82,11 +83,11 @@ export const AlertRuleFromTemplate: FC = () => {
         disabled={isSubmitting}
       >
         {isSubmitting && <Spinner className={styles.buttonSpinner} inline={true} />}
-        Save rule and exit
+        <Trans i18nKey="alerting.alert-rule-form.action-buttons.save">Save rule and exit</Trans>
       </Button>
       <Link to={returnTo}>
         <Button variant="secondary" disabled={isSubmitting} type="button" size="sm">
-          Cancel
+          <Trans i18nKey="alerting.alert-rule-form.action-buttons.cancel">Cancel</Trans>
         </Button>
       </Link>
     </Stack>
