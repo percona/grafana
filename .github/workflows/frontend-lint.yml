@@ -10,8 +10,6 @@ on:
 
 permissions: {}
 
-permissions: {}
-
 jobs:
   detect-changes:
     name: Detect whether code changed
