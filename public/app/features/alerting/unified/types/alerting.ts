@@ -270,7 +270,3 @@ export interface AnnotationItemDTO {
   avatarUrl: string;
   data: any;
 }
-export interface OptionMeta {
-  required?: string | ValidationRule<boolean>;
-  readOnly?: boolean;
-}
