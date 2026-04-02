@@ -12,8 +12,6 @@ export interface Props {
 
 export function RowExpander({ row, tableStyles }: Props) {
   return (
-    // @PERCONA - ignore errors related to expandable rows
-    // @ts-ignore
     <div className={tableStyles.expanderCell} {...row.getToggleRowExpandedProps()}>
       <Icon
         aria-label={
