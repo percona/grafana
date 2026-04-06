@@ -136,7 +136,7 @@ const AddInstancePanel = () => {
           {showSelection ? Messages.selectionStep.cancel : Messages.configurationStep.cancel}
         </ToolbarButton>
         {!showSelection && (
-          <ToolbarButton form={ADD_INSTANCE_FORM_NAME} disabled={submitting} variant="primary">
+          <ToolbarButton form={ADD_INSTANCE_FORM_NAME} disabled={submitting} variant="primary" type="submit">
             {submitLabel}
           </ToolbarButton>
         )}
