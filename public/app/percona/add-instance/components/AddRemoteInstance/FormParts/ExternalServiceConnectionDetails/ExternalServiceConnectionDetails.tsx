@@ -19,7 +19,12 @@ export const ExternalServiceConnectionDetails: FC<FormPartProps> = ({ form }) =>
   const urlValue = formValues?.url;
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
   const timeoutValidators = useMemo(
-    () => [Validators.duration, Validators.minDuration('0s'), Validators.durationUnit({ s: true, m: true })],
+    () => [
+      Validators.duration,
+      Validators.minDuration('0s'),
+      Validators.maxDuration('3600s'),
+      Validators.durationUnit({ s: true }),
+    ],
     []
   );
 
@@ -126,8 +131,8 @@ export const ExternalServiceConnectionDetails: FC<FormPartProps> = ({ form }) =>
               validators={portValidators}
             />
             <TextInputField
-              key="timeout"
-              name="timeout"
+              key="connection_timeout"
+              name="connection_timeout"
               label={Messages.form.labels.mainDetails.timeout}
               tooltipText={Messages.form.tooltips.mainDetails.timeout}
               placeholder={Messages.form.placeholders.mainDetails.timeout}

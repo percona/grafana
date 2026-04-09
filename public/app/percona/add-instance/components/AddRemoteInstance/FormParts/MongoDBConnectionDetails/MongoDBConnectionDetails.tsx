@@ -18,7 +18,12 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
 
   const portValidators = useMemo(() => [validators.required, Validators.validatePort], []);
   const timeoutValidators = useMemo(
-    () => [Validators.duration, Validators.minDuration('0s'), Validators.durationUnit({ s: true, m: true })],
+    () => [
+      Validators.duration,
+      Validators.minDuration('0s'),
+      Validators.maxDuration('3600s'),
+      Validators.durationUnit({ s: true }),
+    ],
     []
   );
   const userPassValidators = useMemo(() => (tlsFlag ? [] : [validators.required]), [tlsFlag]);
@@ -82,8 +87,8 @@ export const MongoDBConnectionDetails: FC<MainDetailsFormPartProps> = ({ form, r
           validators={maxQueryLengthValidators}
         />
         <TextInputField
-          key="timeout"
-          name="timeout"
+          key="connection_timeout"
+          name="connection_timeout"
           label={Messages.form.labels.mainDetails.timeout}
           tooltipText={Messages.form.tooltips.mainDetails.timeout}
           placeholder={Messages.form.placeholders.mainDetails.timeout}

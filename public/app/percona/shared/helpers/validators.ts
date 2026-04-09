@@ -1,5 +1,5 @@
-import { UnitOptions, Validator, VResult } from './validator.types';
 import { durationToMs, getDurationUnit, isValidProtobufDuration } from './duration';
+import { UnitOptions, Validator, VResult } from './validator.types';
 
 export const validators = {
   validatePort: (value: any) => {
@@ -141,6 +141,17 @@ export const validators = {
     const duration = durationToMs(value);
 
     return duration >= min ? undefined : `Duration should be greater or equal to ${minDuration}`;
+  },
+
+  maxDuration: (maxDuration: string) => (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+
+    const max = durationToMs(maxDuration);
+    const duration = durationToMs(value);
+
+    return duration <= max ? undefined : `Duration should be lower or equal to ${maxDuration}`;
   },
 
   compose:

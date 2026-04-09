@@ -297,6 +297,28 @@ describe('validators compose', () => {
     });
   });
 
+  describe('validate max duration', () => {
+    it('return undefined when value is valid', () => {
+      expect(validators.maxDuration('1s')('1s')).toBeUndefined();
+      expect(validators.maxDuration('1ms')('1ms')).toBeUndefined();
+      expect(validators.maxDuration('1m')('1m')).toBeUndefined();
+      expect(validators.maxDuration('2m')('1m')).toBeUndefined();
+      expect(validators.maxDuration('1m')('30s')).toBeUndefined();
+      expect(validators.maxDuration('90s')('1m')).toBeUndefined();
+    });
+
+    it('return undefined when value is empty', () => {
+      expect(validators.maxDuration('1s')('')).toBeUndefined();
+    });
+
+    it('return error message when value exceeds max', () => {
+      expect(validators.maxDuration('1s')('2s')).toEqual('Duration should be lower or equal to 1s');
+      expect(validators.maxDuration('1ms')('1s')).toEqual('Duration should be lower or equal to 1ms');
+      expect(validators.maxDuration('1m')('2m')).toEqual('Duration should be lower or equal to 1m');
+      expect(validators.maxDuration('30s')('1m')).toEqual('Duration should be lower or equal to 30s');
+    });
+  });
+
   describe('validate duration unit', () => {
     it('return undefined when value is valid', () => {
       const values = {
