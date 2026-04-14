@@ -18,7 +18,7 @@ import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/hig
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getHighAvailability, getNodes } from 'app/percona/shared/core/selectors';
-import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import { api, isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { NodeType } from 'app/percona/shared/services/nodes/Nodes.types';
@@ -46,6 +46,7 @@ import {
   getBadgeTextForServiceStatus,
   getTagsFromLabels,
 } from './Services.utils';
+import { MANAGEMENT_CREATE_NODE_INSTALL_TOKEN_PATH } from '../managementApi.constants';
 import { buildQuickInstallCommand, QuickInstallTech } from './NodesInstallCommand.utils';
 import { getStyles } from './Tabs.styles';
 import { DATA_INTERVAL } from 'app/percona/shared/core';
@@ -59,6 +60,7 @@ export const NodesTab = () => {
   const navModel = usePerconaNavModel('inventory-nodes');
   const [triggerTimeout, , stopTimeout] = useRecurringCall();
   const [generateToken] = useCancelToken();
+  const [installTokenLoading, setInstallTokenLoading] = useState(false);
   const styles = useStyles2(getStyles);
   const dispatch = useAppDispatch();
   const { nodes: highAvailabilityNodes, isEnabled: isHighAvailabilityEnabled } = useSelector(getHighAvailability);
@@ -349,47 +351,30 @@ export const NodesTab = () => {
     setSelectedRows(rows);
   }, []);
 
-  const copyQuickInstallCommand = useCallback(async (tech: QuickInstallTech) => {
-    const cmd = buildQuickInstallCommand(tech);
-    if (!cmd) {
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(cmd);
-      appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.installCommandCopied]);
-    } catch (e) {
-      logger.error(e);
-      appEvents.emit(AppEvents.alertError, [Messages.nodes.installCommandCopyFailed]);
-    }
-  }, []);
-
-  const installClientMenu = useCallback(
-    () => (
-      <Menu>
-        <Menu.Item
-          label={Messages.nodes.installMySQL}
-          icon="database"
-          onClick={() => {
-            copyQuickInstallCommand('mysql');
-          }}
-        />
-        <Menu.Item
-          label={Messages.nodes.installPostgreSQL}
-          icon="database"
-          onClick={() => {
-            copyQuickInstallCommand('postgresql');
-          }}
-        />
-        <Menu.Item
-          label={Messages.nodes.installMongoDB}
-          icon="database"
-          onClick={() => {
-            copyQuickInstallCommand('mongodb');
-          }}
-        />
-      </Menu>
-    ),
-    [copyQuickInstallCommand]
+  const copyQuickInstallWithToken = useCallback(
+    async (tech: QuickInstallTech) => {
+      setInstallTokenLoading(true);
+      try {
+        const res = await api.post<
+          { token: string },
+          { ttlSeconds: number; technology: QuickInstallTech }
+        >(MANAGEMENT_CREATE_NODE_INSTALL_TOKEN_PATH, { ttlSeconds: 0, technology: tech }, true);
+        const cmd = buildQuickInstallCommand(tech, res.token);
+        try {
+          await navigator.clipboard.writeText(cmd);
+          appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.installCommandCopied]);
+        } catch (clipErr) {
+          logger.error(clipErr);
+          appEvents.emit(AppEvents.alertError, [Messages.nodes.installCommandCopyFailed]);
+        }
+      } catch (e) {
+        logger.error(e);
+        appEvents.emit(AppEvents.alertError, [Messages.nodes.installTokenFailed]);
+      } finally {
+        setInstallTokenLoading(false);
+      }
+    },
+    []
   );
 
   const installClientAdvancedHref =
@@ -401,8 +386,36 @@ export const NodesTab = () => {
         <FeatureLoader>
           <div className={styles.actionPanel}>
             <HorizontalGroup spacing="md" wrap>
-              <Dropdown overlay={installClientMenu} placement="bottom-start">
-                <Button variant="primary" size="md" icon="angle-down">
+              <Dropdown
+                overlay={() => (
+                  <Menu>
+                    {(
+                      [
+                        ['mysql', Messages.nodes.installMySQL],
+                        ['postgresql', Messages.nodes.installPostgreSQL],
+                        ['mongodb', Messages.nodes.installMongoDB],
+                      ] as const
+                    ).map(([tech, label]) => (
+                      <Menu.Item
+                        key={tech}
+                        label={label}
+                        icon="database"
+                        disabled={installTokenLoading}
+                        onClick={() => {
+                          copyQuickInstallWithToken(tech);
+                        }}
+                      />
+                    ))}
+                  </Menu>
+                )}
+                placement="bottom-start"
+              >
+                <Button
+                  variant="primary"
+                  size="md"
+                  icon="angle-down"
+                  disabled={installTokenLoading}
+                >
                   {Messages.nodes.installClientButton}
                 </Button>
               </Dropdown>
