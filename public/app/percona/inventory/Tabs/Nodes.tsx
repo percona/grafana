@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, HorizontalGroup, Icon, Link, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
+import { Badge, Button, Dropdown, HorizontalGroup, Icon, Link, Menu, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -46,6 +46,7 @@ import {
   getBadgeTextForServiceStatus,
   getTagsFromLabels,
 } from './Services.utils';
+import { buildQuickInstallCommand, QuickInstallTech } from './NodesInstallCommand.utils';
 import { getStyles } from './Tabs.styles';
 import { DATA_INTERVAL } from 'app/percona/shared/core';
 
@@ -348,11 +349,65 @@ export const NodesTab = () => {
     setSelectedRows(rows);
   }, []);
 
+  const copyQuickInstallCommand = useCallback(async (tech: QuickInstallTech) => {
+    const cmd = buildQuickInstallCommand(tech);
+    if (!cmd) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(cmd);
+      appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.installCommandCopied]);
+    } catch (e) {
+      logger.error(e);
+      appEvents.emit(AppEvents.alertError, [Messages.nodes.installCommandCopyFailed]);
+    }
+  }, []);
+
+  const installClientMenu = useCallback(
+    () => (
+      <Menu>
+        <Menu.Item
+          label={Messages.nodes.installMySQL}
+          icon="database"
+          onClick={() => {
+            copyQuickInstallCommand('mysql');
+          }}
+        />
+        <Menu.Item
+          label={Messages.nodes.installPostgreSQL}
+          icon="database"
+          onClick={() => {
+            copyQuickInstallCommand('postgresql');
+          }}
+        />
+        <Menu.Item
+          label={Messages.nodes.installMongoDB}
+          icon="database"
+          onClick={() => {
+            copyQuickInstallCommand('mongodb');
+          }}
+        />
+      </Menu>
+    ),
+    [copyQuickInstallCommand]
+  );
+
+  const installClientAdvancedHref =
+    typeof window !== 'undefined' ? `${window.location.origin}/pmm-ui/install-client` : '/pmm-ui/install-client';
+
   return (
     <TabbedPage navModel={navModel} isLoading={isLoading}>
       <TabbedPageContents>
         <FeatureLoader>
           <div className={styles.actionPanel}>
+            <HorizontalGroup spacing="md" wrap>
+              <Dropdown overlay={installClientMenu} placement="bottom-start">
+                <Button variant="primary" size="md" icon="angle-down">
+                  {Messages.nodes.installClientButton}
+                </Button>
+              </Dropdown>
+              <Link href={installClientAdvancedHref}>{Messages.nodes.installClientAdvanced}</Link>
+            </HorizontalGroup>
             <Button
               size="md"
               disabled={selected.length === 0}
