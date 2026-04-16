@@ -392,8 +392,9 @@ export const NodesTab = () => {
                     {(
                       [
                         ['mysql', Messages.nodes.addNodeMySQL],
-                        ['mongodb', Messages.nodes.addNodeMongoDB],
                         ['postgresql', Messages.nodes.addNodePostgreSQL],
+                        ['mongodb', Messages.nodes.addNodeMongoDB],
+                        ['valkey', Messages.nodes.addNodeValkey],
                       ] as const
                     ).map(([tech, label]) => (
                       <Menu.Item
