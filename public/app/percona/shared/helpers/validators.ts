@@ -118,6 +118,10 @@ export const validators = {
       return undefined;
     }
 
+    if (!isValidProtobufDuration(value)) {
+      return 'Invalid duration';
+    }
+
     const allowed = Object.keys(options).filter((unit) => options[unit as keyof UnitOptions]);
     const unit = getDurationUnit(value);
 

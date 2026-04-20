@@ -1,5 +1,3 @@
-import { UnitOptions } from './validator.types';
-
 const DURATION_RE = /^-?\d+(?:\.\d+)?(ms|s|m)$/;
 
 export const isValidProtobufDuration = (durationString: string): boolean => DURATION_RE.test(durationString.trim());
@@ -20,11 +18,6 @@ export const durationToMs = (duration: string): number => {
   }
 
   throw new Error(`Invalid duration: "${duration}"`);
-};
-
-export const hasValidUnit = (duration: string, options: UnitOptions): boolean => {
-  const unit = getDurationUnit(duration);
-  return !!unit && !!options[unit as keyof UnitOptions];
 };
 
 export const getDurationUnit = (value: string): string | undefined => {
