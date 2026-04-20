@@ -137,6 +137,10 @@ export const validators = {
       return undefined;
     }
 
+    if (!isValidProtobufDuration(value)) {
+      return 'Invalid duration';
+    }
+
     const min = durationToMs(minDuration);
     const duration = durationToMs(value);
 
@@ -146,6 +150,10 @@ export const validators = {
   maxDuration: (maxDuration: string) => (value: string) => {
     if (!value) {
       return undefined;
+    }
+
+    if (!isValidProtobufDuration(value)) {
+      return 'Invalid duration';
     }
 
     const max = durationToMs(maxDuration);
