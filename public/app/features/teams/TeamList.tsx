@@ -28,7 +28,6 @@ import { Role, AccessControlAction } from 'app/types/accessControl';
 import { TeamWithRoles } from 'app/types/teams';
 
 import { TeamRolePicker } from '../../core/components/RolePicker/TeamRolePicker';
-import { EnterpriseAuthFeaturesCard } from '../admin/EnterpriseAuthFeaturesCard';
 
 import { useDeleteTeam, useGetTeams } from './hooks';
 
