@@ -1,13 +1,23 @@
 import { useEffect } from 'react';
 
 import { config } from '@grafana/runtime';
+import { buildInitialState, updateNavIndex } from 'app/core/reducers/navModel';
 import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { fetchUserDetailsAction, setAuthorized } from 'app/percona/shared/core/reducers/user/user';
 import { getCategorizedAdvisors, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types/store';
-import { buildInitialState, updateNavIndex } from 'app/core/reducers/navModel';
+
+
+import { Telemetry } from '../../../ui-events/components/Telemetry';
+import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
+import { checkUpdatesAction } from '../../core/reducers/updates';
+import { logger } from '../../helpers/logger';
+import { isPmmAdmin, isViewer } from '../../helpers/permissions';
+import { isPmmNavEnabled } from '../../helpers/plugin';
+
+import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
 import {
   PMM_ACCESS_ROLE_CREATE_PAGE,
   PMM_ACCESS_ROLE_EDIT_PAGE,
@@ -22,17 +32,9 @@ import {
 import {
   buildAdvisorsNavItem,
   buildIntegratedAlertingMenuItem,
+  buildUsersAndAccessNavWithRoles,
   getPmmSettingsPage,
 } from './PerconaNavigation/PerconaNavigation.utils';
-
-import { Telemetry } from '../../../ui-events/components/Telemetry';
-import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
-import { checkUpdatesAction } from '../../core/reducers/updates';
-import { logger } from '../../helpers/logger';
-import { isPmmAdmin, isViewer } from '../../helpers/permissions';
-import { isPmmNavEnabled } from '../../helpers/plugin';
-
-import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
@@ -68,15 +70,25 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
         if (settings?.enableAccessControl) {
           const cfg = updatedNavTree['cfg'];
+          const usersAndAccessWithRoles = buildUsersAndAccessNavWithRoles(updatedNavTree);
 
-          // update nav index with the access roles tab
+          // Apply cfg first so navIndex is populated from boot nav; then merge Users and access (includes Access Roles).
           if (cfg) {
-            dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
             dispatch(updateNavIndex(cfg));
+          }
+          if (usersAndAccessWithRoles) {
+            dispatch(updateNavIndex(usersAndAccessWithRoles));
+          } else {
+            dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
           }
         }
       } else {
-        dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
+        const usersAndAccessWithRoles = buildUsersAndAccessNavWithRoles(updatedNavTree);
+        if (usersAndAccessWithRoles) {
+          dispatch(updateNavIndex(usersAndAccessWithRoles));
+        } else {
+          dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
+        }
       }
 
       if (alertingEnabled) {

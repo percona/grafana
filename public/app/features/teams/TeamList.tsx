@@ -296,7 +296,8 @@ const TeamList = () => {
             )}
           </>
         )}
-        {!query && <EnterpriseAuthFeaturesCard page="teams" />}
+        {/* PERCONA: remove EnterpriseAuthFeaturesCard */}
+        {/* {!query && <EnterpriseAuthFeaturesCard page="teams" />} */}
       </Page.Contents>
     </Page>
   );

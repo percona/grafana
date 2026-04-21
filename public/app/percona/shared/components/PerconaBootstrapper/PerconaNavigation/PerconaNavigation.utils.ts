@@ -1,8 +1,15 @@
 import { NavIndex, NavModelItem } from '@grafana/data';
-import { CategorizedAdvisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import config from 'app/core/config';
-import { PMM_ALERTING_FIRED_ALERTS, PMM_ALERTING_PERCONA_ALERTS, WEIGHTS } from './PerconaNavigation.constants';
 import { isViewer } from 'app/percona/shared/helpers/permissions';
+import { CategorizedAdvisor } from 'app/percona/shared/services/advisors/Advisors.types';
+
+import {
+  PMM_ACCESS_ROLES_PAGE,
+  PMM_ALERTING_FIRED_ALERTS,
+  PMM_ALERTING_PERCONA_ALERTS,
+  WEIGHTS,
+} from './PerconaNavigation.constants';
+
 
 export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) => {
   const modelItem: NavModelItem = {
@@ -51,6 +58,35 @@ export const buildIntegratedAlertingMenuItem = (mainLinks: NavIndex): NavModelIt
   }
 
   return alertingItem;
+};
+
+/** Grafana Administration → Users and access (`cfg/access` from backend nav tree). */
+export const GRAFANA_NAV_ID_USERS_AND_ACCESS = 'cfg/access';
+
+/**
+ * Returns a copy of the "Users and access" nav section with PMM Access Roles appended, for {@link updateNavIndex}.
+ * Undefined when that section is absent (e.g. empty menu removed server-side).
+ */
+export const buildUsersAndAccessNavWithRoles = (navTree: NavIndex): NavModelItem | undefined => {
+  const accessSection = navTree[GRAFANA_NAV_ID_USERS_AND_ACCESS];
+  if (!accessSection?.id) {
+    return undefined;
+  }
+
+  const existingChildren = accessSection.children ? [...accessSection.children] : [];
+  if (existingChildren.some((c) => c.id === PMM_ACCESS_ROLES_PAGE.id)) {
+    return { ...accessSection, children: existingChildren };
+  }
+
+  const accessRolesItem: NavModelItem = {
+    ...PMM_ACCESS_ROLES_PAGE,
+    parentItem: accessSection,
+  };
+
+  return {
+    ...accessSection,
+    children: [...existingChildren, accessRolesItem],
+  };
 };
 
 export const getPmmSettingsPage = (): NavModelItem => {

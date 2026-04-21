@@ -120,7 +120,8 @@ const UserListAdminPageUnConnected = ({
           fetchData={changeSort}
         />
       )}
-      <EnterpriseAuthFeaturesCard page="users" />
+      {/* PERCONA: remove EnterpriseAuthFeaturesCard */}
+      {/* <EnterpriseAuthFeaturesCard page="users" /> */}
     </Page.Contents>
   );
 };

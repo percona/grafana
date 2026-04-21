@@ -4,7 +4,7 @@ import { FC, type JSX } from 'react';
 import { colorManipulator, GrafanaTheme2, NavModelItem } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { reportInteraction } from '@grafana/runtime';
-import { Tooltip, useStyles2, useTheme2 } from '@grafana/ui';
+import { Icon, Tooltip, useStyles2, useTheme2 } from '@grafana/ui';
 import g8LoginDarkSvg from 'img/g8_login_dark.svg';
 import g8LoginLightSvg from 'img/g8_login_light.svg';
 
@@ -84,7 +84,9 @@ export function HomeLink({ homeNav, inMegaMenuOverlay }: { homeNav?: NavModelIte
         title={homeNav?.text || 'Home'}
         href={homeNav?.url}
       >
-        <Branding.MenuLogo />
+        {/* @PERCONA  */}
+        <Icon name="home-alt" size="xl" />
+        {/* <Branding.MenuLogo /> */}
       </a>
     </Tooltip>
   );
@@ -93,6 +95,9 @@ export function HomeLink({ homeNav, inMegaMenuOverlay }: { homeNav?: NavModelIte
 function homeLinkStyles(theme: GrafanaTheme2) {
   return {
     homeLink: css({
+      // @PERCONA: adjust icon position to match the breadcrumbs
+      position: 'relative',
+      bottom: '1px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
