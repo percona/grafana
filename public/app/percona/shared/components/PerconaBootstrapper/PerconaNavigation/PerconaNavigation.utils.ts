@@ -10,7 +10,6 @@ import {
   WEIGHTS,
 } from './PerconaNavigation.constants';
 
-
 export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) => {
   const modelItem: NavModelItem = {
     id: `advisors`,

@@ -9,7 +9,6 @@ import { getCategorizedAdvisors, getPerconaSettings, getUpdatesInfo } from 'app/
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types/store';
 
-
 import { Telemetry } from '../../../ui-events/components/Telemetry';
 import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 import { checkUpdatesAction } from '../../core/reducers/updates';
