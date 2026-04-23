@@ -396,6 +396,9 @@
     },
     "metric": {
      "type": "string"
+    },
+    "targetDatasourceUid": {
+     "type": "string"
     }
    },
    "title": "Record is the provisioned export of models.Record.",
@@ -3492,6 +3495,11 @@
      "description": "Name of the recorded metric.",
      "example": "grafana_alerts_ratio",
      "type": "string"
+    },
+    "target_datasource_uid": {
+     "description": "Which data source should be used to write the output of the recording rule, specified by UID.",
+     "example": "my-prom",
+     "type": "string"
     }
    },
    "required": [
@@ -4355,6 +4363,15 @@
      "description": "Name of the associated template definition for this result.",
      "type": "string"
     },
+    "scope": {
+     "description": "Scope that was successfully used to interpolate the template. If the root scope \".\" fails, more specific\nscopes will be tried, such as \".Alerts', or \".Alert\".",
+     "enum": [
+      ".",
+      ".Alerts",
+      ".Alert"
+     ],
+     "type": "string"
+    },
     "text": {
      "description": "Interpolated value of the template.",
      "type": "string"
@@ -4933,7 +4950,6 @@
    "type": "object"
   },
   "gettableAlerts": {
-   "description": "GettableAlerts gettable alerts",
    "items": {
     "$ref": "#/definitions/gettableAlert",
     "type": "object"
@@ -5058,7 +5074,6 @@
    "type": "object"
   },
   "gettableSilences": {
-   "description": "GettableSilences gettable silences",
    "items": {
     "$ref": "#/definitions/gettableSilence",
     "type": "object"
