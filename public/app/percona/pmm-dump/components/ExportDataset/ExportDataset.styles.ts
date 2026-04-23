@@ -96,8 +96,14 @@ export const getStyles = ({ breakpoints, colors, shape, spacing, v1: { spacing: 
     justify-content: space-between;
     margin-bottom: ${spacing(2)};
   `,
+  encryptionRow: css`
+    width: 55%;
+
+    & > * {
+      width: 100%;
+    }
+  `,
   switch: css`
-    margin-bottom: ${spacing(2)};
     width: 55%;
     display: flex;
     & > div {

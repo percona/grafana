@@ -16,6 +16,7 @@ export interface PmmDump {
   start_time: string;
   end_time: string;
   created_at: string;
+  encrypted: boolean;
 }
 
 export interface ExportDatasetProps {
@@ -24,6 +25,8 @@ export interface ExportDatasetProps {
   end_time: string;
   ignore_load: boolean;
   export_qan: boolean;
+  enable_encryption: boolean;
+  encryption_password: string;
 }
 
 export interface ExportResponse {

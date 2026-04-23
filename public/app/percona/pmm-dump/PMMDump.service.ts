@@ -38,17 +38,16 @@ export const PMMDumpService = {
   async delete(dumpIds: string[]) {
     await api.post<void, DeleteDump>(`${BASE_URL}:batchDelete`, { dump_ids: dumpIds });
   },
-  async downloadAll(dumpIds: string[], index = 0): Promise<void> {
-    for (let i = index; i < dumpIds.length; i++) {
-      await this.download(dumpIds, i);
-    }
+  async downloadAll(dumps: PmmDump[]): Promise<void> {
+    dumps.forEach(this.download);
   },
-  async download(dumpIds: string[], index: number): Promise<void> {
+  async download({ encrypted, dump_id }: PmmDump): Promise<void> {
     return new Promise<void>(async (resolve) => {
-      const dumpId = dumpIds[index];
+      const fileName = encrypted ? `${dump_id}.tar.gz.enc` : `${dump_id}.tar.gz`;
+      const href = `${window.location.origin}/dump/${fileName}`;
 
-      link.setAttribute('href', `${window.location.origin}/dump/${dumpId}.tar.gz`);
-      link.setAttribute('download', `${dumpId}.tar.gz`);
+      link.setAttribute('href', href);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

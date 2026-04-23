@@ -10,12 +10,14 @@ import { Page } from 'app/core/components/Page/Page';
 import { SwitchRow } from 'app/percona/settings/components/Advanced/SwitchRow';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
+import { TextInputField } from 'app/percona/shared/components/Form/TextInput';
 import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { triggerDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
+import validators from 'app/percona/shared/helpers/validators';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
@@ -99,6 +101,8 @@ const ExportDataset: FC = () => {
         endTime: endDate.toISOString(),
         exportQan: !!data.QAN,
         ignoreLoad: !!data.load,
+        enableEncryption: !!data.enableEncryption,
+        encryptionPassword: data.encryptionPassword,
       })
     );
     history.push(DUMP_URL);
@@ -110,7 +114,7 @@ const ExportDataset: FC = () => {
         <Form
           onSubmit={handleSubmit}
           initialValues={initialValues}
-          render={({ handleSubmit, form }) => (
+          render={({ handleSubmit, values }) => (
             <form onSubmit={handleSubmit} className={styles.form}>
               <PageToolbar title={Messages.breadCrumbTitle} onGoBack={handleGoBack}>
                 <LinkButton href={DUMP_URL} data-testid="cancel-button" variant="secondary" fill="outline">
@@ -191,7 +195,26 @@ const ExportDataset: FC = () => {
                         tooltip={Messages.ignoreLoadTooltip}
                         component={SwitchRow}
                       />
+
+                      <Field
+                        name="enableEncryption"
+                        type="checkbox"
+                        label={Messages.enableEncryption}
+                        dataTestId="pmm-dump-enable-encryption"
+                        tooltip={Messages.enableEncryptionTooltip}
+                        component={SwitchRow}
+                      />
                     </div>
+                    {values.enableEncryption && (
+                      <div className={styles.encryptionRow}>
+                        <TextInputField
+                          name="encryption_password"
+                          label={Messages.encryptionPassword}
+                          placeholder={Messages.encryptionPasswordPlaceholder}
+                          validators={[validators.required]}
+                        />
+                      </div>
+                    )}
                     <div className={styles.submitButton}>
                       <LoaderButton
                         data-testid="create-dataset-submit-button"

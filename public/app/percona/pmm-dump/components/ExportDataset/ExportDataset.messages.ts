@@ -13,6 +13,11 @@ export const Messages = {
   date: 'Date',
   ignoreLoad: 'Ignore load',
   qan: 'Export QAN',
+  enableEncryption: 'Enable encryption',
+  // todo: add tooltip
+  enableEncryptionTooltip: '',
+  encryptionPassword: 'Encryption password',
+  encryptionPasswordPlaceholder: 'Password',
   ignoreLoadTooltip: 'Bypass the default resource limit restrictions to export faster.',
   qanTootltip: 'Include Query Analytics (QAN) metrics alongside core metrics in the export.',
   allServices: 'All Services',

@@ -163,10 +163,10 @@ export const PMMDump = () => {
 
   const onDownload = (value?: PMMDumpServices) => {
     if (value) {
-      dispatch(downloadPmmDumpAction([value.dumpId]));
+      dispatch(downloadPmmDumpAction([value]));
     } else if (selectedRows.length > 0) {
-      const dumpIds = selectedRows.map((item) => item.original.dumpId);
-      dispatch(downloadPmmDumpAction(dumpIds));
+      const dumps = selectedRows.map((item) => item.original);
+      dispatch(downloadPmmDumpAction(dumps));
     }
   };
 
