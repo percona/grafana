@@ -208,7 +208,7 @@ const ExportDataset: FC = () => {
                     {values.enableEncryption && (
                       <div className={styles.encryptionRow}>
                         <TextInputField
-                          name="encryption_password"
+                          name="encryptionPassword"
                           label={Messages.encryptionPassword}
                           placeholder={Messages.encryptionPasswordPlaceholder}
                           validators={[validators.required]}
