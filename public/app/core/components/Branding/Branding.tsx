@@ -12,7 +12,7 @@ export interface BrandComponentProps {
 export const LoginLogo: FC<BrandComponentProps & { logo?: string }> = ({ className, logo }) => {
   // return <img className={className} src={`${logo ? logo : 'public/img/grafana_icon.svg'}`} alt="Grafana" />;
   // @PERCONA
-  return <img className={className} src={`${logo ? logo : 'public/img/percona-logo.svg'}`} alt="PMM" />;
+  return <img className={className} src={`${logo ? logo : 'public/img/icons/mono/pmm-logo.svg'}`} alt="PMM" />;
 };
 
 const LoginBackground: FC<BrandComponentProps> = ({ className, children }) => {

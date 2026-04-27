@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { config } from '@grafana/runtime';
-import { Button, HorizontalGroup, Icon, Modal, useStyles2, useTheme2 } from '@grafana/ui';
+import { Button, HorizontalGroup, Icon, Modal, useStyles2 } from '@grafana/ui';
 import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
 import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
@@ -12,6 +12,7 @@ import { useSelector } from 'app/types';
 
 import { Telemetry } from '../../../ui-events/components/Telemetry';
 import usePerconaTour from '../../core/hooks/tour';
+import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 import { checkUpdatesAction } from '../../core/reducers/updates';
 import { logger } from '../../helpers/logger';
 import { isPmmAdmin, isViewer } from '../../helpers/permissions';
@@ -23,7 +24,6 @@ import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
 import PerconaTourBootstrapper from './PerconaTour';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 import { isPmmNavEnabled } from '../../helpers/plugin';
-import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
@@ -35,7 +35,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const styles = useStyles2(getStyles);
   const { user } = config.bootData;
   const { isSignedIn } = user;
-  const theme = useTheme2();
 
   const dismissModal = () => {
     setModalIsOpen(false);
@@ -117,7 +116,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
         showTour && (
           <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title={Messages.title}>
             <div className={styles.iconContainer}>
-              <Icon type="mono" name={theme.isLight ? 'pmm-logo-light' : 'pmm-logo'} className={styles.svg} />
+              <Icon type="mono" name="pmm-logo" className={styles.svg} />
             </div>
             <p>
               <strong>{Messages.pmm}</strong>
