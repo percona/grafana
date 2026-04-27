@@ -11,7 +11,4 @@ export const Messages = {
   backup: 'Back up your critical data with zero-downtime and minimal performance impact.',
   moreInfo: 'For more information, please check out the ',
   pmmOnlineHelp: 'PMM online help',
-  skip: 'Skip',
-  checkLater: 'Check later',
-  startTour: 'Start tour',
 };
