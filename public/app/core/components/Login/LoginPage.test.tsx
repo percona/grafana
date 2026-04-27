@@ -34,7 +34,6 @@ jest.mock('@grafana/runtime', () => ({
 }));
 
 describe('Login Page', () => {
-
   beforeEach(() => {
     jest.resetAllMocks();
   });

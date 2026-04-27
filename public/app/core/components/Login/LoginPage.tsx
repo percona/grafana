@@ -38,7 +38,7 @@ const LoginPage = () => {
         skipPasswordChange,
         isChangingPassword,
         showDefaultPasswordWarning,
-        loginErrorMessage
+        loginErrorMessage,
       }) => (
         <LoginLayout isChangingPassword={isChangingPassword}>
           {!isChangingPassword && !showPasswordlessConfirmation && (

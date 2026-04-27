@@ -247,8 +247,7 @@ export class LoginCtrl extends PureComponent<Props, State> {
 
   render() {
     const { children } = this.props;
-    const { isLoggingIn, isChangingPassword, showDefaultPasswordWarning, loginErrorMessage } =
-      this.state;
+    const { isLoggingIn, isChangingPassword, showDefaultPasswordWarning, loginErrorMessage } = this.state;
     const { login, toGrafana, changePassword, passwordlessStart, passwordlessConfirm } = this;
     const { loginHint, passwordHint, disableLoginForm, disableUserSignUp } = config;
 
