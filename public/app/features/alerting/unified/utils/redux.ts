@@ -7,12 +7,9 @@ import { appEvents } from 'app/core/app_events';
 import { LogMessages, logInfo } from '../Analytics';
 
 import { isErrorLike } from './misc';
-<<<<<<< PMM-14213-grafana-12.3.1
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { PERCONA_CANCELLED_ERROR_NAME } from 'app/percona/shared/core';
-=======
 import { AxiosError } from 'axios';
->>>>>>> main
 
 export interface AsyncRequestState<T> {
   result?: T;
