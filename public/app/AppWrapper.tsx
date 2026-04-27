@@ -25,7 +25,6 @@ import { LiveConnectionWarning } from './features/live/LiveConnectionWarning';
 import { ExtensionRegistriesProvider } from './features/plugins/extensions/ExtensionRegistriesContext';
 import { pluginExtensionRegistries } from './features/plugins/extensions/registry/setup';
 import { PerconaBootstrapper } from './percona/shared/components/PerconaBootstrapper';
-import PerconaTourProvider from './percona/tour/TourProvider';
 import { ExperimentalSplitPaneRouterWrapper, RouterWrapper } from './routes/RoutesWrapper';
 
 interface AppWrapperProps {
@@ -128,24 +127,22 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
                   actions={[]}
                   options={{ enableHistory: true, callbacks: { onSelectAction: commandPaletteActionSelected } }}
                 >
-                  <PerconaTourProvider>
-                    <GlobalStyles />
-                    <MaybeTimeRangeProvider>
-                      <SidecarContext_EXPERIMENTAL.Provider value={sidecarServiceSingleton_EXPERIMENTAL}>
-                        <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
-                          <div className="grafana-app">
-                            {config.featureToggles.appSidecar ? (
-                              <ExperimentalSplitPaneRouterWrapper {...routerWrapperProps} />
-                            ) : (
-                              <RouterWrapper {...routerWrapperProps} />
-                            )}
-                            <LiveConnectionWarning />
-                            <PortalContainer />
-                          </div>
-                        </ExtensionRegistriesProvider>
-                      </SidecarContext_EXPERIMENTAL.Provider>
-                    </MaybeTimeRangeProvider>
-                  </PerconaTourProvider>
+                  <GlobalStyles />
+                  <MaybeTimeRangeProvider>
+                    <SidecarContext_EXPERIMENTAL.Provider value={sidecarServiceSingleton_EXPERIMENTAL}>
+                      <ExtensionRegistriesProvider registries={pluginExtensionRegistries}>
+                        <div className="grafana-app">
+                          {config.featureToggles.appSidecar ? (
+                            <ExperimentalSplitPaneRouterWrapper {...routerWrapperProps} />
+                          ) : (
+                            <RouterWrapper {...routerWrapperProps} />
+                          )}
+                          <LiveConnectionWarning />
+                          <PortalContainer />
+                        </div>
+                      </ExtensionRegistriesProvider>
+                    </SidecarContext_EXPERIMENTAL.Provider>
+                  </MaybeTimeRangeProvider>
                 </KBarProvider>
               </CacheProvider>
             </ThemeProvider>

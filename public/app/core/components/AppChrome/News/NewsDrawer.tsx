@@ -4,6 +4,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { IconButton, Drawer, useStyles2, Text } from '@grafana/ui';
 import { t } from 'app/core/internationalization';
+import { DEFAULT_FEED_URL } from 'app/plugins/panel/news/constants';
 
 import { NewsWrapper } from './NewsWrapper';
 
@@ -20,15 +21,14 @@ export function NewsContainer({ onClose }: NewsContainerProps) {
       title={
         <div className={styles.title}>
           <Text element="h2">{t('news.title', 'Latest from the blog')}</Text>
-          {/* @PERCONA - point to percona blog */}
           <a
-            href="https://www.percona.com/blog/"
+            href="https://grafana.com/blog/"
             target="_blank"
             rel="noreferrer"
-            title="Go to Percona blog"
+            title="Go to Grafana labs blog"
             className={styles.grot}
           >
-            <img src="public/img/percona-logo.svg" alt="Percona logo" />
+            <img src="public/img/grot-news.svg" alt="Grot reading news" />
           </a>
           <div className={styles.actions}>
             <IconButton
@@ -44,8 +44,7 @@ export function NewsContainer({ onClose }: NewsContainerProps) {
       onClose={onClose}
       size="md"
     >
-      {/* @PERCONA */}
-      <NewsWrapper feedUrl="/percona-blog/feed" />
+      <NewsWrapper feedUrl={DEFAULT_FEED_URL} />
     </Drawer>
   );
 }
