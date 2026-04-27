@@ -7,7 +7,6 @@ import { useLocalStorage } from 'react-use';
 import { FeatureState, GrafanaTheme2, NavModelItem, toIconName } from '@grafana/data';
 import { useStyles2, Text, IconButton, Icon, Stack, FeatureBadge } from '@grafana/ui';
 import { useGrafana } from 'app/core/context/GrafanaContext';
-import { Dot } from 'app/percona/shared/components/Elements/Dot';
 
 import { Indent } from '../../Indent/Indent';
 
@@ -88,11 +87,7 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
       >
         {level !== 0 && <Indent level={level === MAX_DEPTH ? level - 1 : level} spacing={3} />}
         {level === MAX_DEPTH && <div className={styles.itemConnector} />}
-        <div
-          // @PERCONA
-          aria-label={link.text}
-          className={styles.collapsibleSectionWrapper}
-        >
+        <div className={styles.collapsibleSectionWrapper}>
           <MegaMenuItemText
             isActive={isActive}
             onClick={() => {
@@ -107,30 +102,11 @@ export function MegaMenuItem({ link, activeItem, level = 0, onClick, onPin, isPi
             <div
               className={cx(styles.labelWrapper, {
                 [styles.hasActiveChild]: hasActiveChild,
-                // @PERCONA - show icons for inner items
-                [styles.labelWrapperWithIcon]: Boolean(level <= 1 && link.icon),
+                [styles.labelWrapperWithIcon]: Boolean(level === 0 && iconElement),
               })}
             >
-              {/* @PERCONA - show icons for inner items */}
-              {level <= 1 && link.icon && (
-                <FeatureHighlightWrapper>
-                  <>
-                    <Icon
-                      className={cx(styles.icon, level > 0 && styles.deepIcon)}
-                      name={toIconName(link.icon) ?? 'link'}
-                      size={level === 0 ? 'lg' : 'md'}
-                    />
-                    {/* @PERCONA */}
-                    {!!link.showDot && <Dot left={23} top={0} />}
-                  </>
-                </FeatureHighlightWrapper>
-              )}
-              {/* @PERCONA */}
-              <div className={styles.relativeText}>
-                <Text truncate>{link.text}</Text>
-                {/* @PERCONA */}
-                {!!link.showDot && !link.icon && <Dot right={-8} top={2} />}
-              </div>
+              {level === 0 && iconElement && <FeatureHighlightWrapper>{iconElement}</FeatureHighlightWrapper>}
+              <Text truncate>{link.text}</Text>
               {link.isNew && <FeatureBadge featureState={FeatureState.new} />}
             </div>
           </MegaMenuItemText>
@@ -249,14 +225,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     color: theme.colors.text.secondary,
     fontStyle: 'italic',
     padding: theme.spacing(1, 1.5, 1, 7),
-  }),
-  // @PERCONA
-  relativeText: css({
-    position: 'relative',
-  }),
-  // @PERCONA
-  deepIcon: css({
-    marginRight: theme.spacing(-1.5),
   }),
 });
 
