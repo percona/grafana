@@ -310,7 +310,6 @@
     "@react-aria/overlays": "3.25.0",
     "@react-aria/utils": "3.27.0",
     "@react-awesome-query-builder/ui": "6.6.4",
-    "@reactour/tour": "^3.0.0",
     "@reduxjs/toolkit": "2.5.1",
     "@testing-library/react-hooks": "^8.0.1",
     "@visx/event": "3.12.0",
