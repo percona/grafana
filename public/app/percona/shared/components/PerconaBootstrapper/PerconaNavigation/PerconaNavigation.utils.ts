@@ -1,9 +1,14 @@
-import { NavIndex, NavModelItem } from "@grafana/data";
-import config from "app/core/config";
-import { isViewer } from "app/percona/shared/helpers/permissions";
-import { CategorizedAdvisor } from "app/percona/shared/services/advisors/Advisors.types";
+import { NavIndex, NavModelItem } from '@grafana/data';
+import config from 'app/core/config';
+import { isViewer } from 'app/percona/shared/helpers/permissions';
+import { CategorizedAdvisor } from 'app/percona/shared/services/advisors/Advisors.types';
 
-import { PMM_ACCESS_ROLES_PAGE, PMM_ALERTING_FIRED_ALERTS, PMM_ALERTING_PERCONA_ALERTS, WEIGHTS } from "./PerconaNavigation.constants";
+import {
+  PMM_ACCESS_ROLES_PAGE,
+  PMM_ALERTING_FIRED_ALERTS,
+  PMM_ALERTING_PERCONA_ALERTS,
+  WEIGHTS,
+} from './PerconaNavigation.constants';
 
 export const buildAdvisorsNavItem = (categorizedAdvisors: CategorizedAdvisor) => {
   const modelItem: NavModelItem = {
