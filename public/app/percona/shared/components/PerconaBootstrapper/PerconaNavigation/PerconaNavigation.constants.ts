@@ -104,7 +104,6 @@ export const PMM_UPDATES_LINK: NavModelItem = {
   url: '/pmm-ui/updates',
   hideFromTabs: true,
   target: '_self',
-  showDot: false,
 };
 
 export const PMM_HEADING_LINK: NavModelItem = {
@@ -346,7 +345,6 @@ export const PMM_NAV_MYSQL: NavModelItem = {
       text: 'High availability',
       icon: 'percona-cluster',
       hideFromTabs: true,
-      showChildren: true,
       url: `${config.appSubUrl}/d/mysql-group-replicaset-summary`,
       children: [
         {
@@ -453,7 +451,6 @@ export const PMM_NAV_MONGO: NavModelItem = {
       text: 'High availability',
       icon: 'percona-cluster',
       hideFromTabs: true,
-      showChildren: true,
       url: `${config.appSubUrl}/d/mongodb-cluster-summary`,
       children: [
         {
@@ -530,7 +527,6 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
       text: 'High availability',
       icon: 'percona-cluster',
       hideFromTabs: true,
-      showChildren: true,
       url: `${config.appSubUrl}/d/postgresql-replication-overview`,
       children: [
         {

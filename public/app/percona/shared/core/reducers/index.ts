@@ -3,6 +3,7 @@ import { combineReducers, createAsyncThunk } from '@reduxjs/toolkit';
 import { CancelToken } from 'axios';
 
 import { config } from '@grafana/runtime';
+import appEvents from 'app/core/app_events';
 import { createAsyncSlice, withAppEvents, withSerializedError } from 'app/features/alerting/unified/utils/redux';
 import { AlertRuleTemplateService } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.service';
 import { TemplatesList } from 'app/percona/integrated-alerting/components/AlertRuleTemplate/AlertRuleTemplate.types';
@@ -11,6 +12,7 @@ import { Settings, SettingsAPIChangePayload } from 'app/percona/settings/Setting
 import { uiEventsReducer } from 'app/percona/ui-events/reducer';
 
 import { isPmmAdmin } from '../../helpers/permissions';
+import { SettingsUpdatedEvent } from '../events';
 
 import advisorsReducers from './advisors/advisors';
 import perconaBackupLocations from './backups/backupLocations';
@@ -20,12 +22,9 @@ import nodesReducer from './nodes';
 import pmmDumpsReducers from './pmmDump/pmmDump';
 import rolesReducers from './roles/roles';
 import servicesReducer from './services';
-import tourReducer from './tour/tour';
 import updatesReducers from './updates';
 import perconaUserReducers from './user/user';
 import usersReducers from './users/users';
-import appEvents from 'app/core/app_events';
-import { SettingsUpdatedEvent } from '../events';
 
 const initialSettingsState: Settings = {
   updatesEnabled: false,
@@ -151,7 +150,6 @@ export default {
     services: servicesReducer,
     nodes: nodesReducer,
     backupLocations: perconaBackupLocations,
-    tour: tourReducer,
     telemetry: uiEventsReducer,
     roles: rolesReducers,
     users: usersReducers,
