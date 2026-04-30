@@ -177,46 +177,6 @@ export const PMM_ACCESS_ROLES_PAGE: NavModelItem = {
   text: 'Access Roles',
 };
 
-export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
-  const children: NavModelItem[] = [
-    {
-      id: 'settings-metrics-resolution',
-      text: 'Metrics Resolution',
-      url: `${config.appSubUrl}/settings/metrics-resolution`,
-    },
-    {
-      id: 'settings-advanced',
-      text: 'Advanced Settings',
-      url: `${config.appSubUrl}/settings/advanced-settings`,
-    },
-    {
-      id: 'settings-ssh',
-      text: 'SSH Key',
-      url: `${config.appSubUrl}/settings/ssh-key`,
-    },
-  ];
-
-  // TODO remove after integrating SMTP/slack with Grafana's alerting system
-  // if (alertingEnabled) {
-  //   children.push({
-  //     id: 'settings-communication',
-  //     text: 'Communication',
-  //     url: `${config.appSubUrl}/settings/communication`,
-  //   });
-  // }
-  const page: NavModelItem = {
-    id: 'settings',
-    icon: 'percona-setting',
-    text: 'Settings',
-    sortWeight: WEIGHTS.config,
-    url: `${config.appSubUrl}/settings`,
-    subTitle: 'Percona Settings',
-    children,
-  };
-
-  return page;
-};
-
 /**
  * Mapping of menu items id to folders name.
  *
