@@ -651,6 +651,13 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
+      path: '/settings/*',
+      // eslint-disable-next-line react/display-name
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "RedirectPage" */ 'app/percona/redirect/RedirectPage')
+      ),
+    },
+    {
       path: '/inventory',
       // eslint-disable-next-line react/display-name
       component: () => <Navigate replace to="/inventory/services" />,
