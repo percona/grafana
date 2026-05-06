@@ -33,9 +33,5 @@ export function buildQuickInstallCommand(tech: QuickInstallTech, token?: string)
     '--pmm-server-insecure-tls',
   ];
 
-  return [
-    curl,
-    `sudo -E bash ${shellEscape(DOWNLOADED_SCRIPT_PATH)} \\`,
-    `  ${flags.join(' \\\n  ')}`,
-  ].join('\n');
+  return [curl, `sudo -E bash ${shellEscape(DOWNLOADED_SCRIPT_PATH)} \\`, `  ${flags.join(' \\\n  ')}`].join('\n');
 }

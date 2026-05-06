@@ -4,7 +4,19 @@ import { Form } from 'react-final-form';
 import { Row } from 'react-table';
 
 import { AppEvents } from '@grafana/data';
-import { Badge, Button, Dropdown, HorizontalGroup, Icon, Link, Menu, Modal, Stack, TagList, useStyles2 } from '@grafana/ui';
+import {
+  Badge,
+  Button,
+  Dropdown,
+  HorizontalGroup,
+  Icon,
+  Link,
+  Menu,
+  Modal,
+  Stack,
+  TagList,
+  useStyles2,
+} from '@grafana/ui';
 import { CheckboxField } from 'app/percona/shared/components/Elements/Checkbox';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { FeatureLoader } from 'app/percona/shared/components/Elements/FeatureLoader';
@@ -351,31 +363,29 @@ export const NodesTab = () => {
     setSelectedRows(rows);
   }, []);
 
-  const copyQuickInstallWithToken = useCallback(
-    async (tech: QuickInstallTech) => {
-      setInstallTokenLoading(true);
+  const copyQuickInstallWithToken = useCallback(async (tech: QuickInstallTech) => {
+    setInstallTokenLoading(true);
+    try {
+      const res = await api.post<{ token: string }, { ttlSeconds: number; technology: QuickInstallTech }>(
+        MANAGEMENT_CREATE_NODE_INSTALL_TOKEN_PATH,
+        { ttlSeconds: 0, technology: tech },
+        true
+      );
+      const cmd = buildQuickInstallCommand(tech, res.token);
       try {
-        const res = await api.post<
-          { token: string },
-          { ttlSeconds: number; technology: QuickInstallTech }
-        >(MANAGEMENT_CREATE_NODE_INSTALL_TOKEN_PATH, { ttlSeconds: 0, technology: tech }, true);
-        const cmd = buildQuickInstallCommand(tech, res.token);
-        try {
-          await navigator.clipboard.writeText(cmd);
-          appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.addNodeCommandCopied]);
-        } catch (clipErr) {
-          logger.error(clipErr);
-          appEvents.emit(AppEvents.alertError, [Messages.nodes.addNodeCommandCopyFailed]);
-        }
-      } catch (e) {
-        logger.error(e);
-        appEvents.emit(AppEvents.alertError, [Messages.nodes.addNodeTokenFailed]);
-      } finally {
-        setInstallTokenLoading(false);
+        await navigator.clipboard.writeText(cmd);
+        appEvents.emit(AppEvents.alertSuccess, [Messages.nodes.addNodeCommandCopied]);
+      } catch (clipErr) {
+        logger.error(clipErr);
+        appEvents.emit(AppEvents.alertError, [Messages.nodes.addNodeCommandCopyFailed]);
       }
-    },
-    []
-  );
+    } catch (e) {
+      logger.error(e);
+      appEvents.emit(AppEvents.alertError, [Messages.nodes.addNodeTokenFailed]);
+    } finally {
+      setInstallTokenLoading(false);
+    }
+  }, []);
 
   const addNodeAdvancedHref =
     typeof window !== 'undefined' ? `${window.location.origin}/pmm-ui/install-client` : '/pmm-ui/install-client';
@@ -411,12 +421,7 @@ export const NodesTab = () => {
                 )}
                 placement="bottom-start"
               >
-                <Button
-                  variant="primary"
-                  size="md"
-                  icon="angle-down"
-                  disabled={installTokenLoading}
-                >
+                <Button variant="primary" size="md" icon="angle-down" disabled={installTokenLoading}>
                   {Messages.nodes.addNodeButton}
                 </Button>
               </Dropdown>
