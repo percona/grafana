@@ -30,22 +30,18 @@ const DeprecationTooltipContent: FC = () => {
       <strong>UI upgrades deprecated</strong>: This upgrade panel will be removed in PMM 3.9.0.
       <br />
       Use&nbsp;
-      <a
-        className={tooltipStyles.link}
-        href={DEPRECATION_DOCKER_UPGRADE_HREF}
-        target="_blank"
-        rel="noreferrer"
-      >Docker</a> (recommended), <a
-        className={tooltipStyles.link}
-        href={DEPRECATION_PODMAN_UPGRADE_HREF}
-        target="_blank"
-        rel="noreferrer"
-      >Podman</a>, or <a
-        className={tooltipStyles.link}
-        href={DEPRECATION_HELM_UPGRADE_HREF}
-        target="_blank"
-        rel="noreferrer"
-      >Helm</a> for future PMM upgrades.
+      <a className={tooltipStyles.link} href={DEPRECATION_DOCKER_UPGRADE_HREF} target="_blank" rel="noreferrer">
+        Docker
+      </a>{' '}
+      (recommended),{' '}
+      <a className={tooltipStyles.link} href={DEPRECATION_PODMAN_UPGRADE_HREF} target="_blank" rel="noreferrer">
+        Podman
+      </a>
+      , or{' '}
+      <a className={tooltipStyles.link} href={DEPRECATION_HELM_UPGRADE_HREF} target="_blank" rel="noreferrer">
+        Helm
+      </a>{' '}
+      for future PMM upgrades.
     </>
   );
 };
