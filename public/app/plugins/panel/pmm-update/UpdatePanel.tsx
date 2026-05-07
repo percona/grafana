@@ -1,7 +1,7 @@
 import { FC, MouseEvent, useState } from 'react';
 
 import { locationService } from '@grafana/runtime';
-import { Button, Icon, Spinner, Stack, Tooltip, useStyles2 } from '@grafana/ui';
+import { Button, Spinner, Tooltip, useStyles2 } from '@grafana/ui';
 import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
 import { checkUpdatesAction } from 'app/percona/shared/core/reducers/updates';
 import { getPerconaUser, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
