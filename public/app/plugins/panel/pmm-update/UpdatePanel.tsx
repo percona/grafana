@@ -95,11 +95,8 @@ export const UpdatePanel: FC = () => {
             {(updateAvailable || forceUpdate) && settings?.updatesEnabled && isAuthorized && isOnline ? (
               <div className={styles.middleSectionWrapper}>
                 <Tooltip interactive content={<DeprecationTooltipContent />}>
-                  <Button onClick={handleOpenUpdates} variant="secondary">
-                    <Stack direction="row" gap={0.5} alignItems="center">
-                      <Icon name="exclamation-triangle" />
-                      <span>{!!latest?.version ? Messages.upgradeTo(latest.version) : Messages.upgrade}</span>
-                    </Stack>
+                  <Button onClick={handleOpenUpdates} variant="secondary" icon="exclamation-triangle">
+                    {!!latest?.version ? Messages.upgradeTo(latest.version) : Messages.upgrade}
                   </Button>
                 </Tooltip>
               </div>
