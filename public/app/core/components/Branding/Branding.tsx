@@ -54,7 +54,7 @@ const LoginBackground: FC<BrandComponentProps> = ({ className, children }) => {
 const MenuLogo: FC<BrandComponentProps> = ({ className }) => {
   // return <img className={className} src="public/img/grafana_icon.svg" alt="Grafana" />;
   // @PERCONA
-  return <img className={className} src="public/img/pmm-app-rounded-icon.svg" alt="PMM" />;
+  return <img className={className} src="public/img/percona-logo.svg" alt="PMM" />;
 };
 
 /**
