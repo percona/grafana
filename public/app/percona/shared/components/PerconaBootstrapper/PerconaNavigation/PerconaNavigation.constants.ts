@@ -104,7 +104,6 @@ export const PMM_UPDATES_LINK: NavModelItem = {
   url: '/pmm-ui/updates',
   hideFromTabs: true,
   target: '_self',
-  showDot: false,
 };
 
 export const PMM_HEADING_LINK: NavModelItem = {
@@ -176,46 +175,6 @@ export const PMM_ACCESS_ROLES_PAGE: NavModelItem = {
   icon: 'user-square',
   url: `${config.appSubUrl}/roles`,
   text: 'Access Roles',
-};
-
-export const getPmmSettingsPage = (alertingEnabled = false): NavModelItem => {
-  const children: NavModelItem[] = [
-    {
-      id: 'settings-metrics-resolution',
-      text: 'Metrics Resolution',
-      url: `${config.appSubUrl}/settings/metrics-resolution`,
-    },
-    {
-      id: 'settings-advanced',
-      text: 'Advanced Settings',
-      url: `${config.appSubUrl}/settings/advanced-settings`,
-    },
-    {
-      id: 'settings-ssh',
-      text: 'SSH Key',
-      url: `${config.appSubUrl}/settings/ssh-key`,
-    },
-  ];
-
-  // TODO remove after integrating SMTP/slack with Grafana's alerting system
-  // if (alertingEnabled) {
-  //   children.push({
-  //     id: 'settings-communication',
-  //     text: 'Communication',
-  //     url: `${config.appSubUrl}/settings/communication`,
-  //   });
-  // }
-  const page: NavModelItem = {
-    id: 'settings',
-    icon: 'percona-setting',
-    text: 'Settings',
-    sortWeight: WEIGHTS.config,
-    url: `${config.appSubUrl}/settings`,
-    subTitle: 'Percona Settings',
-    children,
-  };
-
-  return page;
 };
 
 /**
@@ -346,7 +305,6 @@ export const PMM_NAV_MYSQL: NavModelItem = {
       text: 'High availability',
       icon: 'percona-cluster',
       hideFromTabs: true,
-      showChildren: true,
       url: `${config.appSubUrl}/d/mysql-group-replicaset-summary`,
       children: [
         {
@@ -453,7 +411,6 @@ export const PMM_NAV_MONGO: NavModelItem = {
       text: 'High availability',
       icon: 'percona-cluster',
       hideFromTabs: true,
-      showChildren: true,
       url: `${config.appSubUrl}/d/mongodb-cluster-summary`,
       children: [
         {
@@ -530,7 +487,6 @@ export const PMM_NAV_POSTGRE: NavModelItem = {
       text: 'High availability',
       icon: 'percona-cluster',
       hideFromTabs: true,
-      showChildren: true,
       url: `${config.appSubUrl}/d/postgresql-replication-overview`,
       children: [
         {

@@ -1,56 +1,104 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { config } from '@grafana/runtime';
-import { Button, HorizontalGroup, Icon, Modal, useStyles2, useTheme2 } from '@grafana/ui';
+import { buildInitialState, updateNavIndex } from 'app/core/reducers/navModel';
 import { fetchSettingsAction } from 'app/percona/shared/core/reducers';
 import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisors';
-import { TourType } from 'app/percona/shared/core/reducers/tour/tour.types';
 import { fetchUserDetailsAction, setAuthorized } from 'app/percona/shared/core/reducers/user/user';
-import { getUpdatesInfo } from 'app/percona/shared/core/selectors';
+import { getCategorizedAdvisors, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
 import { useSelector } from 'app/types';
 
 import { Telemetry } from '../../../ui-events/components/Telemetry';
-import usePerconaTour from '../../core/hooks/tour';
+import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
 import { checkUpdatesAction } from '../../core/reducers/updates';
 import { logger } from '../../helpers/logger';
 import { isPmmAdmin, isViewer } from '../../helpers/permissions';
-
-import { Messages } from './PerconaBootstrapper.messages';
-import { getStyles } from './PerconaBootstrapper.styles';
-import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
-import PerconaNavigation from './PerconaNavigation/PerconaNavigation';
-import PerconaTourBootstrapper from './PerconaTour';
-import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 import { isPmmNavEnabled } from '../../helpers/plugin';
-import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
+
+import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
+import {
+  buildAdvisorsNavItem,
+  buildIntegratedAlertingMenuItem,
+  buildUsersAndAccessNavWithRoles,
+  getPmmSettingsPage,
+  PMM_ACCESS_ROLE_CREATE_PAGE,
+  PMM_ACCESS_ROLE_EDIT_PAGE,
+  PMM_ACCESS_ROLES_PAGE,
+  PMM_ADD_INSTANCE_PAGE,
+  PMM_BACKUP_PAGE,
+  PMM_DUMP_PAGE,
+  PMM_EDIT_INSTANCE_PAGE,
+  PMM_EXPORT_DUMP_PAGE,
+  PMM_INVENTORY_PAGE,
+} from './PerconaNavigation';
+import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
 
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const dispatch = useAppDispatch();
-  const { setSteps, startTour: startPerconaTour, endTour } = usePerconaTour();
+  const categorizedAdvisors = useSelector(getCategorizedAdvisors);
+  const { result: settings } = useSelector(getPerconaSettings);
   const { updateAvailable, isLoading: isLoadingUpdates, showUpdateModal } = useSelector(getUpdatesInfo);
-  const [modalIsOpen, setModalIsOpen] = useState(true);
-  const [showTour, setShowTour] = useState(false);
-  const styles = useStyles2(getStyles);
   const { user } = config.bootData;
   const { isSignedIn } = user;
-  const theme = useTheme2();
 
-  const dismissModal = () => {
-    setModalIsOpen(false);
-  };
+  useEffect(() => {
+    const updateNavTree = async () => {
+      const updatedNavTree = buildInitialState();
+      const { alertingEnabled } = settings || {};
 
-  const finishTour = () => {
-    setModalIsOpen(false);
-    setShowTour(false);
-    endTour(TourType.Product);
-  };
+      await dispatch(updateNavIndex(PMM_EXPORT_DUMP_PAGE));
+      await dispatch(updateNavIndex(PMM_BACKUP_PAGE));
+      await dispatch(updateNavIndex(PMM_INVENTORY_PAGE));
+      await dispatch(updateNavIndex(PMM_ADD_INSTANCE_PAGE));
+      await dispatch(updateNavIndex(PMM_EDIT_INSTANCE_PAGE));
+      await dispatch(updateNavIndex(PMM_ACCESS_ROLE_CREATE_PAGE));
+      await dispatch(updateNavIndex(PMM_ACCESS_ROLE_EDIT_PAGE));
+      await dispatch(updateNavIndex(getPmmSettingsPage()));
+      await dispatch(updateNavIndex(buildAdvisorsNavItem(categorizedAdvisors)));
 
-  const startTour = () => {
-    setModalIsOpen(false);
-    startPerconaTour(TourType.Product);
-  };
+      if (isPmmAdmin(config.bootData.user)) {
+        // PMM Dump
+        const help = updatedNavTree['help'];
+        if (help) {
+          dispatch(updateNavIndex(PMM_DUMP_PAGE));
+          dispatch(updateNavIndex(help));
+        }
+
+        if (settings?.enableAccessControl) {
+          const cfg = updatedNavTree['cfg'];
+          const usersAndAccessWithRoles = buildUsersAndAccessNavWithRoles(updatedNavTree);
+
+          // Apply cfg first so navIndex is populated from boot nav; then merge Users and access (includes Access Roles).
+          if (cfg) {
+            dispatch(updateNavIndex(cfg));
+          }
+          if (usersAndAccessWithRoles) {
+            dispatch(updateNavIndex(usersAndAccessWithRoles));
+          } else {
+            dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
+          }
+        }
+      } else {
+        const usersAndAccessWithRoles = buildUsersAndAccessNavWithRoles(updatedNavTree);
+        if (usersAndAccessWithRoles) {
+          dispatch(updateNavIndex(usersAndAccessWithRoles));
+        } else {
+          dispatch(updateNavIndex(PMM_ACCESS_ROLES_PAGE));
+        }
+      }
+
+      if (alertingEnabled) {
+        const integratedAlertingMenuItem = buildIntegratedAlertingMenuItem(updatedNavTree);
+        if (integratedAlertingMenuItem) {
+          dispatch(updateNavIndex(integratedAlertingMenuItem));
+        }
+      }
+    };
+
+    updateNavTree();
+  }, [dispatch, categorizedAdvisors, settings]);
 
   useEffect(() => {
     const getSettings = async () => {
@@ -69,16 +117,6 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
 
       return null;
     };
-
-    const getUserDetails = async () => {
-      try {
-        const details = await dispatch(fetchUserDetailsAction()).unwrap();
-        setShowTour(!details.productTourCompleted);
-      } catch (e) {
-        setShowTour(false);
-      }
-    };
-
     const bootstrap = async () => {
       const settings = await getSettings();
 
@@ -92,7 +130,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
         }
       }
 
-      await getUserDetails();
+      await dispatch(fetchUserDetailsAction());
       await dispatch(fetchHighAvailabilityStatus());
       onReady();
     };
@@ -102,63 +140,12 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     } else {
       onReady();
     }
-  }, [dispatch, isSignedIn, setSteps, onReady, user]);
+  }, [dispatch, isSignedIn, onReady, user]);
 
   return (
     <>
       {isSignedIn && <Telemetry />}
-      <PerconaNavigation />
-      {!isPmmNavEnabled() && <PerconaTourBootstrapper />}
-      {!isPmmNavEnabled() && updateAvailable && showUpdateModal && !isLoadingUpdates ? (
-        <PerconaUpdateVersion />
-      ) : (
-        !isPmmNavEnabled() &&
-        isSignedIn &&
-        showTour && (
-          <Modal onDismiss={dismissModal} isOpen={modalIsOpen} title={Messages.title}>
-            <div className={styles.iconContainer}>
-              <Icon type="mono" name={theme.isLight ? 'pmm-logo-light' : 'pmm-logo'} className={styles.svg} />
-            </div>
-            <p>
-              <strong>{Messages.pmm}</strong>
-              {Messages.pmmIs}
-            </p>
-            <p>
-              {Messages.pmmEnables}
-              <ul className={styles.list}>
-                <li>{Messages.spotCriticalPerformance}</li>
-                <li>{Messages.ensureDbPerformance}</li>
-                <li>{Messages.backup}</li>
-              </ul>
-            </p>
-            <p>
-              {Messages.moreInfo}
-              <a
-                href="https://per.co.na/pmm_documentation"
-                target="_blank"
-                rel="noreferrer noopener"
-                className={styles.docsLink}
-              >
-                {Messages.pmmOnlineHelp}
-              </a>
-              .
-            </p>
-            <HorizontalGroup justify="center" spacing="md">
-              <Button onClick={startTour} size="lg" className={styles.callToAction}>
-                {Messages.startTour}
-              </Button>
-            </HorizontalGroup>
-            <HorizontalGroup justify="flex-end" spacing="md">
-              <Button variant="secondary" onClick={finishTour}>
-                {Messages.skip}
-              </Button>
-              <Button variant="secondary" onClick={() => setModalIsOpen(false)}>
-                {Messages.checkLater}
-              </Button>
-            </HorizontalGroup>
-          </Modal>
-        )
-      )}
+      {!isPmmNavEnabled() && updateAvailable && showUpdateModal && !isLoadingUpdates && <PerconaUpdateVersion />}
     </>
   );
 };
