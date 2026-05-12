@@ -3,7 +3,9 @@ import { from, forkJoin, timeout, lastValueFrom, catchError, of } from 'rxjs';
 
 import { PanelPlugin, PluginError } from '@grafana/data';
 import { config, getBackendSrv, isFetchError } from '@grafana/runtime';
+import { appEvents } from 'app/core/app_events';
 import { importPanelPlugin } from 'app/features/plugins/importPanelPlugin';
+import { FrontendSettingsUpdatedEvent } from 'app/percona/shared/core/events';
 import { StoreState, ThunkResult } from 'app/types/store';
 
 import { clearPluginInfoInCache } from '../../loader/pluginInfoCache';
@@ -302,5 +304,9 @@ function updatePanels() {
     .get('/api/frontend/settings')
     .then((settings) => {
       config.panels = settings.panels;
+      // @PERCONA
+      // eslint-disable-next-line no-restricted-syntax
+      config.apps = settings.apps;
+      appEvents.publish(new FrontendSettingsUpdatedEvent());
     });
 }
