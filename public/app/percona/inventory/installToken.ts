@@ -1,4 +1,19 @@
+import { config } from '@grafana/runtime';
+
 import { api } from 'app/percona/shared/helpers/api';
+
+/**
+ * Grafana HTTP API path when `serve_from_sub_path` is true (PMM sets
+ * `root_url = https://…/graph`). Browser requests must use `/graph/api/…`,
+ * not `/api/…` — the latter hit the host root where nginx does not proxy
+ * to Grafana, so service-account calls would fail with 404.
+ *
+ * @param restPath Path after `/api`, e.g. `/serviceaccounts/search`.
+ */
+function grafanaHttpApiUrl(restPath: string): string {
+  const p = restPath.startsWith('/') ? restPath : `/${restPath}`;
+  return `${config.appSubUrl ?? ''}/api${p}`;
+}
 
 /**
  * Mints a short-lived Grafana service-account token used by the "Add Node"
@@ -9,8 +24,8 @@ import { api } from 'app/percona/shared/helpers/api';
  * the same job can be done by calling Grafana's serviceaccounts API
  * directly — we're already running inside Grafana with the user's session
  * cookie, so there is no extra trust boundary to add. Grafana enforces
- * Admin-only access to /api/serviceaccounts/*, which is the same gate the
- * removed backend had.
+ * Admin-only access to `{appSubUrl}/api/serviceaccounts/*`, which is the
+ * same gate the removed backend had.
  *
  * Lifecycle mirrors what the old backend did:
  *   - One shared service account per technology ("pmm-install-sa-<tech>"),
@@ -85,7 +100,7 @@ async function findServiceAccountIdByName(name: string): Promise<number | null> 
   // "Could not create install token" toast in the caller is the only one the
   // user sees on failure (api.post would otherwise emit its own toast).
   const res = await api.get<GrafanaServiceAccountSearch, { query: string }>(
-    '/api/serviceaccounts/search',
+    grafanaHttpApiUrl('/serviceaccounts/search'),
     true,
     { params: { query: name } }
   );
@@ -97,7 +112,7 @@ async function createServiceAccount(name: string): Promise<number> {
   // Admin role required — `pmm-admin config` / inventory writes need it in
   // real PMM setups, and Grafana itself only lets Admins POST to this route.
   const res = await api.post<GrafanaServiceAccount, { name: string; role: string; isDisabled: boolean }>(
-    '/api/serviceaccounts',
+    grafanaHttpApiUrl('/serviceaccounts'),
     { name, role: 'Admin', isDisabled: false },
     true
   );
@@ -109,7 +124,7 @@ async function mintToken(serviceAccountId: number, tokenName: string, ttlSeconds
   // observed to make some Grafana versions ignore secondsToLive and fall
   // back to a long default expiry.
   const res = await api.post<GrafanaTokenResponse, { name: string; secondsToLive: number }>(
-    `/api/serviceaccounts/${serviceAccountId}/tokens`,
+    grafanaHttpApiUrl(`/serviceaccounts/${serviceAccountId}/tokens`),
     { name: tokenName, secondsToLive: ttlSeconds },
     true
   );
