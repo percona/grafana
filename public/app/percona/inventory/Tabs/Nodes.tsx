@@ -30,7 +30,7 @@ import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/hig
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
 import { getHighAvailability, getNodes } from 'app/percona/shared/core/selectors';
-import { api, isApiCancelError } from 'app/percona/shared/helpers/api';
+import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndActionsCol';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { NodeType } from 'app/percona/shared/services/nodes/Nodes.types';
@@ -58,7 +58,7 @@ import {
   getBadgeTextForServiceStatus,
   getTagsFromLabels,
 } from './Services.utils';
-import { MANAGEMENT_CREATE_NODE_INSTALL_TOKEN_PATH } from '../managementApi.constants';
+import { createNodeInstallToken } from '../installToken';
 import { buildQuickInstallCommand, QuickInstallTech } from './NodesInstallCommand.utils';
 import { getStyles } from './Tabs.styles';
 import { DATA_INTERVAL } from 'app/percona/shared/core';
@@ -366,11 +366,7 @@ export const NodesTab = () => {
   const copyQuickInstallWithToken = useCallback(async (tech: QuickInstallTech) => {
     setInstallTokenLoading(true);
     try {
-      const res = await api.post<{ token: string }, { ttlSeconds: number; technology: QuickInstallTech }>(
-        MANAGEMENT_CREATE_NODE_INSTALL_TOKEN_PATH,
-        { ttlSeconds: 0, technology: tech },
-        true
-      );
+      const res = await createNodeInstallToken(tech);
       const cmd = buildQuickInstallCommand(tech, res.token);
       try {
         await navigator.clipboard.writeText(cmd);
