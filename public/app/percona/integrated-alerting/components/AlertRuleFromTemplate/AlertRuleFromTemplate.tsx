@@ -83,11 +83,11 @@ export const AlertRuleFromTemplate: FC = () => {
         disabled={isSubmitting}
       >
         {isSubmitting && <Spinner className={styles.buttonSpinner} inline={true} />}
-        <Trans i18nKey="alerting.alert-rule-form.action-buttons.save">Save rule and exit</Trans>
+        <Trans i18nKey="alerting.alert-rule-from-template.action-buttons.save">Save rule and exit</Trans>
       </Button>
       <Link to={returnTo}>
         <Button variant="secondary" disabled={isSubmitting} type="button" size="sm">
-          <Trans i18nKey="alerting.alert-rule-form.action-buttons.cancel">Cancel</Trans>
+          <Trans i18nKey="alerting.alert-rule-from-template.action-buttons.cancel">Cancel</Trans>
         </Button>
       </Link>
     </Stack>
