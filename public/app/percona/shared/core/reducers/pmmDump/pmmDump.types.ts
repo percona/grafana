@@ -26,7 +26,7 @@ export interface ExportDatasetProps {
   ignore_load: boolean;
   export_qan: boolean;
   enable_encryption: boolean;
-  encryption_password: string;
+  encryption_password?: string;
 }
 
 export interface ExportResponse {

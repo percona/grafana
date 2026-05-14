@@ -113,5 +113,5 @@ export interface ExportDatasetService {
   ignoreLoad: boolean;
   exportQan: boolean;
   enableEncryption: boolean;
-  encryptionPassword: string;
+  encryptionPassword?: string;
 }

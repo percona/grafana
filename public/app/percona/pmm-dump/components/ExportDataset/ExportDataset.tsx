@@ -7,13 +7,14 @@ import { SelectableValue, DateTime, dateTime, AppEvents, PageLayoutType } from '
 import { LinkButton, PageToolbar, DateTimePicker, useStyles2 } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
+import { PMMDumpService } from 'app/percona/pmm-dump/PMMDump.service';
 import { SwitchRow } from 'app/percona/settings/components/Advanced/SwitchRow';
 import { LoaderButton } from 'app/percona/shared/components/Elements/LoaderButton';
 import { MultiSelectField } from 'app/percona/shared/components/Form/MultiSelectField';
 import { PasswordInputField } from 'app/percona/shared/components/Form/PasswordInput';
 import { PMM_EXPORT_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
-import { triggerDumpAction } from 'app/percona/shared/core/reducers/pmmDump/pmmDump';
+import { mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
 import { fetchActiveServiceTypesAction, fetchServicesAction } from 'app/percona/shared/core/reducers/services';
 import { getServices } from 'app/percona/shared/core/selectors';
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
@@ -94,18 +95,24 @@ const ExportDataset: FC = () => {
       serviceList = [];
     }
 
-    await dispatch(
-      triggerDumpAction({
-        serviceNames: serviceList,
-        startTime: startDate.toISOString(),
-        endTime: endDate.toISOString(),
-        exportQan: !!data.QAN,
-        ignoreLoad: !!data.load,
-        enableEncryption: !!data.enableEncryption,
-        encryptionPassword: data.encryptionPassword,
-      })
-    );
-    history.push(DUMP_URL);
+    const encryptionEnabled = !!data.enableEncryption;
+
+    try {
+      await PMMDumpService.trigger(
+        mapExportData({
+          serviceNames: serviceList,
+          startTime: startDate.toISOString(),
+          endTime: endDate.toISOString(),
+          exportQan: !!data.QAN,
+          ignoreLoad: !!data.load,
+          enableEncryption: encryptionEnabled,
+          encryptionPassword: encryptionEnabled ? data.encryptionPassword : undefined,
+        })
+      );
+      history.push(DUMP_URL);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (

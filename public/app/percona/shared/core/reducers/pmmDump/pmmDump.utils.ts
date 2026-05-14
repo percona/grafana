@@ -9,7 +9,7 @@ export const mapDumps = (dumps: PmmDump[]): PMMDumpServices[] =>
     startTime: dump.start_time,
     endTime: dump.end_time,
     createdAt: dump.created_at,
-    encrypted: dump.encrypted,
+    encrypted: dump.encrypted ?? false,
   }));
 
 export const mapDumpServices = (dumps: PMMDumpServices[]): PmmDump[] =>
