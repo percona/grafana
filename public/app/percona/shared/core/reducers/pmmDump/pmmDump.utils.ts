@@ -12,7 +12,7 @@ export const mapDumps = (dumps: PmmDump[]): PMMDumpServices[] =>
     encrypted: dump.encrypted,
   }));
 
-export const mapDumpService = (dumps: PMMDumpServices[]): PmmDump[] =>
+export const mapDumpServices = (dumps: PMMDumpServices[]): PmmDump[] =>
   dumps.map((dump) => ({
     dump_id: dump.dumpId,
     status: dump.status,
@@ -20,7 +20,7 @@ export const mapDumpService = (dumps: PMMDumpServices[]): PmmDump[] =>
     start_time: dump.startTime,
     end_time: dump.endTime,
     created_at: dump.createdAt,
-    encrypted: dump.encrypted,
+    encrypted: dump.encrypted ?? false,
   }));
 
 export const mapExportData = (data: ExportDatasetService): ExportDatasetProps => ({

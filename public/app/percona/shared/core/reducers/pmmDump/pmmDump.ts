@@ -9,7 +9,7 @@ import {
   DumpLogs,
 } from 'app/percona/pmm-dump/PmmDump.types';
 import { PmmDumpState, LogsActionProps } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.types';
-import { mapDumps, mapDumpService, mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
+import { mapDumps, mapDumpServices, mapExportData } from 'app/percona/shared/core/reducers/pmmDump/pmmDump.utils';
 import { createAsyncThunk } from 'app/types';
 
 const initialState: PmmDumpState = {
@@ -83,7 +83,7 @@ export const downloadPmmDumpAction = createAsyncThunk(
   async (dumps: PMMDumpServices[]): Promise<void> =>
     withAppEvents(
       (async () => {
-        await PMMDumpService.downloadAll(mapDumpService(dumps));
+        await PMMDumpService.downloadAll(mapDumpServices(dumps));
       })(),
       {
         successMessage: 'Download successfully',

@@ -39,7 +39,9 @@ export const PMMDumpService = {
     await api.post<void, DeleteDump>(`${BASE_URL}:batchDelete`, { dump_ids: dumpIds });
   },
   async downloadAll(dumps: PmmDump[]): Promise<void> {
-    dumps.forEach(this.download);
+    for (const dump of dumps) {
+      await this.download(dump);
+    }
   },
   async download({ encrypted, dump_id }: PmmDump): Promise<void> {
     return new Promise<void>(async (resolve) => {
