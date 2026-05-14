@@ -8,24 +8,70 @@
 package v0alpha1
 
 import (
+	backend "github.com/grafana/grafana-plugin-sdk-go/backend"
+	datav0alpha1 "github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1"
 	common "k8s.io/kube-openapi/pkg/common"
 	spec "k8s.io/kube-openapi/pkg/validation/spec"
 )
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1.DataSourceApiServer":          schema_pkg_apis_query_v0alpha1_DataSourceApiServer(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1.DataSourceApiServerList":      schema_pkg_apis_query_v0alpha1_DataSourceApiServerList(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1.QueryDataRequest":             schema_pkg_apis_query_v0alpha1_QueryDataRequest(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1.QueryDataResponse":            schema_pkg_apis_query_v0alpha1_QueryDataResponse(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1.QueryTypeDefinition":          schema_pkg_apis_query_v0alpha1_QueryTypeDefinition(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1.QueryTypeDefinitionList":      schema_pkg_apis_query_v0alpha1_QueryTypeDefinitionList(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Position":            schema_apis_query_v0alpha1_template_Position(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.QueryTemplate":       schema_apis_query_v0alpha1_template_QueryTemplate(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Target":              schema_apis_query_v0alpha1_template_Target(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.TemplateVariable":    schema_apis_query_v0alpha1_template_TemplateVariable(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.VariableReplacement": schema_apis_query_v0alpha1_template_VariableReplacement(ref),
-		"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.replacement":         schema_apis_query_v0alpha1_template_replacement(ref),
+		BasicColumn{}.OpenAPIModelName():               schema_pkg_apis_query_v0alpha1_BasicColumn(ref),
+		DataSourceApiServer{}.OpenAPIModelName():       schema_pkg_apis_query_v0alpha1_DataSourceApiServer(ref),
+		DataSourceApiServerList{}.OpenAPIModelName():   schema_pkg_apis_query_v0alpha1_DataSourceApiServerList(ref),
+		DataSourceConnection{}.OpenAPIModelName():      schema_pkg_apis_query_v0alpha1_DataSourceConnection(ref),
+		DataSourceConnectionList{}.OpenAPIModelName():  schema_pkg_apis_query_v0alpha1_DataSourceConnectionList(ref),
+		DataSourceConnectionQuery{}.OpenAPIModelName(): schema_pkg_apis_query_v0alpha1_DataSourceConnectionQuery(ref),
+		QueryDataRequest{}.OpenAPIModelName():          schema_pkg_apis_query_v0alpha1_QueryDataRequest(ref),
+		QueryDataResponse{}.OpenAPIModelName():         schema_pkg_apis_query_v0alpha1_QueryDataResponse(ref),
+		QueryResponseSQLSchemas{}.OpenAPIModelName():   schema_pkg_apis_query_v0alpha1_QueryResponseSQLSchemas(ref),
+		QueryTypeDefinition{}.OpenAPIModelName():       schema_pkg_apis_query_v0alpha1_QueryTypeDefinition(ref),
+		QueryTypeDefinitionList{}.OpenAPIModelName():   schema_pkg_apis_query_v0alpha1_QueryTypeDefinitionList(ref),
+		SampleRows{}.OpenAPIModelName():                SampleRows{}.OpenAPIDefinition(),
+		SchemaInfo{}.OpenAPIModelName():                schema_pkg_apis_query_v0alpha1_SchemaInfo(ref),
+	}
+}
+
+func schema_pkg_apis_query_v0alpha1_BasicColumn(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BasicColumn represents the column type for data that is input to a SQL expression.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"mysqlType": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"nullable": {
+						SchemaProps: spec.SchemaProps{
+							Default: false,
+							Type:    []string{"boolean"},
+							Format:  "",
+						},
+					},
+					"dataFrameFieldType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The DataFrameFieldType is the Grafana Plugin SDK data.FieldType that best represents this column we need to somehow expose this as a string value because the JSONMarshaler will write it as a string",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"name", "mysqlType", "nullable", "dataFrameFieldType"},
+			},
+		},
 	}
 }
 
@@ -53,7 +99,7 @@ func schema_pkg_apis_query_v0alpha1_DataSourceApiServer(ref common.ReferenceCall
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"),
 						},
 					},
 					"title": {
@@ -99,7 +145,7 @@ func schema_pkg_apis_query_v0alpha1_DataSourceApiServer(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"},
 	}
 }
 
@@ -127,7 +173,7 @@ func schema_pkg_apis_query_v0alpha1_DataSourceApiServerList(ref common.Reference
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"),
 						},
 					},
 					"items": {
@@ -137,17 +183,167 @@ func schema_pkg_apis_query_v0alpha1_DataSourceApiServerList(ref common.Reference
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1.DataSourceApiServer"),
+										Ref:     ref(DataSourceApiServer{}.OpenAPIModelName()),
 									},
 								},
 							},
 						},
 					},
 				},
+				Required: []string{"items"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apis/query/v0alpha1.DataSourceApiServer", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+			DataSourceApiServer{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"},
+	}
+}
+
+func schema_pkg_apis_query_v0alpha1_DataSourceConnection(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Connection to a datasource instance",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"title": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The configured display name",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The datasource identifier inside the group/version (or UID within legacy grafana apis)",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"version": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"plugin": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+				},
+				Required: []string{"title", "name", "group", "version"},
+			},
+		},
+	}
+}
+
+func schema_pkg_apis_query_v0alpha1_DataSourceConnectionList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "List of all datasource instances across all datasource apiservers",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(DataSourceConnection{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			DataSourceConnection{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"},
+	}
+}
+
+func schema_pkg_apis_query_v0alpha1_DataSourceConnectionQuery(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "List of all datasource instances across all datasource apiservers",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "the namespace",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The datasource identifier inside the group/version (or UID within legacy grafana apis)",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"plugin": {
+						SchemaProps: spec.SchemaProps{
+							Description: "The plugin ID",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"namespace"},
+			},
+		},
 	}
 }
 
@@ -195,7 +391,7 @@ func schema_pkg_apis_query_v0alpha1_QueryDataRequest(ref common.ReferenceCallbac
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref("github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1.DataQuery"),
+										Ref: ref(datav0alpha1.DataQuery{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -213,7 +409,7 @@ func schema_pkg_apis_query_v0alpha1_QueryDataRequest(ref common.ReferenceCallbac
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1.DataQuery"},
+			datav0alpha1.DataQuery{}.OpenAPIModelName()},
 	}
 }
 
@@ -247,7 +443,7 @@ func schema_pkg_apis_query_v0alpha1_QueryDataResponse(ref common.ReferenceCallba
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana-plugin-sdk-go/backend.DataResponse"),
+										Ref:     ref(backend.DataResponse{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -258,7 +454,52 @@ func schema_pkg_apis_query_v0alpha1_QueryDataResponse(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana-plugin-sdk-go/backend.DataResponse"},
+			backend.DataResponse{}.OpenAPIModelName()},
+	}
+}
+
+func schema_pkg_apis_query_v0alpha1_QueryResponseSQLSchemas(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SQLSchemas returns info about what the Schema for a DS query will be like if the query were to be used an input to SQL expressions. So effectively post SQL expressions input conversion.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"sqlSchemas": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SchemaInfo for each requested query by refID",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref(SchemaInfo{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"sqlSchemas"},
+			},
+		},
+		Dependencies: []string{
+			SchemaInfo{}.OpenAPIModelName()},
 	}
 }
 
@@ -286,20 +527,20 @@ func schema_pkg_apis_query_v0alpha1_QueryTypeDefinition(ref common.ReferenceCall
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"),
 						},
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1.QueryTypeDefinitionSpec"),
+							Ref:     ref(datav0alpha1.QueryTypeDefinitionSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1.QueryTypeDefinitionSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			datav0alpha1.QueryTypeDefinitionSpec{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta"},
 	}
 }
 
@@ -326,7 +567,7 @@ func schema_pkg_apis_query_v0alpha1_QueryTypeDefinitionList(ref common.Reference
 					"metadata": {
 						SchemaProps: spec.SchemaProps{
 							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+							Ref:     ref("io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"),
 						},
 					},
 					"items": {
@@ -336,288 +577,62 @@ func schema_pkg_apis_query_v0alpha1_QueryTypeDefinitionList(ref common.Reference
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1.QueryTypeDefinition"),
+										Ref:     ref(QueryTypeDefinition{}.OpenAPIModelName()),
 									},
 								},
 							},
 						},
 					},
 				},
+				Required: []string{"items"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apis/query/v0alpha1.QueryTypeDefinition", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+			QueryTypeDefinition{}.OpenAPIModelName(), "io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta"},
 	}
 }
 
-func schema_apis_query_v0alpha1_template_Position(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_query_v0alpha1_SchemaInfo(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Position is where to do replacement in the targets during render.",
+				Description: "SchemaInfo provides information and some sample data for data that could be an input to a SQL expression.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"start": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Start is the byte offset within TargetKey's property of the variable. It is the start location for replacements).",
-							Default:     0,
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-					"end": {
-						SchemaProps: spec.SchemaProps{
-							Description: "End is the byte offset of the end of the variable.",
-							Default:     0,
-							Type:        []string{"integer"},
-							Format:      "int64",
-						},
-					},
-				},
-				Required: []string{"start", "end"},
-			},
-		},
-	}
-}
-
-func schema_apis_query_v0alpha1_template_QueryTemplate(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"title": {
-						SchemaProps: spec.SchemaProps{
-							Description: "A display name",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"description": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Longer description for why it is interesting",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"vars": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-map-keys": []interface{}{
-									"key",
-								},
-								"x-kubernetes-list-type": "map",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "The variables that can be used to render",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.TemplateVariable"),
-									},
-								},
-							},
-						},
-					},
-					"targets": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "set",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Output variables",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Target"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"targets"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Target", "github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.TemplateVariable"},
-	}
-}
-
-func schema_apis_query_v0alpha1_template_Target(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"dataType": {
-						SchemaProps: spec.SchemaProps{
-							Description: "DataType is the returned Dataplane type from the query.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"variables": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Variables that will be replaced in the query",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Allows: true,
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type: []string{"array"},
-										Items: &spec.SchemaOrArray{
-											Schema: &spec.Schema{
-												SchemaProps: spec.SchemaProps{
-													Default: map[string]interface{}{},
-													Ref:     ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.VariableReplacement"),
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					"properties": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Query target",
-							Ref:         ref("github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1.DataQuery"),
-						},
-					},
-				},
-				Required: []string{"variables", "properties"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1.DataQuery", "github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.VariableReplacement"},
-	}
-}
-
-func schema_apis_query_v0alpha1_template_TemplateVariable(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "TemplateVariable is the definition of a variable that will be interpolated in targets.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"key": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Key is the name of the variable.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"defaultValues": {
+					"columns": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
 								"x-kubernetes-list-type": "atomic",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "DefaultValue is the value to be used when there is no selected value during render.",
-							Type:        []string{"array"},
+							Type: []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Default: map[string]interface{}{},
+										Ref:     ref(BasicColumn{}.OpenAPIModelName()),
 									},
 								},
 							},
 						},
 					},
-					"valueListDefinition": {
+					"sampleRows": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ValueListDefinition is the object definition used by the FE to get a list of possible values to select for render.",
-							Ref:         ref("github.com/grafana/grafana/pkg/apimachinery/apis/common/v0alpha1.Unstructured"),
+							Ref: ref(SampleRows{}.OpenAPIModelName()),
+						},
+					},
+					"error": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
 						},
 					},
 				},
-				Required: []string{"key"},
+				Required: []string{"columns", "sampleRows"},
 			},
 		},
 		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apimachinery/apis/common/v0alpha1.Unstructured"},
-	}
-}
-
-func schema_apis_query_v0alpha1_template_VariableReplacement(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "QueryVariable is the definition of a variable that will be interpolated in targets.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"path": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Path is the location of the property within a target. The format for this is not figured out yet (Maybe JSONPath?). Idea: [\"string\", int, \"string\"] where int indicates array offset",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"position": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Positions is a list of where to perform the interpolation within targets during render. The first string is the Idx of the target as a string, since openAPI does not support ints as map keys",
-							Ref:         ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Position"),
-						},
-					},
-					"format": {
-						SchemaProps: spec.SchemaProps{
-							Description: "How values should be interpolated\n\nPossible enum values:\n - `\"csv\"` Formats variables with multiple values as a comma-separated string.\n - `\"doublequote\"` Formats single- and multi-valued variables into a comma-separated string\n - `\"json\"` Formats variables with multiple values as a comma-separated string.\n - `\"pipe\"` Formats variables with multiple values into a pipe-separated string.\n - `\"raw\"` Formats variables with multiple values into comma-separated string. This is the default behavior when no format is specified\n - `\"singlequote\"` Formats single- and multi-valued variables into a comma-separated string",
-							Type:        []string{"string"},
-							Format:      "",
-							Enum:        []interface{}{"csv", "doublequote", "json", "pipe", "raw", "singlequote"},
-						},
-					},
-				},
-				Required: []string{"path"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Position"},
-	}
-}
-
-func schema_apis_query_v0alpha1_template_replacement(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Type: []string{"object"},
-				Properties: map[string]spec.Schema{
-					"Position": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Position"),
-						},
-					},
-					"TemplateVariable": {
-						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.TemplateVariable"),
-						},
-					},
-					"format": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Possible enum values:\n - `\"csv\"` Formats variables with multiple values as a comma-separated string.\n - `\"doublequote\"` Formats single- and multi-valued variables into a comma-separated string\n - `\"json\"` Formats variables with multiple values as a comma-separated string.\n - `\"pipe\"` Formats variables with multiple values into a pipe-separated string.\n - `\"raw\"` Formats variables with multiple values into comma-separated string. This is the default behavior when no format is specified\n - `\"singlequote\"` Formats single- and multi-valued variables into a comma-separated string",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-							Enum:        []interface{}{"csv", "doublequote", "json", "pipe", "raw", "singlequote"},
-						},
-					},
-				},
-				Required: []string{"Position", "TemplateVariable", "format"},
-			},
-		},
-		Dependencies: []string{
-			"github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.Position", "github.com/grafana/grafana/pkg/apis/query/v0alpha1/template.TemplateVariable"},
+			BasicColumn{}.OpenAPIModelName(), SampleRows{}.OpenAPIModelName()},
 	}
 }

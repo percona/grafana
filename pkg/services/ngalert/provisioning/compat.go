@@ -1,22 +1,21 @@
 package provisioning
 
 import (
-	"fmt"
 	"strings"
 
-	alertingNotify "github.com/grafana/alerting/notify"
+	alertingModels "github.com/grafana/alerting/models"
 
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
 )
 
-func EmbeddedContactPointToGrafanaIntegrationConfig(e definitions.EmbeddedContactPoint) (alertingNotify.GrafanaIntegrationConfig, error) {
+func EmbeddedContactPointToGrafanaIntegrationConfig(e *definitions.EmbeddedContactPoint) (alertingModels.IntegrationConfig, error) {
 	data, err := e.Settings.MarshalJSON()
 	if err != nil {
-		return alertingNotify.GrafanaIntegrationConfig{}, err
+		return alertingModels.IntegrationConfig{}, err
 	}
-	return alertingNotify.GrafanaIntegrationConfig{
+	return alertingModels.IntegrationConfig{
 		UID:                   e.UID,
 		Name:                  e.Name,
 		Type:                  e.Type,
@@ -62,33 +61,9 @@ func GrafanaIntegrationConfigToEmbeddedContactPoint(r *models.Integration, prove
 	return definitions.EmbeddedContactPoint{
 		UID:                   r.UID,
 		Name:                  r.Name,
-		Type:                  r.Config.Type,
+		Type:                  string(r.Config.Type()),
 		DisableResolveMessage: r.DisableResolveMessage,
 		Settings:              settingJson,
 		Provenance:            string(provenance),
 	}
-}
-
-// EmbeddedContactPointToIntegration converts an EmbeddedContactPoint to a models.Integration.
-// This is primarily used for protected field comparison during updates.
-// Note: SecureSettings is not populated as the provisioning API doesn't expose encrypted values.
-func EmbeddedContactPointToIntegration(
-	cp definitions.EmbeddedContactPoint,
-	typeConfig models.IntegrationConfig,
-) (*models.Integration, error) {
-	settings := make(map[string]any)
-	if cp.Settings != nil {
-		m, err := cp.Settings.Map()
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse contact point settings: %w", err)
-		}
-		settings = m
-	}
-	return &models.Integration{
-		UID:                   cp.UID,
-		Name:                  cp.Name,
-		Config:                typeConfig,
-		DisableResolveMessage: cp.DisableResolveMessage,
-		Settings:              settings,
-	}, nil
 }

@@ -1,20 +1,7 @@
 name: PR Checks
 on:
-  pull_request_target:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
-      - labeled
-      - unlabeled
-      - edited
-      - auto_merge_enabled
-  issues:
-    types:
-      - milestoned
-      - demilestoned
-
+  # @PERCONA - disable workflow
+  workflow_dispatch:
 concurrency:
   group: pr-checks-${{ github.event.number }}
 
@@ -31,7 +18,7 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - name: Checkout Actions
-        uses: actions/checkout@v4 # v4.2.2
+        uses: actions/checkout@v5
         with:
           repository: "grafana/grafana-github-actions"
           path: ./actions

@@ -2,12 +2,12 @@ import { FC, MouseEvent, useState } from 'react';
 
 import { locationService } from '@grafana/runtime';
 import { Button, Spinner, Tooltip, useStyles2 } from '@grafana/ui';
-import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_UPDATES_LINK } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { checkUpdatesAction } from 'app/percona/shared/core/reducers/updates';
 import { getPerconaUser, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { isPmmNavEnabled } from 'app/percona/shared/helpers/plugin';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from './UpdatePanel.messages';
 import { getDeprecationTooltipStyles, styles } from './UpdatePanel.styles';

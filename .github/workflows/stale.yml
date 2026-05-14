@@ -1,8 +1,7 @@
 name: 'Close stale issues and PRs'
 on:
-  schedule:
-    - cron: '30 1 * * *'
-
+  # @PERCONA - disable workflow
+  workflow_dispatch:
 permissions:
   issues: write
   pull-requests: write
@@ -11,7 +10,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@v10
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           operations-per-run: 750

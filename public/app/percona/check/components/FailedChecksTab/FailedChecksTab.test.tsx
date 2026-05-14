@@ -7,7 +7,7 @@ import { CheckService } from 'app/percona/check/Check.service';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { FailedChecksTab } from './FailedChecksTab';
 
