@@ -26,6 +26,8 @@ import { FormElement } from 'app/percona/shared/components/Form';
 import { TabbedPage, TabbedPageContents } from 'app/percona/shared/components/TabbedPage';
 import { useCancelToken } from 'app/percona/shared/components/hooks/cancelToken.hook';
 import { usePerconaNavModel } from 'app/percona/shared/components/hooks/perconaNavModel';
+import { DATA_INTERVAL } from 'app/percona/shared/core';
+import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 import { fetchHighAvailabilityNodes } from 'app/percona/shared/core/reducers/highAvailability/highAvailability';
 import { nodeFromDbMapper, RemoveNodeParams } from 'app/percona/shared/core/reducers/nodes';
 import { fetchNodesAction, removeNodesAction } from 'app/percona/shared/core/reducers/nodes/nodes';
@@ -48,20 +50,19 @@ import { Messages } from '../Inventory.messages';
 import { FlattenNode, MonitoringStatus, Node } from '../Inventory.types';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { StatusLink } from '../components/StatusLink/StatusLink';
-import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
+import { createNodeInstallToken } from '../installToken';
 
+import { QUICK_INSTALL_OPTIONS } from './Nodes.constants';
 import { InventoryNode } from './Nodes.types';
 import { getHaRoleBadgeText, getServiceLink, mapNodesToInventoryNodes } from './Nodes.utils';
+import { buildQuickInstallCommand, QuickInstallTech } from './NodesInstallCommand.utils';
 import {
   getBadgeColorForServiceStatus,
   getBadgeIconForServiceStatus,
   getBadgeTextForServiceStatus,
   getTagsFromLabels,
 } from './Services.utils';
-import { createNodeInstallToken } from '../installToken';
-import { buildQuickInstallCommand, QuickInstallTech } from './NodesInstallCommand.utils';
 import { getStyles } from './Tabs.styles';
-import { DATA_INTERVAL } from 'app/percona/shared/core';
 
 export const NodesTab = () => {
   const { nodes } = useSelector(getNodes);
@@ -395,18 +396,11 @@ export const NodesTab = () => {
               <Dropdown
                 overlay={() => (
                   <Menu>
-                    {(
-                      [
-                        ['mysql', Messages.nodes.addNodeMySQL],
-                        ['postgresql', Messages.nodes.addNodePostgreSQL],
-                        ['mongodb', Messages.nodes.addNodeMongoDB],
-                        ['valkey', Messages.nodes.addNodeValkey],
-                      ] as const
-                    ).map(([tech, label]) => (
+                    {QUICK_INSTALL_OPTIONS.map(({ tech, label, icon }) => (
                       <Menu.Item
                         key={tech}
                         label={label}
-                        icon="database"
+                        icon={icon}
                         disabled={installTokenLoading}
                         onClick={() => {
                           copyQuickInstallWithToken(tech);
