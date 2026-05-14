@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
+	"github.com/grafana/grafana/pkg/util"
 )
 
 func TestSchedulableAlertRulesRegistry(t *testing.T) {
@@ -151,13 +152,14 @@ func TestRuleWithFolderFingerprint(t *testing.T) {
 		f2 := ruleWithFolder{rule: rule, folderTitle: uuid.NewString()}.Fingerprint()
 		require.NotEqual(t, f, f2)
 	})
-	t.Run("Version, Updated, IntervalSeconds, GUID and Annotations should be excluded from fingerprint", func(t *testing.T) {
+	t.Run("Version, Updated, IntervalSeconds, GUID, Annotations and RuleGroupIndex should be excluded from fingerprint", func(t *testing.T) {
 		cp := models.CopyRule(rule)
 		cp.Version++
 		cp.Updated = cp.Updated.Add(1 * time.Second)
 		cp.IntervalSeconds++
 		cp.Annotations = make(map[string]string)
 		cp.Annotations["test"] = "test"
+		cp.RuleGroupIndex++
 		cp.GUID = uuid.NewString()
 
 		f2 := ruleWithFolder{rule: cp, folderTitle: title}.Fingerprint()
@@ -195,22 +197,22 @@ func TestRuleWithFolderFingerprint(t *testing.T) {
 			ExecErrState:    "test-err",
 			Record:          &models.Record{Metric: "my_metric", From: "A"},
 			For:             12,
+			KeepFiringFor:   456,
 			Annotations: map[string]string{
 				"key-annotation": "value-annotation",
 			},
 			Labels: map[string]string{
 				"key-label": "value-label",
 			},
-			IsPaused: false,
-			NotificationSettings: []models.NotificationSettings{
-				models.NotificationSettingsGen()(),
-			},
+			IsPaused:             false,
+			NotificationSettings: util.Pointer(models.NotificationSettingsGen()()),
 			Metadata: models.AlertRuleMetadata{
 				EditorSettings: models.EditorSettings{
 					SimplifiedQueryAndExpressionsSection: false,
 					SimplifiedNotificationsSection:       false,
 				},
 			},
+			MissingSeriesEvalsToResolve: util.Pointer[int64](2),
 		}
 		r2 := &models.AlertRule{
 			ID:        2,
@@ -240,21 +242,21 @@ func TestRuleWithFolderFingerprint(t *testing.T) {
 			ExecErrState:    "test-err2",
 			Record:          &models.Record{Metric: "my_metric2", From: "B"},
 			For:             1141,
+			KeepFiringFor:   123,
 			Annotations: map[string]string{
 				"key-annotation2": "value-annotation",
 			},
 			Labels: map[string]string{
 				"key-label": "value-label23",
 			},
-			IsPaused: true,
-			NotificationSettings: []models.NotificationSettings{
-				models.NotificationSettingsGen()(),
-			},
+			IsPaused:             true,
+			NotificationSettings: util.Pointer(models.NotificationSettingsGen()()),
 			Metadata: models.AlertRuleMetadata{
 				EditorSettings: models.EditorSettings{
 					SimplifiedQueryAndExpressionsSection: true,
 				},
 			},
+			MissingSeriesEvalsToResolve: util.Pointer[int64](1),
 		}
 
 		excludedFields := map[string]struct{}{

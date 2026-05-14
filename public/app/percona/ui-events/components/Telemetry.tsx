@@ -3,7 +3,7 @@ import React, { FC, useEffect } from 'react';
 import { getPerconaSettings } from 'app/percona/shared/core/selectors';
 import { EventStore } from 'app/percona/ui-events/EventStore';
 import { UIEventsService } from 'app/percona/ui-events/UIEvents.service';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 export interface UiEventsProps {}
 

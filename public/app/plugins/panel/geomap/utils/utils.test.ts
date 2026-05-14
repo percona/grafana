@@ -7,16 +7,24 @@ import WebGLPointsLayer from 'ol/layer/WebGLPoints';
 import TileSource from 'ol/source/Tile';
 import VectorSource from 'ol/source/Vector';
 
+import { getTemplateSrv } from '@grafana/runtime';
+
 // Mock the config module to avoid undefined panels error
 jest.mock('@grafana/runtime', () => ({
   getTemplateSrv: jest.fn(),
 }));
 
 // Mock the dimensions module since it's imported by utils.ts
-jest.mock('app/features/dimensions', () => ({
+jest.mock('app/features/dimensions/color', () => ({
   getColorDimension: jest.fn(),
+}));
+jest.mock('app/features/dimensions/scalar', () => ({
   getScalarDimension: jest.fn(),
+}));
+jest.mock('app/features/dimensions/scale', () => ({
   getScaledDimension: jest.fn(),
+}));
+jest.mock('app/features/dimensions/text', () => ({
   getTextDimension: jest.fn(),
 }));
 
@@ -25,13 +33,13 @@ jest.mock('app/plugins/datasource/grafana/datasource', () => ({
   getGrafanaDatasource: jest.fn(),
 }));
 
-import { hasLayerData } from './utils';
+import { hasVariableDependencies, hasLayerData } from './utils';
 
 // Test fixtures
 const createTestFeature = () => new Feature(new Point([0, 0]));
 
-const createTestVectorSource = (hasFeature = false): VectorSource<Point> => {
-  const source = new VectorSource<Point>();
+const createTestVectorSource = (hasFeature = false): VectorSource<Feature<Point>> => {
+  const source = new VectorSource<Feature<Point>>();
   if (hasFeature) {
     source.addFeature(createTestFeature());
   }
@@ -39,12 +47,77 @@ const createTestVectorSource = (hasFeature = false): VectorSource<Point> => {
 };
 
 const createTestWebGLStyle = () => ({
-  symbol: {
-    symbolType: 'circle',
-    size: 8,
-    color: '#000000',
-    opacity: 1,
-  },
+  'circle-radius': 8,
+  'circle-fill-color': '#000000',
+  'circle-opacity': 1,
+});
+
+describe('hasVariableDependencies', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return true when object contains existing template variables', () => {
+    const availableVariables = [{ name: 'variable' }];
+    const mockTemplateSrv = {
+      containsTemplate: jest.fn().mockImplementation((str) => {
+        return availableVariables.some((v) => str.includes(`$${v.name}`));
+      }),
+      getVariables: jest.fn().mockReturnValue(availableVariables),
+    };
+    (getTemplateSrv as jest.Mock).mockReturnValue(mockTemplateSrv);
+
+    const obj = { key: '$variable' };
+    expect(hasVariableDependencies(obj)).toBe(true);
+    expect(mockTemplateSrv.containsTemplate).toHaveBeenCalledWith(JSON.stringify(obj));
+  });
+
+  it('should return false when object contains non-existent template variables', () => {
+    const availableVariables = [{ name: 'variable' }];
+    const mockTemplateSrv = {
+      containsTemplate: jest.fn().mockImplementation((str) => {
+        return availableVariables.some((v) => str.includes(`$${v.name}`));
+      }),
+      getVariables: jest.fn().mockReturnValue(availableVariables),
+    };
+    (getTemplateSrv as jest.Mock).mockReturnValue(mockTemplateSrv);
+
+    const obj = { key: '$nonexistent' };
+    expect(hasVariableDependencies(obj)).toBe(false);
+    expect(mockTemplateSrv.containsTemplate).toHaveBeenCalledWith(JSON.stringify(obj));
+  });
+
+  it('should return false when object does not contain template variables', () => {
+    const mockTemplateSrv = {
+      containsTemplate: jest.fn().mockReturnValue(false),
+      getVariables: jest.fn().mockReturnValue([]),
+    };
+    (getTemplateSrv as jest.Mock).mockReturnValue(mockTemplateSrv);
+
+    const obj = { key: 'static value' };
+    expect(hasVariableDependencies(obj)).toBe(false);
+    expect(mockTemplateSrv.containsTemplate).toHaveBeenCalledWith(JSON.stringify(obj));
+  });
+
+  it('should handle nested objects with existing template variables', () => {
+    const availableVariables = [{ name: 'variable' }];
+    const mockTemplateSrv = {
+      containsTemplate: jest.fn().mockImplementation((str) => {
+        return availableVariables.some((v) => str.includes(`$${v.name}`));
+      }),
+      getVariables: jest.fn().mockReturnValue(availableVariables),
+    };
+    (getTemplateSrv as jest.Mock).mockReturnValue(mockTemplateSrv);
+
+    const obj = {
+      key: 'static value',
+      nested: {
+        anotherKey: '$variable',
+      },
+    };
+    expect(hasVariableDependencies(obj)).toBe(true);
+    expect(mockTemplateSrv.containsTemplate).toHaveBeenCalledWith(JSON.stringify(obj));
+  });
 });
 
 describe('hasLayerData', () => {

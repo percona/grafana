@@ -9,7 +9,7 @@ import { logger } from 'app/percona/shared/helpers/logger';
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { Advisor } from 'app/percona/shared/services/advisors/Advisors.types';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { CheckService } from '../../Check.service';
 
@@ -93,6 +93,7 @@ describe('AllChecksTab::', () => {
     expect(collabseDiv).toBeInTheDocument();
 
     await waitFor(() => fireEvent.click(collabseDiv));
+    await waitFor(() => screen.getByTestId('check-table-loader-button'));
 
     const button = screen.getAllByTestId('check-table-loader-button')[0];
     expect(button).toBeInTheDocument();
@@ -198,7 +199,10 @@ const AllChecksTabTesting: FC<{ category?: string }> = ({ category = 'security' 
     } as StoreState)}
   >
     {wrapWithGrafanaContextMock(
-      <MemoryRouter initialEntries={['/advisors/' + category]}>
+      <MemoryRouter
+        initialEntries={['/advisors/' + category]}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <Routes>
           <Route path="/advisors/:category" element={<AllChecksTab />} />
         </Routes>

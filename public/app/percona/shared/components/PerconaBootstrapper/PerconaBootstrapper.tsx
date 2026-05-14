@@ -7,7 +7,7 @@ import { fetchAdvisors } from 'app/percona/shared/core/reducers/advisors/advisor
 import { fetchUserDetailsAction, setAuthorized } from 'app/percona/shared/core/reducers/user/user';
 import { getCategorizedAdvisors, getPerconaSettings, getUpdatesInfo } from 'app/percona/shared/core/selectors';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Telemetry } from '../../../ui-events/components/Telemetry';
 import { fetchHighAvailabilityStatus } from '../../core/reducers/highAvailability/highAvailability';
@@ -18,10 +18,6 @@ import { isPmmNavEnabled } from '../../helpers/plugin';
 
 import { PerconaBootstrapperProps } from './PerconaBootstrapper.types';
 import {
-  buildAdvisorsNavItem,
-  buildIntegratedAlertingMenuItem,
-  buildUsersAndAccessNavWithRoles,
-  getPmmSettingsPage,
   PMM_ACCESS_ROLE_CREATE_PAGE,
   PMM_ACCESS_ROLE_EDIT_PAGE,
   PMM_ACCESS_ROLES_PAGE,
@@ -31,9 +27,14 @@ import {
   PMM_EDIT_INSTANCE_PAGE,
   PMM_EXPORT_DUMP_PAGE,
   PMM_INVENTORY_PAGE,
-} from './PerconaNavigation';
+} from './PerconaNavigation/PerconaNavigation.constants';
+import {
+  buildAdvisorsNavItem,
+  buildIntegratedAlertingMenuItem,
+  buildUsersAndAccessNavWithRoles,
+  getPmmSettingsPage,
+} from './PerconaNavigation/PerconaNavigation.utils';
 import PerconaUpdateVersion from './PerconaUpdateVersion/PerconaUpdateVersion';
-
 // This component is only responsible for populating the store with Percona's settings initially
 export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
   const dispatch = useAppDispatch();
@@ -98,7 +99,7 @@ export const PerconaBootstrapper = ({ onReady }: PerconaBootstrapperProps) => {
     };
 
     updateNavTree();
-  }, [dispatch, categorizedAdvisors, settings]);
+  }, [dispatch, settings, categorizedAdvisors]);
 
   useEffect(() => {
     const getSettings = async () => {

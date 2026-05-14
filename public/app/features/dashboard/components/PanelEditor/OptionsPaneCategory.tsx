@@ -5,7 +5,8 @@ import { useLocalStorage } from 'react-use';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { Button, Counter, useStyles2 } from '@grafana/ui';
+import { t } from '@grafana/i18n';
+import { Button, Counter, Icon, Tooltip, useStyles2 } from '@grafana/ui';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
 
 import { PANEL_EDITOR_UI_STATE_STORAGE_KEY } from './state/reducers';
@@ -16,12 +17,15 @@ export interface OptionsPaneCategoryProps {
   renderTitle?: (isExpanded: boolean) => React.ReactNode;
   isOpenDefault?: boolean;
   itemsCount?: number;
-  forceOpen?: number;
+  forceOpen?: boolean;
   className?: string;
   isNested?: boolean;
   children: ReactNode;
   sandboxId?: string;
-  isOpenable?: boolean;
+  /**
+   * When set will disable category and show tooltip with disabledText on hover
+   */
+  disabledText?: string | React.ReactElement;
 }
 
 const CATEGORY_PARAM_NAME = 'showCategory' as const;
@@ -38,49 +42,33 @@ export const OptionsPaneCategory = React.memo(
     itemsCount,
     isNested = false,
     sandboxId,
-    isOpenable = true,
+    disabledText,
   }: OptionsPaneCategoryProps) => {
     const [savedState, setSavedState] = useLocalStorage(getOptionGroupStorageKey(id), {
       isExpanded: isOpenDefault,
     });
 
-    const [isExpanded, setIsExpanded] = useState(!isOpenable || (savedState?.isExpanded ?? isOpenDefault));
-    const manualClickTime = useRef(0);
+    const isExpandedInitialValue = forceOpen || (savedState?.isExpanded ?? isOpenDefault);
+    const [isExpanded, setIsExpanded] = useState(isExpandedInitialValue);
     const ref = useRef<HTMLDivElement>(null);
     const [queryParams, updateQueryParams] = useQueryParams();
     const isOpenFromUrl = queryParams[CATEGORY_PARAM_NAME] === id;
 
+    // Handle opening by forceOpen param or from URL
     useEffect(() => {
-      if (manualClickTime.current) {
-        // ignore changes since the click handled the expected behavior
-        if (Date.now() - manualClickTime.current < 200) {
-          return;
-        }
-      }
-      if (isOpenFromUrl || forceOpen) {
-        if (!isExpanded) {
-          setIsExpanded(true);
-        }
-        if (isOpenFromUrl) {
+      if ((forceOpen || isOpenFromUrl) && !isExpanded) {
+        setIsExpanded(true);
+        setTimeout(() => {
           ref.current?.scrollIntoView();
-        }
+        }, 200);
       }
-    }, [forceOpen, isExpanded, isOpenFromUrl]);
+    }, [isExpanded, isOpenFromUrl, forceOpen]);
 
     const onToggle = useCallback(() => {
-      if (!isOpenable) {
-        return;
-      }
-      manualClickTime.current = Date.now();
-      updateQueryParams(
-        {
-          [CATEGORY_PARAM_NAME]: isExpanded ? undefined : id,
-        },
-        true
-      );
+      updateQueryParams({ [CATEGORY_PARAM_NAME]: isExpanded ? undefined : id }, true);
       setSavedState({ isExpanded: !isExpanded });
       setIsExpanded(!isExpanded);
-    }, [isOpenable, updateQueryParams, isExpanded, id, setSavedState]);
+    }, [updateQueryParams, isExpanded, id, setSavedState]);
 
     if (!renderTitle) {
       renderTitle = function defaultTitle(isExpanded: boolean) {
@@ -106,7 +94,6 @@ export const OptionsPaneCategory = React.memo(
     );
 
     const headerStyles = cx(styles.header, {
-      [styles.headerHover]: isOpenable,
       [styles.headerExpanded]: isExpanded,
       [styles.headerNested]: isNested,
     });
@@ -114,6 +101,29 @@ export const OptionsPaneCategory = React.memo(
     const bodyStyles = cx(styles.body, {
       [styles.bodyNested]: isNested,
     });
+
+    /**
+     * Disabled categories just show the disabled header and icon
+     */
+    if (disabledText) {
+      return (
+        <div
+          className={boxStyles}
+          data-plugin-sandbox={sandboxId}
+          data-testid={selectors.components.OptionsGroup.group(id)}
+          ref={ref}
+        >
+          <Tooltip interactive={!(typeof disabledText === 'string')} content={disabledText}>
+            <div className={headerStyles}>
+              <h6 id={`button-${id}`} className={cx(styles.title, styles.titleDisabled)}>
+                {renderTitle(isExpanded)}
+              </h6>
+              <Icon size="sm" name="ban" className={styles.disabledIcon} />
+            </div>
+          </Tooltip>
+        </div>
+      );
+    }
 
     return (
       <div
@@ -126,22 +136,25 @@ export const OptionsPaneCategory = React.memo(
         {/* this just provides a better experience for mouse users */}
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div className={headerStyles} onClick={onToggle}>
-          <h6 id={`button-${id}`} className={styles.title}>
+          <h6 id={`button-${id}`} className={cx(styles.title, isExpanded && styles.titleExpanded)}>
             {renderTitle(isExpanded)}
           </h6>
-          {isOpenable ? (
-            <Button
-              data-testid={selectors.components.OptionsGroup.toggle(id)}
-              type="button"
-              fill="text"
-              size="md"
-              variant="secondary"
-              aria-expanded={isExpanded}
-              className={styles.toggleButton}
-              icon={isExpanded ? 'angle-up' : 'angle-down'}
-              onClick={onToggle}
-            />
-          ) : null}
+          <Button
+            aria-label={
+              isExpanded
+                ? t('dashboard.options-pane-category.aria-label-collapse', 'Collapse {{title}} category', { title })
+                : t('dashboard.options-pane-category.aria-label-expand', 'Expand {{title}} category', { title })
+            }
+            data-testid={selectors.components.OptionsGroup.toggle(id)}
+            type="button"
+            fill="text"
+            size="md"
+            variant="secondary"
+            aria-expanded={isExpanded}
+            className={styles.toggleButton}
+            icon={isExpanded ? 'angle-up' : 'angle-down'}
+            onClick={onToggle}
+          />
         </div>
         {isExpanded && (
           <div className={bodyStyles} id={id} aria-labelledby={`button-${id}`}>
@@ -152,7 +165,6 @@ export const OptionsPaneCategory = React.memo(
     );
   }
 );
-
 OptionsPaneCategory.displayName = 'OptionsPaneCategory';
 
 const getStyles = (theme: GrafanaTheme2) => ({
@@ -169,6 +181,10 @@ const getStyles = (theme: GrafanaTheme2) => ({
     fontSize: '1rem',
     fontWeight: theme.typography.fontWeightMedium,
     margin: 0,
+    color: theme.colors.text.secondary,
+  }),
+  titleExpanded: css({
+    color: theme.colors.text.primary,
   }),
   header: css({
     display: 'flex',
@@ -176,8 +192,6 @@ const getStyles = (theme: GrafanaTheme2) => ({
     padding: theme.spacing(0.5, 1.5),
     color: theme.colors.text.primary,
     fontWeight: theme.typography.fontWeightMedium,
-  }),
-  headerHover: css({
     cursor: 'pointer',
     '&:hover': {
       background: theme.colors.emphasize(theme.colors.background.primary, 0.03),
@@ -194,6 +208,14 @@ const getStyles = (theme: GrafanaTheme2) => ({
   }),
   body: css({
     padding: theme.spacing(1, 2, 1, 2),
+  }),
+  titleDisabled: css({
+    color: theme.colors.text.disabled,
+    cursor: 'not-allowed',
+  }),
+  disabledIcon: css({
+    color: theme.colors.text.disabled,
+    margin: theme.spacing(1, 1, 1, 0),
   }),
   bodyNested: css({
     position: 'relative',

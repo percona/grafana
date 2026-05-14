@@ -27,7 +27,7 @@ describe('StatusLink', () => {
 
     const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
       </MemoryRouter>
     );
@@ -51,7 +51,7 @@ describe('StatusLink', () => {
     ];
     const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
       </MemoryRouter>
     );
@@ -75,7 +75,7 @@ describe('StatusLink', () => {
     ];
     const agentsStatus = getAgentsMonitoringStatus(agents);
     render(
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <StatusLink agentsStatus={agentsStatus} type="services" strippedId="service_id_1" />
       </MemoryRouter>
     );

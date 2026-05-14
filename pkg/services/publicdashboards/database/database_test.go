@@ -24,6 +24,7 @@ import (
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/tests/testsuite"
 	"github.com/grafana/grafana/pkg/util"
+	"github.com/grafana/grafana/pkg/util/testutil"
 )
 
 // This is what the db sets empty time settings to
@@ -42,9 +43,7 @@ func TestLogPrefix(t *testing.T) {
 }
 
 func TestIntegrationListPublicDashboard(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
 
 	var sqlStore db.DB
 	var cfg *setting.Cfg
@@ -116,9 +115,8 @@ func TestIntegrationListPublicDashboard(t *testing.T) {
 }
 
 func TestIntegrationExistsEnabledByAccessToken(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -188,9 +186,8 @@ func TestIntegrationExistsEnabledByAccessToken(t *testing.T) {
 }
 
 func TestIntegrationExistsEnabledByDashboardUid(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -274,9 +271,8 @@ func TestIntegrationExistsEnabledByDashboardUid(t *testing.T) {
 }
 
 func TestIntegrationFindByDashboardUid(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -341,9 +337,7 @@ func TestIntegrationFindByDashboardUid(t *testing.T) {
 }
 
 func TestIntegrationFindByOrgAndUid(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
 
 	var sqlStore db.DB
 	var cfg *setting.Cfg
@@ -378,9 +372,8 @@ func TestIntegrationFindByOrgAndUid(t *testing.T) {
 }
 
 func TestIntegrationFindByAccessToken(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -446,9 +439,8 @@ func TestIntegrationFindByAccessToken(t *testing.T) {
 }
 
 func TestIntegrationCreatePublicDashboard(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -524,9 +516,8 @@ func TestIntegrationCreatePublicDashboard(t *testing.T) {
 }
 
 func TestIntegrationUpdatePublicDashboard(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -677,9 +668,8 @@ func TestIntegrationUpdatePublicDashboard(t *testing.T) {
 }
 
 func TestIntegrationGetOrgIdByAccessToken(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -748,9 +738,8 @@ func TestIntegrationGetOrgIdByAccessToken(t *testing.T) {
 }
 
 func TestIntegrationDelete(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -802,7 +791,9 @@ func TestIntegrationDelete(t *testing.T) {
 	})
 }
 
-func TestDeleteByDashboardUIDs(t *testing.T) {
+func TestIntegrationDeleteByDashboardUIDs(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store
@@ -852,10 +843,9 @@ func TestDeleteByDashboardUIDs(t *testing.T) {
 	})
 }
 
-func TestGetMetrics(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+func TestIntegrationGetMetrics(t *testing.T) {
+	testutil.SkipIntegrationTestInShortMode(t)
+
 	var sqlStore db.DB
 	var cfg *setting.Cfg
 	var dashboardStore dashboards.Store

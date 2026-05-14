@@ -10,8 +10,8 @@ export const getStyles = ({ typography, colors, v1: { spacing } }: GrafanaTheme2
   `,
   collapsableHeader: css`
     padding: 20px;
-    width: 100%;
     background-color: ${colors.background.secondary};
+    align-items: flex-start;
   `,
   collapsableHeaderLabel: css`
     width: 100%;
@@ -33,5 +33,9 @@ export const getStyles = ({ typography, colors, v1: { spacing } }: GrafanaTheme2
     font-size: ${typography.fontSize}px;
     font-weight: ${typography.fontWeightLight};
     max-width: 600px;
+  `,
+  collapsableButton: css`
+    position: relative;
+    top: 3px;
   `,
 });

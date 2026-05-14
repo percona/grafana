@@ -24,7 +24,7 @@ describe('Add remote instance:: ', () => {
     const type = Databases.mysql;
     render(
       <Provider store={configureStore()}>
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
         </MemoryRouter>
       </Provider>
@@ -45,7 +45,7 @@ describe('Add remote instance:: ', () => {
     const type = InstanceTypesExtra.external;
     render(
       <Provider store={configureStore()}>
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
         </MemoryRouter>
       </Provider>
@@ -71,7 +71,7 @@ describe('Add remote instance:: ', () => {
 
     render(
       <Provider store={configureStore()}>
-        <MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AddRemoteInstance onSubmit={jest.fn()} instance={{ type, credentials: {} }} selectInstance={jest.fn()} />
         </MemoryRouter>
       </Provider>

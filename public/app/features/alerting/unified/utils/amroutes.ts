@@ -49,6 +49,7 @@ export const commonGroupByOptions = [
 
 export const emptyRoute: FormAmRoute = {
   id: '',
+  name: '',
   overrideGrouping: false,
   // @PERCONA
   groupBy: [],
@@ -61,11 +62,16 @@ export const emptyRoute: FormAmRoute = {
   groupIntervalValue: '',
   repeatIntervalValue: '',
   muteTimeIntervals: [],
+  activeTimeIntervals: [],
 };
+
+export function addUniqueIdentifierToRoutes(routes: Route[]): RouteWithID[] {
+  return routes.map((policy, index) => addUniqueIdentifierToRoute(policy, policy.name ?? index.toString()));
+}
 
 // add unique identifiers to each route in the route tree, that way we can figure out what route we've edited / deleted
 // ⚠️ make sure this function uses _stable_ identifiers!
-export function addUniqueIdentifierToRoute(route: Route, position = '0'): RouteWithID {
+export function addUniqueIdentifierToRoute(route: Route, position = route.name ?? '0'): RouteWithID {
   const routeHash = hashRoute(route);
   const routes = route.routes ?? [];
 
@@ -112,6 +118,7 @@ export const amRouteToFormAmRoute = (route: RouteWithID | undefined): FormAmRout
 
   return {
     id,
+    name: route.name ?? '',
     // Frontend migration to use object_matchers instead of matchers, match, and match_re
     object_matchers: [
       ...matchers,
@@ -129,6 +136,7 @@ export const amRouteToFormAmRoute = (route: RouteWithID | undefined): FormAmRout
     repeatIntervalValue: route.repeat_interval ?? '',
     routes: formRoutes,
     muteTimeIntervals: route.mute_time_intervals ?? [],
+    activeTimeIntervals: route.active_time_intervals ?? [],
   };
 };
 
@@ -185,6 +193,7 @@ export const formAmRouteToAmRoute = (
     repeat_interval,
     routes: routes,
     mute_time_intervals: formAmRoute.muteTimeIntervals,
+    active_time_intervals: formAmRoute.activeTimeIntervals,
     receiver: receiver,
   };
 

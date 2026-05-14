@@ -5,7 +5,7 @@
 import { produce } from 'immer';
 import { omit } from 'lodash';
 
-import { insertAfterImmutably, insertBeforeImmutably } from '@grafana/data/src/utils/arrayUtils';
+import { arrayUtils } from '@grafana/data';
 import { ROUTES_META_SYMBOL, Route, RouteWithID } from 'app/plugins/datasource/alertmanager/types';
 
 import {
@@ -109,12 +109,12 @@ export const addRouteToReferenceRoute = (
 
     // insert new policy before / above the referenceRoute
     if (position === 'above') {
-      parentRoute.routes = insertBeforeImmutably(parentRoute.routes ?? [], newRoute, positionInParent);
+      parentRoute.routes = arrayUtils.insertBeforeImmutably(parentRoute.routes ?? [], newRoute, positionInParent);
     }
 
     // insert new policy after / below the referenceRoute
     if (position === 'below') {
-      parentRoute.routes = insertAfterImmutably(parentRoute.routes ?? [], newRoute, positionInParent);
+      parentRoute.routes = arrayUtils.insertAfterImmutably(parentRoute.routes ?? [], newRoute, positionInParent);
     }
   });
 };
@@ -153,13 +153,14 @@ export function findRouteInTree(
 
 export function cleanRouteIDs<
   T extends RouteWithID | Route | ComGithubGrafanaGrafanaPkgApisAlertingNotificationsV0Alpha1Route,
->(route: T): Omit<T, 'id'> {
+>(route: T): Omit<T, 'id' | 'name'> {
   return omit(
     {
       ...route,
       routes: route.routes?.map((route) => cleanRouteIDs(route)),
     },
-    'id'
+    'id',
+    'name'
   );
 }
 
@@ -198,6 +199,7 @@ export function hashRoute(route: Route): string {
  */
 export function stabilizeRoute(route: Route): Required<Route> {
   const result: Required<Route> = {
+    name: route.name ?? '',
     receiver: route.receiver ?? '',
     group_by: route.group_by ? [...route.group_by].sort() : [],
     continue: route.continue ?? false,
