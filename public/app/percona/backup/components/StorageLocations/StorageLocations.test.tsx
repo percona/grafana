@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom-v5-compat';
 
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { StorageLocations } from './StorageLocations';
 import { StorageLocationsService } from './StorageLocations.service';
@@ -24,7 +24,9 @@ describe('StorageLocations', () => {
           },
         } as StoreState)}
       >
-        <MemoryRouter>{wrapWithGrafanaContextMock(<StorageLocations />)}</MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<StorageLocations />)}
+        </MemoryRouter>
       </Provider>
     );
 
@@ -48,7 +50,9 @@ describe('StorageLocations', () => {
           },
         } as StoreState)}
       >
-        <MemoryRouter>{wrapWithGrafanaContextMock(<StorageLocations />)}</MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<StorageLocations />)}
+        </MemoryRouter>
       </Provider>
     );
 
@@ -79,7 +83,9 @@ describe('StorageLocations', () => {
             },
           } as StoreState)}
         >
-          <MemoryRouter>{wrapWithGrafanaContextMock(<StorageLocations />)}</MemoryRouter>
+          <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            {wrapWithGrafanaContextMock(<StorageLocations />)}
+          </MemoryRouter>
         </Provider>
       )
     );

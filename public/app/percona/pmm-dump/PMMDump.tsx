@@ -2,15 +2,15 @@ import { CancelToken } from 'axios';
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { Row } from 'react-table';
 
-import { HorizontalGroup, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
-import appEvents from 'app/core/app_events';
+import { Stack, Icon, useStyles2, Badge, BadgeColor, LinkButton, Button } from '@grafana/ui';
+import { appEvents } from 'app/core/app_events';
 import { Page } from 'app/core/components/Page/Page';
 import { DetailedDate } from 'app/percona/backup/components/DetailedDate';
 import { DumpStatus, DumpStatusColor, DumpStatusText, PMMDumpServices } from 'app/percona/pmm-dump/PmmDump.types';
 import { DetailsRow } from 'app/percona/shared/components/Elements/DetailsRow/DetailsRow';
 import { Action } from 'app/percona/shared/components/Elements/MultipleActions';
 import { ExtendedColumn, FilterFieldTypes, Table } from 'app/percona/shared/components/Elements/Table';
-import { PMM_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation';
+import { PMM_DUMP_PAGE } from 'app/percona/shared/components/PerconaBootstrapper/PerconaNavigation/PerconaNavigation.constants';
 import { DATA_INTERVAL } from 'app/percona/shared/core';
 import { useRecurringCall } from 'app/percona/shared/core/hooks/recurringCall.hook';
 import {
@@ -25,7 +25,7 @@ import { getExpandAndActionsCol } from 'app/percona/shared/helpers/getExpandAndA
 import { logger } from 'app/percona/shared/helpers/logger';
 import { dateDifferenceInWords } from 'app/percona/shared/helpers/utils/timeRange';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 import { ShowConfirmModalEvent } from 'app/types/events';
 
 import { Messages } from './PMMDump.messages';
@@ -82,10 +82,10 @@ export const PMMDump = () => {
     (row: Row<PMMDumpServices>): Action[] => [
       {
         content: (
-          <HorizontalGroup spacing="sm">
+          <Stack direction="row" gap={0.5}>
             <Icon name="download-alt" />
             <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.download}</span>
-          </HorizontalGroup>
+          </Stack>
         ),
         action: () => {
           onDownload(row.original);
@@ -94,10 +94,10 @@ export const PMMDump = () => {
       },
       {
         content: (
-          <HorizontalGroup spacing="sm">
+          <Stack direction="row" gap={0.5}>
             <Icon name="arrow-right" />
             <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.sendToSupport}</span>
-          </HorizontalGroup>
+          </Stack>
         ),
         action: () => {
           setSelectedDumpIds([row.original.dumpId]);
@@ -106,10 +106,10 @@ export const PMMDump = () => {
       },
       {
         content: (
-          <HorizontalGroup spacing="sm">
+          <Stack direction="row" gap={0.5}>
             <Icon name="eye" />
             <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.viewLogs}</span>
-          </HorizontalGroup>
+          </Stack>
         ),
         action: () => {
           onLogClick(row.original);
@@ -117,10 +117,10 @@ export const PMMDump = () => {
       },
       {
         content: (
-          <HorizontalGroup spacing="sm">
+          <Stack direction="row" gap={0.5}>
             <Icon name="trash-alt" />
             <span className={styles.actionItemTxtSpan}>{Messages.dumps.actions.delete}</span>
-          </HorizontalGroup>
+          </Stack>
         ),
         action: () => {
           onDelete(row.original);

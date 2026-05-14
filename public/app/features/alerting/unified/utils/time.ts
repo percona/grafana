@@ -1,7 +1,6 @@
 import { ValidationRule } from 'react-hook-form';
 
-import { durationToMilliseconds, parseDuration } from '@grafana/data';
-import { describeInterval } from '@grafana/data/src/datetime/rangeutil';
+import { durationToMilliseconds, parseDuration, rangeUtil } from '@grafana/data';
 
 import { TimeOptions } from '../types/time';
 
@@ -21,7 +20,7 @@ export function parseInterval(value: string): [number, string] {
 }
 
 export function intervalToSeconds(interval: string): number {
-  const { sec, count } = describeInterval(interval);
+  const { sec, count } = rangeUtil.describeInterval(interval);
   return sec * count;
 }
 
@@ -137,6 +136,13 @@ export function formatPrometheusDuration(milliseconds: number): string {
   );
 }
 
+/**
+ * Parses a Prometheus duration string and returns the duration in milliseconds.
+ * If the duration is invalid, it returns 0.
+ *
+ * @param duration - The Prometheus duration string to parse.
+ * @returns The duration in milliseconds.
+ */
 export const safeParsePrometheusDuration = (duration: string): number => {
   try {
     return parsePrometheusDuration(duration);

@@ -21,12 +21,12 @@ export interface TemplatedAlertFormValues {
 }
 
 declare module 'react-table' {
-  interface Row {
+  export interface Row<D extends object = {}> {
     isExpanded: boolean;
-    getToggleRowExpandedProps?: () => void;
+    getToggleRowExpandedProps: (...args: unknown[]) => Record<string, unknown>;
   }
 
-  interface HeaderGroup {
+  export interface HeaderGroup<D extends object = {}> {
     className?: string;
     style?: CSSProperties;
   }

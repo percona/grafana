@@ -3,7 +3,8 @@ import { FC } from 'react';
 import { config } from '@grafana/runtime';
 import { useStyles } from '@grafana/ui';
 import { getPerconaUser } from 'app/percona/shared/core/selectors';
-import { OrgRole, useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
+import { OrgRole } from '@grafana/data';
 
 import { PermissionLoader } from '../PermissionLoader';
 

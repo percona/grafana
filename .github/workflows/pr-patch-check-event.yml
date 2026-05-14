@@ -1,14 +1,7 @@
 name: Dispatch check for patch conflicts
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-    branches:
-      - "main"
-      - "release-*"
-
+  # @PERCONA - disable workflow
+  workflow_dispatch:
 permissions:
   id-token: write
   contents: read

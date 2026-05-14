@@ -10,37 +10,77 @@ import (
 	"github.com/grafana/grafana/pkg/services/ngalert/models"
 )
 
+// We only care about the data source UIDs.
+type compactQuery struct {
+	DatasourceUID string `json:"datasourceUid"`
+}
+
+// AlertRuleConvertOptions controls which fields to parse during conversion from alertRule to models.AlertRule.
+// By default all fields are included. Set Exclude* to true to skip parsing expensive fields.
+type AlertRuleConvertOptions struct {
+	ExcludeAlertQueries        bool // Only parse datasource UIDs from queries
+	ExcludeContactPointRouting bool
+	ExcludeMetadata            bool
+}
+
 func alertRuleToModelsAlertRule(ar alertRule, l log.Logger) (models.AlertRule, error) {
+	return convertAlertRuleToModel(ar, l, AlertRuleConvertOptions{})
+}
+
+// convertAlertRuleToModel creates a models.AlertRule from an alertRule.
+// opts.Exclude* fields control which expensive fields to skip parsing, reducing JSON serializations.
+func convertAlertRuleToModel(ar alertRule, l log.Logger, opts AlertRuleConvertOptions) (models.AlertRule, error) {
 	var data []models.AlertQuery
-	err := json.Unmarshal([]byte(ar.Data), &data)
-	if err != nil {
-		return models.AlertRule{}, fmt.Errorf("failed to parse data: %w", err)
+	if opts.ExcludeAlertQueries {
+		var cqs []compactQuery
+		if err := json.Unmarshal([]byte(ar.Data), &cqs); err != nil {
+			return models.AlertRule{}, fmt.Errorf("failed to parse data: %w", err)
+		}
+		for _, cq := range cqs {
+			data = append(data, models.AlertQuery{DatasourceUID: cq.DatasourceUID})
+		}
+	} else {
+		if err := json.Unmarshal([]byte(ar.Data), &data); err != nil {
+			return models.AlertRule{}, fmt.Errorf("failed to parse data: %w", err)
+		}
 	}
 
 	result := models.AlertRule{
-		ID:              ar.ID,
-		OrgID:           ar.OrgID,
-		GUID:            ar.GUID,
-		Title:           ar.Title,
-		Condition:       ar.Condition,
-		Data:            data,
-		Updated:         ar.Updated,
-		IntervalSeconds: ar.IntervalSeconds,
-		Version:         ar.Version,
-		UID:             ar.UID,
-		NamespaceUID:    ar.NamespaceUID,
-		DashboardUID:    ar.DashboardUID,
-		PanelID:         ar.PanelID,
-		RuleGroup:       ar.RuleGroup,
-		RuleGroupIndex:  ar.RuleGroupIndex,
-		For:             ar.For,
-		IsPaused:        ar.IsPaused,
+		ID:                          ar.ID,
+		OrgID:                       ar.OrgID,
+		GUID:                        ar.GUID,
+		Title:                       ar.Title,
+		Condition:                   ar.Condition,
+		Data:                        data,
+		Updated:                     ar.Updated,
+		IntervalSeconds:             ar.IntervalSeconds,
+		Version:                     ar.Version,
+		UID:                         ar.UID,
+		NamespaceUID:                ar.NamespaceUID,
+		DashboardUID:                ar.DashboardUID,
+		PanelID:                     ar.PanelID,
+		RuleGroupIndex:              ar.RuleGroupIndex,
+		For:                         ar.For,
+		KeepFiringFor:               ar.KeepFiringFor,
+		IsPaused:                    ar.IsPaused,
+		MissingSeriesEvalsToResolve: ar.MissingSeriesEvalsToResolve,
+	}
+
+	if ar.RuleGroup == "" {
+		noGroupRuleGroup, err := models.NewNoGroupRuleGroup(ar.UID)
+		if err != nil {
+			return models.AlertRule{}, fmt.Errorf("failed to create no group rule group: %w", err)
+		}
+		result.RuleGroup = noGroupRuleGroup.String()
+	} else {
+		result.RuleGroup = ar.RuleGroup
 	}
 
 	if ar.UpdatedBy != nil {
 		result.UpdatedBy = util.Pointer(models.UserUID(*ar.UpdatedBy))
 	}
 
+	var err error
 	if ar.NoDataState != "" {
 		result.NoDataState, err = models.NoDataStateFromString(ar.NoDataState)
 		if err != nil {
@@ -79,15 +119,17 @@ func alertRuleToModelsAlertRule(ar alertRule, l log.Logger) (models.AlertRule, e
 		}
 	}
 
-	if ar.NotificationSettings != "" {
+	if !opts.ExcludeContactPointRouting && ar.NotificationSettings != "" {
 		ns, err := parseNotificationSettings(ar.NotificationSettings)
 		if err != nil {
 			return models.AlertRule{}, fmt.Errorf("failed to parse notification settings: %w", err)
 		}
-		result.NotificationSettings = ns
+		if ns != nil {
+			result.NotificationSettings = util.Pointer(models.NotificationSettingsFromContact(*ns))
+		}
 	}
 
-	if ar.Metadata != "" {
+	if !opts.ExcludeMetadata && ar.Metadata != "" {
 		err = json.Unmarshal([]byte(ar.Metadata), &result.Metadata)
 		if err != nil {
 			return models.AlertRule{}, fmt.Errorf("failed to metadata: %w", err)
@@ -97,34 +139,46 @@ func alertRuleToModelsAlertRule(ar alertRule, l log.Logger) (models.AlertRule, e
 	return result, nil
 }
 
-func parseNotificationSettings(s string) ([]models.NotificationSettings, error) {
-	var result []models.NotificationSettings
+func parseNotificationSettings(s string) (*models.ContactPointRouting, error) {
+	var result []models.ContactPointRouting
 	if err := json.Unmarshal([]byte(s), &result); err != nil {
 		return nil, err
 	}
-	return result, nil
+
+	if len(result) == 0 {
+		return nil, nil
+	}
+
+	return &result[0], nil
 }
 
 func alertRuleFromModelsAlertRule(ar models.AlertRule) (alertRule, error) {
 	result := alertRule{
-		ID:              ar.ID,
-		GUID:            ar.GUID,
-		OrgID:           ar.OrgID,
-		Title:           ar.Title,
-		Condition:       ar.Condition,
-		Updated:         ar.Updated,
-		IntervalSeconds: ar.IntervalSeconds,
-		Version:         ar.Version,
-		UID:             ar.UID,
-		NamespaceUID:    ar.NamespaceUID,
-		DashboardUID:    ar.DashboardUID,
-		PanelID:         ar.PanelID,
-		RuleGroup:       ar.RuleGroup,
-		RuleGroupIndex:  ar.RuleGroupIndex,
-		NoDataState:     ar.NoDataState.String(),
-		ExecErrState:    ar.ExecErrState.String(),
-		For:             ar.For,
-		IsPaused:        ar.IsPaused,
+		ID:                          ar.ID,
+		GUID:                        ar.GUID,
+		OrgID:                       ar.OrgID,
+		Title:                       ar.Title,
+		Condition:                   ar.Condition,
+		Updated:                     ar.Updated,
+		IntervalSeconds:             ar.IntervalSeconds,
+		Version:                     ar.Version,
+		UID:                         ar.UID,
+		NamespaceUID:                ar.NamespaceUID,
+		DashboardUID:                ar.DashboardUID,
+		PanelID:                     ar.PanelID,
+		RuleGroupIndex:              ar.RuleGroupIndex,
+		NoDataState:                 ar.NoDataState.String(),
+		ExecErrState:                ar.ExecErrState.String(),
+		For:                         ar.For,
+		KeepFiringFor:               ar.KeepFiringFor,
+		IsPaused:                    ar.IsPaused,
+		MissingSeriesEvalsToResolve: ar.MissingSeriesEvalsToResolve,
+	}
+
+	if models.IsNoGroupRuleGroup(ar.RuleGroup) {
+		result.RuleGroup = ""
+	} else {
+		result.RuleGroup = ar.RuleGroup
 	}
 
 	if ar.UpdatedBy != nil {
@@ -162,8 +216,9 @@ func alertRuleFromModelsAlertRule(ar models.AlertRule) (alertRule, error) {
 		result.Labels = string(labelsData)
 	}
 
-	if len(ar.NotificationSettings) > 0 {
-		notificationSettingsData, err := json.Marshal(ar.NotificationSettings)
+	if cpr := ar.ContactPointRouting(); cpr != nil {
+		// We store as a slice for legacy backwards compatibility reasons. This can be simplified with a db migration.
+		notificationSettingsData, err := json.Marshal([]models.ContactPointRouting{*cpr})
 		if err != nil {
 			return alertRule{}, fmt.Errorf("failed to marshal notification settings: %w", err)
 		}
@@ -181,30 +236,33 @@ func alertRuleFromModelsAlertRule(ar models.AlertRule) (alertRule, error) {
 
 func alertRuleToAlertRuleVersion(rule alertRule) alertRuleVersion {
 	return alertRuleVersion{
-		RuleOrgID:            rule.OrgID,
-		RuleGUID:             rule.GUID,
-		RuleUID:              rule.UID,
-		RuleNamespaceUID:     rule.NamespaceUID,
-		RuleGroup:            rule.RuleGroup,
-		RuleGroupIndex:       rule.RuleGroupIndex,
-		ParentVersion:        0,
-		RestoredFrom:         0,
-		Version:              rule.Version,
-		Created:              rule.Updated, // assuming the Updated time as the creation time
-		CreatedBy:            rule.UpdatedBy,
-		Title:                rule.Title,
-		Condition:            rule.Condition,
-		Data:                 rule.Data,
-		IntervalSeconds:      rule.IntervalSeconds,
-		Record:               rule.Record,
-		NoDataState:          rule.NoDataState,
-		ExecErrState:         rule.ExecErrState,
-		For:                  rule.For,
-		Annotations:          rule.Annotations,
-		Labels:               rule.Labels,
-		IsPaused:             rule.IsPaused,
-		NotificationSettings: rule.NotificationSettings,
-		Metadata:             rule.Metadata,
+		RuleOrgID:                   rule.OrgID,
+		RuleGUID:                    rule.GUID,
+		RuleUID:                     rule.UID,
+		RuleNamespaceUID:            rule.NamespaceUID,
+		RuleGroup:                   rule.RuleGroup,
+		RuleGroupIndex:              rule.RuleGroupIndex,
+		ParentVersion:               0,
+		RestoredFrom:                0,
+		Version:                     rule.Version,
+		Created:                     rule.Updated, // assuming the Updated time as the creation time
+		CreatedBy:                   rule.UpdatedBy,
+		Message:                     "", // Message is set by caller when creating versions
+		Title:                       rule.Title,
+		Condition:                   rule.Condition,
+		Data:                        rule.Data,
+		IntervalSeconds:             rule.IntervalSeconds,
+		Record:                      rule.Record,
+		NoDataState:                 rule.NoDataState,
+		ExecErrState:                rule.ExecErrState,
+		For:                         rule.For,
+		KeepFiringFor:               rule.KeepFiringFor,
+		Annotations:                 rule.Annotations,
+		Labels:                      rule.Labels,
+		IsPaused:                    rule.IsPaused,
+		NotificationSettings:        rule.NotificationSettings,
+		Metadata:                    rule.Metadata,
+		MissingSeriesEvalsToResolve: rule.MissingSeriesEvalsToResolve,
 	}
 }
 
@@ -224,18 +282,32 @@ func alertRuleVersionToAlertRule(version alertRuleVersion) alertRule {
 		NamespaceUID:    version.RuleNamespaceUID,
 		// Versions do not store Dashboard\Panel as separate column.
 		// However, these fields are part of annotations and information in these fields is redundant
-		DashboardUID:         nil,
-		PanelID:              nil,
-		RuleGroup:            version.RuleGroup,
-		RuleGroupIndex:       version.RuleGroupIndex,
-		Record:               version.Record,
-		NoDataState:          version.NoDataState,
-		ExecErrState:         version.ExecErrState,
-		For:                  version.For,
-		Annotations:          version.Annotations,
-		Labels:               version.Labels,
-		IsPaused:             version.IsPaused,
-		NotificationSettings: version.NotificationSettings,
-		Metadata:             version.Metadata,
+		DashboardUID:                nil,
+		PanelID:                     nil,
+		RuleGroup:                   version.RuleGroup,
+		RuleGroupIndex:              version.RuleGroupIndex,
+		Record:                      version.Record,
+		NoDataState:                 version.NoDataState,
+		ExecErrState:                version.ExecErrState,
+		For:                         version.For,
+		KeepFiringFor:               version.KeepFiringFor,
+		Annotations:                 version.Annotations,
+		Labels:                      version.Labels,
+		IsPaused:                    version.IsPaused,
+		NotificationSettings:        version.NotificationSettings,
+		Metadata:                    version.Metadata,
+		MissingSeriesEvalsToResolve: version.MissingSeriesEvalsToResolve,
 	}
+}
+
+func alertRuleVersionToModelsAlertRuleVersion(version alertRuleVersion, l log.Logger) (models.AlertRuleVersion, error) {
+	result, err := alertRuleToModelsAlertRule(alertRuleVersionToAlertRule(version), l)
+	if err != nil {
+		return models.AlertRuleVersion{}, err
+	}
+
+	return models.AlertRuleVersion{
+		AlertRule: result,
+		Message:   version.Message,
+	}, nil
 }

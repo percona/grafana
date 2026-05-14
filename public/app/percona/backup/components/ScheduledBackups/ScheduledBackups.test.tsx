@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom-v5-compat';
 
 import { wrapWithGrafanaContextMock } from 'app/percona/shared/helpers/testUtils';
 import { configureStore } from 'app/store/configureStore';
-import { StoreState } from 'app/types';
+import { StoreState } from 'app/types/store';
 
 import { ScheduledBackups } from './ScheduledBackups';
 
@@ -29,7 +29,9 @@ describe('ScheduledBackups', () => {
           },
         } as StoreState)}
       >
-        <MemoryRouter>{wrapWithGrafanaContextMock(<ScheduledBackups />)}</MemoryRouter>
+        <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {wrapWithGrafanaContextMock(<ScheduledBackups />)}
+        </MemoryRouter>
       </Provider>
     );
     await screen.findByText('Backup 1');

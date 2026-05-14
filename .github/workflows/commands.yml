@@ -4,11 +4,8 @@ name: Run commands when issues are labeled or comments added
 # to issues. If you want to change the triggers for this workflow,
 # please review if the permissions are still sufficient.
 on:
-  issues:
-    types: [labeled, unlabeled]
-  issue_comment:
-    types: [created]
-
+  # @PERCONA - disable workflow
+  workflow_dispatch:
 concurrency:
   group: issue-commands-${{ github.event.issue.number }}
 
@@ -53,7 +50,7 @@ jobs:
           private-key: ${{ env.GITHUB_APP_PRIVATE_KEY }}
 
       - name: Checkout Actions
-        uses: actions/checkout@v4 # v4.2.2
+        uses: actions/checkout@v5
         with:
           repository: "grafana/grafana-github-actions"
           path: ./actions

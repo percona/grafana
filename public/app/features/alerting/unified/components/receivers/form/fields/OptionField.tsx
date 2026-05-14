@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { Controller, DeepMap, FieldError, useFormContext } from 'react-hook-form';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { t } from '@grafana/i18n';
 import {
   Checkbox,
   Field,
@@ -17,8 +18,11 @@ import {
   Tooltip,
   useStyles2,
 } from '@grafana/ui';
-import { t } from 'app/core/internationalization';
-import { NotificationChannelOption, NotificationChannelSecureFields, OptionMeta } from 'app/types';
+import {
+  NotificationChannelOption,
+  NotificationChannelSecureFields,
+  OptionMeta,
+} from 'app/features/alerting/unified/types/alerting';
 
 import { KeyValueMapInput } from './KeyValueMapInput';
 import { StringArrayInput } from './StringArrayInput';
@@ -144,31 +148,7 @@ const OptionInput: FC<Props & { id: string }> = ({
 
   const name = `${pathPrefix}${option.propertyName}`;
 
-  // For nested secure fields, construct the full path relative to settings
-  // e.g., if pathPrefix is "items.0.settings.sigv4." and propertyName is "access_key"
-  // we need to look for "sigv4.access_key" in secureFields
-  const getSecureFieldLookupKey = (): string => {
-    if (!option.secure) {
-      return '';
-    }
-
-    // Use secureFieldKey if explicitly set (from mockGrafanaNotifiers)
-    if (option.secureFieldKey) {
-      return option.secureFieldKey;
-    }
-
-    // Extract the path after "settings." to build the lookup key for nested fields
-    const settingsMatch = pathPrefix.match(/settings\.(.+)$/);
-    if (settingsMatch) {
-      const nestedPath = settingsMatch[1];
-      return `${nestedPath}${option.propertyName}`;
-    }
-
-    // Default to just the property name for non-nested fields
-    return option.propertyName;
-  };
-
-  const secureFieldKey = getSecureFieldLookupKey();
+  const secureFieldKey = option.secure && option.secureFieldKey ? option.secureFieldKey : '';
   const isEncryptedInput = secureFieldKey && secureFields?.[secureFieldKey];
 
   const useTemplates = option.placeholder.includes('{{ template');

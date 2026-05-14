@@ -17,7 +17,6 @@ export enum PluginType {
   datasource = 'datasource',
   app = 'app',
   renderer = 'renderer',
-  secretsmanager = 'secretsmanager',
 }
 
 /** Describes status of {@link https://grafana.com/docs/grafana/latest/plugins/plugin-signatures/ | plugin signature} */
@@ -54,6 +53,7 @@ export interface PluginError {
   pluginType?: PluginType;
 }
 
+/** @deprecated it will be removed in a future release */
 export interface AngularMeta {
   detected: boolean;
   hideDeprecation: boolean;
@@ -101,6 +101,9 @@ export interface PluginMeta<T extends KeyValue = {}> {
   loadingStrategy?: PluginLoadingStrategy;
   extensions?: PluginExtensions;
   moduleHash?: string;
+
+  // Paths to the translations for the plugin
+  translations?: Record<string, string>;
 }
 
 interface PluginDependencyInfo {
@@ -214,6 +217,7 @@ export interface PluginMetaInfo {
   screenshots: ScreenshotInfo[];
   updated: string;
   version: string;
+  keywords?: string[] | null;
 }
 
 export interface PluginConfigPageProps<T extends PluginMeta> {
@@ -237,6 +241,7 @@ export class GrafanaPlugin<T extends PluginMeta = PluginMeta> {
   loadError?: boolean;
 
   // Config control (app/datasource)
+  /** @deprecated it will be removed in a future release */
   angularConfigCtrl?: any;
 
   // Show configuration tabs on the plugin page

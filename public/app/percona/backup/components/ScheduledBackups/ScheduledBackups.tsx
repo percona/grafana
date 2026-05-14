@@ -19,7 +19,7 @@ import { getBackupLocations, getPerconaSettingFlag } from 'app/percona/shared/co
 import { isApiCancelError } from 'app/percona/shared/helpers/api';
 import { logger } from 'app/percona/shared/helpers/logger';
 import { useAppDispatch } from 'app/store/store';
-import { useSelector } from 'app/types';
+import { useSelector } from 'app/types/store';
 
 import { Messages } from '../../Backup.messages';
 import { BackupService } from '../../Backup.service';

@@ -203,6 +203,28 @@ func addCloudMigrationsMigrations(mg *Migrator) {
 		Cols: []string{"snapshot_uid", "resource_type", "partition_number"}, Type: UniqueIndex,
 	}
 	mg.AddMigration("add cloud_migration_snapshot_partition srp_unique index", NewAddIndexMigration(migrationSnapshotPartitionTable, &srpUniqueIndex))
+	mg.AddMigration("add resource_storage_type column to cloud_migration_snapshot table", NewAddColumnMigration(migrationSnapshotTable, &Column{
+		Name:     "resource_storage_type",
+		Type:     DB_Varchar,
+		Length:   255,
+		Nullable: true,
+	}))
+	mg.AddMigration("add encryption_algo column to cloud_migration_snapshot table", NewAddColumnMigration(migrationSnapshotTable, &Column{
+		Name:     "encryption_algo",
+		Type:     DB_Varchar,
+		Length:   255,
+		Nullable: true,
+	}))
+	mg.AddMigration("add metadata column to cloud_migration_snapshot table", NewAddColumnMigration(migrationSnapshotTable, &Column{
+		Name:     "metadata",
+		Type:     DB_Blob,
+		Nullable: true,
+	}))
+	mg.AddMigration("add public_key column to cloud_migration_snapshot table", NewAddColumnMigration(migrationSnapshotTable, &Column{
+		Name:     "public_key",
+		Type:     DB_Blob,
+		Nullable: true,
+	}))
 
 	updatedCloudMigrationSnapshotPartitionTable := Table{
 		Name: "cloud_migration_snapshot_partition",
